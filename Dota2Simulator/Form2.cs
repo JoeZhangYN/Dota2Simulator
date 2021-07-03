@@ -1072,20 +1072,20 @@ namespace Dota2Simulator
         {
             var time = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds();
 
-            var q_down = 0;
+            var r_down = 0;
 
-            while (q_down == 0)
+            while (r_down == 0)
             {
-                if (RegPicture(Resource_Picture.露娜_释放月蚀, "Q"))
+                if (RegPicture(Resource_Picture.露娜_释放月蚀, "R"))
                 {
                     Thread.Sleep(50);
                     切敏捷腿();
                     KeyPress((uint)Keys.A);
 
-                    q_down = 1;
+                    r_down = 1;
                 }
 
-                if (new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds() - time > 600) break;
+                if (new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds() - time > 700) break;
             }
         }
 

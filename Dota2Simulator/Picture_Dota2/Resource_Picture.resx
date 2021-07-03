@@ -127,11 +127,17 @@
   <data name="_6格A杖效果" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>6格a杖效果.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="关释放" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>关释放.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
   <data name="军团_头像" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>军团_头像.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="军团图标" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>军团图标.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
   <data name="决斗CD" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>决斗CD.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+    <value>决斗cd.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="刃甲" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>刃甲.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
@@ -217,6 +223,9 @@
   <data name="拍拍_释放超强力量" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>拍拍_释放超强力量.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="敌人血条" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>敌人血条.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
   <data name="敌法_信仰之源闪烁_4" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>敌法_信仰之源闪烁_4.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
@@ -272,22 +281,22 @@
     <value>滚标志.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="火女QCD" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>火女QCD.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+    <value>火女qcd.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="火女QCD结束" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>火女QCD结束.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+    <value>火女qcd结束.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="火女WCD" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>火女WCD.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+    <value>火女wcd.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="火女WCD结束" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>火女WCD结束.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+    <value>火女wcd结束.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="火女大CD" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>火女大CD.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+    <value>火女大cd.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="火女大CD结束" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>火女大CD结束.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+    <value>火女大cd结束.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="炎阳" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>炎阳.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
@@ -349,6 +358,9 @@
   <data name="释放完震撼大地" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>释放完震撼大地.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="释放弧形闪电" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>释放弧形闪电.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
   <data name="释放弱化能流" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>释放弱化能流.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
@@ -372,6 +384,15 @@
   </data>
   <data name="释放隔空取物" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>释放隔空取物.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="释放雷云后弧形闪电" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>释放雷云后弧形闪电.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="释放雷云后雷击" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>释放雷云后雷击.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="释放雷击" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>释放雷击.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="钢背_针刺CD" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>钢背_针刺cd.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
