@@ -202,6 +202,30 @@ namespace Dota2Simulator
 
             #region 敏捷
 
+            #region 露娜
+
+            if (tb_name.Text == "露娜")
+            {
+                if (e.KeyValue == (uint)Keys.Q)
+                {
+                    label1.Text = "Q";
+
+                    切智力腿();
+
+                    Task.Run(月光后敏捷平A);
+                }
+                else if (e.KeyValue == (uint)Keys.R)
+                {
+                    label1.Text = "R";
+
+                    切智力腿();
+
+                    Task.Run(月蚀后敏捷平A);
+                }
+            }
+
+            #endregion
+
             #region 影魔
 
             if (tb_name.Text == "影魔")
@@ -1020,6 +1044,52 @@ namespace Dota2Simulator
         #endregion
 
         #region 敏捷
+
+        #region 露娜
+
+        private void 月光后敏捷平A()
+        {
+            var time = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds();
+            
+            var q_down = 0;
+
+            while (q_down == 0)
+            {
+                if (RegPicture(Resource_Picture.露娜_释放月光, "Q"))
+                {
+                    Thread.Sleep(50);
+                    切敏捷腿();
+                    KeyPress((uint)Keys.A);
+
+                    q_down = 1;
+                }
+
+                if (new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds() - time > 600) break;
+            }
+        }
+
+        private void 月蚀后敏捷平A()
+        {
+            var time = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds();
+
+            var q_down = 0;
+
+            while (q_down == 0)
+            {
+                if (RegPicture(Resource_Picture.露娜_释放月蚀, "Q"))
+                {
+                    Thread.Sleep(50);
+                    切敏捷腿();
+                    KeyPress((uint)Keys.A);
+
+                    q_down = 1;
+                }
+
+                if (new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds() - time > 600) break;
+            }
+        }
+
+        #endregion
 
         #region 影魔
 
