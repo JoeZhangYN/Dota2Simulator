@@ -63,36 +63,6 @@ namespace Dota2Simulator.Picture_Dota2 {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap _4格A杖效果 {
-            get {
-                object obj = ResourceManager.GetObject("_4格A杖效果", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap _5格A杖效果 {
-            get {
-                object obj = ResourceManager.GetObject("_5格A杖效果", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap _6格A杖效果 {
-            get {
-                object obj = ResourceManager.GetObject("_6格A杖效果", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
         internal static System.Drawing.Bitmap 关释放 {
             get {
                 object obj = ResourceManager.GetObject("关释放", resourceCulture);
@@ -573,6 +543,56 @@ namespace Dota2Simulator.Picture_Dota2 {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap 暗影萨满_妖术CD {
+            get {
+                object obj = ResourceManager.GetObject("暗影萨满_妖术CD", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap 暗影萨满_捆绑施法中 {
+            get {
+                object obj = ResourceManager.GetObject("暗影萨满_捆绑施法中", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap 暗影萨满_释放群蛇守卫 {
+            get {
+                object obj = ResourceManager.GetObject("暗影萨满_释放群蛇守卫", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap 暗影萨满_释放苍穹振击 {
+            get {
+                object obj = ResourceManager.GetObject("暗影萨满_释放苍穹振击", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap 永恒遗物_4 {
+            get {
+                object obj = ResourceManager.GetObject("永恒遗物_4", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap 海民_头像 {
             get {
                 object obj = ResourceManager.GetObject("海民_头像", resourceCulture);
@@ -706,6 +726,16 @@ namespace Dota2Simulator.Picture_Dota2 {
         internal static System.Drawing.Bitmap 相位 {
             get {
                 object obj = ResourceManager.GetObject("相位", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap 祭礼长袍_4 {
+            get {
+                object obj = ResourceManager.GetObject("祭礼长袍_4", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

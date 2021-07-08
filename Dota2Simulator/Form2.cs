@@ -320,9 +320,10 @@ namespace Dota2Simulator
                     label1.Text = "Z";
 
                     if (RegPicture(Resource_Picture.魂戒CD, "Z"))
+                    {
                         切力量腿();
-
-                    Task.Run(魂戒敏捷);
+                        Task.Run(魂戒智力);
+                    }
                 }
             }
 
@@ -607,6 +608,42 @@ namespace Dota2Simulator
 
             #endregion
 
+            #region 暗影萨满
+
+            else if (tb_name.Text.Trim() == "暗影萨满")
+            {
+                if (e.KeyValue == (uint)Keys.Q)
+                {
+                    label1.Text = "Q";
+
+                    Task.Run(苍穹振击取消后摇);
+                }
+                else if (e.KeyValue == (uint)Keys.W)
+                {
+                    label1.Text = "W";
+
+                    Task.Run(变羊取消后摇);
+                }
+                else if (e.KeyValue == (uint)Keys.R)
+                {
+                    label1.Text = "R";
+
+                    Task.Run(释放群蛇守卫取消后摇);
+                }
+                else if (e.KeyValue == (uint)Keys.D)
+                {
+                    label1.Text = "D";
+
+                    Task.Run(暗夜萨满最大化控制链);
+                }
+                else if (e.KeyValue == (uint)Keys.S)
+                {
+                    loop_bool_2 = false;
+                }
+            }
+
+            #endregion
+
             #endregion
 
 
@@ -734,9 +771,6 @@ namespace Dota2Simulator
 
         private void 决斗()
         {
-            // 攻速
-            var IAS = Convert.ToDouble(tb_IAS.Text) / 100;
-
             var p = 正面跳刀_无转身();
 
             if (RegPicture(Resource_Picture.魂戒CD, "Z"))
@@ -763,7 +797,6 @@ namespace Dota2Simulator
                     {
                         Thread.Sleep(95);
                         wDown = 1;
-                        IAS += 1.4;
                     }
             }
 
@@ -800,17 +833,6 @@ namespace Dota2Simulator
             Thread.Sleep(5);
 
             MouseMove(point.X, point.Y, false);
-
-
-            if (wDown == 2)
-            {
-                KeyPress((uint)Keys.A);
-                Thread.Sleep(30);
-
-                Thread.Sleep(30);
-                // 等待攻击结束
-                Thread.Sleep(Convert.ToInt16(460 / IAS));
-            }
 
             var time = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds();
 
@@ -1057,15 +1079,26 @@ namespace Dota2Simulator
             {
                 if (RegPicture(Resource_Picture.露娜_释放月光, "Q"))
                 {
-                    Thread.Sleep(50);
+                    Thread.Sleep(100);
                     切敏捷腿();
                     KeyPress((uint)Keys.A);
 
                     q_down = 1;
+
+                    Task.Run(() =>
+                    {
+                        Thread.Sleep(200);
+                        切敏捷腿();
+                    });
                 }
 
-                if (new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds() - time > 600) break;
+                if (new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds() - time > 1100)
+                {
+                    切敏捷腿();
+                    break;
+                }
             }
+                       
         }
 
         private void 月蚀后敏捷平A()
@@ -1078,14 +1111,24 @@ namespace Dota2Simulator
             {
                 if (RegPicture(Resource_Picture.露娜_释放月蚀, "R"))
                 {
-                    Thread.Sleep(50);
+                    Thread.Sleep(100);
                     切敏捷腿();
                     KeyPress((uint)Keys.A);
 
                     r_down = 1;
+
+                    Task.Run(() =>
+                    {
+                        Thread.Sleep(200);
+                        切敏捷腿();
+                    });
                 }
 
-                if (new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds() - time > 700) break;
+                if (new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds() - time > 1100)
+                {
+                    切敏捷腿();
+                    break;
+                }
             }
         }
 
@@ -1196,11 +1239,11 @@ namespace Dota2Simulator
             切敏捷腿();
         }
 
-        private void 魂戒敏捷()
+        private void 魂戒智力()
         {
-            Thread.Sleep(80);
+            Thread.Sleep(100);
 
-            切敏捷腿();
+            切智力腿();
         }
 
         #endregion
@@ -1505,6 +1548,11 @@ namespace Dota2Simulator
 
         private void G_yxc(int dyd, int yd, int dd)
         {
+            if (RegPicture(Resource_Picture.纷争, "C"))
+            {
+                KeyPress((uint)Keys.C);
+            }
+
             KeyPress((uint)Keys.W);
 
             var w_down = 0;
@@ -1515,20 +1563,21 @@ namespace Dota2Simulator
             {
                 if (new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds() - time > 6000) break;
 
-                if (!RegPicture(Resource_Picture.黑鸟_关释放, "W")) continue;
+                if (RegPicture(Resource_Picture.黑鸟_关释放, "W"))
+                {
+                    w_down = 1;
+                    Thread.Sleep(dyd);
+                    RightClick();
 
-                w_down = 1;
-                Thread.Sleep(dyd);
-                RightClick();
+                    Thread.Sleep(yd);
+                    if (b_cancel) break;
 
-                Thread.Sleep(yd);
-                if (b_cancel) break;
+                    KeyPress((uint)Keys.S);
 
-                KeyPress((uint)Keys.S);
-
-                Thread.Sleep(dd);
-                if (b_cancel) break;
-                KeyPress((uint)Keys.Space);
+                    Thread.Sleep(dd);
+                    if (b_cancel) break;
+                    KeyPress((uint)Keys.Space);
+                }
             }
         }
 
@@ -1690,15 +1739,6 @@ namespace Dota2Simulator
             }
         }
 
-        //private void 平A接滚()
-        //{
-        //    KeyPress((uint)Keys.A);
-
-        //    Thread.Sleep(Convert.ToInt16(tb_IAS.Text));
-
-        //    KeyPress((uint)Keys.R);
-        //}
-
         #endregion
 
         #region 宙斯
@@ -1842,11 +1882,143 @@ namespace Dota2Simulator
 
         #endregion
 
+        #region 暗影萨满
+
+        private void 苍穹振击取消后摇()
+        {
+            var time = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds();
+
+            var q_down = 0;
+
+            while (q_down == 0)
+            {
+                if (RegPicture(Resource_Picture.暗影萨满_释放苍穹振击, "Q"))
+                {
+                    Thread.Sleep(110);
+                    q_down = 1;
+                    KeyPress((uint)Keys.A);
+                }
+
+                if (new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds() - time > 700) break;
+            }
+        }
+
+        private void 释放群蛇守卫取消后摇()
+        {
+            var time = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds();
+
+            var q_down = 0;
+
+            while (q_down == 0)
+            {
+                if (RegPicture(Resource_Picture.暗影萨满_释放群蛇守卫, "R"))
+                {
+                    Thread.Sleep(110);
+                    q_down = 1;
+                    KeyPress((uint)Keys.A);
+                }
+
+                if (new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds() - time > 700) break;
+            }
+        }
+
+        private void 变羊取消后摇()
+        {
+            var time = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds();
+
+            var w_down = 0;
+
+            if (RegPicture(Resource_Picture.暗影萨满_捆绑施法中, 767, 726, 85, 85).Count > 0)
+            {
+                return;
+            }
+
+            while (w_down == 0)
+            {
+                if (!RegPicture(Resource_Picture.暗影萨满_妖术CD, "W"))
+                {
+                    label1.Text = "WW";
+                    w_down = 1;
+                    KeyPress((uint)Keys.A);
+                }
+
+                if (new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds() - time > 700) break;
+            }
+        }
+
+        private void 暗夜萨满最大化控制链()
+        {
+            var times = 1.0;
+            var time = 0;
+
+            if (RegPicture(Resource_Picture.祭礼长袍_4, "G"))
+            {
+                times *= 1.1;
+            }
+
+            if (RegPicture(Resource_Picture.永恒遗物_4, "G"))
+            {
+                times *= 1.25;
+            }
+
+            times *= ((100 - (Convert.ToDouble(tb_状态抗性.Text))) / 100);
+
+            Color 技能点颜色 = Color.FromArgb(255, 203, 183, 124);
+
+            if (CaptureColor(909, 1008).Equals(技能点颜色))
+            {
+                time = 3500;
+            }
+            else if (CaptureColor(897, 1008).Equals(技能点颜色))
+            {
+                time = 2750;
+            }
+            else if (CaptureColor(885, 1008).Equals(技能点颜色))
+            {
+                time = 2000;
+            }
+            else if (CaptureColor(875, 1008).Equals(技能点颜色))
+            {
+                time = 1250;
+            }
+
+            KeyPress((uint)Keys.W);
+
+            loop_bool_2 = true;
+
+            Task.Run(() => 
+            {
+                var time1 = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds();
+
+                var w_down = 0;
+
+                while (w_down == 0)
+                {
+                    if (!RegPicture(Resource_Picture.暗影萨满_妖术CD, "W")) w_down = 1;
+
+                    if (!loop_bool_2) return;
+
+                    if (new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds() - time1 > 1200) break;
+                }
+
+                Thread.Sleep(Convert.ToInt32(time * times) - 380);
+
+                if (!loop_bool_2) return;
+
+                KeyPress((uint)Keys.E);
+            });
+        }
+
+
+        #endregion
+
         #endregion
 
 
 
         #region 通用
+
+        #region 跳刀
 
         /// <summary>
         ///     用于快速先手无转身
@@ -1898,6 +2070,10 @@ namespace Dota2Simulator
             return new Point(Convert.ToInt16(move_X), Convert.ToInt16(move_Y));
         }
 
+        #endregion
+
+        #region 扔装备
+
         private void 扔装备()
         {
             var p = MousePosition;
@@ -1911,6 +2087,10 @@ namespace Dota2Simulator
                 MouseMove(p.X, p.Y, false);
             }
         }
+
+        #endregion
+
+        #region 切假腿
 
         private static void 切智力腿()
         {
@@ -1954,6 +2134,8 @@ namespace Dota2Simulator
             }
         }
 
+        #endregion
+
         private void 切臂章()
         {
             KeyPress((uint)Keys.Z);
@@ -1969,10 +2151,33 @@ namespace Dota2Simulator
         //    KeyPress((uint)Keys.F1);
         //}
 
+        #region buff或者装备
+
         private static bool 智力跳刀BUFF()
         {
             return RegPicture(Resource_Picture.智力跳刀BUFF, 400, 865, 1000, 60).Count > 0;
         }
+
+        private static bool 阿哈利姆神杖()
+        {
+            Color 技能点颜色 = Color.FromArgb(255, 35, 167, 234);
+
+            if (CaptureColor(1080, 957).Equals(技能点颜色))
+                return true;
+
+            技能点颜色 = Color.FromArgb(255, 32, 184, 252);
+            
+            if (CaptureColor(1110, 958).Equals(技能点颜色))
+                return true;
+
+            技能点颜色 = Color.FromArgb(255, 32, 180, 244);
+
+            return CaptureColor(1123, 958).Equals(技能点颜色);
+        }
+
+        #endregion
+
+        #region 图片识别
 
         /// <summary>
         /// 
@@ -2048,6 +2253,12 @@ namespace Dota2Simulator
                             width = 61;
                             height = 47;
                             break;
+                        case "G":
+                            x = 1313;
+                            y = 968;
+                            width = 47;
+                            height = 47;
+                            break;
                         case "SPACE":
                             x = 1250;
                             y = 990;
@@ -2118,6 +2329,12 @@ namespace Dota2Simulator
                             x = 1217;
                             y = 991;
                             width = 61;
+                            height = 47;
+                            break;
+                        case "G":
+                            x = 1350;
+                            y = 970;
+                            width = 47;
                             height = 47;
                             break;
                         case "SPACE":
@@ -2198,6 +2415,12 @@ namespace Dota2Simulator
                             width = 61;
                             height = 47;
                             break;
+                        case "G":
+                            x = 1360;
+                            y = 968;
+                            width = 47;
+                            height = 47;
+                            break;
                         case "SPACE":
                             x = 1294;
                             y = 991;
@@ -2270,6 +2493,12 @@ namespace Dota2Simulator
                             width = 60;
                             height = 47;
                             break;
+                        case "G":
+                            x = 1331;
+                            y = 968;
+                            width = 47;
+                            height = 47;
+                            break;
                         case "SPACE":
                             x = 1265;
                             y = 991;
@@ -2284,19 +2513,12 @@ namespace Dota2Simulator
             return FindPicture(bp, CaptureScreen(x, y, width, height), matchRate: matchRate).Count > 0;
         }
 
-        private static bool 阿哈利姆神杖()
-        {
-            if (RegPicture(Resource_Picture._4格A杖效果, 1058, 944, 40, 70).Count > 0)
-                return true;
-            if (RegPicture(Resource_Picture._5格A杖效果, 1084, 944, 40, 70).Count > 0)
-                return true;
-            return RegPicture(Resource_Picture._6格A杖效果, 1102, 944, 40, 70).Count > 0;
-        }
-
         private static List<Point> RegPicture(Bitmap bp, int x, int y, int width, int height, double matchRate = 0.9)
         {
             return FindPicture(bp, CaptureScreen(x, y, width, height), matchRate: matchRate);
         }
+
+        #endregion
 
         #endregion
 
@@ -2348,7 +2570,6 @@ namespace Dota2Simulator
         #endregion
 
         #region 其他
-
         private void 一键保存图片()
         {
             while (RegPicture(Resource1.最后一张, 1132, 947, 40, 40, 1).Count == 0)
@@ -2377,15 +2598,7 @@ namespace Dota2Simulator
 
         private void Btn_Test_Click(object sender, EventArgs e)
         {
-            Task.Run(() =>
-            {
-                if (阿哈利姆神杖())
-                    if (RegPicture(Resource_Picture.钢背_鼻涕CD, "Q"))
-                    {
-                        KeyPress((uint)Keys.Q);
-                        label1.Text = "D32";
-                    }
-            });
+
         }
 
         #region 页面初始化和注销

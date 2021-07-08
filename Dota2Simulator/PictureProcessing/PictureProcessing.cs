@@ -42,6 +42,35 @@ namespace Dota2Simulator
 
         #endregion
 
+        #region 屏幕取色
+
+        /// <summary>
+        ///     屏幕截图
+        /// </summary>
+        /// <param name="x">图片左上角X坐标</param>
+        /// <param name="y">图片左上角Y坐标</param>
+        /// <param name="width">图片的宽度</param>
+        /// <param name="height">图片的长度</param>
+        /// <returns></returns>
+        public static Color CaptureColor(double x, double y)
+        {
+            int ix = Convert.ToInt32(x);
+            int iy = Convert.ToInt32(y);
+            int iw = 1;
+            int ih = 1;
+
+            Bitmap bitmap = new(iw, ih);
+            using Graphics graphics = Graphics.FromImage(bitmap);
+            graphics.CopyFromScreen(ix, iy, 0, 0, new Size(iw, ih));
+            return bitmap.GetPixel(0, 0);
+
+            //SaveFileDialog dialog = new SaveFileDialog();
+            //dialog.Filter = "Png Files|*.png";
+            //if (dialog.ShowDialog() == DialogResult.OK) bitmap.Save(dialog.FileName, ImageFormat.Png);
+        }
+
+        #endregion
+
         #region 找色
 
         /// <summary>
@@ -102,7 +131,7 @@ namespace Dota2Simulator
         /// <returns>返回查找到的图片的中心点坐标</returns>
         public static List<Point> FindPicture(Bitmap subBitmap, Bitmap parBitmap,
             Rectangle searchRect = new Rectangle(), byte errorRange = 0,
-            double matchRate = 0.9, bool isFindAll = false)
+            double matchRate = 0.9, bool isFindAll = true)
         {
             List<Point> ListPoint = new();
             int subWidth = subBitmap.Width;
@@ -196,7 +225,7 @@ namespace Dota2Simulator
         /// <param name="colorB">颜色B</param>
         /// <param name="errorRange">色值误差，默认值10</param>
         /// <returns></returns>
-        private static bool ColorAEqualColorB(Color colorA, Color colorB, byte errorRange = 10)
+        public static bool ColorAEqualColorB(Color colorA, Color colorB, byte errorRange = 10)
         {
             return colorA.A <= colorB.A + errorRange && colorA.A >= colorB.A - errorRange &&
                    colorA.R <= colorB.R + errorRange && colorA.R >= colorB.R - errorRange &&

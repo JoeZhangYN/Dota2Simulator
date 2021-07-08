@@ -31,7 +31,7 @@ namespace Dota2Simulator
         {
             this.label1 = new System.Windows.Forms.Label();
             this.tb_name = new System.Windows.Forms.TextBox();
-            this.tb_IAS = new System.Windows.Forms.TextBox();
+            this.tb_状态抗性 = new System.Windows.Forms.TextBox();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.label2 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
@@ -62,16 +62,16 @@ namespace Dota2Simulator
             this.tb_name.Name = "tb_name";
             this.tb_name.Size = new System.Drawing.Size(87, 23);
             this.tb_name.TabIndex = 4;
-            this.tb_name.Text = "露娜";
+            this.tb_name.Text = "钢背";
             // 
-            // tb_IAS
+            // tb_状态抗性
             // 
-            this.tb_IAS.Location = new System.Drawing.Point(77, 40);
-            this.tb_IAS.Margin = new System.Windows.Forms.Padding(4);
-            this.tb_IAS.Name = "tb_IAS";
-            this.tb_IAS.Size = new System.Drawing.Size(87, 23);
-            this.tb_IAS.TabIndex = 5;
-            this.tb_IAS.Text = "268";
+            this.tb_状态抗性.Location = new System.Drawing.Point(77, 40);
+            this.tb_状态抗性.Margin = new System.Windows.Forms.Padding(4);
+            this.tb_状态抗性.Name = "tb_状态抗性";
+            this.tb_状态抗性.Size = new System.Drawing.Size(87, 23);
+            this.tb_状态抗性.TabIndex = 5;
+            this.tb_状态抗性.Text = "0";
             // 
             // pictureBox1
             // 
@@ -100,7 +100,7 @@ namespace Dota2Simulator
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(56, 17);
             this.label3.TabIndex = 7;
-            this.label3.Text = "攻击速度";
+            this.label3.Text = "状态抗性";
             // 
             // label4
             // 
@@ -184,7 +184,7 @@ namespace Dota2Simulator
             this.Controls.Add(this.textBox3);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.label2);
-            this.Controls.Add(this.tb_IAS);
+            this.Controls.Add(this.tb_状态抗性);
             this.Controls.Add(this.tb_name);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.pictureBox1);
@@ -203,7 +203,7 @@ namespace Dota2Simulator
         private System.Windows.Forms.PictureBox pictureBox1;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.TextBox tb_name;
-        private System.Windows.Forms.TextBox tb_IAS;
+        private System.Windows.Forms.TextBox tb_状态抗性;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label label4;
