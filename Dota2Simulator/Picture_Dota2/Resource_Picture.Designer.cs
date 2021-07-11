@@ -63,6 +63,126 @@ namespace Dota2Simulator.Picture_Dota2 {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap 假腿_力量腿 {
+            get {
+                object obj = ResourceManager.GetObject("假腿_力量腿", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap 假腿_力量腿_5 {
+            get {
+                object obj = ResourceManager.GetObject("假腿_力量腿_5", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap 假腿_力量腿_6 {
+            get {
+                object obj = ResourceManager.GetObject("假腿_力量腿_6", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap 假腿_力量腿_7 {
+            get {
+                object obj = ResourceManager.GetObject("假腿_力量腿_7", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap 假腿_敏捷腿 {
+            get {
+                object obj = ResourceManager.GetObject("假腿_敏捷腿", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap 假腿_敏捷腿_5 {
+            get {
+                object obj = ResourceManager.GetObject("假腿_敏捷腿_5", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap 假腿_敏捷腿_6 {
+            get {
+                object obj = ResourceManager.GetObject("假腿_敏捷腿_6", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap 假腿_敏捷腿_7 {
+            get {
+                object obj = ResourceManager.GetObject("假腿_敏捷腿_7", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap 假腿_智力腿 {
+            get {
+                object obj = ResourceManager.GetObject("假腿_智力腿", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap 假腿_智力腿_5 {
+            get {
+                object obj = ResourceManager.GetObject("假腿_智力腿_5", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap 假腿_智力腿_6 {
+            get {
+                object obj = ResourceManager.GetObject("假腿_智力腿_6", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap 假腿_智力腿_7 {
+            get {
+                object obj = ResourceManager.GetObject("假腿_智力腿_7", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap 关释放 {
             get {
                 object obj = ResourceManager.GetObject("关释放", resourceCulture);
@@ -116,36 +236,6 @@ namespace Dota2Simulator.Picture_Dota2 {
         internal static System.Drawing.Bitmap 分身 {
             get {
                 object obj = ResourceManager.GetObject("分身", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap 力量腿 {
-            get {
-                object obj = ResourceManager.GetObject("力量腿", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap 力量腿_5 {
-            get {
-                object obj = ResourceManager.GetObject("力量腿_5", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap 力量跳刀 {
-            get {
-                object obj = ResourceManager.GetObject("力量跳刀", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -393,9 +483,9 @@ namespace Dota2Simulator.Picture_Dota2 {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap 敌法_信仰之源闪烁_4 {
+        internal static System.Drawing.Bitmap 敌法_释放信仰之源闪烁_4 {
             get {
-                object obj = ResourceManager.GetObject("敌法_信仰之源闪烁_4", resourceCulture);
+                object obj = ResourceManager.GetObject("敌法_释放信仰之源闪烁_4", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -403,9 +493,9 @@ namespace Dota2Simulator.Picture_Dota2 {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap 敌法_信仰之源闪烁_5 {
+        internal static System.Drawing.Bitmap 敌法_释放信仰之源闪烁_7 {
             get {
-                object obj = ResourceManager.GetObject("敌法_信仰之源闪烁_5", resourceCulture);
+                object obj = ResourceManager.GetObject("敌法_释放信仰之源闪烁_7", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -413,9 +503,9 @@ namespace Dota2Simulator.Picture_Dota2 {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap 敌法_法力虚空_4 {
+        internal static System.Drawing.Bitmap 敌法_释放法力虚空_4 {
             get {
-                object obj = ResourceManager.GetObject("敌法_法力虚空_4", resourceCulture);
+                object obj = ResourceManager.GetObject("敌法_释放法力虚空_4", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -423,9 +513,9 @@ namespace Dota2Simulator.Picture_Dota2 {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap 敌法_法力虚空_5 {
+        internal static System.Drawing.Bitmap 敌法_释放法力虚空_7 {
             get {
-                object obj = ResourceManager.GetObject("敌法_法力虚空_5", resourceCulture);
+                object obj = ResourceManager.GetObject("敌法_释放法力虚空_7", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -433,9 +523,9 @@ namespace Dota2Simulator.Picture_Dota2 {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap 敌法_碎颅锤法力虚空_4 {
+        internal static System.Drawing.Bitmap 敌法_释放碎颅锤法力虚空_4 {
             get {
-                object obj = ResourceManager.GetObject("敌法_碎颅锤法力虚空_4", resourceCulture);
+                object obj = ResourceManager.GetObject("敌法_释放碎颅锤法力虚空_4", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -443,9 +533,9 @@ namespace Dota2Simulator.Picture_Dota2 {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap 敌法_碎颅锤法力虚空_5 {
+        internal static System.Drawing.Bitmap 敌法_释放碎颅锤法力虚空_7 {
             get {
-                object obj = ResourceManager.GetObject("敌法_碎颅锤法力虚空_5", resourceCulture);
+                object obj = ResourceManager.GetObject("敌法_释放碎颅锤法力虚空_7", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -453,9 +543,9 @@ namespace Dota2Simulator.Picture_Dota2 {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap 敌法_闪烁_4 {
+        internal static System.Drawing.Bitmap 敌法_释放闪烁_4 {
             get {
-                object obj = ResourceManager.GetObject("敌法_闪烁_4", resourceCulture);
+                object obj = ResourceManager.GetObject("敌法_释放闪烁_4", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -463,29 +553,9 @@ namespace Dota2Simulator.Picture_Dota2 {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap 敌法_闪烁_5 {
+        internal static System.Drawing.Bitmap 敌法_释放闪烁_7 {
             get {
-                object obj = ResourceManager.GetObject("敌法_闪烁_5", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap 敏捷腿 {
-            get {
-                object obj = ResourceManager.GetObject("敏捷腿", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap 敏捷腿_5 {
-            get {
-                object obj = ResourceManager.GetObject("敏捷腿_5", resourceCulture);
+                object obj = ResourceManager.GetObject("敌法_释放闪烁_7", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -496,46 +566,6 @@ namespace Dota2Simulator.Picture_Dota2 {
         internal static System.Drawing.Bitmap 敏捷跳刀 {
             get {
                 object obj = ResourceManager.GetObject("敏捷跳刀", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap 智力腿 {
-            get {
-                object obj = ResourceManager.GetObject("智力腿", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap 智力腿_5 {
-            get {
-                object obj = ResourceManager.GetObject("智力腿_5", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap 智力跳刀 {
-            get {
-                object obj = ResourceManager.GetObject("智力跳刀", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap 智力跳刀BUFF {
-            get {
-                object obj = ResourceManager.GetObject("智力跳刀BUFF", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -576,6 +606,16 @@ namespace Dota2Simulator.Picture_Dota2 {
         internal static System.Drawing.Bitmap 暗影萨满_释放苍穹振击 {
             get {
                 object obj = ResourceManager.GetObject("暗影萨满_释放苍穹振击", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap 水人_释放变体打击_敏捷 {
+            get {
+                object obj = ResourceManager.GetObject("水人_释放变体打击_敏捷", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -693,6 +733,26 @@ namespace Dota2Simulator.Picture_Dota2 {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap 物品_纷争 {
+            get {
+                object obj = ResourceManager.GetObject("物品_纷争", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap 物品_纷争_7 {
+            get {
+                object obj = ResourceManager.GetObject("物品_纷争_7", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap 狂战士之吼 {
             get {
                 object obj = ResourceManager.GetObject("狂战士之吼", resourceCulture);
@@ -713,9 +773,9 @@ namespace Dota2Simulator.Picture_Dota2 {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap 电子狂欢 {
+        internal static System.Drawing.Bitmap 猴子_释放灵魂之矛 {
             get {
-                object obj = ResourceManager.GetObject("电子狂欢", resourceCulture);
+                object obj = ResourceManager.GetObject("猴子_释放灵魂之矛", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -753,26 +813,6 @@ namespace Dota2Simulator.Picture_Dota2 {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap 纷争 {
-            get {
-                object obj = ResourceManager.GetObject("纷争", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap 纷争_7 {
-            get {
-                object obj = ResourceManager.GetObject("纷争_7", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
         internal static System.Drawing.Bitmap 羊刀 {
             get {
                 object obj = ResourceManager.GetObject("羊刀", resourceCulture);
@@ -803,6 +843,26 @@ namespace Dota2Simulator.Picture_Dota2 {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap 蓝猫_释放球状闪电_红 {
+            get {
+                object obj = ResourceManager.GetObject("蓝猫_释放球状闪电_红", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap 蓝猫_释放电子漩涡 {
+            get {
+                object obj = ResourceManager.GetObject("蓝猫_释放电子漩涡", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap 血棘 {
             get {
                 object obj = ResourceManager.GetObject("血棘", resourceCulture);
@@ -813,9 +873,9 @@ namespace Dota2Simulator.Picture_Dota2 {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap 超负荷标志 {
+        internal static System.Drawing.Bitmap 跳刀 {
             get {
-                object obj = ResourceManager.GetObject("超负荷标志", resourceCulture);
+                object obj = ResourceManager.GetObject("跳刀", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -823,9 +883,29 @@ namespace Dota2Simulator.Picture_Dota2 {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap 跳刀 {
+        internal static System.Drawing.Bitmap 跳刀_力量跳刀 {
             get {
-                object obj = ResourceManager.GetObject("跳刀", resourceCulture);
+                object obj = ResourceManager.GetObject("跳刀_力量跳刀", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap 跳刀_智力跳刀 {
+            get {
+                object obj = ResourceManager.GetObject("跳刀_智力跳刀", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap 跳刀_智力跳刀BUFF {
+            get {
+                object obj = ResourceManager.GetObject("跳刀_智力跳刀BUFF", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -893,16 +973,6 @@ namespace Dota2Simulator.Picture_Dota2 {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap 释放弧形闪电 {
-            get {
-                object obj = ResourceManager.GetObject("释放弧形闪电", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
         internal static System.Drawing.Bitmap 释放弱化能流 {
             get {
                 object obj = ResourceManager.GetObject("释放弱化能流", resourceCulture);
@@ -943,29 +1013,9 @@ namespace Dota2Simulator.Picture_Dota2 {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap 释放灵魂之矛 {
-            get {
-                object obj = ResourceManager.GetObject("释放灵魂之矛", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
         internal static System.Drawing.Bitmap 释放球状闪电 {
             get {
                 object obj = ResourceManager.GetObject("释放球状闪电", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap 释放电子旋涡 {
-            get {
-                object obj = ResourceManager.GetObject("释放电子旋涡", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

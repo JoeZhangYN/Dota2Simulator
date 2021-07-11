@@ -12,6 +12,7 @@ namespace Dota2Simulator
 {
     public partial class Form2 : Form
     {
+        #region 局部全局变量
         /// <summary>
         ///     用于捕获按键
         /// </summary>
@@ -42,9 +43,17 @@ namespace Dota2Simulator
         /// </summary>
         private KeyEventHandler myKeyEventHandeler; //按键钩子
 
+        /// <summary>
+        ///     用于生成随机数
+        /// </summary>
+        private RandomGenerator randomGenerator = new RandomGenerator();
+
+        #endregion
+
+        #region 触发重载
 
         /// <summary>
-        ///     案件触发，名称指定操作
+        ///     按键触发，名称指定操作
         ///     如直接写在方法内则在按键触发前生效
         ///     例如可以切假腿放技能
         ///     if (e.KeyValue == (int)Keys.A && (int)Control.ModifierKeys == (int)Keys.Alt) && (int)Control.ModifierKeys ==
@@ -262,9 +271,10 @@ namespace Dota2Simulator
                 else if (e.KeyValue == (uint)Keys.E)
                 {
                     label1.Text = "E";
-                    切智力腿();
+                    // 太过明显
+                    //切智力腿();
 
-                    Task.Run(法术反制敏捷);
+                    //Task.Run(法术反制敏捷);
                 }
                 else if (e.KeyValue == (uint)Keys.R)
                 {
@@ -272,6 +282,11 @@ namespace Dota2Simulator
                     切智力腿();
 
                     Task.Run(法力虚空取消后摇);
+                }
+                else if (e.KeyValue == (uint)Keys.Space)
+                {
+                    label1.Text = "R";
+                    Task.Run(分身一齐攻击);
                 }
             }
 
@@ -457,6 +472,15 @@ namespace Dota2Simulator
 
             #endregion
 
+            #region 水人
+
+            else if (tb_name.Text == "水人")
+            {
+                
+            }
+
+            #endregion
+
             #endregion
 
             #region 智力
@@ -536,6 +560,16 @@ namespace Dota2Simulator
                 {
                     label1.Text = "R";
                     Task.Run(滚接平A);
+                }
+                else if (e.KeyValue == (uint)Keys.F)
+                {
+                    label1.Text = "F";
+                    Task.Run(原地滚A);
+                }
+                else if (e.KeyValue == (uint)Keys.D)
+                {
+                    label1.Text = "F";
+                    Task.Run(泉水出来喝瓶);
                 }
             }
 
@@ -683,6 +717,7 @@ namespace Dota2Simulator
             #endregion
         }
 
+        #endregion
 
         #region Dota2具体实现
 
@@ -718,12 +753,8 @@ namespace Dota2Simulator
             if (RegPicture(Resource_Picture.分身, "Z"))
             {
                 KeyPress((uint)Keys.Z);
-                Thread.Sleep(30);
+                分身一齐攻击();
             }
-
-            KeyDown((uint)Keys.LControlKey);
-            KeyPress((uint)Keys.A);
-            KeyUp((uint)Keys.LControlKey);
         }
 
         private void 战斗饥渴取消后摇()
@@ -826,13 +857,13 @@ namespace Dota2Simulator
 
             var point = MousePosition;
 
-            MouseMove(p.X, p.Y, false);
+            MouseMove(p.X, p.Y);
 
             KeyPress((uint)Keys.Space);
 
             Thread.Sleep(5);
 
-            MouseMove(point.X, point.Y, false);
+            MouseMove(point.X, point.Y);
 
             var time = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds();
 
@@ -988,14 +1019,14 @@ namespace Dota2Simulator
 
             var point = MousePosition;
 
-            MouseMove(p.X, p.Y, false);
+            MouseMove(p.X, p.Y);
 
             // 跳刀空格
             KeyPress((uint)Keys.Space);
 
             Thread.Sleep(5);
 
-            MouseMove(point.X, point.Y, false);
+            MouseMove(point.X, point.Y);
 
             // 勋章放C
             KeyPress((uint)Keys.C);
@@ -1015,23 +1046,21 @@ namespace Dota2Simulator
                 {
                     KeyPress((uint)Keys.W);
                     label1.Text = "D22";
-                    Thread.Sleep(400);
+                    Thread.Sleep(300);
                 }
 
                 else if (RegPicture(Resource_Picture.钢背_针刺刚CD好, "W"))
                 {
                     KeyPress((uint)Keys.W);
                     label1.Text = "D22";
-
-                    Thread.Sleep(400);
+                    Thread.Sleep(300);
                 }
 
                 else if (RegPicture(Resource_Picture.钢背_针刺CD_5, "W", 5))
                 {
                     KeyPress((uint)Keys.W);
                     label1.Text = "D22";
-
-                    Thread.Sleep(400);
+                    Thread.Sleep(300);
                 }
 
                 Thread.Sleep(15);
@@ -1047,14 +1076,14 @@ namespace Dota2Simulator
                     {
                         KeyPress((uint)Keys.Q);
                         label1.Text = "D32";
-                        Thread.Sleep(400);
+                        Thread.Sleep(300);
                     }
 
                     if (RegPicture(Resource_Picture.钢背_鼻涕CD_5, "Q", 5))
                     {
                         KeyPress((uint)Keys.Q);
                         label1.Text = "D32";
-                        Thread.Sleep(400);
+                        Thread.Sleep(300);
                     }
 
                     Thread.Sleep(15);
@@ -1254,12 +1283,14 @@ namespace Dota2Simulator
         {
             var time = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds();
 
-            if (RegPicture(Resource_Picture.纷争, "C") || RegPicture(Resource_Picture.纷争_7, "C", 7))
+            if (RegPicture(Resource_Picture.物品_纷争, "C") || RegPicture(Resource_Picture.物品_纷争_7, "C", 7))
             {
                 KeyPress((uint)Keys.C);
             }
 
+            KeyDown((uint)Keys.LShiftKey);
             KeyPress((uint)Keys.W);
+            KeyUp((uint)Keys.LShiftKey);
 
             var q_down = 0;
 
@@ -1272,7 +1303,7 @@ namespace Dota2Simulator
                     q_down = 1;
                 }
 
-                if (new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds() - time > 1000) break;
+                if (new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds() - time > 3600) break;
             }
         }
 
@@ -1280,7 +1311,7 @@ namespace Dota2Simulator
         {
             var time = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds();
 
-            if (RegPicture(Resource_Picture.纷争, "C") || RegPicture(Resource_Picture.纷争_7, "C", 7))
+            if (RegPicture(Resource_Picture.物品_纷争, "C") || RegPicture(Resource_Picture.物品_纷争_7, "C", 7))
             {
                 KeyPress((uint)Keys.C);
             }
@@ -1299,7 +1330,7 @@ namespace Dota2Simulator
                     f_down = true;
                 }
 
-                if (new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds() - time > 1000) break;
+                if (new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds() - time > 3600) break;
             }
 
             while (!w_down)
@@ -1311,7 +1342,7 @@ namespace Dota2Simulator
                     w_down = true;
                 }
 
-                if (new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds() - time > 1500) break;
+                if (new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds() - time > 1000) break;
             }
         }
 
@@ -1440,7 +1471,7 @@ namespace Dota2Simulator
 
             while (w_down == 0)
             {
-                if (RegPicture(Resource_Picture.释放灵魂之矛, "Q"))
+                if (RegPicture(Resource_Picture.猴子_释放灵魂之矛, "Q"))
                 {
                     Thread.Sleep(125);
 
@@ -1462,6 +1493,10 @@ namespace Dota2Simulator
 
         #endregion
 
+        #region 水人
+
+        #endregion
+
         #region 敌法
 
         private void 闪烁敏捷()
@@ -1472,8 +1507,8 @@ namespace Dota2Simulator
 
             while (w_down == 0)
             {
-                if (RegPicture(Resource_Picture.敌法_闪烁_4, "W") || RegPicture(Resource_Picture.敌法_信仰之源闪烁_4, "W") ||
-                    RegPicture(Resource_Picture.敌法_闪烁_5, "W", 5) || RegPicture(Resource_Picture.敌法_信仰之源闪烁_5, "W", 5))
+                if (RegPicture(Resource_Picture.敌法_释放闪烁_4, "W") || RegPicture(Resource_Picture.敌法_释放信仰之源闪烁_4, "W") ||
+                    RegPicture(Resource_Picture.敌法_释放闪烁_7, "W", 7) || RegPicture(Resource_Picture.敌法_释放信仰之源闪烁_7, "W", 7))
                 {
                     Thread.Sleep(95);
                     KeyPress((uint)Keys.A);
@@ -1504,8 +1539,8 @@ namespace Dota2Simulator
 
             while (w_down == 0)
             {
-                if (RegPicture(Resource_Picture.敌法_法力虚空_4, "R") || RegPicture(Resource_Picture.敌法_碎颅锤法力虚空_4, "R") ||
-                    RegPicture(Resource_Picture.敌法_法力虚空_5, "R", 5) || RegPicture(Resource_Picture.敌法_碎颅锤法力虚空_5, "R", 5))
+                if (RegPicture(Resource_Picture.敌法_释放法力虚空_4, "R") || RegPicture(Resource_Picture.敌法_释放碎颅锤法力虚空_4, "R") ||
+                    RegPicture(Resource_Picture.敌法_释放法力虚空_7, "R", 7) || RegPicture(Resource_Picture.敌法_释放碎颅锤法力虚空_7, "R", 7))
                 {
                     Thread.Sleep(100);
 
@@ -1548,7 +1583,7 @@ namespace Dota2Simulator
 
         private void G_yxc(int dyd, int yd, int dd)
         {
-            if (RegPicture(Resource_Picture.纷争, "C"))
+            if (RegPicture(Resource_Picture.物品_纷争, "C"))
             {
                 KeyPress((uint)Keys.C);
             }
@@ -1592,14 +1627,14 @@ namespace Dota2Simulator
                 KeyPress((uint)Keys.Z);
             }
 
-            if (RegPicture(Resource_Picture.纷争, "C"))
+            if (RegPicture(Resource_Picture.物品_纷争, "C"))
             {
                 KeyPress((uint)Keys.C);
             }
 
             var time = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds();
 
-            while (RegPicture(Resource_Picture.跳刀, "SPACE") || RegPicture(Resource_Picture.智力跳刀, "SPACE"))
+            while (RegPicture(Resource_Picture.跳刀, "SPACE") || RegPicture(Resource_Picture.跳刀_智力跳刀, "SPACE"))
             {
                 Thread.Sleep(30);
                 KeyPress((uint)Keys.Space);
@@ -1699,11 +1734,11 @@ namespace Dota2Simulator
             {
                 if (new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds() - time > 1500) break;
 
-                if (FindPicture(Resource_Picture.释放电子旋涡, CaptureScreen(859, 939, 64, 62)).Count > 0)
+                if (RegPicture(Resource_Picture.蓝猫_释放电子漩涡, "W"))
                 {
                     Task.Run(() =>
                     {
-                        Thread.Sleep(285);
+                        Thread.Sleep(120);
                         KeyPress((uint)Keys.A);
                     });
 
@@ -1727,7 +1762,7 @@ namespace Dota2Simulator
             {
                 if (new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds() - time > 1500) break;
 
-                if (FindPicture(Resource_Picture.释放球状闪电, CaptureScreen(991, 939, 64, 62)).Count > 0)
+                if (RegPicture(Resource_Picture.蓝猫_释放球状闪电_红, "R"))
                 {
                     Task.Run(() =>
                     {
@@ -1736,6 +1771,47 @@ namespace Dota2Simulator
                     });
                     r_down = 1;
                 }
+            }
+        }
+
+        private void 原地滚A()
+        {
+            KeyPress((uint)Keys.A);
+
+            Point p = MousePosition;
+
+            var x_差 = p.X - 623;
+            var y_差 = p.Y - 1000;
+            x_差 /= 4;
+            y_差 /= 4;
+
+            for (int i = 1; i <= 4; i++)
+            {
+                MouseMove(p.X - (x_差 * i), p.Y - (y_差 * i));
+                Thread.Sleep(1);
+            }
+
+            MouseMove(623, 1000);
+            Thread.Sleep(30);
+            KeyPress((uint)Keys.R);
+
+            for (int i = 1; i <= 4; i++)
+            {
+                MouseMove(623 + (x_差 * i), 1000 + (y_差 * i));
+                Thread.Sleep(1);
+            }
+
+            MouseMove(p.X, p.Y);
+
+        }
+
+        private void 泉水出来喝瓶()
+        {
+            Thread.Sleep(200);
+            for (int i = 1; i <= 4; i++)
+            {
+                KeyPress((uint)Keys.C);
+                Thread.Sleep(650);
             }
         }
 
@@ -1864,7 +1940,7 @@ namespace Dota2Simulator
                     if (RegPicture(Resource_Picture.吹风CD, "SPACE"))
                     {
                         label1.Text = "FFF";
-                        if (RegPicture(Resource_Picture.纷争, "C")) KeyPress((uint)Keys.C);
+                        if (RegPicture(Resource_Picture.物品_纷争, "C")) KeyPress((uint)Keys.C);
                         Thread.Sleep(80);
                         KeyPress((uint)Keys.H);
                         Thread.Sleep(1280);
@@ -2081,10 +2157,10 @@ namespace Dota2Simulator
             if (list.Count > 0)
             {
                 LeftDown();
-                MouseMove(list[0].X + 55, list[0].Y + 117, false);
+                MouseMove(list[0].X + 55, list[0].Y + 117);
                 Thread.Sleep(30);
                 LeftUp();
-                MouseMove(p.X, p.Y, false);
+                MouseMove(p.X, p.Y);
             }
         }
 
@@ -2094,11 +2170,17 @@ namespace Dota2Simulator
 
         private static void 切智力腿()
         {
-            if (RegPicture(Resource_Picture.力量腿, "V") || RegPicture(Resource_Picture.力量腿_5, "V", 5))
+            if (RegPicture(Resource_Picture.假腿_力量腿, "V")
+                || RegPicture(Resource_Picture.假腿_力量腿_5, "V", 5)
+                || RegPicture(Resource_Picture.假腿_力量腿_6, "V", 6)
+                || RegPicture(Resource_Picture.假腿_力量腿_7, "V", 7))
             {
                 KeyPress((uint)Keys.V);
             }
-            else if (RegPicture(Resource_Picture.敏捷腿, "V") || RegPicture(Resource_Picture.敏捷腿_5, "V", 5))
+            else if (RegPicture(Resource_Picture.假腿_敏捷腿, "V") 
+                || RegPicture(Resource_Picture.假腿_敏捷腿_5, "V", 5) 
+                || RegPicture(Resource_Picture.假腿_敏捷腿_6, "V", 6)
+                || RegPicture(Resource_Picture.假腿_敏捷腿_7, "V", 7))
             {
                 KeyPress((uint)Keys.V);
                 //Thread.Sleep(30);
@@ -2108,13 +2190,19 @@ namespace Dota2Simulator
 
         private static void 切敏捷腿()
         {
-            if (RegPicture(Resource_Picture.力量腿, "V") || RegPicture(Resource_Picture.力量腿_5, "V", 5))
+            if (RegPicture(Resource_Picture.假腿_力量腿, "V")
+                || RegPicture(Resource_Picture.假腿_力量腿_5, "V", 5)
+                || RegPicture(Resource_Picture.假腿_力量腿_6, "V", 6)
+                || RegPicture(Resource_Picture.假腿_力量腿_7, "V", 7))
             {
                 KeyPress((uint)Keys.V);
                 //Thread.Sleep(30);
                 KeyPress((uint)Keys.V);
             }
-            else if (RegPicture(Resource_Picture.智力腿, "V") || RegPicture(Resource_Picture.智力腿_5, "V", 5))
+            else if (RegPicture(Resource_Picture.假腿_智力腿, "V")
+                || RegPicture(Resource_Picture.假腿_智力腿_5, "V", 5)
+                || RegPicture(Resource_Picture.假腿_智力腿_6, "V", 6)
+                || RegPicture(Resource_Picture.假腿_智力腿_7, "V", 7))
             {
                 KeyPress((uint)Keys.V);
             }
@@ -2122,11 +2210,17 @@ namespace Dota2Simulator
 
         private static void 切力量腿()
         {
-            if (RegPicture(Resource_Picture.敏捷腿, "V") || RegPicture(Resource_Picture.敏捷腿_5, "V", 5))
+            if (RegPicture(Resource_Picture.假腿_敏捷腿, "V")
+                || RegPicture(Resource_Picture.假腿_敏捷腿_5, "V", 5)
+                || RegPicture(Resource_Picture.假腿_敏捷腿_6, "V", 6)
+                || RegPicture(Resource_Picture.假腿_敏捷腿_7, "V", 7))
             {
                 KeyPress((uint)Keys.V);
             }
-            else if (RegPicture(Resource_Picture.智力腿, "V") || RegPicture(Resource_Picture.智力腿_5, "V", 5))
+            else if (RegPicture(Resource_Picture.假腿_智力腿, "V")
+                || RegPicture(Resource_Picture.假腿_智力腿_5, "V", 5)
+                || RegPicture(Resource_Picture.假腿_智力腿_6, "V", 6)
+                || RegPicture(Resource_Picture.假腿_智力腿_7, "V", 7))
             {
                 KeyPress((uint)Keys.V);
                 //Thread.Sleep(30);
@@ -2136,11 +2230,28 @@ namespace Dota2Simulator
 
         #endregion
 
+        #region 切臂章
+
         private void 切臂章()
         {
             KeyPress((uint)Keys.Z);
             KeyPress((uint)Keys.Z);
         }
+
+        #endregion
+
+        #region 分身一齐攻击
+
+        private void 分身一齐攻击()
+        {
+            Thread.Sleep(140);
+
+            KeyDown((uint)Keys.LControlKey);
+            KeyPress((uint)Keys.A);
+            KeyUp((uint)Keys.LControlKey);
+        }
+
+        #endregion
 
         //private static void 死灵射手净化()
         //{
@@ -2155,7 +2266,7 @@ namespace Dota2Simulator
 
         private static bool 智力跳刀BUFF()
         {
-            return RegPicture(Resource_Picture.智力跳刀BUFF, 400, 865, 1000, 60).Count > 0;
+            return RegPicture(Resource_Picture.跳刀_智力跳刀BUFF, 400, 865, 1000, 60).Count > 0;
         }
 
         private static bool 阿哈利姆神杖()
@@ -2552,14 +2663,14 @@ namespace Dota2Simulator
                     pictureBox1.Image = Resource_Picture.释放冰封禁制;
                     break;
                 case "蓝猫":
-                    pictureBox1.Image = Resource_Picture.释放电子旋涡;
+                    pictureBox1.Image = Resource_Picture.蓝猫_释放电子漩涡;
                     break;
                 case "小骷髅":
-                    pictureBox1.Image = Resource_Picture.敏捷腿;
+                    pictureBox1.Image = Resource_Picture.假腿_敏捷腿;
                     break;
                 case "小鱼人":
                 case "拍拍":
-                    pictureBox1.Image = Resource_Picture.敏捷腿;
+                    pictureBox1.Image = Resource_Picture.假腿_敏捷腿;
                     break;
                 case "宙斯":
                     pictureBox1.Image = Resource_Picture.宙斯_释放弧形闪电;
@@ -2624,6 +2735,13 @@ namespace Dota2Simulator
             k_hook.KeyDownEvent += myKeyEventHandeler; // 绑定对应处理函数
             k_hook.Start(); // 安装键盘钩子
 
+            //WinIO32.Initialize();
+
+            // 初始化键盘鼠标模拟，仅模仿系统函数，winIo 和 WinRing0 需要额外的操作
+            i += KeyboardMouseSimulateDriverAPI.Initialize((uint)SimulateWays.Event);
+
+            Thread.Sleep(500);
+
             // 设置窗体显示在最上层
             i = SetWindowPos(Handle, -1, 0, 0, 0, 0, 0x0001 | 0x0002 | 0x0010 | 0x0080);
 
@@ -2634,10 +2752,8 @@ namespace Dota2Simulator
             // 设置窗体置顶
             TopMost = true;
 
-            //WinIO32.Initialize();
-
-            // 初始化键盘鼠标模拟，仅模仿系统函数，winIo 和 WinRing0 需要额外的操作
-            i += KeyboardMouseSimulateDriverAPI.Initialize((uint)SimulateWays.Event);
+            // 设置窗口位置
+            Location = new Point(338, 1000);
 
             return i;
         }
@@ -2668,7 +2784,6 @@ namespace Dota2Simulator
         }
 
         #endregion
-
 
         #region 模拟按键
 
@@ -2704,7 +2819,7 @@ namespace Dota2Simulator
             KeyUp(key);
         }
 
-        public new static void MouseMove(int X, int Y, bool relative = true)
+        public new static void MouseMove(int X, int Y, bool relative = false)
         {
             if (relative)
             {
@@ -2746,6 +2861,5 @@ namespace Dota2Simulator
         //KeyboardMouseSimulateDriverAPI.KeyUp((uint) Keys.Space);
 
         #endregion
-
     }
 }

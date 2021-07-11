@@ -48,7 +48,7 @@ namespace Dota2Simulator
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(14, 148);
+            this.label1.Location = new System.Drawing.Point(14, 121);
             this.label1.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(43, 17);
@@ -57,16 +57,16 @@ namespace Dota2Simulator
             // 
             // tb_name
             // 
-            this.tb_name.Location = new System.Drawing.Point(77, 17);
+            this.tb_name.Location = new System.Drawing.Point(77, -4);
             this.tb_name.Margin = new System.Windows.Forms.Padding(4);
             this.tb_name.Name = "tb_name";
             this.tb_name.Size = new System.Drawing.Size(87, 23);
             this.tb_name.TabIndex = 4;
-            this.tb_name.Text = "钢背";
+            this.tb_name.Text = "猴子";
             // 
             // tb_状态抗性
             // 
-            this.tb_状态抗性.Location = new System.Drawing.Point(77, 40);
+            this.tb_状态抗性.Location = new System.Drawing.Point(77, 19);
             this.tb_状态抗性.Margin = new System.Windows.Forms.Padding(4);
             this.tb_状态抗性.Name = "tb_状态抗性";
             this.tb_状态抗性.Size = new System.Drawing.Size(87, 23);
@@ -75,7 +75,7 @@ namespace Dota2Simulator
             // 
             // pictureBox1
             // 
-            this.pictureBox1.Location = new System.Drawing.Point(8, 187);
+            this.pictureBox1.Location = new System.Drawing.Point(8, 149);
             this.pictureBox1.Margin = new System.Windows.Forms.Padding(4);
             this.pictureBox1.Name = "pictureBox1";
             this.pictureBox1.Size = new System.Drawing.Size(149, 62);
@@ -85,7 +85,7 @@ namespace Dota2Simulator
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(8, 21);
+            this.label2.Location = new System.Drawing.Point(8, 0);
             this.label2.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(56, 17);
@@ -95,7 +95,7 @@ namespace Dota2Simulator
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(8, 44);
+            this.label3.Location = new System.Drawing.Point(8, 23);
             this.label3.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(56, 17);
@@ -105,7 +105,7 @@ namespace Dota2Simulator
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(8, 67);
+            this.label4.Location = new System.Drawing.Point(8, 46);
             this.label4.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(40, 17);
@@ -114,7 +114,7 @@ namespace Dota2Simulator
             // 
             // textBox3
             // 
-            this.textBox3.Location = new System.Drawing.Point(77, 63);
+            this.textBox3.Location = new System.Drawing.Point(77, 42);
             this.textBox3.Margin = new System.Windows.Forms.Padding(4);
             this.textBox3.Name = "textBox3";
             this.textBox3.Size = new System.Drawing.Size(87, 23);
@@ -124,7 +124,7 @@ namespace Dota2Simulator
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(8, 90);
+            this.label5.Location = new System.Drawing.Point(8, 69);
             this.label5.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(39, 17);
@@ -133,7 +133,7 @@ namespace Dota2Simulator
             // 
             // textBox4
             // 
-            this.textBox4.Location = new System.Drawing.Point(77, 86);
+            this.textBox4.Location = new System.Drawing.Point(77, 65);
             this.textBox4.Margin = new System.Windows.Forms.Padding(4);
             this.textBox4.Name = "textBox4";
             this.textBox4.Size = new System.Drawing.Size(87, 23);
@@ -143,7 +143,7 @@ namespace Dota2Simulator
             // label6
             // 
             this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(8, 113);
+            this.label6.Location = new System.Drawing.Point(8, 92);
             this.label6.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(56, 17);
@@ -152,7 +152,7 @@ namespace Dota2Simulator
             // 
             // tb_delay
             // 
-            this.tb_delay.Location = new System.Drawing.Point(77, 109);
+            this.tb_delay.Location = new System.Drawing.Point(77, 88);
             this.tb_delay.Margin = new System.Windows.Forms.Padding(4);
             this.tb_delay.Name = "tb_delay";
             this.tb_delay.Size = new System.Drawing.Size(87, 23);
@@ -161,7 +161,7 @@ namespace Dota2Simulator
             // 
             // btn_test
             // 
-            this.btn_test.Location = new System.Drawing.Point(77, 148);
+            this.btn_test.Location = new System.Drawing.Point(77, 114);
             this.btn_test.Margin = new System.Windows.Forms.Padding(4);
             this.btn_test.Name = "btn_test";
             this.btn_test.Size = new System.Drawing.Size(59, 31);
@@ -174,7 +174,7 @@ namespace Dota2Simulator
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 17F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(173, 262);
+            this.ClientSize = new System.Drawing.Size(173, 217);
             this.Controls.Add(this.btn_test);
             this.Controls.Add(this.label6);
             this.Controls.Add(this.tb_delay);
@@ -188,7 +188,7 @@ namespace Dota2Simulator
             this.Controls.Add(this.tb_name);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.pictureBox1);
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
             this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "Form2";
             this.Text = "Form2";
