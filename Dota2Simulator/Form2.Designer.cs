@@ -62,7 +62,7 @@ namespace Dota2Simulator
             this.tb_name.Name = "tb_name";
             this.tb_name.Size = new System.Drawing.Size(87, 23);
             this.tb_name.TabIndex = 4;
-            this.tb_name.Text = "猴子";
+            this.tb_name.Text = "蓝猫";
             // 
             // tb_状态抗性
             // 
@@ -168,7 +168,6 @@ namespace Dota2Simulator
             this.btn_test.TabIndex = 14;
             this.btn_test.Text = "测试";
             this.btn_test.UseVisualStyleBackColor = true;
-            this.btn_test.Click += new System.EventHandler(this.Btn_Test_Click);
             // 
             // Form2
             // 
