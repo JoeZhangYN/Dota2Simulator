@@ -62,7 +62,7 @@ namespace Dota2Simulator
             this.tb_name.Name = "tb_name";
             this.tb_name.Size = new System.Drawing.Size(87, 23);
             this.tb_name.TabIndex = 4;
-            this.tb_name.Text = "蓝猫";
+            this.tb_name.Text = "猴子";
             // 
             // tb_状态抗性
             // 

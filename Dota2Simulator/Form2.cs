@@ -157,7 +157,7 @@ namespace Dota2Simulator
                 {
                     label1.Text = "R";
 
-                    if (RegPicture(Resource_Picture.臂章, "Z"))
+                    if (RegPicture(Resource_Picture.物品_臂章, "Z"))
                     {
                         KeyPress((uint)Keys.Z);
                         Delay(30);
@@ -263,29 +263,25 @@ namespace Dota2Simulator
                 if (e.KeyValue == (uint)Keys.W)
                 {
                     label1.Text = "W";
-
                     切智力腿();
-
                     Task.Run(闪烁敏捷);
                 }
                 else if (e.KeyValue == (uint)Keys.E)
                 {
                     label1.Text = "E";
-                    // 太过明显
+                    // 太过明显,故不使用
                     //切智力腿();
-
                     //Task.Run(法术反制敏捷);
                 }
                 else if (e.KeyValue == (uint)Keys.R)
                 {
                     label1.Text = "R";
                     切智力腿();
-
                     Task.Run(法力虚空取消后摇);
                 }
-                else if (e.KeyValue == (uint)Keys.Space)
+                else if (e.KeyValue == (uint)Keys.X)
                 {
-                    label1.Text = "R";
+                    label1.Text = "X";
                     Task.Run(分身一齐攻击);
                 }
             }
@@ -334,7 +330,7 @@ namespace Dota2Simulator
                 {
                     label1.Text = "Z";
 
-                    if (RegPicture(Resource_Picture.魂戒CD, "Z"))
+                    if (RegPicture(Resource_Picture.物品_魂戒CD, "Z"))
                     {
                         切力量腿();
                         Task.Run(魂戒智力);
@@ -458,15 +454,23 @@ namespace Dota2Simulator
 
                     Task.Run(灵魂之矛敏捷);
                 }
-                else if (e.KeyValue == (uint)Keys.D2)
+                else if (e.KeyValue == (uint)Keys.D)
                 {
-                    label1.Text = "W";
+                    label1.Text = "D";
 
                     切智力腿();
 
                     KeyPress((uint)Keys.W);
 
                     Task.Run(神行百变敏捷);
+                }
+                else if (e.KeyValue == (uint)Keys.F)
+                {
+                    label1.Text = "F";
+
+                    RightClick();
+
+                    Task.Run(后撤触发冲锋);
                 }
             }
 
@@ -727,7 +731,7 @@ namespace Dota2Simulator
 
         private void 跳吼()
         {
-            while (RegPicture(Resource_Picture.刃甲, "X"))
+            while (RegPicture(Resource_Picture.物品_刃甲, "X"))
             {
                 KeyPress((uint)Keys.X);
                 Delay(30);
@@ -736,7 +740,7 @@ namespace Dota2Simulator
             KeyPress((uint)Keys.Space);
 
 
-            while (RegPicture(Resource_Picture.狂战士之吼, "Q") || RegPicture(Resource_Picture.狂战士之吼_金色饰品, "Q"))
+            while (RegPicture(Resource_Picture.斧王_狂战士之吼, "Q") || RegPicture(Resource_Picture.斧王_狂战士之吼_金色饰品, "Q"))
             {
                 KeyPress((uint)Keys.Q);
                 Delay(30);
@@ -750,7 +754,7 @@ namespace Dota2Simulator
 
             切敏捷腿();
 
-            if (RegPicture(Resource_Picture.分身, "Z"))
+            if (RegPicture(Resource_Picture.物品_分身, "Z"))
             {
                 KeyPress((uint)Keys.Z);
                 分身一齐攻击();
@@ -764,7 +768,7 @@ namespace Dota2Simulator
             var w_down = 0;
             while (w_down == 0)
             {
-                if (RegPicture(Resource_Picture.战斗饥渴, "W"))
+                if (RegPicture(Resource_Picture.斧王_战斗饥渴, "W"))
                 {
                     Delay(302);
                     KeyPress((uint)Keys.A);
@@ -804,13 +808,13 @@ namespace Dota2Simulator
         {
             var p = 正面跳刀_无转身();
 
-            if (RegPicture(Resource_Picture.魂戒CD, "Z"))
+            if (RegPicture(Resource_Picture.物品_魂戒CD, "Z"))
             {
                 KeyPress((uint)Keys.Z);
                 Delay(30);
             }
 
-            if (RegPicture(Resource_Picture.臂章, "Z"))
+            if (RegPicture(Resource_Picture.物品_臂章, "Z"))
             {
                 KeyPress((uint)Keys.Z);
                 Delay(30);
@@ -818,38 +822,38 @@ namespace Dota2Simulator
 
             var wDown = 0;
 
-            if (RegPicture(Resource_Picture.强攻CD, "W", matchRate: 0.7))
+            if (RegPicture(Resource_Picture.军团_强攻CD, "W", matchRate: 0.7))
             {
                 KeyPress((uint)Keys.D);
                 KeyPress((uint)Keys.D);
 
                 while (wDown == 0)
-                    if (RegPicture(Resource_Picture.释放强攻, "W", matchRate: 0.7))
+                    if (RegPicture(Resource_Picture.军团_释放强攻, "W", matchRate: 0.7))
                     {
                         Delay(95);
                         wDown = 1;
                     }
             }
 
-            if (RegPicture(Resource_Picture.黑皇, "Z"))
+            if (RegPicture(Resource_Picture.物品_黑皇, "Z"))
             {
                 KeyPress((uint)Keys.Z);
                 Delay(30);
             }
 
-            if (RegPicture(Resource_Picture.相位, "B"))
+            if (RegPicture(Resource_Picture.物品_相位, "B"))
             {
                 KeyPress((uint)Keys.B);
                 Delay(30);
             }
 
-            if (RegPicture(Resource_Picture.相位, "C"))
+            if (RegPicture(Resource_Picture.物品_相位, "C"))
             {
                 KeyPress((uint)Keys.C);
                 Delay(30);
             }
 
-            if (RegPicture(Resource_Picture.刃甲, "X"))
+            if (RegPicture(Resource_Picture.物品_刃甲, "X"))
             {
                 KeyPress((uint)Keys.X);
                 Delay(30);
@@ -867,7 +871,7 @@ namespace Dota2Simulator
 
             var time = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds();
 
-            while (RegPicture(Resource_Picture.否决, "X"))
+            while (RegPicture(Resource_Picture.物品_否决, "X"))
             {
                 KeyPress((uint)Keys.X);
                 Delay(30);
@@ -876,7 +880,7 @@ namespace Dota2Simulator
                 if (new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds() - time > 150) break;
             }
 
-            while (RegPicture(Resource_Picture.天堂, "C"))
+            while (RegPicture(Resource_Picture.物品_天堂, "C"))
             {
                 KeyPress((uint)Keys.C);
                 Delay(30);
@@ -885,7 +889,7 @@ namespace Dota2Simulator
                 if (new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds() - time > 150) break;
             }
 
-            while (RegPicture(Resource_Picture.勇气, "V"))
+            while (RegPicture(Resource_Picture.物品_勇气, "V"))
             {
                 KeyPress((uint)Keys.V);
                 Delay(30);
@@ -894,7 +898,7 @@ namespace Dota2Simulator
                 if (new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds() - time > 150) break;
             }
 
-            while (RegPicture(Resource_Picture.炎阳, "V"))
+            while (RegPicture(Resource_Picture.物品_炎阳, "V"))
             {
                 KeyPress((uint)Keys.V);
                 Delay(30);
@@ -903,7 +907,7 @@ namespace Dota2Simulator
                 if (new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds() - time > 150) break;
             }
 
-            while (RegPicture(Resource_Picture.决斗CD, "R"))
+            while (RegPicture(Resource_Picture.军团_决斗CD, "R"))
             {
                 KeyPress((uint)Keys.R);
                 Delay(30);
@@ -925,7 +929,7 @@ namespace Dota2Simulator
             KeyPress((uint)Keys.W);
 
             while (all_done == 0)
-                if (FindPicture(Resource_Picture.释放深渊, CaptureScreen(857, 939, 70, 72)).Count > 0)
+                if (FindPicture(Resource_Picture.孽主_释放深渊, CaptureScreen(857, 939, 70, 72)).Count > 0)
                 {
                     Delay(400);
                     KeyPress((uint)Keys.A);
@@ -986,7 +990,7 @@ namespace Dota2Simulator
                 {
                     Delay(400);
 
-                    while (RegPicture(Resource_Picture.刃甲, "X"))
+                    while (RegPicture(Resource_Picture.物品_刃甲, "X"))
                     {
                         KeyPress((uint)Keys.X);
                         Delay(30);
@@ -1009,7 +1013,7 @@ namespace Dota2Simulator
 
         private void 跳接勋章接摔角行家()
         {
-            if (RegPicture(Resource_Picture.臂章, "Z"))
+            if (RegPicture(Resource_Picture.物品_臂章, "Z"))
             {
                 KeyPress((uint)Keys.Z);
                 Delay(30);
@@ -1190,75 +1194,39 @@ namespace Dota2Simulator
             var time = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds();
 
             // 勋章放在c位置
-            while (RegPicture(Resource_Picture.勇气, "C"))
+            while (RegPicture(Resource_Picture.物品_勇气, "C") || RegPicture(Resource_Picture.物品_炎阳, "C") || RegPicture(Resource_Picture.物品_紫苑, "C") || RegPicture(Resource_Picture.物品_血棘, "C") || RegPicture(Resource_Picture.物品_羊刀, "C"))
             {
                 KeyPress((uint)Keys.C);
                 Delay(30);
-
-                if (new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds() - time > 100) break;
-            }
-
-            while (RegPicture(Resource_Picture.炎阳, "C"))
-            {
-                KeyPress((uint)Keys.C);
-                Delay(30);
-
-                if (new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds() - time > 100) break;
+                if (new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds() - time > 200) break;
             }
 
             time = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds();
 
-            while (RegPicture(Resource_Picture.紫苑, "Z"))
+            while (RegPicture(Resource_Picture.物品_勇气, "Z") || RegPicture(Resource_Picture.物品_炎阳, "Z") || RegPicture(Resource_Picture.物品_紫苑, "Z") || RegPicture(Resource_Picture.物品_血棘, "Z") || RegPicture(Resource_Picture.物品_羊刀, "Z"))
             {
                 KeyPress((uint)Keys.Z);
                 Delay(30);
-
-                if (new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds() - time > 100) break;
-            }
-
-            while (RegPicture(Resource_Picture.紫苑, "SPACE"))
-            {
-                KeyPress((uint)Keys.Space);
-                Delay(30);
-
-                if (new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds() - time > 100) break;
-            }
-
-            while (RegPicture(Resource_Picture.血棘, "Z"))    
-            {
-                KeyPress((uint)Keys.Z);
-                Delay(30);
-
-                if (new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds() - time > 100) break;
-            }
-
-            while (RegPicture(Resource_Picture.血棘, "SPACE"))
-            {
-                KeyPress((uint)Keys.Space);
-                Delay(30);
-
-                if (new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds() - time > 100) break;
+                if (new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds() - time > 200) break;
             }
 
             time = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds();
 
-            while (RegPicture(Resource_Picture.羊刀, "SPACE"))
+            while (RegPicture(Resource_Picture.物品_勇气, "SPACE") || RegPicture(Resource_Picture.物品_炎阳, "SPACE") || RegPicture(Resource_Picture.物品_紫苑, "SPACE") || RegPicture(Resource_Picture.物品_血棘, "SPACE") || RegPicture(Resource_Picture.物品_羊刀, "SPACE"))
             {
                 KeyPress((uint)Keys.Space);
                 Delay(30);
-
-                if (new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds() - time > 100) break;
+                if (new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds() - time > 200) break;
             }
 
             time = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds();
 
             // 否决放在x
-            while (RegPicture(Resource_Picture.否决, "X"))
+            while (RegPicture(Resource_Picture.物品_否决, "X"))
             {
                 KeyPress((uint)Keys.X);
                 Delay(30);
-
-                if (new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds() - time > 100) break;
+                if (new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds() - time > 200) break;
             }
 
             KeyPress((uint)Keys.A);
@@ -1383,7 +1351,7 @@ namespace Dota2Simulator
 
         private void 远程飞斧()
         {
-            if (FindPicture(Resource_Picture.远斧头, CaptureScreen(839, 939, 70, 72)).Count > 0)
+            if (FindPicture(Resource_Picture.巨魔_远斧头, CaptureScreen(839, 939, 70, 72)).Count > 0)
             {
                 KeyPress((uint)Keys.Q);
 
@@ -1429,7 +1397,7 @@ namespace Dota2Simulator
         private void 跳水敏捷()
         {
             // 为了避免切太快导致实际上还是敏捷腿
-            Delay(150);
+            Delay(180);
 
             KeyPress((uint)Keys.A);
 
@@ -1446,7 +1414,7 @@ namespace Dota2Simulator
             {
                 if (RegPicture(Resource_Picture.小鱼人_释放深海护罩, "D", 5))
                 {
-                    Delay(50);
+                    Delay(75);
 
                     d_down = true;
 
@@ -1466,7 +1434,6 @@ namespace Dota2Simulator
         private void 灵魂之矛敏捷()
         {
             var w_down = 0;
-
             var time = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds();
 
             while (w_down == 0)
@@ -1474,22 +1441,24 @@ namespace Dota2Simulator
                 if (RegPicture(Resource_Picture.猴子_释放灵魂之矛, "Q"))
                 {
                     Delay(125);
-
                     切敏捷腿();
-
                     w_down = 1;
                 }
 
                 if (new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds() - time > 2000) break;
             }
-
         }
 
         private void 神行百变敏捷()
         {
             Delay(1350);
-
             切敏捷腿();
+        }
+
+        private void 后撤触发冲锋()
+        {
+            Delay(550);
+            KeyPress((uint)Keys.A);
         }
 
         #endregion
@@ -1623,7 +1592,7 @@ namespace Dota2Simulator
 
         private void 跳秒接午夜凋零黑洞()
         {
-            if (RegPicture(Resource_Picture.黑皇, "Z"))
+            if (RegPicture(Resource_Picture.物品_黑皇, "Z"))
             {
                 KeyPress((uint)Keys.Z);
             }
@@ -1635,7 +1604,7 @@ namespace Dota2Simulator
 
             var time = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds();
 
-            while (RegPicture(Resource_Picture.跳刀, "SPACE") || RegPicture(Resource_Picture.跳刀_智力跳刀, "SPACE"))
+            while (RegPicture(Resource_Picture.物品_跳刀, "SPACE") || RegPicture(Resource_Picture.物品_跳刀_智力跳刀, "SPACE"))
             {
                 Delay(30);
                 KeyPress((uint)Keys.Space);
@@ -1645,7 +1614,7 @@ namespace Dota2Simulator
 
             time = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds();
 
-            while (RegPicture(Resource_Picture.午夜凋零CD, "E"))
+            while (RegPicture(Resource_Picture.谜团_午夜凋零CD, "E"))
             {
                 KeyPress((uint)Keys.E);
                 Delay(30);
@@ -1653,7 +1622,7 @@ namespace Dota2Simulator
                 if (new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds() - time > 500) break;
             }
 
-            while (RegPicture(Resource_Picture.黑洞CD, "R"))
+            while (RegPicture(Resource_Picture.谜团_黑洞CD, "R"))
             {
                 KeyPress((uint)Keys.R);
                 Delay(30);
@@ -1697,7 +1666,7 @@ namespace Dota2Simulator
             var w_down = 0;
 
             while (w_down == 0)
-                if (FindPicture(Resource_Picture.释放冰封禁制, CaptureScreen(859, 939, 64, 62)).Count > 0)
+                if (FindPicture(Resource_Picture.冰女_释放冰封禁制, CaptureScreen(859, 939, 64, 62)).Count > 0)
                 {
                     Delay(365);
                     KeyPress((uint)Keys.Space);
@@ -1927,7 +1896,7 @@ namespace Dota2Simulator
         private void 吹风接撕裂大地()
         {
             var all_down = 0;
-            if (RegPicture(Resource_Picture.吹风CD完, "SPACE"))
+            if (RegPicture(Resource_Picture.物品_吹风CD完, "SPACE"))
             {
                 label1.Text = "FF";
                 KeyPress((uint)Keys.Space);
@@ -1939,7 +1908,7 @@ namespace Dota2Simulator
                 {
                     if (new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds() - time > 4000) break;
 
-                    if (RegPicture(Resource_Picture.吹风CD, "SPACE"))
+                    if (RegPicture(Resource_Picture.物品_吹风CD, "SPACE"))
                     {
                         label1.Text = "FFF";
                         if (RegPicture(Resource_Picture.物品_纷争, "C")) KeyPress((uint)Keys.C);
@@ -2029,12 +1998,12 @@ namespace Dota2Simulator
             var times = 1.0;
             var time = 0;
 
-            if (RegPicture(Resource_Picture.祭礼长袍_4, "G"))
+            if (RegPicture(Resource_Picture.物品_祭礼长袍_4, "G"))
             {
                 times *= 1.1;
             }
 
-            if (RegPicture(Resource_Picture.永恒遗物_4, "G"))
+            if (RegPicture(Resource_Picture.物品_永恒遗物_4, "G"))
             {
                 times *= 1.25;
             }
@@ -2105,7 +2074,7 @@ namespace Dota2Simulator
             // 坐标
             var mousePosition = MousePosition;
 
-            var list = FindPicture(Resource_Picture.自身血量, CaptureScreen(0, 0, 1920, 1080), matchRate: 0.6);
+            var list = FindPicture(Resource_Picture.血量_自身血量, CaptureScreen(0, 0, 1920, 1080), matchRate: 0.6);
 
             // X间距
             double move_X = 0;
@@ -2153,7 +2122,7 @@ namespace Dota2Simulator
         private void 扔装备()
         {
             var p = MousePosition;
-            var list = RegPicture(Resource_Picture.自身血量, 0, 0, 1920, 1080, 0.8);
+            var list = RegPicture(Resource_Picture.血量_自身血量, 0, 0, 1920, 1080, 0.8);
             if (list.Count > 0)
             {
                 LeftDown();
@@ -2170,17 +2139,17 @@ namespace Dota2Simulator
 
         private static void 切智力腿()
         {
-            if (RegPicture(Resource_Picture.假腿_力量腿, "V")
-                || RegPicture(Resource_Picture.假腿_力量腿_5, "V", 5)
-                || RegPicture(Resource_Picture.假腿_力量腿_6, "V", 6)
-                || RegPicture(Resource_Picture.假腿_力量腿_7, "V", 7))
+            if (RegPicture(Resource_Picture.物品_假腿_力量腿, "V")
+                || RegPicture(Resource_Picture.物品_假腿_力量腿_5, "V", 5)
+                || RegPicture(Resource_Picture.物品_假腿_力量腿_6, "V", 6)
+                || RegPicture(Resource_Picture.物品_假腿_力量腿_7, "V", 7))
             {
                 KeyPress((uint)Keys.V);
             }
-            else if (RegPicture(Resource_Picture.假腿_敏捷腿, "V") 
-                || RegPicture(Resource_Picture.假腿_敏捷腿_5, "V", 5) 
-                || RegPicture(Resource_Picture.假腿_敏捷腿_6, "V", 6)
-                || RegPicture(Resource_Picture.假腿_敏捷腿_7, "V", 7))
+            else if (RegPicture(Resource_Picture.物品_假腿_敏捷腿, "V") 
+                || RegPicture(Resource_Picture.物品_假腿_敏捷腿_5, "V", 5) 
+                || RegPicture(Resource_Picture.物品_假腿_敏捷腿_6, "V", 6)
+                || RegPicture(Resource_Picture.物品_假腿_敏捷腿_7, "V", 7))
             {
                 KeyPress((uint)Keys.V);
                 //delay(30);
@@ -2190,19 +2159,19 @@ namespace Dota2Simulator
 
         private static void 切敏捷腿()
         {
-            if (RegPicture(Resource_Picture.假腿_力量腿, "V")
-                || RegPicture(Resource_Picture.假腿_力量腿_5, "V", 5)
-                || RegPicture(Resource_Picture.假腿_力量腿_6, "V", 6)
-                || RegPicture(Resource_Picture.假腿_力量腿_7, "V", 7))
+            if (RegPicture(Resource_Picture.物品_假腿_力量腿, "V")
+                || RegPicture(Resource_Picture.物品_假腿_力量腿_5, "V", 5)
+                || RegPicture(Resource_Picture.物品_假腿_力量腿_6, "V", 6)
+                || RegPicture(Resource_Picture.物品_假腿_力量腿_7, "V", 7))
             {
                 KeyPress((uint)Keys.V);
                 //delay(30);
                 KeyPress((uint)Keys.V);
             }
-            else if (RegPicture(Resource_Picture.假腿_智力腿, "V")
-                || RegPicture(Resource_Picture.假腿_智力腿_5, "V", 5)
-                || RegPicture(Resource_Picture.假腿_智力腿_6, "V", 6)
-                || RegPicture(Resource_Picture.假腿_智力腿_7, "V", 7))
+            else if (RegPicture(Resource_Picture.物品_假腿_智力腿, "V")
+                || RegPicture(Resource_Picture.物品_假腿_智力腿_5, "V", 5)
+                || RegPicture(Resource_Picture.物品_假腿_智力腿_6, "V", 6)
+                || RegPicture(Resource_Picture.物品_假腿_智力腿_7, "V", 7))
             {
                 KeyPress((uint)Keys.V);
             }
@@ -2210,17 +2179,17 @@ namespace Dota2Simulator
 
         private static void 切力量腿()
         {
-            if (RegPicture(Resource_Picture.假腿_敏捷腿, "V")
-                || RegPicture(Resource_Picture.假腿_敏捷腿_5, "V", 5)
-                || RegPicture(Resource_Picture.假腿_敏捷腿_6, "V", 6)
-                || RegPicture(Resource_Picture.假腿_敏捷腿_7, "V", 7))
+            if (RegPicture(Resource_Picture.物品_假腿_敏捷腿, "V")
+                || RegPicture(Resource_Picture.物品_假腿_敏捷腿_5, "V", 5)
+                || RegPicture(Resource_Picture.物品_假腿_敏捷腿_6, "V", 6)
+                || RegPicture(Resource_Picture.物品_假腿_敏捷腿_7, "V", 7))
             {
                 KeyPress((uint)Keys.V);
             }
-            else if (RegPicture(Resource_Picture.假腿_智力腿, "V")
-                || RegPicture(Resource_Picture.假腿_智力腿_5, "V", 5)
-                || RegPicture(Resource_Picture.假腿_智力腿_6, "V", 6)
-                || RegPicture(Resource_Picture.假腿_智力腿_7, "V", 7))
+            else if (RegPicture(Resource_Picture.物品_假腿_智力腿, "V")
+                || RegPicture(Resource_Picture.物品_假腿_智力腿_5, "V", 5)
+                || RegPicture(Resource_Picture.物品_假腿_智力腿_6, "V", 6)
+                || RegPicture(Resource_Picture.物品_假腿_智力腿_7, "V", 7))
             {
                 KeyPress((uint)Keys.V);
                 //delay(30);
@@ -2245,7 +2214,6 @@ namespace Dota2Simulator
         private void 分身一齐攻击()
         {
             Delay(140);
-
             KeyDown((uint)Keys.LControlKey);
             KeyPress((uint)Keys.A);
             KeyUp((uint)Keys.LControlKey);
@@ -2253,6 +2221,7 @@ namespace Dota2Simulator
 
         #endregion
 
+        #region 死灵射手净化
         //private static void 死灵射手净化()
         //{
         //    KeyPress((uint)Keys.D1);
@@ -2261,12 +2230,13 @@ namespace Dota2Simulator
         //    delay(30);
         //    KeyPress((uint)Keys.F1);
         //}
+        #endregion
 
         #region buff或者装备
 
         private static bool 智力跳刀BUFF()
         {
-            return RegPicture(Resource_Picture.跳刀_智力跳刀BUFF, 400, 865, 1000, 60).Count > 0;
+            return RegPicture(Resource_Picture.物品_跳刀_智力跳刀BUFF, 400, 865, 1000, 60).Count > 0;
         }
 
         private static bool 阿哈利姆神杖()
@@ -2645,32 +2615,32 @@ namespace Dota2Simulator
             switch (tb_name.Text)
             {
                 case "影魔":
-                    pictureBox1.Image = Resource_Picture.吹风CD;
+                    pictureBox1.Image = Resource_Picture.物品_吹风CD;
                     break;
                 case "黑鸟":
                     pictureBox1.Image = Resource_Picture.黑鸟_关释放;
                     break;
                 case "军团":
-                    pictureBox1.Image = Resource_Picture.释放强攻;
+                    pictureBox1.Image = Resource_Picture.军团_释放强攻;
                     break;
                 case "孽主":
-                    pictureBox1.Image = Resource_Picture.释放深渊;
+                    pictureBox1.Image = Resource_Picture.孽主_释放深渊;
                     break;
                 case "巨魔":
-                    pictureBox1.Image = Resource_Picture.远斧头;
+                    pictureBox1.Image = Resource_Picture.巨魔_远斧头;
                     break;
                 case "冰女":
-                    pictureBox1.Image = Resource_Picture.释放冰封禁制;
+                    pictureBox1.Image = Resource_Picture.冰女_释放冰封禁制;
                     break;
                 case "蓝猫":
                     pictureBox1.Image = Resource_Picture.蓝猫_释放电子漩涡;
                     break;
                 case "小骷髅":
-                    pictureBox1.Image = Resource_Picture.假腿_敏捷腿;
+                    pictureBox1.Image = Resource_Picture.物品_假腿_敏捷腿;
                     break;
                 case "小鱼人":
                 case "拍拍":
-                    pictureBox1.Image = Resource_Picture.假腿_敏捷腿;
+                    pictureBox1.Image = Resource_Picture.物品_假腿_敏捷腿;
                     break;
                 case "宙斯":
                     pictureBox1.Image = Resource_Picture.宙斯_释放弧形闪电;
