@@ -303,6 +303,76 @@ namespace Dota2Simulator.Picture_Dota2 {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap 幻刺_刀阵旋风_5 {
+            get {
+                object obj = ResourceManager.GetObject("幻刺_刀阵旋风_5", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap 幻刺_幻影突袭_4 {
+            get {
+                object obj = ResourceManager.GetObject("幻刺_幻影突袭_4", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap 幻刺_幻影突袭_5 {
+            get {
+                object obj = ResourceManager.GetObject("幻刺_幻影突袭_5", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap 幻刺_窒息短匕_4 {
+            get {
+                object obj = ResourceManager.GetObject("幻刺_窒息短匕_4", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap 幻刺_窒息短匕_5 {
+            get {
+                object obj = ResourceManager.GetObject("幻刺_窒息短匕_5", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap 幻刺_魅影无形_4 {
+            get {
+                object obj = ResourceManager.GetObject("幻刺_魅影无形_4", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap 幻刺_魅影无形_5 {
+            get {
+                object obj = ResourceManager.GetObject("幻刺_魅影无形_5", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap 拉席克_释放完震撼大地 {
             get {
                 object obj = ResourceManager.GetObject("拉席克_释放完震撼大地", resourceCulture);

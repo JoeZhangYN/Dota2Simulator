@@ -396,7 +396,7 @@ namespace Dota2Simulator
 
                     Task.Run(黑暗契约力量);
                 }
-                else if (e.KeyValue == (uint)Keys.W || e.KeyValue == (uint)Keys.R || e.KeyValue == (uint)Keys.C || e.KeyValue == (uint)Keys.Space)
+                else if (e.KeyValue == (uint)Keys.W || e.KeyValue == (uint)Keys.R)
                 {
                     label1.Text = "释放接平A";
 
@@ -431,12 +431,6 @@ namespace Dota2Simulator
                     切智力腿();
 
                     Task.Run(深海护罩敏捷);
-                }
-                else if (e.KeyValue == (uint)Keys.X)
-                {
-                    label1.Text = "Item";
-
-                    切智力腿();
                 }
             }
 
@@ -481,6 +475,38 @@ namespace Dota2Simulator
             else if (tb_name.Text == "水人")
             {
                 
+            }
+
+            #endregion
+
+            #region 幻刺
+
+            else if (tb_name.Text == "幻刺")
+            {
+                if (e.KeyValue == (uint)Keys.Q)
+                {
+                    label1.Text = "Q";
+                    切智力腿();
+                    Task.Run(窒息短匕敏捷);
+                }
+                else if (e.KeyValue == (uint)Keys.W)
+                {
+                    label1.Text = "W";
+                    切智力腿();
+                    Task.Run(幻影突袭敏捷);
+                }
+                else if (e.KeyValue == (uint)Keys.E)
+                {
+                    label1.Text = "E";
+                    切智力腿();
+                    Task.Run(魅影无形敏捷);
+                }
+                else if (e.KeyValue == (uint)Keys.D)
+                {
+                    label1.Text = "E";
+                    切智力腿();
+                    Task.Run(刀阵旋风敏捷);
+                }
             }
 
             #endregion
@@ -684,7 +710,6 @@ namespace Dota2Simulator
 
             #endregion
 
-
             #region 保存微信图片
 
             else if (tb_name.Text.Trim() == "微信图片")
@@ -711,11 +736,8 @@ namespace Dota2Simulator
 
             else if (tb_name.Text.Trim() == "切假腿")
             {
-                if (e.KeyValue == (uint)Keys.Q)
+                if (e.KeyValue == (uint)Keys.Q || e.KeyValue == (uint)Keys.W || e.KeyValue == (uint)Keys.D || e.KeyValue == (uint)Keys.F || e.KeyValue == (uint)Keys.R)
                     切智力腿();
-                else if (e.KeyValue == (uint)Keys.W)
-                    切敏捷腿();
-                else if (e.KeyValue == (uint)Keys.E) 切力量腿();
             }
 
             #endregion
@@ -806,7 +828,7 @@ namespace Dota2Simulator
 
         private void 决斗()
         {
-            var p = 正面跳刀_无转身();
+            //var p = 正面跳刀_无转身();
 
             if (RegPicture(Resource_Picture.物品_魂戒CD, "Z"))
             {
@@ -822,13 +844,13 @@ namespace Dota2Simulator
 
             var wDown = 0;
 
-            if (RegPicture(Resource_Picture.军团_强攻CD, "W", matchRate: 0.7))
+            if (RegPicture(Resource_Picture.军团_强攻CD, "W"))
             {
                 KeyPress((uint)Keys.D);
                 KeyPress((uint)Keys.D);
 
                 while (wDown == 0)
-                    if (RegPicture(Resource_Picture.军团_释放强攻, "W", matchRate: 0.7))
+                    if (RegPicture(Resource_Picture.军团_释放强攻, "W"))
                     {
                         Delay(95);
                         wDown = 1;
@@ -859,15 +881,15 @@ namespace Dota2Simulator
                 Delay(30);
             }
 
-            var point = MousePosition;
+            //var point = MousePosition;
 
-            MouseMove(p.X, p.Y);
+            //MouseMove(p.X, p.Y);
 
             KeyPress((uint)Keys.Space);
 
-            Delay(5);
+            //Delay(5);
 
-            MouseMove(point.X, point.Y);
+            //MouseMove(point.X, point.Y);
 
             var time = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds();
 
@@ -1198,7 +1220,7 @@ namespace Dota2Simulator
             {
                 KeyPress((uint)Keys.C);
                 Delay(30);
-                if (new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds() - time > 200) break;
+                if (new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds() - time > 100) break;
             }
 
             time = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds();
@@ -1207,7 +1229,7 @@ namespace Dota2Simulator
             {
                 KeyPress((uint)Keys.Z);
                 Delay(30);
-                if (new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds() - time > 200) break;
+                if (new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds() - time > 100) break;
             }
 
             time = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds();
@@ -1216,7 +1238,7 @@ namespace Dota2Simulator
             {
                 KeyPress((uint)Keys.Space);
                 Delay(30);
-                if (new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds() - time > 200) break;
+                if (new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds() - time > 100) break;
             }
 
             time = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds();
@@ -1226,7 +1248,7 @@ namespace Dota2Simulator
             {
                 KeyPress((uint)Keys.X);
                 Delay(30);
-                if (new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds() - time > 200) break;
+                if (new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds() - time > 100) break;
             }
 
             KeyPress((uint)Keys.A);
@@ -1341,7 +1363,7 @@ namespace Dota2Simulator
         private void 震撼大地接平A()
         {
             KeyPress((uint)Keys.A);
-            Delay(100);
+            Delay(200);
             切敏捷腿();
         }
 
@@ -1529,6 +1551,102 @@ namespace Dota2Simulator
 
                 切敏捷腿();
 
+                break;
+            }
+        }
+
+        #endregion
+
+        #region 幻刺
+
+        private void 窒息短匕敏捷()
+        {
+            var time = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds();
+
+            var w_down = 0;
+
+            while (w_down == 0)
+            {
+                if (RegPicture(Resource_Picture.幻刺_窒息短匕_4, "Q") || RegPicture(Resource_Picture.幻刺_窒息短匕_5, "Q", 5))
+                {
+                    Delay(150);
+                    KeyPress((uint)Keys.A);
+                    切敏捷腿();
+                    w_down = 1;
+                }
+
+                if (new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds() - time <= 800) continue;
+
+                切敏捷腿();
+                break;
+            }
+        }
+
+        private void 幻影突袭敏捷()
+        {
+            var time = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds();
+
+            var w_down = 0;
+
+            while (w_down == 0)
+            {
+                if (RegPicture(Resource_Picture.幻刺_幻影突袭_4, "W") || RegPicture(Resource_Picture.幻刺_幻影突袭_5, "W", 5))
+                {
+                    Delay(125);
+                    KeyPress((uint)Keys.A);
+                    切敏捷腿();
+                    w_down = 1;
+                }
+
+                if (new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds() - time <= 800) continue;
+
+                切敏捷腿();
+                break;
+            }
+        }
+
+        private void 魅影无形敏捷()
+        {
+            var time = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds();
+
+            var w_down = 0;
+
+            while (w_down == 0)
+            {
+                if (RegPicture(Resource_Picture.幻刺_魅影无形_4, "E") || RegPicture(Resource_Picture.幻刺_魅影无形_5, "E", 5))
+                {
+                    Delay(200);
+                    KeyPress((uint)Keys.A);
+                    切敏捷腿();
+                    w_down = 1;
+                }
+
+                if (new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds() - time <= 800) continue;
+
+                切敏捷腿();
+                break;
+            }
+        }
+
+        private void 刀阵旋风敏捷()
+        {
+            var time = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds();
+
+            var w_down = 0;
+
+            while (w_down == 0)
+            {
+                if (RegPicture(Resource_Picture.幻刺_刀阵旋风_5, "D", 5))
+                {
+                    Delay(200);
+                    KeyPress((uint)Keys.A);
+                    切敏捷腿();
+                    w_down = 1;
+                }
+
+                if (new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds() - time <= 800) continue;
+
+                切敏捷腿();
                 break;
             }
         }
@@ -2048,7 +2166,7 @@ namespace Dota2Simulator
                     if (new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds() - time1 > 1200) break;
                 }
 
-                Delay(Convert.ToInt32(time * times) - 380);
+                Delay(Convert.ToInt32(time * times) - 365);
 
                 if (!loop_bool_2) return;
 

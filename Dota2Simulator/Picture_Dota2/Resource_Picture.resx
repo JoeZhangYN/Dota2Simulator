@@ -152,10 +152,10 @@
     <value>宙斯_释放雷云后雷击.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="宙斯_释放雷击" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>宙斯_释放雷击.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+    <value>宙斯_释放雷击.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="宙斯_释放雷击1" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>宙斯_释放雷击.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+    <value>宙斯_释放雷击.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="宙斯_雷云" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>宙斯_雷云.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
@@ -189,6 +189,27 @@
   </data>
   <data name="巨魔_远斧头" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>巨魔_远斧头.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="幻刺_刀阵旋风_5" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>幻刺_刀阵旋风_5.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="幻刺_幻影突袭_4" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>幻刺_幻影突袭_4.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="幻刺_幻影突袭_5" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>幻刺_幻影突袭_5.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="幻刺_窒息短匕_4" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>幻刺_窒息短匕_4.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="幻刺_窒息短匕_5" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>幻刺_窒息短匕_5.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="幻刺_魅影无形_4" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>幻刺_魅影无形_4.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="幻刺_魅影无形_5" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>幻刺_魅影无形_5.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="拉席克_释放完震撼大地" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>拉席克_释放完震撼大地.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
