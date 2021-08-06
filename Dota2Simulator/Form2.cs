@@ -48,6 +48,11 @@ namespace Dota2Simulator
         ///// </summary>
         //private RandomGenerator randomGenerator = new();
 
+        /// <summary>
+        ///     全局时间
+        /// </summary>
+        private long 全局时间 = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds();
+
         #endregion
 
         #region 触发重载
@@ -64,13 +69,11 @@ namespace Dota2Simulator
         /// <param name="e"></param>
         private void Hook_KeyDown(object sender, KeyEventArgs e)
         {
-            if (e.KeyValue == (uint)Keys.N) Task.Run(扔装备);
-
             #region 力量
 
             #region 军团
 
-            else if (tb_name.Text == "军团")
+            if (tb_name.Text == "军团")
             {
                 if (e.KeyValue == (uint)Keys.E)
                 {
@@ -474,7 +477,7 @@ namespace Dota2Simulator
 
             else if (tb_name.Text == "水人")
             {
-                
+
             }
 
             #endregion
@@ -704,6 +707,81 @@ namespace Dota2Simulator
                 {
                     loop_bool_2 = false;
                 }
+            }
+
+            #endregion
+
+            #region 小仙女
+
+            else if (tb_name.Text.Trim() == "小仙女")
+            {
+                if (e.KeyValue == (uint)Keys.D2)
+                {
+                    label1.Text = "D2";
+
+                    loop_bool_2 = true;
+
+                    Task.Run(诅咒皇冠吹风);
+                }
+                if (e.KeyValue == (uint)Keys.D9)
+                {
+                    label1.Text = "D3";
+
+                    loop_bool_2 = true;
+
+                    Task.Run(作祟暗影之境最大化伤害);
+                }
+                else if (e.KeyValue == (uint)Keys.S)
+                {
+                    loop_bool_2 = false;
+                }
+                else if (e.KeyValue == (uint)Keys.E)
+                {
+                    Task.Run(皇冠延时计时);
+                }
+            }
+
+            #endregion
+
+            #region 天怒
+
+            else if (tb_name.Text.Trim() == "天怒")
+            {
+                if (e.KeyValue == (uint)Keys.D2)
+                {
+                    loop_bool_1 = true;
+
+                    Task.Run(循环奥数鹰隼);
+                }
+                else if (e.KeyValue == (uint)Keys.S)
+                {
+                    loop_bool_1 = false;
+                    loop_bool_2 = false;
+                }
+                else if (e.KeyValue == (uint)Keys.Q)
+                {
+                    // Task.Run(奥数鹰隼取消后摇);
+                }
+                else if (e.KeyValue == (uint)Keys.D3)
+                {
+                    loop_bool_2 = true;
+
+                    Task.Run(天怒秒人连招);
+                }
+
+            }
+
+            #endregion
+
+            #region 炸弹人
+
+            else if (tb_name.Text.Trim() == "炸弹人")
+            {
+                if (e.KeyValue == (uint)Keys.Space)
+                {
+                    魂戒丢装备();
+                }
+
             }
 
             #endregion
@@ -2126,7 +2204,7 @@ namespace Dota2Simulator
                 times *= 1.25;
             }
 
-            times *= ((100 - (Convert.ToDouble(tb_状态抗性.Text))) / 100);
+            times *= ((100 - (Convert.ToDouble(tb_丢装备.Text))) / 100);
 
             Color 技能点颜色 = Color.FromArgb(255, 203, 183, 124);
 
@@ -2174,6 +2252,267 @@ namespace Dota2Simulator
             });
         }
 
+
+        #endregion
+
+        #region 小仙女
+
+        private void 皇冠延时计时()
+        {
+            var 总开始时间 = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds();
+
+            var w_down = 0;
+
+            while (w_down == 0)
+            {
+                if (new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds() - 总开始时间 > 2000) return;
+
+                if (RegPicture(Resource_Picture.小仙女_释放诅咒皇冠_不朽, "E", 7))
+                {
+                    全局时间 = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds();
+                    Delay(100);
+                    KeyPress((uint)Keys.M);
+                }
+            }
+        }
+
+        private void 诅咒皇冠吹风()
+        {
+            var 总开始时间 = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds();
+
+            KeyPress((uint)Keys.E);
+
+            var w_down = 0;
+
+            while (w_down == 0)
+            {
+                if (new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds() - 总开始时间 > 2000) return;
+
+                if (RegPicture(Resource_Picture.小仙女_释放诅咒皇冠_不朽, "E", 7))
+                {
+                    Delay(阿哈利姆魔晶() ? 410 : 1410);  // 大部分技能抬手都是0.2-0.3之间
+                    if (!loop_bool_2) return;
+
+                    if (RegPicture(Resource_Picture.物品_吹风_7, "SPACE", 7))
+                    {
+                        KeyPress((uint)Keys.Space);
+                        KeyPress((uint)Keys.M);
+
+                        Delay(2500);
+                        if (!loop_bool_2) return;
+                        作祟暗影之境最大化伤害();
+                    }
+
+                    w_down = 1;
+                }
+            }
+        }
+
+        private void 作祟暗影之境最大化伤害()
+        {
+            // 释放纷争，增加大量伤害
+            if (RegPicture(Resource_Picture.物品_纷争_7, "C", 7))
+            {
+                KeyPress((uint)Keys.C);
+            }
+
+            KeyPress((uint)Keys.M);
+            Delay(30);
+            KeyPress((uint)Keys.D);
+            Delay(30);
+            KeyPress((uint)Keys.W);
+            Delay(30);
+            KeyPress((uint)Keys.W);
+
+            var 暗影之境_开始时间 = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds();
+
+            if (阿哈利姆神杖())
+            {
+                Delay(400);
+                KeyPress((uint)Keys.A);
+            }
+            else
+            {
+                while (new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds() - 暗影之境_开始时间 < 4500 || !loop_bool_2) { }
+                if (!loop_bool_2) return;
+                KeyPress((uint)Keys.A);
+            }
+        }
+
+        private void 皇冠接花控制衔接()
+        {
+            var 晕眩时间 = 1750;
+
+            Color 技能点颜色 = Color.FromArgb(255, 203, 183, 124);
+            if (CaptureColor(908, 1004).Equals(技能点颜色))
+                晕眩时间 = 1750;
+
+            技能点颜色 = Color.FromArgb(255, 203, 183, 124);
+            if (CaptureColor(920, 1004).Equals(技能点颜色))
+                晕眩时间 = 2250;
+
+            技能点颜色 = Color.FromArgb(255, 180, 162, 107);
+            if (CaptureColor(931, 1005).Equals(技能点颜色))
+                晕眩时间 = 2750;
+
+            技能点颜色 = Color.FromArgb(255, 180, 162, 107);
+            if (CaptureColor(931, 1005).Equals(技能点颜色))
+                晕眩时间 = 2750;
+
+            技能点颜色 = Color.FromArgb(255, 203, 183, 124);
+            if (CaptureColor(944, 1004).Equals(技能点颜色))
+                晕眩时间 = 3250;
+
+            技能点颜色 = Color.FromArgb(255, 246, 175, 57);
+            if (CaptureColor(759, 988).Equals(技能点颜色))
+                晕眩时间 += 600;
+
+            // 950 是第一朵花生效时间,
+            while (new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds() - 全局时间 < (晕眩时间 + (阿哈利姆魔晶() ? 3000 : 4000) - 950) || !loop_bool_2) { }
+            if (!loop_bool_2) return;
+            MouseMove(MousePosition.X - 120, MousePosition.Y);
+            KeyPress((uint)Keys.Q);
+            LeftClick();
+        }
+
+        #endregion
+
+        #region 天怒
+        private void 循环奥数鹰隼()
+        {
+            while (loop_bool_1)
+            {
+                if (RegPicture(Resource_Picture.天怒_魔法鹰隼_金饰品, "Q") || RegPicture(Resource_Picture.天怒_魔法鹰隼_金饰品_刚CD好, "Q"))
+                {
+                    KeyPress((uint)Keys.Q);
+                    label1.Text = "D32";
+                    Delay(200);
+                }
+
+                Delay(15);
+            }
+        }
+        private void 奥数鹰隼取消后摇()
+        {
+            var 总开始时间 = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds();
+
+            var q_down = 0;
+            while (q_down == 0)
+            {
+                if (new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds() - 总开始时间 > 1200) return;
+
+                if (RegPicture(Resource_Picture.天怒_释放魔法鹰隼_金饰品, "Q"))
+                {
+                    Delay(100);
+                    KeyPress((uint)Keys.M);
+                    q_down = 1;
+                }
+
+                Delay(15);
+            }
+        }
+
+        private void 天怒秒人连招()
+        {
+            if (RegPicture(Resource_Picture.物品_羊刀_4, "Z") && loop_bool_2)
+            {
+                KeyPress((uint)Keys.Z);
+
+                var 超时标准 = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds();
+                while (!RegPicture(Resource_Picture.物品_羊刀_4_进入CD, "Z") && loop_bool_2)
+                {
+                    if (new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds() - 超时标准 > 2000) return;
+                }
+            }
+
+            if (RegPicture(Resource_Picture.物品_虚灵之刃_4, "X") && loop_bool_2)
+            {
+                KeyPress((uint)Keys.X);
+
+                var 超时标准 = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds();
+                while (!RegPicture(Resource_Picture.物品_虚灵之刃_4_进入CD, "X") && loop_bool_2)
+                {
+                    if (new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds() - 超时标准 > 2000) return;
+                }
+            }
+
+            if (RegPicture(Resource_Picture.物品_虚灵之刃_4, "X") && loop_bool_2)
+            {
+                KeyPress((uint)Keys.X);
+
+                var 超时标准 = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds();
+                while (!RegPicture(Resource_Picture.物品_虚灵之刃_4_进入CD, "X") && loop_bool_2)
+                {
+                    if (new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds() - 超时标准 > 2000) return;
+                }
+            }
+
+            if ((RegPicture(Resource_Picture.物品_阿托斯之棍_4, "SPACE") || RegPicture(Resource_Picture.物品_缚灵锁_4, "SPACE")) && loop_bool_2)
+            {
+                KeyPress((uint)Keys.Space);
+
+                var 超时标准 = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds();
+                while ((!RegPicture(Resource_Picture.物品_阿托斯之棍_4_进入CD, "SPACE") && !RegPicture(Resource_Picture.物品_缚灵锁_4_进入CD, "SPACE")) && loop_bool_2)
+                {
+                    if (new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds() - 超时标准 > 2000) return;
+                }
+            }
+
+
+            if (RegPicture(Resource_Picture.物品_纷争, "C") && loop_bool_2)
+            {
+                KeyPress((uint)Keys.C);
+            }
+
+            KeyPress((uint)Keys.W);
+
+            tb_状态抗性.Text = "Q";
+
+            if (RegPicture(Resource_Picture.天怒_魔法鹰隼_金饰品, "Q") && loop_bool_2)
+            {
+                KeyPress((uint)Keys.Q);
+
+                var 超时标准 = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds();
+                while (!RegPicture(Resource_Picture.天怒_释放魔法鹰隼_金饰品, "Q") && loop_bool_2)
+                {
+                    if (new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds() - 超时标准 > 2000) return;
+                }
+            }
+
+            tb_状态抗性.Text = "E";
+
+            Delay(100);  // 施法前腰
+
+            if (RegPicture(Resource_Picture.天怒_上古封印, "E") && loop_bool_2)
+            {
+                KeyPress((uint)Keys.E);
+
+                var 超时标准 = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds();
+                while (!RegPicture(Resource_Picture.天怒_释放上古封印, "E") && loop_bool_2)
+                {
+                    if (new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds() - 超时标准 > 2000) return;
+                }
+            }            
+
+            tb_状态抗性.Text = "R";
+
+            Delay(100);  // 施法前腰
+
+            if (RegPicture(Resource_Picture.天怒_神秘之耀, "R") && loop_bool_2)
+            {
+                KeyPress((uint)Keys.R);
+            }
+
+            loop_bool_2 = false;
+        }
+
+        #endregion
+
+        #region 炸弹人
+        private void 魂戒丢装备()
+        {
+            批量扔装备();
+        }
 
         #endregion
 
@@ -2237,18 +2576,100 @@ namespace Dota2Simulator
 
         #region 扔装备
 
-        private void 扔装备()
+        private void 批量扔装备()
         {
-            var p = MousePosition;
+            var list_1 = tb_丢装备.Text.Split(',');
+
             var list = RegPicture(Resource_Picture.血量_自身血量, 0, 0, 1920, 1080, 0.8);
+
             if (list.Count > 0)
             {
-                LeftDown();
-                MouseMove(list[0].X + 55, list[0].Y + 117);
-                Delay(30);
-                LeftUp();
-                MouseMove(p.X, p.Y);
+                var point = new Point(list[0].X + 55, list[0].Y + 117);
+                tb_状态抗性.Text = point.X.ToString() + " " + point.Y.ToString();
+                try
+                {
+                    switch (list_1[0])
+                    {
+                        case "6":
+                            for (int i = 1; i < list_1.Length; i++)
+                            {
+                                switch (list_1[i])
+                                {
+                                    case "1":
+                                        扔装备(new Point(1191, 963), point);
+                                        break;
+                                    case "2":
+                                        扔装备(new Point(1259, 963), point);
+                                        break;
+                                    case "3":
+                                        扔装备(new Point(1325, 963), point);
+                                        break;
+                                    case "4":
+                                        扔装备(new Point(1191, 1011), point);
+                                        break;
+                                    case "5":
+                                        扔装备(new Point(1259, 1011), point);
+                                        break;
+                                    case "6":
+                                        扔装备(new Point(1325, 1011), point);
+                                        break;
+                                    case "7":
+                                        扔装备(new Point(1384, 994), point);
+                                        break;
+                                    default:
+                                        break;
+                                }
+                            }
+                            break;
+                        case "4":
+                            for (int i = 1; i < list_1.Length; i++)
+                            {
+                                switch (list_1[i])
+                                {
+                                    case "1":
+                                        扔装备(new Point(1145, 966), point);
+                                        break;
+                                    case "2":
+                                        扔装备(new Point(1214, 963), point);
+                                        break;
+                                    case "3":
+                                        扔装备(new Point(1288, 963), point);
+                                        break;
+                                    case "4":
+                                        扔装备(new Point(1145, 1011), point);
+                                        break;
+                                    case "5":
+                                        扔装备(new Point(1214, 1011), point);
+                                        break;
+                                    case "6":
+                                        扔装备(new Point(1288, 1011), point);
+                                        break;
+                                    case "7":
+                                        扔装备(new Point(1337, 994), point);
+                                        break;
+                                    default:
+                                        break;
+                                }
+                            }
+                            break;
+                    }
+                }
+                catch (Exception)
+                {
+
+                }
             }
+        }
+
+        private void 扔装备(Point p, Point p1)
+        {            
+            MouseMove(p);
+            LeftDown();
+            Delay(40);
+            MouseMove(p1);
+            Delay(40);
+            LeftUp();
+            Delay(40);
         }
 
         #endregion
@@ -2359,19 +2780,59 @@ namespace Dota2Simulator
 
         private static bool 阿哈利姆神杖()
         {
-            Color 技能点颜色 = Color.FromArgb(255, 35, 167, 234);
-
-            if (CaptureColor(1080, 957).Equals(技能点颜色))
+            Color 技能点颜色 = Color.FromArgb(255, 32, 183, 249);
+            if (CaptureColor(1078, 958).Equals(技能点颜色))
                 return true;
+            // 4技能A杖
 
-            技能点颜色 = Color.FromArgb(255, 32, 184, 252);
-            
-            if (CaptureColor(1110, 958).Equals(技能点颜色))
+            技能点颜色 = Color.FromArgb(255, 30, 188, 252);
+            if (CaptureColor(1094, 960).Equals(技能点颜色))
                 return true;
+            // 5技能A杖
 
-            技能点颜色 = Color.FromArgb(255, 32, 180, 244);
+            技能点颜色 = Color.FromArgb(255, 30, 189, 253);
+            if (CaptureColor(1110, 960).Equals(技能点颜色))
+                return true;
+            // 5技能A杖
 
-            return CaptureColor(1123, 958).Equals(技能点颜色);
+            技能点颜色 = Color.FromArgb(255, 30, 187, 250);
+            return CaptureColor(1122, 959).Equals(技能点颜色);
+            // 6技能A杖
+        }
+
+        private static bool 阿哈利姆魔晶()
+        {
+            Color 技能点颜色 = Color.FromArgb(255, 34, 186, 254);
+
+            if (CaptureColor(1094, 995).Equals(技能点颜色))
+                return true;
+            // 7技能魔晶
+
+            技能点颜色 = Color.FromArgb(255, 29, 187, 255);
+
+            if (CaptureColor(1110, 994).Equals(技能点颜色))
+                return true;
+            // 6技能魔晶无A
+
+            技能点颜色 = Color.FromArgb(255, 28, 187, 255);
+
+            if (CaptureColor(1121, 993).Equals(技能点颜色))
+                return true;
+            // 6技能魔晶A
+
+            技能点颜色 = Color.FromArgb(255, 28, 187, 255);
+
+            if (CaptureColor(1077, 993).Equals(技能点颜色))
+                return true;
+            // 4技能魔晶
+
+            技能点颜色 = Color.FromArgb(255, 30, 187, 254);
+
+            if (CaptureColor(1111, 994).Equals(技能点颜色))
+                return true;
+            // 5技能魔晶
+
+            return false;
         }
 
         #endregion
@@ -2836,7 +3297,7 @@ namespace Dota2Simulator
             TopMost = true;
 
             // 设置窗口位置
-            Location = new Point(338, 1039);
+            Location = new Point(338, 1013);
 
             return i;
         }
@@ -2876,6 +3337,12 @@ namespace Dota2Simulator
             KeyboardMouseSimulateDriverAPI.MouseUp((uint)Dota2Simulator.MouseButtons.RightUp);
         }
 
+        private static void LeftClick()
+        {
+            KeyboardMouseSimulateDriverAPI.MouseDown((uint)Dota2Simulator.MouseButtons.LeftDown);
+            KeyboardMouseSimulateDriverAPI.MouseUp((uint)Dota2Simulator.MouseButtons.LeftUp);
+        }
+
         private static void LeftDown()
         {
             KeyboardMouseSimulateDriverAPI.MouseDown((uint)Dota2Simulator.MouseButtons.LeftDown);
@@ -2909,6 +3376,21 @@ namespace Dota2Simulator
                 var p = MousePosition;
                 X += p.X;
                 Y += p.Y;
+            }
+
+            KeyboardMouseSimulateDriverAPI.MouseMove(X, Y, !relative);
+        }
+
+        public new static void MouseMove(Point p, bool relative = false)
+        {
+            var X = p.X;
+            var Y = p.Y;
+
+            if (relative)
+            {
+                var p1 = MousePosition;
+                X += p1.X;
+                Y += p1.Y;
             }
 
             KeyboardMouseSimulateDriverAPI.MouseMove(X, Y, !relative);
@@ -2958,5 +3440,6 @@ namespace Dota2Simulator
         //KeyboardMouseSimulateDriverAPI.KeyUp((uint) Keys.Space);
 
         #endregion
+
     }
 }
