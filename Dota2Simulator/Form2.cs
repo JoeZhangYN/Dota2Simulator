@@ -218,7 +218,7 @@ namespace Dota2Simulator
                     if (RegPicture(Resource_Picture.物品_魂戒CD, "C") || RegPicture(Resource_Picture.物品_魂戒CD_5, "C", 5))
                     {
                         切力量腿();
-                        Task.Run(魂戒智力);
+                        Task.Run(魂戒魔棒智力);
                     }
                 }
 
@@ -352,7 +352,7 @@ namespace Dota2Simulator
                     if (RegPicture(Resource_Picture.物品_魂戒CD, "Z") || RegPicture(Resource_Picture.物品_魂戒CD_5, "Z", 5))
                     {
                         切力量腿();
-                        Task.Run(魂戒智力);
+                        Task.Run(魂戒魔棒智力);
                     }
                 }
             }
@@ -680,6 +680,16 @@ namespace Dota2Simulator
                 {
                     label1.Text = "F";
                     Task.Run(泉水出来喝瓶);
+                }
+                else if (e.KeyValue == (uint)Keys.X)
+                {
+                    label1.Text = "F";
+
+                    if (RegPicture(Resource_Picture.物品_魂戒CD, "X"))
+                    {
+                        切力量腿();
+                        Task.Run(魂戒魔棒智力);
+                    }
                 }
             }
 
@@ -1404,7 +1414,7 @@ namespace Dota2Simulator
             切敏捷腿();
         }
 
-        private void 魂戒智力()
+        private static void 魂戒魔棒智力()
         {
             Delay(100);
 
@@ -2141,11 +2151,8 @@ namespace Dota2Simulator
 
                 if (RegPicture(Resource_Picture.蓝猫_释放电子漩涡, "W"))
                 {
-                    Task.Run(() =>
-                    {
-                        Delay(120);
-                        KeyPress((uint)Keys.A);
-                    });
+                    Delay(135);
+                    KeyPress((uint)Keys.A);
 
                     w_down = 1;
                 }
@@ -2169,11 +2176,8 @@ namespace Dota2Simulator
 
                 if (RegPicture(Resource_Picture.蓝猫_释放球状闪电_红, "R") || RegPicture(Resource_Picture.蓝猫_释放球状闪电, "R"))
                 {
-                    Task.Run(() =>
-                    {
-                        Delay(150);
-                        KeyPress((uint)Keys.A);
-                    });
+                    Delay(150);
+                    KeyPress((uint)Keys.A);
                     r_down = 1;
                 }
             }
