@@ -1463,6 +1463,16 @@ namespace Dota2Simulator.Picture_Dota2 {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap 物品_魂戒CD_5 {
+            get {
+                object obj = ResourceManager.GetObject("物品_魂戒CD_5", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap 物品_黑皇 {
             get {
                 object obj = ResourceManager.GetObject("物品_黑皇", resourceCulture);

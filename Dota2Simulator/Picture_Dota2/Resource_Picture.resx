@@ -538,6 +538,9 @@
   <data name="物品_魂戒CD" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>物品_魂戒cd.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="物品_魂戒CD_5" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>物品_魂戒cd_5.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
   <data name="物品_黑皇" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>物品_黑皇.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>

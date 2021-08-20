@@ -211,6 +211,16 @@ namespace Dota2Simulator
                     loop_bool_1 = false;
                     loop_bool_2 = false;
                 }
+                else if (e.KeyValue == (uint)Keys.C)
+                {
+                    label1.Text = "C";
+
+                    if (RegPicture(Resource_Picture.物品_魂戒CD, "C") || RegPicture(Resource_Picture.物品_魂戒CD_5, "C", 5))
+                    {
+                        切力量腿();
+                        Task.Run(魂戒智力);
+                    }
+                }
 
             }
 
@@ -339,7 +349,7 @@ namespace Dota2Simulator
                 {
                     label1.Text = "Z";
 
-                    if (RegPicture(Resource_Picture.物品_魂戒CD, "Z"))
+                    if (RegPicture(Resource_Picture.物品_魂戒CD, "Z") || RegPicture(Resource_Picture.物品_魂戒CD_5, "Z", 5))
                     {
                         切力量腿();
                         Task.Run(魂戒智力);
@@ -1215,6 +1225,7 @@ namespace Dota2Simulator
             {
                 if (RegPicture(Resource_Picture.钢背_针刺CD, "W"))
                 {
+                    切智力腿();
                     KeyPress((uint)Keys.W);
                     label1.Text = "D22";
                     Delay(300);
@@ -1222,6 +1233,7 @@ namespace Dota2Simulator
 
                 else if (RegPicture(Resource_Picture.钢背_针刺刚CD好, "W"))
                 {
+                    切智力腿();
                     KeyPress((uint)Keys.W);
                     label1.Text = "D22";
                     Delay(300);
@@ -1229,6 +1241,7 @@ namespace Dota2Simulator
 
                 else if (RegPicture(Resource_Picture.钢背_针刺CD_5, "W", 5))
                 {
+                    切智力腿();
                     KeyPress((uint)Keys.W);
                     label1.Text = "D22";
                     Delay(300);
@@ -1245,6 +1258,7 @@ namespace Dota2Simulator
                 {
                     if (RegPicture(Resource_Picture.钢背_鼻涕CD, "Q"))
                     {
+                        切智力腿();
                         KeyPress((uint)Keys.Q);
                         label1.Text = "D32";
                         Delay(300);
@@ -1252,6 +1266,7 @@ namespace Dota2Simulator
 
                     if (RegPicture(Resource_Picture.钢背_鼻涕CD_5, "Q", 5))
                     {
+                        切智力腿();
                         KeyPress((uint)Keys.Q);
                         label1.Text = "D32";
                         Delay(300);
@@ -2152,7 +2167,7 @@ namespace Dota2Simulator
             {
                 if (new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds() - time > 1500) break;
 
-                if (RegPicture(Resource_Picture.蓝猫_释放球状闪电_红, "R"))
+                if (RegPicture(Resource_Picture.蓝猫_释放球状闪电_红, "R") || RegPicture(Resource_Picture.蓝猫_释放球状闪电, "R"))
                 {
                     Task.Run(() =>
                     {
