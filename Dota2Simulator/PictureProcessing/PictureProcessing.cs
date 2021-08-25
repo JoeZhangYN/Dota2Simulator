@@ -193,7 +193,7 @@ namespace Dota2Simulator
 
                         if ((double)matchNum / sum >= matchRate)
                         {
-                            Console.WriteLine((double)matchNum / sum);
+                            // Console.WriteLine((double)matchNum / sum);
                             pointX = smallStartX + (int)(subWidth / 2.0);
                             pointY = smallStartY + (int)(subHeight / 2.0);
                             Point point = new(pointX, pointY);
