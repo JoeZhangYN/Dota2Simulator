@@ -1523,6 +1523,36 @@ namespace Dota2Simulator.Picture_Dota2 {
         /// <summary>
         ///   查找 System.Drawing.Bitmap 类型的本地化资源。
         /// </summary>
+        internal static System.Drawing.Bitmap 神域_释放命运敕令 {
+            get {
+                object obj = ResourceManager.GetObject("神域_释放命运敕令", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
+        /// </summary>
+        internal static System.Drawing.Bitmap 神域_释放涤罪之焰 {
+            get {
+                object obj = ResourceManager.GetObject("神域_释放涤罪之焰", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
+        /// </summary>
+        internal static System.Drawing.Bitmap 神域_释放虚妄之诺 {
+            get {
+                object obj = ResourceManager.GetObject("神域_释放虚妄之诺", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
+        /// </summary>
         internal static System.Drawing.Bitmap 船长_x标记_4 {
             get {
                 object obj = ResourceManager.GetObject("船长_x标记_4", resourceCulture);
@@ -1813,16 +1843,6 @@ namespace Dota2Simulator.Picture_Dota2 {
         /// <summary>
         ///   查找 System.Drawing.Bitmap 类型的本地化资源。
         /// </summary>
-        internal static System.Drawing.Bitmap 钢背_针刺刚CD好 {
-            get {
-                object obj = ResourceManager.GetObject("钢背_针刺刚CD好", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
-        /// </summary>
         internal static System.Drawing.Bitmap 钢背_鼻涕CD {
             get {
                 object obj = ResourceManager.GetObject("钢背_鼻涕CD", resourceCulture);
@@ -1836,6 +1856,26 @@ namespace Dota2Simulator.Picture_Dota2 {
         internal static System.Drawing.Bitmap 钢背_鼻涕CD_5 {
             get {
                 object obj = ResourceManager.GetObject("钢背_鼻涕CD_5", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
+        /// </summary>
+        internal static System.Drawing.Bitmap 钢背_鼻涕CD_5_不朽 {
+            get {
+                object obj = ResourceManager.GetObject("钢背_鼻涕CD_5_不朽", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
+        /// </summary>
+        internal static System.Drawing.Bitmap 钢背_鼻涕CD_不朽 {
+            get {
+                object obj = ResourceManager.GetObject("钢背_鼻涕CD_不朽", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

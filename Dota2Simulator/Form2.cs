@@ -53,6 +53,11 @@ namespace Dota2Simulator
         /// </summary>
         //private long 全局时间 = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds();
 
+        /// <summary>
+        ///     用于跳拱地点
+        /// </summary>
+        private static Point 指定地点_P = new(0, 0);
+
         #endregion
 
         #region 触发重载
@@ -226,6 +231,16 @@ namespace Dota2Simulator
 
                     loop_bool_1 = !loop_bool_1;
 
+                    // 基本上魂戒可以放4下，只浪费10点蓝
+                    // 配合一次鼻涕就一次也不浪费
+                    if (loop_bool_1)
+                    {
+                        if (RegPicture(Resource_Picture.物品_魂戒CD, "C") || RegPicture(Resource_Picture.物品_魂戒CD_5, "C", 5))
+                        {
+                            KeyPress((uint)Keys.C);
+                        }
+                    }
+
                     Task.Run(循环针刺);
                 }
                 else if (e.KeyValue == (uint)Keys.D3)
@@ -241,19 +256,27 @@ namespace Dota2Simulator
                     loop_bool_1 = false;
                     loop_bool_2 = false;
                 }
-                else if (e.KeyValue == (uint)Keys.C)
-                {
-                    label1.Text = "C";
-
-                    if (RegPicture(Resource_Picture.物品_魂戒CD, "C") || RegPicture(Resource_Picture.物品_魂戒CD_5, "C", 5))
-                    {
-                        切力量腿();
-                        Task.Run(魂戒魔棒智力);
-                    }
-                }
-
             }
 
+            #endregion
+
+            #region 猛犸
+
+            else if (tb_name.Text.Trim() == "猛犸")
+            {
+                if (e.KeyValue == (uint)Keys.F)
+                {
+                    label1.Text = "F";
+
+                    Task.Run(跳拱指定地点);
+                }
+                else if (e.KeyValue == (uint)Keys.D3)
+                {
+                    label1.Text = "F";
+
+                    Task.Run(指定地点);
+                }
+            }
             #endregion
 
             #endregion
@@ -629,13 +652,21 @@ namespace Dota2Simulator
                 {
                     label1.Text = "Q";
 
-                    Task.Run(飞镖接平A);
+                    Task.Run(() =>
+                    {
+                        Thread.CurrentThread.Priority = ThreadPriority.Highest;
+                        飞镖接平A();
+                    });
                 }
                 else if (e.KeyValue == (uint)Keys.R)
                 {
                     label1.Text = "R";
 
-                    Task.Run(标记去后摇);
+                    Task.Run(() =>
+                    {
+                        Thread.CurrentThread.Priority = ThreadPriority.Highest;
+                        标记去后摇();
+                    });
                 }
             }
 
@@ -923,6 +954,27 @@ namespace Dota2Simulator
 
             #endregion
 
+            #region 神域
+
+            else if (tb_name.Text.Trim() == "神域")
+            {
+                if (e.KeyValue == (uint)Keys.W)
+                {
+                    Task.Run(命运敕令去后摇);
+                }
+                else if (e.KeyValue == (uint)Keys.E)
+                {
+                    Task.Run(涤罪之焰去后摇);
+                }
+                else if (e.KeyValue == (uint)Keys.R)
+                {
+                    Task.Run(虚妄之诺去后摇);
+                }
+
+            }
+
+            #endregion
+
             #endregion
 
             #region 保存微信图片
@@ -963,6 +1015,22 @@ namespace Dota2Simulator
         #region Dota2具体实现
 
         #region 力量
+
+        #region 猛犸
+
+        private static void 跳拱指定地点()
+        {
+            KeyPress((uint)Keys.Space);
+            Delay(30);
+            KeyPress((uint)Keys.D9);
+            MouseMove(指定地点_P);
+            Delay(30);
+            KeyPress((uint)Keys.E);
+            Delay(30);
+            KeyPress((uint)Keys.D9);
+        }
+
+        #endregion
 
         #region 船长
 
@@ -1069,15 +1137,15 @@ namespace Dota2Simulator
             KeyPress((uint)Keys.A);
             KeyUp((uint)Keys.LControlKey);
 
-            Delay(430);
+            //Delay(430);
 
-            切敏捷腿();
+            //切敏捷腿();
 
-            if (RegPicture(Resource_Picture.物品_分身, "Z"))
-            {
-                KeyPress((uint)Keys.Z);
-                分身一齐攻击();
-            }
+            //if (RegPicture(Resource_Picture.物品_分身, "Z"))
+            //{
+            //    KeyPress((uint)Keys.Z);
+            //    分身一齐攻击();
+            //}
         }
 
         private void 战斗饥渴取消后摇()
@@ -1309,59 +1377,55 @@ namespace Dota2Simulator
 
         private void 循环针刺()
         {
+            Color 技能点颜色 = Color.FromArgb(255, 254, 254, 254);
             while (loop_bool_1)
             {
-                if (RegPicture(Resource_Picture.钢背_针刺CD, "W"))
+                if (CaptureColor(871, 994).Equals(技能点颜色) || CaptureColor(840, 994).Equals(技能点颜色))
                 {
-                    切智力腿();
                     KeyPress((uint)Keys.W);
-                    label1.Text = "D22";
-                    Delay(300);
+                    label1.Text = "D32";
+                    Delay(30);
                 }
-
-                else if (RegPicture(Resource_Picture.钢背_针刺刚CD好, "W"))
+                else
                 {
-                    切智力腿();
-                    KeyPress((uint)Keys.W);
-                    label1.Text = "D22";
-                    Delay(300);
+                    if (RegPicture(Resource_Picture.钢背_针刺CD, "W") || RegPicture(Resource_Picture.钢背_针刺CD_5, "W", 5))
+                    {
+                        KeyPress((uint)Keys.W);
+                        label1.Text = "D22";
+                        Delay(30);
+                    }
                 }
-
-                else if (RegPicture(Resource_Picture.钢背_针刺CD_5, "W", 5))
-                {
-                    切智力腿();
-                    KeyPress((uint)Keys.W);
-                    label1.Text = "D22";
-                    Delay(300);
-                }
-
-                Delay(15);
             }
         }
 
         private void A杖鼻涕()
         {
+
             if (阿哈利姆神杖())
+            {
+                Color 技能点颜色 = Color.FromArgb(255, 254, 254, 254);
                 while (loop_bool_2)
                 {
-                    if (RegPicture(Resource_Picture.钢背_鼻涕CD, "Q"))
+                    // 4、5技能刚CD好
+                    if (CaptureColor(807, 994).Equals(技能点颜色) || CaptureColor(776, 994).Equals(技能点颜色))
                     {
-                        切智力腿();
                         KeyPress((uint)Keys.Q);
                         label1.Text = "D32";
-                        Delay(300);
+                        Delay(30);
                     }
-
-                    if (RegPicture(Resource_Picture.钢背_鼻涕CD_5, "Q", 5))
+                    else
                     {
-                        切智力腿();
-                        KeyPress((uint)Keys.Q);
-                        label1.Text = "D32";
-                        Delay(300);
+                        if (RegPicture(Resource_Picture.钢背_鼻涕CD_不朽, "Q") || RegPicture(Resource_Picture.钢背_鼻涕CD_5_不朽, "Q", 5)
+                            || RegPicture(Resource_Picture.钢背_鼻涕CD, "Q") || RegPicture(Resource_Picture.钢背_鼻涕CD_5, "Q", 5))
+                        {
+                            KeyPress((uint)Keys.Q);
+                            label1.Text = "d32";
+                            Delay(30);
+                        }
                     }
-
-                    Delay(15);
+                    
                 }
+            }
         }
 
         #endregion
@@ -2070,8 +2134,8 @@ namespace Dota2Simulator
             {
                 if (RegPicture(Resource_Picture.赏金_释放飞镖, "Q") || RegPicture(Resource_Picture.赏金_释放飞镖_双刀, "Q"))
                 {
-                    Delay(125);
-                    KeyPress((uint)Keys.A);
+                    Delay(105);
+                    RightClick();
                     w_down = 1;
                 }
 
@@ -2089,7 +2153,7 @@ namespace Dota2Simulator
             {
                 if (RegPicture(Resource_Picture.赏金_释放标记, "R") || RegPicture(Resource_Picture.赏金_释放标记_不朽, "R"))
                 {
-                    Delay(125);
+                    Delay(110);
                     RightClick();
                     w_down = 1;
                 }
@@ -2171,47 +2235,54 @@ namespace Dota2Simulator
 
             while (RegPicture(Resource_Picture.物品_跳刀, "SPACE") || RegPicture(Resource_Picture.物品_跳刀_智力跳刀, "SPACE"))
             {
-                Delay(30);
-                KeyPress((uint)Keys.Space);
+                Delay(15);
+                KeyPress((uint)Keys.Space); 
 
-                if (new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds() - time > 200) break;
+                if (new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds() - time > 300) break;
             }
+
+            var 午夜凋零_i = false;
 
             time = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds();
 
             while (RegPicture(Resource_Picture.谜团_午夜凋零CD, "E"))
             {
                 KeyPress((uint)Keys.E);
-                Delay(30);
-
+                Delay(15);
+                午夜凋零_i = true;
                 if (new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds() - time > 500) break;
             }
+
+            if (午夜凋零_i) Delay(智力跳刀BUFF() ? 45 : 75);
+
+            time = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds();
 
             while (RegPicture(Resource_Picture.谜团_黑洞CD, "R"))
             {
                 KeyPress((uint)Keys.R);
-                Delay(30);
+                Delay(15);
 
-                if (new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds() - time > 1000) break;
+                if (new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds() - time > 500) break;
             }
 
             Delay(30);
 
-            KeyDown((uint)Keys.LControlKey);
+            //KeyDown((uint)Keys.LControlKey);
 
-            KeyPress((uint)Keys.A);
+            //KeyPress((uint)Keys.A);
 
-            KeyUp((uint)Keys.LControlKey);
+            //KeyUp((uint)Keys.LControlKey);
         }
 
         private void 刷新接凋零黑洞()
         {
             KeyPress((uint)Keys.X);
-            for (int i = 0; i < 5; i++)
+
+            for (int i = 0; i < 2; i++)
             {
                 Delay(30);
                 KeyPress((uint)Keys.Z);
-                KeyPress((uint)Keys.E);
+                KeyPress((uint)Keys.V);
                 KeyPress((uint)Keys.R);
             }
         }
@@ -2879,9 +2950,85 @@ namespace Dota2Simulator
 
         #endregion
 
+        #region 神域
+
+        private void 命运敕令去后摇()
+        {
+            var time = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds();
+
+            var q_down = 0;
+
+            while (q_down == 0)
+            {
+                if (RegPicture(Resource_Picture.神域_释放命运敕令, "W"))
+                {
+                    q_down = 1;
+                    Delay(145);
+                    RightClick();
+                }
+
+                if (new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds() - time > 1200) break;
+            }
+        }
+
+        private void 涤罪之焰去后摇()
+        {
+            var time = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds();
+
+            var q_down = 0;
+
+            while (q_down == 0)
+            {
+                if (RegPicture(Resource_Picture.神域_释放涤罪之焰, "E"))
+                {
+                    q_down = 1;
+                    Delay(95);
+                    RightClick();
+                }
+
+                if (new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds() - time > 1200) break;
+            }
+        }
+
+        private void 虚妄之诺去后摇()
+        {
+            var time = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds();
+
+            var q_down = 0;
+
+            while (q_down == 0)
+            {
+                if (RegPicture(Resource_Picture.神域_释放虚妄之诺, "R"))
+                {
+                    q_down = 1;
+                    Delay(105);
+                    RightClick();
+                }
+
+                if (new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds() - time > 1200) break;
+            }
+        }
+
+        #endregion
+
         #endregion
 
         #region 通用
+
+        #region 指定地点
+
+        private static void 指定地点()
+        {
+            指定地点_P = MousePosition;
+            Delay(30);
+            KeyDown((uint)Keys.LControlKey);
+            Delay(30);
+            KeyPress((uint)Keys.D9);
+            Delay(30);
+            KeyUp((uint)Keys.LControlKey);
+        }
+
+        #endregion
 
         #region 跳刀
 
