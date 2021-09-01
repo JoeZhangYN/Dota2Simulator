@@ -673,6 +673,36 @@ namespace Dota2Simulator.Picture_Dota2 {
         /// <summary>
         ///   查找 System.Drawing.Bitmap 类型的本地化资源。
         /// </summary>
+        internal static System.Drawing.Bitmap 播报_买活 {
+            get {
+                object obj = ResourceManager.GetObject("播报_买活", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
+        /// </summary>
+        internal static System.Drawing.Bitmap 播报_塔防标志 {
+            get {
+                object obj = ResourceManager.GetObject("播报_塔防标志", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
+        /// </summary>
+        internal static System.Drawing.Bitmap 播报_盾标志 {
+            get {
+                object obj = ResourceManager.GetObject("播报_盾标志", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
+        /// </summary>
         internal static System.Drawing.Bitmap 敌法_释放信仰之源闪烁_4 {
             get {
                 object obj = ResourceManager.GetObject("敌法_释放信仰之源闪烁_4", resourceCulture);

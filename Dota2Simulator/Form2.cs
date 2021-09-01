@@ -5,6 +5,7 @@ using System.Drawing;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using static Dota2Simulator.ORC;
 using static Dota2Simulator.PictureProcessing;
 using static Dota2Simulator.SetWindowTop;   
 
@@ -74,940 +75,978 @@ namespace Dota2Simulator
         /// <param name="e"></param>
         private void Hook_KeyDown(object sender, KeyEventArgs e)
         {
-            #region 力量
+            #region 打字时屏蔽功能
 
-            #region 船长
-
-            if (tb_name.Text == "船长")
+            if (CaptureColor(572, 771).Equals(Color.FromArgb(255, 237, 222, 190)))
             {
-                if (e.KeyValue == (uint)Keys.D2)
-                {
-                    label1.Text = "D2";
 
-                    KeyPress((uint)Keys.Q);
-
-                    Task.Run(洪流接x回);
-                }
-                else if (e.KeyValue == (uint)Keys.D3)
-                {
-                    label1.Text = "D3";
-
-                    Task.Run(最大化x伤害控制);
-                }
-                else if (e.KeyValue == (uint)Keys.D4)
-                {
-                    label1.Text = "D4";
-
-                    KeyPress((uint)Keys.Q);
-
-                    Task.Run(洪流接船);
-                }
             }
-
             #endregion
 
-            #region 军团
-
-            else if (tb_name.Text == "军团")
+            else
             {
-                if (e.KeyValue == (uint)Keys.E)
-                {
-                    label1.Text = "E";
+                #region 记录时间
 
-                    Task.Run(决斗);
+                if (e.KeyValue == (uint)Keys.NumPad1)
+                {
+                    获取时间肉山();
                 }
-            }
-
-            #endregion
-
-            #region 斧王
-
-            else if (tb_name.Text == "斧王")
-            {
-                if (e.KeyValue == (uint)Keys.E)
+                else if (e.KeyValue == (uint)Keys.NumPad2)
                 {
-                    label1.Text = "E";
-
-                    切智力腿();
-
-                    Task.Run(跳吼);
+                    获取时间盾();
+                }
+                else if (e.KeyValue == (uint)Keys.NumPad3)
+                {
+                    获取时间塔防();
                 }
 
-                else if (e.KeyValue == (uint)Keys.Q)
+                #endregion
+
+                #region 力量
+
+                #region 船长
+
+                else if (tb_name.Text == "船长")
                 {
-                    label1.Text = "Q";
-
-                    切智力腿();
-                }
-
-                else if (e.KeyValue == (uint)Keys.W)
-                {
-                    label1.Text = "W";
-
-                    切智力腿();
-
-                    Task.Run(战斗饥渴取消后摇);
-                }
-
-                else if (e.KeyValue == (uint)Keys.R)
-                {
-                    label1.Text = "R";
-
-                    切智力腿();
-
-                    Task.Run(淘汰之刃后);
-                }
-            }
-
-            #endregion
-
-            #region 孽主
-
-            else if (tb_name.Text == "孽主")
-            {
-                if (e.KeyValue == (uint)Keys.E)
-                {
-                    label1.Text = "E";
-
-                    Task.Run(深渊火雨阿托斯);
-                }
-            }
-
-            #endregion
-
-            #region 哈斯卡
-
-            else if (tb_name.Text.Trim() == "哈斯卡")
-            {
-                if (e.KeyValue == (uint)Keys.D2)
-                {
-                    label1.Text = "D2";
-
-                    Task.Run(切臂章);
-                }
-                else if (e.KeyValue == (uint)Keys.Q)
-                {
-                    label1.Text = "Q";
-
-                    Task.Run(心炎平A);
-                }
-                else if (e.KeyValue == (uint)Keys.R)
-                {
-                    label1.Text = "R";
-
-                    if (RegPicture(Resource_Picture.物品_臂章, "Z"))
+                    if (e.KeyValue == (uint)Keys.D2)
                     {
-                        KeyPress((uint)Keys.Z);
-                        Delay(30);
+                        label1.Text = "D2";
+
+                        KeyPress((uint)Keys.Q);
+
+                        Task.Run(洪流接x回);
+                    }
+                    else if (e.KeyValue == (uint)Keys.D3)
+                    {
+                        label1.Text = "D3";
+
+                        Task.Run(最大化x伤害控制);
+                    }
+                    else if (e.KeyValue == (uint)Keys.D4)
+                    {
+                        label1.Text = "D4";
+
+                        KeyPress((uint)Keys.Q);
+
+                        Task.Run(洪流接船);
+                    }
+                }
+
+                #endregion
+
+                #region 军团
+
+                else if (tb_name.Text == "军团")
+                {
+                    if (e.KeyValue == (uint)Keys.E)
+                    {
+                        label1.Text = "E";
+
+                        Task.Run(决斗);
+                    }
+                }
+
+                #endregion
+
+                #region 斧王
+
+                else if (tb_name.Text == "斧王")
+                {
+                    if (e.KeyValue == (uint)Keys.E)
+                    {
+                        label1.Text = "E";
+
+                        切智力腿();
+
+                        Task.Run(跳吼);
                     }
 
-                    Task.Run(牺牲平A刃甲);
-                }
-            }
-
-            #endregion
-
-            #region 海民
-
-            else if (tb_name.Text.Trim() == "海民")
-            {
-                if (e.KeyValue == (uint)Keys.G)
-                {
-                    label1.Text = "G";
-
-                    Task.Run(跳接勋章接摔角行家);
-                }
-            }
-
-            #endregion
-
-            #region 钢背
-
-            else if (tb_name.Text.Trim() == "钢背")
-            {
-                if (e.KeyValue == (uint)Keys.D2)
-                {
-                    label1.Text = "D2";
-
-                    loop_bool_1 = !loop_bool_1;
-
-                    // 基本上魂戒可以放4下，只浪费10点蓝
-                    // 配合一次鼻涕就一次也不浪费
-                    if (loop_bool_1)
+                    else if (e.KeyValue == (uint)Keys.Q)
                     {
-                        if (RegPicture(Resource_Picture.物品_魂戒CD, "C") || RegPicture(Resource_Picture.物品_魂戒CD_5, "C", 5))
+                        label1.Text = "Q";
+
+                        切智力腿();
+                    }
+
+                    else if (e.KeyValue == (uint)Keys.W)
+                    {
+                        label1.Text = "W";
+
+                        切智力腿();
+
+                        Task.Run(战斗饥渴取消后摇);
+                    }
+
+                    else if (e.KeyValue == (uint)Keys.R)
+                    {
+                        label1.Text = "R";
+
+                        切智力腿();
+
+                        Task.Run(淘汰之刃后);
+                    }
+                }
+
+                #endregion
+
+                #region 孽主
+
+                else if (tb_name.Text == "孽主")
+                {
+                    if (e.KeyValue == (uint)Keys.E)
+                    {
+                        label1.Text = "E";
+
+                        Task.Run(深渊火雨阿托斯);
+                    }
+                }
+
+                #endregion
+
+                #region 哈斯卡
+
+                else if (tb_name.Text.Trim() == "哈斯卡")
+                {
+                    if (e.KeyValue == (uint)Keys.D2)
+                    {
+                        label1.Text = "D2";
+
+                        Task.Run(切臂章);
+                    }
+                    else if (e.KeyValue == (uint)Keys.Q)
+                    {
+                        label1.Text = "Q";
+
+                        Task.Run(心炎平A);
+                    }
+                    else if (e.KeyValue == (uint)Keys.R)
+                    {
+                        label1.Text = "R";
+
+                        if (RegPicture(Resource_Picture.物品_臂章, "Z"))
                         {
-                            KeyPress((uint)Keys.C);
+                            KeyPress((uint)Keys.Z);
+                            Delay(30);
+                        }
+
+                        Task.Run(牺牲平A刃甲);
+                    }
+                }
+
+                #endregion
+
+                #region 海民
+
+                else if (tb_name.Text.Trim() == "海民")
+                {
+                    if (e.KeyValue == (uint)Keys.G)
+                    {
+                        label1.Text = "G";
+
+                        Task.Run(跳接勋章接摔角行家);
+                    }
+                }
+
+                #endregion
+
+                #region 钢背
+
+                else if (tb_name.Text.Trim() == "钢背")
+                {
+                    if (e.KeyValue == (uint)Keys.D2)
+                    {
+                        label1.Text = "D2";
+
+                        loop_bool_1 = !loop_bool_1;
+
+                        // 基本上魂戒可以放4下，只浪费10点蓝
+                        // 配合一次鼻涕就一次也不浪费
+                        if (loop_bool_1)
+                        {
+                            if (RegPicture(Resource_Picture.物品_魂戒CD, "C") || RegPicture(Resource_Picture.物品_魂戒CD_5, "C", 5))
+                            {
+                                KeyPress((uint)Keys.C);
+                            }
+                        }
+
+                        Task.Run(循环针刺);
+                    }
+                    else if (e.KeyValue == (uint)Keys.D3)
+                    {
+                        loop_bool_2 = !loop_bool_2;
+
+                        label1.Text = "D3";
+
+                        Task.Run(A杖鼻涕);
+                    }
+                    else if (e.KeyValue == (uint)Keys.H)
+                    {
+                        loop_bool_1 = false;
+                        loop_bool_2 = false;
+                    }
+                }
+
+                #endregion
+
+                #region 猛犸
+
+                else if (tb_name.Text.Trim() == "猛犸")
+                {
+                    if (e.KeyValue == (uint)Keys.F)
+                    {
+                        label1.Text = "F";
+
+                        Task.Run(跳拱指定地点);
+                    }
+                    else if (e.KeyValue == (uint)Keys.D3)
+                    {
+                        label1.Text = "F";
+
+                        Task.Run(指定地点);
+                    }
+                }
+                #endregion
+
+                #endregion
+
+                #region 敏捷
+
+                #region 露娜
+
+                if (tb_name.Text == "露娜")
+                {
+                    if (e.KeyValue == (uint)Keys.Q)
+                    {
+                        label1.Text = "Q";
+
+                        切智力腿();
+
+                        Task.Run(月光后敏捷平A);
+                    }
+                    else if (e.KeyValue == (uint)Keys.R)
+                    {
+                        label1.Text = "R";
+
+                        切智力腿();
+
+                        Task.Run(月蚀后敏捷平A);
+                    }
+                }
+
+                #endregion
+
+                #region 影魔
+
+                if (tb_name.Text == "影魔")
+                {
+                    //if (e.KeyValue == (uint)Keys.D)
+                    //{
+                    //    label1.Text = "Space";
+
+                    //    _tasks.Append() = new Task(吹风摇大);
+                    //    _taskDelay = new Task(() => delay(1000));
+
+                    //    _taskDelay.Start();
+                    //    _taskTrigger.Start();
+
+                    //    Task task = new Task(() => { Task.WaitAny(_taskTrigger, _taskDelay); });
+                    //    task.Start();
+                    //}
+                }
+
+                #endregion
+
+                #region 敌法
+
+                else if (tb_name.Text == "敌法")
+                {
+                    if (e.KeyValue == (uint)Keys.W)
+                    {
+                        label1.Text = "W";
+                        切智力腿();
+                        Task.Run(闪烁敏捷);
+                    }
+                    else if (e.KeyValue == (uint)Keys.E)
+                    {
+                        label1.Text = "E";
+                        // 太过明显,故不使用
+                        //切智力腿();
+                        //Task.Run(法术反制敏捷);
+                    }
+                    else if (e.KeyValue == (uint)Keys.R)
+                    {
+                        label1.Text = "R";
+                        切智力腿();
+                        Task.Run(法力虚空取消后摇);
+                    }
+                    else if (e.KeyValue == (uint)Keys.X)
+                    {
+                        label1.Text = "X";
+                        Task.Run(分身一齐攻击);
+                    }
+                }
+
+                #endregion
+
+                #region 巨魔
+
+                else if (tb_name.Text.Trim() == "巨魔")
+                {
+                    if (e.KeyValue == (uint)Keys.D)
+                    {
+                        label1.Text = "D";
+
+                        Task.Run(远程飞斧);
+                    }
+                }
+
+                #endregion
+
+                #region 小骷髅
+
+                else if (tb_name.Text.Trim() == "小骷髅")
+                {
+                    if (e.KeyValue == (uint)Keys.Q)
+                    {
+                        label1.Text = "Q";
+
+                        切智力腿();
+
+                        Task.Run(扫射接勋章);
+                    }
+                    else if (e.KeyValue == (uint)Keys.E)
+                    {
+                        label1.Text = "E";
+
+                        切智力腿();
+                    }
+                    else if (e.KeyValue == (uint)Keys.R)
+                    {
+                        label1.Text = "R";
+
+                        切智力腿();
+                    }
+                    else if (e.KeyValue == (uint)Keys.Z)
+                    {
+                        label1.Text = "Z";
+
+                        if (RegPicture(Resource_Picture.物品_魂戒CD, "Z") || RegPicture(Resource_Picture.物品_魂戒CD_5, "Z", 5))
+                        {
+                            切力量腿();
+                            Task.Run(魂戒魔棒智力);
                         }
                     }
-
-                    Task.Run(循环针刺);
                 }
-                else if (e.KeyValue == (uint)Keys.D3)
+
+                #endregion
+
+                #region 小松鼠
+
+                else if (tb_name.Text.Trim() == "小松鼠")
                 {
-                    loop_bool_2 = !loop_bool_2;
-
-                    label1.Text = "D3";
-
-                    Task.Run(A杖鼻涕);
-                }
-                else if (e.KeyValue == (uint)Keys.H)
-                {
-                    loop_bool_1 = false;
-                    loop_bool_2 = false;
-                }
-            }
-
-            #endregion
-
-            #region 猛犸
-
-            else if (tb_name.Text.Trim() == "猛犸")
-            {
-                if (e.KeyValue == (uint)Keys.F)
-                {
-                    label1.Text = "F";
-
-                    Task.Run(跳拱指定地点);
-                }
-                else if (e.KeyValue == (uint)Keys.D3)
-                {
-                    label1.Text = "F";
-
-                    Task.Run(指定地点);
-                }
-            }
-            #endregion
-
-            #endregion
-
-            #region 敏捷
-
-            #region 露娜
-
-            if (tb_name.Text == "露娜")
-            {
-                if (e.KeyValue == (uint)Keys.Q)
-                {
-                    label1.Text = "Q";
-
-                    切智力腿();
-
-                    Task.Run(月光后敏捷平A);
-                }
-                else if (e.KeyValue == (uint)Keys.R)
-                {
-                    label1.Text = "R";
-
-                    切智力腿();
-
-                    Task.Run(月蚀后敏捷平A);
-                }
-            }
-
-            #endregion
-
-            #region 影魔
-
-            if (tb_name.Text == "影魔")
-            {
-                //if (e.KeyValue == (uint)Keys.D)
-                //{
-                //    label1.Text = "Space";
-
-                //    _tasks.Append() = new Task(吹风摇大);
-                //    _taskDelay = new Task(() => delay(1000));
-
-                //    _taskDelay.Start();
-                //    _taskTrigger.Start();
-
-                //    Task task = new Task(() => { Task.WaitAny(_taskTrigger, _taskDelay); });
-                //    task.Start();
-                //}
-            }
-
-            #endregion
-
-            #region 敌法
-
-            else if (tb_name.Text == "敌法")
-            {
-                if (e.KeyValue == (uint)Keys.W)
-                {
-                    label1.Text = "W";
-                    切智力腿();
-                    Task.Run(闪烁敏捷);
-                }
-                else if (e.KeyValue == (uint)Keys.E)
-                {
-                    label1.Text = "E";
-                    // 太过明显,故不使用
-                    //切智力腿();
-                    //Task.Run(法术反制敏捷);
-                }
-                else if (e.KeyValue == (uint)Keys.R)
-                {
-                    label1.Text = "R";
-                    切智力腿();
-                    Task.Run(法力虚空取消后摇);
-                }
-                else if (e.KeyValue == (uint)Keys.X)
-                {
-                    label1.Text = "X";
-                    Task.Run(分身一齐攻击);
-                }
-            }
-
-            #endregion
-
-            #region 巨魔
-
-            else if (tb_name.Text.Trim() == "巨魔")
-            {
-                if (e.KeyValue == (uint)Keys.D)
-                {
-                    label1.Text = "D";
-
-                    Task.Run(远程飞斧);
-                }
-            }
-
-            #endregion
-
-            #region 小骷髅
-
-            else if (tb_name.Text.Trim() == "小骷髅")
-            {
-                if (e.KeyValue == (uint)Keys.Q)
-                {
-                    label1.Text = "Q";
-
-                    切智力腿();
-
-                    Task.Run(扫射接勋章);
-                }
-                else if (e.KeyValue == (uint)Keys.E)
-                {
-                    label1.Text = "E";
-
-                    切智力腿();
-                }
-                else if (e.KeyValue == (uint)Keys.R)
-                {
-                    label1.Text = "R";
-
-                    切智力腿();
-                }
-                else if (e.KeyValue == (uint)Keys.Z)
-                {
-                    label1.Text = "Z";
-
-                    if (RegPicture(Resource_Picture.物品_魂戒CD, "Z") || RegPicture(Resource_Picture.物品_魂戒CD_5, "Z", 5))
+                    if (e.KeyValue == (uint)Keys.D2)
                     {
-                        切力量腿();
-                        Task.Run(魂戒魔棒智力);
+                        label1.Text = "D2";
+
+                        Task.Run(捆接种树);
+                    }
+                    else if (e.KeyValue == (uint)Keys.D3)
+                    {
+                        label1.Text = "D3";
+
+                        Task.Run(飞镖接捆接种树);
                     }
                 }
-            }
 
-            #endregion
+                #endregion
 
-            #region 小松鼠
+                #region 拍拍
 
-            else if (tb_name.Text.Trim() == "小松鼠")
-            {
-                if (e.KeyValue == (uint)Keys.D2)
+                else if (tb_name.Text.Trim() == "拍拍")
                 {
-                    label1.Text = "D2";
-
-                    Task.Run(捆接种树);
-                }
-                else if (e.KeyValue == (uint)Keys.D3)
-                {
-                    label1.Text = "D3";
-
-                    Task.Run(飞镖接捆接种树);
-                }
-            }
-
-            #endregion
-
-            #region 拍拍
-
-            else if (tb_name.Text.Trim() == "拍拍")
-            {
-                if (e.KeyValue == (uint)Keys.W)
-                {
-                    label1.Text = "W";
-
-                    切智力腿();
-
-                    Task.Run(超强力量平A);
-                }
-                else if (e.KeyValue == (uint)Keys.Q)
-                {
-                    label1.Text = "Q";
-
-                    切智力腿();
-
-                    Task.Run(震撼大地接平A);
-                }
-            }
-
-            #endregion
-
-            #region 小鱼人
-
-            else if (tb_name.Text.Trim() == "小鱼人")
-            {
-                if (e.KeyValue == (uint)Keys.Q)
-                {
-                    label1.Text = "黑暗契约";
-
-                    切智力腿();
-
-                    Task.Run(黑暗契约力量);
-                }
-                else if (e.KeyValue == (uint)Keys.W || e.KeyValue == (uint)Keys.R)
-                {
-                    label1.Text = "释放接平A";
-
-                    切智力腿();
-
-                    Task.Run(跳水敏捷);
-                }
-
-                else if (e.KeyValue == (uint)Keys.D2)
-                {
-                    label1.Text = "W";
-
-                    切智力腿();
-
-                    // 径直移动键位
-                    KeyDown((uint)Keys.L);
-
-                    // 径直移动
-                    RightClick();
-
-                    // 基本上180°310  90°170 75°135 转身定点，配合A杖效果极佳
-                    Delay(170);
-
-                    KeyUp((uint)Keys.L);
-
-                    KeyPress((uint)Keys.W);
-                }
-                else if (e.KeyValue == (uint)Keys.D)
-                {
-                    label1.Text = "D";
-
-                    切智力腿();
-
-                    Task.Run(深海护罩敏捷);
-                }
-            }
-
-            #endregion
-
-            #region 猴子
-
-            else if (tb_name.Text.Trim() == "猴子")
-            {
-                if (e.KeyValue == (uint)Keys.Q)
-                {
-                    label1.Text = "Q";
-
-                    切智力腿();
-
-                    Task.Run(灵魂之矛敏捷);
-                }
-                else if (e.KeyValue == (uint)Keys.D)
-                {
-                    label1.Text = "D";
-
-                    切智力腿();
-
-                    KeyPress((uint)Keys.W);
-
-                    Task.Run(神行百变敏捷);
-                }
-                else if (e.KeyValue == (uint)Keys.F)
-                {
-                    label1.Text = "F";
-
-                    RightClick();
-
-                    Task.Run(后撤触发冲锋);
-                }
-            }
-
-            #endregion
-
-            #region 水人
-
-            else if (tb_name.Text == "水人")
-            {
-
-            }
-
-            #endregion
-
-            #region 幻刺
-
-            else if (tb_name.Text == "幻刺")
-            {
-                if (e.KeyValue == (uint)Keys.Q)
-                {
-                    label1.Text = "Q";
-                    切智力腿();
-                    Task.Run(窒息短匕敏捷);
-                }
-                else if (e.KeyValue == (uint)Keys.W)
-                {
-                    label1.Text = "W";
-                    切智力腿();
-                    Task.Run(幻影突袭敏捷);
-                }
-                else if (e.KeyValue == (uint)Keys.E)
-                {
-                    label1.Text = "E";
-                    切智力腿();
-                    Task.Run(魅影无形敏捷);
-                }
-                else if (e.KeyValue == (uint)Keys.D)
-                {
-                    label1.Text = "E";
-                    切智力腿();
-                    Task.Run(刀阵旋风敏捷);
-                }
-            }
-
-            #endregion
-
-            #region 虚空
-
-            else if (tb_name.Text == "虚空")
-            {
-                if (e.KeyValue == (uint)Keys.Q)
-                {
-                    label1.Text = "Q";
-                    切智力腿();
-                    Task.Run(时间漫游敏捷);
-                }
-                else if (e.KeyValue == (uint)Keys.W)
-                {
-                    label1.Text = "W";
-                    切智力腿();
-                    Task.Run(时间膨胀敏捷);
-                }
-                else if (e.KeyValue == (uint)Keys.R)
-                {
-                    label1.Text = "R";
-                    切智力腿();
-                    Task.Run(时间结界敏捷);
-                }
-            }
-
-            #region TB
-            else if (tb_name.Text == "TB")
-            {
-                if (e.KeyValue == (uint)Keys.Q)
-                {
-                    label1.Text = "Q";
-                    切智力腿();
-                    Task.Run(倒影敏捷);
-                }
-                else if (e.KeyValue == (uint)Keys.W)
-                {
-                    label1.Text = "W";
-                    切智力腿();
-                    Task.Run(幻惑敏捷);
-                }
-                else if (e.KeyValue == (uint)Keys.E || e.KeyValue == (uint)Keys.F)
-                {
-                    label1.Text = "E";
-                    切智力腿();
-                    Task.Run(魔化敏捷);
-                }
-                else if (e.KeyValue == (uint)Keys.D)
-                {
-                    label1.Text = "D";
-                    Task.Run(恶魔狂热去后摇);
-                }
-                else if (e.KeyValue == (uint)Keys.R)
-                {
-                    label1.Text = "R";
-                    切智力腿();
-                    Task.Run(断魂敏捷);
-                }
-            }
-            #endregion
-
-            #endregion
-
-            #region 赏金
-
-            else if (tb_name.Text == "赏金")
-            {
-                if (e.KeyValue == (uint)Keys.Q)
-                {
-                    label1.Text = "Q";
-
-                    Task.Run(() =>
+                    if (e.KeyValue == (uint)Keys.W)
                     {
-                        Thread.CurrentThread.Priority = ThreadPriority.Highest;
-                        飞镖接平A();
-                    });
-                }
-                else if (e.KeyValue == (uint)Keys.R)
-                {
-                    label1.Text = "R";
+                        label1.Text = "W";
 
-                    Task.Run(() =>
+                        切智力腿();
+
+                        Task.Run(超强力量平A);
+                    }
+                    else if (e.KeyValue == (uint)Keys.Q)
                     {
-                        Thread.CurrentThread.Priority = ThreadPriority.Highest;
-                        标记去后摇();
-                    });
-                }
-            }
+                        label1.Text = "Q";
 
-            #endregion
+                        切智力腿();
 
-            #endregion
-
-            #region 智力
-
-            #region 黑鸟
-
-            else if (tb_name.Text == "黑鸟")
-            {
-                if (e.KeyValue == (uint)Keys.D)
-                {
-                    label1.Text = "D";
-                    b_cancel = false;
-                    Task.Run(G_yxc_y);
-                }
-                else if (e.KeyValue == (uint)Keys.F)
-                {
-                    label1.Text = "F";
-                    b_cancel = false;
-                    Task.Run(G_yxc_cg);
-                }
-                else if (e.KeyValue == (uint)Keys.H)
-                {
-                    b_cancel = true;
-                }
-            }
-
-            #endregion
-
-            #region 谜团
-
-            else if (tb_name.Text == "谜团")
-            {
-                if (e.KeyValue == (uint)Keys.D)
-                {
-                    label1.Text = "D";
-                    Task.Run(跳秒接午夜凋零黑洞);
-                }
-                else if (e.KeyValue == (uint)Keys.F)
-                {
-                    label1.Text = "F";
-                    Task.Run(刷新接凋零黑洞);
-                }
-            }
-
-            #endregion
-
-            #region 冰女
-
-            else if (tb_name.Text.Trim() == "冰女")
-            {
-                if (e.KeyValue == (uint)Keys.E)
-                {
-                    label1.Text = "E";
-
-                    Task.Run(冰封禁制接陨星锤);
-                }
-            }
-
-            #endregion
-
-            #region 蓝猫
-
-            else if (tb_name.Text.Trim() == "蓝猫")
-            {
-                if (e.KeyValue == (uint)Keys.W)
-                {
-                    label1.Text = "W";
-                    Task.Run(拉接平A);
-                }
-
-                else if (e.KeyValue == (uint)Keys.Q)
-                {
-                    label1.Text = "Q";
-                    Task.Run(残影接平A);
-                }
-                else if (e.KeyValue == (uint)Keys.R)
-                {
-                    label1.Text = "R";
-                    Task.Run(滚接平A);
-                }
-                else if (e.KeyValue == (uint)Keys.F)
-                {
-                    label1.Text = "F";
-                    Task.Run(原地滚A);
-                }
-                else if (e.KeyValue == (uint)Keys.D)
-                {
-                    label1.Text = "F";
-                    Task.Run(泉水出来喝瓶);
-                }
-                else if (e.KeyValue == (uint)Keys.X)
-                {
-                    label1.Text = "F";
-
-                    if (RegPicture(Resource_Picture.物品_魂戒CD, "X"))
-                    {
-                        切力量腿();
-                        Task.Run(魂戒魔棒智力);
+                        Task.Run(震撼大地接平A);
                     }
                 }
+
+                #endregion
+
+                #region 小鱼人
+
+                else if (tb_name.Text.Trim() == "小鱼人")
+                {
+                    if (e.KeyValue == (uint)Keys.Q)
+                    {
+                        label1.Text = "黑暗契约";
+
+                        切智力腿();
+
+                        Task.Run(黑暗契约力量);
+                    }
+                    else if (e.KeyValue == (uint)Keys.W || e.KeyValue == (uint)Keys.R)
+                    {
+                        label1.Text = "释放接平A";
+
+                        切智力腿();
+
+                        Task.Run(跳水敏捷);
+                    }
+
+                    else if (e.KeyValue == (uint)Keys.D2)
+                    {
+                        label1.Text = "W";
+
+                        切智力腿();
+
+                        // 径直移动键位
+                        KeyDown((uint)Keys.L);
+
+                        // 径直移动
+                        RightClick();
+
+                        // 基本上180°310  90°170 75°135 转身定点，配合A杖效果极佳
+                        Delay(170);
+
+                        KeyUp((uint)Keys.L);
+
+                        KeyPress((uint)Keys.W);
+                    }
+                    else if (e.KeyValue == (uint)Keys.D)
+                    {
+                        label1.Text = "D";
+
+                        切智力腿();
+
+                        Task.Run(深海护罩敏捷);
+                    }
+                }
+
+                #endregion
+
+                #region 猴子
+
+                else if (tb_name.Text.Trim() == "猴子")
+                {
+                    if (e.KeyValue == (uint)Keys.Q)
+                    {
+                        label1.Text = "Q";
+
+                        切智力腿();
+
+                        Task.Run(灵魂之矛敏捷);
+                    }
+                    else if (e.KeyValue == (uint)Keys.D)
+                    {
+                        label1.Text = "D";
+
+                        切智力腿();
+
+                        KeyPress((uint)Keys.W);
+
+                        Task.Run(神行百变敏捷);
+                    }
+                    else if (e.KeyValue == (uint)Keys.F)
+                    {
+                        label1.Text = "F";
+
+                        RightClick();
+
+                        Task.Run(后撤触发冲锋);
+                    }
+                }
+
+                #endregion
+
+                #region 水人
+
+                else if (tb_name.Text == "水人")
+                {
+
+                }
+
+                #endregion
+
+                #region 幻刺
+
+                else if (tb_name.Text == "幻刺")
+                {
+                    if (e.KeyValue == (uint)Keys.Q)
+                    {
+                        label1.Text = "Q";
+                        切智力腿();
+                        Task.Run(窒息短匕敏捷);
+                    }
+                    else if (e.KeyValue == (uint)Keys.W)
+                    {
+                        label1.Text = "W";
+                        切智力腿();
+                        Task.Run(幻影突袭敏捷);
+                    }
+                    else if (e.KeyValue == (uint)Keys.E)
+                    {
+                        label1.Text = "E";
+                        切智力腿();
+                        Task.Run(魅影无形敏捷);
+                    }
+                    else if (e.KeyValue == (uint)Keys.D)
+                    {
+                        label1.Text = "E";
+                        切智力腿();
+                        Task.Run(刀阵旋风敏捷);
+                    }
+                }
+
+                #endregion
+
+                #region 虚空
+
+                else if (tb_name.Text == "虚空")
+                {
+                    if (e.KeyValue == (uint)Keys.Q)
+                    {
+                        label1.Text = "Q";
+                        切智力腿();
+                        Task.Run(时间漫游敏捷);
+                    }
+                    else if (e.KeyValue == (uint)Keys.W)
+                    {
+                        label1.Text = "W";
+                        切智力腿();
+                        Task.Run(时间膨胀敏捷);
+                    }
+                    else if (e.KeyValue == (uint)Keys.R)
+                    {
+                        label1.Text = "R";
+                        切智力腿();
+                        Task.Run(时间结界敏捷);
+                    }
+                }
+
+                #region TB
+                else if (tb_name.Text == "TB")
+                {
+                    if (e.KeyValue == (uint)Keys.Q)
+                    {
+                        label1.Text = "Q";
+                        切智力腿();
+                        Task.Run(倒影敏捷);
+                    }
+                    else if (e.KeyValue == (uint)Keys.W)
+                    {
+                        label1.Text = "W";
+                        切智力腿();
+                        Task.Run(幻惑敏捷);
+                    }
+                    else if (e.KeyValue == (uint)Keys.E || e.KeyValue == (uint)Keys.F)
+                    {
+                        label1.Text = "E";
+                        切智力腿();
+                        Task.Run(魔化敏捷);
+                    }
+                    else if (e.KeyValue == (uint)Keys.D)
+                    {
+                        label1.Text = "D";
+                        Task.Run(恶魔狂热去后摇);
+                    }
+                    else if (e.KeyValue == (uint)Keys.R)
+                    {
+                        label1.Text = "R";
+                        切智力腿();
+                        Task.Run(断魂敏捷);
+                    }
+                }
+                #endregion
+
+                #endregion
+
+                #region 赏金
+
+                else if (tb_name.Text == "赏金")
+                {
+                    if (e.KeyValue == (uint)Keys.Q)
+                    {
+                        label1.Text = "Q";
+
+                        Task.Run(() =>
+                        {
+                            Thread.CurrentThread.Priority = ThreadPriority.Highest;
+                            飞镖接平A();
+                        });
+                    }
+                    else if (e.KeyValue == (uint)Keys.R)
+                    {
+                        label1.Text = "R";
+
+                        Task.Run(() =>
+                        {
+                            Thread.CurrentThread.Priority = ThreadPriority.Highest;
+                            标记去后摇();
+                        });
+                    }
+                }
+
+                #endregion
+
+                #endregion
+
+                #region 智力
+
+                #region 黑鸟
+
+                else if (tb_name.Text == "黑鸟")
+                {
+                    if (e.KeyValue == (uint)Keys.D)
+                    {
+                        label1.Text = "D";
+                        b_cancel = false;
+                        Task.Run(G_yxc_y);
+                    }
+                    else if (e.KeyValue == (uint)Keys.F)
+                    {
+                        label1.Text = "F";
+                        b_cancel = false;
+                        Task.Run(G_yxc_cg);
+                    }
+                    else if (e.KeyValue == (uint)Keys.H)
+                    {
+                        b_cancel = true;
+                    }
+                }
+
+                #endregion
+
+                #region 谜团
+
+                else if (tb_name.Text == "谜团")
+                {
+                    if (e.KeyValue == (uint)Keys.D)
+                    {
+                        label1.Text = "D";
+                        Task.Run(跳秒接午夜凋零黑洞);
+                    }
+                    else if (e.KeyValue == (uint)Keys.F)
+                    {
+                        label1.Text = "F";
+                        Task.Run(刷新接凋零黑洞);
+                    }
+                }
+
+                #endregion
+
+                #region 冰女
+
+                else if (tb_name.Text.Trim() == "冰女")
+                {
+                    if (e.KeyValue == (uint)Keys.E)
+                    {
+                        label1.Text = "E";
+
+                        Task.Run(冰封禁制接陨星锤);
+                    }
+                }
+
+                #endregion
+
+                #region 蓝猫
+
+                else if (tb_name.Text.Trim() == "蓝猫")
+                {
+                    if (e.KeyValue == (uint)Keys.W)
+                    {
+                        label1.Text = "W";
+                        Task.Run(拉接平A);
+                    }
+
+                    else if (e.KeyValue == (uint)Keys.Q)
+                    {
+                        label1.Text = "Q";
+                        Task.Run(残影接平A);
+                    }
+                    else if (e.KeyValue == (uint)Keys.R)
+                    {
+                        label1.Text = "R";
+                        Task.Run(滚接平A);
+                    }
+                    else if (e.KeyValue == (uint)Keys.F)
+                    {
+                        label1.Text = "F";
+                        Task.Run(原地滚A);
+                    }
+                    else if (e.KeyValue == (uint)Keys.D)
+                    {
+                        label1.Text = "F";
+                        Task.Run(泉水出来喝瓶);
+                    }
+                    else if (e.KeyValue == (uint)Keys.X)
+                    {
+                        label1.Text = "F";
+
+                        if (RegPicture(Resource_Picture.物品_魂戒CD, "X"))
+                        {
+                            切力量腿();
+                            Task.Run(魂戒魔棒智力);
+                        }
+                    }
+                }
+
+                #endregion
+
+                #region 宙斯
+
+                else if (tb_name.Text.Trim() == "宙斯")
+                {
+                    // 弧形闪电和雷击都是不朽
+                    if (e.KeyValue == (uint)Keys.Q)
+                    {
+                        label1.Text = "Q";
+
+                        Task.Run(弧形闪电去后摇);
+                    }
+                    else if (e.KeyValue == (uint)Keys.W)
+                    {
+                        label1.Text = "W";
+
+                        Task.Run(雷击去后摇);
+                    }
+                }
+
+                #endregion
+
+                #region 卡尔
+
+                else if (tb_name.Text.Trim() == "卡尔")
+                {
+                    if (e.KeyValue == (uint)Keys.D2)
+                    {
+                        label1.Text = "D2";
+
+                        Task.Run(三冰对线);
+                    }
+                    else if (e.KeyValue == (uint)Keys.D3)
+                    {
+                        label1.Text = "D2";
+
+                        Task.Run(三火平A);
+                    }
+                    else if (e.KeyValue == (uint)Keys.D1)
+                    {
+                        label1.Text = "D2";
+
+                        Task.Run(三雷幽灵);
+                    }
+                }
+
+                #endregion
+
+                #region 拉席克
+
+                else if (tb_name.Text.Trim() == "拉席克")
+                {
+                    if (e.KeyValue == (uint)Keys.F)
+                    {
+                        label1.Text = "F";
+
+                        b_cancel = false;
+
+                        Task.Run(吹风接撕裂大地);
+                    }
+                    else if (e.KeyValue == (uint)Keys.S)
+                    {
+                        b_cancel = true;
+                    }
+                }
+
+                #endregion
+
+                #region 暗影萨满
+
+                else if (tb_name.Text.Trim() == "暗影萨满")
+                {
+                    if (e.KeyValue == (uint)Keys.Q)
+                    {
+                        label1.Text = "Q";
+
+                        Task.Run(苍穹振击取消后摇);
+                    }
+                    else if (e.KeyValue == (uint)Keys.W)
+                    {
+                        label1.Text = "W";
+
+                        Task.Run(变羊取消后摇);
+                    }
+                    else if (e.KeyValue == (uint)Keys.R)
+                    {
+                        label1.Text = "R";
+
+                        Task.Run(释放群蛇守卫取消后摇);
+                    }
+                    else if (e.KeyValue == (uint)Keys.D)
+                    {
+                        label1.Text = "D";
+
+                        Task.Run(暗夜萨满最大化控制链);
+                    }
+                    else if (e.KeyValue == (uint)Keys.S)
+                    {
+                        loop_bool_2 = false;
+                    }
+                }
+
+                #endregion
+
+                #region 小仙女
+
+                else if (tb_name.Text.Trim() == "小仙女")
+                {
+                    if (e.KeyValue == (uint)Keys.D2)
+                    {
+                        label1.Text = "D2";
+
+                        loop_bool_2 = true;
+
+                        Task.Run(诅咒皇冠吹风);
+                    }
+                    if (e.KeyValue == (uint)Keys.D9)
+                    {
+                        label1.Text = "D3";
+
+                        loop_bool_2 = true;
+
+                        Task.Run(作祟暗影之境最大化伤害);
+                    }
+                    else if (e.KeyValue == (uint)Keys.S)
+                    {
+                        loop_bool_2 = false;
+                    }
+                    else if (e.KeyValue == (uint)Keys.E)
+                    {
+                        Task.Run(皇冠延时计时);
+                    }
+                }
+
+                #endregion
+
+                #region 天怒
+
+                else if (tb_name.Text.Trim() == "天怒")
+                {
+                    if (e.KeyValue == (uint)Keys.D2)
+                    {
+                        loop_bool_1 = true;
+
+                        Task.Run(循环奥数鹰隼);
+                    }
+                    else if (e.KeyValue == (uint)Keys.S)
+                    {
+                        loop_bool_1 = false;
+                        loop_bool_2 = false;
+                    }
+                    else if (e.KeyValue == (uint)Keys.Q)
+                    {
+                        Task.Run(奥数鹰隼取消后摇);
+                    }
+                    else if (e.KeyValue == (uint)Keys.D3)
+                    {
+                        loop_bool_2 = true;
+
+                        Task.Run(天怒秒人连招);
+                    }
+
+                }
+
+                #endregion
+
+                #region 炸弹人
+
+                else if (tb_name.Text.Trim() == "炸弹人")
+                {
+                    if (e.KeyValue == (uint)Keys.Space)
+                    {
+                        魂戒丢装备();
+                    }
+
+                }
+
+                #endregion
+
+                #region 神域
+
+                else if (tb_name.Text.Trim() == "神域")
+                {
+                    if (e.KeyValue == (uint)Keys.W)
+                    {
+                        Task.Run(命运敕令去后摇);
+                    }
+                    else if (e.KeyValue == (uint)Keys.E)
+                    {
+                        Task.Run(涤罪之焰去后摇);
+                    }
+                    else if (e.KeyValue == (uint)Keys.R)
+                    {
+                        Task.Run(虚妄之诺去后摇);
+                    }
+
+                }
+
+                #endregion
+
+                #endregion
+
+                #region 保存微信图片
+
+                else if (tb_name.Text.Trim() == "微信图片")
+                {
+                    if (e.KeyValue == (uint)Keys.Q)
+                    {
+                        label1.Text = "Q";
+
+                        b_cancel = false;
+
+                        Task.Run(一键保存图片);
+                    }
+
+                    if (e.KeyValue == (uint)Keys.A)
+                    {
+                        label1.Text = "A";
+                        b_cancel = true;
+                    }
+                }
+
+                #endregion
+
+                #region 切假腿
+
+                else if (tb_name.Text.Trim() == "切假腿")
+                {
+                    if (e.KeyValue == (uint)Keys.Q || e.KeyValue == (uint)Keys.W || e.KeyValue == (uint)Keys.D || e.KeyValue == (uint)Keys.F || e.KeyValue == (uint)Keys.R)
+                        切智力腿();
+                }
+
+                #endregion
+
+                #region 测试
+
+                else if (tb_name.Text.Trim() == "测试")
+                {
+                }
+
+                #endregion
+
+
             }
-
-            #endregion
-
-            #region 宙斯
-
-            else if (tb_name.Text.Trim() == "宙斯")
-            {
-                // 弧形闪电和雷击都是不朽
-                if (e.KeyValue == (uint)Keys.Q)
-                {
-                    label1.Text = "Q";
-
-                    Task.Run(弧形闪电去后摇);
-                }
-                else if (e.KeyValue == (uint)Keys.W)
-                {
-                    label1.Text = "W";
-
-                    Task.Run(雷击去后摇);
-                }
-            }
-
-            #endregion
-
-            #region 卡尔
-
-            else if (tb_name.Text.Trim() == "卡尔")
-            {
-                if (e.KeyValue == (uint)Keys.D2)
-                {
-                    label1.Text = "D2";
-
-                    Task.Run(三冰对线);
-                }
-                else if (e.KeyValue == (uint)Keys.D3)
-                {
-                    label1.Text = "D2";
-
-                    Task.Run(三火平A);
-                }
-                else if (e.KeyValue == (uint)Keys.D1)
-                {
-                    label1.Text = "D2";
-
-                    Task.Run(三雷幽灵);
-                }
-            }
-
-            #endregion
-
-            #region 拉席克
-
-            else if (tb_name.Text.Trim() == "拉席克")
-            {
-                if (e.KeyValue == (uint)Keys.F)
-                {
-                    label1.Text = "F";
-
-                    b_cancel = false;
-
-                    Task.Run(吹风接撕裂大地);
-                }
-                else if (e.KeyValue == (uint)Keys.S)
-                {
-                    b_cancel = true;
-                }
-            }
-
-            #endregion
-
-            #region 暗影萨满
-
-            else if (tb_name.Text.Trim() == "暗影萨满")
-            {
-                if (e.KeyValue == (uint)Keys.Q)
-                {
-                    label1.Text = "Q";
-
-                    Task.Run(苍穹振击取消后摇);
-                }
-                else if (e.KeyValue == (uint)Keys.W)
-                {
-                    label1.Text = "W";
-
-                    Task.Run(变羊取消后摇);
-                }
-                else if (e.KeyValue == (uint)Keys.R)
-                {
-                    label1.Text = "R";
-
-                    Task.Run(释放群蛇守卫取消后摇);
-                }
-                else if (e.KeyValue == (uint)Keys.D)
-                {
-                    label1.Text = "D";
-
-                    Task.Run(暗夜萨满最大化控制链);
-                }
-                else if (e.KeyValue == (uint)Keys.S)
-                {
-                    loop_bool_2 = false;
-                }
-            }
-
-            #endregion
-
-            #region 小仙女
-
-            else if (tb_name.Text.Trim() == "小仙女")
-            {
-                if (e.KeyValue == (uint)Keys.D2)
-                {
-                    label1.Text = "D2";
-
-                    loop_bool_2 = true;
-
-                    Task.Run(诅咒皇冠吹风);
-                }
-                if (e.KeyValue == (uint)Keys.D9)
-                {
-                    label1.Text = "D3";
-
-                    loop_bool_2 = true;
-
-                    Task.Run(作祟暗影之境最大化伤害);
-                }
-                else if (e.KeyValue == (uint)Keys.S)
-                {
-                    loop_bool_2 = false;
-                }
-                else if (e.KeyValue == (uint)Keys.E)
-                {
-                    Task.Run(皇冠延时计时);
-                }
-            }
-
-            #endregion
-
-            #region 天怒
-
-            else if (tb_name.Text.Trim() == "天怒")
-            {
-                if (e.KeyValue == (uint)Keys.D2)
-                {
-                    loop_bool_1 = true;
-
-                    Task.Run(循环奥数鹰隼);
-                }
-                else if (e.KeyValue == (uint)Keys.S)
-                {
-                    loop_bool_1 = false;
-                    loop_bool_2 = false;
-                }
-                else if (e.KeyValue == (uint)Keys.Q)
-                {
-                    Task.Run(奥数鹰隼取消后摇);
-                }
-                else if (e.KeyValue == (uint)Keys.D3)
-                {
-                    loop_bool_2 = true;
-
-                    Task.Run(天怒秒人连招);
-                }
-
-            }
-
-            #endregion
-
-            #region 炸弹人
-
-            else if (tb_name.Text.Trim() == "炸弹人")
-            {
-                if (e.KeyValue == (uint)Keys.Space)
-                {
-                    魂戒丢装备();
-                }
-
-            }
-
-            #endregion
-
-            #region 神域
-
-            else if (tb_name.Text.Trim() == "神域")
-            {
-                if (e.KeyValue == (uint)Keys.W)
-                {
-                    Task.Run(命运敕令去后摇);
-                }
-                else if (e.KeyValue == (uint)Keys.E)
-                {
-                    Task.Run(涤罪之焰去后摇);
-                }
-                else if (e.KeyValue == (uint)Keys.R)
-                {
-                    Task.Run(虚妄之诺去后摇);
-                }
-
-            }
-
-            #endregion
-
-            #endregion
-
-            #region 保存微信图片
-
-            else if (tb_name.Text.Trim() == "微信图片")
-            {
-                if (e.KeyValue == (uint)Keys.Q)
-                {
-                    label1.Text = "Q";
-
-                    b_cancel = false;
-
-                    Task.Run(一键保存图片);
-                }
-
-                if (e.KeyValue == (uint)Keys.A)
-                {
-                    label1.Text = "A";
-                    b_cancel = true;
-                }
-            }
-
-            #endregion
-
-            #region 切假腿
-
-            else if (tb_name.Text.Trim() == "切假腿")
-            {
-                if (e.KeyValue == (uint)Keys.Q || e.KeyValue == (uint)Keys.W || e.KeyValue == (uint)Keys.D || e.KeyValue == (uint)Keys.F || e.KeyValue == (uint)Keys.R)
-                    切智力腿();
-            }
-
-            #endregion
         }
 
         #endregion
@@ -1262,7 +1301,7 @@ namespace Dota2Simulator
             KeyPress((uint)Keys.W);
 
             while (all_done == 0)
-                if (RegPicture(Resource_Picture.孽主_释放深渊, 857, 939, 70, 72).Count > 0)
+                if (RegPicture(Resource_Picture.孽主_释放深渊, 857, 939, 70, 72))
                 {
                     Delay(400);
                     KeyPress((uint)Keys.A);
@@ -1496,7 +1535,7 @@ namespace Dota2Simulator
         //    KeyPress((uint)Keys.Space);
 
         //    while (w_down == 0)
-        //        if (RegPicture(Resource_Picture.吹风CD, 1291, 991, 60, 45).Count > 0)
+        //        if (RegPicture(Resource_Picture.吹风CD, 1291, 991, 60, 45))
         //        {
         //            w_down = 1;
         //            KeyPress((uint)Keys.M);
@@ -1671,7 +1710,7 @@ namespace Dota2Simulator
 
         private void 远程飞斧()
         {
-            if (RegPicture(Resource_Picture.巨魔_远斧头, 839, 939, 70, 72).Count > 0)
+            if (RegPicture(Resource_Picture.巨魔_远斧头, 839, 939, 70, 72))
             {
                 KeyPress((uint)Keys.Q);
 
@@ -2302,7 +2341,7 @@ namespace Dota2Simulator
             var w_down = 0;
 
             while (w_down == 0)
-                if (RegPicture(Resource_Picture.冰女_释放冰封禁制, 859, 939, 64, 62).Count > 0)
+                if (RegPicture(Resource_Picture.冰女_释放冰封禁制, 859, 939, 64, 62))
                 {
                     Delay(365);
                     KeyPress((uint)Keys.Space);
@@ -2319,7 +2358,7 @@ namespace Dota2Simulator
         //    var w_down = 0;
 
         //    while (w_down == 0)
-        //        if (RegPicture(Resource_Picture.释放冰封禁制, 859, 939, 64, 62).Count > 0)
+        //        if (RegPicture(Resource_Picture.释放冰封禁制, 859, 939, 64, 62))
         //        {
         //            delay(365);
         //            KeyPress((uint)Keys.Space);
@@ -2605,7 +2644,7 @@ namespace Dota2Simulator
 
             var w_down = 0;
 
-            if (RegPicture(Resource_Picture.暗影萨满_捆绑施法中, 767, 726, 85, 85).Count > 0)
+            if (RegPicture(Resource_Picture.暗影萨满_捆绑施法中, 767, 726, 85, 85))
             {
                 return;
             }
@@ -3041,17 +3080,16 @@ namespace Dota2Simulator
             // 坐标
             var mousePosition = MousePosition;
 
-            var list = RegPicture(Resource_Picture.血量_自身血量, 0, 0, 1920, 1080, matchRate: 0.6);
-
             // X间距
             double move_X = 0;
             // Y间距，自动根据X调整
             double move_Y = 0;
 
-            if (list.Count > 0)
+            if (RegPicture(Resource_Picture.血量_自身血量, 0, 0, 1920, 1080, matchRate: 0.6))
             {
-                double realX = list[0].X + 55;
-                double realY = list[0].Y + 117;
+                var p = RegPicturePoint(Resource_Picture.血量_自身血量, 0, 0, 1920, 1080, matchRate: 0.6);
+                double realX = p.X + 55;
+                double realY = p.Y + 117;
 
                 //textBox4.Text = realX.ToString();
                 //tb_delay.Text = realY.ToString();
@@ -3181,11 +3219,10 @@ namespace Dota2Simulator
         {
             var list_1 = tb_丢装备.Text.Split(',');
 
-            var list = RegPicture(Resource_Picture.血量_自身血量, 0, 0, 1920, 1080, 0.8);
-
-            if (list.Count > 0)
+            if (RegPicture(Resource_Picture.血量_自身血量, 0, 0, 1920, 1080, 0.8))
             {
-                var point = new Point(list[0].X + 55, list[0].Y + 117);
+                var p = RegPicturePoint(Resource_Picture.血量_自身血量, 0, 0, 1920, 1080, 0.8);
+                var point = new Point(p.X + 55, p.Y + 117);
                 tb_状态抗性.Text = point.X.ToString() + " " + point.Y.ToString();
                 try
                 {
@@ -3376,7 +3413,7 @@ namespace Dota2Simulator
 
         private static bool 智力跳刀BUFF()
         {
-            return RegPicture(Resource_Picture.物品_跳刀_智力跳刀BUFF, 400, 865, 1000, 60).Count > 0;
+            return RegPicture(Resource_Picture.物品_跳刀_智力跳刀BUFF, 400, 865, 1000, 60);
         }
 
         private static bool 阿哈利姆神杖()
@@ -3455,7 +3492,7 @@ namespace Dota2Simulator
             var wait_i = 0;
             while (wait_i == 0)
             {
-                if (RegPicture(Resource_Picture.物品_释放陨星锤_持续施法, 785, 744, 51, 42, matchRate: 0.9).Count > 0)
+                if (RegPicture(Resource_Picture.物品_释放陨星锤_持续施法, 785, 744, 51, 42, matchRate: 0.9))
                 {
                     Delay(2350);
                     wait_i = 1;
@@ -3469,6 +3506,7 @@ namespace Dota2Simulator
 
         #region 图片识别
 
+        #region Dota2技能物品识别
         /// <summary>
         /// 
         /// </summary>
@@ -3878,16 +3916,276 @@ namespace Dota2Simulator
             return FindPicture(bp, CaptureScreen(x, y, width, height), matchRate: matchRate).Count > 0;
         }
 
-        private static List<Point> RegPicture(Bitmap bp, int x, int y, int width, int height, double matchRate = 0.9)
+        #endregion
+
+        #region 是否存在图片
+        private static bool RegPicture(Bitmap bp, int x, int y, int width, int height, double matchRate = 0.9)
         {
-            return FindPicture(bp, CaptureScreen(x, y, width, height), matchRate: matchRate);
+            return FindPicture(bp, CaptureScreen(x, y, width, height), matchRate: matchRate).Count > 0;
+        }
+        #endregion
+
+        #region 返回图片实际坐标
+
+        private static Point RegPicturePoint(Bitmap bp, int x, int y, int width, int height, double matchRate = 0.9)
+        {
+            try
+            {
+                var p = FindPicture(bp, CaptureScreen(x, y, width, height), matchRate: matchRate)[0];
+                return new Point(x + p.X, y + p.Y);
+            }
+            catch
+            {
+
+            }
+
+            return new Point(-1, -1);
         }
 
         #endregion
 
         #endregion
 
+        #region 记录买活
+
+        private static void 记录买活()
+        {
+            Color 计时颜色 = Color.FromArgb(255, 14, 19, 24);
+
+            while (true)
+            {
+                if (RegPicture(Resource_Picture.播报_买活, 549, 41, 52, 21) && !CaptureColor(559, 76).Equals(计时颜色))
+                {
+                    var p = MousePosition;
+                    while (!CaptureColor(559, 76).Equals(计时颜色))
+                    {
+                        MouseMove(559, 76);
+                        Thread.Sleep(30);
+                        LeftClick();
+                        Thread.Sleep(30);
+                    }
+                    MouseMove(p);
+                }
+
+                if (RegPicture(Resource_Picture.播报_买活, 613, 41, 52, 21) && !CaptureColor(623, 76).Equals(计时颜色))
+                {
+                    var p = MousePosition;
+
+                    while (!CaptureColor(623, 76).Equals(计时颜色))
+                    {
+                        MouseMove(623, 76);
+                        Thread.Sleep(30);
+                        LeftClick();
+                        Thread.Sleep(30);
+                    }
+                    MouseMove(p);
+                }
+
+                if (RegPicture(Resource_Picture.播报_买活, 674, 41, 52, 21) && !CaptureColor(688, 76).Equals(计时颜色))
+                {
+                    var p = MousePosition;
+
+                    while (!CaptureColor(688, 76).Equals(计时颜色))
+                    {
+                        MouseMove(688, 76);
+                        Thread.Sleep(30);
+                        LeftClick();
+                        Thread.Sleep(30);
+                    }
+                    MouseMove(p);
+                }
+
+                if (RegPicture(Resource_Picture.播报_买活, 735, 41, 52, 21) && !CaptureColor(749, 76).Equals(计时颜色))
+                {
+                    var p = MousePosition;
+
+                    while (!CaptureColor(749, 76).Equals(计时颜色))
+                    {
+                        MouseMove(749, 76);
+                        Thread.Sleep(30);
+                        LeftClick();
+                        Thread.Sleep(30);
+                    }
+                    MouseMove(p);
+                }
+
+                if (RegPicture(Resource_Picture.播报_买活, 797, 41, 52, 21) && !CaptureColor(811, 76).Equals(计时颜色))
+                {
+                    var p = MousePosition;
+
+                    while (!CaptureColor(811, 76).Equals(计时颜色))
+                    {
+                        MouseMove(811, 76);
+                        Thread.Sleep(30);
+                        LeftClick();
+                        Thread.Sleep(30);
+                    }
+                    MouseMove(p);
+                }
+
+                if (RegPicture(Resource_Picture.播报_买活, 1060, 41, 52, 21) && !CaptureColor(1073, 76).Equals(计时颜色))
+                {
+                    var p = MousePosition;
+
+                    while (!CaptureColor(1073, 76).Equals(计时颜色))
+                    {
+                        MouseMove(1073, 76);
+                        Thread.Sleep(30);
+                        LeftClick();
+                        Thread.Sleep(30);
+                    }
+                    MouseMove(p);
+                }
+
+                if (RegPicture(Resource_Picture.播报_买活, 1124, 41, 52, 21) && !CaptureColor(1137, 76).Equals(计时颜色))
+                {
+                    var p = MousePosition;
+
+                    while (!CaptureColor(1137, 76).Equals(计时颜色))
+                    {
+                        MouseMove(1137, 76);
+                        Thread.Sleep(30);
+                        LeftClick();
+                        Thread.Sleep(30);
+                    }
+                    MouseMove(p);
+                }
+
+                if (RegPicture(Resource_Picture.播报_买活, 1185, 41, 52, 21) && !CaptureColor(1198, 76).Equals(计时颜色))
+                {
+                    var p = MousePosition;
+
+                    while (!CaptureColor(1198, 76).Equals(计时颜色))
+                    {
+                        MouseMove(1198, 76);
+                        Thread.Sleep(30);
+                        LeftClick();
+                        Thread.Sleep(30);
+                    }
+                    MouseMove(p);
+                }
+
+                if (RegPicture(Resource_Picture.播报_买活, 1248, 41, 52, 21) && !CaptureColor(1261, 76).Equals(计时颜色))
+                {
+                    var p = MousePosition;
+
+                    while (!CaptureColor(1261, 76).Equals(计时颜色))
+                    {
+                        MouseMove(1261, 76);
+                        Thread.Sleep(30);
+                        LeftClick();
+                        Thread.Sleep(30);
+                    }
+                    MouseMove(p);
+                }
+
+                if (RegPicture(Resource_Picture.播报_买活, 1308, 41, 52, 21) && !CaptureColor(1321, 76).Equals(计时颜色))
+                {
+                    var p = MousePosition;
+
+                    while (!CaptureColor(1321, 76).Equals(计时颜色))
+                    {
+                        MouseMove(1321, 76);
+                        Thread.Sleep(30);
+                        LeftClick();
+                        Thread.Sleep(30);
+                    }
+                    MouseMove(p);
+                }
+                Thread.Sleep(100);
+            }
+
+            // tb_状态抗性.Text = string.Concat(bz.X.ToString(), " ", bz.Y.ToString());
+            //tb_状态抗性.Text = CaptureColor(bz.X + 175, bz.Y).ToString();
+        }
+
         #endregion
+
+        #region 记录肉山
+
+        private static void 获取时间肉山()
+        {
+            int time = 0;
+            FirstTry:
+            try
+            {
+                time = Convert.ToInt32(识别英文文字(ToGray(MethodBaseOnMemory(CaptureScreen(930, 21, 58, 16)))).Replace(":", ""));
+            }
+            catch
+            {
+                goto FirstTry;
+            }
+            time += 800;
+            var  time_str = time.ToString();
+            var str = string.Concat("肉山刷新", time_str[0..^2], ":", time_str[^2..]);
+            Delay(500);
+            快速发言(str);
+        }
+
+        private static void 获取时间盾()
+        {
+            int time = 0;
+        FirstTry:
+            try
+            {
+                time = Convert.ToInt32(识别英文文字(ToGray(MethodBaseOnMemory(CaptureScreen(930, 21, 58, 16)))).Replace(":", ""));
+            }
+            catch
+            {
+                goto FirstTry;
+            }
+            time += 500;
+            var time_str = time.ToString();
+            var str = string.Concat("盾消时间", time_str[0..^2], ":", time_str[^2..]);
+            Delay(500);
+            快速发言(str);
+        }
+
+
+        #endregion
+
+        #region 记录塔防
+
+        private static void 获取时间塔防()
+        {
+            int time;
+        FirstTry:
+            try
+            {
+                time = Convert.ToInt32(识别英文文字(ToGray(MethodBaseOnMemory(CaptureScreen(930, 21, 58, 16)))).Replace(":", ""));
+            }
+            catch
+            {
+                goto FirstTry;
+            }
+            time += 800;
+            string time_str = time.ToString();
+            string str = string.Concat("塔防刷新", time_str[0..^2], ":", time_str[^2..]);
+            Delay(500);
+            快速发言(str);
+        }
+
+        #endregion
+
+        #region 快速发言
+
+        private static void 快速发言(string str)
+        {
+            Clipboard.SetText(str);
+            KeyPress((uint)Keys.Enter);
+            KeyDown((uint)Keys.LControlKey);
+            KeyPress((uint)Keys.V);
+            KeyUp((uint)Keys.LControlKey);
+            Delay(30);
+            KeyPress((uint)Keys.Enter);
+            Delay(30);
+        }
+
+        #endregion
+
+        #endregion
+
+#endregion
 
         #region 起始加载图片
 
@@ -3937,7 +4235,7 @@ namespace Dota2Simulator
         #region 其他
         private void 一键保存图片()
         {
-            while (RegPicture(Resource1.最后一张, 1132, 947, 40, 40, 1).Count == 0)
+            while (!RegPicture(Resource1.最后一张, 1132, 947, 40, 40, 1))
             {
                 KeyDown((uint)Keys.LControlKey);
 
@@ -3990,7 +4288,7 @@ namespace Dota2Simulator
             myKeyEventHandeler = Hook_KeyDown;
             k_hook.KeyDownEvent += myKeyEventHandeler; // 绑定对应处理函数
             k_hook.Start(); // 安装键盘钩子
-
+            
             //WinIO32.Initialize();
 
             // 初始化键盘鼠标模拟，仅模仿系统函数，winIo 和 WinRing0 需要额外的操作
@@ -4010,6 +4308,8 @@ namespace Dota2Simulator
 
             // 设置窗口位置
             Location = new Point(338, 1013);
+
+            Task.Run(记录买活);
 
             return i;
         }

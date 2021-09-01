@@ -128,7 +128,7 @@ namespace Dota2Simulator
         /// <param name="errorRange">容错，单个色值范围内视为正确0~255</param>
         /// <param name="matchRate">图片匹配度，默认90%</param>
         /// <param name="isFindAll">是否查找所有相似的图片</param>
-        /// <returns>返回查找到的图片的中心点坐标</returns>
+        /// <returns>返回查找到的图片的左上角坐标</returns>
         public static List<Point> FindPicture(Bitmap subBitmap, Bitmap parBitmap,
             Rectangle searchRect = new Rectangle(), byte errorRange = 0,
             double matchRate = 0.9, bool isFindAll = true)
@@ -194,8 +194,8 @@ namespace Dota2Simulator
                         if ((double)matchNum / sum >= matchRate)
                         {
                             // Console.WriteLine((double)matchNum / sum);
-                            pointX = smallStartX + (int)(subWidth / 2.0);
-                            pointY = smallStartY + (int)(subHeight / 2.0);
+                            pointX = smallStartX;
+                            pointY = smallStartY;
                             Point point = new(pointX, pointY);
                             if (!ListContainsPoint(ListPoint, point)) ListPoint.Add(point);
                             if (!isFindAll) goto FIND_END;
@@ -233,6 +233,10 @@ namespace Dota2Simulator
                    colorA.B <= colorB.B + errorRange && colorA.B >= colorB.B - errorRange;
         }
 
+        #endregion
+
+        #region 坐标对比
+
         /// <summary>
         ///     坐标比对
         /// </summary>
@@ -248,6 +252,107 @@ namespace Dota2Simulator
                     item.Y <= point.Y + errorRange && item.Y >= point.Y - errorRange)
                     isExist = true;
             return isExist;
+        }
+
+        #endregion
+
+        #region 增加对比度
+
+        public unsafe static Bitmap MethodBaseOnMemory(Bitmap bitmap, int degree = 15)
+        {
+            if (bitmap == null)
+            {
+                return null;
+            }
+            double Deg = (100.0 + degree) / 100.0;
+
+            int width = bitmap.Width;
+            int height = bitmap.Height;
+
+            int length = height * 3 * width;
+            byte[] RGB = new byte[length];
+
+            BitmapData data = bitmap.LockBits(new Rectangle(0, 0, width, height), ImageLockMode.ReadWrite, PixelFormat.Format24bppRgb);
+
+            System.IntPtr Scan0 = data.Scan0;
+            System.Runtime.InteropServices.Marshal.Copy(Scan0, RGB, 0, length);
+
+            double gray;
+            for (int i = 0; i < RGB.Length; i += 3)
+            {
+                for (int j = 0; j < 3; j++)
+                {
+                    gray = (((RGB[i + j] / 255.0 - 0.5) * Deg + 0.5)) * 255.0;
+                    if (gray > 255)
+                        gray = 255;
+
+                    if (gray < 0)
+                        gray = 0;
+                    RGB[i + j] = (byte)gray;
+                }
+            }
+
+            System.Runtime.InteropServices.Marshal.Copy(RGB, 0, Scan0, length);// 此处Copy是之前Copy的逆操作
+            bitmap.UnlockBits(data);
+            return bitmap;
+        }
+
+        #endregion
+
+        #region 转化为灰度图
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="bmp">原彩色图片</param>
+        /// <param name="mode">模式 0 加权平均 1 算数平均</param>
+        /// <returns></returns>
+        public static Bitmap ToGray(Bitmap bmp, int mode = 0)
+        {
+            if (bmp == null)
+            {
+                return null;
+            }
+
+            int w = bmp.Width;
+            int h = bmp.Height;
+            try
+            {
+                byte newColor = 0;
+                BitmapData srcData = bmp.LockBits(new Rectangle(0, 0, w, h), ImageLockMode.ReadWrite, PixelFormat.Format24bppRgb);
+                unsafe
+                {
+                    byte* p = (byte*)srcData.Scan0.ToPointer();
+                    for (int y = 0; y < h; y++)
+                    {
+                        for (int x = 0; x < w; x++)
+                        {
+
+                            if (mode == 0)　// 加权平均
+                            {
+                                newColor = (byte)((float)p[0] * 0.114f + (float)p[1] * 0.587f + (float)p[2] * 0.299f);
+                            }
+                            else　　　　// 算数平均
+                            {
+                                newColor = (byte)((float)(p[0] + p[1] + p[2]) / 3.0f);
+                            }
+                            p[0] = newColor;
+                            p[1] = newColor;
+                            p[2] = newColor;
+
+                            p += 3;
+                        }
+                        p += srcData.Stride - w * 3;
+                    }
+                    bmp.UnlockBits(srcData);
+                    return bmp;
+                }
+            }
+            catch
+            {
+                return null;
+            }
+
         }
 
         #endregion
