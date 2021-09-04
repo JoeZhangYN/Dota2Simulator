@@ -203,6 +203,26 @@ namespace Dota2Simulator.Picture_Dota2 {
         /// <summary>
         ///   查找 System.Drawing.Bitmap 类型的本地化资源。
         /// </summary>
+        internal static System.Drawing.Bitmap 修补匠_再填装施法 {
+            get {
+                object obj = ResourceManager.GetObject("修补匠_再填装施法", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
+        /// </summary>
+        internal static System.Drawing.Bitmap 修补匠_护盾BUFF {
+            get {
+                object obj = ResourceManager.GetObject("修补匠_护盾BUFF", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
+        /// </summary>
         internal static System.Drawing.Bitmap 军团_决斗CD {
             get {
                 object obj = ResourceManager.GetObject("军团_决斗CD", resourceCulture);
@@ -246,6 +266,56 @@ namespace Dota2Simulator.Picture_Dota2 {
         internal static System.Drawing.Bitmap 冰女_释放冰封禁制 {
             get {
                 object obj = ResourceManager.GetObject("冰女_释放冰封禁制", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
+        /// </summary>
+        internal static System.Drawing.Bitmap 剧毒_剧毒新星_CD {
+            get {
+                object obj = ResourceManager.GetObject("剧毒_剧毒新星_CD", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
+        /// </summary>
+        internal static System.Drawing.Bitmap 剧毒_瘴气_CD {
+            get {
+                object obj = ResourceManager.GetObject("剧毒_瘴气_CD", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
+        /// </summary>
+        internal static System.Drawing.Bitmap 剧毒_瘴气_CD_不朽 {
+            get {
+                object obj = ResourceManager.GetObject("剧毒_瘴气_CD_不朽", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
+        /// </summary>
+        internal static System.Drawing.Bitmap 剧毒_蛇棒_CD {
+            get {
+                object obj = ResourceManager.GetObject("剧毒_蛇棒_CD", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
+        /// </summary>
+        internal static System.Drawing.Bitmap 剧毒_蛇棒_CD_不朽 {
+            get {
+                object obj = ResourceManager.GetObject("剧毒_蛇棒_CD_不朽", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -1173,6 +1243,36 @@ namespace Dota2Simulator.Picture_Dota2 {
         /// <summary>
         ///   查找 System.Drawing.Bitmap 类型的本地化资源。
         /// </summary>
+        internal static System.Drawing.Bitmap 物品_希瓦CD_6 {
+            get {
+                object obj = ResourceManager.GetObject("物品_希瓦CD_6", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
+        /// </summary>
+        internal static System.Drawing.Bitmap 物品_希瓦CD_7 {
+            get {
+                object obj = ResourceManager.GetObject("物品_希瓦CD_7", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
+        /// </summary>
+        internal static System.Drawing.Bitmap 物品_推推BUFF {
+            get {
+                object obj = ResourceManager.GetObject("物品_推推BUFF", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
+        /// </summary>
         internal static System.Drawing.Bitmap 物品_永恒遗物_4 {
             get {
                 object obj = ResourceManager.GetObject("物品_永恒遗物_4", resourceCulture);
@@ -1523,6 +1623,26 @@ namespace Dota2Simulator.Picture_Dota2 {
         /// <summary>
         ///   查找 System.Drawing.Bitmap 类型的本地化资源。
         /// </summary>
+        internal static System.Drawing.Bitmap 物品_魂戒CD_6 {
+            get {
+                object obj = ResourceManager.GetObject("物品_魂戒CD_6", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
+        /// </summary>
+        internal static System.Drawing.Bitmap 物品_魂戒CD_7 {
+            get {
+                object obj = ResourceManager.GetObject("物品_魂戒CD_7", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
+        /// </summary>
         internal static System.Drawing.Bitmap 物品_黑皇 {
             get {
                 object obj = ResourceManager.GetObject("物品_黑皇", resourceCulture);
@@ -1773,9 +1893,9 @@ namespace Dota2Simulator.Picture_Dota2 {
         /// <summary>
         ///   查找 System.Drawing.Bitmap 类型的本地化资源。
         /// </summary>
-        internal static System.Drawing.Bitmap 血量_敌人血条 {
+        internal static System.Drawing.Bitmap 血量_敌人血量 {
             get {
-                object obj = ResourceManager.GetObject("血量_敌人血条", resourceCulture);
+                object obj = ResourceManager.GetObject("血量_敌人血量", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

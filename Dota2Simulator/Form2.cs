@@ -1,13 +1,9 @@
 ﻿using Dota2Simulator.Picture_Dota2;
-using System;
-using System.Collections.Generic;
 using System.Drawing;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using static Dota2Simulator.ORC;
 using static Dota2Simulator.PictureProcessing;
-using static Dota2Simulator.SetWindowTop;   
+using static Dota2Simulator.SetWindowTop;
 
 namespace Dota2Simulator
 {
@@ -33,6 +29,38 @@ namespace Dota2Simulator
         ///     循环计数2
         /// </summary>
         private bool loop_bool_2 = false;
+
+        /// <summary>
+        ///     条件布尔
+        /// </summary>
+        private bool condition_bool_1 = false;
+
+        /// <summary>
+        ///     条件布尔
+        /// </summary>
+        private bool condition_bool_2 = false;
+
+        /// <summary>
+        ///     条件布尔
+        /// </summary>
+        private bool condition_bool_3 = false;
+
+        /// <summary>
+        ///     条件布尔
+        /// </summary>
+        private bool condition_bool_4 = false;
+
+        /// <summary>
+        ///     条件布尔
+        /// </summary>
+        private bool condition_bool_5 = false;
+
+        /// <summary>
+        ///     条件布尔
+        /// </summary>
+        private bool condition_bool_6 = false;
+
+
 
         ///// <summary>
         /////     模拟按键
@@ -90,10 +118,6 @@ namespace Dota2Simulator
                 if (e.KeyValue == (uint)Keys.NumPad1)
                 {
                     获取时间肉山();
-                }
-                else if (e.KeyValue == (uint)Keys.NumPad2)
-                {
-                    获取时间盾();
                 }
                 else if (e.KeyValue == (uint)Keys.NumPad3)
                 {
@@ -700,6 +724,38 @@ namespace Dota2Simulator
 
                 #endregion
 
+                #region 剧毒
+
+                else if (tb_name.Text == "剧毒")
+                {
+                    if (e.KeyValue == (uint)Keys.Q)
+                    {
+                        Task.Run(瘴气去后摇);
+                    }
+                    else if (e.KeyValue == (uint)Keys.E)
+                    {
+                        Task.Run(蛇棒去后摇);
+                    }
+                    else if (e.KeyValue == (uint)Keys.R)
+                    {
+                        Task.Run(剧毒新星去后摇);
+                    }
+                    else if (e.KeyValue == (uint)Keys.D3)
+                    {
+                        loop_bool_1 = !loop_bool_1;
+
+                        Task.Run(循环蛇棒);
+                    }
+                    else if (e.KeyValue == (uint)Keys.H)
+                    {
+                        loop_bool_1 = false;
+                        loop_bool_2 = false;
+                    }
+                }
+
+
+                #endregion
+
                 #endregion
 
                 #region 智力
@@ -1003,6 +1059,64 @@ namespace Dota2Simulator
 
                 #endregion
 
+                #region 修补匠
+
+                else if (tb_name.Text.Trim() == "修补匠")
+                {
+                    if (e.KeyValue == (uint)Keys.R)
+                    {
+                        KeyPress((uint)Keys.C);
+                        KeyPress((uint)Keys.V);
+                        Task.Run(刷新完跳);
+                    }
+                    else if (e.KeyValue == (uint)Keys.D1)
+                    {
+                        condition_bool_1 = !condition_bool_1;
+                        if (condition_bool_1)
+                        {
+                            TTS.TTS.Speak("开启刷导弹");
+                        }
+                        else
+                        {
+                            TTS.TTS.Speak("关闭刷导弹");
+                        }
+                    }
+                    else if (e.KeyValue == (uint)Keys.D2)
+                    {
+                        condition_bool_2 = !condition_bool_2;
+                        if (condition_bool_2)
+                        {
+                            TTS.TTS.Speak("开启刷跳");
+                        }
+                        else
+                        {
+                            TTS.TTS.Speak("关闭刷跳");
+                        }
+                    }
+                    else if (e.KeyValue == (uint)Keys.D3)
+                    {
+                        condition_bool_3 = !condition_bool_3;
+                        if (condition_bool_3)
+                        {
+                            TTS.TTS.Speak("开启希瓦");
+                        }
+                        else
+                        {
+                            TTS.TTS.Speak("关闭希瓦");
+                        }
+                    }
+                    else if (e.KeyValue == (uint)Keys.X)
+                    {
+                        Task.Run(推推接刷新);
+                    }
+                    else if (e.KeyValue == (uint)Keys.D1)
+                    {
+                        Task.Run(检测敌方英雄自动导弹);
+                    }
+
+                }
+                #endregion
+
                 #endregion
 
                 #region 保存微信图片
@@ -1031,7 +1145,7 @@ namespace Dota2Simulator
 
                 else if (tb_name.Text.Trim() == "切假腿")
                 {
-                    if (e.KeyValue == (uint)Keys.Q || e.KeyValue == (uint)Keys.W || e.KeyValue == (uint)Keys.D || e.KeyValue == (uint)Keys.F || e.KeyValue == (uint)Keys.R)
+                    if (e.KeyValue == (uint)Keys.Q || e.KeyValue == (uint)Keys.W || e.KeyValue == (uint)Keys.E || e.KeyValue == (uint)Keys.D || e.KeyValue == (uint)Keys.F || e.KeyValue == (uint)Keys.R)
                         切智力腿();
                 }
 
@@ -1041,6 +1155,10 @@ namespace Dota2Simulator
 
                 else if (tb_name.Text.Trim() == "测试")
                 {
+                    if (e.KeyValue == (uint)Keys.Q)
+                    {
+                        TTS.TTS.Speak("我干你老母");
+                    }
                 }
 
                 #endregion
@@ -2203,6 +2321,85 @@ namespace Dota2Simulator
 
         #endregion
 
+        #region 剧毒
+
+        private void 循环蛇棒()
+        {
+            Color 技能点颜色 = Color.FromArgb(255, 254, 254, 254);
+            while (loop_bool_1)
+            {
+                if (CaptureColor(942, 989).Equals(技能点颜色))
+                {
+                    KeyPress((uint)Keys.E);
+                    Delay(30);
+                }
+                else
+                {
+                    if (RegPicture(Resource_Picture.剧毒_蛇棒_CD_不朽, "E") || RegPicture(Resource_Picture.剧毒_蛇棒_CD, "E"))
+                    {
+                        KeyPress((uint)Keys.E);
+                        Delay(30);
+                    }
+                }
+            }
+        }
+
+        private static void 蛇棒去后摇()
+        {
+            var time = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds();
+
+            var w_down = 0;
+            while (w_down == 0)
+            {
+                if (!RegPicture(Resource_Picture.剧毒_蛇棒_CD_不朽, "E") && !RegPicture(Resource_Picture.剧毒_蛇棒_CD, "E"))
+                {
+                    Delay(60);
+                    RightClick();
+                    w_down = 1;
+                }
+
+                if (new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds() - time <= 1200) continue;
+            }
+        }
+
+        private static void 瘴气去后摇()
+        {
+            var time = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds();
+
+            var w_down = 0;
+            while (w_down == 0)
+            {
+                if (!RegPicture(Resource_Picture.剧毒_瘴气_CD_不朽, "Q") && !RegPicture(Resource_Picture.剧毒_瘴气_CD, "Q"))
+                {
+                    Delay(60);
+                    RightClick();
+                    w_down = 1;
+                }
+
+                if (new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds() - time <= 1200) continue;
+            }
+        }
+
+        private static void 剧毒新星去后摇()
+        {
+            var time = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds();
+
+            var w_down = 0;
+            while (w_down == 0)
+            {
+                if (!RegPicture(Resource_Picture.剧毒_剧毒新星_CD, "R"))
+                {
+                    Delay(60);
+                    RightClick();
+                    w_down = 1;
+                }
+
+                if (new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds() - time <= 1200) continue;
+            }
+        }
+
+        #endregion
+
         #endregion
 
         #region 智力
@@ -3045,6 +3242,86 @@ namespace Dota2Simulator
                 }
 
                 if (new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds() - time > 1200) break;
+            }
+        }
+
+        #endregion
+
+        #region 修补匠
+
+        private static async Task 检测敌方英雄自动导弹()
+        {
+            Task t = new(() =>
+            {
+                if (RegPicture(Resource_Picture.血量_敌人血量, 0, 0, 1920, 1080, matchRate: 0.6))
+                {
+                    KeyPress((uint)Keys.W);
+                    Delay(40);
+                }
+            });
+            t.Start();
+            await t;
+        }
+
+        private static async Task 检测希瓦()
+        {
+            Task t = new(() =>
+            {
+                Delay(120);
+                if (RegPicture(Resource_Picture.物品_希瓦CD_6, "Z", 6) || RegPicture(Resource_Picture.物品_希瓦CD_7, "Z", 7))
+                {
+                    KeyPress((uint)Keys.Z);
+                }
+            });
+            t.Start();
+            await t;
+        }
+
+        private static void 推推接刷新()
+        {
+            var time = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds();
+            var x_down = 0;
+            while (x_down == 0)
+            {
+                if (RegPicture(Resource_Picture.物品_推推BUFF, 400, 865, 1000, 60))
+                {
+                    KeyPress((uint)Keys.R);
+                    x_down = 1;
+                }
+                if (new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds() - time > 500) break;
+            }
+        }
+
+
+        private async void 刷新完跳()
+        {
+            var all_down = 0;
+            var time = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds();
+            while (all_down == 0)
+            {
+                var r_down = 0;
+                if (RegPicture(Resource_Picture.修补匠_再填装施法, 773, 727, 75, 77, matchRate: 0.7))
+                {
+                    if (condition_bool_3)
+                        await 检测希瓦();
+                    while (r_down == 0)
+                    {
+                        if (!RegPicture(Resource_Picture.修补匠_再填装施法, 773, 727, 75, 77, matchRate: 0.7))
+                        {
+                            r_down = 1;
+                            all_down = 1;
+                            if (condition_bool_1)
+                                await 检测敌方英雄自动导弹();
+                            if (condition_bool_2)
+                            {
+                                Delay(60);
+                                KeyPress((uint)Keys.Space);
+                            }
+                            
+                        }
+                    }
+                }
+                if (new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds() - time > 700) break;
             }
         }
 
@@ -4105,42 +4382,8 @@ namespace Dota2Simulator
 
         private static void 获取时间肉山()
         {
-            int time = 0;
-            FirstTry:
-            try
-            {
-                time = Convert.ToInt32(识别英文文字(ToGray(MethodBaseOnMemory(CaptureScreen(930, 21, 58, 16)))).Replace(":", ""));
-            }
-            catch
-            {
-                goto FirstTry;
-            }
-            time += 800;
-            var  time_str = time.ToString();
-            var str = string.Concat("肉山刷新", time_str[0..^2], ":", time_str[^2..]);
-            Delay(500);
-            快速发言(str);
+            快速发言("肉山");
         }
-
-        private static void 获取时间盾()
-        {
-            int time = 0;
-        FirstTry:
-            try
-            {
-                time = Convert.ToInt32(识别英文文字(ToGray(MethodBaseOnMemory(CaptureScreen(930, 21, 58, 16)))).Replace(":", ""));
-            }
-            catch
-            {
-                goto FirstTry;
-            }
-            time += 500;
-            var time_str = time.ToString();
-            var str = string.Concat("盾消时间", time_str[0..^2], ":", time_str[^2..]);
-            Delay(500);
-            快速发言(str);
-        }
-
 
         #endregion
 
@@ -4149,15 +4392,15 @@ namespace Dota2Simulator
         private static void 获取时间塔防()
         {
             int time;
-        FirstTry:
             try
             {
                 time = Convert.ToInt32(识别英文文字(ToGray(MethodBaseOnMemory(CaptureScreen(930, 21, 58, 16)))).Replace(":", ""));
             }
             catch
             {
-                goto FirstTry;
+                time = 0;
             }
+            if (time == 0) return;
             time += 800;
             string time_str = time.ToString();
             string str = string.Concat("塔防刷新", time_str[0..^2], ":", time_str[^2..]);
@@ -4309,7 +4552,7 @@ namespace Dota2Simulator
             // 设置窗口位置
             Location = new Point(338, 1013);
 
-            Task.Run(记录买活);
+            //Task.Run(记录买活);
 
             return i;
         }
