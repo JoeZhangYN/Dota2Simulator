@@ -1,4 +1,5 @@
 ﻿using Dota2Simulator.Picture_Dota2;
+using System.Collections;
 using System.Drawing;
 using System.Windows.Forms;
 using static Dota2Simulator.ORC;
@@ -115,14 +116,14 @@ namespace Dota2Simulator
             {
                 #region 记录时间
 
-                if (e.KeyValue == (uint)Keys.NumPad1)
-                {
-                    获取时间肉山();
-                }
-                else if (e.KeyValue == (uint)Keys.NumPad3)
-                {
-                    获取时间塔防();
-                }
+                //if (e.KeyValue == (uint)Keys.NumPad1)
+                //{
+                //    获取时间肉山();
+                //}
+                //else if (e.KeyValue == (uint)Keys.NumPad3)
+                //{
+                //    获取时间塔防();
+                //}
 
                 #endregion
 
@@ -130,7 +131,7 @@ namespace Dota2Simulator
 
                 #region 船长
 
-                else if (tb_name.Text == "船长")
+                if (tb_name.Text == "船长")
                 {
                     if (e.KeyValue == (uint)Keys.D2)
                     {
@@ -660,6 +661,7 @@ namespace Dota2Simulator
                 }
 
                 #region TB
+
                 else if (tb_name.Text == "TB")
                 {
                     if (e.KeyValue == (uint)Keys.Q)
@@ -1074,11 +1076,11 @@ namespace Dota2Simulator
                         condition_bool_1 = !condition_bool_1;
                         if (condition_bool_1)
                         {
-                            TTS.TTS.Speak("开启刷导弹");
+                            TTS.Speak("开启刷导弹");
                         }
                         else
                         {
-                            TTS.TTS.Speak("关闭刷导弹");
+                            TTS.Speak("关闭刷导弹");
                         }
                     }
                     else if (e.KeyValue == (uint)Keys.D2)
@@ -1086,11 +1088,11 @@ namespace Dota2Simulator
                         condition_bool_2 = !condition_bool_2;
                         if (condition_bool_2)
                         {
-                            TTS.TTS.Speak("开启刷跳");
+                            TTS.Speak("开启刷跳");
                         }
                         else
                         {
-                            TTS.TTS.Speak("关闭刷跳");
+                            TTS.Speak("关闭刷跳");
                         }
                     }
                     else if (e.KeyValue == (uint)Keys.D3)
@@ -1098,11 +1100,11 @@ namespace Dota2Simulator
                         condition_bool_3 = !condition_bool_3;
                         if (condition_bool_3)
                         {
-                            TTS.TTS.Speak("开启希瓦");
+                            TTS.Speak("开启希瓦");
                         }
                         else
                         {
-                            TTS.TTS.Speak("关闭希瓦");
+                            TTS.Speak("关闭希瓦");
                         }
                     }
                     else if (e.KeyValue == (uint)Keys.X)
@@ -1155,9 +1157,11 @@ namespace Dota2Simulator
 
                 else if (tb_name.Text.Trim() == "测试")
                 {
-                    if (e.KeyValue == (uint)Keys.Q)
+                    if (e.KeyValue == (uint)Keys.X)
                     {
-                        TTS.TTS.Speak("我干你老母");
+                        tb_状态抗性.Text = "";
+                        tb_丢装备.Text = "";
+                        捕捉颜色();
                     }
                 }
 
@@ -1280,7 +1284,16 @@ namespace Dota2Simulator
 
         private void 跳吼()
         {
-            单次使用装备(Resource_Picture.物品_刃甲);
+            long s_time;
+            s_time = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds();
+
+            //单次使用装备(Resource_Picture.物品_刃甲);
+
+            if (RegPicture(Resource_Picture.物品_刃甲, "Z", ablityCount: 4))
+            {
+                KeyPress((uint)Keys.Z);
+                //Delay(30);
+            }
 
             KeyPress((uint)Keys.Space);
 
@@ -1308,21 +1321,24 @@ namespace Dota2Simulator
         private void 战斗饥渴取消后摇()
         {
             var time = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds();
+            long s_time;
 
             var w_down = 0;
             while (w_down == 0)
             {
-                if (RegPicture(Resource_Picture.斧王_战斗饥渴, "W"))
+                s_time = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds();
+
+                // 开始释放不朽技能读条的最开始端颜色，大约耗时10ms内
+                if (CaptureColor(892, 952).Equals(Color.FromArgb(255, 39, 149, 22)))
                 {
-                    Delay(302);
-                    KeyPress((uint)Keys.A);
-                    w_down = 1;
-
-                    切敏捷腿();
-
-                    Delay(200);
-
-                    切敏捷腿();
+                    // 检测刚释放完毕
+                    if (RegPicture(Resource_Picture.斧王_释放战斗饥渴_不朽, "W"))
+                    {
+                        Delay(300, s_time);
+                        KeyPress((uint)Keys.A);
+                        切敏捷腿();
+                        w_down = 1;
+                    }
                 }
 
                 if (new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds() - time > 700) break;
@@ -1613,6 +1629,7 @@ namespace Dota2Simulator
                 if (new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds() - time <= 1100) continue;
 
                 切敏捷腿();
+
                 break;
             }
                        
@@ -2297,6 +2314,7 @@ namespace Dota2Simulator
                 }
 
                 if (new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds() - time <= 1200) continue;
+                break;
             }
         }
 
@@ -2316,6 +2334,7 @@ namespace Dota2Simulator
                 }
 
                 if (new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds() - time <= 1200) continue;
+                break;
             }
         }
 
@@ -2344,21 +2363,29 @@ namespace Dota2Simulator
             }
         }
 
-        private static void 蛇棒去后摇()
+        private void 蛇棒去后摇()
         {
             var time = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds();
 
             var w_down = 0;
             while (w_down == 0)
             {
-                if (!RegPicture(Resource_Picture.剧毒_蛇棒_CD_不朽, "E") && !RegPicture(Resource_Picture.剧毒_蛇棒_CD, "E"))
+                Color c = CaptureColor(943, 988);
+
+                if (c.Equals(Color.FromArgb(255, 181, 218, 9))) continue; // 不朽CD好颜色
+                if (c.Equals(Color.FromArgb(255, 124, 126, 0))) continue; // 普通CD好颜色
+
+                // 瘴气进入CD颜色
+                if (
+                    !ColorAEqualColorB(c, Color.FromArgb(255, 38, 39, 21), 3) // 普通最短值
+                    && !ColorAEqualColorB(c, Color.FromArgb(255, 65, 73, 46), 3)) // 不朽最短值
                 {
-                    Delay(60);
                     RightClick();
                     w_down = 1;
                 }
 
-                if (new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds() - time <= 1200) continue;
+                if (new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds() - time <= 600) continue;
+                break;
             }
         }
 
@@ -2369,14 +2396,23 @@ namespace Dota2Simulator
             var w_down = 0;
             while (w_down == 0)
             {
-                if (!RegPicture(Resource_Picture.剧毒_瘴气_CD_不朽, "Q") && !RegPicture(Resource_Picture.剧毒_瘴气_CD, "Q"))
+                Color c = CaptureColor(820, 957);
+
+                if (c.Equals(Color.FromArgb(255, 193, 207, 21))) continue; // 不朽CD好颜色
+                if (c.Equals(Color.FromArgb(255, 68, 39, 23))) continue; // 普通CD好颜色
+
+                // 瘴气进入CD颜色
+                if (
+                    ColorAEqualColorB(c, Color.FromArgb(255, 14, 10, 8), 3) // 普通最短值
+                    || ColorAEqualColorB(c, Color.FromArgb(255, 60, 62, 39), 6) // 不朽最短值
+                    )
                 {
-                    Delay(60);
-                    RightClick();
+                    KeyPress((uint)Keys.A);
                     w_down = 1;
                 }
 
-                if (new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds() - time <= 1200) continue;
+                if (new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds() - time <= 600) continue;
+                break;
             }
         }
 
@@ -2387,14 +2423,16 @@ namespace Dota2Simulator
             var w_down = 0;
             while (w_down == 0)
             {
-                if (!RegPicture(Resource_Picture.剧毒_剧毒新星_CD, "R"))
+                Color c = CaptureColor(1016, 957);
+                // 剧毒新星最佳匹配
+                if (ColorAEqualColorB(c, Color.FromArgb(255, 74, 78, 52), 5))
                 {
-                    Delay(60);
                     RightClick();
                     w_down = 1;
                 }
 
-                if (new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds() - time <= 1200) continue;
+                if (new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds() - time <= 600) continue;
+                break;
             }
         }
 
@@ -4428,7 +4466,77 @@ namespace Dota2Simulator
 
         #endregion
 
-#endregion
+        #region 测试_捕捉颜色
+
+        private void 捕捉颜色()
+        {
+            Color c1 = CaptureColor(1016, 957);
+
+            KeyPress((uint)Keys.R);
+
+            tb_状态抗性.Text = "";
+            tb_丢装备.Text = "";
+
+            ArrayList al = new ArrayList();
+            ArrayList ax = new ArrayList();
+
+            var time = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds();
+
+            while (1 == 1)
+            {
+                Color c = CaptureColor(1016, 957);
+
+                //if (c.Equals(Color.FromArgb(255, 193, 207, 21))) continue; // 不朽CD好颜色
+                //if (c.Equals(Color.FromArgb(255, 68, 39, 23))) continue; // 普通CD好颜色
+
+                // 瘴气进入CD颜色
+                if (
+                    // !ColorAEqualColorB(c, Color.FromArgb(255, 38, 39, 21), 3) // 普通最适合值
+                    // && !ColorAEqualColorB(c, Color.FromArgb(255, 65, 73, 46), 3) // 不朽最适合值
+                    !c.Equals(c1)
+                    )
+                {
+                    if (al.Count == 0)
+                    {
+                        ax.Add(new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds() - time);
+                        al.Add(string.Concat(c.R.ToString(), ",", c.G.ToString(), ",", c.B.ToString(), ", "));
+                    }
+                    else
+                    {
+                        if ((string)al[al.Count - 1] != string.Concat(c.R.ToString(), ",", c.G.ToString(), ",", c.B.ToString(), ", "))
+                        {
+                            ax.Add(new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds() - time);
+                            al.Add(string.Concat(c.R.ToString(), ",", c.G.ToString(), ",", c.B.ToString(), ", "));
+                        }
+                    }
+                }
+
+                if (new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds() - time > 3000) break;
+            }
+
+            foreach (string item in al)
+            {
+                tb_状态抗性.Text = string.Concat(tb_状态抗性.Text, item);
+            }
+            foreach (long item in ax)
+            {
+                tb_丢装备.Text = string.Concat(tb_丢装备.Text, item.ToString(), ",");
+            }
+
+            if (tb_状态抗性.Text.Equals(""))
+            {
+                tb_状态抗性.Text = "无匹配";
+            }
+
+            if (tb_丢装备.Text.Equals(""))
+            {
+                tb_丢装备.Text = "无匹配";
+            }
+        }
+
+        #endregion
+
+        #endregion
 
         #region 起始加载图片
 
@@ -4618,6 +4726,10 @@ namespace Dota2Simulator
             KeyboardMouseSimulateDriverAPI.KeyDown(key);
         }
 
+        /// <summary>
+        ///     单次操作大约需要7ms
+        /// </summary>
+        /// <param name="key"></param>
         private new static void KeyPress(uint key)
         {
             KeyDown(key);
@@ -4656,12 +4768,13 @@ namespace Dota2Simulator
         #region 延时
 
         /// <summary>
-        /// 精简延迟实现
+        ///     精准延迟
         /// </summary>
-        /// <param name="delay"></param>
-        private static void Delay(int delay)
+        /// <param name="delay">需要延迟的时间</param>
+        /// <param name="time"></param>
+        private static void Delay(int delay, long time = -1)
         {
-            var time = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds();
+            if (time == -1) { time = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds(); }
             while (new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds() - time <= delay) { }
         }
 
@@ -4695,6 +4808,5 @@ namespace Dota2Simulator
         //KeyboardMouseSimulateDriverAPI.KeyUp((uint) Keys.Space);
 
         #endregion
-
     }
 }

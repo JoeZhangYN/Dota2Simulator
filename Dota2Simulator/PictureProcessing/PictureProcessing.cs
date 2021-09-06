@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
+﻿using System.Drawing;
 using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
 
@@ -23,16 +21,11 @@ namespace Dota2Simulator
         /// <param name="width">图片的宽度</param>
         /// <param name="height">图片的长度</param>
         /// <returns></returns>
-        public static Bitmap CaptureScreen(double x, double y, double width, double height)
+        public static Bitmap CaptureScreen(int x, int y, int width, int height)
         {
-            int ix = Convert.ToInt32(x);
-            int iy = Convert.ToInt32(y);
-            int iw = Convert.ToInt32(width);
-            int ih = Convert.ToInt32(height);
-
-            Bitmap bitmap = new(iw, ih);
+            Bitmap bitmap = new(width, height);
             using Graphics graphics = Graphics.FromImage(bitmap);
-            graphics.CopyFromScreen(ix, iy, 0, 0, new Size(iw, ih));
+            graphics.CopyFromScreen(x, y, 0, 0, new Size(width, height));
             return bitmap;
 
             //SaveFileDialog dialog = new SaveFileDialog();
@@ -52,16 +45,11 @@ namespace Dota2Simulator
         /// <param name="width">图片的宽度</param>
         /// <param name="height">图片的长度</param>
         /// <returns></returns>
-        public static Color CaptureColor(double x, double y)
+        public static Color CaptureColor(int x, int y)
         {
-            int ix = Convert.ToInt32(x);
-            int iy = Convert.ToInt32(y);
-            int iw = 1;
-            int ih = 1;
-
-            Bitmap bitmap = new(iw, ih);
+            Bitmap bitmap = new(1, 1);
             using Graphics graphics = Graphics.FromImage(bitmap);
-            graphics.CopyFromScreen(ix, iy, 0, 0, new Size(iw, ih));
+            graphics.CopyFromScreen(x, y, 0, 0, new Size(1, 1));
             return bitmap.GetPixel(0, 0);
 
             //SaveFileDialog dialog = new SaveFileDialog();

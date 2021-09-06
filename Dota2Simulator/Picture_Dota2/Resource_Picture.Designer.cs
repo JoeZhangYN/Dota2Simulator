@@ -853,16 +853,6 @@ namespace Dota2Simulator.Picture_Dota2 {
         /// <summary>
         ///   查找 System.Drawing.Bitmap 类型的本地化资源。
         /// </summary>
-        internal static System.Drawing.Bitmap 斧王_战斗饥渴 {
-            get {
-                object obj = ResourceManager.GetObject("斧王_战斗饥渴", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
-        /// </summary>
         internal static System.Drawing.Bitmap 斧王_狂战士之吼 {
             get {
                 object obj = ResourceManager.GetObject("斧王_狂战士之吼", resourceCulture);
@@ -876,6 +866,26 @@ namespace Dota2Simulator.Picture_Dota2 {
         internal static System.Drawing.Bitmap 斧王_狂战士之吼_金色饰品 {
             get {
                 object obj = ResourceManager.GetObject("斧王_狂战士之吼_金色饰品", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
+        /// </summary>
+        internal static System.Drawing.Bitmap 斧王_释放战斗饥渴 {
+            get {
+                object obj = ResourceManager.GetObject("斧王_释放战斗饥渴", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
+        /// </summary>
+        internal static System.Drawing.Bitmap 斧王_释放战斗饥渴_不朽 {
+            get {
+                object obj = ResourceManager.GetObject("斧王_释放战斗饥渴_不朽", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

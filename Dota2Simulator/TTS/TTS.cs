@@ -2,7 +2,7 @@
 
 using System.Speech.Synthesis;
 
-namespace Dota2Simulator.TTS
+namespace Dota2Simulator
 {
     /// <summary>
     ///     <see cref="TTS" /> TTS 类
@@ -19,7 +19,7 @@ namespace Dota2Simulator.TTS
         /// <param name="volume">The volume. 0 to 100</param>
         /// <param name="index">The index.</param>
         /// <param name="limitTime">The limit time.</param>
-        public static void Speak(string str, int rate = 5, int volume = 100)
+        public static void Speak(string str, int rate = 6, int volume = 100)
         {
             var synthesizer = new SpeechSynthesizer();
             synthesizer.Rate = rate;
