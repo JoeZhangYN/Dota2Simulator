@@ -2377,8 +2377,8 @@ namespace Dota2Simulator
 
                 // 瘴气进入CD颜色
                 if (
-                    !ColorAEqualColorB(c, Color.FromArgb(255, 38, 39, 21), 3) // 普通最短值
-                    && !ColorAEqualColorB(c, Color.FromArgb(255, 65, 73, 46), 3)) // 不朽最短值
+                    !ColorAEqualColorB(c, Color.FromArgb(255, 38, 39, 21), 8) // 普通最短值3
+                    && !ColorAEqualColorB(c, Color.FromArgb(255, 65, 73, 46), 8)) // 不朽最短值3
                 {
                     RightClick();
                     w_down = 1;
@@ -2403,8 +2403,8 @@ namespace Dota2Simulator
 
                 // 瘴气进入CD颜色
                 if (
-                    ColorAEqualColorB(c, Color.FromArgb(255, 14, 10, 8), 3) // 普通最短值
-                    || ColorAEqualColorB(c, Color.FromArgb(255, 60, 62, 39), 6) // 不朽最短值
+                    ColorAEqualColorB(c, Color.FromArgb(255, 14, 10, 8), 8) // 普通最短值3
+                    || ColorAEqualColorB(c, Color.FromArgb(255, 60, 62, 39), 8) // 不朽最短值6
                     )
                 {
                     KeyPress((uint)Keys.A);
@@ -2425,7 +2425,7 @@ namespace Dota2Simulator
             {
                 Color c = CaptureColor(1016, 957);
                 // 剧毒新星最佳匹配
-                if (ColorAEqualColorB(c, Color.FromArgb(255, 74, 78, 52), 5))
+                if (ColorAEqualColorB(c, Color.FromArgb(255, 74, 78, 52), 8)) // 最短值5
                 {
                     RightClick();
                     w_down = 1;
