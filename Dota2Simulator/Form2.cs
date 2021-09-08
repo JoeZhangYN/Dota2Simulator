@@ -22,6 +22,11 @@ namespace Dota2Simulator
         private bool b_cancel;
 
         /// <summary>
+        ///     循环计数total
+        /// </summary>
+        private bool loop_bool_total = false;
+
+        /// <summary>
         ///     循环计数1
         /// </summary>
         private bool loop_bool_1 = false;
@@ -30,6 +35,53 @@ namespace Dota2Simulator
         ///     循环计数2
         /// </summary>
         private bool loop_bool_2 = false;
+
+        /// <summary>
+        ///     获取图片委托
+        /// </summary>
+        /// <returns></returns>
+        private delegate Bitmap GetBitmap();
+
+        /// <summary>
+        ///     获取图片委托
+        /// </summary>
+        private GetBitmap getBitmap;
+
+        /// <summary>
+        ///     条件委托图片
+        /// </summary>
+        /// <param name="bp"></param>
+        private delegate bool condition_delegate_bitmap(Bitmap bp);
+
+        /// <summary>
+        ///     条件1委托
+        /// </summary>
+        private condition_delegate_bitmap condition_Delegate_bitmap_1;
+
+        /// <summary> 
+        ///     条件2委托
+        /// </summary>
+        private condition_delegate_bitmap condition_Delegate_bitmap_2;
+
+        /// <summary> 
+        ///     条件3委托
+        /// </summary>
+        private condition_delegate_bitmap condition_Delegate_bitmap_3;
+
+        /// <summary> 
+        ///     条件4委托
+        /// </summary>
+        private condition_delegate_bitmap condition_Delegate_bitmap_4;
+
+        /// <summary> 
+        ///     条件5委托
+        /// </summary>
+        private condition_delegate_bitmap condition_Delegate_bitmap_5;
+
+        /// <summary> 
+        ///     条件6委托
+        /// </summary>
+        private condition_delegate_bitmap condition_Delegate_bitmap_6;
 
         /// <summary>
         ///     条件布尔
@@ -278,12 +330,23 @@ namespace Dota2Simulator
 
                 else if (tb_name.Text.Trim() == "钢背")
                 {
+                    if (!loop_bool_total)
+                    {
+                        loop_bool_total = true;
+                        if (getBitmap == null)
+                            getBitmap = 获取图片_1;
+                        Task.Run(一般程序循环);
+                    }
+
+                    if (condition_Delegate_bitmap_1 == null)
+                        condition_Delegate_bitmap_1 = 鼻涕针刺循环;
+
                     if (e.KeyValue == (uint)Keys.D2)
                     {
-                        label1.Text = "D2";
+                        if (!condition_bool_1)
+                            condition_bool_1 = true;
 
                         loop_bool_1 = !loop_bool_1;
-
                         // 基本上魂戒可以放4下，只浪费10点蓝
                         // 配合一次鼻涕就一次也不浪费
                         if (loop_bool_1)
@@ -293,16 +356,13 @@ namespace Dota2Simulator
                                 KeyPress((uint)Keys.C);
                             }
                         }
-
-                        Task.Run(循环针刺);
                     }
                     else if (e.KeyValue == (uint)Keys.D3)
                     {
+                        if (!condition_bool_1)
+                            condition_bool_1 = true;
+
                         loop_bool_2 = !loop_bool_2;
-
-                        label1.Text = "D3";
-
-                        Task.Run(A杖鼻涕);
                     }
                     else if (e.KeyValue == (uint)Keys.H)
                     {
@@ -702,25 +762,27 @@ namespace Dota2Simulator
 
                 else if (tb_name.Text == "赏金")
                 {
+                    if (!loop_bool_total)
+                    {
+                        loop_bool_total = true;
+                        if (getBitmap == null)
+                            getBitmap = 获取图片_1;
+                        Task.Run(一般程序循环);
+                    }
+
+                    if (condition_Delegate_bitmap_1 == null)
+                        condition_Delegate_bitmap_1 = 飞镖接平A;
+
+                    if (condition_Delegate_bitmap_2 == null)
+                        condition_Delegate_bitmap_2 = 标记去后摇;
+
                     if (e.KeyValue == (uint)Keys.Q)
                     {
-                        label1.Text = "Q";
-
-                        Task.Run(() =>
-                        {
-                            Thread.CurrentThread.Priority = ThreadPriority.Highest;
-                            飞镖接平A();
-                        });
+                        condition_bool_1 = true;
                     }
                     else if (e.KeyValue == (uint)Keys.R)
                     {
-                        label1.Text = "R";
-
-                        Task.Run(() =>
-                        {
-                            Thread.CurrentThread.Priority = ThreadPriority.Highest;
-                            标记去后摇();
-                        });
+                        condition_bool_2 = true;
                     }
                 }
 
@@ -730,28 +792,43 @@ namespace Dota2Simulator
 
                 else if (tb_name.Text == "剧毒")
                 {
+                    if (!loop_bool_total)
+                    {
+                        loop_bool_total = true;
+                        if (getBitmap == null)
+                            getBitmap = 获取图片_1;
+                        Task.Run(一般程序循环);
+                    }
+
+                    if (condition_Delegate_bitmap_1 == null)
+                        condition_Delegate_bitmap_1 = 瘴气去后摇;
+
+                    if (condition_Delegate_bitmap_2 == null)
+                        condition_Delegate_bitmap_2 = 蛇棒去后摇;
+
+                    if (condition_Delegate_bitmap_3 == null)
+                        condition_Delegate_bitmap_3 = 剧毒新星去后摇;
+
+                    if (condition_Delegate_bitmap_4 == null)
+                        condition_Delegate_bitmap_4 = 循环蛇棒;
+
                     if (e.KeyValue == (uint)Keys.Q)
                     {
-                        Task.Run(瘴气去后摇);
+                        condition_bool_1 = true;
                     }
                     else if (e.KeyValue == (uint)Keys.E)
                     {
-                        Task.Run(蛇棒去后摇);
+                        condition_bool_2 = true;
                     }
                     else if (e.KeyValue == (uint)Keys.R)
                     {
-                        Task.Run(剧毒新星去后摇);
+                        condition_bool_3 = true;
                     }
                     else if (e.KeyValue == (uint)Keys.D3)
                     {
                         loop_bool_1 = !loop_bool_1;
-
-                        Task.Run(循环蛇棒);
-                    }
-                    else if (e.KeyValue == (uint)Keys.H)
-                    {
-                        loop_bool_1 = false;
-                        loop_bool_2 = false;
+                        if (loop_bool_1)
+                            condition_bool_4 = true;
                     }
                 }
 
@@ -1166,8 +1243,6 @@ namespace Dota2Simulator
                 }
 
                 #endregion
-
-
             }
         }
 
@@ -1284,9 +1359,6 @@ namespace Dota2Simulator
 
         private void 跳吼()
         {
-            long s_time;
-            s_time = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds();
-
             //单次使用装备(Resource_Picture.物品_刃甲);
 
             if (RegPicture(Resource_Picture.物品_刃甲, "Z", ablityCount: 4))
@@ -1548,58 +1620,84 @@ namespace Dota2Simulator
 
         #region 钢背
 
-        private void 循环针刺()
+        private bool 鼻涕针刺循环(Bitmap bp)
         {
-            Color 技能点颜色 = Color.FromArgb(255, 254, 254, 254);
-            while (loop_bool_1)
+            Color q4, q5, w4, w5;
+            bool 是否魔晶, 是否A杖;
+
+            q5 = bp.GetPixel(97, 59); // CaptureColor(775, 994);
+            q4 = bp.GetPixel(129, 59); // CaptureColor(807, 994);
+            w5 = bp.GetPixel(161, 59); //Color w5 = CaptureColor(839, 994);
+            w4 = bp.GetPixel(193, 59); //Color w4 = CaptureColor(871, 994);
+            是否魔晶 = 阿哈利姆魔晶(bp);
+            是否A杖 = 阿哈利姆神杖(bp);
+
+            if (loop_bool_1)
             {
-                if (CaptureColor(871, 994).Equals(技能点颜色) || CaptureColor(840, 994).Equals(技能点颜色))
+                if (是否魔晶)
                 {
-                    KeyPress((uint)Keys.W);
-                    label1.Text = "D32";
-                    Delay(30);
+                    if (ColorAEqualColorB(w5, Color.FromArgb(255, 79, 74, 73), 8)
+                        )
+                    {
+                        KeyPress((uint)Keys.W);
+                    }
+
+                    if (RegPicture(Resource_Picture.钢背_针刺CD_5, bp))
+                    {
+                        KeyPress((uint)Keys.W);
+                    }
                 }
                 else
                 {
-                    if (RegPicture(Resource_Picture.钢背_针刺CD, "W") || RegPicture(Resource_Picture.钢背_针刺CD_5, "W", 5))
+                    if (ColorAEqualColorB(w4, Color.FromArgb(255, 80, 76, 75), 8)
+                        )
                     {
                         KeyPress((uint)Keys.W);
-                        label1.Text = "D22";
-                        Delay(30);
+                    }
+
+                    if (RegPicture(Resource_Picture.钢背_针刺CD, bp))
+                    {
+                        KeyPress((uint)Keys.W);
                     }
                 }
             }
-        }
 
-        private void A杖鼻涕()
-        {
-
-            if (阿哈利姆神杖())
+            if (是否A杖 && loop_bool_2)
             {
-                Color 技能点颜色 = Color.FromArgb(255, 254, 254, 254);
-                while (loop_bool_2)
+                if (是否魔晶)
                 {
-                    // 4、5技能刚CD好
-                    if (CaptureColor(807, 994).Equals(技能点颜色) || CaptureColor(776, 994).Equals(技能点颜色))
+                    if (
+                        ColorAEqualColorB(q5, Color.FromArgb(255, 64, 61, 55), 10) // 不朽颜色变化
+                        )
                     {
                         KeyPress((uint)Keys.Q);
-                        label1.Text = "D32";
-                        Delay(30);
                     }
-                    else
+
+                    if (RegPicture(Resource_Picture.钢背_鼻涕CD_5_不朽, bp))
                     {
-                        if (RegPicture(Resource_Picture.钢背_鼻涕CD_不朽, "Q") || RegPicture(Resource_Picture.钢背_鼻涕CD_5_不朽, "Q", 5)
-                            || RegPicture(Resource_Picture.钢背_鼻涕CD, "Q") || RegPicture(Resource_Picture.钢背_鼻涕CD_5, "Q", 5))
-                        {
-                            KeyPress((uint)Keys.Q);
-                            label1.Text = "d32";
-                            Delay(30);
-                        }
+                        KeyPress((uint)Keys.Q);
                     }
-                    
+
+                }
+                else
+                {
+                    if (
+                        ColorAEqualColorB(q4, Color.FromArgb(255, 64, 61, 55), 10) // 不朽颜色变化
+                        )
+                    {
+                        KeyPress((uint)Keys.Q);
+                    }
+
+                    if (RegPicture(Resource_Picture.钢背_鼻涕CD_不朽, bp))
+                    {
+                        KeyPress((uint)Keys.Q);
+                    }
                 }
             }
+
+            return true;
         }
+        
 
         #endregion
 
@@ -2298,142 +2396,103 @@ namespace Dota2Simulator
 
         #region 赏金
 
-        private static void 飞镖接平A()
+        private static bool 飞镖接平A(Bitmap bp)
         {
-            var time = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds();
-
-            var w_down = 0;
-
-            while (w_down == 0)
+            if (RegPicture(Resource_Picture.赏金_释放飞镖, bp) || RegPicture(Resource_Picture.赏金_释放飞镖_双刀, bp))
             {
-                if (RegPicture(Resource_Picture.赏金_释放飞镖, "Q") || RegPicture(Resource_Picture.赏金_释放飞镖_双刀, "Q"))
-                {
-                    Delay(105);
-                    RightClick();
-                    w_down = 1;
-                }
-
-                if (new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds() - time <= 1200) continue;
-                break;
+                Delay(105);
+                RightClick();
+                return false;
             }
+
+            return true;
         }
 
-        private static void 标记去后摇()
+        private static bool 标记去后摇(Bitmap bp)
         {
-            var time = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds();
-
-            var w_down = 0;
-
-            while (w_down == 0)
+            if (RegPicture(Resource_Picture.赏金_释放标记, bp) || RegPicture(Resource_Picture.赏金_释放标记_不朽, bp))
             {
-                if (RegPicture(Resource_Picture.赏金_释放标记, "R") || RegPicture(Resource_Picture.赏金_释放标记_不朽, "R"))
-                {
-                    Delay(110);
-                    RightClick();
-                    w_down = 1;
-                }
-
-                if (new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds() - time <= 1200) continue;
-                break;
+                Delay(110);
+                RightClick();
+                return false;
             }
+
+            return true;
         }
 
         #endregion
 
         #region 剧毒
 
-        private void 循环蛇棒()
+        private bool 循环蛇棒(Bitmap bp)
         {
             Color 技能点颜色 = Color.FromArgb(255, 254, 254, 254);
-            while (loop_bool_1)
+
+            if (bp.GetPixel(264, 54).Equals(技能点颜色))
             {
-                if (CaptureColor(942, 989).Equals(技能点颜色))
+                KeyPress((uint)Keys.E);
+            }
+            else
+            {
+                if (RegPicture(Resource_Picture.剧毒_蛇棒_CD_不朽, bp) || RegPicture(Resource_Picture.剧毒_蛇棒_CD, bp))
                 {
                     KeyPress((uint)Keys.E);
-                    Delay(30);
-                }
-                else
-                {
-                    if (RegPicture(Resource_Picture.剧毒_蛇棒_CD_不朽, "E") || RegPicture(Resource_Picture.剧毒_蛇棒_CD, "E"))
-                    {
-                        KeyPress((uint)Keys.E);
-                        Delay(30);
-                    }
                 }
             }
+
+            return loop_bool_1;
         }
 
-        private void 蛇棒去后摇()
+        private static bool 蛇棒去后摇(Bitmap bp)
         {
-            var time = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds();
+            Color c = bp.GetPixel(265, 53);
 
-            var w_down = 0;
-            while (w_down == 0)
+            if (c.Equals(Color.FromArgb(255, 181, 218, 9))) return true; // 不朽CD好颜色
+            if (c.Equals(Color.FromArgb(255, 124, 126, 0))) return true; // 普通CD好颜色
+
+            // 瘴气进入CD颜色
+            if (
+                !ColorAEqualColorB(c, Color.FromArgb(255, 38, 39, 21)) // 普通最短值3
+                && !ColorAEqualColorB(c, Color.FromArgb(255, 65, 73, 46))) // 不朽最短值3
             {
-                Color c = CaptureColor(943, 988);
-
-                if (c.Equals(Color.FromArgb(255, 181, 218, 9))) continue; // 不朽CD好颜色
-                if (c.Equals(Color.FromArgb(255, 124, 126, 0))) continue; // 普通CD好颜色
-
-                // 瘴气进入CD颜色
-                if (
-                    !ColorAEqualColorB(c, Color.FromArgb(255, 38, 39, 21), 8) // 普通最短值3
-                    && !ColorAEqualColorB(c, Color.FromArgb(255, 65, 73, 46), 8)) // 不朽最短值3
-                {
-                    RightClick();
-                    w_down = 1;
-                }
-
-                if (new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds() - time <= 600) continue;
-                break;
+                RightClick();
+                return false;
             }
+
+            return true;
         }
 
-        private static void 瘴气去后摇()
+        private static bool 瘴气去后摇(Bitmap bp)
         {
-            var time = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds();
+            Color c = bp.GetPixel(142, 22);
 
-            var w_down = 0;
-            while (w_down == 0)
+            if (c.Equals(Color.FromArgb(255, 193, 207, 21))) return true; // 不朽CD好颜色
+            if (c.Equals(Color.FromArgb(255, 68, 39, 23))) return true; // 普通CD好颜色
+
+            // 瘴气进入CD颜色
+            if (
+                ColorAEqualColorB(c, Color.FromArgb(255, 14, 10, 8)) // 普通最短值3
+                || ColorAEqualColorB(c, Color.FromArgb(255, 60, 62, 39)) // 不朽最短值6
+                )
             {
-                Color c = CaptureColor(820, 957);
-
-                if (c.Equals(Color.FromArgb(255, 193, 207, 21))) continue; // 不朽CD好颜色
-                if (c.Equals(Color.FromArgb(255, 68, 39, 23))) continue; // 普通CD好颜色
-
-                // 瘴气进入CD颜色
-                if (
-                    ColorAEqualColorB(c, Color.FromArgb(255, 14, 10, 8), 8) // 普通最短值3
-                    || ColorAEqualColorB(c, Color.FromArgb(255, 60, 62, 39), 8) // 不朽最短值6
-                    )
-                {
-                    KeyPress((uint)Keys.A);
-                    w_down = 1;
-                }
-
-                if (new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds() - time <= 600) continue;
-                break;
+                KeyPress((uint)Keys.A);
+                return false;
             }
+
+            return true;
         }
 
-        private static void 剧毒新星去后摇()
+        private static bool 剧毒新星去后摇(Bitmap bp)
         {
-            var time = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds();
-
-            var w_down = 0;
-            while (w_down == 0)
+            Color c = bp.GetPixel(338, 22);
+            // 剧毒新星最佳匹配
+            if (ColorAEqualColorB(c, Color.FromArgb(255, 74, 78, 52))) // 最短值5
             {
-                Color c = CaptureColor(1016, 957);
-                // 剧毒新星最佳匹配
-                if (ColorAEqualColorB(c, Color.FromArgb(255, 74, 78, 52), 8)) // 最短值5
-                {
-                    RightClick();
-                    w_down = 1;
-                }
-
-                if (new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds() - time <= 600) continue;
-                break;
+                RightClick();
+                return false;
             }
+
+            return true;
         }
 
         #endregion
@@ -2998,7 +3057,7 @@ namespace Dota2Simulator
 
                 if (RegPicture(Resource_Picture.小仙女_释放诅咒皇冠_不朽, "E", 7))
                 {
-                    Delay(阿哈利姆魔晶() ? 410 : 1410);  // 大部分技能抬手都是0.2-0.3之间
+                    // Delay(阿哈利姆魔晶() ? 410 : 1410);  // 大部分技能抬手都是0.2-0.3之间
                     if (!loop_bool_2) return;
 
                     if (RegPicture(Resource_Picture.物品_吹风_7, "SPACE", 7))
@@ -3034,17 +3093,17 @@ namespace Dota2Simulator
 
             var 暗影之境_开始时间 = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds();
 
-            if (阿哈利姆神杖())
-            {
-                Delay(400);
-                KeyPress((uint)Keys.A);
-            }
-            else
-            {
-                while (new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds() - 暗影之境_开始时间 < 4500 || !loop_bool_2) { }
-                if (!loop_bool_2) return;
-                KeyPress((uint)Keys.A);
-            }
+            //if (阿哈利姆神杖())
+            //{
+            //    Delay(400);
+            //    KeyPress((uint)Keys.A);
+            //}
+            //else
+            //{
+            //    while (new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds() - 暗影之境_开始时间 < 4500 || !loop_bool_2) { }
+            //    if (!loop_bool_2) return;
+            //    KeyPress((uint)Keys.A);
+            //}
         }
 
         //private void 皇冠接花控制衔接()
@@ -3369,6 +3428,107 @@ namespace Dota2Simulator
 
         #region 通用
 
+        private async void 一般程序循环()
+        {
+            while (loop_bool_total)
+            {
+                if (getBitmap != null)
+                {
+                    // 总检测图片
+                    using (Bitmap bp = getBitmap())
+                    {
+                        if (condition_bool_1 && condition_Delegate_bitmap_1 != null)
+                        {
+                            await Task.Run(() =>
+                            {
+                                condition_bool_1 = condition_Delegate_bitmap_1(bp);
+                            });
+                        }
+
+                        if (condition_bool_2 && condition_Delegate_bitmap_2 != null)
+                        {
+                            await Task.Run(() =>
+                            {
+                                condition_bool_2 = condition_Delegate_bitmap_2(bp);
+                            });
+                        }
+
+                        if (condition_bool_3 && condition_Delegate_bitmap_3 != null)
+                        {
+                            await Task.Run(() =>
+                            {
+                                condition_bool_3 = condition_Delegate_bitmap_3(bp);
+                            });
+                        }
+
+                        if (condition_bool_4 && condition_Delegate_bitmap_4 != null)
+                        {
+                            await Task.Run(() =>
+                            {
+                                condition_bool_4 = condition_Delegate_bitmap_4(bp);
+                            });
+                        }
+
+                        if (condition_bool_5 && condition_Delegate_bitmap_5 != null)
+                        {
+                            await Task.Run(() =>
+                            {
+                                condition_bool_5 = condition_Delegate_bitmap_5(bp);
+                            });
+                        }
+
+                        if (condition_bool_6 && condition_Delegate_bitmap_6 != null)
+                        {
+                            await Task.Run(() =>
+                            {
+                                condition_bool_6 = condition_Delegate_bitmap_6(bp);
+                            });
+                        }
+                    }
+                }
+            }
+        }
+
+        private void 取消所有功能()
+        {
+            loop_bool_total = false;
+            loop_bool_1 = false;
+            loop_bool_2 = false;
+            condition_bool_1 = false;
+            condition_bool_2 = false;
+            condition_bool_3 = false;
+            condition_bool_4 = false;
+            condition_bool_5 = false;
+            condition_bool_6 = false;
+
+            condition_Delegate_bitmap_1 = null;
+            condition_Delegate_bitmap_2 = null;
+            condition_Delegate_bitmap_3 = null;
+            condition_Delegate_bitmap_4 = null;
+            condition_Delegate_bitmap_5 = null;
+            condition_Delegate_bitmap_6 = null;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        private Bitmap 获取图片_1()
+        {
+            // 678, 935, 476, 81 所有技能，6-14ms延迟
+            // 675, 852, 737, 226 基本所有技能状态，14ms延迟
+            // 具体点则为起始坐标点加与其的差值
+            return CaptureScreen(678, 935, 476, 81);
+        }
+
+        private Bitmap 获取图片_2()
+        {
+            // 678, 935, 476, 81 所有技能，6-14ms延迟
+            // 675, 852, 737, 226 基本所有技能状态，14ms延迟
+            // 具体点则为起始坐标点加与其的差值
+            return CaptureScreen(675, 852, 737, 226);
+        }
+
         #region 指定地点
 
         private static void 指定地点()
@@ -3428,8 +3588,8 @@ namespace Dota2Simulator
                 move_X = Convert.ToDouble(mousePosition.X) +
                          (realX < mousePosition.X ? -Math.Abs(move_X) : Math.Abs(move_X));
 
-                textBox3.Text = move_X.ToString();
-                textBox4.Text = move_Y.ToString();
+                tb_x.Text = move_X.ToString();
+                tb_y.Text = move_Y.ToString();
             }
 
             return new Point(Convert.ToInt16(move_X), Convert.ToInt16(move_Y));
@@ -3731,74 +3891,85 @@ namespace Dota2Simulator
             return RegPicture(Resource_Picture.物品_跳刀_智力跳刀BUFF, 400, 865, 1000, 60);
         }
 
-        private static bool 阿哈利姆神杖()
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="bp">指定图片</param>
+        /// <returns></returns>
+        private static bool 阿哈利姆神杖(Bitmap bp)
         {
+            int x = 678;
+            int y = 935;
+
             Color 技能点颜色 = Color.FromArgb(255, 32, 183, 249);
-            if (CaptureColor(1078, 958).Equals(技能点颜色))
+            if (bp.GetPixel(1078 - x, 958 - y).Equals(技能点颜色))
                 return true;
             // 4技能A杖
 
             技能点颜色 = Color.FromArgb(255, 30, 188, 252);
-            if (CaptureColor(1094, 960).Equals(技能点颜色))
+            if (bp.GetPixel(1094 - x, 960 - y).Equals(技能点颜色))
                 return true;
             // 5技能A杖
 
             技能点颜色 = Color.FromArgb(255, 30, 189, 253);
-            if (CaptureColor(1110, 960).Equals(技能点颜色))
+            if (bp.GetPixel(1110 - x, 960 - y).Equals(技能点颜色))
                 return true;
             // 5技能A杖
 
             技能点颜色 = Color.FromArgb(255, 31, 188, 253);
 
-            if (CaptureColor(1143, 959).Equals(技能点颜色))
+            if (bp.GetPixel(1143 - x, 959 - y).Equals(技能点颜色))
                 return true;
             // 8技能A杖
 
             技能点颜色 = Color.FromArgb(255, 30, 187, 250);
-            return CaptureColor(1122, 959).Equals(技能点颜色);
+            return bp.GetPixel(1122 - x, 959 - y).Equals(技能点颜色);
             // 6技能A杖
-
         }
 
-        private static bool 阿哈利姆魔晶()
+        /// <summary>
+        ///     
+        /// </summary>
+        /// <param name="bp">指定图片</param>
+        /// <returns></returns>
+        private static bool 阿哈利姆魔晶(Bitmap bp)
         {
+            int x = 678;
+            int y = 935;
+
             Color 技能点颜色 = Color.FromArgb(255, 34, 186, 254);
 
-            if (CaptureColor(1094, 995).Equals(技能点颜色))
+            if (bp.GetPixel(1094 - x, 995 - y).Equals(技能点颜色))
                 return true;
             // 7技能魔晶
 
             技能点颜色 = Color.FromArgb(255, 29, 188, 255);
 
-            if (CaptureColor(1144, 993).Equals(技能点颜色))
+            if (bp.GetPixel(1144 - x, 993 - y).Equals(技能点颜色))
                 return true;
             // 8技能魔晶
 
             技能点颜色 = Color.FromArgb(255, 29, 187, 255);
 
-            if (CaptureColor(1110, 994).Equals(技能点颜色))
+            if (bp.GetPixel(1110 - x, 994 - y).Equals(技能点颜色))
                 return true;
             // 6技能魔晶无A
 
             技能点颜色 = Color.FromArgb(255, 28, 187, 255);
 
-            if (CaptureColor(1121, 993).Equals(技能点颜色))
+            if (bp.GetPixel(1121 - x, 993 - y).Equals(技能点颜色))
                 return true;
             // 6技能魔晶A
 
             技能点颜色 = Color.FromArgb(255, 28, 187, 255);
 
-            if (CaptureColor(1077, 993).Equals(技能点颜色))
+            if (bp.GetPixel(1077 - x, 993 - y).Equals(技能点颜色))
                 return true;
             // 4技能魔晶
 
             技能点颜色 = Color.FromArgb(255, 30, 187, 254);
-
-            if (CaptureColor(1111, 994).Equals(技能点颜色))
-                return true;
+            return (bp.GetPixel(1111 - x, 994 - y).Equals(技能点颜色));
             // 5技能魔晶
-
-            return false;
         }
 
         private static void 等待陨星锤结束()
@@ -4230,6 +4401,17 @@ namespace Dota2Simulator
             
             return FindPicture(bp, CaptureScreen(x, y, width, height), matchRate: matchRate).Count > 0;
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="bp">原始图片</param>
+        /// <param name="bp1">对比图片</param>
+        /// <param name="matchRate">匹配率</param>
+        /// <returns></returns>
+        private static bool RegPicture(Bitmap bp, Bitmap bp1,double matchRate=0.9)
+        {
+            return FindPicture(bp, new Bitmap(bp1), matchRate: matchRate).Count > 0;
+        }
 
         #endregion
 
@@ -4470,68 +4652,73 @@ namespace Dota2Simulator
 
         private void 捕捉颜色()
         {
-            Color c1 = CaptureColor(1016, 957);
+            KeyPress((uint)Keys.W);
 
-            KeyPress((uint)Keys.R);
-
-            tb_状态抗性.Text = "";
-            tb_丢装备.Text = "";
-
-            ArrayList al = new ArrayList();
-            ArrayList ax = new ArrayList();
+            ArrayList al = new();
+            ArrayList ax = new();
 
             var time = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds();
+            string str = string.Empty;
 
-            while (1 == 1)
-            {
-                Color c = CaptureColor(1016, 957);
+            //while (1 == 1)
+            //{
+            //    Color w4, w5, color;
 
-                //if (c.Equals(Color.FromArgb(255, 193, 207, 21))) continue; // 不朽CD好颜色
-                //if (c.Equals(Color.FromArgb(255, 68, 39, 23))) continue; // 普通CD好颜色
+            //    // 678, 935, 476, 81 所有技能，6-14ms延迟
+            //    // 675, 852, 737, 226 基本所有技能状态，14ms延迟
+            //    using (Bitmap bitmap = CaptureScreen(678, 935, 476, 81))
+            //    {
+            //        w5 = bitmap.GetPixel(161, 59); //Color w5 = CaptureColor(839, 994);
+            //        w4 = bitmap.GetPixel(193, 59); //Color w4 = CaptureColor(871, 994);
+            //    }
 
-                // 瘴气进入CD颜色
-                if (
-                    // !ColorAEqualColorB(c, Color.FromArgb(255, 38, 39, 21), 3) // 普通最适合值
-                    // && !ColorAEqualColorB(c, Color.FromArgb(255, 65, 73, 46), 3) // 不朽最适合值
-                    !c.Equals(c1)
-                    )
-                {
-                    if (al.Count == 0)
-                    {
-                        ax.Add(new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds() - time);
-                        al.Add(string.Concat(c.R.ToString(), ",", c.G.ToString(), ",", c.B.ToString(), ", "));
-                    }
-                    else
-                    {
-                        if ((string)al[al.Count - 1] != string.Concat(c.R.ToString(), ",", c.G.ToString(), ",", c.B.ToString(), ", "))
-                        {
-                            ax.Add(new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds() - time);
-                            al.Add(string.Concat(c.R.ToString(), ",", c.G.ToString(), ",", c.B.ToString(), ", "));
-                        }
-                    }
-                }
+            //    color = w5;
 
-                if (new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds() - time > 3000) break;
-            }
+            //    if (str.Length == 0)
+            //    {
+            //        str = (new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds() - time).ToString();
+            //    }
 
-            foreach (string item in al)
-            {
-                tb_状态抗性.Text = string.Concat(tb_状态抗性.Text, item);
-            }
-            foreach (long item in ax)
-            {
-                tb_丢装备.Text = string.Concat(tb_丢装备.Text, item.ToString(), ",");
-            }
+            //    if (al.Count == 0)
+            //    {
+            //        ax.Add(new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds() - time);
+            //        al.Add(string.Concat(FormatColor(color), ";"));
+            //    }
+            //    else
+            //    {
+            //        //// 未CD好不记录
+            //        //if (new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds() - time < 1000) continue;
 
-            if (tb_状态抗性.Text.Equals(""))
-            {
-                tb_状态抗性.Text = "无匹配";
-            }
+            //        if ((string)al[^1] != string.Concat(FormatColor(color), ";"))
+            //        {
+            //            ax.Add(new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds() - time);
+            //            al.Add(string.Concat(FormatColor(color), ";"));
+            //        }
+            //    }
 
-            if (tb_丢装备.Text.Equals(""))
-            {
-                tb_丢装备.Text = "无匹配";
-            }
+            //    if (new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds() - time > 3400) break;
+            //}
+
+            //foreach (string item in al)
+            //{
+            //    tb_状态抗性.Text = string.Concat(tb_状态抗性.Text, item);
+            //}
+            //foreach (long item in ax)
+            //{
+            //    tb_丢装备.Text = string.Concat(tb_丢装备.Text, item.ToString(), ";");
+            //}
+
+            //tb_x.Text = str;
+
+            //if (tb_状态抗性.Text.Length == 0)
+            //{
+            //    tb_状态抗性.Text = "无匹配";
+            //}
+
+            //if (tb_丢装备.Text.Length == 0)
+            //{
+            //    tb_丢装备.Text = "无匹配";
+            //}
         }
 
         #endregion
@@ -4658,7 +4845,7 @@ namespace Dota2Simulator
             TopMost = true;
 
             // 设置窗口位置
-            Location = new Point(338, 1013);
+            Location = new Point(338, 967);
 
             //Task.Run(记录买活);
 
@@ -4736,6 +4923,15 @@ namespace Dota2Simulator
             KeyUp(key);
         }
 
+        private static void KeyPressAsync(uint key)
+        {
+            Task.Run(() =>
+            {
+                KeyDown(key);
+                KeyUp(key);
+            });
+        }
+
         public new static void MouseMove(int X, int Y, bool relative = false)
         {
             if (relative)
@@ -4808,5 +5004,10 @@ namespace Dota2Simulator
         //KeyboardMouseSimulateDriverAPI.KeyUp((uint) Keys.Space);
 
         #endregion
+
+        private void tb_name_TextChanged(object sender, EventArgs e)
+        {
+            取消所有功能();
+        }
     }
 }

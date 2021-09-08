@@ -36,9 +36,9 @@ namespace Dota2Simulator
             this.label2 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
             this.label4 = new System.Windows.Forms.Label();
-            this.textBox3 = new System.Windows.Forms.TextBox();
+            this.tb_x = new System.Windows.Forms.TextBox();
             this.label5 = new System.Windows.Forms.Label();
-            this.textBox4 = new System.Windows.Forms.TextBox();
+            this.tb_y = new System.Windows.Forms.TextBox();
             this.label6 = new System.Windows.Forms.Label();
             this.tb_delay = new System.Windows.Forms.TextBox();
             this.btn_test = new System.Windows.Forms.Button();
@@ -64,7 +64,8 @@ namespace Dota2Simulator
             this.tb_name.Name = "tb_name";
             this.tb_name.Size = new System.Drawing.Size(87, 23);
             this.tb_name.TabIndex = 4;
-            this.tb_name.Text = "测试";
+            this.tb_name.Text = "钢背";
+            this.tb_name.TextChanged += new System.EventHandler(this.tb_name_TextChanged);
             // 
             // tb_丢装备
             // 
@@ -114,14 +115,14 @@ namespace Dota2Simulator
             this.label4.TabIndex = 9;
             this.label4.Text = "偏移X";
             // 
-            // textBox3
+            // tb_x
             // 
-            this.textBox3.Location = new System.Drawing.Point(77, 65);
-            this.textBox3.Margin = new System.Windows.Forms.Padding(4);
-            this.textBox3.Name = "textBox3";
-            this.textBox3.Size = new System.Drawing.Size(87, 23);
-            this.textBox3.TabIndex = 8;
-            this.textBox3.Text = "250";
+            this.tb_x.Location = new System.Drawing.Point(77, 65);
+            this.tb_x.Margin = new System.Windows.Forms.Padding(4);
+            this.tb_x.Name = "tb_x";
+            this.tb_x.Size = new System.Drawing.Size(87, 23);
+            this.tb_x.TabIndex = 8;
+            this.tb_x.Text = "250";
             // 
             // label5
             // 
@@ -133,14 +134,14 @@ namespace Dota2Simulator
             this.label5.TabIndex = 11;
             this.label5.Text = "偏移Y";
             // 
-            // textBox4
+            // tb_y
             // 
-            this.textBox4.Location = new System.Drawing.Point(77, 88);
-            this.textBox4.Margin = new System.Windows.Forms.Padding(4);
-            this.textBox4.Name = "textBox4";
-            this.textBox4.Size = new System.Drawing.Size(87, 23);
-            this.textBox4.TabIndex = 10;
-            this.textBox4.Text = "250";
+            this.tb_y.Location = new System.Drawing.Point(77, 88);
+            this.tb_y.Margin = new System.Windows.Forms.Padding(4);
+            this.tb_y.Name = "tb_y";
+            this.tb_y.Size = new System.Drawing.Size(87, 23);
+            this.tb_y.TabIndex = 10;
+            this.tb_y.Text = "250";
             // 
             // label6
             // 
@@ -201,9 +202,9 @@ namespace Dota2Simulator
             this.Controls.Add(this.label6);
             this.Controls.Add(this.tb_delay);
             this.Controls.Add(this.label5);
-            this.Controls.Add(this.textBox4);
+            this.Controls.Add(this.tb_y);
             this.Controls.Add(this.label4);
-            this.Controls.Add(this.textBox3);
+            this.Controls.Add(this.tb_x);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.tb_丢装备);
@@ -229,9 +230,9 @@ namespace Dota2Simulator
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label label4;
-        private System.Windows.Forms.TextBox textBox3;
+        private System.Windows.Forms.TextBox tb_x;
         private System.Windows.Forms.Label label5;
-        private System.Windows.Forms.TextBox textBox4;
+        private System.Windows.Forms.TextBox tb_y;
         private System.Windows.Forms.Label label6;
         private System.Windows.Forms.TextBox tb_delay;
         private System.Windows.Forms.Button btn_test;

@@ -14,7 +14,7 @@ namespace Dota2Simulator
         #region 屏幕截图
 
         /// <summary>
-        ///     屏幕截图
+        ///     屏幕截图，单操作耗时7ms
         /// </summary>
         /// <param name="x">图片左上角X坐标</param>
         /// <param name="y">图片左上角Y坐标</param>
@@ -24,8 +24,8 @@ namespace Dota2Simulator
         public static Bitmap CaptureScreen(int x, int y, int width, int height)
         {
             Bitmap bitmap = new(width, height);
-            using Graphics graphics = Graphics.FromImage(bitmap);
-            graphics.CopyFromScreen(x, y, 0, 0, new Size(width, height));
+            using (Graphics graphics = Graphics.FromImage(bitmap))
+                graphics.CopyFromScreen(x, y, 0, 0, new Size(width, height));
             return bitmap;
 
             //SaveFileDialog dialog = new SaveFileDialog();
@@ -38,7 +38,7 @@ namespace Dota2Simulator
         #region 屏幕取色
 
         /// <summary>
-        ///     屏幕截图
+        ///     屏幕截图，单操作耗时7ms（最好是一次性截图，然后多点提取）
         /// </summary>
         /// <param name="x">图片左上角X坐标</param>
         /// <param name="y">图片左上角Y坐标</param>
@@ -47,10 +47,14 @@ namespace Dota2Simulator
         /// <returns></returns>
         public static Color CaptureColor(int x, int y)
         {
-            Bitmap bitmap = new(1, 1);
-            using Graphics graphics = Graphics.FromImage(bitmap);
-            graphics.CopyFromScreen(x, y, 0, 0, new Size(1, 1));
-            return bitmap.GetPixel(0, 0);
+            Color c;
+            using (Bitmap bitmap = new(1, 1))
+            {
+                using (Graphics graphics = Graphics.FromImage(bitmap))
+                    graphics.CopyFromScreen(x, y, 0, 0, new Size(1, 1));
+                c = bitmap.GetPixel(0, 0);
+            }
+            return c;
 
             //SaveFileDialog dialog = new SaveFileDialog();
             //dialog.Filter = "Png Files|*.png";
@@ -215,12 +219,11 @@ namespace Dota2Simulator
         /// <returns></returns>
         public static bool ColorAEqualColorB(Color colorA, Color colorB, byte errorRange = 10)
         {
-            return colorA.A <= colorB.A + errorRange && colorA.A >= colorB.A - errorRange &&
-                   colorA.R <= colorB.R + errorRange && colorA.R >= colorB.R - errorRange &&
-                   colorA.G <= colorB.G + errorRange && colorA.G >= colorB.G - errorRange &&
-                   colorA.B <= colorB.B + errorRange && colorA.B >= colorB.B - errorRange;
+            return //Math.Abs(colorA.A - colorB.A) <= errorRange &&
+                   Math.Abs(colorA.R - colorB.R) <= errorRange &&
+                   Math.Abs(colorA.G - colorB.G) <= errorRange && 
+                   Math.Abs(colorA.B - colorB.B) <= errorRange;
         }
-
         #endregion
 
         #region 坐标对比
@@ -344,6 +347,11 @@ namespace Dota2Simulator
         }
 
         #endregion
+
+        public static string FormatColor(Color c)
+        {
+            return string.Concat(c.R.ToString(), ",", c.G.ToString(), ",", c.B.ToString());
+        }
 
         #endregion
     }

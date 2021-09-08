@@ -21,9 +21,11 @@ namespace Dota2Simulator
         /// <param name="limitTime">The limit time.</param>
         public static void Speak(string str, int rate = 6, int volume = 100)
         {
-            var synthesizer = new SpeechSynthesizer();
-            synthesizer.Rate = rate;
-            synthesizer.Volume = volume;
+            var synthesizer = new SpeechSynthesizer
+            {
+                Rate = rate,
+                Volume = volume
+            };
             synthesizer.SpeakAsync(str);
         }
 
