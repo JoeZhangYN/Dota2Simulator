@@ -1,7 +1,5 @@
-﻿using System.Diagnostics;
-using System.Drawing;
-using System.Drawing.Imaging;
-using System.Text;
+﻿using System.Drawing;
+using System.IO;
 using Tesseract;
 
 namespace Dota2Simulator
@@ -15,7 +13,7 @@ namespace Dota2Simulator
         /// <returns></returns>
         public static string 识别英文文字(Bitmap bp)
         {
-            using var ocr = new TesseractEngine(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "tessdata"), "eng", EngineMode.LstmOnly);
+            using var ocr = new TesseractEngine(Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "tessdata"), "eng", EngineMode.LstmOnly);
             var pix = PixConverter.ToPix(bp);
             using var page = ocr.Process(pix);
             return page.GetText();
@@ -28,7 +26,7 @@ namespace Dota2Simulator
         /// <returns></returns>
         public static string 识别中文文字(Bitmap bp)
         {
-            using var ocr = new TesseractEngine(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "tessdata"), "chi_sim", EngineMode.LstmOnly);
+            using var ocr = new TesseractEngine(Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "tessdata"), "chi_sim", EngineMode.LstmOnly);
             var pix = PixConverter.ToPix(bp);
             using var page = ocr.Process(pix);
             return page.GetText();

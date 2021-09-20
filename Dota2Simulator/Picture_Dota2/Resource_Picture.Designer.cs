@@ -1283,6 +1283,16 @@ namespace Dota2Simulator.Picture_Dota2 {
         /// <summary>
         ///   查找 System.Drawing.Bitmap 类型的本地化资源。
         /// </summary>
+        internal static System.Drawing.Bitmap 物品_推推棒 {
+            get {
+                object obj = ResourceManager.GetObject("物品_推推棒", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
+        /// </summary>
         internal static System.Drawing.Bitmap 物品_永恒遗物_4 {
             get {
                 object obj = ResourceManager.GetObject("物品_永恒遗物_4", resourceCulture);

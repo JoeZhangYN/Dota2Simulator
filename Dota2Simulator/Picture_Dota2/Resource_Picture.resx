@@ -484,6 +484,9 @@
   <data name="物品_推推BUFF" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>物品_推推buff.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="物品_推推棒" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>物品_推推棒.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
   <data name="物品_永恒遗物_4" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>物品_永恒遗物_4.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>

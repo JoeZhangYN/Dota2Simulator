@@ -1,4 +1,6 @@
-﻿using System.Drawing;
+﻿using System;
+using System.Collections.Generic;
+using System.Drawing;
 using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
 
@@ -14,7 +16,7 @@ namespace Dota2Simulator
         #region 屏幕截图
 
         /// <summary>
-        ///     屏幕截图，单操作耗时7ms
+        ///     屏幕截图，单操作耗时7ms，能一次解决的不要并行（因为有锁，基本时间是翻倍的）
         /// </summary>
         /// <param name="x">图片左上角X坐标</param>
         /// <param name="y">图片左上角Y坐标</param>
@@ -27,6 +29,25 @@ namespace Dota2Simulator
             using (Graphics graphics = Graphics.FromImage(bitmap))
                 graphics.CopyFromScreen(x, y, 0, 0, new Size(width, height));
             return bitmap;
+
+            //SaveFileDialog dialog = new SaveFileDialog();
+            //dialog.Filter = "Png Files|*.png";
+            //if (dialog.ShowDialog() == DialogResult.OK) bitmap.Save(dialog.FileName, ImageFormat.Png);
+        }
+
+        /// <summary>
+        ///     屏幕截图，单操作耗时7ms，能一次解决的不要并行（因为有锁，基本时间是翻倍的）
+        /// </summary>
+        /// <param name="x">图片左上角X坐标</param>
+        /// <param name="y">图片左上角Y坐标</param>
+        /// <param name="width">图片的宽度</param>
+        /// <param name="height">图片的长度</param>
+        /// <param name="bitmap">输出的bitmap</param>
+        /// <returns></returns>
+        public static void CaptureScreen(int x, int y, ref Bitmap bitmap)
+        {
+            using Graphics graphics = Graphics.FromImage(bitmap);
+            graphics.CopyFromScreen(x, y, 0, 0, bitmap.Size);
 
             //SaveFileDialog dialog = new SaveFileDialog();
             //dialog.Filter = "Png Files|*.png";
@@ -221,7 +242,7 @@ namespace Dota2Simulator
         {
             return //Math.Abs(colorA.A - colorB.A) <= errorRange &&
                    Math.Abs(colorA.R - colorB.R) <= errorRange &&
-                   Math.Abs(colorA.G - colorB.G) <= errorRange && 
+                   Math.Abs(colorA.G - colorB.G) <= errorRange &&
                    Math.Abs(colorA.B - colorB.B) <= errorRange;
         }
         #endregion
