@@ -4,10 +4,10 @@ using Tesseract;
 
 namespace Dota2Simulator
 {
-    public class ORC
+    public class OCR
     {
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="bp">识别用的图片</param>
         /// <returns></returns>
@@ -20,7 +20,7 @@ namespace Dota2Simulator
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="bp">识别用的图片</param>
         /// <returns></returns>

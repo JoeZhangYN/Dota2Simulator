@@ -963,9 +963,9 @@ namespace Dota2Simulator.Picture_Dota2 {
         /// <summary>
         ///   查找 System.Drawing.Bitmap 类型的本地化资源。
         /// </summary>
-        internal static System.Drawing.Bitmap 火女_QCD {
+        internal static System.Drawing.Bitmap 火女_释放光击阵 {
             get {
-                object obj = ResourceManager.GetObject("火女_QCD", resourceCulture);
+                object obj = ResourceManager.GetObject("火女_释放光击阵", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -973,9 +973,9 @@ namespace Dota2Simulator.Picture_Dota2 {
         /// <summary>
         ///   查找 System.Drawing.Bitmap 类型的本地化资源。
         /// </summary>
-        internal static System.Drawing.Bitmap 火女_QCD结束 {
+        internal static System.Drawing.Bitmap 火女_释放神灭斩 {
             get {
-                object obj = ResourceManager.GetObject("火女_QCD结束", resourceCulture);
+                object obj = ResourceManager.GetObject("火女_释放神灭斩", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -983,9 +983,9 @@ namespace Dota2Simulator.Picture_Dota2 {
         /// <summary>
         ///   查找 System.Drawing.Bitmap 类型的本地化资源。
         /// </summary>
-        internal static System.Drawing.Bitmap 火女_WCD {
+        internal static System.Drawing.Bitmap 火女_释放龙破斩 {
             get {
-                object obj = ResourceManager.GetObject("火女_WCD", resourceCulture);
+                object obj = ResourceManager.GetObject("火女_释放龙破斩", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -993,29 +993,9 @@ namespace Dota2Simulator.Picture_Dota2 {
         /// <summary>
         ///   查找 System.Drawing.Bitmap 类型的本地化资源。
         /// </summary>
-        internal static System.Drawing.Bitmap 火女_WCD结束 {
+        internal static System.Drawing.Bitmap 物品_TP效果 {
             get {
-                object obj = ResourceManager.GetObject("火女_WCD结束", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
-        /// </summary>
-        internal static System.Drawing.Bitmap 火女_大CD {
-            get {
-                object obj = ResourceManager.GetObject("火女_大CD", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
-        /// </summary>
-        internal static System.Drawing.Bitmap 火女_大CD结束 {
-            get {
-                object obj = ResourceManager.GetObject("火女_大CD结束", resourceCulture);
+                object obj = ResourceManager.GetObject("物品_TP效果", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

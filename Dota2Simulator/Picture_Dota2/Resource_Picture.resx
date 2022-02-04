@@ -388,23 +388,17 @@
   <data name="海民_摔角行家_准备就绪_4" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>海民_摔角行家_准备就绪_4.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="火女_QCD" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>火女_qcd.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="火女_释放光击阵" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>火女_释放光击阵.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="火女_QCD结束" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>火女_qcd结束.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="火女_释放神灭斩" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>火女_释放神灭斩.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="火女_WCD" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>火女_wcd.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="火女_释放龙破斩" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>火女_释放龙破斩.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="火女_WCD结束" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>火女_wcd结束.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="火女_大CD" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>火女_大cd.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="火女_大CD结束" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>火女_大cd结束.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="物品_TP效果" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>物品_tp效果.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="物品_假腿_力量腿" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>物品_假腿_力量腿.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
