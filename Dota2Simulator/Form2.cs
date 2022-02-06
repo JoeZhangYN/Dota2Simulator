@@ -1030,7 +1030,7 @@ public partial class Form2 : Form
                 //}
                 else if (e.KeyValue == (uint)Keys.D)
                 {
-                    Task.Run(泉水出来喝瓶);
+                    Task.Run(泉水状态喝瓶);
                 }
             }
 
@@ -2962,17 +2962,6 @@ public partial class Form2 : Form
         return true;
     }
 
-    private void 泉水出来喝瓶()
-    {
-        Delay(200);
-
-        for (var i = 1; i <= 4; i++)
-        {
-            KeyPress((uint)Keys.C);
-            Delay(650);
-        }
-    }
-
     #region 未使用
 
     private void 原地滚A()
@@ -3723,6 +3712,41 @@ public partial class Form2 : Form
 
         return false;
     }
+    #endregion
+
+    #region 泉水状态喝瓶子
+
+    private void 泉水状态喝瓶()
+    {
+        Delay(300);
+
+        for (var i = 1; i <= 5; i++)
+        {
+            KeyPress((uint)Keys.C);
+            Delay(587);
+        }
+    }
+
+    private static void 泉水状态喂瓶()
+    {
+        Delay(3000);
+
+        var time = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds();
+
+        for (var i = 1; i <= 10; i++)
+        {
+            if (new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds() - time > 1850) return;
+
+            KeyDown((uint)Keys.LControlKey);
+            KeyDown((uint)Keys.C);
+            KeyUp((uint)Keys.LControlKey);
+            KeyUp((uint)Keys.C);
+
+            Delay(587);
+        }
+
+    }
+
     #endregion
 
     #region 魂戒力量智力

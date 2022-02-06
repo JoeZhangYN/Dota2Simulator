@@ -592,8 +592,14 @@
   <data name="物品_魂戒CD_7" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>物品_魂戒cd_7.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="物品_魔瓶_满状态" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>物品_魔瓶_满状态.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
   <data name="物品_黑皇" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>物品_黑皇.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="状态_TP状态" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>状态_tp状态.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="猴子_释放灵魂之矛" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>猴子_释放灵魂之矛.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
