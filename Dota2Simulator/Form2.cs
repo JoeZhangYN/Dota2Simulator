@@ -120,9 +120,14 @@ public partial class Form2 : Form
     private bool 条件6;
 
     /// <summary>
-    ///     中断条件布尔niao 
+    ///     中断条件布尔
     /// </summary>
     private bool 中断条件;
+
+    /// <summary>
+    ///     丢装备条件布尔
+    /// </summary>
+    private bool 丢装备条件;
 
 
     ///// <summary>
@@ -1005,12 +1010,12 @@ public partial class Form2 : Form
                     中断条件 = false;
                     条件2 = true;
                 }
-                else if (e.KeyValue == (uint)Keys.D2)
+                else if (e.KeyValue == (uint)Keys.D4)
                 {
                     中断条件 = false;
                     条件3 = true;
                 }
-                else if (e.KeyValue == (uint)Keys.D3)
+                else if (e.KeyValue == (uint)Keys.D2)
                 {
                     中断条件 = false;
                     条件4 = true;
@@ -1031,6 +1036,19 @@ public partial class Form2 : Form
                 else if (e.KeyValue == (uint)Keys.D)
                 {
                     Task.Run(泉水状态喝瓶);
+                }
+                else if (e.KeyValue == (uint)Keys.F)
+                {
+                    if (!丢装备条件)
+                    {
+                        Task.Run(批量扔装备);
+                        丢装备条件 = !丢装备条件;
+                    }
+                    else
+                    {
+                        Task.Run(捡装备);
+                        丢装备条件 = !丢装备条件;
+                    }
                 }
             }
 
@@ -3441,7 +3459,16 @@ public partial class Form2 : Form
 
     private void 魂戒丢装备()
     {
-        批量扔装备();
+        if (!丢装备条件)
+        {
+            Task.Run(批量扔装备);
+            丢装备条件 = !丢装备条件;
+        }
+        else
+        {
+            Task.Run(捡装备);
+            丢装备条件 = !丢装备条件;
+        }
     }
 
     #endregion
@@ -3664,6 +3691,7 @@ public partial class Form2 : Form
         循环条件1 = false;
         循环条件2 = false;
         中断条件 = false;
+        丢装备条件 = false;
         条件1 = false;
         条件2 = false;
         条件3 = false;
@@ -3718,9 +3746,9 @@ public partial class Form2 : Form
 
     private void 泉水状态喝瓶()
     {
-        Delay(300);
+        Delay(400);
 
-        for (var i = 1; i <= 5; i++)
+        for (var i = 1; i <= 4; i++)
         {
             KeyPress((uint)Keys.C);
             Delay(587);
@@ -3756,7 +3784,7 @@ public partial class Form2 : Form
         {
             切力量腿(bp);
             KeyPress((uint)Keys.X);
-            Task.Run(魂戒魔棒智力);
+            KeyPress((uint)Keys.V);
             return false;
         }
 
@@ -3927,90 +3955,107 @@ private static void 指定地点()
 
     private void 批量扔装备()
     {
+        KeyPress((uint)Keys.S);
+        Delay(40);
+        KeyPress((uint)Keys.F1);
+        Delay(40);
+        KeyPress((uint)Keys.F1);
+
         var list_1 = tb_丢装备.Text.Split(',');
 
-        if (RegPicture(Resource_Picture.血量_自身血量, 0, 0, 1920, 1080, 0.8))
+        try
         {
-            var p = RegPicturePoint(Resource_Picture.血量_自身血量, 0, 0, 1920, 1080, 0.8);
-            var point = new Point(p.X + 55, p.Y + 117);
-            tb_状态抗性.Text = point.X + " " + point.Y;
-            try
+            switch (list_1[0])
             {
-                switch (list_1[0])
-                {
-                    case "6":
-                        for (var i = 1; i < list_1.Length; i++)
-                            switch (list_1[i])
-                            {
-                                case "1":
-                                    扔装备(new Point(1191, 963), point);
-                                    break;
-                                case "2":
-                                    扔装备(new Point(1259, 963), point);
-                                    break;
-                                case "3":
-                                    扔装备(new Point(1325, 963), point);
-                                    break;
-                                case "4":
-                                    扔装备(new Point(1191, 1011), point);
-                                    break;
-                                case "5":
-                                    扔装备(new Point(1259, 1011), point);
-                                    break;
-                                case "6":
-                                    扔装备(new Point(1325, 1011), point);
-                                    break;
-                                case "7":
-                                    扔装备(new Point(1384, 994), point);
-                                    break;
-                            }
+                case "6":
+                    for (var i = 1; i < list_1.Length; i++)
+                        switch (list_1[i])
+                        {
+                            case "1":
+                                扔装备(new Point(1191, 963));
+                                break;
+                            case "2":
+                                扔装备(new Point(1259, 963));
+                                break;
+                            case "3":
+                                扔装备(new Point(1325, 963));
+                                break;
+                            case "4":
+                                扔装备(new Point(1191, 1011));
+                                break;
+                            case "5":
+                                扔装备(new Point(1259, 1011));
+                                break;
+                            case "6":
+                                扔装备(new Point(1325, 1011));
+                                break;
+                            case "7":
+                                扔装备(new Point(1384, 994));
+                                break;
+                        }
 
-                        break;
-                    case "4":
-                        for (var i = 1; i < list_1.Length; i++)
-                            switch (list_1[i])
-                            {
-                                case "1":
-                                    扔装备(new Point(1145, 966), point);
-                                    break;
-                                case "2":
-                                    扔装备(new Point(1214, 963), point);
-                                    break;
-                                case "3":
-                                    扔装备(new Point(1288, 963), point);
-                                    break;
-                                case "4":
-                                    扔装备(new Point(1145, 1011), point);
-                                    break;
-                                case "5":
-                                    扔装备(new Point(1214, 1011), point);
-                                    break;
-                                case "6":
-                                    扔装备(new Point(1288, 1011), point);
-                                    break;
-                                case "7":
-                                    扔装备(new Point(1337, 994), point);
-                                    break;
-                            }
+                    break;
+                case "4":
+                    for (var i = 1; i < list_1.Length; i++)
+                        switch (list_1[i])
+                        {
+                            case "1":
+                                扔装备(new Point(1145, 966));
+                                break;
+                            case "2":
+                                扔装备(new Point(1214, 963));
+                                break;
+                            case "3":
+                                扔装备(new Point(1288, 963));
+                                break;
+                            case "4":
+                                扔装备(new Point(1145, 1011));
+                                break;
+                            case "5":
+                                扔装备(new Point(1214, 1011));
+                                break;
+                            case "6":
+                                扔装备(new Point(1288, 1011));
+                                break;
+                            case "7":
+                                扔装备(new Point(1337, 994));
+                                break;
+                        }
 
-                        break;
-                }
-            }
-            catch (Exception)
-            {
+                    break;
             }
         }
+        catch (Exception)
+        {
+        }
+
     }
 
-    private static void 扔装备(Point p, Point p1)
+    private static void 扔装备(Point p)
     {
         MouseMove(p);
         LeftDown();
         Delay(40);
-        MouseMove(p1);
+        MouseMove(new Point(p.X + 5, p.Y + 5));
+        Delay(40);
+        KeyDown((uint)Keys.Y);
         Delay(40);
         LeftUp();
+        KeyUp((uint)Keys.Y);
         Delay(40);
+    }
+
+    private void 捡装备()
+    {
+        var list_1 = tb_丢装备.Text.Split(',');
+        KeyDown((uint)Keys.Y);
+        Delay(40);
+        for (var i = 1; i < list_1.Length; i++)
+        {
+            RightClick();
+            Delay(100);
+        }
+        KeyUp((uint)Keys.Y);
     }
 
     #endregion
