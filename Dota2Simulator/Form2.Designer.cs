@@ -64,7 +64,7 @@ namespace Dota2Simulator
             this.tb_name.Name = "tb_name";
             this.tb_name.Size = new System.Drawing.Size(87, 23);
             this.tb_name.TabIndex = 4;
-            this.tb_name.Text = "蓝猫";
+            this.tb_name.Text = "炸弹人";
             this.tb_name.TextChanged += new System.EventHandler(this.Tb_name_TextChanged);
             // 
             // tb_丢装备
@@ -74,7 +74,7 @@ namespace Dota2Simulator
             this.tb_丢装备.Name = "tb_丢装备";
             this.tb_丢装备.Size = new System.Drawing.Size(87, 23);
             this.tb_丢装备.TabIndex = 5;
-            this.tb_丢装备.Text = "4,1,2,3";
+            this.tb_丢装备.Text = "6,1,2,3";
             // 
             // pictureBox1
             // 

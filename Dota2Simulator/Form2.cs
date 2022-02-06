@@ -1230,7 +1230,7 @@ public partial class Form2 : Form
 
             else if (tb_name.Text.Trim() == "炸弹人")
             {
-                if (e.KeyValue == (uint)Keys.Space) 魂戒丢装备();
+                if (e.KeyValue == (uint)Keys.D2) 魂戒丢装备();
             }
 
             #endregion
@@ -3459,16 +3459,9 @@ public partial class Form2 : Form
 
     private void 魂戒丢装备()
     {
-        if (!丢装备条件)
-        {
-            Task.Run(批量扔装备);
-            丢装备条件 = !丢装备条件;
-        }
-        else
-        {
-            Task.Run(捡装备);
-            丢装备条件 = !丢装备条件;
-        }
+        批量扔装备();
+        KeyPress((uint)Keys.Space);
+        捡装备();
     }
 
     #endregion
@@ -4028,7 +4021,6 @@ private static void 指定地点()
         catch (Exception)
         {
         }
-
     }
 
     private static void 扔装备(Point p)
