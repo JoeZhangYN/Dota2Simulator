@@ -1203,6 +1203,7 @@ public partial class Form2 : Form
                 {
                     tb_状态抗性.Text = "";
                     tb_丢装备.Text = "";
+
                     捕捉颜色();
                 }
             }
@@ -5011,10 +5012,15 @@ public partial class Form2 : Form
 
         //string str = string.Empty;
 
+        //Stopwatch stopWatch1 = new();
 
-        Stopwatch stopWatch = new();
+        //stopWatch1.Start();
 
-        stopWatch.Start();
+        //var i = Convert.ToInt16(tb_x.Text.Trim());
+
+        //stopWatch1.Stop();
+
+        //tb_丢装备.Text = string.Concat("单体用时", stopWatch1.Elapsed.TotalSeconds * 1000);
 
         //Parallel.Invoke(
         //    () => { Bitmap bp = new(308, 73); CaptureScreen(792, 941, ref bp); bp.Dispose(); },
@@ -5023,7 +5029,7 @@ public partial class Form2 : Form
 
         //stopWatch.Stop();
 
-        //tb_x.Text = string.Concat("两个并行用时", stopWatch.ElapsedMilliseconds);
+        //tb_x.Text = string.Concat("两个并行用时", stopWatch.Elapsed.TotalSeconds * 1000);
 
         //stopWatch.Reset();
 
@@ -5041,12 +5047,26 @@ public partial class Form2 : Form
 
         //asd();
 
+        //if (Bitmap == null) Bitmap = new Bitmap(1920, 1080);
+        //CaptureScreen(0, 0, ref Bitmap);
+
+
         if (Bitmap == null) Bitmap = new Bitmap(653, 182);
         CaptureScreen(750, 856, ref Bitmap);
 
+        Stopwatch stopWatch = new();
+
+        stopWatch.Start();
+
+        RegPicture(Resource_Picture.物品_羊刀_4, Bitmap);
+
+        //tb_丢装备.Text = RegPicture(Resource_Picture.物品_羊刀_4, Bitmap) ? "1" : "0";
+
+        //tb_丢装备.Text = asdaa(Resource_Picture.物品_羊刀_4, Bitmap).ToString();
+
         stopWatch.Stop();
 
-        tb_状态抗性.Text = string.Concat("单体用时", stopWatch.ElapsedMilliseconds);
+        tb_状态抗性.Text = string.Concat("单体用时", stopWatch.Elapsed.TotalSeconds * 1000);
 
         //while (1 == 1)
         //{

@@ -4,9 +4,13 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
+using OpenCvSharp;
+using OpenCvSharp.Extensions;
 using SharpDX;
 using SharpDX.Direct3D11;
 using SharpDX.DXGI;
+using Point = System.Drawing.Point;
+using Size = System.Drawing.Size;
 using Device = SharpDX.Direct3D11.Device;
 using MapFlags = SharpDX.Direct3D11.MapFlags;
 using Resource = SharpDX.DXGI.Resource;
@@ -19,6 +23,51 @@ namespace Dota2Simulator;
 /// </summary>
 public class PictureProcessing
 {
+    #region 未使用
+    public static Point asdaa(Bitmap bp1, Bitmap bp2)
+    {
+
+        using (Mat bigMatMat = BitmapConverter.ToMat(new Bitmap(bp2))) //大图
+        using (Mat smalMat = BitmapConverter.ToMat(new Bitmap(bp1))) //小图
+        using (Mat res = new Mat(bigMatMat.Rows - smalMat.Rows + 1, bigMatMat.Cols - smalMat.Cols + 1, MatType.CV_32FC1))
+        {
+            Mat gref = bigMatMat.CvtColor(ColorConversionCodes.BGR2GRAY);
+            Mat gtpl = smalMat.CvtColor(ColorConversionCodes.BGR2GRAY);
+
+            Cv2.MatchTemplate(gref, gtpl, res, TemplateMatchModes.CCoeffNormed);
+            Cv2.Threshold(res, res, 0.8, 1.0, ThresholdTypes.Tozero);
+
+            while (true)
+            {
+                double minval, maxval, threshold = 0.8;
+                OpenCvSharp.Point minloc, maxloc;
+                Cv2.MinMaxLoc(res, out minval, out maxval, out minloc, out maxloc);
+
+                if (maxval >= threshold)
+                {
+                    return new Point(maxloc.X, maxloc.Y);
+
+                    ////Setup the rectangle to draw
+                    //Rect r = new Rect(new OpenCvSharp.Point(maxloc.X, maxloc.Y),
+                    //    new OpenCvSharp.Size(smalMat.Width, smalMat.Height));
+
+                    ////Draw a rectangle of the matching area
+                    //Cv2.Rectangle(bigMatMat, r, Scalar.LimeGreen, 2);
+
+                    ////Fill in the res Mat so you don't find the same area again in the MinMaxLoc
+                    //Rect outRect;
+                    //Cv2.FloodFill(res, maxloc, new Scalar(0), out outRect, new Scalar(0.1), new Scalar(1.0));
+                }
+                else
+                    break;
+            }
+
+            return new Point();
+        }
+
+
+    }
+
     public static void asd()
     {
         var factory = new Factory1();
@@ -106,6 +155,8 @@ public class PictureProcessing
             }
         }
     }
+
+    #endregion
 
     #region 图片处理
 
@@ -329,7 +380,6 @@ public class PictureProcessing
         GC.Collect();
         return ListPoint;
     }
-
     #endregion
 
     #region 颜色对比
