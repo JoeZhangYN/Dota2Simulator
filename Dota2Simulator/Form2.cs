@@ -947,6 +947,12 @@ public partial class Form2 : Form
 
                     Task.Run(三雷幽灵);
                 }
+                else if (e.KeyValue == (uint)Keys.D4)
+                {
+                    label1.Text = "D2";
+
+                    Task.Run(吹风天火);
+                }
             }
 
             #endregion
@@ -1147,13 +1153,39 @@ public partial class Form2 : Form
                     总循环条件 = true;
                     无物品状态初始化();
                 }
+
+                if (条件根据图片委托1 == null)
+                    条件根据图片委托1 = 莱恩羊接技能;
+
+
+                if (e.KeyValue == (uint)Keys.D3)
+                {
+                    if (!条件4)
+                    {
+                        条件4 = true;
+                        TTS.Speak("开启羊接吸");
+                    }
+                    else
+                    {
+                        条件4 = false;
+                        TTS.Speak("开启羊接A");
+                    }
+                }
+                else if (e.KeyValue == (uint)Keys.W)
+                {
+                    条件1 = true;
+                }
+                else if (e.KeyValue == (uint)Keys.S)
+                {
+                    条件1 = false;
+                }
                 else if (e.KeyValue == (uint) Keys.R)
                 {
-                    大招前纷争(Bitmap);
+                    大招前纷争(new Bitmap(Bitmap));
                 }
                 else if (e.KeyValue == (uint) Keys.D2)
                 {
-                    推推破林肯秒羊(Bitmap);
+                    推推破林肯秒羊(new Bitmap(Bitmap));
                     KeyPress((uint) Keys.W);
                 }
             }
@@ -2960,7 +2992,7 @@ public partial class Form2 : Form
     {
         if (RegPicture(Resource_Picture.蓝猫_释放球状闪电_红, bp) || RegPicture(Resource_Picture.蓝猫_释放球状闪电, bp))
         {
-            Delay(115);
+            Delay(117);
             //RightClick();
             KeyPress((uint) Keys.A);
             return false;
@@ -3106,6 +3138,29 @@ public partial class Form2 : Form
         KeyPress((uint) Keys.D);
     }
 
+    private void 吹风天火()
+    {
+        KeyPress((uint)Keys.W);
+        Delay(30);
+        KeyPress((uint)Keys.W);
+        Delay(30);
+        KeyPress((uint)Keys.Q);
+        Delay(30);
+        KeyPress((uint)Keys.R);
+        Delay(30);
+        KeyPress((uint)Keys.D);
+        Delay(30);
+        KeyPress((uint)Keys.E);
+        Delay(30);
+        KeyPress((uint)Keys.E);
+        Delay(30);
+        KeyPress((uint)Keys.E);
+        Delay(30);
+        KeyPress((uint)Keys.R);
+        Delay(600);
+        KeyPress((uint)Keys.D);
+    }
+
     #endregion
 
     #region 拉席克
@@ -3247,7 +3302,7 @@ public partial class Form2 : Form
                 if (new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds() - time1 > 1200) break;
             }
 
-            Delay(Convert.ToInt32(time * times) - 365);
+            Delay(Convert.ToInt32(time * times) - 400);
 
             if (!循环条件2) return;
 
@@ -3594,6 +3649,20 @@ public partial class Form2 : Form
     #endregion
 
     #region 莱恩
+
+    private bool 莱恩羊接技能(Bitmap bp)
+    {
+        if (!RegPicture(Resource_Picture.莱恩_羊, bp) && !RegPicture(Resource_Picture.莱恩_羊_鱼, bp))
+        {
+            if (条件4)
+                KeyPress((uint)Keys.E);
+            else
+                KeyPress((uint)Keys.A);
+            return false;
+        }
+
+        return true;
+    }
 
     private static bool 大招前纷争(Bitmap bp)
     {
@@ -5041,8 +5110,14 @@ public partial class Form2 : Form
 
         //asd();
 
-        if (Bitmap == null) Bitmap = new Bitmap(653, 182);
-        CaptureScreen(750, 856, ref Bitmap);
+        //if (Bitmap == null) Bitmap = new Bitmap(653, 182);
+        //CaptureScreen(750, 856, ref Bitmap);
+
+
+        if (Bitmap == null) Bitmap = new Bitmap(1920, 1080);
+        CaptureScreen(0, 0, ref Bitmap);
+        
+        RegPicture(Resource_Picture.TB_恶魔狂热_5, Bitmap);
 
         stopWatch.Stop();
 
