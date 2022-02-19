@@ -5110,14 +5110,23 @@ public partial class Form2 : Form
 
         //asd();
 
+        //// 区域捕捉
         //if (Bitmap == null) Bitmap = new Bitmap(653, 182);
         //CaptureScreen(750, 856, ref Bitmap);
 
+        //// 捕捉全图
+        //if (Bitmap == null) Bitmap = new Bitmap(1920, 1080);
+        //CaptureScreen(0, 0, ref Bitmap);
 
-        if (Bitmap == null) Bitmap = new Bitmap(1920, 1080);
-        CaptureScreen(0, 0, ref Bitmap);
-        
-        RegPicture(Resource_Picture.TB_恶魔狂热_5, Bitmap);
+        //// 识别时间
+        //if (Bitmap == null) Bitmap = new Bitmap(44, 14);
+        //CaptureScreen(939, 22, ref Bitmap);
+        //tb_丢装备.Text = OCR.识别英文数字(Bitmap);
+
+        // 捕捉攻速
+        if (Bitmap == null) Bitmap = new Bitmap(78, 17);
+        CaptureScreen(552, 510, ref Bitmap);
+        tb_丢装备.Text = OCR.识别英文数字(Bitmap);
 
         stopWatch.Stop();
 
