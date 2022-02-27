@@ -23,6 +23,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="OpenCvSharp4" Version="4.5.5.20211231" />
+    <PackageReference Include="OpenCvSharp4.Extensions" Version="4.5.5.20211231" />
+    <PackageReference Include="OpenCvSharp4.runtime.win" Version="4.5.5.20211231" />
+    <PackageReference Include="OpenCvSharp4.Windows" Version="4.5.5.20211231" />
     <PackageReference Include="SharpDX.Direct3D11" Version="4.2.0" />
     <PackageReference Include="SharpDX.DXGI" Version="4.2.0" />
     <PackageReference Include="System.Speech" Version="7.0.0-preview.1.22076.8" />

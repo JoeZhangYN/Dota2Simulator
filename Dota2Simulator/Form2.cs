@@ -13,6 +13,10 @@ namespace Dota2Simulator;
 
 public partial class Form2 : Form
 {
+    /// 动态肖像 法线贴图 地面视差 主界面高画质 计算器渲染器 纹理、特效、阴影 中 渲染 70%
+    ///
+
+
     #region 触发重载
 
     /// <summary>
