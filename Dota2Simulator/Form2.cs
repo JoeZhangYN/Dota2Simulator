@@ -33,7 +33,9 @@ public partial class Form2 : Form
     {
         #region 打字时屏蔽功能
 
-        if (CaptureColor(572, 771).Equals(Color.FromArgb(255, 237, 222, 190)))
+        if (1==0
+            // && CaptureColor(572, 771).Equals(Color.FromArgb(255, 237, 222, 190))
+            )
         {
         }
 
@@ -1065,13 +1067,12 @@ public partial class Form2 : Form
 
                 if (e.KeyValue == (uint) Keys.D3)
                     条件2 = true;
-                else if (e.KeyValue == (uint) Keys.D2)
-                    条件3 = true;
+                //else if (e.KeyValue == (uint) Keys.D2)
+                //    条件3 = true;
                 else if (e.KeyValue == (uint) Keys.S)
                     for (var i = 0; i < 2; i++)
                     {
                         条件根据图片委托2 = null;
-                        条件根据图片委托3 = null;
                         条件3 = false;
                         条件2 = false;
                         Delay(60); // 等待程序内延迟结束
@@ -1185,11 +1186,11 @@ public partial class Form2 : Form
                 }
                 else if (e.KeyValue == (uint) Keys.R)
                 {
-                    大招前纷争(new Bitmap(Bitmap));
+                    大招前纷争(new Bitmap(全局图像));
                 }
                 else if (e.KeyValue == (uint) Keys.D2)
                 {
-                    推推破林肯秒羊(new Bitmap(Bitmap));
+                    推推破林肯秒羊(new Bitmap(全局图像));
                     KeyPress((uint) Keys.W);
                 }
             }
@@ -1374,7 +1375,7 @@ public partial class Form2 : Form
     /// <summary>
     ///     全局图像
     /// </summary>
-    private static Bitmap Bitmap;
+    private static Bitmap 全局图像;
 
     /// <summary>
     ///     获取图片委托
@@ -2104,11 +2105,10 @@ public partial class Form2 : Form
         切敏捷腿();
     }
 
-    private static void 魂戒魔棒智力()
+    private static void 魂戒魔棒智力(Bitmap bp)
     {
         Delay(100);
-
-        切智力腿(new Bitmap(Bitmap));
+        切智力腿(bp);
     }
 
     #endregion
@@ -2119,21 +2119,19 @@ public partial class Form2 : Form
     {
         var time = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds();
 
-        if (RegPicture(Resource_Picture.物品_纷争, "C") || RegPicture(Resource_Picture.物品_纷争_7, "C", 7))
-            KeyPress((uint) Keys.C);
+        if (RegPicture(Resource_Picture.物品_纷争, 全局图像) || RegPicture(Resource_Picture.物品_纷争_7, 全局图像))
+            ShiftKeyPress((uint)Keys.C);
 
-        KeyDown((uint) Keys.LShiftKey);
-        KeyPress((uint) Keys.W);
-        KeyUp((uint) Keys.LShiftKey);
+        ShiftKeyPress((uint)Keys.Q);
 
         var q_down = 0;
 
         while (q_down == 0)
         {
-            if (RegPicture(Resource_Picture.小松鼠_释放野地奇袭, "W") || RegPicture(Resource_Picture.小松鼠_释放野地奇袭_7, "W", 7))
+            if (RegPicture(Resource_Picture.小松鼠_释放爆栗出击, 全局图像) || RegPicture(Resource_Picture.小松鼠_释放野地奇袭_7, 全局图像))
             {
                 Delay(85);
-                KeyPress((uint) Keys.Q);
+                ShiftKeyPress((uint) Keys.W);
                 q_down = 1;
             }
 
@@ -2724,6 +2722,10 @@ public partial class Form2 : Form
     {
         if (!RegPicture(Resource_Picture.剧毒_蛇棒_CD_不朽, bp) && !RegPicture(Resource_Picture.剧毒_蛇棒_CD, bp))
         {
+            //KeyDown((uint)Keys.LControlKey);
+            //KeyDown((uint)Keys.A);
+            //KeyUp((uint)Keys.LControlKey);
+            //KeyUp((uint)Keys.A);
             RightClick();
             Delay(30);
             return false;
@@ -3446,31 +3448,38 @@ public partial class Form2 : Form
 
     private bool 天怒秒人连招(Bitmap bp)
     {
+        if (RegPicture(Resource_Picture.物品_血精石_4, bp))
+        {
+            KeyPress((uint)Keys.B);
+            Delay(20);
+            return true;
+        }
+
         if (RegPicture(Resource_Picture.物品_虚灵之刃_4, bp))
         {
             KeyPress((uint) Keys.X);
-            Delay(30);
+            Delay(20);
             return true;
         }
 
         if (RegPicture(Resource_Picture.物品_羊刀_4, bp))
         {
             KeyPress((uint) Keys.Z);
-            Delay(30);
+            Delay(20);
             return true;
         }
 
         if (RegPicture(Resource_Picture.物品_阿托斯之棍_4, bp) || RegPicture_small(Resource_Picture.物品_缚灵锁_4, bp))
         {
             KeyPress((uint) Keys.Space);
-            Delay(30);
+            Delay(20);
             return true;
         }
 
         if (RegPicture(Resource_Picture.物品_纷争, bp))
         {
             KeyPress((uint) Keys.C);
-            Delay(30);
+            Delay(20);
         }
 
         Delay(15);
@@ -3480,21 +3489,21 @@ public partial class Form2 : Form
         if (RegPicture(Resource_Picture.天怒_魔法鹰隼_金饰品, bp))
         {
             KeyPress((uint) Keys.Q);
-            Delay(30);
+            Delay(20);
             return true;
         }
 
         if (RegPicture(Resource_Picture.天怒_上古封印, bp))
         {
             KeyPress((uint) Keys.E);
-            Delay(30);
+            Delay(20);
             return true;
         }
 
         if (RegPicture(Resource_Picture.天怒_神秘之耀, bp))
         {
             KeyPress((uint) Keys.R);
-            Delay(30);
+            Delay(20);
             return true;
         }
 
@@ -3707,7 +3716,7 @@ public partial class Form2 : Form
 
                 if (中断条件) continue; // 中断则跳过循环
 
-                using var bp = new Bitmap(Bitmap);
+                using var bp = new Bitmap(全局图像);
 
                 if (条件1 && 条件根据图片委托1 != null)
                     await Task.Run(() => { 条件1 = 条件根据图片委托1(bp); });
@@ -3769,16 +3778,16 @@ public partial class Form2 : Form
     {
         // 750 856 653 217 基本所有技能状态物品，7-8ms延迟
         // 具体点则为起始坐标点加与其的差值
-        if (Bitmap == null) Bitmap = new Bitmap(653, 217);
-        CaptureScreen(750, 856, ref Bitmap);
+        if (全局图像 == null) 全局图像 = new Bitmap(653, 217);
+        CaptureScreen(750, 856, ref 全局图像);
     }
 
     private void 获取图片_2()
     {
         // 0 0 1920 1080 全屏，25-36ms延迟
         // 具体点则为起始坐标点加与其的差值
-        if (Bitmap == null) Bitmap = new Bitmap(1920, 1080);
-        CaptureScreen(0, 0, ref Bitmap);
+        if (全局图像 == null) 全局图像 = new Bitmap(1920, 1080);
+        CaptureScreen(0, 0, ref 全局图像);
     }
 
     #region 快速回城
@@ -4391,6 +4400,7 @@ public partial class Form2 : Form
     #region Dota2技能物品识别
 
     /// <summary>
+    ///     用于特定位置找图，实际不太行，主要延迟集中在截图方面
     /// </summary>
     /// <param name="bp">图片</param>
     /// <param name="position">位置</param>
@@ -4798,11 +4808,11 @@ public partial class Form2 : Form
                 break;
         }
 
-        return FindPicture(bp, CaptureScreen(x, y, width, height), matchRate: matchRate).Count > 0;
+        return FindPictureParallel(bp, CaptureScreen(x, y, width, height), matchRate: matchRate).Count > 0;
     }
 
     /// <summary>
-    ///     基本上只需要1-2ms的延迟
+    ///     基本上只需要1-9ms不等的延迟
     /// </summary>
     /// <param name="bp">原始图片</param>
     /// <param name="bp1">对比图片</param>
@@ -4810,7 +4820,7 @@ public partial class Form2 : Form
     /// <returns></returns>
     private static bool RegPicture(Bitmap bp, Bitmap bp1, double matchRate = 0.9)
     {
-        return FindPicture(bp, new Bitmap(bp1), matchRate: matchRate).Count > 0;
+        return FindPictureParallel(bp, new Bitmap(bp1), matchRate: matchRate).Count > 0;
     }
 
     /// <summary>
@@ -4831,7 +4841,7 @@ public partial class Form2 : Form
 
     private static bool RegPicture(Bitmap bp, int x, int y, int width, int height, double matchRate = 0.9)
     {
-        return FindPicture(bp, CaptureScreen(x, y, width, height), matchRate: matchRate).Count > 0;
+        return FindPictureParallel(bp, CaptureScreen(x, y, width, height), matchRate: matchRate).Count > 0;
     }
 
     #endregion
@@ -4842,7 +4852,7 @@ public partial class Form2 : Form
     {
         try
         {
-            var p = FindPicture(bp, CaptureScreen(x, y, width, height), matchRate: matchRate)[0];
+            var p = FindPictureParallel(bp, CaptureScreen(x, y, width, height), matchRate: matchRate)[0];
             return new Point(x + p.X, y + p.Y);
         }
         catch
@@ -5015,9 +5025,6 @@ public partial class Form2 : Form
 
             Thread.Sleep(100);
         }
-
-        // tb_状态抗性.Text = string.Concat(bz.X.ToString(), " ", bz.Y.ToString());
-        //tb_状态抗性.Text = CaptureColor(bz.X + 175, bz.Y).ToString();
     }
 
     #endregion
@@ -5118,9 +5125,48 @@ public partial class Form2 : Form
         //if (Bitmap == null) Bitmap = new Bitmap(653, 182);
         //CaptureScreen(750, 856, ref Bitmap);
 
-        //// 捕捉全图
-        //if (Bitmap == null) Bitmap = new Bitmap(1920, 1080);
-        //CaptureScreen(0, 0, ref Bitmap);
+        Bitmap bp = new Bitmap(653, 182);
+        CaptureScreen(0, 0, ref bp);
+
+        Stopwatch stopWatch1 = new();
+
+        stopWatch1.Start();
+
+        RegPicture(Resource_Picture.物品_纷争, bp);
+
+        //object balanceLock = new object();
+
+        //long o = 0;
+
+        //Parallel.For<long>(0, 10, () => 0, (i, loop, subPoint) =>
+        //{
+        //    long k = 0;
+        //    Parallel.For<long>(0, 10, () => 0, (j, loop1, subPoint1) =>
+        //    {
+        //        subPoint1 += j;
+        //        return subPoint1;
+        //    },
+        //    (x) =>
+        //    {
+        //        Interlocked.Add(ref k, x);
+        //    });
+        //    subPoint += i + k;
+        //    return subPoint;
+        //},
+        //(x) =>
+        //{
+        //    Interlocked.Add(ref o, x);
+        //    //lock (balanceLock)
+        //    //{
+        //    //    tb_y.Text = x.ToString();
+        //    //}
+        //});
+
+        stopWatch1.Stop();
+
+        //tb_y.Text = o.ToString();
+
+        tb_x.Text = string.Concat("单体用时", stopWatch1.ElapsedMilliseconds);
 
         //// 识别时间
         //if (Bitmap == null) Bitmap = new Bitmap(44, 14);
@@ -5128,9 +5174,9 @@ public partial class Form2 : Form
         //tb_丢装备.Text = OCR.识别英文数字(Bitmap);
 
         // 捕捉攻速
-        if (Bitmap == null) Bitmap = new Bitmap(78, 17);
-        CaptureScreen(552, 510, ref Bitmap);
-        tb_丢装备.Text = OCR.识别英文数字(Bitmap);
+        //if (Bitmap == null) Bitmap = new Bitmap(78, 17);
+        //CaptureScreen(552, 510, ref Bitmap);
+        //tb_丢装备.Text = OCR.识别英文数字(Bitmap);
 
         stopWatch.Stop();
 
@@ -5244,6 +5290,11 @@ public partial class Form2 : Form
         // 设置窗口位置
         Location = new Point(338, 1010);
 
+        if (tb_name.Text == "测试")
+        {
+            Location = new Point(338, 967);
+        }
+
         //Task.Run(记录买活);
 
         return i;
@@ -5320,6 +5371,15 @@ public partial class Form2 : Form
         KeyUp(key);
     }
 
+    private static void ShiftKeyPress(uint key)
+    {
+        KeyDown((uint)Keys.LShiftKey);
+        KeyDown(key);
+        Delay(10);
+        KeyUp(key);
+        KeyUp((uint)Keys.LShiftKey);
+    }
+
     private static void KeyPressAsync(uint key)
     {
         Task.Run(() =>
@@ -5386,4 +5446,5 @@ public partial class Form2 : Form
     //KeyboardMouseSimulateDriverAPI.KeyUp((uint) Keys.Space);
 
     #endregion
+
 }
