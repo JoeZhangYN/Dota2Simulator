@@ -225,12 +225,6 @@ public partial class Form2 : Form
 
             else if (tb_name.Text.Trim() == "钢背")
             {
-                if (!总循环条件)
-                {
-                    总循环条件 = true;
-                    无物品状态初始化();
-                }
-
                 if (条件根据图片委托1 == null)
                     条件根据图片委托1 = 鼻涕针刺循环;
 
@@ -642,12 +636,6 @@ public partial class Form2 : Form
 
             else if (tb_name.Text == "赏金")
             {
-                if (!总循环条件)
-                {
-                    总循环条件 = true;
-                    无物品状态初始化();
-                }
-
                 if (条件根据图片委托1 == null)
                     条件根据图片委托1 = 飞镖接平A;
 
@@ -665,12 +653,6 @@ public partial class Form2 : Form
 
             else if (tb_name.Text == "剧毒")
             {
-                if (!总循环条件)
-                {
-                    总循环条件 = true;
-                    无物品状态初始化();
-                }
-
                 if (条件根据图片委托1 == null)
                     条件根据图片委托1 = 瘴气去后摇;
 
@@ -786,12 +768,6 @@ public partial class Form2 : Form
 
             else if (tb_name.Text.Trim() == "火女")
             {
-                if (!总循环条件)
-                {
-                    总循环条件 = true;
-                    无物品状态初始化();
-                }
-
                 if (条件根据图片委托1 == null)
                     条件根据图片委托1 = 龙破斩去后摇;
 
@@ -831,12 +807,6 @@ public partial class Form2 : Form
 
             else if (tb_name.Text.Trim() == "蓝猫")
             {
-                if (!总循环条件)
-                {
-                    总循环条件 = true;
-                    无物品状态初始化();
-                }
-
                 if (条件根据图片委托1 == null)
                     条件根据图片委托1 = 拉接平A;
 
@@ -1054,12 +1024,6 @@ public partial class Form2 : Form
 
             else if (tb_name.Text.Trim() == "天怒")
             {
-                if (!总循环条件)
-                {
-                    总循环条件 = true;
-                    无物品状态初始化();
-                }
-
                 if (条件根据图片委托2 == null)
                     条件根据图片委托2 = 天怒秒人连招;
 
@@ -1152,12 +1116,6 @@ public partial class Form2 : Form
 
             else if (tb_name.Text.Trim() == "莱恩")
             {
-                if (!总循环条件)
-                {
-                    总循环条件 = true;
-                    无物品状态初始化();
-                }
-
                 if (条件根据图片委托1 == null)
                     条件根据图片委托1 = 莱恩羊接技能;
 
@@ -3742,7 +3700,6 @@ public partial class Form2 : Form
 
     private void 取消所有功能()
     {
-        总循环条件 = false;
         循环条件1 = false;
         循环条件2 = false;
         中断条件 = false;
@@ -5118,9 +5075,7 @@ public partial class Form2 : Form
         //if (Bitmap == null) Bitmap = new Bitmap(653, 182);
         //CaptureScreen(750, 856, ref Bitmap);
 
-        //// 捕捉全图
-        //if (Bitmap == null) Bitmap = new Bitmap(1920, 1080);
-        //CaptureScreen(0, 0, ref Bitmap);
+        CaptureScreen(0, 0, 1920, 1080);
 
         //// 识别时间
         //if (Bitmap == null) Bitmap = new Bitmap(44, 14);
@@ -5128,9 +5083,9 @@ public partial class Form2 : Form
         //tb_丢装备.Text = OCR.识别英文数字(Bitmap);
 
         // 捕捉攻速
-        if (Bitmap == null) Bitmap = new Bitmap(78, 17);
-        CaptureScreen(552, 510, ref Bitmap);
-        tb_丢装备.Text = OCR.识别英文数字(Bitmap);
+        //if (Bitmap == null) Bitmap = new Bitmap(78, 17);
+        //CaptureScreen(552, 510, ref Bitmap);
+        //tb_丢装备.Text = OCR.识别英文数字(Bitmap);
 
         stopWatch.Stop();
 
@@ -5245,6 +5200,12 @@ public partial class Form2 : Form
         Location = new Point(338, 1010);
 
         //Task.Run(记录买活);
+
+        if (!总循环条件)
+        {
+            总循环条件 = true;
+            无物品状态初始化();
+        }
 
         return i;
     }
