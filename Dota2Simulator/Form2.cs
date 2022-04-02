@@ -62,25 +62,25 @@ public partial class Form2 : Form
 
             if (tb_name.Text == "船长")
             {
-                if (e.KeyValue == (uint) Keys.D2)
+                if (e.KeyValue == (uint)Keys.D2)
                 {
                     label1.Text = "D2";
 
-                    KeyPress((uint) Keys.Q);
+                    KeyPress((uint)Keys.Q);
 
                     Task.Run(洪流接x回);
                 }
-                else if (e.KeyValue == (uint) Keys.D3)
+                else if (e.KeyValue == (uint)Keys.D3)
                 {
                     label1.Text = "D3";
 
                     Task.Run(最大化x伤害控制);
                 }
-                else if (e.KeyValue == (uint) Keys.D4)
+                else if (e.KeyValue == (uint)Keys.D4)
                 {
                     label1.Text = "D4";
 
-                    KeyPress((uint) Keys.Q);
+                    KeyPress((uint)Keys.Q);
 
                     Task.Run(洪流接船);
                 }
@@ -92,28 +92,28 @@ public partial class Form2 : Form
 
             else if (tb_name.Text == "军团")
             {
-                if (e.KeyValue == (uint) Keys.E)
+                if (e.KeyValue == (uint)Keys.E)
                 {
                     label1.Text = "E";
 
                     Task.Run(决斗);
                 }
-                else if (e.KeyValue == (uint) Keys.D1)
+                else if (e.KeyValue == (uint)Keys.D1)
                 {
                     mod_int = 1;
                     TTS.Speak("左下决斗");
                 }
-                else if (e.KeyValue == (uint) Keys.D2)
+                else if (e.KeyValue == (uint)Keys.D2)
                 {
                     mod_int = 2;
                     TTS.Speak("左上决斗");
                 }
-                else if (e.KeyValue == (uint) Keys.D3)
+                else if (e.KeyValue == (uint)Keys.D3)
                 {
                     mod_int = 3;
                     TTS.Speak("右下决斗");
                 }
-                else if (e.KeyValue == (uint) Keys.D4)
+                else if (e.KeyValue == (uint)Keys.D4)
                 {
                     mod_int = 4;
                     TTS.Speak("右上决斗");
@@ -126,38 +126,33 @@ public partial class Form2 : Form
 
             else if (tb_name.Text == "斧王")
             {
-                if (e.KeyValue == (uint) Keys.E)
+                if (!总循环条件)
                 {
-                    label1.Text = "E";
-
-                    切智力腿();
-
-                    Task.Run(跳吼);
+                    总循环条件 = true;
+                    无物品状态初始化();
                 }
 
-                else if (e.KeyValue == (uint) Keys.Q)
-                {
-                    label1.Text = "Q";
+                if (条件根据图片委托1 == null)
+                    条件根据图片委托1 = 跳吼;
 
-                    切智力腿();
+                if (条件根据图片委托2 == null)
+                    条件根据图片委托2 = 战斗饥渴取消后摇;
+
+                if (e.KeyValue == (uint)Keys.E)
+                {
+                    条件1 = true;
+                    中断条件 = false;
                 }
-
-                else if (e.KeyValue == (uint) Keys.W)
+                else if (e.KeyValue == (uint)Keys.W)
                 {
-                    label1.Text = "W";
-
-                    切智力腿();
-
-                    Task.Run(战斗饥渴取消后摇);
+                    条件2 = true;
+                    中断条件 = false;
                 }
-
-                else if (e.KeyValue == (uint) Keys.R)
+                else if (e.KeyValue == (uint)Keys.S)
                 {
-                    label1.Text = "R";
-
-                    切智力腿();
-
-                    Task.Run(淘汰之刃后);
+                    条件1 = false;
+                    条件2= false;
+                    中断条件 = true;
                 }
             }
 
@@ -167,7 +162,7 @@ public partial class Form2 : Form
 
             else if (tb_name.Text == "孽主")
             {
-                if (e.KeyValue == (uint) Keys.E)
+                if (e.KeyValue == (uint)Keys.E)
                 {
                     label1.Text = "E";
 
@@ -181,25 +176,25 @@ public partial class Form2 : Form
 
             else if (tb_name.Text.Trim() == "哈斯卡")
             {
-                if (e.KeyValue == (uint) Keys.D2)
+                if (e.KeyValue == (uint)Keys.D2)
                 {
                     label1.Text = "D2";
 
                     Task.Run(切臂章);
                 }
-                else if (e.KeyValue == (uint) Keys.Q)
+                else if (e.KeyValue == (uint)Keys.Q)
                 {
                     label1.Text = "Q";
 
                     Task.Run(心炎平A);
                 }
-                else if (e.KeyValue == (uint) Keys.R)
+                else if (e.KeyValue == (uint)Keys.R)
                 {
                     label1.Text = "R";
 
                     if (RegPicture(Resource_Picture.物品_臂章, "Z"))
                     {
-                        KeyPress((uint) Keys.Z);
+                        KeyPress((uint)Keys.Z);
                         Delay(30);
                     }
 
@@ -213,7 +208,7 @@ public partial class Form2 : Form
 
             else if (tb_name.Text.Trim() == "海民")
             {
-                if (e.KeyValue == (uint) Keys.G)
+                if (e.KeyValue == (uint)Keys.G)
                 {
                     label1.Text = "G";
 
@@ -236,7 +231,7 @@ public partial class Form2 : Form
                 if (条件根据图片委托1 == null)
                     条件根据图片委托1 = 鼻涕针刺循环;
 
-                if (e.KeyValue == (uint) Keys.D2)
+                if (e.KeyValue == (uint)Keys.D2)
                 {
                     if (!条件1)
                         条件1 = true;
@@ -246,16 +241,16 @@ public partial class Form2 : Form
                     // 配合一次鼻涕就一次也不浪费
                     if (循环条件1)
                         if (RegPicture(Resource_Picture.物品_魂戒CD, "C") || RegPicture(Resource_Picture.物品_魂戒CD_5, "C", 5))
-                            KeyPress((uint) Keys.C);
+                            KeyPress((uint)Keys.C);
                 }
-                else if (e.KeyValue == (uint) Keys.D3)
+                else if (e.KeyValue == (uint)Keys.D3)
                 {
                     if (!条件1)
                         条件1 = true;
 
                     循环条件2 = !循环条件2;
                 }
-                else if (e.KeyValue == (uint) Keys.H)
+                else if (e.KeyValue == (uint)Keys.H)
                 {
                     循环条件1 = false;
                     循环条件2 = false;
@@ -268,13 +263,13 @@ public partial class Form2 : Form
 
             else if (tb_name.Text.Trim() == "猛犸")
             {
-                if (e.KeyValue == (uint) Keys.F)
+                if (e.KeyValue == (uint)Keys.F)
                 {
                     label1.Text = "F";
 
                     Task.Run(跳拱指定地点);
                 }
-                else if (e.KeyValue == (uint) Keys.D3)
+                else if (e.KeyValue == (uint)Keys.D3)
                 {
                     label1.Text = "F";
 
@@ -1495,6 +1490,11 @@ public partial class Form2 : Form
     /// </summary>
     private static int mod_int;
 
+    /// <summary>
+    ///     用于寻找最佳延迟
+    /// </summary>
+    private static int delay_time = 0;
+
     #endregion
 
     #region Dota2具体实现
@@ -1600,74 +1600,41 @@ public partial class Form2 : Form
 
     #region 斧王
 
-    private void 跳吼()
+    private static bool 跳吼(Bitmap bp)
     {
-        //单次使用装备(Resource_Picture.物品_刃甲);
-
-        if (RegPicture(Resource_Picture.物品_刃甲, "Z"))
+        if (RegPicture(Resource_Picture.物品_刃甲, bp))
             KeyPress((uint) Keys.Z);
         //Delay(30);
 
-        KeyPress((uint) Keys.Space);
+        KeyPress((uint) Keys.Space); 
 
-        while (RegPicture(Resource_Picture.斧王_狂战士之吼, "Q") || RegPicture(Resource_Picture.斧王_狂战士之吼_金色饰品, "Q"))
+        var s_time = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds();
+        if (RegPicture(Resource_Picture.斧王_狂战士之吼, bp) || RegPicture(Resource_Picture.斧王_狂战士之吼_金色饰品, bp))
         {
             KeyPress((uint) Keys.Q);
-            Delay(30);
+            Delay(550, s_time);
+            //RightClick();
+            KeyPress((uint)Keys.A);
+            return false;
         }
 
-        KeyDown((uint) Keys.LControlKey);
-        KeyPress((uint) Keys.A);
-        KeyUp((uint) Keys.LControlKey);
-
-        //Delay(430);
-
-        //切敏捷腿();
-
-        //if (RegPicture(Resource_Picture.物品_分身, "Z"))
-        //{
-        //    KeyPress((uint)Keys.Z);
-        //    分身一齐攻击();
-        //}
+        return true;
     }
 
-    private void 战斗饥渴取消后摇()
+    private static bool 战斗饥渴取消后摇(Bitmap bp)
     {
-        var time = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds();
+        var s_time = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds();
 
-        var w_down = 0;
-        while (w_down == 0)
+        // 检测刚释放完毕
+        if (RegPicture(Resource_Picture.斧王_释放战斗饥渴_不朽, bp))
         {
-            var s_time = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds();
-
-            // 开始释放不朽技能读条的最开始端颜色，大约耗时10ms内
-            if (CaptureColor(892, 952).Equals(Color.FromArgb(255, 39, 149, 22)))
-                // 检测刚释放完毕
-                if (RegPicture(Resource_Picture.斧王_释放战斗饥渴_不朽, "W"))
-                {
-                    Delay(300, s_time);
-                    KeyPress((uint) Keys.A);
-                    切敏捷腿();
-                    w_down = 1;
-                }
-
-            if (new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds() - time > 700) break;
+            Delay(290, s_time);
+            //RightClick();
+            KeyPress((uint) Keys.A);
+            return false;
         }
-    }
 
-    private void 淘汰之刃后()
-    {
-        Delay(200);
-
-        切敏捷腿();
-
-        Delay(200);
-
-        切敏捷腿();
-
-        Delay(200);
-
-        切敏捷腿();
+        return true;
     }
 
     #endregion
@@ -3769,6 +3736,8 @@ public partial class Form2 : Form
         条件根据图片委托4 = null;
         条件根据图片委托5 = null;
         条件根据图片委托6 = null;
+
+        delay_time = 0;
     }
 
     /// <summary>
@@ -4868,164 +4837,164 @@ public partial class Form2 : Form
 
     #region 记录买活
 
-    private static void 记录买活()
-    {
-        var 计时颜色 = Color.FromArgb(255, 14, 19, 24);
+    //private static void 记录买活()
+    //{
+    //    var 计时颜色 = Color.FromArgb(255, 14, 19, 24);
 
-        while (true)
-        {
-            if (RegPicture(Resource_Picture.播报_买活, 549, 41, 52, 21) && !CaptureColor(559, 76).Equals(计时颜色))
-            {
-                var p = MousePosition;
-                while (!CaptureColor(559, 76).Equals(计时颜色))
-                {
-                    MouseMove(559, 76);
-                    Thread.Sleep(30);
-                    LeftClick();
-                    Thread.Sleep(30);
-                }
+    //    while (true)
+    //    {
+    //        if (RegPicture(Resource_Picture.播报_买活, 549, 41, 52, 21) && !CaptureColor(559, 76).Equals(计时颜色))
+    //        {
+    //            var p = MousePosition;
+    //            while (!CaptureColor(559, 76).Equals(计时颜色))
+    //            {
+    //                MouseMove(559, 76);
+    //                Thread.Sleep(30);
+    //                LeftClick();
+    //                Thread.Sleep(30);
+    //            }
 
-                MouseMove(p);
-            }
+    //            MouseMove(p);
+    //        }
 
-            if (RegPicture(Resource_Picture.播报_买活, 613, 41, 52, 21) && !CaptureColor(623, 76).Equals(计时颜色))
-            {
-                var p = MousePosition;
+    //        if (RegPicture(Resource_Picture.播报_买活, 613, 41, 52, 21) && !CaptureColor(623, 76).Equals(计时颜色))
+    //        {
+    //            var p = MousePosition;
 
-                while (!CaptureColor(623, 76).Equals(计时颜色))
-                {
-                    MouseMove(623, 76);
-                    Thread.Sleep(30);
-                    LeftClick();
-                    Thread.Sleep(30);
-                }
+    //            while (!CaptureColor(623, 76).Equals(计时颜色))
+    //            {
+    //                MouseMove(623, 76);
+    //                Thread.Sleep(30);
+    //                LeftClick();
+    //                Thread.Sleep(30);
+    //            }
 
-                MouseMove(p);
-            }
+    //            MouseMove(p);
+    //        }
 
-            if (RegPicture(Resource_Picture.播报_买活, 674, 41, 52, 21) && !CaptureColor(688, 76).Equals(计时颜色))
-            {
-                var p = MousePosition;
+    //        if (RegPicture(Resource_Picture.播报_买活, 674, 41, 52, 21) && !CaptureColor(688, 76).Equals(计时颜色))
+    //        {
+    //            var p = MousePosition;
 
-                while (!CaptureColor(688, 76).Equals(计时颜色))
-                {
-                    MouseMove(688, 76);
-                    Thread.Sleep(30);
-                    LeftClick();
-                    Thread.Sleep(30);
-                }
+    //            while (!CaptureColor(688, 76).Equals(计时颜色))
+    //            {
+    //                MouseMove(688, 76);
+    //                Thread.Sleep(30);
+    //                LeftClick();
+    //                Thread.Sleep(30);
+    //            }
 
-                MouseMove(p);
-            }
+    //            MouseMove(p);
+    //        }
 
-            if (RegPicture(Resource_Picture.播报_买活, 735, 41, 52, 21) && !CaptureColor(749, 76).Equals(计时颜色))
-            {
-                var p = MousePosition;
+    //        if (RegPicture(Resource_Picture.播报_买活, 735, 41, 52, 21) && !CaptureColor(749, 76).Equals(计时颜色))
+    //        {
+    //            var p = MousePosition;
 
-                while (!CaptureColor(749, 76).Equals(计时颜色))
-                {
-                    MouseMove(749, 76);
-                    Thread.Sleep(30);
-                    LeftClick();
-                    Thread.Sleep(30);
-                }
+    //            while (!CaptureColor(749, 76).Equals(计时颜色))
+    //            {
+    //                MouseMove(749, 76);
+    //                Thread.Sleep(30);
+    //                LeftClick();
+    //                Thread.Sleep(30);
+    //            }
 
-                MouseMove(p);
-            }
+    //            MouseMove(p);
+    //        }
 
-            if (RegPicture(Resource_Picture.播报_买活, 797, 41, 52, 21) && !CaptureColor(811, 76).Equals(计时颜色))
-            {
-                var p = MousePosition;
+    //        if (RegPicture(Resource_Picture.播报_买活, 797, 41, 52, 21) && !CaptureColor(811, 76).Equals(计时颜色))
+    //        {
+    //            var p = MousePosition;
 
-                while (!CaptureColor(811, 76).Equals(计时颜色))
-                {
-                    MouseMove(811, 76);
-                    Thread.Sleep(30);
-                    LeftClick();
-                    Thread.Sleep(30);
-                }
+    //            while (!CaptureColor(811, 76).Equals(计时颜色))
+    //            {
+    //                MouseMove(811, 76);
+    //                Thread.Sleep(30);
+    //                LeftClick();
+    //                Thread.Sleep(30);
+    //            }
 
-                MouseMove(p);
-            }
+    //            MouseMove(p);
+    //        }
 
-            if (RegPicture(Resource_Picture.播报_买活, 1060, 41, 52, 21) && !CaptureColor(1073, 76).Equals(计时颜色))
-            {
-                var p = MousePosition;
+    //        if (RegPicture(Resource_Picture.播报_买活, 1060, 41, 52, 21) && !CaptureColor(1073, 76).Equals(计时颜色))
+    //        {
+    //            var p = MousePosition;
 
-                while (!CaptureColor(1073, 76).Equals(计时颜色))
-                {
-                    MouseMove(1073, 76);
-                    Thread.Sleep(30);
-                    LeftClick();
-                    Thread.Sleep(30);
-                }
+    //            while (!CaptureColor(1073, 76).Equals(计时颜色))
+    //            {
+    //                MouseMove(1073, 76);
+    //                Thread.Sleep(30);
+    //                LeftClick();
+    //                Thread.Sleep(30);
+    //            }
 
-                MouseMove(p);
-            }
+    //            MouseMove(p);
+    //        }
 
-            if (RegPicture(Resource_Picture.播报_买活, 1124, 41, 52, 21) && !CaptureColor(1137, 76).Equals(计时颜色))
-            {
-                var p = MousePosition;
+    //        if (RegPicture(Resource_Picture.播报_买活, 1124, 41, 52, 21) && !CaptureColor(1137, 76).Equals(计时颜色))
+    //        {
+    //            var p = MousePosition;
 
-                while (!CaptureColor(1137, 76).Equals(计时颜色))
-                {
-                    MouseMove(1137, 76);
-                    Thread.Sleep(30);
-                    LeftClick();
-                    Thread.Sleep(30);
-                }
+    //            while (!CaptureColor(1137, 76).Equals(计时颜色))
+    //            {
+    //                MouseMove(1137, 76);
+    //                Thread.Sleep(30);
+    //                LeftClick();
+    //                Thread.Sleep(30);
+    //            }
 
-                MouseMove(p);
-            }
+    //            MouseMove(p);
+    //        }
 
-            if (RegPicture(Resource_Picture.播报_买活, 1185, 41, 52, 21) && !CaptureColor(1198, 76).Equals(计时颜色))
-            {
-                var p = MousePosition;
+    //        if (RegPicture(Resource_Picture.播报_买活, 1185, 41, 52, 21) && !CaptureColor(1198, 76).Equals(计时颜色))
+    //        {
+    //            var p = MousePosition;
 
-                while (!CaptureColor(1198, 76).Equals(计时颜色))
-                {
-                    MouseMove(1198, 76);
-                    Thread.Sleep(30);
-                    LeftClick();
-                    Thread.Sleep(30);
-                }
+    //            while (!CaptureColor(1198, 76).Equals(计时颜色))
+    //            {
+    //                MouseMove(1198, 76);
+    //                Thread.Sleep(30);
+    //                LeftClick();
+    //                Thread.Sleep(30);
+    //            }
 
-                MouseMove(p);
-            }
+    //            MouseMove(p);
+    //        }
 
-            if (RegPicture(Resource_Picture.播报_买活, 1248, 41, 52, 21) && !CaptureColor(1261, 76).Equals(计时颜色))
-            {
-                var p = MousePosition;
+    //        if (RegPicture(Resource_Picture.播报_买活, 1248, 41, 52, 21) && !CaptureColor(1261, 76).Equals(计时颜色))
+    //        {
+    //            var p = MousePosition;
 
-                while (!CaptureColor(1261, 76).Equals(计时颜色))
-                {
-                    MouseMove(1261, 76);
-                    Thread.Sleep(30);
-                    LeftClick();
-                    Thread.Sleep(30);
-                }
+    //            while (!CaptureColor(1261, 76).Equals(计时颜色))
+    //            {
+    //                MouseMove(1261, 76);
+    //                Thread.Sleep(30);
+    //                LeftClick();
+    //                Thread.Sleep(30);
+    //            }
 
-                MouseMove(p);
-            }
+    //            MouseMove(p);
+    //        }
 
-            if (RegPicture(Resource_Picture.播报_买活, 1308, 41, 52, 21) && !CaptureColor(1321, 76).Equals(计时颜色))
-            {
-                var p = MousePosition;
+    //        if (RegPicture(Resource_Picture.播报_买活, 1308, 41, 52, 21) && !CaptureColor(1321, 76).Equals(计时颜色))
+    //        {
+    //            var p = MousePosition;
 
-                while (!CaptureColor(1321, 76).Equals(计时颜色))
-                {
-                    MouseMove(1321, 76);
-                    Thread.Sleep(30);
-                    LeftClick();
-                    Thread.Sleep(30);
-                }
+    //            while (!CaptureColor(1321, 76).Equals(计时颜色))
+    //            {
+    //                MouseMove(1321, 76);
+    //                Thread.Sleep(30);
+    //                LeftClick();
+    //                Thread.Sleep(30);
+    //            }
 
-                MouseMove(p);
-            }
+    //            MouseMove(p);
+    //        }
 
-            Thread.Sleep(100);
-        }
-    }
+    //        Thread.Sleep(100);
+    //    }
+    //}
 
     #endregion
 
