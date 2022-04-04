@@ -64,7 +64,7 @@ namespace Dota2Simulator
             this.tb_name.Name = "tb_name";
             this.tb_name.Size = new System.Drawing.Size(87, 23);
             this.tb_name.TabIndex = 4;
-            this.tb_name.Text = "赏金";
+            this.tb_name.Text = "斧王";
             this.tb_name.TextChanged += new System.EventHandler(this.Tb_name_TextChanged);
             // 
             // tb_丢装备
@@ -195,7 +195,7 @@ namespace Dota2Simulator
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 17F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(173, 265);
+            this.ClientSize = new System.Drawing.Size(169, 247);
             this.Controls.Add(this.label7);
             this.Controls.Add(this.tb_状态抗性);
             this.Controls.Add(this.btn_test);

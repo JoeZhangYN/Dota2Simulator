@@ -873,6 +873,26 @@ namespace Dota2Simulator.Picture_Dota2 {
         /// <summary>
         ///   查找 System.Drawing.Bitmap 类型的本地化资源。
         /// </summary>
+        internal static System.Drawing.Bitmap 斧王_释放_狂战士之吼 {
+            get {
+                object obj = ResourceManager.GetObject("斧王_释放_狂战士之吼", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
+        /// </summary>
+        internal static System.Drawing.Bitmap 斧王_释放_狂战士之吼_金色饰品 {
+            get {
+                object obj = ResourceManager.GetObject("斧王_释放_狂战士之吼_金色饰品", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
+        /// </summary>
         internal static System.Drawing.Bitmap 斧王_释放战斗饥渴 {
             get {
                 object obj = ResourceManager.GetObject("斧王_释放战斗饥渴", resourceCulture);
@@ -2096,6 +2116,56 @@ namespace Dota2Simulator.Picture_Dota2 {
         internal static System.Drawing.Bitmap 黑鸟_关释放 {
             get {
                 object obj = ResourceManager.GetObject("黑鸟_关释放", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
+        /// </summary>
+        internal static System.Drawing.Bitmap 龙骑_神龙摆尾_4 {
+            get {
+                object obj = ResourceManager.GetObject("龙骑_神龙摆尾_4", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
+        /// </summary>
+        internal static System.Drawing.Bitmap 龙骑_神龙摆尾_5 {
+            get {
+                object obj = ResourceManager.GetObject("龙骑_神龙摆尾_5", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
+        /// </summary>
+        internal static System.Drawing.Bitmap 龙骑_释放火焰吐息_4 {
+            get {
+                object obj = ResourceManager.GetObject("龙骑_释放火焰吐息_4", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
+        /// </summary>
+        internal static System.Drawing.Bitmap 龙骑_释放火焰吐息_5 {
+            get {
+                object obj = ResourceManager.GetObject("龙骑_释放火焰吐息_5", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
+        /// </summary>
+        internal static System.Drawing.Bitmap 龙骑_释放龙炎火球 {
+            get {
+                object obj = ResourceManager.GetObject("龙骑_释放龙炎火球", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

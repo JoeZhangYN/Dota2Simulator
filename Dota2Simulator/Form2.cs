@@ -124,39 +124,57 @@ public partial class Form2 : Form
 
             else if (tb_name.Text == "斧王")
             {
-                if (e.KeyValue == (uint) Keys.E)
+                if (!总循环条件)
                 {
-                    label1.Text = "E";
-
-                    切智力腿();
-
-                    Task.Run(跳吼);
+                    总循环条件 = true;
+                    无物品状态初始化();
                 }
 
-                else if (e.KeyValue == (uint) Keys.Q)
-                {
-                    label1.Text = "Q";
+                if (条件根据图片委托1 == null)
+                    条件根据图片委托1 = 跳吼;
 
-                    切智力腿();
+                if (条件根据图片委托2 == null)
+                    条件根据图片委托2 = 战斗饥渴取消后摇;
+
+                if (e.KeyValue == (uint)Keys.E)
+                {
+                    条件1 = true;
+                    中断条件 = false;
+                }
+                else if (e.KeyValue == (uint)Keys.W)
+                {
+                    条件2 = true;
+                    中断条件 = false;
+                }
+                else if (e.KeyValue == (uint)Keys.S)
+                {
+                    中断条件 = true;
                 }
 
-                else if (e.KeyValue == (uint) Keys.W)
-                {
-                    label1.Text = "W";
+                //else if (e.KeyValue == (uint) Keys.Q)
+                //{
+                //    label1.Text = "Q";
 
-                    切智力腿();
+                //    切智力腿();
+                //}
 
-                    Task.Run(战斗饥渴取消后摇);
-                }
+                //else if (e.KeyValue == (uint) Keys.W)
+                //{
+                //    label1.Text = "W";
 
-                else if (e.KeyValue == (uint) Keys.R)
-                {
-                    label1.Text = "R";
+                //    切智力腿();
 
-                    切智力腿();
+                //    Task.Run(战斗饥渴取消后摇);
+                //}
 
-                    Task.Run(淘汰之刃后);
-                }
+                //else if (e.KeyValue == (uint) Keys.R)
+                //{
+                //    label1.Text = "R";
+
+                //    切智力腿();
+
+                //    Task.Run(淘汰之刃后);
+                //}
             }
 
             #endregion
@@ -280,6 +298,31 @@ public partial class Form2 : Form
                 }
             }
 
+            #endregion
+
+            #region 龙骑
+
+            else if (tb_name.Text.Trim() == "龙骑")
+            {
+                if (!总循环条件)
+                {
+                    总循环条件 = true;
+                    无物品状态初始化();
+                }
+
+                if (条件根据图片委托1 == null)
+                    条件根据图片委托1 = 魂戒火球假腿;
+
+                if (e.KeyValue == (uint)Keys.D2)
+                {
+                    条件1 = true;
+                    中断条件 = false;
+                }
+                else if (e.KeyValue == (uint)Keys.S)
+                {
+                    中断条件 = true;
+                }
+            }
             #endregion
 
             #endregion
@@ -1599,25 +1642,32 @@ public partial class Form2 : Form
 
     #region 斧王
 
-    private void 跳吼()
+    private bool 跳吼(Bitmap bp)
     {
         //单次使用装备(Resource_Picture.物品_刃甲);
 
-        if (RegPicture(Resource_Picture.物品_刃甲, "Z"))
-            KeyPress((uint) Keys.Z);
+        if (RegPicture(Resource_Picture.物品_刃甲, bp))
+            KeyPress((uint)Keys.Z);
         //Delay(30);
 
-        KeyPress((uint) Keys.Space);
-
-        while (RegPicture(Resource_Picture.斧王_狂战士之吼, "Q") || RegPicture(Resource_Picture.斧王_狂战士之吼_金色饰品, "Q"))
+        if (RegPicture(Resource_Picture.斧王_狂战士之吼, bp) || RegPicture(Resource_Picture.斧王_狂战士之吼_金色饰品, bp))
         {
-            KeyPress((uint) Keys.Q);
-            Delay(30);
+            KeyPress((uint)Keys.Space);
+            KeyPress((uint)Keys.Q);
         }
 
-        KeyDown((uint) Keys.LControlKey);
-        KeyPress((uint) Keys.A);
-        KeyUp((uint) Keys.LControlKey);
+        if (RegPicture(Resource_Picture.斧王_释放_狂战士之吼, bp) || RegPicture(Resource_Picture.斧王_释放_狂战士之吼_金色饰品, bp))
+        {
+            Delay(210);
+            KeyPress((uint)Keys.A);
+            return false;
+        }
+
+        return true;
+
+        //KeyDown((uint) Keys.LControlKey);
+        //KeyPress((uint) Keys.A);
+        //KeyUp((uint) Keys.LControlKey);
 
         //Delay(430);
 
@@ -1630,28 +1680,16 @@ public partial class Form2 : Form
         //}
     }
 
-    private void 战斗饥渴取消后摇()
+    private bool 战斗饥渴取消后摇(Bitmap bp)
     {
-        var time = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds();
-
-        var w_down = 0;
-        while (w_down == 0)
+        if (RegPicture(Resource_Picture.斧王_释放战斗饥渴_不朽, bp) || RegPicture(Resource_Picture.斧王_释放战斗饥渴, bp))
         {
-            var s_time = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds();
-
-            // 开始释放不朽技能读条的最开始端颜色，大约耗时10ms内
-            if (CaptureColor(892, 952).Equals(Color.FromArgb(255, 39, 149, 22)))
-                // 检测刚释放完毕
-                if (RegPicture(Resource_Picture.斧王_释放战斗饥渴_不朽, "W"))
-                {
-                    Delay(300, s_time);
-                    KeyPress((uint) Keys.A);
-                    切敏捷腿();
-                    w_down = 1;
-                }
-
-            if (new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds() - time > 700) break;
+            Delay(100);
+            RightClick();
+            return false;
         }
+
+        return true;
     }
 
     private void 淘汰之刃后()
@@ -1966,6 +2004,40 @@ public partial class Form2 : Form
                 }
             }
         }
+
+        return true;
+    }
+
+    #endregion
+
+    #region 龙骑
+
+    private bool 魂戒火球假腿(Bitmap bp)
+    {
+        魂戒力量智力(bp);
+
+        if (RegPicture(Resource_Picture.龙骑_神龙摆尾_4, bp) || RegPicture(Resource_Picture.龙骑_神龙摆尾_5, bp))
+        {
+            KeyPress((uint)Keys.W);
+            Delay(30);
+            KeyPress((uint)Keys.D);
+            return true;
+        }
+
+        if (RegPicture(Resource_Picture.龙骑_释放龙炎火球, bp))
+        {
+            KeyPress((uint)Keys.Q);
+            return true;
+        }
+
+        if (RegPicture(Resource_Picture.龙骑_释放火焰吐息_4, bp) || RegPicture(Resource_Picture.龙骑_释放火焰吐息_5, bp))
+        {
+            Delay(110);
+            KeyPress((uint)Keys.A);
+            切力量腿(bp);
+            return false;
+        }
+        
 
         return true;
     }
@@ -3742,6 +3814,7 @@ public partial class Form2 : Form
 
     private void 取消所有功能()
     {
+        mod_int = 0;
         总循环条件 = false;
         循环条件1 = false;
         循环条件2 = false;
@@ -3837,7 +3910,7 @@ public partial class Form2 : Form
 
     private static bool 魂戒力量智力(Bitmap bp)
     {
-        if (RegPicture(Resource_Picture.物品_魂戒CD, bp))
+        if (RegPicture(Resource_Picture.物品_魂戒CD, bp) || RegPicture(Resource_Picture.物品_魂戒CD_5, bp))
         {
             切力量腿(bp);
             KeyPress((uint) Keys.X);
@@ -5089,6 +5162,16 @@ public partial class Form2 : Form
 
         stopWatch.Start();
 
+        if (Bitmap == null) Bitmap = new Bitmap(653, 182);
+        CaptureScreen(750, 856, ref Bitmap);
+
+        var bp = new Bitmap(Bitmap);
+
+        if (RegPicture(Resource_Picture.龙骑_神龙摆尾_4, bp) || RegPicture(Resource_Picture.龙骑_神龙摆尾_5, bp))
+        {
+            tb_丢装备.Text = "找到";
+        }
+
         //Parallel.Invoke(
         //    () => { Bitmap bp = new(308, 73); CaptureScreen(792, 941, ref bp); bp.Dispose(); },
         //    () => { Bitmap bp = new(200, 97); CaptureScreen(1116, 941, ref bp); bp.Dispose(); }
@@ -5127,10 +5210,10 @@ public partial class Form2 : Form
         //CaptureScreen(939, 22, ref Bitmap);
         //tb_丢装备.Text = OCR.识别英文数字(Bitmap);
 
-        // 捕捉攻速
-        if (Bitmap == null) Bitmap = new Bitmap(78, 17);
-        CaptureScreen(552, 510, ref Bitmap);
-        tb_丢装备.Text = OCR.识别英文数字(Bitmap);
+        //// 捕捉攻速
+        //if (Bitmap == null) Bitmap = new Bitmap(78, 17);
+        //CaptureScreen(552, 510, ref Bitmap);
+        //tb_丢装备.Text = OCR.识别英文数字(Bitmap);
 
         stopWatch.Stop();
 
