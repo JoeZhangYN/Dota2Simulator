@@ -1503,6 +1503,16 @@ namespace Dota2Simulator.Picture_Dota2 {
         /// <summary>
         ///   查找 System.Drawing.Bitmap 类型的本地化资源。
         /// </summary>
+        internal static System.Drawing.Bitmap 物品_血精石_4 {
+            get {
+                object obj = ResourceManager.GetObject("物品_血精石_4", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
+        /// </summary>
         internal static System.Drawing.Bitmap 物品_跳刀 {
             get {
                 object obj = ResourceManager.GetObject("物品_跳刀", resourceCulture);
@@ -1736,6 +1746,46 @@ namespace Dota2Simulator.Picture_Dota2 {
         internal static System.Drawing.Bitmap 神域_释放虚妄之诺 {
             get {
                 object obj = ResourceManager.GetObject("神域_释放虚妄之诺", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
+        /// </summary>
+        internal static System.Drawing.Bitmap 美杜莎_释放石化凝视 {
+            get {
+                object obj = ResourceManager.GetObject("美杜莎_释放石化凝视", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
+        /// </summary>
+        internal static System.Drawing.Bitmap 美杜莎_释放石化凝视_5 {
+            get {
+                object obj = ResourceManager.GetObject("美杜莎_释放石化凝视_5", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
+        /// </summary>
+        internal static System.Drawing.Bitmap 美杜莎_释放秘术异蛇 {
+            get {
+                object obj = ResourceManager.GetObject("美杜莎_释放秘术异蛇", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
+        /// </summary>
+        internal static System.Drawing.Bitmap 美杜莎_释放秘术异蛇_5 {
+            get {
+                object obj = ResourceManager.GetObject("美杜莎_释放秘术异蛇_5", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
