@@ -243,10 +243,113 @@ public class PictureProcessing
     #region 找图
 
     /// <summary>
+    ///     根据数组查找坐标
+    /// </summary>
+    /// <param name="byteArrarySub">小图像数组</param>
+    /// <param name="byteArraryPar">大图像数组</param>
+    /// <param name="subSize">小图像尺码</param>
+    /// <param name="parSize">大图像尺码</param>
+    /// <param name="errorRange">误差范围</param>
+    /// <param name="matchRate">匹配率</param>
+    /// <returns></returns>
+    public static List<Point> FindBytesParallel(byte[] byteArrarySub,
+        Size subSize, byte[] byteArraryPar, Size parSize, byte errorRange = 0,
+        double matchRate = 0.9)
+    {
+        List<Point> ListPoint = new();
+        var subWidth = subSize.Width;
+        var subHeight = subSize.Height;
+        var parWidth = parSize.Width;
+        //int parHeight = parBitmap.Height;
+        var searchRect = new Rectangle(0, 0, parSize.Width, parSize.Height);
+
+        var searchLeftTop = searchRect.Location;
+        var searchSize = searchRect.Size;
+        // 第一个颜色
+        var startPixelColor = Color.FromArgb(byteArrarySub[3], byteArrarySub[2],
+                    byteArrarySub[1], byteArrarySub[0]);
+
+        var iMax = searchLeftTop.Y + searchSize.Height - subSize.Height; //行
+        var jMax = searchLeftTop.X + searchSize.Width - subSize.Width; //列
+
+        int smallOffsetX = 0, smallOffsetY = 0;
+        int smallStartX, smallStartY;
+        int pointX;
+        int pointY;
+
+
+        object balanceLock = new object();
+
+        Parallel.For<Point>(searchLeftTop.X, jMax, () => new Point(), (j, loop, subPoint) => {
+            for (var i = searchLeftTop.Y; i < iMax; i++)
+            {
+                // for (var j = searchLeftTop.X; j < jMax; j++)
+
+                //大图x，y坐标处的颜色值
+                int x = j, y = i;
+                var parIndex = i * parWidth * 4 + j * 4;
+                var colorBig = Color.FromArgb(byteArraryPar[parIndex + 3], byteArraryPar[parIndex + 2],
+                    byteArraryPar[parIndex + 1], byteArraryPar[parIndex]);
+                if (ColorAEqualColorB(colorBig, startPixelColor, errorRange))
+                {
+                    smallStartX = x - smallOffsetX; //待找的图X坐标
+                    smallStartY = y - smallOffsetY; //待找的图Y坐标
+                    var sum = 0; //所有需要比对的有效点
+                    var matchNum = 0; //成功匹配的点
+                    for (var m = 0; m < subHeight; m++)
+                        for (var n = 0; n < subWidth; n++)
+                        {
+                            int x1 = n, y1 = m;
+                            var subIndex = m * subWidth * 4 + n * 4;
+                            var color = Color.FromArgb(byteArrarySub[subIndex + 3], byteArrarySub[subIndex + 2],
+                                byteArrarySub[subIndex + 1], byteArrarySub[subIndex]);
+
+                            sum++;
+                            int x2 = smallStartX + x1, y2 = smallStartY + y1;
+                            var parReleativeIndex = y2 * parWidth * 4 + x2 * 4; //比对大图对应的像素点的颜色
+                            var colorPixel = Color.FromArgb(byteArraryPar[parReleativeIndex + 3],
+                                byteArraryPar[parReleativeIndex + 2], byteArraryPar[parReleativeIndex + 1],
+                                byteArraryPar[parReleativeIndex]);
+                            if (ColorAEqualColorB(colorPixel, color, errorRange)) matchNum++;
+                        }
+
+                    if ((double)matchNum / sum >= matchRate)
+                    {
+                        // Console.WriteLine((double)matchNum / sum);
+                        pointX = smallStartX;
+                        pointY = smallStartY;
+                        Point point = new(pointX, pointY);
+                        if (!ListContainsPoint(ListPoint, point))
+                            subPoint = point;
+                        return subPoint;
+                    }
+                }
+            }
+
+            return subPoint;
+
+            //小图x1,y1坐标处的颜色值
+        },
+            (x) =>
+            {
+                lock (balanceLock)
+                {
+                    if (x.X != 0)
+                    {
+                        ListPoint.Add(x);
+                    }
+                }
+            }
+        );
+
+        return ListPoint;
+    }
+
+    /// <summary>
     ///     查找图片，不能镂空
     /// </summary>
-    /// <param name="subBitmap">原始图像</param>
-    /// <param name="parBitmap">对比图像</param>
+    /// <param name="subBitmap">小图像</param>
+    /// <param name="parBitmap">大图像</param>
     /// <param name="searchRect">如果为empty，则默认查找整个图像</param>
     /// <param name="errorRange">容错，单个色值范围内视为正确0~255</param>
     /// <param name="matchRate">图片匹配度，默认90%</param>
@@ -357,8 +460,8 @@ public class PictureProcessing
     /// <summary>
     ///     查找图片，不能镂空
     /// </summary>
-    /// <param name="subBitmap">原始图像</param>
-    /// <param name="parBitmap">对比图像</param>
+    /// <param name="subBitmap">小图像</param>
+    /// <param name="parBitmap">大图像</param>
     /// <param name="searchRect">如果为empty，则默认查找整个图像</param>
     /// <param name="errorRange">容错，单个色值范围内视为正确0~255</param>
     /// <param name="matchRate">图片匹配度，默认90%</param>
