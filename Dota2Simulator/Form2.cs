@@ -734,13 +734,15 @@ public partial class Form2 : Form
 
                 if (e.KeyValue == (uint)Keys.W)
                 {
-                    切智力腿(全局图像);
+                    var bp = new Bitmap(全局图像);
+                    切智力腿(GetBitmapByte(bp), bp.Size);
                     中断条件 = false;
                     条件1 = true;
                 }
                 else if (e.KeyValue == (uint)Keys.R)
                 {
-                    切智力腿(全局图像);
+                    var bp = new Bitmap(全局图像);
+                    切智力腿(GetBitmapByte(bp), bp.Size);
                     中断条件 = false;
                     条件2 = true;
                 }
@@ -1221,11 +1223,13 @@ public partial class Form2 : Form
                 }
                 else if (e.KeyValue == (uint)Keys.R)
                 {
-                    大招前纷争(new Bitmap(全局图像));
+                    var bp = new Bitmap(全局图像);
+                    大招前纷争(GetBitmapByte(bp), bp.Size);
                 }
                 else if (e.KeyValue == (uint)Keys.D2)
                 {
-                    推推破林肯秒羊(new Bitmap(全局图像));
+                    var bp = new Bitmap(全局图像);
+                    推推破林肯秒羊(GetBitmapByte(bp), bp.Size);
                     KeyPress((uint)Keys.W);
                 }
             }
@@ -1424,10 +1428,12 @@ public partial class Form2 : Form
     private GetBitmap getBitmap;
 
     /// <summary>
-    ///     条件委托图片
+    /// 
     /// </summary>
-    /// <param name="bp"></param>
-    private delegate bool condition_delegate_bitmap(Bitmap bp);
+    /// <param name="bytes"></param>
+    /// <param name="size"></param>
+    /// <returns></returns>
+    private delegate bool condition_delegate_bitmap(byte[] bytes, Size size);
 
     /// <summary>
     ///     条件1委托
@@ -1640,11 +1646,8 @@ public partial class Form2 : Form
 
     #region 斧王
 
-    private static bool 跳吼(Bitmap bp)
+    private static bool 跳吼(byte[] bts, Size size)
     {
-        var bts = GetBitmapByte(bp);
-        var size = bp.Size;
-
         if (RegPicture(Resource_Picture.物品_刃甲, bts, size))
             KeyPress((uint)Keys.Z);
         //Delay(30);
@@ -1664,11 +1667,8 @@ public partial class Form2 : Form
         return true;
     }
 
-    private static bool 战斗饥渴取消后摇(Bitmap bp)
+    private static bool 战斗饥渴取消后摇(byte[] bts, Size size)
     {
-        var bts = GetBitmapByte(bp);
-        var size = bp.Size;
-
         var s_time = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds();
 
         // 检测刚释放完毕
@@ -1898,21 +1898,18 @@ public partial class Form2 : Form
 
     #region 钢背
 
-    private bool 鼻涕针刺循环(Bitmap bp)
+    private bool 鼻涕针刺循环(byte[] bts, Size size)
     {
         bool 是否魔晶, 是否A杖;
 
-        var bts = GetBitmapByte(bp);
-        var size = bp.Size;
-
         var x = 750;
         var y = 856;
-        var q5 = bp.GetPixel(775 - x, 994 - y);
-        var q4 = bp.GetPixel(807 - x, 994 - y);
-        var w5 = bp.GetPixel(839 - x, 994 - y);
-        var w4 = bp.GetPixel(871 - x, 994 - y);
-        是否魔晶 = 阿哈利姆魔晶(bp);
-        是否A杖 = 阿哈利姆神杖(bp);
+        var q5 = GetPixelBytes(bts, size, 775 - x, 994 - y);
+        var q4 = GetPixelBytes(bts, size, 807 - x, 994 - y);
+        var w5 = GetPixelBytes(bts, size, 839 - x, 994 - y);
+        var w4 = GetPixelBytes(bts, size, 871 - x, 994 - y);
+        是否魔晶 = 阿哈利姆魔晶(bts, size);
+        是否A杖 = 阿哈利姆神杖(bts, size);
 
         if (循环条件1)
         {
@@ -2121,10 +2118,10 @@ public partial class Form2 : Form
         切敏捷腿();
     }
 
-    private static void 魂戒魔棒智力(Bitmap bp)
+    private static void 魂戒魔棒智力(byte[] bts, Size size)
     {
         Delay(100);
-        切智力腿(bp);
+        切智力腿(bts, size);
     }
 
     #endregion
@@ -2684,9 +2681,9 @@ public partial class Form2 : Form
 
     #region 赏金
 
-    private static bool 飞镖接平A(Bitmap bp)
+    private static bool 飞镖接平A(byte[] bts, Size size)
     {
-        if (RegPicture(Resource_Picture.赏金_释放飞镖, bp) || RegPicture(Resource_Picture.赏金_释放飞镖_双刀, bp))
+        if (RegPicture(Resource_Picture.赏金_释放飞镖, bts, size) || RegPicture(Resource_Picture.赏金_释放飞镖_双刀, bts, size))
         {
             Delay(105);
             RightClick();
@@ -2696,9 +2693,9 @@ public partial class Form2 : Form
         return true;
     }
 
-    private static bool 标记去后摇(Bitmap bp)
+    private static bool 标记去后摇(byte[] bts, Size size)
     {
-        if (RegPicture(Resource_Picture.赏金_释放标记, bp) || RegPicture(Resource_Picture.赏金_释放标记_不朽, bp))
+        if (RegPicture(Resource_Picture.赏金_释放标记, bts, size) || RegPicture(Resource_Picture.赏金_释放标记_不朽, bts, size))
         {
             Delay(110);
             RightClick();
@@ -2712,19 +2709,19 @@ public partial class Form2 : Form
 
     #region 剧毒
 
-    private bool 循环蛇棒(Bitmap bp)
+    private bool 循环蛇棒(byte[] bts,Size size)
     {
         var x = 750;
         var y = 856;
 
-        if (ColorAEqualColorB(bp.GetPixel(942 - x, 989 - y), Color.FromArgb(255, 153, 161, 70), 29)) // (942,989)
+        if (ColorAEqualColorB(GetPixelBytes(bts, size, 942 - x, 989 - y), Color.FromArgb(255, 153, 161, 70), 29)) // (942,989)
         {
             KeyPress((uint)Keys.E);
             Delay(30);
         }
         else
         {
-            if (RegPicture(Resource_Picture.剧毒_蛇棒_CD_不朽, bp) || RegPicture(Resource_Picture.剧毒_蛇棒_CD, bp))
+            if (RegPicture(Resource_Picture.剧毒_蛇棒_CD_不朽, bts, size) || RegPicture(Resource_Picture.剧毒_蛇棒_CD, bts, size))
             {
                 KeyPress((uint)Keys.E);
                 Delay(30);
@@ -2734,9 +2731,9 @@ public partial class Form2 : Form
         return 循环条件1;
     }
 
-    private static bool 蛇棒去后摇(Bitmap bp)
+    private static bool 蛇棒去后摇(byte[] bts, Size size)
     {
-        if (!RegPicture(Resource_Picture.剧毒_蛇棒_CD_不朽, bp) && !RegPicture(Resource_Picture.剧毒_蛇棒_CD, bp))
+        if (!RegPicture(Resource_Picture.剧毒_蛇棒_CD_不朽, bts, size) && !RegPicture(Resource_Picture.剧毒_蛇棒_CD, bts, size))
         {
             //KeyDown((uint)Keys.LControlKey);
             //KeyDown((uint)Keys.A);
@@ -2750,11 +2747,11 @@ public partial class Form2 : Form
         return true;
     }
 
-    private static bool 瘴气去后摇(Bitmap bp)
+    private static bool 瘴气去后摇(byte[] bts, Size size)
     {
         var x = 750;
         var y = 856;
-        var c = bp.GetPixel(820 - x, 957 - y); // (820,957)
+        var c = GetPixelBytes(bts, size, 820 - x, 957 - y); // (820,957)
 
         if (c.Equals(Color.FromArgb(255, 193, 207, 21))) return true; // 不朽CD好颜色
         if (c.Equals(Color.FromArgb(255, 68, 39, 23))) return true; // 普通CD好颜色
@@ -2772,11 +2769,11 @@ public partial class Form2 : Form
         return true;
     }
 
-    private static bool 剧毒新星去后摇(Bitmap bp)
+    private static bool 剧毒新星去后摇(byte[] bts, Size size)
     {
         var x = 750;
         var y = 856;
-        var c = bp.GetPixel(1016 - x, 957 - y); // (1016,957)
+        var c = GetPixelBytes(bts, size, 1016 - x, 957 - y); // (1016,957)
         // 剧毒新星最佳匹配
         if (ColorAEqualColorB(c, Color.FromArgb(255, 74, 78, 52))) // 最短值5
         {
@@ -2790,26 +2787,26 @@ public partial class Form2 : Form
     #endregion
 
     #region 美杜莎
-    private static bool 秘术异蛇去后摇(Bitmap bp)
+    private static bool 秘术异蛇去后摇(byte[] bts, Size size)
     {
-        if (RegPicture(Resource_Picture.美杜莎_释放秘术异蛇, bp) || RegPicture(Resource_Picture.美杜莎_释放秘术异蛇_5, bp))
+        if (RegPicture(Resource_Picture.美杜莎_释放秘术异蛇, bts, size) || RegPicture(Resource_Picture.美杜莎_释放秘术异蛇_5, bts, size))
         {
             Delay(60);
             RightClick();
-            切敏捷腿(bp);
+            切敏捷腿(bts, size);
             return false;
         }
 
         return true;
     }
 
-    private static bool 石化凝视去后摇(Bitmap bp)
+    private static bool 石化凝视去后摇(byte[] bts, Size size)
     {
-        if (RegPicture(Resource_Picture.美杜莎_释放石化凝视, bp) || RegPicture(Resource_Picture.美杜莎_释放石化凝视_5, bp))
+        if (RegPicture(Resource_Picture.美杜莎_释放石化凝视, bts, size) || RegPicture(Resource_Picture.美杜莎_释放石化凝视_5, bts, size))
         {
             Delay(120);
             RightClick();
-            切敏捷腿(bp);
+            切敏捷腿(bts, size);
             return false;
         }
 
@@ -2981,9 +2978,9 @@ public partial class Form2 : Form
 
     #region 火女
 
-    private static bool 龙破斩去后摇(Bitmap bp)
+    private static bool 龙破斩去后摇(byte[] bts, Size size)
     {
-        if (RegPicture(Resource_Picture.火女_释放龙破斩, bp))
+        if (RegPicture(Resource_Picture.火女_释放龙破斩, bts, size))
         {
             Delay(120);
             RightClick(); // 移动反应更快，更好检测最短延时
@@ -2993,9 +2990,9 @@ public partial class Form2 : Form
         return true;
     }
 
-    private static bool 光击阵去后摇(Bitmap bp)
+    private static bool 光击阵去后摇(byte[] bts, Size size)
     {
-        if (RegPicture(Resource_Picture.火女_释放光击阵, bp))
+        if (RegPicture(Resource_Picture.火女_释放光击阵, bts, size))
         {
             Delay(120);
             RightClick(); // 移动反应更快，更好检测最短延时
@@ -3005,9 +3002,9 @@ public partial class Form2 : Form
         return true;
     }
 
-    private static bool 神灭斩去后摇(Bitmap bp)
+    private static bool 神灭斩去后摇(byte[] bts, Size size)
     {
-        if (RegPicture(Resource_Picture.火女_释放神灭斩, bp))
+        if (RegPicture(Resource_Picture.火女_释放神灭斩, bts, size))
         {
             Delay(120);
             RightClick(); // 移动反应更快，更好检测最短延时
@@ -3021,9 +3018,9 @@ public partial class Form2 : Form
 
     #region 蓝猫
 
-    private static bool 拉接平A(Bitmap bp)
+    private static bool 拉接平A(byte[] bts, Size size)
     {
-        if (RegPicture(Resource_Picture.蓝猫_释放电子漩涡, bp))
+        if (RegPicture(Resource_Picture.蓝猫_释放电子漩涡, bts, size))
         {
             Delay(115);
             //RightClick();
@@ -3040,9 +3037,9 @@ public partial class Form2 : Form
         KeyPress((uint)Keys.A);
     }
 
-    private static bool 滚接平A(Bitmap bp)
+    private static bool 滚接平A(byte[] bts, Size size)
     {
-        if (RegPicture(Resource_Picture.蓝猫_释放球状闪电_红, bp) || RegPicture(Resource_Picture.蓝猫_释放球状闪电, bp))
+        if (RegPicture(Resource_Picture.蓝猫_释放球状闪电_红, bts, size) || RegPicture(Resource_Picture.蓝猫_释放球状闪电, bts, size))
         {
             Delay(117);
             //RightClick();
@@ -3485,44 +3482,44 @@ public partial class Form2 : Form
 
     #region 天怒
 
-    private bool 循环奥数鹰隼(Bitmap bp)
+    private bool 循环奥数鹰隼(byte[] bts, Size size)
     {
-        if (RegPicture(Resource_Picture.天怒_魔法鹰隼_金饰品, bp)) KeyPress((uint)Keys.Q);
+        if (RegPicture(Resource_Picture.天怒_魔法鹰隼_金饰品, bts, size)) KeyPress((uint)Keys.Q);
 
         return 循环条件1;
     }
 
-    private bool 天怒秒人连招(Bitmap bp)
+    private bool 天怒秒人连招(byte[] bts, Size size)
     {
-        if (RegPicture(Resource_Picture.物品_血精石_4, bp))
+        if (RegPicture(Resource_Picture.物品_血精石_4, bts, size))
         {
             KeyPress((uint)Keys.B);
             Delay(20);
             return true;
         }
 
-        if (RegPicture(Resource_Picture.物品_虚灵之刃_4, bp))
+        if (RegPicture(Resource_Picture.物品_虚灵之刃_4, bts, size))
         {
             KeyPress((uint)Keys.X);
             Delay(20);
             return true;
         }
 
-        if (RegPicture(Resource_Picture.物品_羊刀_4, bp))
+        if (RegPicture(Resource_Picture.物品_羊刀_4, bts, size))
         {
             KeyPress((uint)Keys.Z);
             Delay(20);
             return true;
         }
 
-        if (RegPicture(Resource_Picture.物品_阿托斯之棍_4, bp) || RegPicture(Resource_Picture.物品_缚灵锁_4, bp))
+        if (RegPicture(Resource_Picture.物品_阿托斯之棍_4, bts, size) || RegPicture(Resource_Picture.物品_缚灵锁_4, bts, size))
         {
             KeyPress((uint)Keys.Space);
             Delay(20);
             return true;
         }
 
-        if (RegPicture(Resource_Picture.物品_纷争, bp))
+        if (RegPicture(Resource_Picture.物品_纷争, bts, size))
         {
             KeyPress((uint)Keys.C);
             Delay(20);
@@ -3532,21 +3529,21 @@ public partial class Form2 : Form
         KeyPress((uint)Keys.W);
 
 
-        if (RegPicture(Resource_Picture.天怒_魔法鹰隼_金饰品, bp))
+        if (RegPicture(Resource_Picture.天怒_魔法鹰隼_金饰品, bts, size))
         {
             KeyPress((uint)Keys.Q);
             Delay(20);
             return true;
         }
 
-        if (RegPicture(Resource_Picture.天怒_上古封印, bp))
+        if (RegPicture(Resource_Picture.天怒_上古封印, bts, size))
         {
             KeyPress((uint)Keys.E);
             Delay(20);
             return true;
         }
 
-        if (RegPicture(Resource_Picture.天怒_神秘之耀, bp))
+        if (RegPicture(Resource_Picture.天怒_神秘之耀, bts, size))
         {
             KeyPress((uint)Keys.R);
             Delay(20);
@@ -3709,9 +3706,9 @@ public partial class Form2 : Form
 
     #region 莱恩
 
-    private bool 莱恩羊接技能(Bitmap bp)
+    private bool 莱恩羊接技能(byte[] bts, Size size)
     {
-        if (!RegPicture(Resource_Picture.莱恩_羊, bp) && !RegPicture(Resource_Picture.莱恩_羊_鱼, bp))
+        if (!RegPicture(Resource_Picture.莱恩_羊, bts, size) && !RegPicture(Resource_Picture.莱恩_羊_鱼, bts, size))
         {
             if (条件4)
                 KeyPress((uint)Keys.E);
@@ -3723,10 +3720,10 @@ public partial class Form2 : Form
         return true;
     }
 
-    private static bool 大招前纷争(Bitmap bp)
+    private static bool 大招前纷争(byte[] bts, Size size)
     {
         // 纷争放在C键
-        if (RegPicture(Resource_Picture.物品_纷争, bp))
+        if (RegPicture(Resource_Picture.物品_纷争, bts, size))
         {
             KeyPress((uint)Keys.C);
             return false;
@@ -3735,10 +3732,10 @@ public partial class Form2 : Form
         return true;
     }
 
-    private static bool 推推破林肯秒羊(Bitmap bp)
+    private static bool 推推破林肯秒羊(byte[] bts, Size size)
     {
         // 纷争放在C键
-        if (RegPicture(Resource_Picture.物品_推推棒, bp))
+        if (RegPicture(Resource_Picture.物品_推推棒, bts, size))
         {
             KeyPress((uint)Keys.X);
             return false;
@@ -3762,25 +3759,26 @@ public partial class Form2 : Form
 
                 if (中断条件) continue; // 中断则跳过循环
 
-                using var bp = new Bitmap(全局图像);
+                var bts = GetBitmapByte(全局图像);
+                var size = 全局图像.Size;
 
                 if (条件1 && 条件根据图片委托1 != null)
-                    await Task.Run(() => { 条件1 = 条件根据图片委托1(bp); });
+                    await Task.Run(() => { 条件1 = 条件根据图片委托1(bts, size); });
 
                 if (条件2 && 条件根据图片委托2 != null)
-                    await Task.Run(() => { 条件2 = 条件根据图片委托2(bp); });
+                    await Task.Run(() => { 条件2 = 条件根据图片委托2(bts, size); });
 
                 if (条件3 && 条件根据图片委托3 != null)
-                    await Task.Run(() => { 条件3 = 条件根据图片委托3(bp); });
+                    await Task.Run(() => { 条件3 = 条件根据图片委托3(bts, size); });
 
                 if (条件4 && 条件根据图片委托4 != null)
-                    await Task.Run(() => { 条件4 = 条件根据图片委托4(bp); });
+                    await Task.Run(() => { 条件4 = 条件根据图片委托4(bts, size); });
 
                 if (条件5 && 条件根据图片委托5 != null)
-                    await Task.Run(() => { 条件5 = 条件根据图片委托5(bp); });
+                    await Task.Run(() => { 条件5 = 条件根据图片委托5(bts, size); });
 
                 if (条件6 && 条件根据图片委托6 != null)
-                    await Task.Run(() => { 条件6 = 条件根据图片委托6(bp); });
+                    await Task.Run(() => { 条件6 = 条件根据图片委托6(bts, size); });
             }
     }
 
@@ -3840,9 +3838,9 @@ public partial class Form2 : Form
 
     #region 快速回城
 
-    private static bool 快速回城(Bitmap bp)
+    private static bool 快速回城(byte[] bts, Size size)
     {
-        if (!RegPicture(Resource_Picture.物品_TP效果, bp))
+        if (!RegPicture(Resource_Picture.物品_TP效果, bts, size))
         {
             KeyPress((uint)Keys.T);
             Delay(30);
@@ -3892,11 +3890,11 @@ public partial class Form2 : Form
 
     #region 魂戒力量智力
 
-    private static bool 魂戒力量智力(Bitmap bp)
+    private static bool 魂戒力量智力(byte[] bts ,Size size)
     {
-        if (RegPicture(Resource_Picture.物品_魂戒CD, bp))
+        if (RegPicture(Resource_Picture.物品_魂戒CD, bts, size))
         {
-            切力量腿(bp);
+            切力量腿(bts, size);
             KeyPress((uint)Keys.X);
             KeyPress((uint)Keys.V);
             return false;
@@ -4239,11 +4237,8 @@ public partial class Form2 : Form
     }
 
 
-    private static bool 切敏捷腿(Bitmap bp)
+    private static bool 切敏捷腿(byte[] parByte, Size size)
     {
-        var parByte = GetBitmapByte(bp);
-        var size = bp.Size;
-
         if (RegPicture(Resource_Picture.物品_假腿_力量腿, parByte,size)
             || RegPicture(Resource_Picture.物品_假腿_力量腿_5, parByte, size)
             || RegPicture(Resource_Picture.物品_假腿_力量腿_6, parByte, size)
@@ -4263,11 +4258,8 @@ public partial class Form2 : Form
         return true;
     }
 
-    private static bool 切智力腿(Bitmap bp)
+    private static bool 切智力腿(byte[] parByte, Size size)
     {
-        var parByte = GetBitmapByte(bp);
-        var size = bp.Size;
-
         if (RegPicture(Resource_Picture.物品_假腿_力量腿, parByte, size)
             || RegPicture(Resource_Picture.物品_假腿_力量腿_5, parByte, size)
             || RegPicture(Resource_Picture.物品_假腿_力量腿_6, parByte, size)
@@ -4287,11 +4279,8 @@ public partial class Form2 : Form
         return true;
     }
 
-    private static bool 切力量腿(Bitmap bp)
+    private static bool 切力量腿(byte[] parByte, Size size)
     {
-        var parByte = GetBitmapByte(bp);
-        var size = bp.Size;
-
         if (RegPicture(Resource_Picture.物品_假腿_敏捷腿, parByte, size)
             || RegPicture(Resource_Picture.物品_假腿_敏捷腿_5, parByte, size)
             || RegPicture(Resource_Picture.物品_假腿_敏捷腿_6, parByte, size)
@@ -4359,34 +4348,34 @@ public partial class Form2 : Form
     /// </summary>
     /// <param name="bp">指定图片</param>
     /// <returns></returns>
-    private static bool 阿哈利姆神杖(Bitmap bp)
+    private static bool 阿哈利姆神杖(byte[] bts, Size size)
     {
         var x = 750;
         var y = 856;
 
         var 技能点颜色 = Color.FromArgb(255, 32, 183, 249);
-        if (bp.GetPixel(1078 - x, 958 - y).Equals(技能点颜色))
+        if (GetPixelBytes(bts, size, 1078 - x, 958 - y).Equals(技能点颜色))
             return true;
         // 4技能A杖
 
         技能点颜色 = Color.FromArgb(255, 30, 188, 252);
-        if (bp.GetPixel(1094 - x, 960 - y).Equals(技能点颜色))
+        if (GetPixelBytes(bts, size, 1094 - x, 960 - y).Equals(技能点颜色))
             return true;
         // 5技能A杖
 
         技能点颜色 = Color.FromArgb(255, 30, 189, 253);
-        if (bp.GetPixel(1110 - x, 960 - y).Equals(技能点颜色))
+        if (GetPixelBytes(bts, size, 1110 - x, 960 - y).Equals(技能点颜色))
             return true;
         // 5技能A杖
 
         技能点颜色 = Color.FromArgb(255, 31, 188, 253);
 
-        if (bp.GetPixel(1143 - x, 959 - y).Equals(技能点颜色))
+        if (GetPixelBytes(bts, size, 1143 - x, 959 - y).Equals(技能点颜色))
             return true;
         // 8技能A杖
 
         技能点颜色 = Color.FromArgb(255, 30, 187, 250);
-        return bp.GetPixel(1122 - x, 959 - y).Equals(技能点颜色);
+        return GetPixelBytes(bts, size, 1122 - x, 959 - y).Equals(技能点颜色);
         // 6技能A杖
     }
 
@@ -4394,43 +4383,43 @@ public partial class Form2 : Form
     /// </summary>
     /// <param name="bp">指定图片</param>
     /// <returns></returns>
-    private static bool 阿哈利姆魔晶(Bitmap bp)
+    private static bool 阿哈利姆魔晶(byte[] bts, Size size)
     {
         var x = 750;
         var y = 856;
 
         var 技能点颜色 = Color.FromArgb(255, 34, 186, 254);
 
-        if (bp.GetPixel(1094 - x, 995 - y).Equals(技能点颜色))
+        if (GetPixelBytes(bts, size, 1094 - x, 995 - y).Equals(技能点颜色))
             return true;
         // 7技能魔晶
 
         技能点颜色 = Color.FromArgb(255, 29, 188, 255);
 
-        if (bp.GetPixel(1144 - x, 993 - y).Equals(技能点颜色))
+        if (GetPixelBytes(bts, size, 1144 - x, 993 - y).Equals(技能点颜色))
             return true;
         // 8技能魔晶
 
         技能点颜色 = Color.FromArgb(255, 29, 187, 255);
 
-        if (bp.GetPixel(1110 - x, 994 - y).Equals(技能点颜色))
+        if (GetPixelBytes(bts, size, 1110 - x, 994 - y).Equals(技能点颜色))
             return true;
         // 6技能魔晶无A
 
         技能点颜色 = Color.FromArgb(255, 28, 187, 255);
 
-        if (bp.GetPixel(1121 - x, 993 - y).Equals(技能点颜色))
+        if (GetPixelBytes(bts, size, 1121 - x, 993 - y).Equals(技能点颜色))
             return true;
         // 6技能魔晶A
 
         技能点颜色 = Color.FromArgb(255, 28, 187, 255);
 
-        if (bp.GetPixel(1077 - x, 993 - y).Equals(技能点颜色))
+        if (GetPixelBytes(bts, size, 1077 - x, 993 - y).Equals(技能点颜色))
             return true;
         // 4技能魔晶
 
         技能点颜色 = Color.FromArgb(255, 30, 187, 254);
-        return bp.GetPixel(1111 - x, 994 - y).Equals(技能点颜色);
+        return GetPixelBytes(bts, size, 1111 - x, 994 - y).Equals(技能点颜色);
         // 5技能魔晶
     }
 
@@ -4949,6 +4938,17 @@ public partial class Form2 : Form
 
     #endregion
 
+    #region 返回数组对应颜色
+
+    private static Color GetPixelBytes(byte[] bts, Size size, int x, int y)
+    {
+        var subIndex = x * size.Width * 4 + y * 4;
+        return Color.FromArgb(bts[subIndex + 3], bts[subIndex + 2],
+            bts[subIndex + 1], bts[subIndex]);
+    }
+
+    #endregion
+
     #endregion
 
     #region 记录买活
@@ -5176,7 +5176,6 @@ public partial class Form2 : Form
 
         //string str = string.Empty;
 
-
         Stopwatch stopWatch = new();
 
         stopWatch.Start();
@@ -5210,14 +5209,15 @@ public partial class Form2 : Form
         //if (Bitmap == null) Bitmap = new Bitmap(653, 182);
         //CaptureScreen(750, 856, ref Bitmap);
 
-        Bitmap bp = new Bitmap(653, 182);
-        CaptureScreen(0, 0, ref bp);
 
-        Stopwatch stopWatch1 = new();
+        //Bitmap bp = new Bitmap(653, 182);
+        //CaptureScreen(0, 0, ref bp);
 
-        stopWatch1.Start();
+        //Stopwatch stopWatch1 = new();
 
-        RegPicture(Resource_Picture.物品_纷争, bp);
+        //stopWatch1.Start();
+
+        //RegPicture(Resource_Picture.物品_纷争, bp);
 
         //object balanceLock = new object();
 
@@ -5247,11 +5247,11 @@ public partial class Form2 : Form
         //    //}
         //});
 
-        stopWatch1.Stop();
+        //stopWatch1.Stop();
 
         //tb_y.Text = o.ToString();
 
-        tb_x.Text = string.Concat("单体用时", stopWatch1.ElapsedMilliseconds);
+        //tb_x.Text = string.Concat("单体用时", stopWatch1.ElapsedMilliseconds);
 
         //// 识别时间
         //if (Bitmap == null) Bitmap = new Bitmap(44, 14);
