@@ -1013,9 +1013,69 @@ namespace Dota2Simulator.Picture_Dota2 {
         /// <summary>
         ///   查找 System.Drawing.Bitmap 类型的本地化资源。
         /// </summary>
+        internal static System.Drawing.Bitmap 炸弹人_图标 {
+            get {
+                object obj = ResourceManager.GetObject("炸弹人_图标", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
+        /// </summary>
+        internal static System.Drawing.Bitmap 炸弹人_炸弹1 {
+            get {
+                object obj = ResourceManager.GetObject("炸弹人_炸弹1", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
+        /// </summary>
+        internal static System.Drawing.Bitmap 炸弹人_炸弹2 {
+            get {
+                object obj = ResourceManager.GetObject("炸弹人_炸弹2", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
+        /// </summary>
+        internal static System.Drawing.Bitmap 炸弹人_炸弹3 {
+            get {
+                object obj = ResourceManager.GetObject("炸弹人_炸弹3", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
+        /// </summary>
+        internal static System.Drawing.Bitmap 炸弹人_释放爆破起飞 {
+            get {
+                object obj = ResourceManager.GetObject("炸弹人_释放爆破起飞", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
+        /// </summary>
         internal static System.Drawing.Bitmap 物品_TP效果 {
             get {
                 object obj = ResourceManager.GetObject("物品_TP效果", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
+        /// </summary>
+        internal static System.Drawing.Bitmap 物品_以太_5 {
+            get {
+                object obj = ResourceManager.GetObject("物品_以太_5", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -1323,6 +1383,16 @@ namespace Dota2Simulator.Picture_Dota2 {
         /// <summary>
         ///   查找 System.Drawing.Bitmap 类型的本地化资源。
         /// </summary>
+        internal static System.Drawing.Bitmap 物品_玲珑心_5 {
+            get {
+                object obj = ResourceManager.GetObject("物品_玲珑心_5", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
+        /// </summary>
         internal static System.Drawing.Bitmap 物品_相位 {
             get {
                 object obj = ResourceManager.GetObject("物品_相位", resourceCulture);
@@ -1366,6 +1436,16 @@ namespace Dota2Simulator.Picture_Dota2 {
         internal static System.Drawing.Bitmap 物品_纷争 {
             get {
                 object obj = ResourceManager.GetObject("物品_纷争", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
+        /// </summary>
+        internal static System.Drawing.Bitmap 物品_纷争_5 {
+            get {
+                object obj = ResourceManager.GetObject("物品_纷争_5", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -1996,6 +2076,16 @@ namespace Dota2Simulator.Picture_Dota2 {
         internal static System.Drawing.Bitmap 虚空_释放时间膨胀_5 {
             get {
                 object obj = ResourceManager.GetObject("虚空_释放时间膨胀_5", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
+        /// </summary>
+        internal static System.Drawing.Bitmap 血量_敌人等级底色 {
+            get {
+                object obj = ResourceManager.GetObject("血量_敌人等级底色", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

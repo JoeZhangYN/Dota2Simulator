@@ -11,6 +11,7 @@ using static Dota2Simulator.OCR;
 using static Dota2Simulator.PictureProcessing;
 using static Dota2Simulator.SetWindowTop;
 using Dota2Simulator.KeyboardMouse;
+using System.Collections.Generic;
 
 namespace Dota2Simulator;
 
@@ -100,26 +101,6 @@ public partial class Form2 : Form
                     label1.Text = "E";
 
                     Task.Run(决斗);
-                }
-                else if (e.KeyValue == (uint)Keys.D1)
-                {
-                    mod_int = 1;
-                    TTS.Speak("左下决斗");
-                }
-                else if (e.KeyValue == (uint)Keys.D2)
-                {
-                    mod_int = 2;
-                    TTS.Speak("左上决斗");
-                }
-                else if (e.KeyValue == (uint)Keys.D3)
-                {
-                    mod_int = 3;
-                    TTS.Speak("右下决斗");
-                }
-                else if (e.KeyValue == (uint)Keys.D4)
-                {
-                    mod_int = 4;
-                    TTS.Speak("右上决斗");
                 }
             }
 
@@ -1139,7 +1120,35 @@ public partial class Form2 : Form
 
             else if (tb_name.Text.Trim() == "炸弹人")
             {
-                if (e.KeyValue == (uint)Keys.D2) 魂戒丢装备();
+                if (!总循环条件)
+                {
+                    总循环条件 = true;
+                    无物品状态初始化();
+                }
+
+                if (条件根据图片委托1 == null)
+                    条件根据图片委托1 = 爆破后接3雷粘性炸弹;
+
+                if (e.KeyValue == (uint)Keys.D2)
+                {
+                    中断条件 = false;
+                    条件1 = true;
+
+                    if (RegPicture(Resource_Picture.物品_纷争_7, 全局bytes, 全局size))
+                    {
+                        KeyPress('z');
+                    }
+                    if (RegPicture(Resource_Picture.物品_魂戒CD_5, 全局bytes, 全局size))
+                    {
+                        KeyPress('x');
+                    }
+                    KeyPress('e');
+                }
+                else if (e.KeyValue == (uint)Keys.S)
+                {
+                    中断条件 = true;
+                    条件1 = false;
+                }
             }
 
             #endregion
@@ -1295,6 +1304,14 @@ public partial class Form2 : Form
                     tb_状态抗性.Text = "";
                     tb_丢装备.Text = "";
                     捕捉颜色();
+                }
+            }
+
+            else if (tb_name.Text.Trim() == "测试截图")
+            {
+                if (e.KeyValue == (uint)Keys.X)
+                {
+                    捕捉颜色截图();
                 }
             }
 
@@ -1744,38 +1761,8 @@ public partial class Form2 : Form
         if (mod_int == 0)
         {
             KeyPress((uint)Keys.Space);
-        }
-        else if (mod_int == 1)
-        {
-            var point = MousePosition;
-            MouseMove(point.X - 50, point.Y + 50);
-            KeyPress((uint)Keys.Space);
-            Delay(5);
-            MouseMove(point.X, point.Y);
-        }
-        else if (mod_int == 2)
-        {
-            var point = MousePosition;
-            MouseMove(point.X - 50, point.Y - 50);
-            KeyPress((uint)Keys.Space);
-            Delay(5);
-            MouseMove(point.X, point.Y);
-        }
-        else if (mod_int == 3)
-        {
-            var point = MousePosition;
-            MouseMove(point.X + 50, point.Y + 50);
-            KeyPress((uint)Keys.Space);
-            Delay(5);
-            MouseMove(point.X, point.Y);
-        }
-        else if (mod_int == 4)
-        {
-            var point = MousePosition;
-            MouseMove(point.X + 50, point.Y - 50);
-            KeyPress((uint)Keys.Space);
-            Delay(5);
-            MouseMove(point.X, point.Y);
+            //Delay(100);
+            快速选择敌方英雄();
         }
 
         持续使用装备直到超时(Resource_Picture.物品_否决, 150);
@@ -1791,7 +1778,7 @@ public partial class Form2 : Form
         while (RegPicture(Resource_Picture.军团_决斗CD, "R"))
         {
             KeyPress((uint)Keys.R);
-            Delay(30);
+            快速选择敌方英雄();
 
             if (new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds() - time > 450) break;
         }
@@ -3556,11 +3543,51 @@ public partial class Form2 : Form
 
     #region 炸弹人
 
-    private void 魂戒丢装备()
+    private bool 爆破后接3雷粘性炸弹(byte[] bts,Size size)
     {
-        批量扔装备();
-        KeyPress((uint)Keys.Space);
-        捡装备();
+        if (RegPicture(Resource_Picture.炸弹人_释放爆破起飞, bts, size))
+        {
+            Delay(995);
+
+            if (RegPicture(Resource_Picture.物品_以太_5,bts, size) || RegPicture(Resource_Picture.物品_玲珑心_5, bts, size))
+            {
+
+            }
+            else
+            {
+                //var x = MousePosition.X;
+                //var y = MousePosition.Y;
+
+                //Delay(175);
+                //MouseMove(x - 188, y + 50);
+                //KeyPress('r');
+
+                //MouseMove(619, 1002);
+                //KeyPress('h');
+
+                //KeyPress((uint)Keys.F1);
+                //KeyPress((uint)Keys.F1);
+
+                //Delay(175);
+                //KeyPress('r');
+
+                //MouseMove(790, 385);
+                //Delay(175);
+                //KeyPress('r');
+                //Delay(175);
+                //KeyPress('r');
+
+                //MouseMove(1041, 331);
+                //Delay(175);
+                ////MouseMove(x + 90, y - 35);
+                ////KeyPress('r');
+                //KeyPress('r');
+            }
+
+            return false;
+        }
+
+        return true;
     }
 
     #endregion
@@ -4924,6 +4951,19 @@ public partial class Form2 : Form
         return new Point(-1, -1);
     }
 
+    private static List<Point> RegPicturePoint(Bitmap bp, byte[] btys, Size size, double matchRate = 0.9)
+    {
+        try
+        {
+            return FindBytesParallel(GetBitmapByte(bp), bp.Size, btys, size, matchRate: matchRate);
+        }
+        catch
+        {
+        }
+
+        return new List<Point>();
+    }
+
     #endregion
 
     #region 返回图片颜色数组
@@ -5170,6 +5210,61 @@ public partial class Form2 : Form
 
     #endregion
 
+    #region 快速选择敌方英雄
+    /// <summary>
+    ///     基本需要时间 50ms 左右
+    /// </summary>
+    /// <param name="width"></param>
+    /// <param name="hight"></param>
+    /// <param name="type"></param>
+    /// <returns></returns>
+    private static bool 快速选择敌方英雄(int width = 1920, int hight = 1080, int type = 0)
+    {
+        var p = MousePosition;
+
+        //var x = p.X - (width / 2) < 0 ? 0 : p.X + (width / 2) > 1920 ? 0 : p.X - (width / 2);
+        //var y = p.Y - (hight / 2) < 0 ? 0 : p.Y + (hight / 2) > 1080 ? 0 : p.Y - (hight / 2);
+
+        var x = 0;
+        var y = 0;
+
+        var bp = new Bitmap(width, hight);
+        var size = new Size(width, hight);
+
+        CaptureScreen(x, y, ref bp);
+        var bytes = GetBitmapByte(bp);
+
+        var list = RegPicturePoint(Resource_Picture.血量_敌人等级底色, bytes, size, matchRate: 0.6);
+
+        var 偏移x = 1920;
+        var 偏移y = 1080;
+
+        foreach (var item in list)
+        {
+            if (Math.Abs(item.X + x - p.X) + Math.Abs(item.Y + y - p.Y) < Math.Abs(偏移x) + Math.Abs(偏移y))
+            {
+                偏移x = item.X + x - p.X;
+                偏移y = item.Y + y - p.Y;
+            }
+        }
+
+        if (list.Count > 0)
+        {
+            if (type == 1)
+            {
+                MouseMoveSim(p.X - 45 + 偏移x, p.Y + 80 + 偏移y);
+            }
+            else
+            {
+                MouseMove(p.X - 45 + 偏移x, p.Y + 80 + 偏移y);
+            }
+        }
+
+        return true;
+    }
+
+    #endregion
+
     #endregion
 
     #region 测试_捕捉颜色
@@ -5180,17 +5275,41 @@ public partial class Form2 : Form
 
         stopWatch.Start();
 
-        KeyPress('q');
+        //KeyPress('q');
 
-        for (int i = 0; i < 100; i++)
-        {
-            获取图片_1();
-            苍穹振击取消后摇(全局bytes, 全局size);
-        }
+        //for (int i = 0; i < 100; i++)
+        //{
+        //    获取图片_1();
+        //    苍穹振击取消后摇(全局bytes, 全局size);
+        //}
+
+        快速选择敌方英雄();
+
+        tb_x.Text = string.Concat(MousePosition.X, " ", MousePosition.Y);
 
         stopWatch.Stop();
 
         tb_状态抗性.Text = string.Concat("单体用时", stopWatch.ElapsedMilliseconds);
+    }
+
+    private void 捕捉颜色截图()
+    {
+        MouseMove(69, 178);
+        Delay(300);
+        LeftClick();
+
+        KeyPress((uint)Keys.F2);
+        Delay(1300);
+        KeyPress((uint)Keys.R);
+        Delay(1300);
+        KeyPressControl('s');
+        KeyPress((uint)Keys.Enter);
+        Delay(600);
+
+        for (int i = 0; i < 6; i++)
+        {
+            KeyPress((uint)Keys.Down);
+        }
     }
 
     #endregion
@@ -5291,14 +5410,16 @@ public partial class Form2 : Form
 
     private static void RightClick()
     {
-        KeyboardMouseSimulateDriverAPI.MouseDown((uint)Dota2Simulator.MouseButtons.RightDown);
-        KeyboardMouseSimulateDriverAPI.MouseUp((uint)Dota2Simulator.MouseButtons.RightUp);
+        SimEnigo.Rightlick();
+        //KeyboardMouseSimulateDriverAPI.MouseDown((uint)Dota2Simulator.MouseButtons.RightDown);
+        //KeyboardMouseSimulateDriverAPI.MouseUp((uint)Dota2Simulator.MouseButtons.RightUp);
     }
 
     private static void LeftClick()
     {
-        KeyboardMouseSimulateDriverAPI.MouseDown((uint)Dota2Simulator.MouseButtons.LeftDown);
-        KeyboardMouseSimulateDriverAPI.MouseUp((uint)Dota2Simulator.MouseButtons.LeftUp);
+        SimEnigo.LeftClick();
+        //KeyboardMouseSimulateDriverAPI.MouseDown((uint)Dota2Simulator.MouseButtons.LeftDown);
+        //KeyboardMouseSimulateDriverAPI.MouseUp((uint)Dota2Simulator.MouseButtons.LeftUp);
     }
 
     private static void LeftDown()
@@ -5335,6 +5456,16 @@ public partial class Form2 : Form
         SimEnigo.KeyPress(key);
     }
 
+    private new static void KeyUp(char key)
+    {
+        SimEnigo.KeyUp(key);
+    }
+
+    private new static void KeyDown(char key)
+    {
+        SimEnigo.KeyDown(key);
+    }
+
     private static void KeyPressAlt(char key)
     {
         SimEnigo.KeyPressAlt(key);
@@ -5368,16 +5499,41 @@ public partial class Form2 : Form
         });
     }
 
-    public new static void MouseMove(int X, int Y, bool relative = false)
+    public new static void MouseMove(int x, int y, bool relative = false)
     {
         if (relative)
         {
-            var p = MousePosition;
-            X += p.X;
-            Y += p.Y;
+            SimEnigo.MouseMoveRelative(x, y);
         }
+        else
+        {
+            SimEnigo.MouseMove(x, y);
+        }
+        //if (relative)
+        //{
+        //    var p = MousePosition;
+        //    X += p.X;
+        //    Y += p.Y;
+        //}
 
-        KeyboardMouseSimulateDriverAPI.MouseMove(X, Y, !relative);
+        //KeyboardMouseSimulateDriverAPI.MouseMove(X, Y, !relative);
+    }
+
+    public new static void MouseMoveSim(int X, int Y, bool relative = false)
+    {
+        var p = MousePosition;
+
+        var def_x = (X - p.X) / 15;
+        var def_y = (Y - p.Y) / 15;
+
+        for (int i = 1; i < 15; i++)
+        {
+            Delay(1);
+            SimEnigo.MouseMove(p.X + def_x * i, p.Y + def_y * i);
+            //KeyboardMouseSimulateDriverAPI.MouseMove(p.X + def_x * i, p.Y + def_y * i, !relative);
+        }
+        SimEnigo.MouseMove(X, Y);
+        //KeyboardMouseSimulateDriverAPI.MouseMove(X, Y, !relative);
     }
 
     public new static void MouseMove(Point p, bool relative = false)
@@ -5391,8 +5547,8 @@ public partial class Form2 : Form
             X += p1.X;
             Y += p1.Y;
         }
-
-        KeyboardMouseSimulateDriverAPI.MouseMove(X, Y, !relative);
+        SimEnigo.MouseMove(X, Y);
+        //KeyboardMouseSimulateDriverAPI.MouseMove(X, Y, !relative);
     }
 
     #endregion

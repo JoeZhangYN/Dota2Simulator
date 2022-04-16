@@ -388,7 +388,7 @@ public class PictureProcessing
 
         object balanceLock = new object();
 
-        Parallel.For<Point>(searchLeftTop.X, jMax, () => new Point(), (j, loop, subPoint) => { 
+        Parallel.For<Point>(searchLeftTop.X, jMax, () => new Point(), (j, loop, subPoint) => {
             for (var i = searchLeftTop.Y; i < iMax; i++) {
                 // for (var j = searchLeftTop.X; j < jMax; j++)
 
