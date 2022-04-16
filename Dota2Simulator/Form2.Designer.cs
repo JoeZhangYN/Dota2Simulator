@@ -43,13 +43,14 @@ namespace Dota2Simulator
             this.tb_delay = new System.Windows.Forms.TextBox();
             this.label7 = new System.Windows.Forms.Label();
             this.tb_状态抗性 = new System.Windows.Forms.TextBox();
+            this.button1 = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.SuspendLayout();
             // 
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(8, 141);
+            this.label1.Location = new System.Drawing.Point(8, 143);
             this.label1.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(43, 17);
@@ -63,7 +64,7 @@ namespace Dota2Simulator
             this.tb_name.Name = "tb_name";
             this.tb_name.Size = new System.Drawing.Size(87, 23);
             this.tb_name.TabIndex = 4;
-            this.tb_name.Text = "暗影萨满";
+            this.tb_name.Text = "沉默";
             this.tb_name.TextChanged += new System.EventHandler(this.Tb_name_TextChanged);
             // 
             // tb_丢装备
@@ -77,7 +78,7 @@ namespace Dota2Simulator
             // 
             // pictureBox1
             // 
-            this.pictureBox1.Location = new System.Drawing.Point(8, 162);
+            this.pictureBox1.Location = new System.Drawing.Point(8, 171);
             this.pictureBox1.Margin = new System.Windows.Forms.Padding(4);
             this.pictureBox1.Name = "pictureBox1";
             this.pictureBox1.Size = new System.Drawing.Size(149, 62);
@@ -180,11 +181,22 @@ namespace Dota2Simulator
             this.tb_状态抗性.TabIndex = 15;
             this.tb_状态抗性.Text = "0";
             // 
+            // button1
+            // 
+            this.button1.Location = new System.Drawing.Point(77, 140);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(75, 23);
+            this.button1.TabIndex = 17;
+            this.button1.Text = "测试";
+            this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.button1_Click);
+            // 
             // Form2
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 17F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(173, 233);
+            this.ClientSize = new System.Drawing.Size(173, 246);
+            this.Controls.Add(this.button1);
             this.Controls.Add(this.label7);
             this.Controls.Add(this.tb_状态抗性);
             this.Controls.Add(this.label6);
@@ -225,5 +237,6 @@ namespace Dota2Simulator
         private System.Windows.Forms.TextBox tb_delay;
         private System.Windows.Forms.Label label7;
         private System.Windows.Forms.TextBox tb_状态抗性;
+        private System.Windows.Forms.Button button1;
     }
 }

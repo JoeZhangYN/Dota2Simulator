@@ -187,8 +187,8 @@
   <data name="剧毒_瘴气_CD" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>剧毒_瘴气_cd.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="剧毒_瘴气_CD_不朽" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>剧毒_瘴气_cd_不朽.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="剧毒_瘴气不朽_CD" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>剧毒_瘴气不朽_cd.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="剧毒_蛇棒_CD" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>剧毒_蛇棒_cd.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
@@ -388,6 +388,12 @@
   <data name="水人_释放变体打击_敏捷" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>水人_释放变体打击_敏捷.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="沉默_释放奥数诅咒" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>沉默_释放奥数诅咒.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="沉默_释放遗言" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>沉默_释放遗言.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
   <data name="海民_头像" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>海民_头像.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
@@ -403,8 +409,26 @@
   <data name="火女_释放龙破斩" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>火女_释放龙破斩.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="炸弹人_图标" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>炸弹人_图标.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="炸弹人_炸弹1" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>炸弹人_炸弹1.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="炸弹人_炸弹2" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>炸弹人_炸弹2.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="炸弹人_炸弹3" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>炸弹人_炸弹3.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="炸弹人_释放爆破起飞" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>炸弹人_释放爆破起飞.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
   <data name="物品_TP效果" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>物品_tp效果.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="物品_以太_5" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>物品_以太_5.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="物品_假腿_力量腿" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>物品_假腿_力量腿.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
@@ -496,6 +520,9 @@
   <data name="物品_炎阳_5" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>物品_炎阳_5.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="物品_玲珑心_5" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>物品_玲珑心_5.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
   <data name="物品_相位" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>物品_相位.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
@@ -510,6 +537,9 @@
   </data>
   <data name="物品_纷争" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>物品_纷争.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="物品_纷争_5" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>物品_纷争_5.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="物品_纷争_7" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>物品_纷争_7.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
@@ -699,6 +729,9 @@
   </data>
   <data name="虚空_释放时间膨胀_5" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>虚空_释放时间膨胀_5.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="血量_敌人等级底色" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>血量_敌人等级底色.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="血量_敌人血量" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>血量_敌人血量.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>

@@ -11,6 +11,7 @@ using static Dota2Simulator.OCR;
 using static Dota2Simulator.PictureProcessing;
 using static Dota2Simulator.SetWindowTop;
 using Dota2Simulator.KeyboardMouse;
+using System.Collections.Generic;
 
 namespace Dota2Simulator;
 
@@ -100,26 +101,6 @@ public partial class Form2 : Form
                     label1.Text = "E";
 
                     Task.Run(决斗);
-                }
-                else if (e.KeyValue == (uint)Keys.D1)
-                {
-                    mod_int = 1;
-                    TTS.Speak("左下决斗");
-                }
-                else if (e.KeyValue == (uint)Keys.D2)
-                {
-                    mod_int = 2;
-                    TTS.Speak("左上决斗");
-                }
-                else if (e.KeyValue == (uint)Keys.D3)
-                {
-                    mod_int = 3;
-                    TTS.Speak("右下决斗");
-                }
-                else if (e.KeyValue == (uint)Keys.D4)
-                {
-                    mod_int = 4;
-                    TTS.Speak("右上决斗");
                 }
             }
 
@@ -335,29 +316,27 @@ public partial class Form2 : Form
 
             else if (tb_name.Text == "敌法")
             {
+                if (!总循环条件)
+                {
+                    总循环条件 = true;
+                    无物品状态初始化();
+                }
+
+                if (条件根据图片委托2 == null)
+                    条件根据图片委托2 = 闪烁敏捷;
+
+                if (条件根据图片委托3 == null)
+                    条件根据图片委托3 = 法力虚空取消后摇;
+
                 if (e.KeyValue == (uint)Keys.W)
                 {
-                    label1.Text = "W";
-                    切智力腿();
-                    Task.Run(闪烁敏捷);
-                }
-                else if (e.KeyValue == (uint)Keys.E)
-                {
-                    label1.Text = "E";
-                    // 太过明显,故不使用
-                    //切智力腿();
-                    //Task.Run(法术反制敏捷);
+                    切智力腿(全局bytes, 全局size);
+                    条件2 = true;
                 }
                 else if (e.KeyValue == (uint)Keys.R)
                 {
-                    label1.Text = "R";
-                    //切智力腿();
-                    Task.Run(法力虚空取消后摇);
-                }
-                else if (e.KeyValue == (uint)Keys.X)
-                {
-                    label1.Text = "X";
-                    Task.Run(分身一齐攻击);
+                    切智力腿(全局bytes, 全局size);
+                    条件3 = true;
                 }
             }
 
@@ -547,29 +526,44 @@ public partial class Form2 : Form
 
             else if (tb_name.Text == "幻刺")
             {
+                if (!总循环条件)
+                {
+                    总循环条件 = true;
+                    无物品状态初始化();
+                }
+
+                if (条件根据图片委托1 == null)
+                    条件根据图片委托1 = 窒息短匕敏捷;
+
+                if (条件根据图片委托2 == null)
+                    条件根据图片委托2 = 幻影突袭敏捷;
+
+                if (条件根据图片委托3 == null)
+                    条件根据图片委托3 = 魅影无形敏捷;
+
+                if (条件根据图片委托4 == null)
+                    条件根据图片委托4 = 刀阵旋风敏捷;
+
+
                 if (e.KeyValue == (uint)Keys.Q)
                 {
-                    label1.Text = "Q";
-                    切智力腿();
-                    Task.Run(窒息短匕敏捷);
+                    切智力腿(全局bytes, 全局size);
+                    条件1 = true;
                 }
                 else if (e.KeyValue == (uint)Keys.W)
                 {
-                    label1.Text = "W";
-                    切智力腿();
-                    Task.Run(幻影突袭敏捷);
+                    切智力腿(全局bytes, 全局size);
+                    条件2 = true;
                 }
                 else if (e.KeyValue == (uint)Keys.E)
                 {
-                    label1.Text = "E";
-                    切智力腿();
-                    Task.Run(魅影无形敏捷);
+                    切智力腿(全局bytes, 全局size);
+                    条件3 = true;
                 }
                 else if (e.KeyValue == (uint)Keys.D)
                 {
-                    label1.Text = "E";
-                    切智力腿();
-                    Task.Run(刀阵旋风敏捷);
+                    切智力腿(全局bytes, 全局size);
+                    条件4 = true;
                 }
             }
 
@@ -1139,7 +1133,35 @@ public partial class Form2 : Form
 
             else if (tb_name.Text.Trim() == "炸弹人")
             {
-                if (e.KeyValue == (uint)Keys.D2) 魂戒丢装备();
+                if (!总循环条件)
+                {
+                    总循环条件 = true;
+                    无物品状态初始化();
+                }
+
+                if (条件根据图片委托1 == null)
+                    条件根据图片委托1 = 爆破后接3雷粘性炸弹;
+
+                if (e.KeyValue == (uint)Keys.D2)
+                {
+                    中断条件 = false;
+                    条件1 = true;
+
+                    if (RegPicture(Resource_Picture.物品_纷争_7, 全局bytes, 全局size))
+                    {
+                        KeyPress('z');
+                    }
+                    if (RegPicture(Resource_Picture.物品_魂戒CD_5, 全局bytes, 全局size))
+                    {
+                        KeyPress('x');
+                    }
+                    KeyPress('e');
+                }
+                else if (e.KeyValue == (uint)Keys.S)
+                {
+                    中断条件 = true;
+                    条件1 = false;
+                }
             }
 
             #endregion
@@ -1246,6 +1268,43 @@ public partial class Form2 : Form
                 {
                     推推破林肯秒羊(全局bytes, 全局size);
                     KeyPress((uint)Keys.W);
+                }
+            }
+
+            #endregion
+
+            #region 沉默
+            else if (tb_name.Text.Trim() == "沉默")
+            {
+                if (!总循环条件)
+                {
+                    总循环条件 = true;
+                    无物品状态初始化();
+                }
+
+                if (条件根据图片委托1 == null)
+                    条件根据图片委托1 = 奥数诅咒去后摇;
+
+                if (条件根据图片委托2 == null)
+                    条件根据图片委托2 = 遗言去后摇;
+
+
+                if (e.KeyValue == (uint)Keys.Q)
+                {
+                    中断条件 = false;
+                    条件1 = true;
+                }
+                else if (e.KeyValue == (uint)Keys.E)
+                {
+                    大招前纷争(全局bytes, 全局size);
+                    中断条件 = false;
+                    条件2 = true;
+                }
+                else if (e.KeyValue == (uint)Keys.S)
+                {
+                    中断条件 = true;
+                    条件1 = false;
+                    条件2 = false;
                 }
             }
 
@@ -1744,38 +1803,8 @@ public partial class Form2 : Form
         if (mod_int == 0)
         {
             KeyPress((uint)Keys.Space);
-        }
-        else if (mod_int == 1)
-        {
-            var point = MousePosition;
-            MouseMove(point.X - 50, point.Y + 50);
-            KeyPress((uint)Keys.Space);
-            Delay(5);
-            MouseMove(point.X, point.Y);
-        }
-        else if (mod_int == 2)
-        {
-            var point = MousePosition;
-            MouseMove(point.X - 50, point.Y - 50);
-            KeyPress((uint)Keys.Space);
-            Delay(5);
-            MouseMove(point.X, point.Y);
-        }
-        else if (mod_int == 3)
-        {
-            var point = MousePosition;
-            MouseMove(point.X + 50, point.Y + 50);
-            KeyPress((uint)Keys.Space);
-            Delay(5);
-            MouseMove(point.X, point.Y);
-        }
-        else if (mod_int == 4)
-        {
-            var point = MousePosition;
-            MouseMove(point.X + 50, point.Y - 50);
-            KeyPress((uint)Keys.Space);
-            Delay(5);
-            MouseMove(point.X, point.Y);
+            //Delay(100);
+            快速选择敌方英雄();
         }
 
         持续使用装备直到超时(Resource_Picture.物品_否决, 150);
@@ -1791,7 +1820,7 @@ public partial class Form2 : Form
         while (RegPicture(Resource_Picture.军团_决斗CD, "R"))
         {
             KeyPress((uint)Keys.R);
-            Delay(30);
+            快速选择敌方英雄();
 
             if (new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds() - time > 450) break;
         }
@@ -2379,30 +2408,18 @@ public partial class Form2 : Form
 
     #region 敌法
 
-    private void 闪烁敏捷()
+    private static bool 闪烁敏捷(byte[] bts, Size size)
     {
-        var time = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds();
-
-        var w_down = 0;
-
-        while (w_down == 0)
+        if (RegPicture(Resource_Picture.敌法_释放闪烁_4, bts, size) || RegPicture(Resource_Picture.敌法_释放信仰之源闪烁_4, bts, size) ||
+                RegPicture(Resource_Picture.敌法_释放闪烁_7, bts, size) || RegPicture(Resource_Picture.敌法_释放信仰之源闪烁_7, bts, size))
         {
-            if (RegPicture(Resource_Picture.敌法_释放闪烁_4, "W") || RegPicture(Resource_Picture.敌法_释放信仰之源闪烁_4, "W") ||
-                RegPicture(Resource_Picture.敌法_释放闪烁_7, "W", 7) || RegPicture(Resource_Picture.敌法_释放信仰之源闪烁_7, "W", 7))
-            {
-                Delay(95);
-                KeyPress((uint)Keys.A);
-                切敏捷腿();
-
-                w_down = 1;
-            }
-
-            if (new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds() - time <= 800) continue;
-
-            切敏捷腿();
-
-            break;
+            Delay(150);
+            RightClick();
+            切敏捷腿(bts, size);
+            return false;
         }
+
+        return true;
     }
 
     //private static void 法术反制敏捷()
@@ -2411,132 +2428,80 @@ public partial class Form2 : Form
     //    KeyPress((uint)Keys.V);
     //}
 
-    private void 法力虚空取消后摇()
+    private static bool 法力虚空取消后摇(byte[] bts, Size size)
     {
-        var time = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds();
-
-        var w_down = 0;
-
-        while (w_down == 0)
+        if (RegPicture(Resource_Picture.敌法_释放法力虚空_4, bts, size) || RegPicture(Resource_Picture.敌法_释放碎颅锤法力虚空_4, bts, size) ||
+               RegPicture(Resource_Picture.敌法_释放法力虚空_7, bts, size) || RegPicture(Resource_Picture.敌法_释放碎颅锤法力虚空_7, bts, size))
         {
-            if (RegPicture(Resource_Picture.敌法_释放法力虚空_4, "R") || RegPicture(Resource_Picture.敌法_释放碎颅锤法力虚空_4, "R") ||
-                RegPicture(Resource_Picture.敌法_释放法力虚空_7, "R", 7) || RegPicture(Resource_Picture.敌法_释放碎颅锤法力虚空_7, "R", 7))
-            {
-                Delay(100);
+            Delay(100);
 
-                KeyPress((uint)Keys.A);
+            KeyPress((uint)Keys.A);
 
-                切敏捷腿();
+            切敏捷腿(bts, size);
 
-                Delay(50);
+            Delay(50);
 
-                KeyPress((uint)Keys.A);
-
-                w_down = 1;
-            }
-
-            if (new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds() - time <= 800) continue;
-
-            切敏捷腿();
-
-            break;
+            KeyPress((uint)Keys.A);
+            return false;
         }
+
+        return true;
     }
 
     #endregion
 
     #region 幻刺
 
-    private void 窒息短匕敏捷()
+    private static bool 窒息短匕敏捷(byte[] bts,Size size)
     {
-        var time = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds();
-
-        var w_down = 0;
-
-        while (w_down == 0)
+        if (RegPicture(Resource_Picture.幻刺_窒息短匕_4, bts, size) || RegPicture(Resource_Picture.幻刺_窒息短匕_5, bts, size))
         {
-            if (RegPicture(Resource_Picture.幻刺_窒息短匕_4, "Q") || RegPicture(Resource_Picture.幻刺_窒息短匕_5, "Q", 5))
-            {
-                Delay(150);
-                KeyPress((uint)Keys.A);
-                切敏捷腿();
-                w_down = 1;
-            }
-
-            if (new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds() - time <= 800) continue;
-
-            切敏捷腿();
-            break;
+            Delay(150);
+            RightClick();
+            切敏捷腿(bts, size);
+            return false;
         }
+
+        return true;
     }
 
-    private void 幻影突袭敏捷()
+    private static bool 幻影突袭敏捷(byte[] bts, Size size)
     {
-        var time = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds();
-
-        var w_down = 0;
-
-        while (w_down == 0)
+        if (RegPicture(Resource_Picture.幻刺_幻影突袭_4, bts, size) || RegPicture(Resource_Picture.幻刺_幻影突袭_5, bts, size))
         {
-            if (RegPicture(Resource_Picture.幻刺_幻影突袭_4, "W") || RegPicture(Resource_Picture.幻刺_幻影突袭_5, "W", 5))
-            {
-                Delay(125);
-                KeyPress((uint)Keys.A);
-                切敏捷腿();
-                w_down = 1;
-            }
-
-            if (new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds() - time <= 800) continue;
-
-            切敏捷腿();
-            break;
+            Delay(150);
+            KeyPress((uint)Keys.A);
+            切敏捷腿(bts, size);
+            return false;
         }
+
+        return true;
     }
 
-    private void 魅影无形敏捷()
+    private static bool 魅影无形敏捷(byte[] bts, Size size)
     {
-        var time = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds();
-
-        var w_down = 0;
-
-        while (w_down == 0)
+        if (RegPicture(Resource_Picture.幻刺_魅影无形_4, bts, size) || RegPicture(Resource_Picture.幻刺_魅影无形_5, bts, size))
         {
-            if (RegPicture(Resource_Picture.幻刺_魅影无形_4, "E") || RegPicture(Resource_Picture.幻刺_魅影无形_5, "E", 5))
-            {
-                Delay(200);
-                KeyPress((uint)Keys.A);
-                切敏捷腿();
-                w_down = 1;
-            }
-
-            if (new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds() - time <= 800) continue;
-
-            切敏捷腿();
-            break;
+            Delay(200);
+            KeyPress((uint)Keys.A);
+            切敏捷腿(bts, size);
+            return false;
         }
+
+        return true;
     }
 
-    private void 刀阵旋风敏捷()
+    private static bool 刀阵旋风敏捷(byte[] bts, Size size)
     {
-        var time = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds();
-
-        var w_down = 0;
-
-        while (w_down == 0)
+        if (RegPicture(Resource_Picture.幻刺_刀阵旋风_5, bts, size))
         {
-            if (RegPicture(Resource_Picture.幻刺_刀阵旋风_5, "D", 5))
-            {
-                Delay(200);
-                KeyPress((uint)Keys.A);
-                切敏捷腿();
-                w_down = 1;
-            }
-
-            if (new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds() - time <= 800) continue;
-
-            切敏捷腿();
-            break;
+            Delay(200);
+            KeyPress((uint)Keys.A);
+            切敏捷腿(bts, size);
+            return false;
         }
+
+        return true;
     }
 
     #endregion
@@ -2774,20 +2739,10 @@ public partial class Form2 : Form
 
     private static bool 瘴气去后摇(byte[] bts, Size size)
     {
-        var x = 750;
-        var y = 856;
-        var c = GetPixelBytes(bts, size, 820 - x, 957 - y); // (820,957)
-
-        if (c.Equals(Color.FromArgb(255, 193, 207, 21))) return true; // 不朽CD好颜色
-        if (c.Equals(Color.FromArgb(255, 68, 39, 23))) return true; // 普通CD好颜色
-
-        // 瘴气进入CD颜色
-        if (
-            ColorAEqualColorB(c, Color.FromArgb(255, 14, 10, 8)) // 普通最短值3
-            || ColorAEqualColorB(c, Color.FromArgb(255, 60, 62, 39)) // 不朽最短值6
-        )
+        if (!RegPicture(Resource_Picture.剧毒_瘴气_CD, bts, size) && !RegPicture(Resource_Picture.剧毒_瘴气不朽_CD, bts, size))
         {
-            KeyPress((uint)Keys.A);
+            KeyPress('a');
+            Delay(30);
             return false;
         }
 
@@ -3556,11 +3511,51 @@ public partial class Form2 : Form
 
     #region 炸弹人
 
-    private void 魂戒丢装备()
+    private bool 爆破后接3雷粘性炸弹(byte[] bts,Size size)
     {
-        批量扔装备();
-        KeyPress((uint)Keys.Space);
-        捡装备();
+        if (RegPicture(Resource_Picture.炸弹人_释放爆破起飞, bts, size))
+        {
+            Delay(995);
+
+            if (RegPicture(Resource_Picture.物品_以太_5,bts, size) || RegPicture(Resource_Picture.物品_玲珑心_5, bts, size))
+            {
+
+            }
+            else
+            {
+                //var x = MousePosition.X;
+                //var y = MousePosition.Y;
+
+                //Delay(175);
+                //MouseMove(x - 188, y + 50);
+                //KeyPress('r');
+
+                //MouseMove(619, 1002);
+                //KeyPress('h');
+
+                //KeyPress((uint)Keys.F1);
+                //KeyPress((uint)Keys.F1);
+
+                //Delay(175);
+                //KeyPress('r');
+
+                //MouseMove(790, 385);
+                //Delay(175);
+                //KeyPress('r');
+                //Delay(175);
+                //KeyPress('r');
+
+                //MouseMove(1041, 331);
+                //Delay(175);
+                ////MouseMove(x + 90, y - 35);
+                ////KeyPress('r');
+                //KeyPress('r');
+            }
+
+            return false;
+        }
+
+        return true;
     }
 
     #endregion
@@ -3737,6 +3732,34 @@ public partial class Form2 : Form
         if (RegPicture(Resource_Picture.物品_推推棒, bts, size))
         {
             KeyPress((uint)Keys.X);
+            return false;
+        }
+
+        return true;
+    }
+
+    #endregion
+
+    #region 沉默
+
+    private bool 奥数诅咒去后摇(byte[] bts, Size size)
+    {
+        if (RegPicture(Resource_Picture.沉默_释放奥数诅咒, bts, size))
+        {
+            Delay(175);
+            KeyPress((uint)Keys.A);
+            return false;
+        }
+
+        return true;
+    }
+
+    private bool 遗言去后摇(byte[] bts, Size size)
+    {
+        if (RegPicture(Resource_Picture.沉默_释放遗言, bts, size))
+        {
+            Delay(175);
+            KeyPress((uint)Keys.A);
             return false;
         }
 
@@ -4924,6 +4947,19 @@ public partial class Form2 : Form
         return new Point(-1, -1);
     }
 
+    private static List<Point> RegPicturePoint(Bitmap bp, byte[] btys, Size size, double matchRate = 0.9)
+    {
+        try
+        {
+            return FindBytesParallel(GetBitmapByte(bp), bp.Size, btys, size, matchRate: matchRate);
+        }
+        catch
+        {
+        }
+
+        return new List<Point>();
+    }
+
     #endregion
 
     #region 返回图片颜色数组
@@ -5170,27 +5206,105 @@ public partial class Form2 : Form
 
     #endregion
 
+    #region 快速选择敌方英雄
+    /// <summary>
+    ///     基本需要时间 50ms 左右
+    /// </summary>
+    /// <param name="width"></param>
+    /// <param name="hight"></param>
+    /// <param name="type"></param>
+    /// <returns></returns>
+    private static bool 快速选择敌方英雄(int width = 1920, int hight = 1080, int type = 0)
+    {
+        var p = MousePosition;
+
+        //var x = p.X - (width / 2) < 0 ? 0 : p.X + (width / 2) > 1920 ? 0 : p.X - (width / 2);
+        //var y = p.Y - (hight / 2) < 0 ? 0 : p.Y + (hight / 2) > 1080 ? 0 : p.Y - (hight / 2);
+
+        var x = 0;
+        var y = 0;
+
+        var bp = new Bitmap(width, hight);
+        var size = new Size(width, hight);
+
+        CaptureScreen(x, y, ref bp);
+        var bytes = GetBitmapByte(bp);
+
+        var list = RegPicturePoint(Resource_Picture.血量_敌人等级底色, bytes, size, matchRate: 0.6);
+
+        var 偏移x = 1920;
+        var 偏移y = 1080;
+
+        foreach (var item in list)
+        {
+            if (Math.Abs(item.X + x - p.X) + Math.Abs(item.Y + y - p.Y) < Math.Abs(偏移x) + Math.Abs(偏移y))
+            {
+                偏移x = item.X + x - p.X;
+                偏移y = item.Y + y - p.Y;
+            }
+        }
+
+        if (list.Count > 0)
+        {
+            if (type == 1)
+            {
+                MouseMoveSim(p.X - 45 + 偏移x, p.Y + 80 + 偏移y);
+            }
+            else
+            {
+                MouseMove(p.X - 45 + 偏移x, p.Y + 80 + 偏移y);
+            }
+        }
+
+        return true;
+    }
+
+    #endregion
+
     #endregion
 
     #region 测试_捕捉颜色
 
-    private void 捕捉颜色()
+    private void 捕捉颜色1()
     {
         Stopwatch stopWatch = new();
 
         stopWatch.Start();
 
-        KeyPress('q');
-
-        for (int i = 0; i < 100; i++)
-        {
-            获取图片_1();
-            苍穹振击取消后摇(全局bytes, 全局size);
-        }
+        tb_x.Text = string.Concat(MousePosition.X, " ", MousePosition.Y);
 
         stopWatch.Stop();
 
         tb_状态抗性.Text = string.Concat("单体用时", stopWatch.ElapsedMilliseconds);
+    }
+
+    private void 捕捉颜色()
+    {
+        var time = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds();
+
+        List<Color> colors = new List<Color>();
+
+        while (1 == 1)
+        {
+            var p = CaptureColor(820, 957);
+
+            if (colors.Count == 0 || !colors[colors.Count - 1].Equals(p))
+            {
+                colors.Add(p);
+            }
+
+            if (new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds() - time <= 6000) continue;
+
+            break;
+        }
+
+        var str = "";
+        foreach (var color in colors)
+        {
+            str = string.Concat(str, color.R.ToString(), ",", color.G.ToString(), ",", color.B.ToString(), "|");
+        }
+
+        tb_x.Text = str;
     }
 
     #endregion
@@ -5250,7 +5364,7 @@ public partial class Form2 : Form
 
         if (tb_name.Text == "测试")
         {
-            Location = new Point(338, 967);
+            Location = new Point(338, 900);
         }
 
         //Task.Run(记录买活);
@@ -5291,12 +5405,14 @@ public partial class Form2 : Form
 
     private static void RightClick()
     {
+        //SimEnigo.Rightlick();
         KeyboardMouseSimulateDriverAPI.MouseDown((uint)Dota2Simulator.MouseButtons.RightDown);
         KeyboardMouseSimulateDriverAPI.MouseUp((uint)Dota2Simulator.MouseButtons.RightUp);
     }
 
     private static void LeftClick()
     {
+        //SimEnigo.LeftClick();
         KeyboardMouseSimulateDriverAPI.MouseDown((uint)Dota2Simulator.MouseButtons.LeftDown);
         KeyboardMouseSimulateDriverAPI.MouseUp((uint)Dota2Simulator.MouseButtons.LeftUp);
     }
@@ -5335,6 +5451,16 @@ public partial class Form2 : Form
         SimEnigo.KeyPress(key);
     }
 
+    private new static void KeyUp(char key)
+    {
+        SimEnigo.KeyUp(key);
+    }
+
+    private new static void KeyDown(char key)
+    {
+        SimEnigo.KeyDown(key);
+    }
+
     private static void KeyPressAlt(char key)
     {
         SimEnigo.KeyPressAlt(key);
@@ -5368,16 +5494,41 @@ public partial class Form2 : Form
         });
     }
 
-    public new static void MouseMove(int X, int Y, bool relative = false)
+    public new static void MouseMove(int x, int y, bool relative = false)
     {
         if (relative)
         {
-            var p = MousePosition;
-            X += p.X;
-            Y += p.Y;
+            SimEnigo.MouseMoveRelative(x, y);
         }
+        else
+        {
+            SimEnigo.MouseMove(x, y);
+        }
+        //if (relative)
+        //{
+        //    var p = MousePosition;
+        //    X += p.X;
+        //    Y += p.Y;
+        //}
 
-        KeyboardMouseSimulateDriverAPI.MouseMove(X, Y, !relative);
+        //KeyboardMouseSimulateDriverAPI.MouseMove(X, Y, !relative);
+    }
+
+    public new static void MouseMoveSim(int X, int Y, bool relative = false)
+    {
+        var p = MousePosition;
+
+        var def_x = (X - p.X) / 15;
+        var def_y = (Y - p.Y) / 15;
+
+        for (int i = 1; i < 15; i++)
+        {
+            Delay(1);
+            SimEnigo.MouseMove(p.X + def_x * i, p.Y + def_y * i);
+            //KeyboardMouseSimulateDriverAPI.MouseMove(p.X + def_x * i, p.Y + def_y * i, !relative);
+        }
+        SimEnigo.MouseMove(X, Y);
+        //KeyboardMouseSimulateDriverAPI.MouseMove(X, Y, !relative);
     }
 
     public new static void MouseMove(Point p, bool relative = false)
@@ -5391,8 +5542,8 @@ public partial class Form2 : Form
             X += p1.X;
             Y += p1.Y;
         }
-
-        KeyboardMouseSimulateDriverAPI.MouseMove(X, Y, !relative);
+        SimEnigo.MouseMove(X, Y);
+        //KeyboardMouseSimulateDriverAPI.MouseMove(X, Y, !relative);
     }
 
     #endregion
@@ -5426,4 +5577,8 @@ public partial class Form2 : Form
 
     #endregion
 
+    private void button1_Click(object sender, EventArgs e)
+    {
+        捕捉颜色();
+    }
 }
