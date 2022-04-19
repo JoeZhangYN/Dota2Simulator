@@ -567,6 +567,14 @@ public class PictureProcessing
             Math.Abs(colorA.B - colorB.B) <= errorRange;
     }
 
+    public static bool ColorAEqualColorB(Color colorA, Color colorB, byte errorR, byte errorG, byte errorB)
+    {
+        return //Math.Abs(colorA.A - colorB.A) <= errorRange &&
+            Math.Abs(colorA.R - colorB.R) <= errorR &&
+            Math.Abs(colorA.G - colorB.G) <= errorG &&
+            Math.Abs(colorA.B - colorB.B) <= errorB;
+    }
+
     #endregion
 
     #region 坐标对比
