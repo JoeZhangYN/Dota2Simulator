@@ -483,7 +483,7 @@ public partial class Form2 : Form
                 }
 
                 if (条件根据图片委托1 == null)
-                    条件根据图片委托1 = 黑暗契约敏捷;
+                    条件根据图片委托1 = 黑暗契约力量;
 
                 if (条件根据图片委托2 == null)
                     条件根据图片委托2 = 跳水敏捷;
@@ -498,16 +498,7 @@ public partial class Form2 : Form
                         条件1 = true;
                     });
                 }
-                else if (e.KeyValue == (uint)Keys.W || e.KeyValue == (uint)Keys.R)
-                {
-                    切智力腿(全局bytes, 全局size);
-                    Task.Run(() =>
-                    {
-                        Delay(200);
-                        条件2 = true;
-                    });
-                }
-                else if (e.KeyValue == (uint)Keys.D)
+                else if (e.KeyValue == (uint)Keys.W || e.KeyValue == (uint)Keys.R || e.KeyValue == (uint)Keys.D)
                 {
                     切智力腿(全局bytes, 全局size);
                     Task.Run(() =>
@@ -534,6 +525,19 @@ public partial class Form2 : Form
                     KeyUp((uint)Keys.L);
 
                     KeyPress((uint)Keys.W);
+                }
+                else if (e.KeyValue == (uint)Keys.D3)
+                {
+                    if (全局模式 == 0)
+                    {
+                        全局模式 = 1;
+                        TTS.Speak("切力量");
+                    }
+                    else
+                    {
+                        全局模式 = 0;
+                        TTS.Speak("切敏捷");
+                    }
                 }
             }
 
@@ -1113,7 +1117,29 @@ public partial class Form2 : Form
                 }
                 else if (e.KeyValue == (uint)Keys.D3)
                 {
-                    Task.Run(() => { 渐隐期间放技能('e', 800); });
+                    Task.Run(() => {
+                        Task.Run(() =>
+                        {
+                            渐隐期间放技能('e', 800);
+                        });
+                        if (全局模式 == 1)
+                        {
+                            Delay(650);
+                            var p = MousePosition;
+                            MouseMove(指定地点_P);
+                            KeyPress((uint)Keys.Space);
+                            Delay(30);
+                            MouseMove(p);
+                            全局模式 = 0;
+                        }
+                    });
+                }
+                else if (e.KeyValue == (uint)Keys.D4)
+                {
+                    Task.Run(() => {
+                        指定地点_P = MousePosition;
+                        全局模式 = 1;
+                    });
                 }
                 else if (e.KeyValue == (uint)Keys.S)
                 {
@@ -1413,31 +1439,6 @@ public partial class Form2 : Form
                     tb_状态抗性.Text = "";
                     tb_丢装备.Text = "";
                     捕捉颜色1();
-                }
-            }
-
-
-            else if (tb_name.Text.Trim() == "红心")
-            {
-                if (!总循环条件)
-                {
-                    总循环条件 = true;
-                    无截图初始化();
-                }
-
-                if (条件根据图片委托1 == null)
-                    条件根据图片委托1 = 移动红心;
-
-
-                if (e.KeyValue == (uint)Keys.Q)
-                {
-                    中断条件 = false;
-                    条件1 = true;
-                }
-                else if (e.KeyValue == (uint)Keys.S)
-                {
-                    中断条件 = true;
-                    条件1 = false;
                 }
             }
 
@@ -2530,17 +2531,44 @@ public partial class Form2 : Form
 
     #region 小鱼人
 
-    private static bool 黑暗契约敏捷(byte[] bts,Size size)
+    private static bool 黑暗契约力量(byte[] bts, Size size)
     {
         KeyPress((uint)Keys.A);
-        切敏捷腿(bts, size);
+        if (全局模式 == 0)
+        {
+            切敏捷腿(bts, size);
+        }
+        else
+        {
+            切力量腿(bts, size);
+        }
         return false;
+
+        #region 切智力后力量后敏捷，实际作用前期少减12点血。
+
+        //delay(1424);
+        //切力量腿();
+        //delay(930);
+        //切敏捷腿();
+        //delay(300);
+        //切敏捷腿();
+        //delay(300);
+        //切敏捷腿();
+
+        #endregion
     }
 
     private static bool 跳水敏捷(byte[] bts, Size size)
     {
         KeyPress((uint)Keys.A);
-        切敏捷腿(bts, size);
+        if (全局模式 == 0)
+        {
+            切敏捷腿(bts, size);
+        }
+        else
+        {
+            切力量腿(bts, size);
+        }
         return false;
     }
 
@@ -2603,7 +2631,7 @@ public partial class Form2 : Form
         if (RegPicture(Resource_Picture.敌法_释放闪烁_4, bts, size) || RegPicture(Resource_Picture.敌法_释放信仰之源闪烁_4, bts, size) ||
                 RegPicture(Resource_Picture.敌法_释放闪烁_7, bts, size) || RegPicture(Resource_Picture.敌法_释放信仰之源闪烁_7, bts, size))
         {
-            Delay(150);
+            Delay(200);
             RightClick();
             切敏捷腿(bts, size);
             return false;
@@ -2623,7 +2651,7 @@ public partial class Form2 : Form
         if (RegPicture(Resource_Picture.敌法_释放法力虚空_4, bts, size) || RegPicture(Resource_Picture.敌法_释放碎颅锤法力虚空_4, bts, size) ||
                RegPicture(Resource_Picture.敌法_释放法力虚空_7, bts, size) || RegPicture(Resource_Picture.敌法_释放碎颅锤法力虚空_7, bts, size))
         {
-            Delay(100);
+            Delay(200);
 
             KeyPress((uint)Keys.A);
 
@@ -3426,9 +3454,9 @@ public partial class Form2 : Form
         var times = 1.0;
         var time = 0;
 
-        if (RegPicture(Resource_Picture.物品_祭礼长袍_4, "G")) times *= 1.1;
+        if (RegPicture(Resource_Picture.物品_祭礼长袍_4, bts, size)) times *= 1.1;
 
-        if (RegPicture(Resource_Picture.物品_永恒遗物_4, "G")) times *= 1.25;
+        if (RegPicture(Resource_Picture.物品_永恒遗物_4, bts, size)) times *= 1.25;
 
         times *= (100 - Convert.ToDouble(tb_状态抗性.Text)) / 100;
 
@@ -3889,46 +3917,6 @@ public partial class Form2 : Form
 
     #endregion
 
-    #region 其他
-
-    private bool 移动红心(byte[] bts, Size size)
-    {
-        var color2 = Color.FromArgb(255, 60, 53, 72);
-        var color1 = Color.FromArgb(255, 255, 60, 54);
-
-        if (ColorAEqualColorB(CaptureColor(762, 717), color2))
-        {
-            MouseMove(810, 715);
-            Delay(300);
-            LeftClick();
-            Delay(300);
-
-            Delay(2400);
-            MouseMove(1363, 334);
-            Delay(300);
-            LeftClick();
-
-            Delay(1000);
-            MouseMove(809, 468);
-            Delay(300);
-            LeftClick();
-        }
-
-        if (ColorAEqualColorB(CaptureColor(816, 541), color1))
-        {
-            MouseMove(816, 541);
-            Delay(100);
-        }
-        else
-        {
-            MouseMove(1637, 903);
-        }
-
-        return true;
-    }
-
-    #endregion
-
     #region 通用
 
     private async void 一般程序循环()
@@ -3964,17 +3952,6 @@ public partial class Form2 : Form
     {
         if (getBitmap == null)
             getBitmap = 获取图片_1;
-        Task.Run(() =>
-        {
-            Thread.CurrentThread.Priority = ThreadPriority.Highest;
-            一般程序循环();
-        });
-    }
-
-    private void 无截图初始化()
-    {
-        if (getBitmap == null)
-            getBitmap = 获取图片_3;
         Task.Run(() =>
         {
             Thread.CurrentThread.Priority = ThreadPriority.Highest;
@@ -4031,14 +4008,6 @@ public partial class Form2 : Form
         CaptureScreen(0, 0, ref 全局图像);
         全局bytes = GetBitmapByte(全局图像);
         全局size = new Size(1920, 1080);
-    }
-
-    private void 获取图片_3()
-    {
-        // 750 856 653 217 基本所有技能状态物品，7-8ms延迟
-        // 具体点则为起始坐标点加与其的差值
-        if (全局图像 == null) 全局图像 = new Bitmap(0, 0);
-        全局size = new Size(0, 0);
     }
 
     #region 快速回城
