@@ -12,7 +12,6 @@ using static Dota2Simulator.PictureProcessing;
 using static Dota2Simulator.SetWindowTop;
 using Dota2Simulator.KeyboardMouse;
 using System.Collections.Generic;
-using Dota2Simulator.Resources;
 
 namespace Dota2Simulator;
 
@@ -476,51 +475,28 @@ public partial class Form2 : Form
 
             else if (tb_name.Text.Trim() == "小鱼人")
             {
-                if (!总循环条件)
-                {
-                    总循环条件 = true;
-                    无物品状态初始化();
-                }
-
-                if (条件根据图片委托1 == null)
-                    条件根据图片委托1 = 黑暗契约敏捷;
-
-                if (条件根据图片委托2 == null)
-                    条件根据图片委托2 = 跳水敏捷;
-
-
                 if (e.KeyValue == (uint)Keys.Q)
                 {
-                    切智力腿(全局bytes, 全局size);
-                    Task.Run(() =>
-                    {
-                        Delay(200);
-                        条件1 = true;
-                    });
+                    label1.Text = "黑暗契约";
+
+                    切智力腿();
+
+                    Task.Run(黑暗契约力量);
                 }
                 else if (e.KeyValue == (uint)Keys.W || e.KeyValue == (uint)Keys.R)
                 {
-                    切智力腿(全局bytes, 全局size);
-                    Task.Run(() =>
-                    {
-                        Delay(200);
-                        条件2 = true;
-                    });
+                    label1.Text = "释放接平A";
+
+                    切智力腿();
+
+                    Task.Run(跳水敏捷);
                 }
-                else if (e.KeyValue == (uint)Keys.D)
-                {
-                    切智力腿(全局bytes, 全局size);
-                    Task.Run(() =>
-                    {
-                        Delay(200);
-                        条件2 = true;
-                    });
-                }
+
                 else if (e.KeyValue == (uint)Keys.D2)
                 {
                     label1.Text = "W";
 
-                    切智力腿(全局bytes, 全局size);
+                    切智力腿();
 
                     // 径直移动键位
                     KeyDown((uint)Keys.L);
@@ -534,6 +510,14 @@ public partial class Form2 : Form
                     KeyUp((uint)Keys.L);
 
                     KeyPress((uint)Keys.W);
+                }
+                else if (e.KeyValue == (uint)Keys.D)
+                {
+                    label1.Text = "D";
+
+                    切智力腿();
+
+                    Task.Run(深海护罩敏捷);
                 }
             }
 
@@ -1413,31 +1397,6 @@ public partial class Form2 : Form
                     tb_状态抗性.Text = "";
                     tb_丢装备.Text = "";
                     捕捉颜色1();
-                }
-            }
-
-
-            else if (tb_name.Text.Trim() == "红心")
-            {
-                if (!总循环条件)
-                {
-                    总循环条件 = true;
-                    无截图初始化();
-                }
-
-                if (条件根据图片委托1 == null)
-                    条件根据图片委托1 = 移动红心;
-
-
-                if (e.KeyValue == (uint)Keys.Q)
-                {
-                    中断条件 = false;
-                    条件1 = true;
-                }
-                else if (e.KeyValue == (uint)Keys.S)
-                {
-                    中断条件 = true;
-                    条件1 = false;
                 }
             }
 
@@ -2530,18 +2489,60 @@ public partial class Form2 : Form
 
     #region 小鱼人
 
-    private static bool 黑暗契约敏捷(byte[] bts,Size size)
+    private void 黑暗契约力量()
     {
+        // 为了避免切太快导致实际上还是敏捷腿
+        Delay(150);
+
         KeyPress((uint)Keys.A);
-        切敏捷腿(bts, size);
-        return false;
+
+        切敏捷腿();
+
+        #region 切智力后力量后敏捷，实际作用前期少减12点血。
+
+        //delay(1424);
+        //切力量腿();
+        //delay(930);
+        //切敏捷腿();
+        //delay(300);
+        //切敏捷腿();
+        //delay(300);
+        //切敏捷腿();
+
+        #endregion
     }
 
-    private static bool 跳水敏捷(byte[] bts, Size size)
+    private void 跳水敏捷()
     {
+        // 为了避免切太快导致实际上还是敏捷腿
+        Delay(180);
+
         KeyPress((uint)Keys.A);
-        切敏捷腿(bts, size);
-        return false;
+
+        切敏捷腿();
+    }
+
+    private void 深海护罩敏捷()
+    {
+        var time = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds();
+
+        var d_down = false;
+
+        while (!d_down)
+        {
+            if (RegPicture(Resource_Picture.小鱼人_释放深海护罩, "D", 5))
+            {
+                Delay(75);
+
+                d_down = true;
+
+                KeyPress((uint)Keys.A);
+
+                切敏捷腿();
+            }
+
+            if (new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds() - time > 800) break;
+        }
     }
 
     #endregion
@@ -3889,46 +3890,6 @@ public partial class Form2 : Form
 
     #endregion
 
-    #region 其他
-
-    private bool 移动红心(byte[] bts, Size size)
-    {
-        var color2 = Color.FromArgb(255, 60, 53, 72);
-        var color1 = Color.FromArgb(255, 255, 60, 54);
-
-        if (ColorAEqualColorB(CaptureColor(762, 717), color2))
-        {
-            MouseMove(810, 715);
-            Delay(300);
-            LeftClick();
-            Delay(300);
-
-            Delay(2400);
-            MouseMove(1363, 334);
-            Delay(300);
-            LeftClick();
-
-            Delay(1000);
-            MouseMove(809, 468);
-            Delay(300);
-            LeftClick();
-        }
-
-        if (ColorAEqualColorB(CaptureColor(816, 541), color1))
-        {
-            MouseMove(816, 541);
-            Delay(100);
-        }
-        else
-        {
-            MouseMove(1637, 903);
-        }
-
-        return true;
-    }
-
-    #endregion
-
     #region 通用
 
     private async void 一般程序循环()
@@ -3964,17 +3925,6 @@ public partial class Form2 : Form
     {
         if (getBitmap == null)
             getBitmap = 获取图片_1;
-        Task.Run(() =>
-        {
-            Thread.CurrentThread.Priority = ThreadPriority.Highest;
-            一般程序循环();
-        });
-    }
-
-    private void 无截图初始化()
-    {
-        if (getBitmap == null)
-            getBitmap = 获取图片_3;
         Task.Run(() =>
         {
             Thread.CurrentThread.Priority = ThreadPriority.Highest;
@@ -4031,14 +3981,6 @@ public partial class Form2 : Form
         CaptureScreen(0, 0, ref 全局图像);
         全局bytes = GetBitmapByte(全局图像);
         全局size = new Size(1920, 1080);
-    }
-
-    private void 获取图片_3()
-    {
-        // 750 856 653 217 基本所有技能状态物品，7-8ms延迟
-        // 具体点则为起始坐标点加与其的差值
-        if (全局图像 == null) 全局图像 = new Bitmap(0, 0);
-        全局size = new Size(0, 0);
     }
 
     #region 快速回城
