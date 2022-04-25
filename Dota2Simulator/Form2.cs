@@ -621,7 +621,6 @@ public partial class Form2 : Form
                 else if (e.KeyValue == (uint)Keys.E)
                 {
                     切智力腿(全局bytes, 全局size);
-                    条件3 = true;
                 }
                 else if (e.KeyValue == (uint)Keys.D)
                 {
@@ -1593,7 +1592,7 @@ public partial class Form2 : Form
     /// <summary>
     ///     获取图片委托
     /// </summary>
-    private GetBitmap getBitmap;
+    private static GetBitmap getBitmap;
 
     /// <summary>
     /// 
@@ -2632,8 +2631,9 @@ public partial class Form2 : Form
                 RegPicture(Resource_Picture.敌法_释放闪烁_7, bts, size) || RegPicture(Resource_Picture.敌法_释放信仰之源闪烁_7, bts, size))
         {
             Delay(200);
-            RightClick();
-            切敏捷腿(bts, size);
+            KeyPress((uint)Keys.A);
+            getBitmap();
+            切敏捷腿(全局bytes, 全局size);
             return false;
         }
 
@@ -2651,11 +2651,10 @@ public partial class Form2 : Form
         if (RegPicture(Resource_Picture.敌法_释放法力虚空_4, bts, size) || RegPicture(Resource_Picture.敌法_释放碎颅锤法力虚空_4, bts, size) ||
                RegPicture(Resource_Picture.敌法_释放法力虚空_7, bts, size) || RegPicture(Resource_Picture.敌法_释放碎颅锤法力虚空_7, bts, size))
         {
-            Delay(200);
-
             KeyPress((uint)Keys.A);
-
-            切敏捷腿(bts, size);
+            Delay(200);
+            getBitmap();
+            切敏捷腿(全局bytes, 全局size);
 
             Delay(50);
 
@@ -2676,7 +2675,8 @@ public partial class Form2 : Form
         {
             Delay(150);
             RightClick();
-            切敏捷腿(bts, size);
+            getBitmap();
+            切敏捷腿(全局bytes, 全局size);
             return false;
         }
 
@@ -2687,9 +2687,13 @@ public partial class Form2 : Form
     {
         if (RegPicture(Resource_Picture.幻刺_幻影突袭_4, bts, size) || RegPicture(Resource_Picture.幻刺_幻影突袭_5, bts, size))
         {
-            Delay(150);
+            Delay(200);
             KeyPress((uint)Keys.A);
-            切敏捷腿(bts, size);
+            getBitmap();
+            切敏捷腿(全局bytes, 全局size);
+            Delay(200);
+            getBitmap();
+            切敏捷腿(全局bytes, 全局size);
             return false;
         }
 
@@ -2702,7 +2706,8 @@ public partial class Form2 : Form
         {
             Delay(200);
             KeyPress((uint)Keys.A);
-            切敏捷腿(bts, size);
+            getBitmap();
+            切敏捷腿(全局bytes, 全局size);
             return false;
         }
 
@@ -2715,7 +2720,8 @@ public partial class Form2 : Form
         {
             Delay(200);
             KeyPress((uint)Keys.A);
-            切敏捷腿(bts, size);
+            getBitmap();
+            切敏捷腿(全局bytes, 全局size);
             return false;
         }
 
