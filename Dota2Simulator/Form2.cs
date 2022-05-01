@@ -2533,13 +2533,14 @@ public partial class Form2 : Form
     private static bool 黑暗契约力量(byte[] bts, Size size)
     {
         KeyPress((uint)Keys.A);
+        Delay(60);
         if (全局模式 == 0)
         {
-            切敏捷腿(bts, size);
+            切敏捷腿();
         }
         else
         {
-            切力量腿(bts, size);
+            切力量腿();
         }
         return false;
 
@@ -2560,13 +2561,14 @@ public partial class Form2 : Form
     private static bool 跳水敏捷(byte[] bts, Size size)
     {
         KeyPress((uint)Keys.A);
+        Delay(60);
         if (全局模式 == 0)
         {
-            切敏捷腿(bts, size);
+            切敏捷腿();
         }
         else
         {
-            切力量腿(bts, size);
+            切力量腿();
         }
         return false;
     }
@@ -2632,8 +2634,7 @@ public partial class Form2 : Form
         {
             Delay(200);
             KeyPress((uint)Keys.A);
-            getBitmap();
-            切敏捷腿(全局bytes, 全局size);
+            切敏捷腿();
             return false;
         }
 
@@ -2653,8 +2654,7 @@ public partial class Form2 : Form
         {
             KeyPress((uint)Keys.A);
             Delay(200);
-            getBitmap();
-            切敏捷腿(全局bytes, 全局size);
+            切敏捷腿();
 
             Delay(50);
 
@@ -2673,10 +2673,9 @@ public partial class Form2 : Form
     {
         if (RegPicture(Resource_Picture.幻刺_窒息短匕_4, bts, size) || RegPicture(Resource_Picture.幻刺_窒息短匕_5, bts, size))
         {
-            Delay(150);
+            Delay(105);
+            切敏捷腿();
             RightClick();
-            getBitmap();
-            切敏捷腿(全局bytes, 全局size);
             return false;
         }
 
@@ -2687,13 +2686,9 @@ public partial class Form2 : Form
     {
         if (RegPicture(Resource_Picture.幻刺_幻影突袭_4, bts, size) || RegPicture(Resource_Picture.幻刺_幻影突袭_5, bts, size))
         {
-            Delay(200);
-            KeyPress((uint)Keys.A);
-            getBitmap();
-            切敏捷腿(全局bytes, 全局size);
-            Delay(200);
-            getBitmap();
-            切敏捷腿(全局bytes, 全局size);
+            Delay(105);
+            切敏捷腿();
+            KeyPress('a');
             return false;
         }
 
@@ -2704,10 +2699,9 @@ public partial class Form2 : Form
     {
         if (RegPicture(Resource_Picture.幻刺_魅影无形_4, bts, size) || RegPicture(Resource_Picture.幻刺_魅影无形_5, bts, size))
         {
-            Delay(200);
-            KeyPress((uint)Keys.A);
-            getBitmap();
-            切敏捷腿(全局bytes, 全局size);
+            Delay(105);
+            切敏捷腿();
+            KeyPress('a');
             return false;
         }
 
@@ -2718,10 +2712,9 @@ public partial class Form2 : Form
     {
         if (RegPicture(Resource_Picture.幻刺_刀阵旋风_5, bts, size))
         {
-            Delay(200);
-            KeyPress((uint)Keys.A);
-            getBitmap();
-            切敏捷腿(全局bytes, 全局size);
+            Delay(105);
+            切敏捷腿();
+            KeyPress('a');
             return false;
         }
 
@@ -2997,7 +2990,7 @@ public partial class Form2 : Form
         {
             Delay(60);
             RightClick();
-            切敏捷腿(bts, size);
+            切敏捷腿();
             return false;
         }
 
@@ -3010,7 +3003,7 @@ public partial class Form2 : Form
         {
             Delay(120);
             RightClick();
-            切敏捷腿(bts, size);
+            切敏捷腿();
             return false;
         }
 
@@ -4074,7 +4067,7 @@ public partial class Form2 : Form
     {
         if (RegPicture(Resource_Picture.物品_魂戒CD, bts, size))
         {
-            切力量腿(bts, size);
+            切力量腿();
             KeyPress((uint)Keys.X);
             KeyPress((uint)Keys.V);
             return false;
@@ -4357,65 +4350,34 @@ public partial class Form2 : Form
 
     private static void 切智力腿()
     {
-        if (RegPicture(Resource_Picture.物品_假腿_力量腿, "V")
-            || RegPicture(Resource_Picture.物品_假腿_力量腿_5, "V", 5)
-            || RegPicture(Resource_Picture.物品_假腿_力量腿_6, "V", 6)
-            || RegPicture(Resource_Picture.物品_假腿_力量腿_7, "V", 7))
-        {
-            KeyPress((uint)Keys.V);
-        }
-        else if (RegPicture(Resource_Picture.物品_假腿_敏捷腿, "V")
-                 || RegPicture(Resource_Picture.物品_假腿_敏捷腿_5, "V", 5)
-                 || RegPicture(Resource_Picture.物品_假腿_敏捷腿_6, "V", 6)
-                 || RegPicture(Resource_Picture.物品_假腿_敏捷腿_7, "V", 7))
-        {
-            KeyPress((uint)Keys.V);
-            //delay(30);
-            KeyPress((uint)Keys.V);
-        }
+        var 图像 = new Bitmap(653, 217);
+        CaptureScreen(750, 856, ref 图像);
+        var parByte = GetBitmapByte(图像);
+        var size = new Size(653, 217);
+
+        切智力腿(parByte, size);
     }
 
     private static void 切敏捷腿()
     {
-        if (RegPicture(Resource_Picture.物品_假腿_力量腿, "V")
-            || RegPicture(Resource_Picture.物品_假腿_力量腿_5, "V", 5)
-            || RegPicture(Resource_Picture.物品_假腿_力量腿_6, "V", 6)
-            || RegPicture(Resource_Picture.物品_假腿_力量腿_7, "V", 7))
-        {
-            KeyPress((uint)Keys.V);
-            //delay(30);
-            KeyPress((uint)Keys.V);
-        }
-        else if (RegPicture(Resource_Picture.物品_假腿_智力腿, "V")
-                 || RegPicture(Resource_Picture.物品_假腿_智力腿_5, "V", 5)
-                 || RegPicture(Resource_Picture.物品_假腿_智力腿_6, "V", 6)
-                 || RegPicture(Resource_Picture.物品_假腿_智力腿_7, "V", 7))
-        {
-            KeyPress((uint)Keys.V);
-        }
+        var 图像 = new Bitmap(653, 217);
+        CaptureScreen(750, 856, ref 图像);
+        var parByte = GetBitmapByte(图像);
+        var size = new Size(653, 217);
+
+        切敏捷腿(parByte, size);
     }
 
 
     private static void 切力量腿()
     {
-        if (RegPicture(Resource_Picture.物品_假腿_敏捷腿, "V")
-            || RegPicture(Resource_Picture.物品_假腿_敏捷腿_5, "V", 5)
-            || RegPicture(Resource_Picture.物品_假腿_敏捷腿_6, "V", 6)
-            || RegPicture(Resource_Picture.物品_假腿_敏捷腿_7, "V", 7))
-        {
-            KeyPress((uint)Keys.V);
-        }
-        else if (RegPicture(Resource_Picture.物品_假腿_智力腿, "V")
-                 || RegPicture(Resource_Picture.物品_假腿_智力腿_5, "V", 5)
-                 || RegPicture(Resource_Picture.物品_假腿_智力腿_6, "V", 6)
-                 || RegPicture(Resource_Picture.物品_假腿_智力腿_7, "V", 7))
-        {
-            KeyPress((uint)Keys.V);
-            //delay(30);
-            KeyPress((uint)Keys.V);
-        }
-    }
+        var 图像 = new Bitmap(653, 217);
+        CaptureScreen(750, 856, ref 图像);
+        var parByte = GetBitmapByte(图像);
+        var size = new Size(653, 217);
 
+        切力量腿(parByte, size);
+    }
 
     private static bool 切敏捷腿(byte[] parByte, Size size)
     {
