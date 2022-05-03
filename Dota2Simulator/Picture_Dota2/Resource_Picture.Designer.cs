@@ -613,16 +613,6 @@ namespace Dota2Simulator.Picture_Dota2 {
         /// <summary>
         ///   查找 System.Drawing.Bitmap 类型的本地化资源。
         /// </summary>
-        internal static System.Drawing.Bitmap 巨魔_远斧头 {
-            get {
-                object obj = ResourceManager.GetObject("巨魔_远斧头", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
-        /// </summary>
         internal static System.Drawing.Bitmap 幻刺_刀阵旋风_5 {
             get {
                 object obj = ResourceManager.GetObject("幻刺_刀阵旋风_5", resourceCulture);
@@ -1093,9 +1083,9 @@ namespace Dota2Simulator.Picture_Dota2 {
         /// <summary>
         ///   查找 System.Drawing.Bitmap 类型的本地化资源。
         /// </summary>
-        internal static System.Drawing.Bitmap 物品_以太_5 {
+        internal static System.Drawing.Bitmap 物品_以太 {
             get {
-                object obj = ResourceManager.GetObject("物品_以太_5", resourceCulture);
+                object obj = ResourceManager.GetObject("物品_以太", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -1113,36 +1103,6 @@ namespace Dota2Simulator.Picture_Dota2 {
         /// <summary>
         ///   查找 System.Drawing.Bitmap 类型的本地化资源。
         /// </summary>
-        internal static System.Drawing.Bitmap 物品_假腿_力量腿_5 {
-            get {
-                object obj = ResourceManager.GetObject("物品_假腿_力量腿_5", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
-        /// </summary>
-        internal static System.Drawing.Bitmap 物品_假腿_力量腿_6 {
-            get {
-                object obj = ResourceManager.GetObject("物品_假腿_力量腿_6", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
-        /// </summary>
-        internal static System.Drawing.Bitmap 物品_假腿_力量腿_7 {
-            get {
-                object obj = ResourceManager.GetObject("物品_假腿_力量腿_7", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
-        /// </summary>
         internal static System.Drawing.Bitmap 物品_假腿_敏捷腿 {
             get {
                 object obj = ResourceManager.GetObject("物品_假腿_敏捷腿", resourceCulture);
@@ -1153,69 +1113,9 @@ namespace Dota2Simulator.Picture_Dota2 {
         /// <summary>
         ///   查找 System.Drawing.Bitmap 类型的本地化资源。
         /// </summary>
-        internal static System.Drawing.Bitmap 物品_假腿_敏捷腿_5 {
-            get {
-                object obj = ResourceManager.GetObject("物品_假腿_敏捷腿_5", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
-        /// </summary>
-        internal static System.Drawing.Bitmap 物品_假腿_敏捷腿_6 {
-            get {
-                object obj = ResourceManager.GetObject("物品_假腿_敏捷腿_6", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
-        /// </summary>
-        internal static System.Drawing.Bitmap 物品_假腿_敏捷腿_7 {
-            get {
-                object obj = ResourceManager.GetObject("物品_假腿_敏捷腿_7", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
-        /// </summary>
         internal static System.Drawing.Bitmap 物品_假腿_智力腿 {
             get {
                 object obj = ResourceManager.GetObject("物品_假腿_智力腿", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
-        /// </summary>
-        internal static System.Drawing.Bitmap 物品_假腿_智力腿_5 {
-            get {
-                object obj = ResourceManager.GetObject("物品_假腿_智力腿_5", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
-        /// </summary>
-        internal static System.Drawing.Bitmap 物品_假腿_智力腿_6 {
-            get {
-                object obj = ResourceManager.GetObject("物品_假腿_智力腿_6", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
-        /// </summary>
-        internal static System.Drawing.Bitmap 物品_假腿_智力腿_7 {
-            get {
-                object obj = ResourceManager.GetObject("物品_假腿_智力腿_7", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -1243,29 +1143,9 @@ namespace Dota2Simulator.Picture_Dota2 {
         /// <summary>
         ///   查找 System.Drawing.Bitmap 类型的本地化资源。
         /// </summary>
-        internal static System.Drawing.Bitmap 物品_勇气 {
+        internal static System.Drawing.Bitmap 物品_勇气勋章 {
             get {
-                object obj = ResourceManager.GetObject("物品_勇气", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
-        /// </summary>
-        internal static System.Drawing.Bitmap 物品_勇气_5 {
-            get {
-                object obj = ResourceManager.GetObject("物品_勇气_5", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
-        /// </summary>
-        internal static System.Drawing.Bitmap 物品_勋章 {
-            get {
-                object obj = ResourceManager.GetObject("物品_勋章", resourceCulture);
+                object obj = ResourceManager.GetObject("物品_勇气勋章", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -1293,9 +1173,9 @@ namespace Dota2Simulator.Picture_Dota2 {
         /// <summary>
         ///   查找 System.Drawing.Bitmap 类型的本地化资源。
         /// </summary>
-        internal static System.Drawing.Bitmap 物品_吹风_7 {
+        internal static System.Drawing.Bitmap 物品_吹风 {
             get {
-                object obj = ResourceManager.GetObject("物品_吹风_7", resourceCulture);
+                object obj = ResourceManager.GetObject("物品_吹风", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -1373,9 +1253,9 @@ namespace Dota2Simulator.Picture_Dota2 {
         /// <summary>
         ///   查找 System.Drawing.Bitmap 类型的本地化资源。
         /// </summary>
-        internal static System.Drawing.Bitmap 物品_永恒遗物_4 {
+        internal static System.Drawing.Bitmap 物品_散失 {
             get {
-                object obj = ResourceManager.GetObject("物品_永恒遗物_4", resourceCulture);
+                object obj = ResourceManager.GetObject("物品_散失", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -1383,9 +1263,9 @@ namespace Dota2Simulator.Picture_Dota2 {
         /// <summary>
         ///   查找 System.Drawing.Bitmap 类型的本地化资源。
         /// </summary>
-        internal static System.Drawing.Bitmap 物品_炎阳 {
+        internal static System.Drawing.Bitmap 物品_永恒遗物 {
             get {
-                object obj = ResourceManager.GetObject("物品_炎阳", resourceCulture);
+                object obj = ResourceManager.GetObject("物品_永恒遗物", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -1393,9 +1273,9 @@ namespace Dota2Simulator.Picture_Dota2 {
         /// <summary>
         ///   查找 System.Drawing.Bitmap 类型的本地化资源。
         /// </summary>
-        internal static System.Drawing.Bitmap 物品_炎阳_5 {
+        internal static System.Drawing.Bitmap 物品_深渊之刃 {
             get {
-                object obj = ResourceManager.GetObject("物品_炎阳_5", resourceCulture);
+                object obj = ResourceManager.GetObject("物品_深渊之刃", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -1403,9 +1283,19 @@ namespace Dota2Simulator.Picture_Dota2 {
         /// <summary>
         ///   查找 System.Drawing.Bitmap 类型的本地化资源。
         /// </summary>
-        internal static System.Drawing.Bitmap 物品_玲珑心_5 {
+        internal static System.Drawing.Bitmap 物品_炎阳勋章 {
             get {
-                object obj = ResourceManager.GetObject("物品_玲珑心_5", resourceCulture);
+                object obj = ResourceManager.GetObject("物品_炎阳勋章", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
+        /// </summary>
+        internal static System.Drawing.Bitmap 物品_玲珑心 {
+            get {
+                object obj = ResourceManager.GetObject("物品_玲珑心", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -1423,9 +1313,9 @@ namespace Dota2Simulator.Picture_Dota2 {
         /// <summary>
         ///   查找 System.Drawing.Bitmap 类型的本地化资源。
         /// </summary>
-        internal static System.Drawing.Bitmap 物品_祭礼长袍_4 {
+        internal static System.Drawing.Bitmap 物品_祭礼长袍 {
             get {
-                object obj = ResourceManager.GetObject("物品_祭礼长袍_4", resourceCulture);
+                object obj = ResourceManager.GetObject("物品_祭礼长袍", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -1443,39 +1333,9 @@ namespace Dota2Simulator.Picture_Dota2 {
         /// <summary>
         ///   查找 System.Drawing.Bitmap 类型的本地化资源。
         /// </summary>
-        internal static System.Drawing.Bitmap 物品_紫苑_5 {
-            get {
-                object obj = ResourceManager.GetObject("物品_紫苑_5", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
-        /// </summary>
         internal static System.Drawing.Bitmap 物品_纷争 {
             get {
                 object obj = ResourceManager.GetObject("物品_纷争", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
-        /// </summary>
-        internal static System.Drawing.Bitmap 物品_纷争_5 {
-            get {
-                object obj = ResourceManager.GetObject("物品_纷争_5", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
-        /// </summary>
-        internal static System.Drawing.Bitmap 物品_纷争_7 {
-            get {
-                object obj = ResourceManager.GetObject("物品_纷争_7", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -1513,36 +1373,6 @@ namespace Dota2Simulator.Picture_Dota2 {
         /// <summary>
         ///   查找 System.Drawing.Bitmap 类型的本地化资源。
         /// </summary>
-        internal static System.Drawing.Bitmap 物品_羊刀_4 {
-            get {
-                object obj = ResourceManager.GetObject("物品_羊刀_4", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
-        /// </summary>
-        internal static System.Drawing.Bitmap 物品_羊刀_4_进入CD {
-            get {
-                object obj = ResourceManager.GetObject("物品_羊刀_4_进入CD", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
-        /// </summary>
-        internal static System.Drawing.Bitmap 物品_羊刀_5 {
-            get {
-                object obj = ResourceManager.GetObject("物品_羊刀_5", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
-        /// </summary>
         internal static System.Drawing.Bitmap 物品_臂章 {
             get {
                 object obj = ResourceManager.GetObject("物品_臂章", resourceCulture);
@@ -1553,29 +1383,9 @@ namespace Dota2Simulator.Picture_Dota2 {
         /// <summary>
         ///   查找 System.Drawing.Bitmap 类型的本地化资源。
         /// </summary>
-        internal static System.Drawing.Bitmap 物品_虚灵_4 {
+        internal static System.Drawing.Bitmap 物品_虚灵之刃 {
             get {
-                object obj = ResourceManager.GetObject("物品_虚灵_4", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
-        /// </summary>
-        internal static System.Drawing.Bitmap 物品_虚灵之刃_4 {
-            get {
-                object obj = ResourceManager.GetObject("物品_虚灵之刃_4", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
-        /// </summary>
-        internal static System.Drawing.Bitmap 物品_虚灵之刃_4_进入CD {
-            get {
-                object obj = ResourceManager.GetObject("物品_虚灵之刃_4_进入CD", resourceCulture);
+                object obj = ResourceManager.GetObject("物品_虚灵之刃", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -1593,19 +1403,9 @@ namespace Dota2Simulator.Picture_Dota2 {
         /// <summary>
         ///   查找 System.Drawing.Bitmap 类型的本地化资源。
         /// </summary>
-        internal static System.Drawing.Bitmap 物品_血棘_5 {
+        internal static System.Drawing.Bitmap 物品_血精石 {
             get {
-                object obj = ResourceManager.GetObject("物品_血棘_5", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
-        /// </summary>
-        internal static System.Drawing.Bitmap 物品_血精石_4 {
-            get {
-                object obj = ResourceManager.GetObject("物品_血精石_4", resourceCulture);
+                object obj = ResourceManager.GetObject("物品_血精石", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -1703,29 +1503,9 @@ namespace Dota2Simulator.Picture_Dota2 {
         /// <summary>
         ///   查找 System.Drawing.Bitmap 类型的本地化资源。
         /// </summary>
-        internal static System.Drawing.Bitmap 物品_陨星锤_4 {
+        internal static System.Drawing.Bitmap 物品_陨星锤 {
             get {
-                object obj = ResourceManager.GetObject("物品_陨星锤_4", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
-        /// </summary>
-        internal static System.Drawing.Bitmap 物品_陨星锤_5 {
-            get {
-                object obj = ResourceManager.GetObject("物品_陨星锤_5", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
-        /// </summary>
-        internal static System.Drawing.Bitmap 物品_陨星锤_8 {
-            get {
-                object obj = ResourceManager.GetObject("物品_陨星锤_8", resourceCulture);
+                object obj = ResourceManager.GetObject("物品_陨星锤", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -1736,36 +1516,6 @@ namespace Dota2Simulator.Picture_Dota2 {
         internal static System.Drawing.Bitmap 物品_魂戒CD {
             get {
                 object obj = ResourceManager.GetObject("物品_魂戒CD", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
-        /// </summary>
-        internal static System.Drawing.Bitmap 物品_魂戒CD_5 {
-            get {
-                object obj = ResourceManager.GetObject("物品_魂戒CD_5", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
-        /// </summary>
-        internal static System.Drawing.Bitmap 物品_魂戒CD_6 {
-            get {
-                object obj = ResourceManager.GetObject("物品_魂戒CD_6", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
-        /// </summary>
-        internal static System.Drawing.Bitmap 物品_魂戒CD_7 {
-            get {
-                object obj = ResourceManager.GetObject("物品_魂戒CD_7", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
