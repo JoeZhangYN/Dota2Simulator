@@ -1158,10 +1158,21 @@ public partial class Form2 : Form
                 if (条件根据图片委托2 == null)
                     条件根据图片委托2 = 雷击去后摇;
 
+                if (条件根据图片委托3 == null)
+                    条件根据图片委托3 = 弧形闪电不能释放;
+
                 // 弧形闪电和雷击都是不朽
                 if (e.KeyValue == (uint)Keys.Q)
                 {
-                    条件1 = true;
+                    if (弧形闪电不能释放(全局bts, 全局size))
+                    {
+                        全局模式Q = 1;
+                        条件3 = true;
+                    }
+                    else
+                    {
+                        条件1 = true;
+                    }
                 }
                 else if (e.KeyValue == (uint)Keys.W)
                 {
@@ -1664,17 +1675,17 @@ public partial class Form2 : Form
     /// <summary>
     ///     循环计数total
     /// </summary>
-    private bool 总循环条件;
+    private static bool 总循环条件;
 
     /// <summary>
     ///     循环计数1
     /// </summary>
-    private bool 循环条件1;
+    private static bool 循环条件1;
 
     /// <summary>
     ///     循环计数2
     /// </summary>
-    private bool 循环条件2;
+    private static bool 循环条件2;
 
     /// <summary>
     ///     全局图像
@@ -1713,32 +1724,32 @@ public partial class Form2 : Form
     /// <summary>
     ///     条件1委托
     /// </summary>
-    private condition_delegate_bitmap 条件根据图片委托1;
+    private static condition_delegate_bitmap 条件根据图片委托1;
 
     /// <summary>
     ///     条件2委托
     /// </summary>
-    private condition_delegate_bitmap 条件根据图片委托2;
+    private static condition_delegate_bitmap 条件根据图片委托2;
 
     /// <summary>
     ///     条件3委托
     /// </summary>
-    private condition_delegate_bitmap 条件根据图片委托3;
+    private static condition_delegate_bitmap 条件根据图片委托3;
 
     /// <summary>
     ///     条件4委托
     /// </summary>
-    private condition_delegate_bitmap 条件根据图片委托4;
+    private static condition_delegate_bitmap 条件根据图片委托4;
 
     /// <summary>
     ///     条件5委托
     /// </summary>
-    private condition_delegate_bitmap 条件根据图片委托5;
+    private static condition_delegate_bitmap 条件根据图片委托5;
 
     /// <summary>
     ///     条件6委托
     /// </summary>
-    private condition_delegate_bitmap 条件根据图片委托6;
+    private static condition_delegate_bitmap 条件根据图片委托6;
 
     /// <summary>
     ///     条件布尔
@@ -1812,9 +1823,69 @@ public partial class Form2 : Form
     private static long 全局时间 = -1;
 
     /// <summary>
+    ///     全局时间
+    /// </summary>
+    private static long 全局时间Q = -1;
+
+    /// <summary>
+    ///     全局时间
+    /// </summary>
+    private static long 全局时间W = -1;
+
+    /// <summary>
+    ///     全局时间
+    /// </summary>
+    private static long 全局时间E = -1;
+
+    /// <summary>
+    ///     全局时间
+    /// </summary>
+    private static long 全局时间R = -1;
+
+    /// <summary>
+    ///     全局时间
+    /// </summary>
+    private static long 全局时间D = -1;
+
+    /// <summary>
+    ///     全局时间
+    /// </summary>
+    private static long 全局时间F = -1;
+
+    /// <summary>
     ///     用于跳拱地点
     /// </summary>
     private static Point 指定地点_P = new(0, 0);
+
+    /// <summary>
+    ///     用于跳拱地点
+    /// </summary>
+    private static Point 指定地点_Q = new(0, 0);
+
+    /// <summary>
+    ///     用于跳拱地点
+    /// </summary>
+    private static Point 指定地点_W = new(0, 0);
+
+    /// <summary>
+    ///     用于跳拱地点
+    /// </summary>
+    private static Point 指定地点_E = new(0, 0);
+
+    /// <summary>
+    ///     用于跳拱地点
+    /// </summary>
+    private static Point 指定地点_R = new(0, 0);
+
+    /// <summary>
+    ///     用于跳拱地点
+    /// </summary>
+    private static Point 指定地点_D = new(0, 0);
+
+    /// <summary>
+    ///     用于跳拱地点
+    /// </summary>
+    private static Point 指定地点_F = new(0, 0);
 
     /// <summary>
     ///     用于不同设定
@@ -1822,9 +1893,69 @@ public partial class Form2 : Form
     private static int 全局模式 = 0;
 
     /// <summary>
+    ///     用于不同设定
+    /// </summary>
+    private static int 全局模式Q = 0;
+
+    /// <summary>
+    ///     用于不同设定
+    /// </summary>
+    private static int 全局模式W = 0;
+
+    /// <summary>
+    ///     用于不同设定
+    /// </summary>
+    private static int 全局模式E = 0;
+
+    /// <summary>
+    ///     用于不同设定
+    /// </summary>
+    private static int 全局模式R = 0;
+
+    /// <summary>
+    ///     用于不同设定
+    /// </summary>
+    private static int 全局模式D = 0;
+
+    /// <summary>
+    ///     用于不同设定
+    /// </summary>
+    private static int 全局模式F = 0;
+
+    /// <summary>
     ///     用于阶段性
     /// </summary>
     private static int 全局步骤 = 0;
+
+    /// <summary>
+    ///     用于阶段性
+    /// </summary>
+    private static int 全局步骤Q = 0;
+
+    /// <summary>
+    ///     用于阶段性
+    /// </summary>
+    private static int 全局步骤W = 0;
+
+    /// <summary>
+    ///     用于阶段性
+    /// </summary>
+    private static int 全局步骤E = 0;
+
+    /// <summary>
+    ///     用于阶段性
+    /// </summary>
+    private static int 全局步骤R = 0;
+
+    /// <summary>
+    ///     用于阶段性
+    /// </summary>
+    private static int 全局步骤D = 0;
+
+    /// <summary>
+    ///     用于阶段性
+    /// </summary>
+    private static int 全局步骤F = 0;
 
     #endregion
 
@@ -3323,10 +3454,12 @@ public partial class Form2 : Form
 
         if (是否魔晶 && 是否A杖)
         {
+            
             if (ColorAEqualColorB(q6, Color.FromArgb(255, 61, 156, 155), 5, 12, 10)) // 不朽6电弧
             {
                 Delay(220);
                 RightClick();
+                KeyPress('s');
                 return false;
             }
         }
@@ -3336,6 +3469,7 @@ public partial class Form2 : Form
             {
                 Delay(220);
                 RightClick();
+                KeyPress('s');
                 return false;
             }
         }
@@ -3345,7 +3479,69 @@ public partial class Form2 : Form
             {
                 Delay(220);
                 RightClick();
+                KeyPress('s');
                 return false;
+            }
+        }
+
+        return true;
+    }
+
+    private static bool 弧形闪电不能释放(byte[] bts, Size size)
+    {
+        /// 逻辑 
+        /// 先检测是否可以释放
+        /// 如果可以则返回false
+        /// 外部触发原本逻辑
+        /// 否则改全局模式为1，并重复触发本逻辑
+        /// 直到可以释放，改回全局模式0，再延迟释放释放
+        /// 用不同的循环条件，避免不可预知的时序错误
+        
+        var x = 截图模式1_X;
+        var y = 截图模式1_Y;
+
+        var q4 = GetPixelBytes(bts, size, 827 - x, 976 - y);
+        var q5 = GetPixelBytes(bts, size, 810 - x, 971 - y);
+        var q6 = GetPixelBytes(bts, size, 780 - x, 971 - y);
+
+        if (是否魔晶 && 是否A杖)
+        {
+
+            if (ColorAEqualColorB(q6, Color.FromArgb(255, 73, 112, 181), 1, 1, 1)) // 不朽6电弧
+            {
+                if (全局模式Q == 0) return false;
+                else if (全局模式Q == 1)
+                {
+                    全局模式Q = 0;
+                    Task.Run(() => { KeyPress('q'); });
+                    return false;
+                }
+            }
+        }
+        else if (是否魔晶 || 是否A杖)
+        {
+            if (ColorAEqualColorB(q5, Color.FromArgb(255, 73, 112, 181), 1, 1, 1)) // 不朽5电弧
+            {
+                if (全局模式Q == 0) return false;
+                else if (全局模式Q == 1)
+                {
+                    全局模式Q = 0;
+                    Task.Run(() => { KeyPress('q'); });
+                    return false;
+                }
+            }
+        }
+        else
+        {
+            if (ColorAEqualColorB(q4, Color.FromArgb(255, 125, 120, 89), 1, 1, 4)) // 不朽4电弧
+            {
+                if (全局模式Q == 0) return false;
+                else if (全局模式Q == 1)
+                {
+                    全局模式Q = 0;
+                    Task.Run(() => { KeyPress('q'); });
+                    return false;
+                }
             }
         }
 
@@ -4058,7 +4254,26 @@ public partial class Form2 : Form
         是否魔晶 = false;
         是否A杖 = false;
         全局步骤 = 0;
+        全局步骤Q = 0;
+        全局步骤W = 0;
+        全局步骤E = 0;
+        全局步骤R = 0;
+        全局步骤D = 0;
+        全局步骤F = 0;
         全局模式 = 0;
+        全局模式Q = 0;
+        全局模式W = 0;
+        全局模式E = 0;
+        全局模式R = 0;
+        全局模式D = 0;
+        全局模式F = 0; 
+        指定地点_P = new(0, 0);
+        指定地点_Q = new(0, 0);
+        指定地点_W = new(0, 0);
+        指定地点_E = new(0, 0);
+        指定地点_R = new(0, 0);
+        指定地点_D = new(0, 0);
+        指定地点_F = new(0, 0);
 
         条件根据图片委托1 = null;
         条件根据图片委托2 = null;
@@ -5525,7 +5740,44 @@ public partial class Form2 : Form
             var w5 = GetPixelBytes(bts, size, 868 - x, 971 - y);
             var w6 = GetPixelBytes(bts, size, 838 - x, 971 - y);
 
-            var p = w5;
+            var p = q4;
+
+            if (tb_丢装备.Text.Trim() == "1")
+            {
+                p = q4;
+            }
+            else if (tb_丢装备.Text.Trim() == "2")
+            {
+                p = q5;
+            }
+            else if (tb_丢装备.Text.Trim() == "3")
+            {
+                p = q6;
+            }
+            else if (tb_丢装备.Text.Trim() == "4")
+            {
+                p = w4;
+            }
+            else if (tb_丢装备.Text.Trim() == "5")
+            {
+                p = w5;
+            }
+            else if (tb_丢装备.Text.Trim() == "6")
+            {
+                p = w6;
+            }
+            else if (tb_丢装备.Text.Trim() == "7")
+            {
+                p = q5;
+            }
+            else if (tb_丢装备.Text.Trim() == "8")
+            {
+                p = q5;
+            }
+            else if (tb_丢装备.Text.Trim() == "9")
+            {
+                p = q5;
+            }
 
             if (colors.Count == 0 || !colors[^1].Equals(p))
             {
@@ -5542,7 +5794,7 @@ public partial class Form2 : Form
             //    KeyPress('q');
             //}
 
-            if (new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds() - time <= 9000) continue;
+            if (new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds() - time <= 5000) continue;
 
             break;
         }
@@ -5835,7 +6087,10 @@ public partial class Form2 : Form
 
     private void button1_Click(object sender, EventArgs e)
     {
-        捕捉颜色();
+        Task.Run(() =>
+        {
+            捕捉颜色();
+        });
     }
 
     private void tb_delay_TextChanged(object sender, EventArgs e)
