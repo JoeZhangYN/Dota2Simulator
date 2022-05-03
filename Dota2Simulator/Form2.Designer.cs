@@ -64,7 +64,7 @@ namespace Dota2Simulator
             this.tb_name.Name = "tb_name";
             this.tb_name.Size = new System.Drawing.Size(87, 23);
             this.tb_name.TabIndex = 4;
-            this.tb_name.Text = "剧毒";
+            this.tb_name.Text = "测试";
             this.tb_name.TextChanged += new System.EventHandler(this.Tb_name_TextChanged);
             // 
             // tb_丢装备
@@ -161,6 +161,7 @@ namespace Dota2Simulator
             this.tb_delay.Size = new System.Drawing.Size(87, 23);
             this.tb_delay.TabIndex = 12;
             this.tb_delay.Text = "30";
+            this.tb_delay.TextChanged += new System.EventHandler(this.tb_delay_TextChanged);
             // 
             // label7
             // 
