@@ -63,16 +63,6 @@ namespace Dota2Simulator.Picture_Dota2 {
         /// <summary>
         ///   查找 System.Drawing.Bitmap 类型的本地化资源。
         /// </summary>
-        internal static System.Drawing.Bitmap TB_恶魔狂热_5 {
-            get {
-                object obj = ResourceManager.GetObject("TB_恶魔狂热_5", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
-        /// </summary>
         internal static System.Drawing.Bitmap TB_恶魔狂热_6 {
             get {
                 object obj = ResourceManager.GetObject("TB_恶魔狂热_6", resourceCulture);
@@ -353,9 +343,29 @@ namespace Dota2Simulator.Picture_Dota2 {
         /// <summary>
         ///   查找 System.Drawing.Bitmap 类型的本地化资源。
         /// </summary>
+        internal static System.Drawing.Bitmap 天怒_上古封印_5 {
+            get {
+                object obj = ResourceManager.GetObject("天怒_上古封印_5", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
+        /// </summary>
         internal static System.Drawing.Bitmap 天怒_神秘之耀 {
             get {
                 object obj = ResourceManager.GetObject("天怒_神秘之耀", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
+        /// </summary>
+        internal static System.Drawing.Bitmap 天怒_神秘之耀_5 {
+            get {
+                object obj = ResourceManager.GetObject("天怒_神秘之耀_5", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -413,9 +423,39 @@ namespace Dota2Simulator.Picture_Dota2 {
         /// <summary>
         ///   查找 System.Drawing.Bitmap 类型的本地化资源。
         /// </summary>
+        internal static System.Drawing.Bitmap 天怒_魔法鹰隼 {
+            get {
+                object obj = ResourceManager.GetObject("天怒_魔法鹰隼", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
+        /// </summary>
+        internal static System.Drawing.Bitmap 天怒_魔法鹰隼_5 {
+            get {
+                object obj = ResourceManager.GetObject("天怒_魔法鹰隼_5", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
+        /// </summary>
         internal static System.Drawing.Bitmap 天怒_魔法鹰隼_金饰品 {
             get {
                 object obj = ResourceManager.GetObject("天怒_魔法鹰隼_金饰品", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
+        /// </summary>
+        internal static System.Drawing.Bitmap 天怒_魔法鹰隼_金饰品_5 {
+            get {
+                object obj = ResourceManager.GetObject("天怒_魔法鹰隼_金饰品_5", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

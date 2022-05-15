@@ -1,13 +1,12 @@
-﻿namespace TestKeyboard.PressKey
+﻿namespace TestKeyboard.PressKey;
+
+internal interface IPressKey
 {
-    interface IPressKey
-    {
-        bool Initialize(EnumWindowsType winType);
+    bool Initialize(EnumWindowsType winType);
 
-        void KeyPress(char key);
+    void KeyPress(char key);
 
-        void KeyDown(char key);
+    void KeyDown(char key);
 
-        void KeyUp(char key);
-    }
+    void KeyUp(char key);
 }

@@ -25,13 +25,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Emgu.CV" Version="4.5.5.4823" />
-    <PackageReference Include="Emgu.CV.runtime.windows" Version="4.5.5.4823" />
-    <PackageReference Include="SharpDX.Direct3D11" Version="4.2.0" />
-    <PackageReference Include="SharpDX.DXGI" Version="4.2.0" />
-    <PackageReference Include="System.Speech" Version="7.0.0-preview.1.22076.8" />
-    <PackageReference Include="Tesseract" Version="4.1.1" />
-    <PackageReference Include="Tesseract.Drawing" Version="4.1.1" />
+    <PackageReference Include="PaddleOCRSharp" Version="2.0.0" />
+    <PackageReference Include="System.Speech" Version="7.0.0-preview.4.22229.4" />
   </ItemGroup>
 
   <ItemGroup>
@@ -76,6 +71,36 @@
     <None Update="Driver\x64\KeyboardMouseSimulateDriver.dll">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </None>
+    <None Update="inference1\ch_PP-OCRv3_det_infer\inference.pdiparams">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="inference1\ch_PP-OCRv3_det_infer\inference.pdiparams.info">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="inference1\ch_PP-OCRv3_det_infer\inference.pdmodel">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="inference1\ch_PP-OCRv3_rec_infer\inference.pdiparams">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="inference1\ch_PP-OCRv3_rec_infer\inference.pdiparams.info">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="inference1\ch_PP-OCRv3_rec_infer\inference.pdmodel">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="inference1\ch_ppocr_mobile_v2.0_cls_infer\inference.pdiparams">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="inference1\ch_ppocr_mobile_v2.0_cls_infer\inference.pdiparams.info">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="inference1\ch_ppocr_mobile_v2.0_cls_infer\inference.pdmodel">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="inference1\ppocr_keys.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="KeyboardMouseSimulateDriver.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -83,14 +108,11 @@
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
+    <None Update="rscaptrs.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="simengio.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="tessdata\chi_sim.traineddata">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="tessdata\eng.traineddata">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
 

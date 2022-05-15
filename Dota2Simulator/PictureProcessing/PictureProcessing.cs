@@ -1,18 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.Linq;
 using System.Runtime.InteropServices;
-using SharpDX;
-using SharpDX.Direct3D11;
-using SharpDX.DXGI;
-using Point = System.Drawing.Point;
-using Size = System.Drawing.Size;
-using Device = SharpDX.Direct3D11.Device;
-using MapFlags = SharpDX.Direct3D11.MapFlags;
-using Resource = SharpDX.DXGI.Resource;
-using ResultCode = SharpDX.DXGI.ResultCode;
 using System.Threading.Tasks;
 
 namespace Dota2Simulator;
@@ -22,101 +13,40 @@ namespace Dota2Simulator;
 /// </summary>
 public class PictureProcessing
 {
-    #region 未使用
-
-    public static void asd()
-    {
-        var factory = new Factory1();
-        //Get first adapter
-        var adapter = factory.GetAdapter1(0);
-        //Get device from adapter
-        var device = new Device(adapter);
-        //Get front buffer of the adapter
-        var output = adapter.GetOutput(0);
-        var output1 = output.QueryInterface<Output1>();
-
-        // Width/Height of desktop to capture
-        var width = output.Description.DesktopBounds.Right;
-        var height = output.Description.DesktopBounds.Bottom;
-
-        // Create Staging texture CPU-accessible
-        var textureDesc = new Texture2DDescription
-        {
-            CpuAccessFlags = CpuAccessFlags.Read,
-            BindFlags = BindFlags.None,
-            Format = Format.B8G8R8A8_UNorm,
-            Width = width,
-            Height = height,
-            OptionFlags = ResourceOptionFlags.None,
-            MipLevels = 1,
-            ArraySize = 1,
-            SampleDescription = {Count = 1, Quality = 0},
-            Usage = ResourceUsage.Staging
-        };
-        var screenTexture = new Texture2D(device, textureDesc);
-        // Duplicate the output
-        using (var duplicatedOutput = output1.DuplicateOutput(device))
-        {
-            try
-            {
-                Resource screenResource;
-                OutputDuplicateFrameInformation duplicateFrameInformation;
-
-                // Try to get duplicated frame within given time is ms
-                duplicatedOutput.TryAcquireNextFrame(5, out duplicateFrameInformation, out screenResource);
-
-                // copy resource into memory that can be accessed by the CPU
-                using (var screenTexture2D = screenResource.QueryInterface<Texture2D>())
-                {
-                    device.ImmediateContext.CopyResource(screenTexture2D, screenTexture);
-                }
-
-                // Get the desktop capture texture
-                var mapSource = device.ImmediateContext.MapSubresource(screenTexture, 0, MapMode.Read, MapFlags.None);
-
-                // Create Drawing.Bitmap
-                using (var bitmap = new Bitmap(width, height, PixelFormat.Format32bppArgb))
-                {
-                    var boundsRect = new Rectangle(0, 0, width, height);
-
-                    // Copy pixels from screen capture Texture to GDI bitmap
-                    var mapDest = bitmap.LockBits(boundsRect, ImageLockMode.WriteOnly, bitmap.PixelFormat);
-                    var sourcePtr = mapSource.DataPointer;
-                    var destPtr = mapDest.Scan0;
-                    for (var y = 0; y < height; y++)
-                    {
-                        // Copy a single line
-                        Utilities.CopyMemory(destPtr, sourcePtr, width * 4);
-
-                        // Advance pointers
-                        sourcePtr = IntPtr.Add(sourcePtr, mapSource.RowPitch);
-                        destPtr = IntPtr.Add(destPtr, mapDest.Stride);
-                    }
-
-                    // Release source and dest locks
-                    bitmap.UnlockBits(mapDest);
-                    device.ImmediateContext.UnmapSubresource(screenTexture, 0);
-                }
-
-                screenResource.Dispose();
-                duplicatedOutput.ReleaseFrame();
-            }
-            catch (SharpDXException e)
-            {
-                if (e.ResultCode.Code != ResultCode.WaitTimeout.Result.Code)
-                {
-                    Trace.TraceError(e.Message);
-                    Trace.TraceError(e.StackTrace);
-                }
-            }
-        }
-    }
-
-    #endregion
 
     #region 图片处理
 
     #region 屏幕截图
+
+    public struct Bgr8
+    {
+        public uint b;
+        public uint g;
+        public uint r;
+    }
+
+    [DllImport("rscaptrs.dll")]
+    public static extern IEnumerable<Bgr8> GetColor(uint i);
+
+    [DllImport("rscaptrs.dll")]
+    public static extern IntTuple GetSize();
+
+    [StructLayout(LayoutKind.Sequential)]
+    public struct IntTuple
+    {
+        public uint x;
+        public uint y;
+
+        public static implicit operator Tuple<uint, uint>(IntTuple t)
+        {
+            return Tuple.Create(t.x, t.y);
+        }
+
+        public static implicit operator IntTuple(Tuple<uint, uint> t)
+        {
+            return new IntTuple { x = t.Item1, y = t.Item2 };
+        }
+    };
 
     /// <summary>
     ///     屏幕截图，单操作耗时7ms，能一次解决的不要并行（因为有锁，基本时间是翻倍的）
@@ -129,11 +59,8 @@ public class PictureProcessing
     public static Bitmap CaptureScreen(int x, int y, int width, int height)
     {
         Bitmap bitmap = new(width, height);
-        using (var graphics = Graphics.FromImage(bitmap))
-        {
-            graphics.CopyFromScreen(x, y, 0, 0, new Size(width, height));
-        }
-
+        using var graphics = Graphics.FromImage(bitmap);
+        graphics.CopyFromScreen(x, y, 0, 0, new Size(width, height));
         return bitmap;
 
         //SaveFileDialog dialog = new SaveFileDialog();
@@ -175,15 +102,13 @@ public class PictureProcessing
     public static Color CaptureColor(int x, int y)
     {
         Color c;
-        using (Bitmap bitmap = new(1, 1))
+        using Bitmap bitmap = new(1, 1);
+        using (var graphics = Graphics.FromImage(bitmap))
         {
-            using (var graphics = Graphics.FromImage(bitmap))
-            {
-                graphics.CopyFromScreen(x, y, 0, 0, new Size(1, 1));
-            }
-
-            c = bitmap.GetPixel(0, 0);
+            graphics.CopyFromScreen(x, y, 0, 0, new Size(1, 1));
         }
+
+        c = bitmap.GetPixel(0, 0);
 
         return c;
 
@@ -225,12 +150,10 @@ public class PictureProcessing
             var index = m * parBitmap.Width * 4 + n * 4;
             var color = Color.FromArgb(byteArraryPar[index + 3], byteArraryPar[index + 2],
                 byteArraryPar[index + 1], byteArraryPar[index]);
-            if (ColorAEqualColorB(color, colorX, errorRange))
-            {
-                pointX = n;
-                pointY = m;
-                goto END;
-            }
+            if (!ColorAEqualColorB(color, colorX, errorRange)) continue;
+            pointX = n;
+            pointY = m;
+            goto END;
         }
 
         END:
@@ -267,7 +190,7 @@ public class PictureProcessing
         var searchSize = searchRect.Size;
         // 第一个颜色
         var startPixelColor = Color.FromArgb(byteArrarySub[3], byteArrarySub[2],
-                    byteArrarySub[1], byteArrarySub[0]);
+            byteArrarySub[1], byteArrarySub[0]);
 
         var iMax = searchLeftTop.Y + searchSize.Height - subSize.Height; //行
         var jMax = searchLeftTop.X + searchSize.Width - subSize.Width; //列
@@ -278,25 +201,26 @@ public class PictureProcessing
         int pointY;
 
 
-        object balanceLock = new object();
+        var balanceLock = new object();
 
-        Parallel.For<Point>(searchLeftTop.X, jMax, () => new Point(), (j, loop, subPoint) => {
-            for (var i = searchLeftTop.Y; i < iMax; i++)
+        Parallel.For(searchLeftTop.X, jMax, () => new Point(), (j, loop, subPoint) =>
             {
-                // for (var j = searchLeftTop.X; j < jMax; j++)
-
-                //大图x，y坐标处的颜色值
-                int x = j, y = i;
-                var parIndex = i * parWidth * 4 + j * 4;
-                var colorBig = Color.FromArgb(byteArraryPar[parIndex + 3], byteArraryPar[parIndex + 2],
-                    byteArraryPar[parIndex + 1], byteArraryPar[parIndex]);
-                if (ColorAEqualColorB(colorBig, startPixelColor, errorRange))
+                for (var i = searchLeftTop.Y; i < iMax; i++)
                 {
-                    smallStartX = x - smallOffsetX; //待找的图X坐标
-                    smallStartY = y - smallOffsetY; //待找的图Y坐标
-                    var sum = 0; //所有需要比对的有效点
-                    var matchNum = 0; //成功匹配的点
-                    for (var m = 0; m < subHeight; m++)
+                    // for (var j = searchLeftTop.X; j < jMax; j++)
+
+                    //大图x，y坐标处的颜色值
+                    int x = j, y = i;
+                    var parIndex = i * parWidth * 4 + j * 4;
+                    var colorBig = Color.FromArgb(byteArraryPar[parIndex + 3], byteArraryPar[parIndex + 2],
+                        byteArraryPar[parIndex + 1], byteArraryPar[parIndex]);
+                    if (ColorAEqualColorB(colorBig, startPixelColor, errorRange))
+                    {
+                        smallStartX = x - smallOffsetX; //待找的图X坐标
+                        smallStartY = y - smallOffsetY; //待找的图Y坐标
+                        var sum = 0; //所有需要比对的有效点
+                        var matchNum = 0; //成功匹配的点
+                        for (var m = 0; m < subHeight; m++)
                         for (var n = 0; n < subWidth; n++)
                         {
                             int x1 = n, y1 = m;
@@ -313,8 +237,7 @@ public class PictureProcessing
                             if (ColorAEqualColorB(colorPixel, color, errorRange)) matchNum++;
                         }
 
-                    if ((double)matchNum / sum >= matchRate)
-                    {
+                        if (!((double) matchNum / sum >= matchRate)) continue;
                         // Console.WriteLine((double)matchNum / sum);
                         pointX = smallStartX;
                         pointY = smallStartY;
@@ -324,20 +247,16 @@ public class PictureProcessing
                         return subPoint;
                     }
                 }
-            }
 
-            return subPoint;
+                return subPoint;
 
-            //小图x1,y1坐标处的颜色值
-        },
-            (x) =>
+                //小图x1,y1坐标处的颜色值
+            },
+            x =>
             {
                 lock (balanceLock)
                 {
-                    if (x.X != 0)
-                    {
-                        ListPoint.Add(x);
-                    }
+                    if (x.X != 0) ListPoint.Add(x);
                 }
             }
         );
@@ -358,7 +277,7 @@ public class PictureProcessing
         Rectangle searchRect = new(), byte errorRange = 0,
         double matchRate = 0.9)
     {
-        List<Point> ListPoint = new();
+        List<Point> listPoint = new();
         var subWidth = subBitmap.Width;
         var subHeight = subBitmap.Height;
         var parWidth = parBitmap.Width;
@@ -386,65 +305,60 @@ public class PictureProcessing
         int pointY;
 
 
-        object balanceLock = new object();
+        var balanceLock = new object();
 
-        Parallel.For<Point>(searchLeftTop.X, jMax, () => new Point(), (j, loop, subPoint) => {
-            for (var i = searchLeftTop.Y; i < iMax; i++) {
-                // for (var j = searchLeftTop.X; j < jMax; j++)
-
-                //大图x，y坐标处的颜色值
-                int x = j, y = i;
-                var parIndex = i * parWidth * 4 + j * 4;
-                var colorBig = Color.FromArgb(byteArraryPar[parIndex + 3], byteArraryPar[parIndex + 2],
-                    byteArraryPar[parIndex + 1], byteArraryPar[parIndex]);
-                if (ColorAEqualColorB(colorBig, startPixelColor, errorRange))
+        Parallel.For(searchLeftTop.X, jMax, () => new Point(), (j, loop, subPoint) =>
+            {
+                for (var i = searchLeftTop.Y; i < iMax; i++)
                 {
+                    // for (var j = searchLeftTop.X; j < jMax; j++)
+
+                    //大图x，y坐标处的颜色值
+                    int x = j, y = i;
+                    var parIndex = i * parWidth * 4 + j * 4;
+                    var colorBig = Color.FromArgb(byteArraryPar[parIndex + 3], byteArraryPar[parIndex + 2],
+                        byteArraryPar[parIndex + 1], byteArraryPar[parIndex]);
+                    if (!ColorAEqualColorB(colorBig, startPixelColor, errorRange)) continue;
                     smallStartX = x - smallOffsetX; //待找的图X坐标
                     smallStartY = y - smallOffsetY; //待找的图Y坐标
                     var sum = 0; //所有需要比对的有效点
                     var matchNum = 0; //成功匹配的点
                     for (var m = 0; m < subHeight; m++)
-                        for (var n = 0; n < subWidth; n++)
-                        {
-                            int x1 = n, y1 = m;
-                            var subIndex = m * subWidth * 4 + n * 4;
-                            var color = Color.FromArgb(byteArrarySub[subIndex + 3], byteArrarySub[subIndex + 2],
-                                byteArrarySub[subIndex + 1], byteArrarySub[subIndex]);
-
-                            sum++;
-                            int x2 = smallStartX + x1, y2 = smallStartY + y1;
-                            var parReleativeIndex = y2 * parWidth * 4 + x2 * 4; //比对大图对应的像素点的颜色
-                            var colorPixel = Color.FromArgb(byteArraryPar[parReleativeIndex + 3],
-                                byteArraryPar[parReleativeIndex + 2], byteArraryPar[parReleativeIndex + 1],
-                                byteArraryPar[parReleativeIndex]);
-                            if (ColorAEqualColorB(colorPixel, color, errorRange)) matchNum++;
-                        }
-
-                    if ((double)matchNum / sum >= matchRate)
+                    for (var n = 0; n < subWidth; n++)
                     {
-                        // Console.WriteLine((double)matchNum / sum);
-                        pointX = smallStartX;
-                        pointY = smallStartY;
-                        Point point = new(pointX, pointY);
-                        if (!ListContainsPoint(ListPoint, point))
-                            subPoint = point;
-                        return subPoint;
+                        int x1 = n, y1 = m;
+                        var subIndex = m * subWidth * 4 + n * 4;
+                        var color = Color.FromArgb(byteArrarySub[subIndex + 3], byteArrarySub[subIndex + 2],
+                            byteArrarySub[subIndex + 1], byteArrarySub[subIndex]);
+
+                        sum++;
+                        int x2 = smallStartX + x1, y2 = smallStartY + y1;
+                        var parReleativeIndex = y2 * parWidth * 4 + x2 * 4; //比对大图对应的像素点的颜色
+                        var colorPixel = Color.FromArgb(byteArraryPar[parReleativeIndex + 3],
+                            byteArraryPar[parReleativeIndex + 2], byteArraryPar[parReleativeIndex + 1],
+                            byteArraryPar[parReleativeIndex]);
+                        if (ColorAEqualColorB(colorPixel, color, errorRange)) matchNum++;
                     }
+
+                    if (!((double) matchNum / sum >= matchRate)) continue;
+                    // Console.WriteLine((double)matchNum / sum);
+                    pointX = smallStartX;
+                    pointY = smallStartY;
+                    Point point = new(pointX, pointY);
+                    if (!ListContainsPoint(listPoint, point))
+                        subPoint = point;
+                    return subPoint;
                 }
-            }
 
-            return subPoint;
+                return subPoint;
 
-            //小图x1,y1坐标处的颜色值
-        },
-            (x) =>
+                //小图x1,y1坐标处的颜色值
+            },
+            x =>
             {
                 lock (balanceLock)
                 {
-                    if (x.X != 0)
-                    {
-                        ListPoint.Add(x);
-                    }
+                    if (x.X != 0) listPoint.Add(x);
                 }
             }
         );
@@ -454,7 +368,7 @@ public class PictureProcessing
         subBitmap.Dispose();
         parBitmap.Dispose();
         GC.Collect();
-        return ListPoint;
+        return listPoint;
     }
 
     /// <summary>
@@ -470,7 +384,7 @@ public class PictureProcessing
         Rectangle searchRect = new(), byte errorRange = 0,
         double matchRate = 0.9, bool isFindAll = true)
     {
-        List<Point> ListPoint = new();
+        List<Point> listPoint = new();
         var subWidth = subBitmap.Width;
         var subHeight = subBitmap.Height;
         var parWidth = parBitmap.Width;
@@ -505,40 +419,36 @@ public class PictureProcessing
             var parIndex = i * parWidth * 4 + j * 4;
             var colorBig = Color.FromArgb(byteArraryPar[parIndex + 3], byteArraryPar[parIndex + 2],
                 byteArraryPar[parIndex + 1], byteArraryPar[parIndex]);
-            if (ColorAEqualColorB(colorBig, startPixelColor, errorRange))
+            if (!ColorAEqualColorB(colorBig, startPixelColor, errorRange)) continue;
+            smallStartX = x - smallOffsetX; //待找的图X坐标
+            smallStartY = y - smallOffsetY; //待找的图Y坐标
+            var sum = 0; //所有需要比对的有效点
+            var matchNum = 0; //成功匹配的点
+            for (var m = 0; m < subHeight; m++)
+            for (var n = 0; n < subWidth; n++)
             {
-                smallStartX = x - smallOffsetX; //待找的图X坐标
-                smallStartY = y - smallOffsetY; //待找的图Y坐标
-                var sum = 0; //所有需要比对的有效点
-                var matchNum = 0; //成功匹配的点
-                for (var m = 0; m < subHeight; m++)
-                    for (var n = 0; n < subWidth; n++)
-                    {
-                        int x1 = n, y1 = m;
-                        var subIndex = m * subWidth * 4 + n * 4;
-                        var color = Color.FromArgb(byteArrarySub[subIndex + 3], byteArrarySub[subIndex + 2],
-                            byteArrarySub[subIndex + 1], byteArrarySub[subIndex]);
+                int x1 = n, y1 = m;
+                var subIndex = m * subWidth * 4 + n * 4;
+                var color = Color.FromArgb(byteArrarySub[subIndex + 3], byteArrarySub[subIndex + 2],
+                    byteArrarySub[subIndex + 1], byteArrarySub[subIndex]);
 
-                        sum++;
-                        int x2 = smallStartX + x1, y2 = smallStartY + y1;
-                        var parReleativeIndex = y2 * parWidth * 4 + x2 * 4; //比对大图对应的像素点的颜色
-                        var colorPixel = Color.FromArgb(byteArraryPar[parReleativeIndex + 3],
-                            byteArraryPar[parReleativeIndex + 2], byteArraryPar[parReleativeIndex + 1],
-                            byteArraryPar[parReleativeIndex]);
-                        if (ColorAEqualColorB(colorPixel, color, errorRange)) matchNum++;
-                    }
-
-                if ((double)matchNum / sum >= matchRate)
-                {
-                    // Console.WriteLine((double)matchNum / sum);
-                    pointX = smallStartX;
-                    pointY = smallStartY;
-                    Point point = new(pointX, pointY);
-                    if (!ListContainsPoint(ListPoint, point)) ListPoint.Add(point);
-                    if (!isFindAll) goto FIND_END;
-                }
+                sum++;
+                int x2 = smallStartX + x1, y2 = smallStartY + y1;
+                var parReleativeIndex = y2 * parWidth * 4 + x2 * 4; //比对大图对应的像素点的颜色
+                var colorPixel = Color.FromArgb(byteArraryPar[parReleativeIndex + 3],
+                    byteArraryPar[parReleativeIndex + 2], byteArraryPar[parReleativeIndex + 1],
+                    byteArraryPar[parReleativeIndex]);
+                if (ColorAEqualColorB(colorPixel, color, errorRange)) matchNum++;
             }
-         }
+
+            if (!((double) matchNum / sum >= matchRate)) continue;
+            // Console.WriteLine((double)matchNum / sum);
+            pointX = smallStartX;
+            pointY = smallStartY;
+            Point point = new(pointX, pointY);
+            if (!ListContainsPoint(listPoint, point)) listPoint.Add(point);
+            if (!isFindAll) goto FIND_END;
+        }
 
         FIND_END:
         subBitmap.UnlockBits(subData);
@@ -546,8 +456,9 @@ public class PictureProcessing
         subBitmap.Dispose();
         parBitmap.Dispose();
         GC.Collect();
-        return ListPoint;
+        return listPoint;
     }
+
     #endregion
 
     #region 颜色对比
@@ -589,10 +500,9 @@ public class PictureProcessing
     private static bool ListContainsPoint(List<Point> listPoint, Point point, double errorRange = 10)
     {
         var isExist = false;
-        foreach (var item in listPoint)
-            if (item.X <= point.X + errorRange && item.X >= point.X - errorRange &&
-                item.Y <= point.Y + errorRange && item.Y >= point.Y - errorRange)
-                isExist = true;
+        foreach (var item in listPoint.Where(item => item.X <= point.X + errorRange && item.X >= point.X - errorRange &&
+                                                     item.Y <= point.Y + errorRange && item.Y >= point.Y - errorRange))
+            isExist = true;
         return isExist;
     }
 
@@ -708,7 +618,7 @@ public class PictureProcessing
         return CalcSimilarDegree(GetHash(a), GetHash(b), matchrate);
     }
 
-    public static string GetHash(Bitmap bitmap)
+    private static string GetHash(Bitmap bitmap)
     {
         var grayValues = ReduceColor(ReduceSize(bitmap));
         var average = CalcAverage(grayValues);
@@ -767,10 +677,7 @@ public class PictureProcessing
     {
         if (a.Length != b.Length)
             return false;
-        var count = 0;
-        for (var i = 0; i < a.Length; i++)
-            if (a[i] == b[i])
-                count++;
+        var count = a.Where((t, i) => t == b[i]).Count();
         return count / a.Length >= matchRate;
     }
 
