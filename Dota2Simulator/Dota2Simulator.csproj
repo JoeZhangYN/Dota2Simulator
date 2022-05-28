@@ -25,7 +25,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="PaddleOCRSharp" Version="2.0.0" />
+    <PackageReference Include="Collections.Pooled" Version="2.0.0-preview.27" />
+    <PackageReference Include="Microsoft.IO.RecyclableMemoryStream" Version="2.2.0" />
+    <PackageReference Include="PaddleOCRSharp" Version="2.0.1" />
+    <PackageReference Include="SharpDX.Direct3D11" Version="4.2.0" />
     <PackageReference Include="System.Speech" Version="7.0.0-preview.4.22229.4" />
   </ItemGroup>
 
@@ -112,7 +115,7 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="simengio.dll">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
 

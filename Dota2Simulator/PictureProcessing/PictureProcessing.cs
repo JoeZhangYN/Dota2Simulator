@@ -5,15 +5,238 @@ using System.Drawing.Imaging;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
+using Collections.Pooled;
 
 namespace Dota2Simulator;
 
 /// <summary>
 ///     图片处理类
 /// </summary>
+///
+///
+
+#region DX捕捉并不行
+
+///// <summary>
+/////     DirectX截图
+///// </summary>
+//DirectXScreenCapturer _capturer = new DirectXScreenCapturer();
+
+//// 注销捕捉
+//_capturer.Dispose();
+
+//var bitmap = new Bitmap(19220,1080);
+//Image image = bitmap;
+//(_, _, image) = _capturer.GetFrameImage();
+//pictureBox1.BackgroundImage = image;
+
+//using var memoryStream = tempmanager.GetStream("全局图像bts");
+//image.Save(memoryStream, image.RawFormat);
+//public class DirectXScreenCapturer : IDisposable
+//{
+//    private Factory1 factory;
+//    private Adapter1 adapter;
+//    private SharpDX.Direct3D11.Device device;
+//    private Output output;
+//    private Output1 output1;
+//    private Texture2DDescription textureDesc;
+//    //2D 纹理，存储截屏数据
+//    private Texture2D screenTexture;
+
+//    public DirectXScreenCapturer()
+//    {
+//        // 获取输出设备（显卡、显示器），这里是主显卡和主显示器
+//        factory = new Factory1();
+//        adapter = factory.GetAdapter1(0);
+//        device = new SharpDX.Direct3D11.Device(adapter);
+//        output = adapter.GetOutput(0);
+//        output1 = output.QueryInterface<Output1>();
+
+//        //设置纹理信息，供后续使用（截图大小和质量）
+//        textureDesc = new Texture2DDescription
+//        {
+//            CpuAccessFlags = CpuAccessFlags.Read,
+//            BindFlags = BindFlags.None,
+//            Format = Format.R8G8B8A8_UNorm,
+//            Width = output.Description.DesktopBounds.Right,
+//            Height = output.Description.DesktopBounds.Bottom,
+//            OptionFlags = ResourceOptionFlags.None,
+//            MipLevels = 1,
+//            ArraySize = 1,
+//            SampleDescription = { Count = 1, Quality = 0 },
+//            Usage = ResourceUsage.Staging
+//        };
+
+//        screenTexture = new Texture2D(device, textureDesc);
+//    }
+
+//    public Result ProcessFrame(Action<DataBox, Texture2DDescription> processAction, int timeoutInMilliseconds = 5)
+//    {
+//        //截屏，可能失败
+//        using OutputDuplication duplicatedOutput = output1.DuplicateOutput(device);
+//        var result = duplicatedOutput.TryAcquireNextFrame(timeoutInMilliseconds, out OutputDuplicateFrameInformation duplicateFrameInformation, out SharpDX.DXGI.Resource screenResource);
+
+//        if (!result.Success) return result;
+
+//        using Texture2D screenTexture2D = screenResource.QueryInterface<Texture2D>();
+
+//        //复制数据
+//        device.ImmediateContext.CopyResource(screenTexture2D, screenTexture);
+//        DataBox mapSource = device.ImmediateContext.MapSubresource(screenTexture, 0, MapMode.Read, SharpDX.Direct3D11.MapFlags.None);
+
+//        processAction?.Invoke(mapSource, textureDesc);
+
+//        //释放资源
+//        device.ImmediateContext.UnmapSubresource(screenTexture, 0);
+//        screenResource.Dispose();
+//        duplicatedOutput.ReleaseFrame();
+
+//        return result;
+//    }
+
+//    public (Result result, bool isBlackFrame, Image image) GetFrameImage(int timeoutInMilliseconds = 5)
+//    {
+//        //生成 C# 用图像
+//        Bitmap image = new Bitmap(textureDesc.Width, textureDesc.Height, PixelFormat.Format24bppRgb);
+//        bool isBlack = true;
+//        var result = ProcessFrame(ProcessImage);
+
+//        if (!result.Success) image.Dispose();
+
+//        return (result, isBlack, result.Success ? image : null);
+
+//        void ProcessImage(DataBox dataBox, Texture2DDescription texture)
+//        {
+//            BitmapData data = image.LockBits(new Rectangle(0, 0, texture.Width, texture.Height), ImageLockMode.ReadWrite, PixelFormat.Format24bppRgb);
+
+//            unsafe
+//            {
+//                byte* dataHead = (byte*)dataBox.DataPointer.ToPointer();
+
+//                for (int x = 0; x < texture.Width; x++)
+//                {
+//                    for (int y = 0; y < texture.Height; y++)
+//                    {
+//                        byte* pixPtr = (byte*)(data.Scan0 + y * data.Stride + x * 3);
+
+//                        int pos = x + y * texture.Width;
+//                        pos *= 4;
+
+//                        byte r = dataHead[pos + 2];
+//                        byte g = dataHead[pos + 1];
+//                        byte b = dataHead[pos + 0];
+
+//                        if (isBlack && (r != 0 || g != 0 || b != 0)) isBlack = false;
+
+//                        pixPtr[0] = b;
+//                        pixPtr[1] = g;
+//                        pixPtr[2] = r;
+//                    }
+//                }
+//            }
+
+//            image.UnlockBits(data);
+//        }
+//    }
+
+//    public (Result result, bool isBlackFrame, byte[] bts) GetFrameBytes(int timeoutInMilliseconds = 5)
+//    {
+//        //生成 C# 用图像
+//        Bitmap image = new Bitmap(textureDesc.Width, textureDesc.Height, PixelFormat.Format24bppRgb);
+//        bool isBlack = true;
+//        var result = ProcessFrame(ProcessImage);
+
+//        if (!result.Success) image.Dispose();
+
+//        return (result, isBlack, result.Success ? new byte[0] : new byte[0]);
+
+//        void ProcessImage(DataBox dataBox, Texture2DDescription texture)
+//        {
+//            BitmapData data = image.LockBits(new Rectangle(0, 0, texture.Width, texture.Height), ImageLockMode.ReadWrite, PixelFormat.Format24bppRgb);
+
+//            unsafe
+//            {
+//                byte* dataHead = (byte*)dataBox.DataPointer.ToPointer();
+
+//                for (int x = 0; x < texture.Width; x++)
+//                {
+//                    for (int y = 0; y < texture.Height; y++)
+//                    {
+//                        byte* pixPtr = (byte*)(data.Scan0 + y * data.Stride + x * 3);
+
+//                        int pos = x + y * texture.Width;
+//                        pos *= 4;
+
+//                        byte r = dataHead[pos + 2];
+//                        byte g = dataHead[pos + 1];
+//                        byte b = dataHead[pos + 0];
+
+//                        if (isBlack && (r != 0 || g != 0 || b != 0)) isBlack = false;
+
+//                        pixPtr[0] = b;
+//                        pixPtr[1] = g;
+//                        pixPtr[2] = r;
+//                    }
+//                }
+//            }
+
+//            image.UnlockBits(data);
+//        }
+//    }
+
+//    #region IDisposable Support
+//    private bool disposedValue = false; // 要检测冗余调用
+
+//    protected virtual void Dispose(bool disposing)
+//    {
+//        if (!disposedValue)
+//        {
+//            if (disposing)
+//            {
+//                // TODO: 释放托管状态(托管对象)。
+//                factory.Dispose();
+//                adapter.Dispose();
+//                device.Dispose();
+//                output.Dispose();
+//                output1.Dispose();
+//                screenTexture.Dispose();
+//            }
+
+//            // TODO: 释放未托管的资源(未托管的对象)并在以下内容中替代终结器。
+//            // TODO: 将大型字段设置为 null。
+//            factory = null;
+//            adapter = null;
+//            device = null;
+//            output = null;
+//            output1 = null;
+//            screenTexture = null;
+
+//            disposedValue = true;
+//        }
+//    }
+
+//    // TODO: 仅当以上 Dispose(bool disposing) 拥有用于释放未托管资源的代码时才替代终结器。
+//    // ~DirectXScreenCapturer()
+//    // {
+//    //   // 请勿更改此代码。将清理代码放入以上 Dispose(bool disposing) 中。
+//    //   Dispose(false);
+//    // }
+
+//    // 添加此代码以正确实现可处置模式。
+//    public void Dispose()
+//    {
+//        // 请勿更改此代码。将清理代码放入以上 Dispose(bool disposing) 中。
+//        Dispose(true);
+//        // TODO: 如果在以上内容中替代了终结器，则取消注释以下行。
+//        // GC.SuppressFinalize(this);
+//    }
+//    #endregion
+//} 
+#endregion
+
+
 public class PictureProcessing
 {
-
     #region 图片处理
 
     #region 屏幕截图
@@ -34,8 +257,8 @@ public class PictureProcessing
     [StructLayout(LayoutKind.Sequential)]
     public struct IntTuple
     {
-        public uint x;
-        public uint y;
+        private uint x;
+        private uint y;
 
         public static implicit operator Tuple<uint, uint>(IntTuple t)
         {
@@ -175,11 +398,11 @@ public class PictureProcessing
     /// <param name="errorRange">误差范围</param>
     /// <param name="matchRate">匹配率</param>
     /// <returns></returns>
-    public static List<Point> FindBytesParallel(byte[] byteArrarySub,
-        Size subSize, byte[] byteArraryPar, Size parSize, byte errorRange = 0,
+    public static PooledList<Point> FindBytesParallel(byte[] byteArrarySub,
+        Size subSize,byte[] byteArraryPar, Size parSize, byte errorRange = 0,
         double matchRate = 0.9)
     {
-        List<Point> ListPoint = new();
+        PooledList<Point> ListPoint = new();
         var subWidth = subSize.Width;
         var subHeight = subSize.Height;
         var parWidth = parSize.Width;
@@ -208,44 +431,41 @@ public class PictureProcessing
                 for (var i = searchLeftTop.Y; i < iMax; i++)
                 {
                     // for (var j = searchLeftTop.X; j < jMax; j++)
-
                     //大图x，y坐标处的颜色值
                     int x = j, y = i;
                     var parIndex = i * parWidth * 4 + j * 4;
                     var colorBig = Color.FromArgb(byteArraryPar[parIndex + 3], byteArraryPar[parIndex + 2],
                         byteArraryPar[parIndex + 1], byteArraryPar[parIndex]);
-                    if (ColorAEqualColorB(colorBig, startPixelColor, errorRange))
+                    if (!ColorAEqualColorB(colorBig, startPixelColor, errorRange)) continue;
+                    smallStartX = x - smallOffsetX; //待找的图X坐标
+                    smallStartY = y - smallOffsetY; //待找的图Y坐标
+                    var sum = 0; //所有需要比对的有效点
+                    var matchNum = 0; //成功匹配的点
+                    for (var m = 0; m < subHeight; m++)
+                    for (var n = 0; n < subWidth; n++)
                     {
-                        smallStartX = x - smallOffsetX; //待找的图X坐标
-                        smallStartY = y - smallOffsetY; //待找的图Y坐标
-                        var sum = 0; //所有需要比对的有效点
-                        var matchNum = 0; //成功匹配的点
-                        for (var m = 0; m < subHeight; m++)
-                        for (var n = 0; n < subWidth; n++)
-                        {
-                            int x1 = n, y1 = m;
-                            var subIndex = m * subWidth * 4 + n * 4;
-                            var color = Color.FromArgb(byteArrarySub[subIndex + 3], byteArrarySub[subIndex + 2],
-                                byteArrarySub[subIndex + 1], byteArrarySub[subIndex]);
+                        int x1 = n, y1 = m;
+                        var subIndex = m * subWidth * 4 + n * 4;
+                        var color = Color.FromArgb(byteArrarySub[subIndex + 3], byteArrarySub[subIndex + 2],
+                            byteArrarySub[subIndex + 1], byteArrarySub[subIndex]);
 
-                            sum++;
-                            int x2 = smallStartX + x1, y2 = smallStartY + y1;
-                            var parReleativeIndex = y2 * parWidth * 4 + x2 * 4; //比对大图对应的像素点的颜色
-                            var colorPixel = Color.FromArgb(byteArraryPar[parReleativeIndex + 3],
-                                byteArraryPar[parReleativeIndex + 2], byteArraryPar[parReleativeIndex + 1],
-                                byteArraryPar[parReleativeIndex]);
-                            if (ColorAEqualColorB(colorPixel, color, errorRange)) matchNum++;
-                        }
-
-                        if (!((double) matchNum / sum >= matchRate)) continue;
-                        // Console.WriteLine((double)matchNum / sum);
-                        pointX = smallStartX;
-                        pointY = smallStartY;
-                        Point point = new(pointX, pointY);
-                        if (!ListContainsPoint(ListPoint, point))
-                            subPoint = point;
-                        return subPoint;
+                        sum++;
+                        int x2 = smallStartX + x1, y2 = smallStartY + y1;
+                        var parReleativeIndex = y2 * parWidth * 4 + x2 * 4; //比对大图对应的像素点的颜色
+                        var colorPixel = Color.FromArgb(byteArraryPar[parReleativeIndex + 3],
+                            byteArraryPar[parReleativeIndex + 2], byteArraryPar[parReleativeIndex + 1],
+                            byteArraryPar[parReleativeIndex]);
+                        if (ColorAEqualColorB(colorPixel, color, errorRange)) matchNum++;
                     }
+
+                    if (!((double) matchNum / sum >= matchRate)) continue;
+                    // Console.WriteLine((double)matchNum / sum);
+                    pointX = smallStartX;
+                    pointY = smallStartY;
+                    Point point = new(pointX, pointY);
+                    if (!ListPoint.Contains(point))
+                        subPoint = point;
+                    return subPoint;
                 }
 
                 return subPoint;
@@ -256,7 +476,8 @@ public class PictureProcessing
             {
                 lock (balanceLock)
                 {
-                    if (x.X != 0) ListPoint.Add(x);
+                    if (x.X != 0) 
+                        ListPoint.Add(x);
                 }
             }
         );
@@ -273,11 +494,11 @@ public class PictureProcessing
     /// <param name="errorRange">容错，单个色值范围内视为正确0~255</param>
     /// <param name="matchRate">图片匹配度，默认90%</param>
     /// <returns>返回查找到的图片的左上角坐标</returns>
-    public static List<Point> FindPictureParallel(Bitmap subBitmap, Bitmap parBitmap,
+    public static PooledList<Point> FindPictureParallel(Bitmap subBitmap, Bitmap parBitmap,
         Rectangle searchRect = new(), byte errorRange = 0,
         double matchRate = 0.9)
     {
-        List<Point> listPoint = new();
+        PooledList<Point> listPoint = new();
         var subWidth = subBitmap.Width;
         var subHeight = subBitmap.Height;
         var parWidth = parBitmap.Width;
@@ -345,7 +566,7 @@ public class PictureProcessing
                     pointX = smallStartX;
                     pointY = smallStartY;
                     Point point = new(pointX, pointY);
-                    if (!ListContainsPoint(listPoint, point))
+                    if (!listPoint.Contains(point))
                         subPoint = point;
                     return subPoint;
                 }
@@ -380,11 +601,11 @@ public class PictureProcessing
     /// <param name="errorRange">容错，单个色值范围内视为正确0~255</param>
     /// <param name="matchRate">图片匹配度，默认90%</param>
     /// <returns>返回查找到的图片的左上角坐标</returns>
-    public static List<Point> FindPicture(Bitmap subBitmap, Bitmap parBitmap,
+    public static PooledList<Point> FindPicture(Bitmap subBitmap, Bitmap parBitmap,
         Rectangle searchRect = new(), byte errorRange = 0,
         double matchRate = 0.9, bool isFindAll = true)
     {
-        List<Point> listPoint = new();
+        PooledList<Point> listPoint = new();
         var subWidth = subBitmap.Width;
         var subHeight = subBitmap.Height;
         var parWidth = parBitmap.Width;
@@ -446,7 +667,7 @@ public class PictureProcessing
             pointX = smallStartX;
             pointY = smallStartY;
             Point point = new(pointX, pointY);
-            if (!ListContainsPoint(listPoint, point)) listPoint.Add(point);
+            if (!listPoint.Contains(point)) listPoint.Add(point);
             if (!isFindAll) goto FIND_END;
         }
 
@@ -461,6 +682,44 @@ public class PictureProcessing
 
     #endregion
 
+    #region 返回图片颜色数组
+
+    /// <summary>
+    ///     将图片数据写入对应的内存
+    /// </summary>
+    /// <param name="subBitmap">图片</param>
+    /// <param name="bts">数组</param>
+    /// <returns></returns>
+    public static void GetBitmapByte(Bitmap subBitmap,ref byte[] bts)
+    {
+        var subData = subBitmap.LockBits(new Rectangle(0, 0, subBitmap.Width, subBitmap.Height),
+            ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
+        if (bts.Length != subBitmap.Width * subBitmap.Height * 4)
+        {
+            bts = new byte[subData.Stride * subData.Height];
+        }
+        Marshal.Copy(subData.Scan0, bts, 0, subData.Stride * subData.Height);
+        subBitmap.UnlockBits(subData);
+    }
+
+    /// <summary>
+    ///     将图片数据写入对应的内存
+    /// </summary>
+    /// <param name="subBitmap">图片</param>
+    /// <param name="bts">数组</param>
+    /// <returns></returns>
+    public static byte[] GetBitmapByte(Bitmap subBitmap)
+    {
+        var subData = subBitmap.LockBits(new Rectangle(0, 0, subBitmap.Width, subBitmap.Height),
+            ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
+        var bts = new byte[subData.Stride * subData.Height];
+        Marshal.Copy(subData.Scan0, bts, 0, subData.Stride * subData.Height);
+        subBitmap.UnlockBits(subData);
+        return bts;
+    }
+
+    #endregion
+
     #region 颜色对比
 
     /// <summary>
@@ -470,7 +729,7 @@ public class PictureProcessing
     /// <param name="colorB">颜色B</param>
     /// <param name="errorRange">色值误差，默认值10</param>
     /// <returns></returns>
-    public static bool ColorAEqualColorB(Color colorA, Color colorB, byte errorRange = 10)
+    public static bool ColorAEqualColorB(in Color colorA,in Color colorB, byte errorRange = 10)
     {
         return //Math.Abs(colorA.A - colorB.A) <= errorRange &&
             Math.Abs(colorA.R - colorB.R) <= errorRange &&
@@ -478,7 +737,7 @@ public class PictureProcessing
             Math.Abs(colorA.B - colorB.B) <= errorRange;
     }
 
-    public static bool ColorAEqualColorB(Color colorA, Color colorB, byte errorR, byte errorG, byte errorB)
+    public static bool ColorAEqualColorB(in Color colorA,in Color colorB, byte errorR, byte errorG, byte errorB)
     {
         return //Math.Abs(colorA.A - colorB.A) <= errorRange &&
             Math.Abs(colorA.R - colorB.R) <= errorR &&
@@ -497,7 +756,7 @@ public class PictureProcessing
     /// <param name="point">坐标</param>
     /// <param name="errorRange">误差范围</param>
     /// <returns></returns>
-    private static bool ListContainsPoint(List<Point> listPoint, Point point, double errorRange = 10)
+    private static bool ListContainsPoint(PooledList<Point> listPoint, Point point, double errorRange = 10)
     {
         var isExist = false;
         foreach (var item in listPoint.Where(item => item.X <= point.X + errorRange && item.X >= point.X - errorRange &&
