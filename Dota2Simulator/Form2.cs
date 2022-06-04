@@ -1,5 +1,4 @@
 ﻿using Dota2Simulator.KeyboardMouse;
-using Dota2Simulator.Resources;
 using PaddleOCRSharp;
 using System;
 using System.Collections.Generic;
@@ -1580,30 +1579,6 @@ public partial class Form2 : Form
 
     #region 其他
 
-    private static void 一键保存图片()
-    {
-        while (!RegPicture(Resource1.最后一张, 1132, 947, 40, 40, 1))
-        {
-            KeyDown((uint)Keys.LControlKey);
-
-            KeyPress((uint)Keys.S);
-
-            KeyUp((uint)Keys.LControlKey);
-
-            Delay(250);
-
-            KeyPress((uint)Keys.Enter);
-
-            Delay(500);
-
-            KeyPress((uint)Keys.Right);
-
-            Delay(500);
-
-            if (_中断条件) break;
-        }
-    }
-
     #endregion
 
     #region 延时
@@ -1817,7 +1792,7 @@ public partial class Form2 : Form
     /// <summary>
     ///     全局OCR
     /// </summary>
-    private static PaddleOCREngine _paddleOcrEngine;
+    private static PaddleOCREngine _PaddleOcrEngine;
 
     /// <summary>
     ///     丢装备条件布尔
@@ -5583,12 +5558,12 @@ public partial class Form2 : Form
 
     private static string 获取图片文字(byte[] bts)
     {
-        return _paddleOcrEngine.DetectText(bts).Text;
+        return _PaddleOcrEngine.DetectText(bts).Text;
     }
 
     private static string 获取图片文字(Bitmap bp)
     {
-        return _paddleOcrEngine.DetectText(bp).Text;
+        return _PaddleOcrEngine.DetectText(bp).Text;
     }
 
     #endregion
@@ -6069,7 +6044,7 @@ public partial class Form2 : Form
         oCRParameter.det_db_score_mode = 1; //是否使用多段线，即文字区域是用多段线还是用矩形，
 
         //建议程序全局初始化一次即可，不必每次识别都初始化，容易报错。  
-        _paddleOcrEngine = new PaddleOCREngine(config, oCRParameter);
+        _PaddleOcrEngine = new PaddleOCREngine(config, oCRParameter);
     }
 
     /// <summary>
@@ -6087,7 +6062,7 @@ public partial class Form2 : Form
         //WinIO32.Shutdown();
 
         // 释放识别功能
-        _paddleOcrEngine?.Dispose();
+        _PaddleOcrEngine?.Dispose();
     }
 
     /// <summary>
