@@ -17,6 +17,9 @@ public class SimEnigo
     public static extern void KeyPressWhile(uint s,uint d);
 
     [DllImport("simengio.dll")]
+    public static extern void KeyPressAlt(uint s);
+
+    [DllImport("simengio.dll")]
     public static extern void MouseMove(int x, int y);
 
     [DllImport("simengio.dll")]

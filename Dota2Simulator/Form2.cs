@@ -304,6 +304,48 @@ public partial class Form2 : Form
 
             #endregion
 
+            #region 屠夫
+
+            case "屠夫":
+            {
+                if (!_总循环条件)
+                {
+                    _总循环条件 = true;
+                    无物品状态初始化();
+                    _全局模式 = 0;
+                }
+
+                _条件根据图片委托1 ??= 阿托斯接钩子;
+
+                if (!_是否魔晶)
+                {
+                    _是否魔晶 = 阿哈利姆魔晶(_全局bts, _全局size);
+                    if (_是否魔晶) _技能数量 = "5";
+                }
+
+                switch (e.KeyCode)
+                {
+                    case Keys.D2:
+                        _条件1 = true;
+                        _中断条件 = false;
+                        break;
+                    case Keys.E:
+                        
+                        break;
+                    case Keys.R:
+                        
+                        break;
+                    case Keys.S:
+                        _中断条件 = true;
+                        _条件1 = false;
+                        break;
+                    }
+
+                break;
+            }
+
+            #endregion
+
             #endregion
 
             #region 敏捷
@@ -1269,6 +1311,12 @@ public partial class Form2 : Form
                     case Keys.D4:
                         Run(() =>
                         {
+                            KeyPressAlt((uint) Keys.Z);
+                        });
+                        break;
+                    case Keys.D5:
+                        Run(() =>
+                        {
                             _指定地点p = MousePosition;
                             _全局模式 = 1;
                         });
@@ -1403,26 +1451,61 @@ public partial class Form2 : Form
 
             #region 神域
 
-            case "神域" when e.KeyCode == Keys.W:
-                Run(命运敕令去后摇);
-                break;
-            case "神域" when e.KeyCode == Keys.E:
-                Run(涤罪之焰去后摇);
-                break;
             case "神域":
             {
-                if (e.KeyCode == Keys.R) Run(虚妄之诺去后摇);
+                if (!_总循环条件)
+                {
+                    _总循环条件 = true;
+                    无物品状态初始化();
+                }
+
+                _条件根据图片委托1 ??= 命运敕令去后摇;
+
+                _条件根据图片委托2 ??= 涤罪之焰去后摇;
+
+                _条件根据图片委托3 ??= 虚妄之诺去后摇;
+
+                if (!_是否魔晶)
+                {
+                    _是否a杖 = 阿哈利姆神杖(_全局bts, _全局size);
+                    if (_是否a杖) _技能数量 = "5";
+                }
+
+                switch (e.KeyCode)
+                {
+                    case Keys.W:
+                        _中断条件 = false;
+                        _条件1 = true;
+                        break;
+                    case Keys.E:
+                        _中断条件 = false;
+                        _条件2 = true;
+                        break;
+                    case Keys.R:
+                        _中断条件 = false;
+                        _条件3 = true;
+                        break;
+                    case Keys.S:
+                        _中断条件 = true;
+                        _条件1 = false;
+                        _条件2 = false;
+                        _条件3 = false;
+                        break;
+
+                }
+
                 break;
             }
+
+            #endregion
+
+            #region 修补匠
+
             case "修补匠" when e.KeyCode == Keys.R:
                 KeyPress((uint)Keys.C);
                 KeyPress((uint)Keys.V);
                 Run(刷新完跳);
                 break;
-
-            #endregion
-
-            #region 修补匠
 
             case "修补匠" when e.KeyCode == Keys.D1:
             {
@@ -1557,88 +1640,6 @@ public partial class Form2 : Form
             }
 
             #endregion
-        }
-    }
-
-    #endregion
-
-    #region 获取当前时间毫秒()
-
-    private static long 获取当前时间毫秒()
-    {
-        return new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds();
-    }
-
-    private static void 初始化全局时间(ref long time)
-    {
-        if (time == -1)
-            time = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds();
-    }
-
-    #endregion
-
-    #region 其他
-
-    #endregion
-
-    #region 延时
-
-    /// <summary>
-    ///     精准延迟
-    /// </summary>
-    /// <param name="delay">需要延迟的时间</param>
-    /// <param name="time"></param>
-    private static void Delay(int delay, long time = -1)
-    {
-        time = time switch
-        {
-            -1 => 获取当前时间毫秒(),
-            _ => time
-        };
-        while (获取当前时间毫秒() - time <= delay)
-        {
-        }
-    }
-
-    #endregion
-
-    #region 更改名字取消功能
-
-    private void Tb_name_TextChanged(object sender, EventArgs e)
-    {
-        取消所有功能();
-    }
-
-    #endregion
-
-    #region 按钮捕捉颜色
-
-    private void button1_Click(object sender, EventArgs e)
-    {
-        Run(捕捉颜色);
-    }
-
-    #endregion
-
-    #region 测试显示颜色
-
-    /// <summary>
-    ///     显示颜色
-    /// </summary>
-    /// <param name="sender"></param>
-    /// <param name="e"></param>
-    private void tb_delay_TextChanged(object sender, EventArgs e)
-    {
-        if (tb_name.Text.Trim() != "测试") return;
-
-        try
-        {
-            using var list = new PooledList<string>(tb_delay.Text.Split(','));
-            pictureBox1.BackColor = Color.FromArgb(255, int.Parse(list[0]), int.Parse(list[1]), int.Parse(list[2]));
-        }
-        catch
-        {
-            // ignored
         }
     }
 
@@ -2121,7 +2122,7 @@ public partial class Form2 : Form
 
                 if (RegPicture(军团_强攻CD, bts, size))
                 {
-                    AltKeyPress((uint)Keys.W);
+                    KeyPressAlt((uint)Keys.W);
                     Delay(260); // 去后摇
                     RightClick();
                     Delay(30);
@@ -2416,6 +2417,34 @@ public partial class Form2 : Form
     }
 
     #endregion
+
+    #region 屠夫
+    private static bool 阿托斯接钩子(in byte[] bts, Size size)
+    {
+        var time = 获取当前时间毫秒();
+
+        根据图片以及类别使用物品(物品_阿托斯之棍_4, bts, size, _技能数量);
+
+        根据图片以及类别使用物品(物品_纷争, bts, size, _技能数量);
+
+        var 是否以太 = RegPicture(物品_以太, bts, size);
+
+        while (获取当前时间毫秒() - time < (是否以太 ? 420 :300))
+        {
+        }
+
+        KeyPress((uint)Keys.Q);
+
+        KeyPressWhile((uint)Keys.R,(uint)Keys.LShiftKey);
+
+        Delay(100);
+
+        KeyPressWhile((uint)Keys.E, (uint)Keys.LShiftKey);
+
+        return false;
+    }
+    #endregion
+
 
     #endregion
 
@@ -4161,61 +4190,29 @@ public partial class Form2 : Form
 
     #region 神域
 
-    private void 命运敕令去后摇()
+    private static bool 命运敕令去后摇(in byte[] bts, Size size)
     {
-        var time = 获取当前时间毫秒();
+        if (!RegPicture(神域_释放命运敕令, bts, size)) return true;
 
-        var q_down = 0;
-
-        while (q_down == 0)
-        {
-            if (RegPicture(神域_释放命运敕令, "W"))
-            {
-                q_down = 1;
-                Delay(145);
-                RightClick();
-            }
-
-            if (获取当前时间毫秒() - time > 1200) break;
-        }
+        Delay(145);
+        RightClick();
+        return false;
     }
 
-    private void 涤罪之焰去后摇()
+    private static bool 涤罪之焰去后摇(in byte[] bts, Size size)
     {
-        var time = 获取当前时间毫秒();
-
-        var q_down = 0;
-
-        while (q_down == 0)
-        {
-            if (RegPicture(神域_释放涤罪之焰, "E"))
-            {
-                q_down = 1;
-                Delay(95);
-                RightClick();
-            }
-
-            if (获取当前时间毫秒() - time > 1200) break;
-        }
+        if (!RegPicture(神域_释放涤罪之焰, bts,size)) return true;
+        Delay(95);
+        RightClick();
+        return false;
     }
 
-    private void 虚妄之诺去后摇()
+    private static bool 虚妄之诺去后摇(in byte[] bts, Size size)
     {
-        var time = 获取当前时间毫秒();
-
-        var q_down = 0;
-
-        while (q_down == 0)
-        {
-            if (RegPicture(神域_释放虚妄之诺, "R"))
-            {
-                q_down = 1;
-                Delay(105);
-                RightClick();
-            }
-
-            if (获取当前时间毫秒() - time > 1200) break;
-        }
+        if (!RegPicture(神域_释放虚妄之诺, bts, size)) return true;
+        Delay(105);
+        RightClick();
+        return false;
     }
 
     #endregion
@@ -5033,7 +5030,7 @@ public partial class Form2 : Form
 
     private static void 渐隐期间放技能(uint c, int delay)
     {
-        AltKeyPress((uint)Keys.Z);
+        KeyPressAlt((uint)Keys.Z);
         Delay(delay);
         KeyPress(c);
     }
@@ -5954,6 +5951,88 @@ public partial class Form2 : Form
 
     #endregion
 
+    #region 获取当前时间毫秒
+
+    private static long 获取当前时间毫秒()
+    {
+        return new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds();
+    }
+
+    private static void 初始化全局时间(ref long time)
+    {
+        if (time == -1)
+            time = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds();
+    }
+
+    #endregion
+
+    #region 其他
+
+    #endregion
+
+    #region 延时
+
+    /// <summary>
+    ///     精准延迟
+    /// </summary>
+    /// <param name="delay">需要延迟的时间</param>
+    /// <param name="time"></param>
+    private static void Delay(int delay, long time = -1)
+    {
+        time = time switch
+        {
+            -1 => 获取当前时间毫秒(),
+            _ => time
+        };
+        while (获取当前时间毫秒() - time <= delay)
+        {
+        }
+    }
+
+    #endregion
+
+    #region 更改名字取消功能
+
+    private void Tb_name_TextChanged(object sender, EventArgs e)
+    {
+        取消所有功能();
+    }
+
+    #endregion
+
+    #region 按钮捕捉颜色
+
+    private void button1_Click(object sender, EventArgs e)
+    {
+        Run(捕捉颜色);
+    }
+
+    #endregion
+
+    #region 测试显示颜色
+
+    /// <summary>
+    ///     显示颜色
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
+    private void tb_delay_TextChanged(object sender, EventArgs e)
+    {
+        if (tb_name.Text.Trim() != "测试") return;
+
+        try
+        {
+            using var list = new PooledList<string>(tb_delay.Text.Split(','));
+            pictureBox1.BackColor = Color.FromArgb(255, int.Parse(list[0]), int.Parse(list[1]), int.Parse(list[2]));
+        }
+        catch
+        {
+            // ignored
+        }
+    }
+
+    #endregion
+
     #region 页面初始化和注销
 
     /// <summary>
@@ -6145,14 +6224,14 @@ public partial class Form2 : Form
         SimEnigo.KeyDown(key);
     }
 
-    private static void KeyPressWhile(uint key, uint key1 = (uint)Keys.Alt)
+    private static void KeyPressWhile(uint key, uint key1)
     {
         SimEnigo.KeyPressWhile(key, key1);
     }
 
-    private static void AltKeyPress(uint key)
+    private static void KeyPressAlt(uint key)
     {
-        SimEnigo.KeyPressWhile(key, (uint)Keys.Alt);
+        SimEnigo.KeyPressAlt(key);
     }
 
     private static void ShiftKeyPress(uint key)
