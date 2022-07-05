@@ -15,225 +15,6 @@ namespace Dota2Simulator;
 ///
 ///
 
-#region DX捕捉并不行
-
-///// <summary>
-/////     DirectX截图
-///// </summary>
-//DirectXScreenCapturer _capturer = new DirectXScreenCapturer();
-
-//// 注销捕捉
-//_capturer.Dispose();
-
-//var bitmap = new Bitmap(19220,1080);
-//Image image = bitmap;
-//(_, _, image) = _capturer.GetFrameImage();
-//pictureBox1.BackgroundImage = image;
-
-//using var memoryStream = tempmanager.GetStream("全局图像bts");
-//image.Save(memoryStream, image.RawFormat);
-//public class DirectXScreenCapturer : IDisposable
-//{
-//    private Factory1 factory;
-//    private Adapter1 adapter;
-//    private SharpDX.Direct3D11.Device device;
-//    private Output output;
-//    private Output1 output1;
-//    private Texture2DDescription textureDesc;
-//    //2D 纹理，存储截屏数据
-//    private Texture2D screenTexture;
-
-//    public DirectXScreenCapturer()
-//    {
-//        // 获取输出设备（显卡、显示器），这里是主显卡和主显示器
-//        factory = new Factory1();
-//        adapter = factory.GetAdapter1(0);
-//        device = new SharpDX.Direct3D11.Device(adapter);
-//        output = adapter.GetOutput(0);
-//        output1 = output.QueryInterface<Output1>();
-
-//        //设置纹理信息，供后续使用（截图大小和质量）
-//        textureDesc = new Texture2DDescription
-//        {
-//            CpuAccessFlags = CpuAccessFlags.Read,
-//            BindFlags = BindFlags.None,
-//            Format = Format.R8G8B8A8_UNorm,
-//            Width = output.Description.DesktopBounds.Right,
-//            Height = output.Description.DesktopBounds.Bottom,
-//            OptionFlags = ResourceOptionFlags.None,
-//            MipLevels = 1,
-//            ArraySize = 1,
-//            SampleDescription = { Count = 1, Quality = 0 },
-//            Usage = ResourceUsage.Staging
-//        };
-
-//        screenTexture = new Texture2D(device, textureDesc);
-//    }
-
-//    public Result ProcessFrame(Action<DataBox, Texture2DDescription> processAction, int timeoutInMilliseconds = 5)
-//    {
-//        //截屏，可能失败
-//        using OutputDuplication duplicatedOutput = output1.DuplicateOutput(device);
-//        var result = duplicatedOutput.TryAcquireNextFrame(timeoutInMilliseconds, out OutputDuplicateFrameInformation duplicateFrameInformation, out SharpDX.DXGI.Resource screenResource);
-
-//        if (!result.Success) return result;
-
-//        using Texture2D screenTexture2D = screenResource.QueryInterface<Texture2D>();
-
-//        //复制数据
-//        device.ImmediateContext.CopyResource(screenTexture2D, screenTexture);
-//        DataBox mapSource = device.ImmediateContext.MapSubresource(screenTexture, 0, MapMode.Read, SharpDX.Direct3D11.MapFlags.None);
-
-//        processAction?.Invoke(mapSource, textureDesc);
-
-//        //释放资源
-//        device.ImmediateContext.UnmapSubresource(screenTexture, 0);
-//        screenResource.Dispose();
-//        duplicatedOutput.ReleaseFrame();
-
-//        return result;
-//    }
-
-//    public (Result result, bool isBlackFrame, Image image) GetFrameImage(int timeoutInMilliseconds = 5)
-//    {
-//        //生成 C# 用图像
-//        Bitmap image = new Bitmap(textureDesc.Width, textureDesc.Height, PixelFormat.Format24bppRgb);
-//        bool isBlack = true;
-//        var result = ProcessFrame(ProcessImage);
-
-//        if (!result.Success) image.Dispose();
-
-//        return (result, isBlack, result.Success ? image : null);
-
-//        void ProcessImage(DataBox dataBox, Texture2DDescription texture)
-//        {
-//            BitmapData data = image.LockBits(new Rectangle(0, 0, texture.Width, texture.Height), ImageLockMode.ReadWrite, PixelFormat.Format24bppRgb);
-
-//            unsafe
-//            {
-//                byte* dataHead = (byte*)dataBox.DataPointer.ToPointer();
-
-//                for (int x = 0; x < texture.Width; x++)
-//                {
-//                    for (int y = 0; y < texture.Height; y++)
-//                    {
-//                        byte* pixPtr = (byte*)(data.Scan0 + y * data.Stride + x * 3);
-
-//                        int pos = x + y * texture.Width;
-//                        pos *= 4;
-
-//                        byte r = dataHead[pos + 2];
-//                        byte g = dataHead[pos + 1];
-//                        byte b = dataHead[pos + 0];
-
-//                        if (isBlack && (r != 0 || g != 0 || b != 0)) isBlack = false;
-
-//                        pixPtr[0] = b;
-//                        pixPtr[1] = g;
-//                        pixPtr[2] = r;
-//                    }
-//                }
-//            }
-
-//            image.UnlockBits(data);
-//        }
-//    }
-
-//    public (Result result, bool isBlackFrame, byte[] bts) GetFrameBytes(int timeoutInMilliseconds = 5)
-//    {
-//        //生成 C# 用图像
-//        Bitmap image = new Bitmap(textureDesc.Width, textureDesc.Height, PixelFormat.Format24bppRgb);
-//        bool isBlack = true;
-//        var result = ProcessFrame(ProcessImage);
-
-//        if (!result.Success) image.Dispose();
-
-//        return (result, isBlack, result.Success ? new byte[0] : new byte[0]);
-
-//        void ProcessImage(DataBox dataBox, Texture2DDescription texture)
-//        {
-//            BitmapData data = image.LockBits(new Rectangle(0, 0, texture.Width, texture.Height), ImageLockMode.ReadWrite, PixelFormat.Format24bppRgb);
-
-//            unsafe
-//            {
-//                byte* dataHead = (byte*)dataBox.DataPointer.ToPointer();
-
-//                for (int x = 0; x < texture.Width; x++)
-//                {
-//                    for (int y = 0; y < texture.Height; y++)
-//                    {
-//                        byte* pixPtr = (byte*)(data.Scan0 + y * data.Stride + x * 3);
-
-//                        int pos = x + y * texture.Width;
-//                        pos *= 4;
-
-//                        byte r = dataHead[pos + 2];
-//                        byte g = dataHead[pos + 1];
-//                        byte b = dataHead[pos + 0];
-
-//                        if (isBlack && (r != 0 || g != 0 || b != 0)) isBlack = false;
-
-//                        pixPtr[0] = b;
-//                        pixPtr[1] = g;
-//                        pixPtr[2] = r;
-//                    }
-//                }
-//            }
-
-//            image.UnlockBits(data);
-//        }
-//    }
-
-//    #region IDisposable Support
-//    private bool disposedValue = false; // 要检测冗余调用
-
-//    protected virtual void Dispose(bool disposing)
-//    {
-//        if (!disposedValue)
-//        {
-//            if (disposing)
-//            {
-//                // TODO: 释放托管状态(托管对象)。
-//                factory.Dispose();
-//                adapter.Dispose();
-//                device.Dispose();
-//                output.Dispose();
-//                output1.Dispose();
-//                screenTexture.Dispose();
-//            }
-
-//            // TODO: 释放未托管的资源(未托管的对象)并在以下内容中替代终结器。
-//            // TODO: 将大型字段设置为 null。
-//            factory = null;
-//            adapter = null;
-//            device = null;
-//            output = null;
-//            output1 = null;
-//            screenTexture = null;
-
-//            disposedValue = true;
-//        }
-//    }
-
-//    // TODO: 仅当以上 Dispose(bool disposing) 拥有用于释放未托管资源的代码时才替代终结器。
-//    // ~DirectXScreenCapturer()
-//    // {
-//    //   // 请勿更改此代码。将清理代码放入以上 Dispose(bool disposing) 中。
-//    //   Dispose(false);
-//    // }
-
-//    // 添加此代码以正确实现可处置模式。
-//    public void Dispose()
-//    {
-//        // 请勿更改此代码。将清理代码放入以上 Dispose(bool disposing) 中。
-//        Dispose(true);
-//        // TODO: 如果在以上内容中替代了终结器，则取消注释以下行。
-//        // GC.SuppressFinalize(this);
-//    }
-//    #endregion
-//} 
-#endregion
-
 
 public class PictureProcessing
 {
@@ -293,6 +74,7 @@ public class PictureProcessing
 
     /// <summary>
     ///     屏幕截图，单操作耗时7ms，能一次解决的不要并行（因为有锁，基本时间是翻倍的）
+    ///     全屏截图大约要60ms
     /// </summary>
     /// <param name="x">图片左上角X坐标</param>
     /// <param name="y">图片左上角Y坐标</param>
@@ -315,7 +97,7 @@ public class PictureProcessing
     #region 屏幕取色
 
     /// <summary>
-    ///     屏幕截图，单操作耗时7ms（最好是一次性截图，然后多点提取）
+    ///     屏幕截图，单操作耗时7ms（最好是一次性截图，然后多点提取） 性能过低 排除
     /// </summary>
     /// <param name="x">图片左上角X坐标</param>
     /// <param name="y">图片左上角Y坐标</param>
@@ -345,44 +127,136 @@ public class PictureProcessing
     #region 找色
 
     /// <summary>
-    ///     找颜色
+    ///     单点找色 找出符合条件的颜色坐标
     /// </summary>
-    /// <param name="parPic">查找的图片的绝对路径</param>
-    /// <param name="searchColor">查找的16进制颜色值，如#0C5FAB</param>
-    /// <param name="searchRect">查找的矩形区域范围内</param>
-    /// <param name="errorRange">容错</param>
+    /// <param name="color">要找的颜色</param>
+    /// <param name="byteArraryPar">找图数组</param>
+    /// <param name="parSize">图片尺寸</param>
+    /// <param name="errorRange">容错范围 一般为0</param>
     /// <returns></returns>
-    public static Point FindColor(Bitmap parBitmap, string searchColor, Rectangle searchRect = new(),
-        byte errorRange = 10)
+    public static PooledList<Point> FindColor(Color color, byte[] byteArraryPar, Size parSize, byte errorRange = 0)
     {
-        var colorX = ColorTranslator.FromHtml(searchColor);
-        var parData = parBitmap.LockBits(new Rectangle(0, 0, parBitmap.Width, parBitmap.Height),
-            ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
-        var byteArraryPar = new byte[parData.Stride * parData.Height];
-        Marshal.Copy(parData.Scan0, byteArraryPar, 0, parData.Stride * parData.Height);
-        if (searchRect.IsEmpty) searchRect = new Rectangle(0, 0, parBitmap.Width, parBitmap.Height);
+        PooledList<Point> listPoint = new();
+        var parWidth = parSize.Width;
+        var searchRect = new Rectangle(0, 0, parSize.Width, parSize.Height);
+
         var searchLeftTop = searchRect.Location;
         var searchSize = searchRect.Size;
+
         var iMax = searchLeftTop.Y + searchSize.Height; //行
         var jMax = searchLeftTop.X + searchSize.Width; //列
-        var pointX = -1;
-        var pointY = -1;
-        for (var m = searchRect.Y; m < iMax; m++)
-        for (var n = searchRect.X; n < jMax; n++)
+
+        var balanceLock = new object();
+
+        Parallel.For(searchLeftTop.X, jMax, () => new Point(), (j, loop, subPoint) =>
+            {
+                for (var i = searchLeftTop.Y; i < iMax; i++)
+                {
+                    int x = j, y = i;
+                    var parIndex = i * parWidth * 4 + j * 4;
+                    var colorBig = Color.FromArgb(byteArraryPar[parIndex + 3], byteArraryPar[parIndex + 2],
+                        byteArraryPar[parIndex + 1], byteArraryPar[parIndex]);
+
+                    if (!ColorAEqualColorB(colorBig, color, errorRange)) continue;
+                    Point point = new(j, i);
+                    return point;
+                }
+
+                //小图x1,y1坐标处的颜色值
+                return default;
+            },
+            x =>
+            {
+                lock (balanceLock)
+                {
+                    if (x.X != 0)
+                        listPoint.Add(x);
+                }
+            }
+        );
+
+        return listPoint;
+    }
+
+    /// <summary>
+    ///     多线程耗时11ms(第二次优化后) 同步40ms 左右，相差的不是很大，
+    ///     但准确度差很多，图片因为数量多所以掉几个没问题，找色就几个，掉几个就完全不一样了
+    /// </summary>
+    /// <param name="colors">颜色数组</param>
+    /// <param name="points">坐标数组相，对于左上角的坐标</param>
+    /// <param name="byteArraryPar">找图数组</param>
+    /// <param name="parSize">图片尺寸</param>
+    /// <param name="errorRange">容错范围 一般为0</param>
+    /// <param name="matchRate">匹配率，大概有多少颜色是匹配的</param>
+    /// <returns></returns>
+    public static PooledList<Point> FindColors(PooledList<Color> colors, PooledList<Point> points, byte[] byteArraryPar, Size parSize, byte errorRange = 0, double matchRate = 0.9)
+    {
+        PooledList<Point> ListPoint = new();
+        var subWidth = 0;
+        var subHeight = 0;
+        foreach (var p in points)
         {
-            var index = m * parBitmap.Width * 4 + n * 4;
-            var color = Color.FromArgb(byteArraryPar[index + 3], byteArraryPar[index + 2],
-                byteArraryPar[index + 1], byteArraryPar[index]);
-            if (!ColorAEqualColorB(color, colorX, errorRange)) continue;
-            pointX = n;
-            pointY = m;
-            goto END;
+            if (p.X > subWidth) subWidth = p.X;
+            if (p.Y > subHeight) subHeight = p.Y;
         }
 
-        END:
-        parBitmap.UnlockBits(parData);
-        return new Point(pointX, pointY);
+        var parWidth = parSize.Width;
+        //int parHeight = parBitmap.Height;
+        var searchRect = new Rectangle(0, 0, parSize.Width, parSize.Height);
+
+        var searchLeftTop = searchRect.Location;
+        var searchSize = searchRect.Size;
+        // 第一个颜色
+        var startPixelColor = colors[0];
+
+        var iMax = searchLeftTop.Y + searchSize.Height - subHeight; //行
+        var jMax = searchLeftTop.X + searchSize.Width - subWidth; //列
+
+        int smallOffsetX = 0, smallOffsetY = 0;
+        int smallStartX, smallStartY;
+        int pointX;
+        int pointY;
+
+        for (var j = searchLeftTop.X; j < jMax; j++)
+        {
+            for (var i = searchLeftTop.Y; i < iMax; i++)
+            {
+                int x = j, y = i;
+                var parIndex = (i + points[0].X) * parWidth * 4 + (j + points[0].Y) * 4; // 第一个颜色坐标的颜色
+                var colorBig = Color.FromArgb(byteArraryPar[parIndex + 3], byteArraryPar[parIndex + 2],
+                    byteArraryPar[parIndex + 1], byteArraryPar[parIndex]);
+                if (!ColorAEqualColorB(colorBig, startPixelColor, errorRange)) continue;
+                smallStartX = x - smallOffsetX; //待找的点X坐标
+                smallStartY = y - smallOffsetY; //待找的点Y坐标
+                var sum = 0; //所有需要比对的有效点
+                var matchNum = 0; //成功匹配的点
+                for (var m = 1; m < points.Count; m++)
+                {
+                    int x1 = points[m].X, y1 = points[m].Y;
+                    var color = colors[m];
+                    sum++;
+                    int x2 = smallStartX + x1, y2 = smallStartY + y1;
+                    var parReleativeIndex = y2 * parWidth * 4 + x2 * 4; //比对大图对应的像素点的颜色
+                    var colorPixel = Color.FromArgb(byteArraryPar[parReleativeIndex + 3],
+                        byteArraryPar[parReleativeIndex + 2], byteArraryPar[parReleativeIndex + 1],
+                        byteArraryPar[parReleativeIndex]);
+                    if (ColorAEqualColorB(colorPixel, color, errorRange)) matchNum++;
+                }
+
+                if (((double) matchNum / sum < matchRate)) continue;
+                // Console.WriteLine((double)matchNum / sum);
+                pointX = smallStartX;
+                pointY = smallStartY;
+                // 获取找到匹配的左上角坐标
+                Point point = new(pointX, pointY);
+                if (!ListPoint.Contains(point))
+                    ListPoint.Add(point);
+            }
+        }
+
+        return ListPoint;
     }
+
 
     #endregion
 
@@ -942,3 +816,223 @@ public class PictureProcessing
 
     #endregion
 }
+
+
+#region DX捕捉并不行
+
+///// <summary>
+/////     DirectX截图
+///// </summary>
+//DirectXScreenCapturer _capturer = new DirectXScreenCapturer();
+
+//// 注销捕捉
+//_capturer.Dispose();
+
+//var bitmap = new Bitmap(19220,1080);
+//Image image = bitmap;
+//(_, _, image) = _capturer.GetFrameImage();
+//pictureBox1.BackgroundImage = image;
+
+//using var memoryStream = tempmanager.GetStream("全局图像bts");
+//image.Save(memoryStream, image.RawFormat);
+//public class DirectXScreenCapturer : IDisposable
+//{
+//    private Factory1 factory;
+//    private Adapter1 adapter;
+//    private SharpDX.Direct3D11.Device device;
+//    private Output output;
+//    private Output1 output1;
+//    private Texture2DDescription textureDesc;
+//    //2D 纹理，存储截屏数据
+//    private Texture2D screenTexture;
+
+//    public DirectXScreenCapturer()
+//    {
+//        // 获取输出设备（显卡、显示器），这里是主显卡和主显示器
+//        factory = new Factory1();
+//        adapter = factory.GetAdapter1(0);
+//        device = new SharpDX.Direct3D11.Device(adapter);
+//        output = adapter.GetOutput(0);
+//        output1 = output.QueryInterface<Output1>();
+
+//        //设置纹理信息，供后续使用（截图大小和质量）
+//        textureDesc = new Texture2DDescription
+//        {
+//            CpuAccessFlags = CpuAccessFlags.Read,
+//            BindFlags = BindFlags.None,
+//            Format = Format.R8G8B8A8_UNorm,
+//            Width = output.Description.DesktopBounds.Right,
+//            Height = output.Description.DesktopBounds.Bottom,
+//            OptionFlags = ResourceOptionFlags.None,
+//            MipLevels = 1,
+//            ArraySize = 1,
+//            SampleDescription = { Count = 1, Quality = 0 },
+//            Usage = ResourceUsage.Staging
+//        };
+
+//        screenTexture = new Texture2D(device, textureDesc);
+//    }
+
+//    public Result ProcessFrame(Action<DataBox, Texture2DDescription> processAction, int timeoutInMilliseconds = 5)
+//    {
+//        //截屏，可能失败
+//        using OutputDuplication duplicatedOutput = output1.DuplicateOutput(device);
+//        var result = duplicatedOutput.TryAcquireNextFrame(timeoutInMilliseconds, out OutputDuplicateFrameInformation duplicateFrameInformation, out SharpDX.DXGI.Resource screenResource);
+
+//        if (!result.Success) return result;
+
+//        using Texture2D screenTexture2D = screenResource.QueryInterface<Texture2D>();
+
+//        //复制数据
+//        device.ImmediateContext.CopyResource(screenTexture2D, screenTexture);
+//        DataBox mapSource = device.ImmediateContext.MapSubresource(screenTexture, 0, MapMode.Read, SharpDX.Direct3D11.MapFlags.None);
+
+//        processAction?.Invoke(mapSource, textureDesc);
+
+//        //释放资源
+//        device.ImmediateContext.UnmapSubresource(screenTexture, 0);
+//        screenResource.Dispose();
+//        duplicatedOutput.ReleaseFrame();
+
+//        return result;
+//    }
+
+//    public (Result result, bool isBlackFrame, Image image) GetFrameImage(int timeoutInMilliseconds = 5)
+//    {
+//        //生成 C# 用图像
+//        Bitmap image = new Bitmap(textureDesc.Width, textureDesc.Height, PixelFormat.Format24bppRgb);
+//        bool isBlack = true;
+//        var result = ProcessFrame(ProcessImage);
+
+//        if (!result.Success) image.Dispose();
+
+//        return (result, isBlack, result.Success ? image : null);
+
+//        void ProcessImage(DataBox dataBox, Texture2DDescription texture)
+//        {
+//            BitmapData data = image.LockBits(new Rectangle(0, 0, texture.Width, texture.Height), ImageLockMode.ReadWrite, PixelFormat.Format24bppRgb);
+
+//            unsafe
+//            {
+//                byte* dataHead = (byte*)dataBox.DataPointer.ToPointer();
+
+//                for (int x = 0; x < texture.Width; x++)
+//                {
+//                    for (int y = 0; y < texture.Height; y++)
+//                    {
+//                        byte* pixPtr = (byte*)(data.Scan0 + y * data.Stride + x * 3);
+
+//                        int pos = x + y * texture.Width;
+//                        pos *= 4;
+
+//                        byte r = dataHead[pos + 2];
+//                        byte g = dataHead[pos + 1];
+//                        byte b = dataHead[pos + 0];
+
+//                        if (isBlack && (r != 0 || g != 0 || b != 0)) isBlack = false;
+
+//                        pixPtr[0] = b;
+//                        pixPtr[1] = g;
+//                        pixPtr[2] = r;
+//                    }
+//                }
+//            }
+
+//            image.UnlockBits(data);
+//        }
+//    }
+
+//    public (Result result, bool isBlackFrame, byte[] bts) GetFrameBytes(int timeoutInMilliseconds = 5)
+//    {
+//        //生成 C# 用图像
+//        Bitmap image = new Bitmap(textureDesc.Width, textureDesc.Height, PixelFormat.Format24bppRgb);
+//        bool isBlack = true;
+//        var result = ProcessFrame(ProcessImage);
+
+//        if (!result.Success) image.Dispose();
+
+//        return (result, isBlack, result.Success ? new byte[0] : new byte[0]);
+
+//        void ProcessImage(DataBox dataBox, Texture2DDescription texture)
+//        {
+//            BitmapData data = image.LockBits(new Rectangle(0, 0, texture.Width, texture.Height), ImageLockMode.ReadWrite, PixelFormat.Format24bppRgb);
+
+//            unsafe
+//            {
+//                byte* dataHead = (byte*)dataBox.DataPointer.ToPointer();
+
+//                for (int x = 0; x < texture.Width; x++)
+//                {
+//                    for (int y = 0; y < texture.Height; y++)
+//                    {
+//                        byte* pixPtr = (byte*)(data.Scan0 + y * data.Stride + x * 3);
+
+//                        int pos = x + y * texture.Width;
+//                        pos *= 4;
+
+//                        byte r = dataHead[pos + 2];
+//                        byte g = dataHead[pos + 1];
+//                        byte b = dataHead[pos + 0];
+
+//                        if (isBlack && (r != 0 || g != 0 || b != 0)) isBlack = false;
+
+//                        pixPtr[0] = b;
+//                        pixPtr[1] = g;
+//                        pixPtr[2] = r;
+//                    }
+//                }
+//            }
+
+//            image.UnlockBits(data);
+//        }
+//    }
+
+//    #region IDisposable Support
+//    private bool disposedValue = false; // 要检测冗余调用
+
+//    protected virtual void Dispose(bool disposing)
+//    {
+//        if (!disposedValue)
+//        {
+//            if (disposing)
+//            {
+//                // TODO: 释放托管状态(托管对象)。
+//                factory.Dispose();
+//                adapter.Dispose();
+//                device.Dispose();
+//                output.Dispose();
+//                output1.Dispose();
+//                screenTexture.Dispose();
+//            }
+
+//            // TODO: 释放未托管的资源(未托管的对象)并在以下内容中替代终结器。
+//            // TODO: 将大型字段设置为 null。
+//            factory = null;
+//            adapter = null;
+//            device = null;
+//            output = null;
+//            output1 = null;
+//            screenTexture = null;
+
+//            disposedValue = true;
+//        }
+//    }
+
+//    // TODO: 仅当以上 Dispose(bool disposing) 拥有用于释放未托管资源的代码时才替代终结器。
+//    // ~DirectXScreenCapturer()
+//    // {
+//    //   // 请勿更改此代码。将清理代码放入以上 Dispose(bool disposing) 中。
+//    //   Dispose(false);
+//    // }
+
+//    // 添加此代码以正确实现可处置模式。
+//    public void Dispose()
+//    {
+//        // 请勿更改此代码。将清理代码放入以上 Dispose(bool disposing) 中。
+//        Dispose(true);
+//        // TODO: 如果在以上内容中替代了终结器，则取消注释以下行。
+//        // GC.SuppressFinalize(this);
+//    }
+//    #endregion
+//} 
+#endregion

@@ -27,9 +27,10 @@
   <ItemGroup>
     <PackageReference Include="Collections.Pooled" Version="2.0.0-preview.27" />
     <PackageReference Include="Microsoft.IO.RecyclableMemoryStream" Version="2.2.0" />
-    <PackageReference Include="PaddleOCRSharp" Version="2.0.1" />
+    <PackageReference Include="PaddleOCRSharp" Version="2.0.2" />
     <PackageReference Include="SharpDX.Direct3D11" Version="4.2.0" />
-    <PackageReference Include="System.Speech" Version="7.0.0-preview.4.22229.4" />
+    <PackageReference Include="System.Speech" Version="7.0.0-preview.5.22301.12" />
+    <PackageReference Include="WindowsHook" Version="1.0.1" />
   </ItemGroup>
 
   <ItemGroup>
