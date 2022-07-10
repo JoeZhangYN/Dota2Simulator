@@ -153,7 +153,7 @@ public partial class Form2 : Form
                 _条件根据图片委托2 ??= 淘汰之刃去后摇;
                 _条件根据图片委托4 ??= 跳吼;
 
-                    switch (e.KeyCode)
+                switch (e.KeyCode)
                 {
                     case Keys.Q:
                         根据图片以及类别使用物品(物品_魂戒CD, _全局bts, _全局size, _技能数量);
@@ -173,17 +173,18 @@ public partial class Form2 : Form
                     case Keys.D2:
                         switch (_全局模式q)
                         {
-                                case 1:
-                                    _全局模式q = 0;
-                                    TTS.Speak("吼不接刃甲");
-                                    break;
-                                case 0:
-                                    _全局模式q = 1;
-                                    TTS.Speak("吼接刃甲");
-                                    break;
-                            }
+                            case 1:
+                                _全局模式q = 0;
+                                TTS.Speak("吼不接刃甲");
+                                break;
+                            case 0:
+                                _全局模式q = 1;
+                                TTS.Speak("吼接刃甲");
+                                break;
+                        }
+
                         break;
-                    }
+                }
 
                 break;
             }
@@ -271,8 +272,8 @@ public partial class Form2 : Form
                         break;
                     case Keys.D:
                         _条件3 = true;
-                    break;
-                        case Keys.D2:
+                        break;
+                    case Keys.D2:
                         _指定地点d = MousePosition;
                         TTS.Speak("已指定地点");
                         break;
@@ -289,27 +290,29 @@ public partial class Form2 : Form
                             MouseMove(p);
                             _条件3 = true;
                         }
+
                         break;
 
                     case Keys.D4:
                         if (_是否a杖)
                         {
-                            KeyDown((uint)Keys.Space);
+                            KeyDown((uint) Keys.Space);
                             Delay(30);
-                            KeyDown((uint)Keys.W);
+                            KeyDown((uint) Keys.W);
                             Delay(30);
                             var p = MousePosition;
-                            KeyDown((uint)Keys.D);
+                            KeyDown((uint) Keys.D);
                             Delay(30);
                             MouseMove(_指定地点d);
                             Delay(30);
-                            KeyUp((uint)Keys.D);
+                            KeyUp((uint) Keys.D);
                             Delay(30);
                             MouseMove(p);
                             _条件3 = true;
                         }
+
                         break;
-                    }
+                }
 
                 break;
             }
@@ -533,6 +536,7 @@ public partial class Form2 : Form
                         {
                             _条件1 = true;
                         }
+
                         break;
                     }
                     case Keys.W:
@@ -553,9 +557,77 @@ public partial class Form2 : Form
 
             #endregion
 
-            #region MyRegion
+            #region 大鱼人
 
-            
+            case "大鱼人":
+            {
+                if (!_总循环条件)
+                {
+                    _总循环条件 = true;
+                    无物品状态初始化();
+                }
+
+                if (!_是否魔晶) _是否魔晶 = 阿哈利姆魔晶(_全局bts, _全局size);
+
+                _条件根据图片委托1 ??= 踩去后摇;
+                _条件根据图片委托2 ??= 跳刀接踩;
+                _条件根据图片委托3 ??= 雾霭去后摇;
+
+                switch (e.KeyCode)
+                {
+                    case Keys.W:
+                    {
+                        _条件保持假腿 = false;
+                        根据图片以及类别使用物品(物品_勇气勋章, _全局bts, _全局size);
+                        根据图片以及类别使用物品(物品_炎阳勋章, _全局bts, _全局size);
+                        切智力腿(_技能数量);
+                        _全局模式w = _是否魔晶 ? 1 : 0;
+                        _条件1 = true;
+                        break;
+                    }
+                    case Keys.E:
+                    {
+                        _条件保持假腿 = false;
+                        _条件2 = true;
+                        break;
+                    }
+                    case Keys.R:
+                    {
+                        _条件保持假腿 = false;
+                        切智力腿(_技能数量);
+                        _条件3 = true;
+                        break;
+                    }
+                    case Keys.D3 when _条件假腿敏捷:
+                        _条件假腿敏捷 = false;
+                        _条件保持假腿 = true;
+                        TTS.Speak("切力量");
+                        break;
+                    case Keys.D3:
+                        _条件假腿敏捷 = true;
+                        _条件保持假腿 = true;
+                        TTS.Speak("切敏捷");
+                        break;
+                    case Keys.D4:
+                        switch (_条件开启切假腿)
+                        {
+                            case true:
+                                _条件开启切假腿 = false;
+                                TTS.Speak("不保持假腿");
+                                break;
+                            default:
+                                _条件开启切假腿 = true;
+                                TTS.Speak("保持假腿");
+                                break;
+                        }
+
+                        break;
+                }
+
+                break;
+            }
+
+
 
             #endregion
 
@@ -1828,11 +1900,11 @@ public partial class Form2 : Form
                 _条件根据图片委托2 ??= 神智之蚀去后摇;
                 _条件根据图片委托3 ??= 关接跳;
 
-                    switch (e.KeyCode)
+                switch (e.KeyCode)
                 {
                     case Keys.D:
                         _中断条件 = false;
-                        KeyPress((uint)Keys.W);
+                        KeyPress((uint) Keys.W);
                         _条件1 = true;
                         break;
                     case Keys.H:
@@ -1845,8 +1917,8 @@ public partial class Form2 : Form
                         _中断条件 = true;
                         根据图片以及类别使用物品(物品_纷争, _全局bts, _全局size, _技能数量);
                         _条件2 = true;
-                            break;
-                    }
+                        break;
+                }
 
                 break;
             }
@@ -2714,36 +2786,36 @@ public partial class Form2 : Form
             #region 女王
 
             case "女王":
+            {
+                if (!_总循环条件)
                 {
-                    if (!_总循环条件)
-                    {
-                        _总循环条件 = true;
-                        无物品状态初始化();
-                    }
-
-                    _条件根据图片委托1 ??= 暗影突袭去后摇;
-                    _条件根据图片委托2 ??= 闪烁去后摇;
-                    _条件根据图片委托3 ??= 痛苦尖叫去后摇;
-                    _条件根据图片委托4 ??= 冲击波去后摇;
-
-                    switch (e.KeyCode)
-                    {
-                        case Keys.Q:
-                            _条件1 = true;
-                            break;
-                        case Keys.W:
-                            _条件2 = true;
-                            break;
-                        case Keys.E:
-                            _条件3 = true;
-                            break;
-                        case Keys.R:
-                            _条件4 = true;
-                            break;
-                    }
-
-                    break;
+                    _总循环条件 = true;
+                    无物品状态初始化();
                 }
+
+                _条件根据图片委托1 ??= 暗影突袭去后摇;
+                _条件根据图片委托2 ??= 闪烁去后摇;
+                _条件根据图片委托3 ??= 痛苦尖叫去后摇;
+                _条件根据图片委托4 ??= 冲击波去后摇;
+
+                switch (e.KeyCode)
+                {
+                    case Keys.Q:
+                        _条件1 = true;
+                        break;
+                    case Keys.W:
+                        _条件2 = true;
+                        break;
+                    case Keys.E:
+                        _条件3 = true;
+                        break;
+                    case Keys.R:
+                        _条件4 = true;
+                        break;
+                }
+
+                break;
+            }
 
             #endregion
 
@@ -3225,10 +3297,11 @@ public partial class Form2 : Form
                 {
                     根据图片以及类别使用物品(物品_刃甲, bts1, size, _技能数量);
                 }
-                KeyPress((uint)Keys.A);
+
+                KeyPress((uint) Keys.A);
             });
         }
-        
+
         var q4 = 获取q4左下角颜色(bts, size);
 
         if (ColorAEqualColorB(q4, Color.FromArgb(255, 65, 74, 81), 0)) return true;
@@ -3241,10 +3314,7 @@ public partial class Form2 : Form
     {
         static void 战斗饥渴后()
         {
-            Run(() =>
-            {
-                RightClick();
-            });
+            Run(() => { RightClick(); });
         }
 
         var w4 = 获取w4左下角颜色(bts, size);
@@ -3259,10 +3329,7 @@ public partial class Form2 : Form
     {
         static void 淘汰之刃后()
         {
-            Run(() =>
-            {
-                RightClick();
-            });
+            Run(() => { RightClick(); });
         }
 
         var r4 = 获取r4左下角颜色(bts, size);
@@ -3275,8 +3342,8 @@ public partial class Form2 : Form
 
     private static bool 跳吼(in byte[] bts, Size size)
     {
-        if (根据图片以及类别使用物品(物品_跳刀, bts, size, _技能数量) 
-            || 根据图片以及类别使用物品(物品_跳刀_力量跳刀, bts, size, _技能数量) 
+        if (根据图片以及类别使用物品(物品_跳刀, bts, size, _技能数量)
+            || 根据图片以及类别使用物品(物品_跳刀_力量跳刀, bts, size, _技能数量)
             || 根据图片以及类别使用物品(物品_跳刀_智力跳刀, bts, size, _技能数量))
         {
             Delay(30);
@@ -3287,7 +3354,7 @@ public partial class Form2 : Form
 
         if (ColorAEqualColorB(q4, Color.FromArgb(255, 65, 74, 81), 0))
         {
-            KeyPress((uint)Keys.Q);
+            KeyPress((uint) Keys.Q);
         }
 
         return false;
@@ -3405,10 +3472,7 @@ public partial class Form2 : Form
     {
         static void 摔角行家后()
         {
-            Run(() =>
-            {
-                KeyPress((uint)Keys.A);
-            });
+            Run(() => { KeyPress((uint) Keys.A); });
         }
 
         var e4 = 获取e4左下角颜色(bts, size);
@@ -3431,10 +3495,7 @@ public partial class Form2 : Form
     {
         static void 飞踢后()
         {
-            Run(() =>
-            {
-                KeyPress((uint) Keys.W);
-            });
+            Run(() => { KeyPress((uint) Keys.W); });
         }
 
         var d5 = 获取d5颜色(bts, size);
@@ -3470,13 +3531,13 @@ public partial class Form2 : Form
         MouseMove(p.X, p.Y);
 
         // 跳刀空格
-        KeyPress((uint)Keys.Space);
+        KeyPress((uint) Keys.Space);
 
         Delay(30);
 
         MouseMove(point.X, point.Y);
 
-        KeyPress((uint)Keys.E);
+        KeyPress((uint) Keys.E);
 #endif
         return false;
     }
@@ -3639,6 +3700,7 @@ public partial class Form2 : Form
             var bts1 = bts;
             根据图片以及类别使用物品(物品_相位鞋, bts1, size);
         }
+
         var q4 = 获取q4左下角颜色(bts, size);
 
         if (ColorAEqualColorB(q4, Color.FromArgb(255, 65, 74, 81), 0)) return true;
@@ -3653,6 +3715,7 @@ public partial class Form2 : Form
         {
             RightClick();
         }
+
         var w4 = 获取w4左下角颜色(bts, size);
 
         if (ColorAEqualColorB(w4, Color.FromArgb(255, 65, 74, 81), 0)) return true;
@@ -3662,6 +3725,75 @@ public partial class Form2 : Form
     }
 
     #endregion
+
+    #region 大鱼人
+
+    private static bool 踩去后摇(in byte[] bts, Size size)
+    {
+        static void 鱼人碎击后()
+        {
+            switch (_全局模式w)
+            {
+                case 0:
+                    KeyPress((uint) Keys.R);
+                    break;
+                case 1:
+                    _条件保持假腿 = true;
+                    KeyPress((uint) Keys.A);
+                    break;
+            }
+        }
+
+        var w4 = 获取w4左下角颜色(bts, size);
+
+        if (ColorAEqualColorB(w4, Color.FromArgb(255, 65, 74, 81), 0)) return true;
+
+        鱼人碎击后();
+        return false;
+    }
+
+    private static bool 跳刀接踩(in byte[] bts, Size size)
+    {
+        if (
+            根据图片以及类别使用物品(物品_魂戒CD, bts, size))
+        {
+            Delay(30);
+            return true;
+        }
+
+        if (根据图片以及类别使用物品(物品_跳刀, bts, size) || 根据图片以及类别使用物品(物品_跳刀_力量跳刀, bts, size))
+
+        {
+            Delay(30);
+            return true;
+        }
+
+        var w4 = 获取w4左下角颜色(bts, size);
+
+        if (!ColorAEqualColorB(w4, Color.FromArgb(255, 65, 74, 81), 0)) return true;
+
+        KeyPress((uint) Keys.W);
+        return false;
+    }
+
+    private static bool 雾霭去后摇(in byte[] bts, Size size)
+    {
+        static void 雾霭后()
+        {
+            _条件保持假腿 = true;
+            KeyPress((uint) Keys.A);
+        }
+
+        var r4 = 获取r4左下角颜色(bts, size);
+
+        if (ColorAEqualColorB(r4, Color.FromArgb(255, 65, 74, 81), 0)) return true;
+
+        雾霭后();
+        return false;
+    }
+
+    #endregion
+
 
     #endregion
 
@@ -5446,7 +5578,7 @@ public partial class Form2 : Form
                 初始化全局时间(ref _全局时间w);
                 RightClick();
                 Delay(150);
-                KeyPress((uint)Keys.S);
+                KeyPress((uint) Keys.S);
                 Delay(time - 3000, _全局时间w);
                 if (!_中断条件)
                 {
@@ -5465,7 +5597,7 @@ public partial class Form2 : Form
     {
         static void 神智之蚀后()
         {
-            KeyPress((uint)Keys.A);
+            KeyPress((uint) Keys.A);
         }
 
         var r4 = 获取r4左下角颜色(bts, size);
@@ -7218,8 +7350,8 @@ public partial class Form2 : Form
         void 暗影突袭后()
         {
             _全局时间q = -1;
-            KeyPress((uint)Keys.A);
-            
+            KeyPress((uint) Keys.A);
+
         }
 
         if (ColorAEqualColorB(q4, Color.FromArgb(255, 65, 74, 81), 0)) return true;
@@ -7251,7 +7383,7 @@ public partial class Form2 : Form
         void 痛苦尖叫后()
         {
             _全局时间e = -1;
-            KeyPress((uint)Keys.A);
+            KeyPress((uint) Keys.A);
         }
 
         if (ColorAEqualColorB(e4, Color.FromArgb(255, 65, 74, 81), 0)) return true;
@@ -7267,7 +7399,7 @@ public partial class Form2 : Form
         void 冲击波后()
         {
             _全局时间r = -1;
-            KeyPress((uint)Keys.A);
+            KeyPress((uint) Keys.A);
 
         }
 
@@ -9106,7 +9238,7 @@ public partial class Form2 : Form
 
     #region 获取敌方坐标
 
-    private static PooledList<Point> 获取敌方坐标(Size size,in byte[] bytes)
+    private static PooledList<Point> 获取敌方坐标(Size size, in byte[] bytes)
     {
         var colors = new PooledList<Color>();
         var points = new PooledList<Point>();
@@ -9162,6 +9294,7 @@ public partial class Form2 : Form
     #endregion
 
     #region 快速获取自身坐标
+
     private static Point 快速获取自身坐标(int width = 1920, int hight = 1080)
     {
         var bp = new Bitmap(width, hight);
@@ -9171,12 +9304,13 @@ public partial class Form2 : Form
         var bytes = Array.Empty<byte>();
         GetBitmapByte(bp, ref bytes);
         return 获取自身坐标(size, bytes);
-    } 
+    }
+
     #endregion
 
     #region 获取自身坐标
 
-    private static Point 获取自身坐标(Size size,in byte[] bytes)
+    private static Point 获取自身坐标(Size size, in byte[] bytes)
     {
         var colors = new PooledList<Color>();
         var points = new PooledList<Point>();
