@@ -346,7 +346,7 @@ public partial class Form2 : Form
                     {
                         _条件开启切假腿 = false;
                         初始化全局时间(ref _全局时间d);
-                        切智力腿(_全局bts, _全局size, _技能数量);
+                        切智力腿(_技能数量);
                         _条件2 = true;
                         break;
                     }
@@ -2998,7 +2998,7 @@ public partial class Form2 : Form
             case "切假腿":
             {
                 if (e.KeyCode is Keys.Q or Keys.W or Keys.E or Keys.D or Keys.F or Keys.R)
-                    切智力腿("5");
+                    切智力腿();
                 break;
             }
             case "测试":
@@ -3006,6 +3006,9 @@ public partial class Form2 : Form
                 switch (e.KeyCode)
                 {
                     case Keys.D2:
+                        Run(捕捉颜色);
+                        break;
+                    case Keys.D3:
                         Run(捕捉颜色);
                         break;
                     case Keys.D1:
@@ -3181,9 +3184,14 @@ public partial class Form2 : Form
     private static bool _条件假腿敏捷;
 
     /// <summary>
+    ///     条件布尔
+    /// </summary>
+    private static bool _切假腿中;
+
+    /// <summary>
     ///     条件走A
     /// </summary>
-    private static bool _条件走A;
+    private static bool _条件走a;
 
     /// <summary>
     ///     技能数量
@@ -3209,6 +3217,11 @@ public partial class Form2 : Form
     ///     状态抗性
     /// </summary>
     private static double _状态抗性倍数 = 0;
+
+    /// <summary>
+    ///     用于判断是否延迟
+    /// </summary>
+    private static bool _循环最终是否延迟 = false;
 
     #endregion
 
@@ -3728,27 +3741,29 @@ public partial class Form2 : Form
         static void 针刺(in byte[] bts, Size size)
         {
             //if (!_条件开启切假腿)
-            //{
             //    切智力腿(bts, size);
-            //}
             KeyPress((uint) Keys.W);
-            Delay(30);
+            _循环最终是否延迟 = true;
         }
 
         static void 鼻涕(in byte[] bts, Size size)
         {
             //if (!_条件开启切假腿)
-            //{
             //    切智力腿(bts, size);
-            //}
             KeyPress((uint) Keys.Q);
-            Delay(30);
+            _循环最终是否延迟 = true;
+        }
+
+        static void 循环末尾()
+        {
+            _条件保持假腿 = true;
+            if (_循环最终是否延迟) Delay(30);
         }
 
 
-        if (_循环条件1)
+        switch (_循环条件1)
         {
-            if (_是否魔晶)
+            case true when _是否魔晶:
             {
                 if (
                     ColorAEqualColorB(w5, Color.FromArgb(255, 45, 52, 59), 0)
@@ -3758,8 +3773,10 @@ public partial class Form2 : Form
                 {
                     针刺(bts, size);
                 }
+
+                break;
             }
-            else
+            case true:
             {
                 if (
                     ColorAEqualColorB(w4, Color.FromArgb(255, 65, 74, 81), 0)
@@ -3769,31 +3786,41 @@ public partial class Form2 : Form
                 {
                     针刺(bts, size);
                 }
+
+                break;
             }
         }
 
-        if (!_是否a杖 || !_循环条件2)
+        switch (_是否a杖)
         {
-            _条件保持假腿 = true;
-            return true;
+            case true when _循环条件2:
+            {
+                if (_是否魔晶)
+                {
+                    if (
+                        ColorAEqualColorB(q5, Color.FromArgb(255, 45, 52, 59), 0)
+                        &
+                        !ColorAEqualColorB(q5, Color.FromArgb(255, 25, 29, 32), 0))
+                        鼻涕(bts, size);
+                    else
+                        return true;
+                }
+                else
+                {
+                    if (
+                        ColorAEqualColorB(q4, Color.FromArgb(255, 65, 74, 81), 0)
+                        &
+                        !ColorAEqualColorB(q4, Color.FromArgb(255, 14, 18, 20), 0))
+                        鼻涕(bts, size);
+                    else
+                        return true;
+                }
+
+                break;
+            }
         }
 
-        if (_是否魔晶)
-        {
-            if (!(ColorAEqualColorB(q5, Color.FromArgb(255, 45, 52, 59), 0)
-                  &
-                  !ColorAEqualColorB(q5, Color.FromArgb(255, 25, 29, 32), 0))) return true;
-            鼻涕(bts, size);
-        }
-        else
-        {
-            if (!(ColorAEqualColorB(q4, Color.FromArgb(255, 65, 74, 81), 0)
-                  &
-                  !ColorAEqualColorB(q4, Color.FromArgb(255, 14, 18, 20), 0))) return true;
-            鼻涕(bts, size);
-        }
-
-        _条件保持假腿 = true;
+        循环末尾();
         return true;
     }
 
@@ -4389,8 +4416,8 @@ public partial class Form2 : Form
         {
             _全局时间q = -1;
             _条件保持假腿 = true;
-            //RightClick();
-            KeyPress((uint) Keys.A);
+            RightClick();
+            // KeyPress((uint) Keys.A);
         }
 
         // 超时则切回 总体释放时间
@@ -7739,8 +7766,6 @@ public partial class Form2 : Form
 
     private static async void 一般程序循环()
     {
-        var 切腿lock = new object();
-
         while (_总循环条件)
             if (_循环内获取图片 != null)
             {
@@ -7772,32 +7797,40 @@ public partial class Form2 : Form
                 if (_条件8 && _条件根据图片委托8 != null)
                     await Run(() => { _条件8 = _条件根据图片委托8(_全局bts, _全局size); });
 
-                if (!_条件保持假腿 || !_条件开启切假腿) continue;
-
-                if (_条件假腿敏捷)
-                    await Run(() =>
+                if (_条件保持假腿 && _条件开启切假腿)
+                    switch (_条件假腿敏捷)
                     {
-                        if (RegPicture(物品_假腿_敏捷腿, _全局bts, _全局size)) return;
-                        _条件保持假腿 = false;
-                        lock (切腿lock)
-                        {
-                            切敏捷腿(_全局bts, _全局size, _技能数量);
-                            Delay(210); // 2次切假腿稳定时间
-                            _条件保持假腿 = true;
-                        }
-                    });
+                        case true:
+                            await Run(() =>
+                            {
+                                if (RegPicture(物品_假腿_敏捷腿, _全局bts, _全局size)) return;
+                                if (_切假腿中) return;
+                                _切假腿中 = true;
+                                切敏捷腿循环(_全局bts, _全局size, _技能数量);
+                                Run(() =>
+                                {
+                                    Delay(125);
+                                    _切假腿中 = false;
+                                });
+                            });
+                            break;
+                        default:
+                            await Run(() =>
+                            {
+                                if (RegPicture(物品_假腿_力量腿, _全局bts, _全局size)) return;
+                                if (_切假腿中) return;
+                                _切假腿中 = true;
+                                切力量腿循环(_全局bts, _全局size, _技能数量);
+                                Run(() =>
+                                {
+                                    Delay(125);
+                                    _切假腿中 = false;
+                                });
+                            });
+                            break;
+                    }
                 else
-                    await Run(() =>
-                    {
-                        if (RegPicture(物品_假腿_力量腿, _全局bts, _全局size)) return;
-                        _条件保持假腿 = false;
-                        lock (切腿lock)
-                        {
-                            切力量腿(_全局bts, _全局size, _技能数量);
-                            Delay(210); // 2次切假腿稳定时间
-                            _条件保持假腿 = true;
-                        }
-                    });
+                    continue;
             }
     }
 
@@ -7834,7 +7867,7 @@ public partial class Form2 : Form
         _条件假腿敏捷 = false;
         _是否魔晶 = false;
         _是否a杖 = false;
-        _条件走A = false;
+        _条件走a = false;
         _全局步骤 = 0;
         _全局步骤q = 0;
         _全局步骤w = 0;
@@ -7875,6 +7908,7 @@ public partial class Form2 : Form
         _条件根据图片委托6 = null;
         _条件根据图片委托7 = null;
         _条件根据图片委托8 = null;
+        _切假腿中 = false;
     }
 
     #endregion
@@ -8205,22 +8239,39 @@ public partial class Form2 : Form
         切力量腿(_全局假腿bts, size, mode);
     }
 
-    private static bool 切敏捷腿(in byte[] parByte, Size size, string mode = "4")
-    {
-        return 根据图片以及类别使用物品(物品_假腿_智力腿, parByte, size, mode) ||
-               根据图片以及类别使用物品多次(物品_假腿_力量腿, parByte, size, 2, 30, mode);
-    }
-
     private static bool 切智力腿(in byte[] parByte, Size size, string mode = "4")
     {
-        return 根据图片以及类别使用物品(物品_假腿_力量腿, parByte, size, mode) ||
-               根据图片以及类别使用物品多次(物品_假腿_敏捷腿, parByte, size, 2, 30, mode);
+        var 切腿成功 = 根据图片以及类别使用物品(物品_假腿_力量腿, parByte, size, mode) ||
+                   根据图片以及类别使用物品多次(物品_假腿_敏捷腿, parByte, size, 2, 30, mode);
+        return 切腿成功;
+    }
+
+    private static bool 切敏捷腿(in byte[] parByte, Size size, string mode = "4")
+    {
+        var 切腿成功 = 根据图片以及类别使用物品(物品_假腿_智力腿, parByte, size, mode) ||
+                   根据图片以及类别使用物品多次(物品_假腿_力量腿, parByte, size, 2, 30, mode);
+        return 切腿成功;
     }
 
     private static bool 切力量腿(in byte[] parByte, Size size, string mode = "4")
     {
-        return 根据图片以及类别使用物品(物品_假腿_敏捷腿, parByte, size, mode) ||
-               根据图片以及类别使用物品多次(物品_假腿_智力腿, parByte, size, 2, 30, mode);
+        var 切腿成功 = 根据图片以及类别使用物品(物品_假腿_敏捷腿, parByte, size, mode) ||
+                   根据图片以及类别使用物品多次(物品_假腿_智力腿, parByte, size, 2, 30, mode);
+        return 切腿成功;
+    }
+
+    private static bool 切敏捷腿循环(in byte[] parByte, Size size, string mode = "4")
+    {
+        var 切腿成功 = 根据图片以及类别使用物品(物品_假腿_智力腿, parByte, size, mode) ||
+                   根据图片以及类别使用物品(物品_假腿_力量腿, parByte, size, mode);
+        return 切腿成功;
+    }
+
+    private static bool 切力量腿循环(in byte[] parByte, Size size, string mode = "4")
+    {
+        var 切腿成功 = 根据图片以及类别使用物品(物品_假腿_敏捷腿, parByte, size, mode) ||
+                   根据图片以及类别使用物品(物品_假腿_智力腿, parByte, size, mode);
+        return 切腿成功;
     }
 
     #endregion
@@ -8304,6 +8355,10 @@ public partial class Form2 : Form
         for (var i = 0; i < times; i++)
         {
             根据物品位置按键(list[0], mode);
+            if (i == times - 1)
+            {
+                break;
+            }
             Delay(delay);
         }
 
@@ -9688,6 +9743,11 @@ public partial class Form2 : Form
     #endregion
 
     #region 捕捉颜色
+
+    private void 测试方法()
+    {
+
+    }
 
     private void 捕捉颜色()
     {
