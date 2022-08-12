@@ -8,7 +8,6 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using Collections.Pooled;
 using WindowsHook;
@@ -30,6 +29,7 @@ public partial class Form2 : Form
     private const int 截图模式1Y = 856;
     private const int 截图模式1W = 657;
     private const int 截图模式1H = 217;
+    private const int 等待延迟 = 100;
 
     #region 触发重载
 
@@ -45,10 +45,22 @@ public partial class Form2 : Form
     /// <param name="e"></param>
     private void Hook_KeyDown(object sender, KeyEventArgs e)
     {
+        
+        #region 总开关
+
+        if (e.KeyCode == Keys.Home)
+        {
+            _总开关条件 = !_总开关条件;
+            TTS.Speak(_总开关条件 ? "开启功能" : "关闭功能");
+            KeyPress((uint)Keys.End);
+            Delay(等待延迟);
+        }
+        #endregion
+
         #region 打字时屏蔽功能 (未使用)
 
         //if (false
-        //    // && CaptureColor(572, 771).Equals(Color.FromArgb(255, 237, 222, 190))
+        //    // && CaptureColor(572, 771).Equals(SimpleColor.FromRgb(237, 222, 190))
         //   )
         //{
         //}
@@ -61,6 +73,7 @@ public partial class Form2 : Form
 
         switch (tb_name.Text.Trim())
         {
+
             #region 力量
 
             #region 船长
@@ -225,11 +238,11 @@ public partial class Form2 : Form
                 {
                     label1.Text = "R";
 
-                    if (RegPicture(物品_臂章, "Z"))
-                    {
-                        KeyPress((uint) Keys.Z);
-                        Delay(30);
-                    }
+                    //if (RegPicture(物品_臂章, "Z"))
+                    //{
+                    //    KeyPress((uint) Keys.Z);
+                    //    Delay(等待延迟);
+                    //}
 
                     Run(牺牲平a刃甲);
                 }
@@ -282,11 +295,11 @@ public partial class Form2 : Form
                         {
                             var p = MousePosition;
                             KeyDown((uint) Keys.D);
-                            Delay(30);
+                            Delay(等待延迟);
                             MouseMove(_指定地点d);
-                            Delay(30);
+                            Delay(等待延迟);
                             KeyUp((uint) Keys.D);
-                            Delay(30);
+                            Delay(等待延迟);
                             MouseMove(p);
                             _条件3 = true;
                         }
@@ -297,16 +310,16 @@ public partial class Form2 : Form
                         if (_是否a杖)
                         {
                             KeyDown((uint) Keys.Space);
-                            Delay(30);
+                            Delay(等待延迟);
                             KeyDown((uint) Keys.W);
-                            Delay(30);
+                            Delay(等待延迟);
                             var p = MousePosition;
                             KeyDown((uint) Keys.D);
-                            Delay(30);
+                            Delay(等待延迟);
                             MouseMove(_指定地点d);
-                            Delay(30);
+                            Delay(等待延迟);
                             KeyUp((uint) Keys.D);
-                            Delay(30);
+                            Delay(等待延迟);
                             MouseMove(p);
                             _条件3 = true;
                         }
@@ -359,8 +372,11 @@ public partial class Form2 : Form
                         // 配合一次鼻涕就一次也不浪费
                         if (_循环条件1)
                         {
-                            切力量腿(_全局bts, _全局size, _技能数量);
-                            根据图片以及类别使用物品(物品_魂戒CD, _全局bts, _全局size);
+                            if (RegPicture(物品_魂戒CD, _全局bts, _全局size))
+                            {
+                                切力量腿(_全局bts, _全局size, _技能数量);
+                                根据图片以及类别使用物品(物品_魂戒CD, _全局bts, _全局size, _技能数量);
+                            }
                         }
 
                         break;
@@ -372,8 +388,11 @@ public partial class Form2 : Form
                         _循环条件2 = !_循环条件2;
                         if (_循环条件2)
                         {
-                            切力量腿(_全局bts, _全局size, _技能数量);
-                            根据图片以及类别使用物品(物品_魂戒CD, _全局bts, _全局size);
+                            if (RegPicture(物品_魂戒CD, _全局bts, _全局size))
+                            {
+                                切力量腿(_全局bts, _全局size, _技能数量);
+                                根据图片以及类别使用物品(物品_魂戒CD, _全局bts, _全局size, _技能数量);
+                            }
                         }
 
                         break;
@@ -534,8 +553,8 @@ public partial class Form2 : Form
                         var w5 = 获取w5开关颜色(_全局bts, _全局size);
                         switch (_是否魔晶)
                         {
-                            case true when !ColorAEqualColorB(w5, Color.FromArgb(255, 0, 129, 0), 0):
-                            case false when !ColorAEqualColorB(w4, Color.FromArgb(255, 0, 129, 0), 0):
+                            case true when !ColorAEqualColorB(w5, SimpleColor.FromRgb(0, 129, 0), 0):
+                            case false when !ColorAEqualColorB(w4, SimpleColor.FromRgb(0, 129, 0), 0):
                                 KeyPressWhile((uint) Keys.W, (uint) Keys.LShiftKey);
                                 break;
                         }
@@ -698,6 +717,7 @@ public partial class Form2 : Form
                         切智力腿(_技能数量);
                         _条件保持假腿 = false;
                         _条件1 = true;
+                        初始化全局时间(ref _全局时间q);
                         break;
                     }
                     case Keys.W:
@@ -705,6 +725,7 @@ public partial class Form2 : Form
                         切智力腿(_技能数量);
                         _条件保持假腿 = false;
                         _条件2 = true;
+                        初始化全局时间(ref _全局时间w);
                         break;
                     }
                     case Keys.D3 when _条件假腿敏捷:
@@ -732,6 +753,73 @@ public partial class Form2 : Form
 
                         break;
                 }
+
+                break;
+            }
+
+            #endregion
+
+            #region 小精灵
+
+            case "小精灵":
+            {
+                if (!_总循环条件)
+                {
+                    _总循环条件 = true;
+                    无物品状态初始化();
+                }
+
+                if (!_是否a杖)
+                {
+                    _是否a杖 = 阿哈利姆神杖(_全局bts, _全局size);
+                    if (_是否a杖) _技能数量 = "6";
+                }
+
+
+                _条件根据图片委托1 ??= 循环续勋章;
+                _条件根据图片委托2 ??= 幽魂检测;
+
+
+                switch (e.KeyCode)
+                {
+                    case Keys.W:
+                    {
+                        if (_是否a杖) break;
+                        _条件2 = true;
+                        break;
+                    }
+                    case Keys.D2:
+                    {
+                        if (_循环条件1)
+                        {
+                            _条件1 = false;
+                            _循环条件1 = false;
+                            TTS.Speak("关闭续勋章");
+                        }
+                        else
+                        {
+                            _条件1 = true;
+                            _循环条件1 = true;
+                            TTS.Speak("开启续勋章");
+                        }
+
+                        break;
+                    }
+                    case Keys.D3:
+                    {
+                        if (_选择队友头像 < 9)
+                        {
+                            _选择队友头像 += 1;
+                        }
+                        else
+                        {
+                            _选择队友头像 = 0;
+                        }
+                        TTS.Speak(string.Concat("选择第", (_选择队友头像 + 1), "个人"));
+                        break;
+                    }
+
+                    }
 
                 break;
             }
@@ -775,7 +863,7 @@ public partial class Form2 : Form
                         切智力腿(_技能数量);
                         Run(() =>
                         {
-                            Delay(30);
+                            Delay(等待延迟);
                             _条件保持假腿 = true;
                         });
                         break;
@@ -784,7 +872,7 @@ public partial class Form2 : Form
                         切智力腿(_技能数量);
                         Run(() =>
                         {
-                            Delay(30);
+                            Delay(等待延迟);
                             _条件保持假腿 = true;
                         });
                         break;
@@ -867,7 +955,7 @@ public partial class Form2 : Form
                 //            {
                 //                var q5 = 获取q5颜色(_全局bts, _全局size);
                 //                var q6 = 获取q6颜色(_全局bts, _全局size);
-                //                var color = Color.FromArgb(255, 56, 80, 80); // 远程形态 颜色
+                //                var color = SimpleColor.FromRgb(56, 80, 80); // 远程形态 颜色
                 //                if (_是否魔晶)
                 //                {
                 //                    if (!ColorAEqualColorB(color, q6, 0))
@@ -903,7 +991,7 @@ public partial class Form2 : Form
                 //        {
                 //            var q5 = 获取q5颜色(_全局bts, _全局size);
                 //            var q6 = 获取q6颜色(_全局bts, _全局size);
-                //            var color = Color.FromArgb(255, 128, 51, 12); // 近战形态 颜色
+                //            var color = SimpleColor.FromRgb(128, 51, 12); // 近战形态 颜色
                 //            if (_是否魔晶)
                 //            {
                 //                if (!ColorAEqualColorB(color, q6, 0))
@@ -1201,7 +1289,7 @@ public partial class Form2 : Form
                         切智力腿(_技能数量);
                         Run(() =>
                         {
-                            Delay(30);
+                            Delay(等待延迟);
                             _条件保持假腿 = true;
                         });
                         break;
@@ -2334,7 +2422,7 @@ public partial class Form2 : Form
                             var p = MousePosition;
                             MouseMove(_指定地点p);
                             KeyPress((uint) Keys.Space);
-                            Delay(30);
+                            Delay(等待延迟);
                             MouseMove(p);
                             _全局模式 = 0;
                         });
@@ -2783,15 +2871,15 @@ public partial class Form2 : Form
                         {
                             // RightClick();
                             case true:
-                                if (ColorAEqualColorB(d5, Color.FromArgb(255, 9, 38, 81), 0))
+                                if (ColorAEqualColorB(d5, SimpleColor.FromRgb(9, 38, 81), 0))
                                     KeyPress((uint) Keys.D);
-                                else if (ColorAEqualColorB(e5, Color.FromArgb(255, 79, 36, 7), 0))
+                                else if (ColorAEqualColorB(e5, SimpleColor.FromRgb(79, 36, 7), 0))
                                     KeyPress((uint) Keys.E);
                                 else
                                     KeyPress((uint) Keys.A);
                                 break;
                             default:
-                                if (ColorAEqualColorB(e4, Color.FromArgb(255, 70, 32, 8), 0))
+                                if (ColorAEqualColorB(e4, SimpleColor.FromRgb(70, 32, 8), 0))
                                     KeyPress((uint) Keys.E);
                                 else
                                     KeyPress((uint) Keys.A);
@@ -3009,7 +3097,7 @@ public partial class Form2 : Form
                         Run(捕捉颜色);
                         break;
                     case Keys.D3:
-                        Run(捕捉颜色);
+                        Run(测试方法_寻找大勋章);
                         break;
                     case Keys.D1:
                         Run(() =>
@@ -3036,9 +3124,14 @@ public partial class Form2 : Form
     #region 循环用到
 
     /// <summary>
-    ///     循环计数total
+    ///     循环条件
     /// </summary>
     private static bool _总循环条件;
+
+    /// <summary>
+    ///     循环开关条件
+    /// </summary>
+    private static bool _总开关条件;
 
     /// <summary>
     ///     循环计数1
@@ -3058,12 +3151,12 @@ public partial class Form2 : Form
     /// <summary>
     ///     全局bytes
     /// </summary>
-    private static byte[] _全局bts = new byte[4 * 截图模式1W * 截图模式1H];
+    private static byte[] _全局bts = new byte[3 * 截图模式1W * 截图模式1H];
 
     /// <summary>
     ///     全局假腿bytes
     /// </summary>
-    private static byte[] _全局假腿bts = new byte[4 * 截图模式1W * 截图模式1H];
+    private static byte[] _全局假腿bts = new byte[3 * 截图模式1W * 截图模式1H];
 
     /// <summary>
     ///     全局size
@@ -3222,6 +3315,11 @@ public partial class Form2 : Form
     ///     用于判断是否延迟
     /// </summary>
     private static bool _循环最终是否延迟 = false;
+
+    /// <summary>
+    ///     用于选择队友头像
+    /// </summary>
+    private static int _选择队友头像 = 0;
 
     #endregion
 
@@ -3442,12 +3540,12 @@ public partial class Form2 : Form
     private static void 跳拱指定地点()
     {
         KeyPress((uint) Keys.Space);
-        Delay(30);
+        Delay(等待延迟);
         KeyPress((uint) Keys.D9);
         MouseMove(_指定地点p);
-        Delay(30);
+        Delay(等待延迟);
         KeyPress((uint) Keys.E);
-        Delay(30);
+        Delay(等待延迟);
         KeyPress((uint) Keys.D9);
     }
 
@@ -3489,7 +3587,7 @@ public partial class Form2 : Form
 
         var q4 = 获取q4左下角颜色(bts, size);
 
-        if (ColorAEqualColorB(q4, Color.FromArgb(255, 65, 74, 81), 0)) return true;
+        if (ColorAEqualColorB(q4, SimpleColor.FromRgb(65, 74, 81), 0)) return true;
 
         吼后(bts, size);
         return false;
@@ -3504,7 +3602,7 @@ public partial class Form2 : Form
 
         var w4 = 获取w4左下角颜色(bts, size);
 
-        if (ColorAEqualColorB(w4, Color.FromArgb(255, 65, 74, 81), 0)) return true;
+        if (ColorAEqualColorB(w4, SimpleColor.FromRgb(65, 74, 81), 0)) return true;
 
         战斗饥渴后();
         return false;
@@ -3519,7 +3617,7 @@ public partial class Form2 : Form
 
         var r4 = 获取r4左下角颜色(bts, size);
 
-        if (ColorAEqualColorB(r4, Color.FromArgb(255, 65, 74, 81), 0)) return true;
+        if (ColorAEqualColorB(r4, SimpleColor.FromRgb(65, 74, 81), 0)) return true;
 
         淘汰之刃后();
         return false;
@@ -3531,13 +3629,13 @@ public partial class Form2 : Form
             || 根据图片以及类别使用物品(物品_跳刀_力量跳刀, bts, size, _技能数量)
             || 根据图片以及类别使用物品(物品_跳刀_智力跳刀, bts, size, _技能数量))
         {
-            Delay(30);
+            Delay(等待延迟);
             return true;
         }
 
         var q4 = 获取q4左下角颜色(bts, size);
 
-        if (ColorAEqualColorB(q4, Color.FromArgb(255, 65, 74, 81), 0))
+        if (ColorAEqualColorB(q4, SimpleColor.FromRgb(65, 74, 81), 0))
         {
             KeyPress((uint) Keys.Q);
         }
@@ -3564,7 +3662,7 @@ public partial class Form2 : Form
                 //    KeyPressAlt((uint)Keys.W);
                 //    Delay(260); // 去后摇
                 //    RightClick();
-                //    Delay(30);
+                //    Delay(等待延迟);
                 //}
 
                 break;
@@ -3618,7 +3716,7 @@ public partial class Form2 : Form
             //if (RegPicture(军团_决斗CD, bts, size))
             //{
             //    KeyPress((uint)Keys.R);
-            //    Delay(30);
+            //    Delay(等待延迟);
             //    return 获取当前时间毫秒() - _全局时间 <= 450;
             //}
 
@@ -3665,11 +3763,11 @@ public partial class Form2 : Form
 
         if (_是否a杖)
         {
-            if (ColorAEqualColorB(e5, Color.FromArgb(255, 45, 52, 59), 0)) return true;
+            if (ColorAEqualColorB(e5, SimpleColor.FromRgb(45, 52, 59), 0)) return true;
         }
         else
         {
-            if (ColorAEqualColorB(e4, Color.FromArgb(255, 65, 74, 81), 0)) return true;
+            if (ColorAEqualColorB(e4, SimpleColor.FromRgb(65, 74, 81), 0)) return true;
         }
 
         摔角行家后();
@@ -3685,7 +3783,7 @@ public partial class Form2 : Form
 
         var d5 = 获取d5颜色(bts, size);
 
-        if (!ColorAEqualColorB(d5, Color.FromArgb(255, 72, 73, 73), 0, 1, 1)) return true;
+        if (!ColorAEqualColorB(d5, SimpleColor.FromRgb(72, 73, 73), 0, 1, 1)) return true;
 
         飞踢后();
         return false;
@@ -3718,7 +3816,7 @@ public partial class Form2 : Form
         // 跳刀空格
         KeyPress((uint) Keys.Space);
 
-        Delay(30);
+        Delay(等待延迟);
 
         MouseMove(point.X, point.Y);
 
@@ -3740,24 +3838,42 @@ public partial class Form2 : Form
 
         static void 针刺(in byte[] bts, Size size)
         {
-            //if (!_条件开启切假腿)
-            //    切智力腿(bts, size);
-            KeyPress((uint) Keys.W);
+            if (_条件开启切假腿 && !_循环条件2)
+            {
+                _条件开启切假腿 = false;
+                切智力腿(bts, size, _技能数量);
+                KeyPress((uint)Keys.W);
+            }
+            else
+            {
+                KeyPress((uint)Keys.W);
+            }
             _循环最终是否延迟 = true;
         }
 
         static void 鼻涕(in byte[] bts, Size size)
         {
-            //if (!_条件开启切假腿)
-            //    切智力腿(bts, size);
-            KeyPress((uint) Keys.Q);
+            if (_条件开启切假腿)
+            {
+                _条件开启切假腿 = false;
+                切智力腿(bts, size, _技能数量);
+                KeyPress((uint)Keys.Q);
+            }
+            else
+            {
+                KeyPress((uint)Keys.Q);
+            }
             _循环最终是否延迟 = true;
         }
 
         static void 循环末尾()
         {
             _条件保持假腿 = true;
-            if (_循环最终是否延迟) Delay(30);
+            if (!_循环最终是否延迟) return;
+
+            Delay(等待延迟 + 60);
+            if (_条件保持假腿)
+                _条件开启切假腿 = true;
         }
 
 
@@ -3766,9 +3882,9 @@ public partial class Form2 : Form
             case true when _是否魔晶:
             {
                 if (
-                    ColorAEqualColorB(w5, Color.FromArgb(255, 45, 52, 59), 0)
+                    ColorAEqualColorB(w5, SimpleColor.FromRgb(45, 52, 59), 0)
                     &
-                    !ColorAEqualColorB(w5, Color.FromArgb(255, 25, 29, 32), 0) // 沉默 恐惧 不能释放
+                    !ColorAEqualColorB(w5, SimpleColor.FromRgb(25, 29, 32), 0) // 沉默 恐惧 不能释放
                 )
                 {
                     针刺(bts, size);
@@ -3779,9 +3895,9 @@ public partial class Form2 : Form
             case true:
             {
                 if (
-                    ColorAEqualColorB(w4, Color.FromArgb(255, 65, 74, 81), 0)
+                    ColorAEqualColorB(w4, SimpleColor.FromRgb(65, 74, 81), 0)
                     &
-                    !ColorAEqualColorB(w4, Color.FromArgb(255, 14, 18, 20), 0) // 沉默 恐惧 不能释放
+                    !ColorAEqualColorB(w4, SimpleColor.FromRgb(14, 18, 20), 0) // 沉默 恐惧 不能释放
                 )
                 {
                     针刺(bts, size);
@@ -3798,9 +3914,9 @@ public partial class Form2 : Form
                 if (_是否魔晶)
                 {
                     if (
-                        ColorAEqualColorB(q5, Color.FromArgb(255, 45, 52, 59), 0)
+                        ColorAEqualColorB(q5, SimpleColor.FromRgb(45, 52, 59), 0)
                         &
-                        !ColorAEqualColorB(q5, Color.FromArgb(255, 25, 29, 32), 0))
+                        !ColorAEqualColorB(q5, SimpleColor.FromRgb(25, 29, 32), 0))
                         鼻涕(bts, size);
                     else
                         return true;
@@ -3808,9 +3924,9 @@ public partial class Form2 : Form
                 else
                 {
                     if (
-                        ColorAEqualColorB(q4, Color.FromArgb(255, 65, 74, 81), 0)
+                        ColorAEqualColorB(q4, SimpleColor.FromRgb(65, 74, 81), 0)
                         &
-                        !ColorAEqualColorB(q4, Color.FromArgb(255, 14, 18, 20), 0))
+                        !ColorAEqualColorB(q4, SimpleColor.FromRgb(14, 18, 20), 0))
                         鼻涕(bts, size);
                     else
                         return true;
@@ -3842,7 +3958,7 @@ public partial class Form2 : Form
 
         var d5 = 获取d5左下角颜色(bts, size);
 
-        if (ColorAEqualColorB(d5, Color.FromArgb(255, 45, 52, 59), 0)) return true;
+        if (ColorAEqualColorB(d5, SimpleColor.FromRgb(45, 52, 59), 0)) return true;
 
         毛团后();
         return false;
@@ -3873,15 +3989,15 @@ public partial class Form2 : Form
         var w4 = 获取w4开关颜色(bts, size);
         var w5 = 获取w5开关颜色(bts, size);
 
-        static void 钩子后(Color w4, Color w5)
+        static void 钩子后(SimpleColor w4, SimpleColor w5)
         {
             _全局时间q = -1;
             //RightClick();
             KeyPress((uint) Keys.S);
             switch (_是否魔晶)
             {
-                case true when !ColorAEqualColorB(w5, Color.FromArgb(255, 0, 129, 0), 0):
-                case false when !ColorAEqualColorB(w4, Color.FromArgb(255, 0, 129, 0), 0):
+                case true when !ColorAEqualColorB(w5, SimpleColor.FromRgb(0, 129, 0), 0):
+                case false when !ColorAEqualColorB(w4, SimpleColor.FromRgb(0, 129, 0), 0):
                     KeyPressWhile((uint) Keys.W, (uint) Keys.LShiftKey);
                     break;
             }
@@ -3894,13 +4010,13 @@ public partial class Form2 : Form
 
         switch (_是否魔晶)
         {
-            case true when ColorAEqualColorB(q5, Color.FromArgb(255, 45, 52, 59), 0):
+            case true when ColorAEqualColorB(q5, SimpleColor.FromRgb(45, 52, 59), 0):
                 return true;
             case true:
                 钩子后(w4, w5);
                 return false;
 
-            case false when ColorAEqualColorB(q4, Color.FromArgb(255, 65, 74, 81), 0):
+            case false when ColorAEqualColorB(q4, SimpleColor.FromRgb(65, 74, 81), 0):
                 return true;
             case false:
                 钩子后(w4, w5);
@@ -3922,7 +4038,7 @@ public partial class Form2 : Form
 
         var q4 = 获取q4左下角颜色(bts, size);
 
-        if (ColorAEqualColorB(q4, Color.FromArgb(255, 65, 74, 81), 0)) return true;
+        if (ColorAEqualColorB(q4, SimpleColor.FromRgb(65, 74, 81), 0)) return true;
 
         石破天惊后(bts, size);
         return false;
@@ -3937,7 +4053,7 @@ public partial class Form2 : Form
 
         var w4 = 获取w4左下角颜色(bts, size);
 
-        if (ColorAEqualColorB(w4, Color.FromArgb(255, 65, 74, 81), 0)) return true;
+        if (ColorAEqualColorB(w4, SimpleColor.FromRgb(65, 74, 81), 0)) return true;
 
         上界重锤后();
         return false;
@@ -3965,7 +4081,7 @@ public partial class Form2 : Form
 
         var w4 = 获取w4左下角颜色(bts, size);
 
-        if (ColorAEqualColorB(w4, Color.FromArgb(255, 65, 74, 81), 0)) return true;
+        if (ColorAEqualColorB(w4, SimpleColor.FromRgb(65, 74, 81), 0)) return true;
 
         鱼人碎击后();
         return false;
@@ -3976,20 +4092,20 @@ public partial class Form2 : Form
         if (
             根据图片以及类别使用物品(物品_魂戒CD, bts, size))
         {
-            Delay(30);
+            Delay(等待延迟);
             return true;
         }
 
         if (根据图片以及类别使用物品(物品_跳刀, bts, size) || 根据图片以及类别使用物品(物品_跳刀_力量跳刀, bts, size))
 
         {
-            Delay(30);
+            Delay(等待延迟);
             return true;
         }
 
         var w4 = 获取w4左下角颜色(bts, size);
 
-        if (!ColorAEqualColorB(w4, Color.FromArgb(255, 65, 74, 81), 0)) return true;
+        if (!ColorAEqualColorB(w4, SimpleColor.FromRgb(65, 74, 81), 0)) return true;
 
         KeyPress((uint) Keys.W);
         return false;
@@ -4005,7 +4121,7 @@ public partial class Form2 : Form
 
         var r4 = 获取r4左下角颜色(bts, size);
 
-        if (ColorAEqualColorB(r4, Color.FromArgb(255, 65, 74, 81), 0)) return true;
+        if (ColorAEqualColorB(r4, SimpleColor.FromRgb(65, 74, 81), 0)) return true;
 
         雾霭后();
         return false;
@@ -4019,8 +4135,16 @@ public partial class Form2 : Form
     {
         static void 山崩后()
         {
+            _全局时间q = -1;
             _条件保持假腿 = true;
             KeyPress((uint) Keys.A);
+        }
+
+        // 超时则切回 总体释放时间
+        if (获取当前时间毫秒() - _全局时间q > 500 && _全局时间q != -1)
+        {
+            山崩后();
+            return false;
         }
 
         var q4 = 获取q4左下角颜色(bts, size);
@@ -4029,10 +4153,10 @@ public partial class Form2 : Form
         switch (_是否a杖)
         {
             case true:
-                if (ColorAEqualColorB(q5, Color.FromArgb(255, 65, 74, 81), 0)) return true;
+                if (ColorAEqualColorB(q5, SimpleColor.FromRgb(65, 74, 81), 0)) return true;
                 break;
             default:
-                if (ColorAEqualColorB(q4, Color.FromArgb(255, 65, 74, 81), 0)) return true;
+                if (ColorAEqualColorB(q4, SimpleColor.FromRgb(65, 74, 81), 0)) return true;
                 break;
         }
 
@@ -4044,8 +4168,16 @@ public partial class Form2 : Form
     {
         static void 投掷后()
         {
+            _全局时间w = -1;
             _条件保持假腿 = true;
             KeyPress((uint) Keys.A);
+        }
+
+        // 超时则切回 总体释放时间
+        if (获取当前时间毫秒() - _全局时间w > 500 && _全局时间w != -1)
+        {
+            投掷后();
+            return false;
         }
 
         var w4 = 获取w4左下角颜色(bts, size);
@@ -4054,14 +4186,51 @@ public partial class Form2 : Form
         switch (_是否a杖)
         {
             case true:
-                if (ColorAEqualColorB(w5, Color.FromArgb(255, 65, 74, 81), 0)) return true;
+                if (ColorAEqualColorB(w5, SimpleColor.FromRgb(65, 74, 81), 0)) return true;
                 break;
             default:
-                if (ColorAEqualColorB(w4, Color.FromArgb(255, 65, 74, 81), 0)) return true;
+                if (ColorAEqualColorB(w4, SimpleColor.FromRgb(65, 74, 81), 0)) return true;
                 break;
         }
 
         投掷后();
+        return false;
+    }
+
+    #endregion
+
+    #region 小精灵
+
+    private static bool 循环续勋章(in byte[] bts, Size size)
+    {
+        if (!RegPicture(物品_勇气勋章, bts, size) && !RegPicture(物品_炎阳勋章, bts, size))
+        {
+            //TTS.Speak("未找到图片");
+            return _循环条件1;
+        }
+
+        var p = MousePosition;
+        MouseMove(574 + _选择队友头像 * 61 + (_选择队友头像 >= 5 ? 216 : 0), 23);
+        Delay(15);
+        if (根据图片以及类别使用物品(物品_勇气勋章, bts, size, _技能数量) || 根据图片以及类别使用物品(物品_炎阳勋章, bts, size, _技能数量))
+        {
+            Delay(15);
+        }
+        MouseMove(p);
+        Delay(15);
+        RightClick();
+        return _循环条件1;
+    }
+
+    private static bool 幽魂检测(in byte[] bts, Size size)
+    {
+        if (RegPicture(小精灵_幽魂buff, bts, size))
+        {
+            _技能数量 = "6";
+            return true;
+        }
+
+        _技能数量 = "4";
         return false;
     }
 
@@ -4092,7 +4261,7 @@ public partial class Form2 : Form
 
         var q4 = 获取q4左下角颜色(bts, size);
 
-        if (ColorAEqualColorB(q4, Color.FromArgb(255, 65, 74, 81), 0)) return true;
+        if (ColorAEqualColorB(q4, SimpleColor.FromRgb(65, 74, 81), 0)) return true;
 
         月光后();
         return false;
@@ -4117,7 +4286,7 @@ public partial class Form2 : Form
 
         var r4 = 获取r4左下角颜色(bts, size);
 
-        if (ColorAEqualColorB(r4, Color.FromArgb(255, 65, 74, 81), 0)) return true;
+        if (ColorAEqualColorB(r4, SimpleColor.FromRgb(65, 74, 81), 0)) return true;
 
         月蚀后();
         return false;
@@ -4157,7 +4326,7 @@ public partial class Form2 : Form
     //           RegPicture(Resource_Picture.物品_羊刀, "C"))
     //    {
     //        KeyPress((uint)Keys.C);
-    //        Delay(30);
+    //        Delay(等待延迟);
     //        if (获取当前时间毫秒() - time > 100) break;
     //    }
 
@@ -4168,7 +4337,7 @@ public partial class Form2 : Form
     //           RegPicture(Resource_Picture.物品_羊刀, "Z"))
     //    {
     //        KeyPress((uint)Keys.Z);
-    //        Delay(30);
+    //        Delay(等待延迟);
     //        if (获取当前时间毫秒() - time > 100) break;
     //    }
 
@@ -4179,7 +4348,7 @@ public partial class Form2 : Form
     //           RegPicture(Resource_Picture.物品_羊刀, "SPACE"))
     //    {
     //        KeyPress((uint)Keys.Space);
-    //        Delay(30);
+    //        Delay(等待延迟);
     //        if (获取当前时间毫秒() - time > 100) break;
     //    }
 
@@ -4189,7 +4358,7 @@ public partial class Form2 : Form
     //    while (RegPicture(Resource_Picture.物品_否决, "X"))
     //    {
     //        KeyPress((uint)Keys.X);
-    //        Delay(30);
+    //        Delay(等待延迟);
     //        if (获取当前时间毫秒() - time > 100) break;
     //    }
 
@@ -4241,7 +4410,7 @@ public partial class Form2 : Form
 
         var w4 = 获取w4左下角颜色(bts, size);
 
-        if (ColorAEqualColorB(w4, Color.FromArgb(255, 65, 74, 81), 0)) return true;
+        if (ColorAEqualColorB(w4, SimpleColor.FromRgb(65, 74, 81), 0)) return true;
 
         超强力量后();
         return false;
@@ -4266,7 +4435,7 @@ public partial class Form2 : Form
 
         var q4 = 获取q4左下角颜色(bts, size);
 
-        if (ColorAEqualColorB(q4, Color.FromArgb(255, 65, 74, 81), 0)) return true;
+        if (ColorAEqualColorB(q4, SimpleColor.FromRgb(65, 74, 81), 0)) return true;
 
         震撼大地后();
         return false;
@@ -4283,11 +4452,11 @@ public partial class Form2 : Form
     //    var w5 = 获取w5颜色(bts, size);
     //    var w6 = 获取w6颜色(bts, size);
 
-    //    var 远程q颜色 = Color.FromArgb(255, 56, 80, 80); // 远程形态 颜色
-    //    var 远程飞斧可以释放颜色 = Color.FromArgb(255, 87, 105, 97); // 技能可以释放颜色
-    //    var 释放二阶段颜色 = Color.FromArgb(255, 68, 165, 76); // 释放颜色
-    //    var 技能进入CD颜色 = Color.FromArgb(255, 255, 255, 255); // 释放完颜色
-    //    var A杖技能进入CD颜色 = Color.FromArgb(255, 1, 1, 1); // A杖释放完颜色
+    //    var 远程q颜色 = SimpleColor.FromRgb(56, 80, 80); // 远程形态 颜色
+    //    var 远程飞斧可以释放颜色 = SimpleColor.FromRgb(87, 105, 97); // 技能可以释放颜色
+    //    var 释放二阶段颜色 = SimpleColor.FromRgb(68, 165, 76); // 释放颜色
+    //    var 技能进入CD颜色 = SimpleColor.FromRgb(255, 255, 255); // 释放完颜色
+    //    var A杖技能进入CD颜色 = SimpleColor.FromRgb(1, 1, 1); // A杖释放完颜色
 
     //    switch (_全局步骤q)
     //    {
@@ -4335,7 +4504,7 @@ public partial class Form2 : Form
     //                }
 
     //                KeyPress((uint)Keys.W);
-    //                Delay(30);
+    //                Delay(等待延迟);
     //            }
     //            else
     //            {
@@ -4345,7 +4514,7 @@ public partial class Form2 : Form
     //                }
 
     //                KeyPress((uint)Keys.W);
-    //                Delay(30);
+    //                Delay(等待延迟);
     //            }
 
     //            if (_全局时间 != -1 && 获取当前时间毫秒() - _全局时间 <= 500) return true;
@@ -4432,13 +4601,13 @@ public partial class Form2 : Form
 
         switch (_是否魔晶)
         {
-            case true when ColorAEqualColorB(q5, Color.FromArgb(255, 45, 52, 59), 0):
+            case true when ColorAEqualColorB(q5, SimpleColor.FromRgb(45, 52, 59), 0):
                 return true;
             case true:
                 黑暗契约后();
                 return false;
 
-            case false when ColorAEqualColorB(q4, Color.FromArgb(255, 65, 74, 81), 0):
+            case false when ColorAEqualColorB(q4, SimpleColor.FromRgb(65, 74, 81), 0):
                 return true;
             case false:
                 黑暗契约后();
@@ -4474,7 +4643,7 @@ public partial class Form2 : Form
 
         switch (_是否魔晶)
         {
-            case true when ColorAEqualColorB(d5, Color.FromArgb(255, 45, 52, 59), 0): // 一般技能原色颜色
+            case true when ColorAEqualColorB(d5, SimpleColor.FromRgb(45, 52, 59), 0): // 一般技能原色颜色
                 return true;
             case true:
                 深海护罩后();
@@ -4510,13 +4679,13 @@ public partial class Form2 : Form
 
         switch (_是否a杖)
         {
-            case true when ColorAEqualColorB(w5, Color.FromArgb(255, 45, 52, 59), 0):
+            case true when ColorAEqualColorB(w5, SimpleColor.FromRgb(45, 52, 59), 0):
                 return true;
             case true:
                 闪烁后();
                 return false;
 
-            case false when ColorAEqualColorB(w4, Color.FromArgb(255, 65, 74, 81), 0):
+            case false when ColorAEqualColorB(w4, SimpleColor.FromRgb(65, 74, 81), 0):
                 return true;
             case false:
                 闪烁后();
@@ -4546,14 +4715,14 @@ public partial class Form2 : Form
 
         switch (_是否a杖)
         {
-            case true when ColorAEqualColorB(r5, Color.FromArgb(255, 45, 52, 59), 0):
+            case true when ColorAEqualColorB(r5, SimpleColor.FromRgb(45, 52, 59), 0):
                 return true;
             case true:
             {
                 法力虚空后();
                 return false;
             }
-            case false when ColorAEqualColorB(r4, Color.FromArgb(255, 65, 74, 81), 0):
+            case false when ColorAEqualColorB(r4, SimpleColor.FromRgb(65, 74, 81), 0):
                 return true;
             case false:
             {
@@ -4585,7 +4754,7 @@ public partial class Form2 : Form
 
         var q4 = 获取q4左下角颜色(bts, size);
 
-        if (ColorAEqualColorB(q4, Color.FromArgb(255, 65, 74, 81), 0)) return true;
+        if (ColorAEqualColorB(q4, SimpleColor.FromRgb(65, 74, 81), 0)) return true;
 
         灵魂之矛后();
         return false;
@@ -4610,7 +4779,7 @@ public partial class Form2 : Form
 
         var w4 = 获取w4左下角颜色(bts, size);
 
-        if (ColorAEqualColorB(w4, Color.FromArgb(255, 65, 74, 81), 0)) return true;
+        if (ColorAEqualColorB(w4, SimpleColor.FromRgb(65, 74, 81), 0)) return true;
 
         神行百变后();
         return false;
@@ -4643,7 +4812,7 @@ public partial class Form2 : Form
         {
             case true:
             {
-                if (!ColorAEqualColorB(q5, Color.FromArgb(255, 45, 52, 59), 0))
+                if (!ColorAEqualColorB(q5, SimpleColor.FromRgb(45, 52, 59), 0))
                 {
                     匕首后();
                     return false;
@@ -4653,7 +4822,7 @@ public partial class Form2 : Form
             }
             default:
             {
-                if (!ColorAEqualColorB(q4, Color.FromArgb(255, 65, 74, 81), 0))
+                if (!ColorAEqualColorB(q4, SimpleColor.FromRgb(65, 74, 81), 0))
                 {
                     匕首后();
                     return false;
@@ -4688,7 +4857,7 @@ public partial class Form2 : Form
         {
             case true:
             {
-                if (!ColorAEqualColorB(w5, Color.FromArgb(255, 45, 52, 59), 0))
+                if (!ColorAEqualColorB(w5, SimpleColor.FromRgb(45, 52, 59), 0))
                 {
                     幻影突袭后();
                     return false;
@@ -4698,7 +4867,7 @@ public partial class Form2 : Form
             }
             default:
             {
-                if (!ColorAEqualColorB(w4, Color.FromArgb(255, 65, 74, 81), 0))
+                if (!ColorAEqualColorB(w4, SimpleColor.FromRgb(65, 74, 81), 0))
                 {
                     幻影突袭后();
                     return false;
@@ -4734,7 +4903,7 @@ public partial class Form2 : Form
         {
             case true:
             {
-                if (!ColorAEqualColorB(e5, Color.FromArgb(255, 45, 52, 59), 0))
+                if (!ColorAEqualColorB(e5, SimpleColor.FromRgb(45, 52, 59), 0))
                 {
                     魅影无形后();
                     return false;
@@ -4744,7 +4913,7 @@ public partial class Form2 : Form
             }
             default:
             {
-                if (!ColorAEqualColorB(e4, Color.FromArgb(255, 65, 74, 81), 0))
+                if (!ColorAEqualColorB(e4, SimpleColor.FromRgb(65, 74, 81), 0))
                 {
                     魅影无形后();
                     return false;
@@ -4779,7 +4948,7 @@ public partial class Form2 : Form
         {
             case true:
             {
-                if (!ColorAEqualColorB(d5, Color.FromArgb(255, 45, 52, 59), 0))
+                if (!ColorAEqualColorB(d5, SimpleColor.FromRgb(45, 52, 59), 0))
                 {
                     刀阵旋风后();
                     return false;
@@ -4821,7 +4990,7 @@ public partial class Form2 : Form
             case true:
             {
                 if (
-                    !ColorAEqualColorB(q5, Color.FromArgb(255, 45, 52, 59), 0)
+                    !ColorAEqualColorB(q5, SimpleColor.FromRgb(45, 52, 59), 0)
                 )
                 {
                     时间漫游后();
@@ -4833,7 +5002,7 @@ public partial class Form2 : Form
             default:
             {
                 if (
-                    !ColorAEqualColorB(q4, Color.FromArgb(255, 65, 74, 81), 0)
+                    !ColorAEqualColorB(q4, SimpleColor.FromRgb(65, 74, 81), 0)
                 )
                 {
                     时间漫游后();
@@ -4872,7 +5041,7 @@ public partial class Form2 : Form
             case true:
             {
                 if (
-                    !ColorAEqualColorB(w5, Color.FromArgb(255, 45, 52, 59), 0)
+                    !ColorAEqualColorB(w5, SimpleColor.FromRgb(45, 52, 59), 0)
                 )
                 {
                     时间膨胀后();
@@ -4884,7 +5053,7 @@ public partial class Form2 : Form
             default:
             {
                 if (
-                    !ColorAEqualColorB(w4, Color.FromArgb(255, 65, 74, 81), 0)
+                    !ColorAEqualColorB(w4, SimpleColor.FromRgb(65, 74, 81), 0)
                 )
                 {
                     时间膨胀后();
@@ -4923,7 +5092,7 @@ public partial class Form2 : Form
             case true:
             {
                 if (
-                    !ColorAEqualColorB(r5, Color.FromArgb(255, 45, 52, 59), 0)
+                    !ColorAEqualColorB(r5, SimpleColor.FromRgb(45, 52, 59), 0)
                 )
                 {
                     时间结界后();
@@ -4935,7 +5104,7 @@ public partial class Form2 : Form
             default:
             {
                 if (
-                    !ColorAEqualColorB(r4, Color.FromArgb(255, 65, 74, 81), 0)
+                    !ColorAEqualColorB(r4, SimpleColor.FromRgb(65, 74, 81), 0)
                 )
                 {
                     时间结界后();
@@ -4979,8 +5148,8 @@ public partial class Form2 : Form
             case true:
             {
                 if (
-                    !ColorAEqualColorB(q5, Color.FromArgb(255, 45, 52, 59), 0)
-                    && !ColorAEqualColorB(q6, Color.FromArgb(255, 45, 52, 59), 0)
+                    !ColorAEqualColorB(q5, SimpleColor.FromRgb(45, 52, 59), 0)
+                    && !ColorAEqualColorB(q6, SimpleColor.FromRgb(45, 52, 59), 0)
                 )
                 {
                     倒影后();
@@ -4992,7 +5161,7 @@ public partial class Form2 : Form
             default:
             {
                 if (
-                    !ColorAEqualColorB(q4, Color.FromArgb(255, 65, 74, 81), 0)
+                    !ColorAEqualColorB(q4, SimpleColor.FromRgb(65, 74, 81), 0)
                 )
                 {
                     倒影后();
@@ -5032,8 +5201,8 @@ public partial class Form2 : Form
             case true:
             {
                 if (
-                    !ColorAEqualColorB(w5, Color.FromArgb(255, 45, 52, 59), 0)
-                    && !ColorAEqualColorB(w6, Color.FromArgb(255, 45, 52, 59), 0)
+                    !ColorAEqualColorB(w5, SimpleColor.FromRgb(45, 52, 59), 0)
+                    && !ColorAEqualColorB(w6, SimpleColor.FromRgb(45, 52, 59), 0)
                 )
                 {
                     幻惑后();
@@ -5045,7 +5214,7 @@ public partial class Form2 : Form
             default:
             {
                 if (
-                    !ColorAEqualColorB(w4, Color.FromArgb(255, 65, 74, 81), 0)
+                    !ColorAEqualColorB(w4, SimpleColor.FromRgb(65, 74, 81), 0)
                 )
                 {
                     幻惑后();
@@ -5085,8 +5254,8 @@ public partial class Form2 : Form
             case true:
             {
                 if (
-                    !ColorAEqualColorB(e5, Color.FromArgb(255, 45, 52, 59), 0)
-                    && !ColorAEqualColorB(e6, Color.FromArgb(255, 45, 52, 59), 0)
+                    !ColorAEqualColorB(e5, SimpleColor.FromRgb(45, 52, 59), 0)
+                    && !ColorAEqualColorB(e6, SimpleColor.FromRgb(45, 52, 59), 0)
                 )
                 {
                     魔化后();
@@ -5098,7 +5267,7 @@ public partial class Form2 : Form
             default:
             {
                 if (
-                    !ColorAEqualColorB(e4, Color.FromArgb(255, 65, 74, 81), 0)
+                    !ColorAEqualColorB(e4, SimpleColor.FromRgb(65, 74, 81), 0)
                 )
                 {
                     魔化后();
@@ -5136,8 +5305,8 @@ public partial class Form2 : Form
             case true:
             {
                 if (
-                    !ColorAEqualColorB(d5, Color.FromArgb(255, 45, 52, 59), 0)
-                    && !ColorAEqualColorB(d6, Color.FromArgb(255, 45, 52, 59), 0)
+                    !ColorAEqualColorB(d5, SimpleColor.FromRgb(45, 52, 59), 0)
+                    && !ColorAEqualColorB(d6, SimpleColor.FromRgb(45, 52, 59), 0)
                 )
                 {
                     恶魔狂热后();
@@ -5176,8 +5345,8 @@ public partial class Form2 : Form
             case true:
             {
                 if (
-                    !ColorAEqualColorB(d5, Color.FromArgb(255, 45, 52, 59), 0)
-                    && !ColorAEqualColorB(f6, Color.FromArgb(255, 45, 52, 59), 0)
+                    !ColorAEqualColorB(d5, SimpleColor.FromRgb(45, 52, 59), 0)
+                    && !ColorAEqualColorB(f6, SimpleColor.FromRgb(45, 52, 59), 0)
                 )
                 {
                     恐怖心潮后();
@@ -5217,8 +5386,8 @@ public partial class Form2 : Form
             case true:
             {
                 if (
-                    !ColorAEqualColorB(r5, Color.FromArgb(255, 45, 52, 59), 0)
-                    && !ColorAEqualColorB(r6, Color.FromArgb(255, 45, 52, 59), 0)
+                    !ColorAEqualColorB(r5, SimpleColor.FromRgb(45, 52, 59), 0)
+                    && !ColorAEqualColorB(r6, SimpleColor.FromRgb(45, 52, 59), 0)
                 )
                 {
                     魂断后();
@@ -5230,7 +5399,7 @@ public partial class Form2 : Form
             default:
             {
                 if (
-                    !ColorAEqualColorB(r4, Color.FromArgb(255, 65, 74, 81), 0)
+                    !ColorAEqualColorB(r4, SimpleColor.FromRgb(65, 74, 81), 0)
                 )
                 {
                     魂断后();
@@ -5267,7 +5436,7 @@ public partial class Form2 : Form
 
         var q4 = 获取q4左下角颜色(bts, size);
 
-        if (ColorAEqualColorB(q4, Color.FromArgb(255, 65, 74, 81), 0)) return true;
+        if (ColorAEqualColorB(q4, SimpleColor.FromRgb(65, 74, 81), 0)) return true;
 
         飞镖后();
         return false;
@@ -5292,7 +5461,7 @@ public partial class Form2 : Form
 
         var r4 = 获取r4左下角颜色(bts, size);
 
-        if (ColorAEqualColorB(r4, Color.FromArgb(255, 65, 74, 81), 0)) return true;
+        if (ColorAEqualColorB(r4, SimpleColor.FromRgb(65, 74, 81), 0)) return true;
 
         标记后();
         return false;
@@ -5302,7 +5471,7 @@ public partial class Form2 : Form
     {
         var r4 = 获取r4左下角颜色(bts, size);
         if (
-            !ColorAEqualColorB(r4, Color.FromArgb(255, 65, 74, 81), 0)
+            !ColorAEqualColorB(r4, SimpleColor.FromRgb(65, 74, 81), 0)
         ) return _循环条件1;
 
         KeyPress((uint) Keys.R);
@@ -5318,11 +5487,11 @@ public partial class Form2 : Form
     {
         var e4 = 获取e4左下角颜色(bts, size);
         if (
-            !ColorAEqualColorB(e4, Color.FromArgb(255, 65, 74, 81), 0)
+            !ColorAEqualColorB(e4, SimpleColor.FromRgb(65, 74, 81), 0)
         ) return _循环条件1;
 
         KeyPress((uint) Keys.E);
-        Delay(30);
+        Delay(等待延迟);
         return _循环条件1;
     }
 
@@ -5330,7 +5499,7 @@ public partial class Form2 : Form
     {
         var e4 = 获取e4左下角颜色(bts, size);
 
-        if (ColorAEqualColorB(e4, Color.FromArgb(255, 65, 74, 81), 0)) return true;
+        if (ColorAEqualColorB(e4, SimpleColor.FromRgb(65, 74, 81), 0)) return true;
 
         RightClick();
 
@@ -5341,7 +5510,7 @@ public partial class Form2 : Form
     {
         var q4 = 获取q4左下角颜色(bts, size);
 
-        if (ColorAEqualColorB(q4, Color.FromArgb(255, 65, 74, 81), 0)) return true;
+        if (ColorAEqualColorB(q4, SimpleColor.FromRgb(65, 74, 81), 0)) return true;
 
         KeyPress((uint) Keys.A);
         return false;
@@ -5351,7 +5520,7 @@ public partial class Form2 : Form
     {
         var r4 = 获取r4左下角颜色(bts, size);
 
-        if (ColorAEqualColorB(r4, Color.FromArgb(255, 65, 74, 81), 0)) return true;
+        if (ColorAEqualColorB(r4, SimpleColor.FromRgb(65, 74, 81), 0)) return true;
         RightClick();
         return false;
     }
@@ -5371,7 +5540,7 @@ public partial class Form2 : Form
 
             if (!_循环条件1) return;
             KeyPress((uint) Keys.Q);
-            Delay(30);
+            Delay(等待延迟);
             KeyPress((uint) Keys.Q);
         }
 
@@ -5390,7 +5559,7 @@ public partial class Form2 : Form
             case true:
             {
                 if (
-                    !ColorAEqualColorB(w5, Color.FromArgb(255, 45, 52, 59), 0)
+                    !ColorAEqualColorB(w5, SimpleColor.FromRgb(45, 52, 59), 0)
                 )
                 {
                     秘术银蛇后();
@@ -5402,7 +5571,7 @@ public partial class Form2 : Form
             default:
             {
                 if (
-                    !ColorAEqualColorB(w4, Color.FromArgb(255, 65, 74, 81), 0)
+                    !ColorAEqualColorB(w4, SimpleColor.FromRgb(65, 74, 81), 0)
                 )
                 {
                     秘术银蛇后();
@@ -5427,7 +5596,7 @@ public partial class Form2 : Form
 
             if (!_循环条件1) return;
             KeyPress((uint) Keys.Q);
-            Delay(30);
+            Delay(等待延迟);
             KeyPress((uint) Keys.Q);
         }
 
@@ -5446,7 +5615,7 @@ public partial class Form2 : Form
             case true:
             {
                 if (
-                    !ColorAEqualColorB(r5, Color.FromArgb(255, 45, 52, 59), 0)
+                    !ColorAEqualColorB(r5, SimpleColor.FromRgb(45, 52, 59), 0)
                 )
                 {
                     石化凝视后();
@@ -5458,7 +5627,7 @@ public partial class Form2 : Form
             default:
             {
                 if (
-                    !ColorAEqualColorB(r4, Color.FromArgb(255, 65, 74, 81), 0)
+                    !ColorAEqualColorB(r4, SimpleColor.FromRgb(65, 74, 81), 0)
                 )
                 {
                     石化凝视后();
@@ -5496,8 +5665,8 @@ public partial class Form2 : Form
         var q5 = 获取q5左下角颜色(bts, size);
         var q6 = 获取q6左下角颜色(bts, size);
 
-        if (ColorAEqualColorB(q6, Color.FromArgb(255, 45, 52, 59), 0) ||
-            ColorAEqualColorB(q5, Color.FromArgb(255, 45, 52, 59), 0)) return true;
+        if (ColorAEqualColorB(q6, SimpleColor.FromRgb(45, 52, 59), 0) ||
+            ColorAEqualColorB(q5, SimpleColor.FromRgb(45, 52, 59), 0)) return true;
 
         幽鬼之刃后();
         return false;
@@ -5511,7 +5680,7 @@ public partial class Form2 : Form
             _条件保持假腿 = true;
             //RightClick();
             KeyPress((uint) Keys.D);
-            Delay(30);
+            Delay(等待延迟);
             KeyPress((uint) Keys.X);
             // KeyPress((uint)Keys.A);
         }
@@ -5525,7 +5694,7 @@ public partial class Form2 : Form
 
         var f6 = 获取f6左下角颜色(bts, size);
 
-        if (ColorAEqualColorB(f6, Color.FromArgb(255, 45, 52, 59), 0)) return true;
+        if (ColorAEqualColorB(f6, SimpleColor.FromRgb(45, 52, 59), 0)) return true;
 
         如影随形后();
         return false;
@@ -5551,8 +5720,8 @@ public partial class Form2 : Form
         var r5 = 获取r5左下角颜色(bts, size);
         var r6 = 获取r6左下角颜色(bts, size);
 
-        if (ColorAEqualColorB(r6, Color.FromArgb(255, 45, 52, 59), 0) ||
-            ColorAEqualColorB(r5, Color.FromArgb(255, 45, 52, 59), 0)) return true;
+        if (ColorAEqualColorB(r6, SimpleColor.FromRgb(45, 52, 59), 0) ||
+            ColorAEqualColorB(r5, SimpleColor.FromRgb(45, 52, 59), 0)) return true;
 
         鬼影重重后();
         return false;
@@ -5587,7 +5756,7 @@ public partial class Form2 : Form
             case true:
             {
                 if (
-                    ColorAEqualColorB(q5, Color.FromArgb(255, 94, 154, 25), 0)
+                    ColorAEqualColorB(q5, SimpleColor.FromRgb(94, 154, 25), 0)
                 )
                 {
                     流霰弹后();
@@ -5599,7 +5768,7 @@ public partial class Form2 : Form
             default:
             {
                 if (
-                    ColorAEqualColorB(q4, Color.FromArgb(255, 72, 150, 11), 0)
+                    ColorAEqualColorB(q4, SimpleColor.FromRgb(72, 150, 11), 0)
                 )
                 {
                     流霰弹后();
@@ -5639,7 +5808,7 @@ public partial class Form2 : Form
             case true:
             {
                 if (
-                    !ColorAEqualColorB(e5, Color.FromArgb(255, 45, 52, 59), 0)
+                    !ColorAEqualColorB(e5, SimpleColor.FromRgb(45, 52, 59), 0)
                 )
                 {
                     瞄准后(bts, size);
@@ -5651,7 +5820,7 @@ public partial class Form2 : Form
             default:
             {
                 if (
-                    !ColorAEqualColorB(e4, Color.FromArgb(255, 65, 74, 81), 0)
+                    !ColorAEqualColorB(e4, SimpleColor.FromRgb(65, 74, 81), 0)
                 )
                 {
                     瞄准后(bts, size);
@@ -5690,7 +5859,7 @@ public partial class Form2 : Form
             case true:
             {
                 if (
-                    !ColorAEqualColorB(r5, Color.FromArgb(255, 45, 52, 59), 0)
+                    !ColorAEqualColorB(r5, SimpleColor.FromRgb(45, 52, 59), 0)
                 )
                 {
                     暗杀后();
@@ -5702,7 +5871,7 @@ public partial class Form2 : Form
             default:
             {
                 if (
-                    !ColorAEqualColorB(r4, Color.FromArgb(255, 65, 74, 81), 0)
+                    !ColorAEqualColorB(r4, SimpleColor.FromRgb(65, 74, 81), 0)
                 )
                 {
                     暗杀后();
@@ -5740,7 +5909,7 @@ public partial class Form2 : Form
             case true:
             {
                 if (
-                    !ColorAEqualColorB(d5, Color.FromArgb(255, 45, 52, 59), 0)
+                    !ColorAEqualColorB(d5, SimpleColor.FromRgb(45, 52, 59), 0)
                 )
                 {
                     震荡手雷后();
@@ -5781,7 +5950,7 @@ public partial class Form2 : Form
 
         var w4 = 获取w4左下角颜色(bts, size);
 
-        if (ColorAEqualColorB(w4, Color.FromArgb(255, 65, 74, 81), 0)) return true;
+        if (ColorAEqualColorB(w4, SimpleColor.FromRgb(65, 74, 81), 0)) return true;
 
         狂风后();
         return false;
@@ -5792,8 +5961,8 @@ public partial class Form2 : Form
         static void 数箭齐发后(in byte[] bts1, Size size)
         {
             _全局时间q = -1;
-            var is25 = ColorAEqualColorB(GetPixelBytes(bts1, size, 754 - 截图模式1X, 957 - 截图模式1Y),
-                Color.FromArgb(255, 246, 178, 60), 0);
+            var is25 = ColorAEqualColorB(GetSPixelBytes(bts1, size, 754 - 截图模式1X, 957 - 截图模式1Y),
+                SimpleColor.FromRgb(246, 178, 60), 0);
             Delay(is25 ? 2600 : 1300);
             switch (_全局模式)
             {
@@ -5814,7 +5983,7 @@ public partial class Form2 : Form
 
         var e4 = 获取e4左下角颜色(bts, size);
 
-        if (ColorAEqualColorB(e4, Color.FromArgb(255, 65, 74, 81), 0)) return true;
+        if (ColorAEqualColorB(e4, SimpleColor.FromRgb(65, 74, 81), 0)) return true;
 
         数箭齐发后(bts, size);
         return false;
@@ -5834,11 +6003,11 @@ public partial class Form2 : Form
 
         var time = 0;
 
-        var 技能点颜色 = Color.FromArgb(255, 203, 183, 124);
+        var 技能点颜色 = SimpleColor.FromRgb(203, 183, 124);
 
-        if (ColorAEqualColorB(GetPixelBytes(bts, size, 909 - 截图模式1X, 1008 - 截图模式1Y), 技能点颜色, 0))
+        if (ColorAEqualColorB(GetSPixelBytes(bts, size, 909 - 截图模式1X, 1008 - 截图模式1Y), 技能点颜色, 0))
             time = 4000;
-        else if (ColorAEqualColorB(GetPixelBytes(bts, size, 897 - 截图模式1X, 1008 - 截图模式1Y), 技能点颜色, 0))
+        else if (ColorAEqualColorB(GetSPixelBytes(bts, size, 897 - 截图模式1X, 1008 - 截图模式1Y), 技能点颜色, 0))
             time = 3250;
 
         static void 关后(int time, in byte[] bts, Size size)
@@ -5859,7 +6028,7 @@ public partial class Form2 : Form
             });
         }
 
-        if (!ColorAEqualColorB(w4, Color.FromArgb(255, 183, 242, 203), 0)) return true;
+        if (!ColorAEqualColorB(w4, SimpleColor.FromRgb(183, 242, 203), 0)) return true;
 
         关后(time, bts, size);
         return false;
@@ -5874,7 +6043,7 @@ public partial class Form2 : Form
 
         var r4 = 获取r4左下角颜色(bts, size);
 
-        if (ColorAEqualColorB(r4, Color.FromArgb(255, 65, 74, 81), 0)) return true;
+        if (ColorAEqualColorB(r4, SimpleColor.FromRgb(65, 74, 81), 0)) return true;
 
         神智之蚀后();
         return false;
@@ -5891,21 +6060,21 @@ public partial class Form2 : Form
 
     private void 跳秒接午夜凋零黑洞()
     {
-        if (RegPicture(物品_黑黄杖, "Z")) KeyPress((uint) Keys.Z);
+        //if (RegPicture(物品_黑黄杖, "Z")) KeyPress((uint) Keys.Z);
 
-        if (RegPicture(物品_纷争, "C")) KeyPress((uint) Keys.C);
+        //if (RegPicture(物品_纷争, "C")) KeyPress((uint) Keys.C);
 
-        var time = 获取当前时间毫秒();
+        //var time = 获取当前时间毫秒();
 
-        while (RegPicture(物品_跳刀, "SPACE") || RegPicture(物品_跳刀_智力跳刀, "SPACE"))
-        {
-            Delay(15);
-            KeyPress((uint) Keys.Space);
+        //while (RegPicture(物品_跳刀, "SPACE") || RegPicture(物品_跳刀_智力跳刀, "SPACE"))
+        //{
+        //    Delay(15);
+        //    KeyPress((uint) Keys.Space);
 
-            if (获取当前时间毫秒() - time > 300) break;
-        }
+        //    if (获取当前时间毫秒() - time > 300) break;
+        //}
 
-        Delay(30);
+        Delay(等待延迟);
 
         //KeyDown((uint)Keys.LControlKey);
 
@@ -5920,7 +6089,7 @@ public partial class Form2 : Form
 
         for (var i = 0; i < 2; i++)
         {
-            Delay(30);
+            Delay(等待延迟);
             KeyPress((uint) Keys.Z);
             KeyPress((uint) Keys.V);
             KeyPress((uint) Keys.R);
@@ -5961,7 +6130,7 @@ public partial class Form2 : Form
 
     private void 残影接平A()
     {
-        Delay(30);
+        Delay(等待延迟);
         KeyPress((uint) Keys.A);
     }
 
@@ -6000,7 +6169,7 @@ public partial class Form2 : Form
         {
             case true when _是否a杖:
             {
-                if (ColorAEqualColorB(q6, Color.FromArgb(255, 45, 52, 59), 0)) return true;
+                if (ColorAEqualColorB(q6, SimpleColor.FromRgb(45, 52, 59), 0)) return true;
                 弧形闪电后();
                 return false;
             }
@@ -6008,12 +6177,12 @@ public partial class Form2 : Form
             {
                 if (_是否魔晶 || _是否a杖)
                 {
-                    if (ColorAEqualColorB(q5, Color.FromArgb(255, 45, 52, 59), 0)) return true;
+                    if (ColorAEqualColorB(q5, SimpleColor.FromRgb(45, 52, 59), 0)) return true;
                     弧形闪电后();
                     return false;
                 }
 
-                if (ColorAEqualColorB(q4, Color.FromArgb(255, 65, 74, 81), 0)) return true;
+                if (ColorAEqualColorB(q4, SimpleColor.FromRgb(65, 74, 81), 0)) return true;
                 弧形闪电后();
                 return false;
             }
@@ -6036,7 +6205,7 @@ public partial class Form2 : Form
 
         if (_是否魔晶 && _是否a杖)
         {
-            if (!ColorAEqualColorB(q6, Color.FromArgb(255, 45, 52, 59), 0)) return true;
+            if (!ColorAEqualColorB(q6, SimpleColor.FromRgb(45, 52, 59), 0)) return true;
 
             switch (_全局模式q)
             {
@@ -6050,7 +6219,7 @@ public partial class Form2 : Form
         }
         else if (_是否魔晶 || _是否a杖)
         {
-            if (!ColorAEqualColorB(q5, Color.FromArgb(255, 45, 52, 59), 0)) return true;
+            if (!ColorAEqualColorB(q5, SimpleColor.FromRgb(45, 52, 59), 0)) return true;
 
             switch (_全局模式q)
             {
@@ -6064,7 +6233,7 @@ public partial class Form2 : Form
         }
         else
         {
-            if (!ColorAEqualColorB(q4, Color.FromArgb(255, 65, 74, 81), 0)) return true;
+            if (!ColorAEqualColorB(q4, SimpleColor.FromRgb(65, 74, 81), 0)) return true;
 
             switch (_全局模式q)
             {
@@ -6104,7 +6273,7 @@ public partial class Form2 : Form
 
         if (_是否魔晶 && _是否a杖)
         {
-            if (ColorAEqualColorB(w6, Color.FromArgb(255, 45, 52, 59), 0)) return true;
+            if (ColorAEqualColorB(w6, SimpleColor.FromRgb(45, 52, 59), 0)) return true;
 
             雷击后();
             return false;
@@ -6112,14 +6281,14 @@ public partial class Form2 : Form
 
         if (_是否魔晶 || _是否a杖)
         {
-            if (ColorAEqualColorB(w5, Color.FromArgb(255, 45, 52, 59), 0)) return true;
+            if (ColorAEqualColorB(w5, SimpleColor.FromRgb(45, 52, 59), 0)) return true;
 
             雷击后();
             return false;
         }
 
 
-        if (ColorAEqualColorB(w4, Color.FromArgb(255, 65, 74, 81), 0)) return true;
+        if (ColorAEqualColorB(w4, SimpleColor.FromRgb(65, 74, 81), 0)) return true;
         雷击后();
         return false;
     }
@@ -6148,7 +6317,7 @@ public partial class Form2 : Form
 
         if (_是否魔晶 && _是否a杖)
         {
-            if (ColorAEqualColorB(e6, Color.FromArgb(255, 45, 52, 59), 0)) return true;
+            if (ColorAEqualColorB(e6, SimpleColor.FromRgb(45, 52, 59), 0)) return true;
 
             神圣一跳后();
             return false;
@@ -6156,14 +6325,14 @@ public partial class Form2 : Form
 
         if (_是否魔晶 || _是否a杖)
         {
-            if (ColorAEqualColorB(e5, Color.FromArgb(255, 45, 52, 59), 0)) return true;
+            if (ColorAEqualColorB(e5, SimpleColor.FromRgb(45, 52, 59), 0)) return true;
 
             神圣一跳后();
             return false;
         }
 
 
-        if (ColorAEqualColorB(e4, Color.FromArgb(255, 65, 74, 81), 0)) return true;
+        if (ColorAEqualColorB(e4, SimpleColor.FromRgb(65, 74, 81), 0)) return true;
         神圣一跳后();
         return false;
     }
@@ -6175,58 +6344,58 @@ public partial class Form2 : Form
     private void 三冰对线()
     {
         KeyPress((uint) Keys.Q);
-        Delay(30);
+        Delay(等待延迟);
         KeyPress((uint) Keys.Q);
-        Delay(30);
+        Delay(等待延迟);
         KeyPress((uint) Keys.Q);
-        Delay(30);
+        Delay(等待延迟);
     }
 
     private void 三火平A()
     {
         KeyPress((uint) Keys.E);
-        Delay(30);
+        Delay(等待延迟);
         KeyPress((uint) Keys.E);
-        Delay(30);
+        Delay(等待延迟);
         KeyPress((uint) Keys.E);
-        Delay(30);
+        Delay(等待延迟);
     }
 
     private void 三雷幽灵()
     {
         KeyPress((uint) Keys.Q);
-        Delay(30);
+        Delay(等待延迟);
         KeyPress((uint) Keys.Q);
-        Delay(30);
+        Delay(等待延迟);
         KeyPress((uint) Keys.W);
-        Delay(30);
+        Delay(等待延迟);
         KeyPress((uint) Keys.R);
-        Delay(30);
+        Delay(等待延迟);
         KeyPress((uint) Keys.W);
-        Delay(30);
+        Delay(等待延迟);
         KeyPress((uint) Keys.W);
-        Delay(30);
+        Delay(等待延迟);
         KeyPress((uint) Keys.D);
     }
 
     private void 吹风天火()
     {
         KeyPress((uint) Keys.W);
-        Delay(30);
+        Delay(等待延迟);
         KeyPress((uint) Keys.W);
-        Delay(30);
+        Delay(等待延迟);
         KeyPress((uint) Keys.Q);
-        Delay(30);
+        Delay(等待延迟);
         KeyPress((uint) Keys.R);
-        Delay(30);
+        Delay(等待延迟);
         KeyPress((uint) Keys.D);
-        Delay(30);
+        Delay(等待延迟);
         KeyPress((uint) Keys.E);
-        Delay(30);
+        Delay(等待延迟);
         KeyPress((uint) Keys.E);
-        Delay(30);
+        Delay(等待延迟);
         KeyPress((uint) Keys.E);
-        Delay(30);
+        Delay(等待延迟);
         KeyPress((uint) Keys.R);
         Delay(600);
         KeyPress((uint) Keys.D);
@@ -6238,36 +6407,36 @@ public partial class Form2 : Form
 
     private void 吹风接撕裂大地()
     {
-        var all_down = 0;
-        if (RegPicture(物品_吹风CD完, "SPACE"))
-        {
-            label1.Text = "FF";
-            KeyPress((uint) Keys.Space);
-            Delay(30);
+        // var all_down = 0;
+        //if (RegPicture(物品_吹风CD完, "SPACE"))
+        //{
+        //    label1.Text = "FF";
+        //    KeyPress((uint) Keys.Space);
+        //    Delay(等待延迟);
 
-            var time = 获取当前时间毫秒();
+        //    var time = 获取当前时间毫秒();
 
-            while (all_down == 0)
-            {
-                if (获取当前时间毫秒() - time > 4000) break;
+        //    while (all_down == 0)
+        //    {
+        //        if (获取当前时间毫秒() - time > 4000) break;
 
-                if (RegPicture(物品_吹风CD, "SPACE"))
-                {
-                    label1.Text = "FFF";
-                    if (RegPicture(物品_纷争, "C")) KeyPress((uint) Keys.C);
-                    Delay(80);
-                    KeyPress((uint) Keys.H);
-                    Delay(1280);
-                    if (_中断条件) break;
-                    KeyPress((uint) Keys.Q);
-                    Delay(760);
-                    KeyPress((uint) Keys.R);
-                    all_down = 1;
-                }
+        //        //if (RegPicture(物品_吹风CD, "SPACE"))
+        //        //{
+        //        //    label1.Text = "FFF";
+        //        //    if (RegPicture(物品_纷争, "C")) KeyPress((uint) Keys.C);
+        //        //    Delay(80);
+        //        //    KeyPress((uint) Keys.H);
+        //        //    Delay(1280);
+        //        //    if (_中断条件) break;
+        //        //    KeyPress((uint) Keys.Q);
+        //        //    Delay(760);
+        //        //    KeyPress((uint) Keys.R);
+        //        //    all_down = 1;
+        //        //}
 
-                Delay(50);
-            }
-        }
+        //        Delay(50);
+        //    }
+        //}
     }
 
     #endregion
@@ -6295,7 +6464,7 @@ public partial class Form2 : Form
 
         var q4 = 获取q4左下角颜色(bts, size);
 
-        if (ColorAEqualColorB(q4, Color.FromArgb(255, 65, 74, 81), 0)) return true;
+        if (ColorAEqualColorB(q4, SimpleColor.FromRgb(65, 74, 81), 0)) return true;
 
         苍穹振击后();
         return false;
@@ -6324,7 +6493,7 @@ public partial class Form2 : Form
 
         var e4 = 获取e4左下角颜色(bts, size);
 
-        if (ColorAEqualColorB(e4, Color.FromArgb(255, 65, 74, 81), 0)) return true;
+        if (ColorAEqualColorB(e4, SimpleColor.FromRgb(65, 74, 81), 0)) return true;
 
         枷锁后(bts, size);
         return false;
@@ -6345,7 +6514,7 @@ public partial class Form2 : Form
 
         var r4 = 获取r4左下角颜色(bts, size);
 
-        if (ColorAEqualColorB(r4, Color.FromArgb(255, 65, 74, 81), 0)) return true;
+        if (ColorAEqualColorB(r4, SimpleColor.FromRgb(65, 74, 81), 0)) return true;
 
         群蛇守卫后();
         return false;
@@ -6362,15 +6531,15 @@ public partial class Form2 : Form
             {
                 var time = 1250;
 
-                var 技能点颜色 = Color.FromArgb(255, 203, 183, 124);
+                var 技能点颜色 = SimpleColor.FromRgb(203, 183, 124);
 
-                if (ColorAEqualColorB(GetPixelBytes(bts, size, 909 - 截图模式1X, 1008 - 截图模式1Y), 技能点颜色, 0))
+                if (ColorAEqualColorB(GetSPixelBytes(bts, size, 909 - 截图模式1X, 1008 - 截图模式1Y), 技能点颜色, 0))
                     time = 3500;
-                else if (ColorAEqualColorB(GetPixelBytes(bts, size, 897 - 截图模式1X, 1008 - 截图模式1Y), 技能点颜色, 0))
+                else if (ColorAEqualColorB(GetSPixelBytes(bts, size, 897 - 截图模式1X, 1008 - 截图模式1Y), 技能点颜色, 0))
                     time = 2750;
-                else if (ColorAEqualColorB(GetPixelBytes(bts, size, 885 - 截图模式1X, 1008 - 截图模式1Y), 技能点颜色, 0))
+                else if (ColorAEqualColorB(GetSPixelBytes(bts, size, 885 - 截图模式1X, 1008 - 截图模式1Y), 技能点颜色, 0))
                     time = 2000;
-                else if (ColorAEqualColorB(GetPixelBytes(bts, size, 875 - 截图模式1X, 1008 - 截图模式1Y), 技能点颜色, 0))
+                else if (ColorAEqualColorB(GetSPixelBytes(bts, size, 875 - 截图模式1X, 1008 - 截图模式1Y), 技能点颜色, 0))
                     time = 1300;
 
                 var 智力跳刀buff = Form2.智力跳刀buff(bts, size);
@@ -6408,7 +6577,7 @@ public partial class Form2 : Form
 
         var w4 = 获取w4左下角颜色(bts, size);
 
-        if (ColorAEqualColorB(w4, Color.FromArgb(255, 65, 74, 81), 0)) return true;
+        if (ColorAEqualColorB(w4, SimpleColor.FromRgb(65, 74, 81), 0)) return true;
 
         萨满变羊后(bts, size);
         return false;
@@ -6464,14 +6633,14 @@ public partial class Form2 : Form
     private static void 作祟暗影之境最大化伤害()
     {
         // 释放纷争，增加大量伤害
-        if (RegPicture(物品_纷争, "C", 7)) KeyPress((uint) Keys.C);
+        //if (RegPicture(物品_纷争, "C", 7)) KeyPress((uint) Keys.C);
 
         KeyPress((uint) Keys.M);
-        Delay(30);
+        Delay(等待延迟);
         KeyPress((uint) Keys.D);
-        Delay(30);
+        Delay(等待延迟);
         KeyPress((uint) Keys.W);
-        Delay(30);
+        Delay(等待延迟);
         KeyPress((uint) Keys.W);
 
         //var 暗影之境_开始时间 = 获取当前时间毫秒();
@@ -6498,7 +6667,7 @@ public partial class Form2 : Form
         static void 释放奥数鹰隼()
         {
             KeyPress((uint) Keys.Q);
-            Delay(30);
+            Delay(等待延迟);
         }
 
         var q4 = 获取q4左下角颜色(bts, size);
@@ -6506,11 +6675,11 @@ public partial class Form2 : Form
 
         if (_是否魔晶)
         {
-            if (!ColorAEqualColorB(q5, Color.FromArgb(255, 45, 52, 59), 0)) return _循环条件1;
+            if (!ColorAEqualColorB(q5, SimpleColor.FromRgb(45, 52, 59), 0)) return _循环条件1;
             释放奥数鹰隼();
         }
 
-        if (!ColorAEqualColorB(q4, Color.FromArgb(255, 65, 74, 81), 0)) return _循环条件1;
+        if (!ColorAEqualColorB(q4, SimpleColor.FromRgb(65, 74, 81), 0)) return _循环条件1;
         释放奥数鹰隼();
 
         return _循环条件1;
@@ -6535,10 +6704,10 @@ public partial class Form2 : Form
                 {
                     case true:
                     {
-                        if (ColorAEqualColorB(w5, Color.FromArgb(255, 45, 52, 59), 0))
+                        if (ColorAEqualColorB(w5, SimpleColor.FromRgb(45, 52, 59), 0))
                         {
                             KeyPress((uint) Keys.W);
-                            Delay(30);
+                            Delay(等待延迟);
                         }
                         else
                         {
@@ -6549,10 +6718,10 @@ public partial class Form2 : Form
                     }
                     default:
                     {
-                        if (ColorAEqualColorB(w4, Color.FromArgb(255, 65, 74, 81), 0))
+                        if (ColorAEqualColorB(w4, SimpleColor.FromRgb(65, 74, 81), 0))
                         {
                             KeyPress((uint) Keys.W);
-                            Delay(30);
+                            Delay(等待延迟);
                         }
                         else
                         {
@@ -6567,7 +6736,7 @@ public partial class Form2 : Form
             }
             case < 2 when 根据图片以及类别使用物品(物品_血精石, bts, size, _技能数量):
             {
-                Delay(30);
+                Delay(等待延迟);
                 RightClick();
                 if (!根据图片以及类别使用物品(物品_血精石, bts, size, _技能数量))
                     _全局步骤 = 2;
@@ -6576,7 +6745,7 @@ public partial class Form2 : Form
 
             case < 3 when 根据图片以及类别使用物品(物品_虚灵之刃, bts, size, _技能数量):
             {
-                Delay(30);
+                Delay(等待延迟);
                 RightClick();
                 if (!根据图片以及类别使用物品(物品_虚灵之刃, bts, size, _技能数量))
                     _全局步骤 = 3;
@@ -6585,7 +6754,7 @@ public partial class Form2 : Form
 
             case < 4 when 根据图片以及类别使用物品(物品_红杖, bts, size, _技能数量):
             {
-                Delay(30);
+                Delay(等待延迟);
                 RightClick();
                 if (!根据图片以及类别使用物品(物品_红杖, bts, size, _技能数量))
                     _全局步骤 = 4;
@@ -6594,7 +6763,7 @@ public partial class Form2 : Form
 
             case < 4 when 根据图片以及类别使用物品(物品_红杖2, bts, size, _技能数量):
             {
-                Delay(30);
+                Delay(等待延迟);
                 RightClick();
                 if (!根据图片以及类别使用物品(物品_红杖2, bts, size, _技能数量))
                     _全局步骤 = 4;
@@ -6603,7 +6772,7 @@ public partial class Form2 : Form
 
             case < 4 when 根据图片以及类别使用物品(物品_红杖3, bts, size, _技能数量):
             {
-                Delay(30);
+                Delay(等待延迟);
                 RightClick();
                 if (!根据图片以及类别使用物品(物品_红杖3, bts, size, _技能数量))
                     _全局步骤 = 4;
@@ -6612,7 +6781,7 @@ public partial class Form2 : Form
 
             case < 4 when 根据图片以及类别使用物品(物品_红杖4, bts, size, _技能数量):
             {
-                Delay(30);
+                Delay(等待延迟);
                 RightClick();
                 if (!根据图片以及类别使用物品(物品_红杖4, bts, size, _技能数量))
                     _全局步骤 = 4;
@@ -6621,7 +6790,7 @@ public partial class Form2 : Form
 
             case < 4 when 根据图片以及类别使用物品(物品_红杖5, bts, size, _技能数量):
             {
-                Delay(30);
+                Delay(等待延迟);
                 RightClick();
                 if (!根据图片以及类别使用物品(物品_红杖5, bts, size, _技能数量))
                     _全局步骤 = 4;
@@ -6630,7 +6799,7 @@ public partial class Form2 : Form
 
             case < 5 when 根据图片以及类别使用物品(物品_羊刀, bts, size, _技能数量):
             {
-                Delay(30);
+                Delay(等待延迟);
                 RightClick();
                 if (!根据图片以及类别使用物品(物品_羊刀, bts, size, _技能数量))
                     _全局步骤 = 5;
@@ -6640,7 +6809,7 @@ public partial class Form2 : Form
 
             case < 6 when 根据图片以及类别使用物品(物品_纷争, bts, size, _技能数量):
             {
-                Delay(30);
+                Delay(等待延迟);
                 RightClick();
                 if (!根据图片以及类别使用物品(物品_纷争, bts, size, _技能数量))
                     _全局步骤 = 6;
@@ -6649,7 +6818,7 @@ public partial class Form2 : Form
 
             case < 7 when 根据图片以及类别使用物品(物品_阿托斯之棍_4, bts, size, _技能数量):
             {
-                Delay(30);
+                Delay(等待延迟);
                 RightClick();
                 if (!根据图片以及类别使用物品(物品_阿托斯之棍_4, bts, size, _技能数量))
                     _全局步骤 = 7;
@@ -6658,7 +6827,7 @@ public partial class Form2 : Form
 
             case < 8 when 根据图片以及类别使用物品(物品_缚灵锁_4, bts, size, _技能数量):
             {
-                Delay(30);
+                Delay(等待延迟);
                 RightClick();
                 if (!根据图片以及类别使用物品(物品_缚灵锁_4, bts, size, _技能数量))
                     _全局步骤 = 8;
@@ -6671,10 +6840,10 @@ public partial class Form2 : Form
                 {
                     case true:
                     {
-                        if (ColorAEqualColorB(q5, Color.FromArgb(255, 45, 52, 59), 0))
+                        if (ColorAEqualColorB(q5, SimpleColor.FromRgb(45, 52, 59), 0))
                         {
                             KeyPress((uint) Keys.Q);
-                            Delay(30);
+                            Delay(等待延迟);
                         }
                         else
                         {
@@ -6685,10 +6854,10 @@ public partial class Form2 : Form
                     }
                     default:
                     {
-                        if (ColorAEqualColorB(q4, Color.FromArgb(255, 65, 74, 81), 0))
+                        if (ColorAEqualColorB(q4, SimpleColor.FromRgb(65, 74, 81), 0))
                         {
                             KeyPress((uint) Keys.Q);
-                            Delay(30);
+                            Delay(等待延迟);
                         }
                         else
                         {
@@ -6708,10 +6877,10 @@ public partial class Form2 : Form
                 {
                     case true:
                     {
-                        if (ColorAEqualColorB(e5, Color.FromArgb(255, 45, 52, 59), 0))
+                        if (ColorAEqualColorB(e5, SimpleColor.FromRgb(45, 52, 59), 0))
                         {
                             KeyPress((uint) Keys.E);
-                            Delay(30);
+                            Delay(等待延迟);
                         }
                         else
                         {
@@ -6722,10 +6891,10 @@ public partial class Form2 : Form
                     }
                     default:
                     {
-                        if (ColorAEqualColorB(e4, Color.FromArgb(255, 65, 74, 81), 0))
+                        if (ColorAEqualColorB(e4, SimpleColor.FromRgb(65, 74, 81), 0))
                         {
                             KeyPress((uint) Keys.E);
-                            Delay(30);
+                            Delay(等待延迟);
                         }
                         else
                         {
@@ -6746,10 +6915,10 @@ public partial class Form2 : Form
                 {
                     case true:
                     {
-                        if (ColorAEqualColorB(r5, Color.FromArgb(255, 45, 52, 59), 0))
+                        if (ColorAEqualColorB(r5, SimpleColor.FromRgb(45, 52, 59), 0))
                         {
                             KeyPress((uint) Keys.R);
-                            Delay(30);
+                            Delay(等待延迟);
                         }
                         else
                         {
@@ -6760,10 +6929,10 @@ public partial class Form2 : Form
                     }
                     default:
                     {
-                        if (ColorAEqualColorB(r4, Color.FromArgb(255, 65, 74, 81), 0))
+                        if (ColorAEqualColorB(r4, SimpleColor.FromRgb(65, 74, 81), 0))
                         {
                             KeyPress((uint) Keys.R);
-                            Delay(30);
+                            Delay(等待延迟);
                         }
                         else
                         {
@@ -6800,7 +6969,7 @@ public partial class Form2 : Form
 
         var q5 = 获取q5左下角颜色(bts, size);
 
-        if (ColorAEqualColorB(q5, Color.FromArgb(255, 45, 52, 59), 0)) return true;
+        if (ColorAEqualColorB(q5, SimpleColor.FromRgb(45, 52, 59), 0)) return true;
 
         粘性炸弹后();
         return false;
@@ -6816,7 +6985,7 @@ public partial class Form2 : Form
 
         var w5 = 获取w5左下角颜色(bts, size);
 
-        if (ColorAEqualColorB(w5, Color.FromArgb(255, 45, 52, 59), 0)) return true;
+        if (ColorAEqualColorB(w5, SimpleColor.FromRgb(45, 52, 59), 0)) return true;
 
         活性电击后();
         return false;
@@ -6844,7 +7013,7 @@ public partial class Form2 : Form
 
         var e5 = 获取e5左下角颜色(bts, size);
 
-        if (ColorAEqualColorB(e5, Color.FromArgb(255, 45, 52, 59), 0)) return true;
+        if (ColorAEqualColorB(e5, SimpleColor.FromRgb(45, 52, 59), 0)) return true;
 
         爆破起飞后();
         return false;
@@ -6862,7 +7031,7 @@ public partial class Form2 : Form
         {
             MouseMove(_指定地点r.X - 34, _指定地点r.Y - 130);
             KeyPress((uint) Keys.R);
-            Delay(30);
+            Delay(等待延迟);
             return true;
         }
 
@@ -6870,7 +7039,7 @@ public partial class Form2 : Form
         {
             MouseMove(_指定地点r.X - 139 - _全局步骤r, _指定地点r.Y + 96 + _全局步骤r);
             KeyPress((uint) Keys.R);
-            Delay(30);
+            Delay(等待延迟);
             _全局步骤r += 3;
             return true;
         }
@@ -6879,7 +7048,7 @@ public partial class Form2 : Form
         {
             MouseMove(_指定地点r.X + 158 + _全局步骤r, _指定地点r.Y + 31 + _全局步骤r);
             KeyPress((uint) Keys.R);
-            Delay(30);
+            Delay(等待延迟);
             _全局步骤r += 3;
             return true;
         }
@@ -6891,37 +7060,37 @@ public partial class Form2 : Form
 
             if (根据图片以及类别使用物品(物品_虚灵之刃, bts, size, _技能数量))
             {
-                Delay(30);
+                Delay(等待延迟);
                 return true;
             }
 
             if (根据图片以及类别使用物品(物品_红杖, bts, size, _技能数量))
             {
-                Delay(30);
+                Delay(等待延迟);
                 return true;
             }
 
             if (根据图片以及类别使用物品(物品_红杖2, bts, size, _技能数量))
             {
-                Delay(30);
+                Delay(等待延迟);
                 return true;
             }
 
             if (根据图片以及类别使用物品(物品_红杖3, bts, size, _技能数量))
             {
-                Delay(30);
+                Delay(等待延迟);
                 return true;
             }
 
             if (根据图片以及类别使用物品(物品_红杖4, bts, size, _技能数量))
             {
-                Delay(30);
+                Delay(等待延迟);
                 return true;
             }
 
             if (根据图片以及类别使用物品(物品_红杖5, bts, size, _技能数量))
             {
-                Delay(30);
+                Delay(等待延迟);
                 return true;
             }
 
@@ -6948,13 +7117,13 @@ public partial class Form2 : Form
 
         if (_是否a杖)
         {
-            if (ColorAEqualColorB(w5, Color.FromArgb(255, 45, 52, 59), 0)) return true;
+            if (ColorAEqualColorB(w5, SimpleColor.FromRgb(45, 52, 59), 0)) return true;
 
             命运敕令后();
             return false;
         }
 
-        if (ColorAEqualColorB(w4, Color.FromArgb(255, 65, 74, 81), 0)) return true;
+        if (ColorAEqualColorB(w4, SimpleColor.FromRgb(65, 74, 81), 0)) return true;
 
         命运敕令后();
         return false;
@@ -6973,13 +7142,13 @@ public partial class Form2 : Form
 
         if (_是否a杖)
         {
-            if (ColorAEqualColorB(e5, Color.FromArgb(255, 45, 52, 59), 0)) return true;
+            if (ColorAEqualColorB(e5, SimpleColor.FromRgb(45, 52, 59), 0)) return true;
 
             涤罪之焰后();
             return false;
         }
 
-        if (ColorAEqualColorB(e4, Color.FromArgb(255, 65, 74, 81), 0)) return true;
+        if (ColorAEqualColorB(e4, SimpleColor.FromRgb(65, 74, 81), 0)) return true;
 
         涤罪之焰后();
         return false;
@@ -7005,13 +7174,13 @@ public partial class Form2 : Form
 
         if (_是否a杖)
         {
-            if (!ColorAEqualColorB(e5, Color.FromArgb(255, 45, 52, 59), 0)) return true;
+            if (!ColorAEqualColorB(e5, SimpleColor.FromRgb(45, 52, 59), 0)) return true;
             涤罪之焰释放();
 
             return false;
         }
 
-        if (!ColorAEqualColorB(e4, Color.FromArgb(255, 65, 74, 81), 0)) return true;
+        if (!ColorAEqualColorB(e4, SimpleColor.FromRgb(65, 74, 81), 0)) return true;
         涤罪之焰释放();
         return false;
     }
@@ -7029,13 +7198,13 @@ public partial class Form2 : Form
 
         if (_是否a杖)
         {
-            if (ColorAEqualColorB(r5, Color.FromArgb(255, 45, 52, 59), 0)) return true;
+            if (ColorAEqualColorB(r5, SimpleColor.FromRgb(45, 52, 59), 0)) return true;
 
             虚妄之诺后();
             return false;
         }
 
-        if (ColorAEqualColorB(r4, Color.FromArgb(255, 65, 74, 81), 0)) return true;
+        if (ColorAEqualColorB(r4, SimpleColor.FromRgb(65, 74, 81), 0)) return true;
 
         虚妄之诺后();
         return false;
@@ -7053,7 +7222,7 @@ public partial class Form2 : Form
 
         if (!_是否a杖) return false;
 
-        if (ColorAEqualColorB(d5, Color.FromArgb(255, 45, 52, 59), 0)) return true;
+        if (ColorAEqualColorB(d5, SimpleColor.FromRgb(45, 52, 59), 0)) return true;
 
         天命之雨后();
         return false;
@@ -7087,11 +7256,11 @@ public partial class Form2 : Form
         var x_down = 0;
         while (x_down == 0)
         {
-            if (RegPicture(物品_推推BUFF, 400, 865, 1000, 60))
-            {
-                KeyPress((uint) Keys.R);
-                x_down = 1;
-            }
+            //if (RegPicture(物品_推推BUFF, 400, 865, 1000, 60))
+            //{
+            //    KeyPress((uint) Keys.R);
+            //    x_down = 1;
+            //}
 
             if (获取当前时间毫秒() - time > 500) break;
         }
@@ -7143,7 +7312,7 @@ public partial class Form2 : Form
 
         var w4 = 获取w4左下角颜色(bts, size);
 
-        if (ColorAEqualColorB(w4, Color.FromArgb(255, 65, 74, 81), 0)) return true;
+        if (ColorAEqualColorB(w4, SimpleColor.FromRgb(65, 74, 81), 0)) return true;
 
         莱恩羊后();
         return false;
@@ -7159,7 +7328,7 @@ public partial class Form2 : Form
 
         var r4 = 获取r4左下角颜色(bts, size);
 
-        if (ColorAEqualColorB(r4, Color.FromArgb(255, 65, 74, 81), 0)) return true;
+        if (ColorAEqualColorB(r4, SimpleColor.FromRgb(65, 74, 81), 0)) return true;
 
         死亡一指后();
         return false;
@@ -7167,13 +7336,13 @@ public partial class Form2 : Form
 
     private static bool 大招前纷争(in byte[] bts, Size size)
     {
-        if (根据图片以及类别使用物品(物品_虚灵之刃, bts, size)) Delay(30);
-        if (根据图片以及类别使用物品(物品_纷争, bts, size)) Delay(30);
-        if (根据图片以及类别使用物品(物品_红杖, bts, size)) Delay(30);
-        if (根据图片以及类别使用物品(物品_红杖2, bts, size)) Delay(30);
-        if (根据图片以及类别使用物品(物品_红杖3, bts, size)) Delay(30);
-        if (根据图片以及类别使用物品(物品_红杖4, bts, size)) Delay(30);
-        if (根据图片以及类别使用物品(物品_红杖5, bts, size)) Delay(30);
+        if (根据图片以及类别使用物品(物品_虚灵之刃, bts, size)) Delay(等待延迟);
+        if (根据图片以及类别使用物品(物品_纷争, bts, size)) Delay(等待延迟);
+        if (根据图片以及类别使用物品(物品_红杖, bts, size)) Delay(等待延迟);
+        if (根据图片以及类别使用物品(物品_红杖2, bts, size)) Delay(等待延迟);
+        if (根据图片以及类别使用物品(物品_红杖3, bts, size)) Delay(等待延迟);
+        if (根据图片以及类别使用物品(物品_红杖4, bts, size)) Delay(等待延迟);
+        if (根据图片以及类别使用物品(物品_红杖5, bts, size)) Delay(等待延迟);
         return false;
     }
 
@@ -7181,7 +7350,7 @@ public partial class Form2 : Form
     {
         if (根据图片以及类别使用物品(物品_推推棒, bts, size))
         {
-            Delay(30);
+            Delay(等待延迟);
             return true;
         }
 
@@ -7226,7 +7395,7 @@ public partial class Form2 : Form
 
         var q4 = 获取q4左下角颜色(bts, size);
 
-        if (ColorAEqualColorB(q4, Color.FromArgb(255, 65, 74, 81), 0)) return true;
+        if (ColorAEqualColorB(q4, SimpleColor.FromRgb(65, 74, 81), 0)) return true;
 
         奥数诅咒后(bts, size);
         return false;
@@ -7250,7 +7419,7 @@ public partial class Form2 : Form
 
         var e4 = 获取e4左下角颜色(bts, size);
 
-        if (ColorAEqualColorB(e4, Color.FromArgb(255, 65, 74, 81), 0)) return true;
+        if (ColorAEqualColorB(e4, SimpleColor.FromRgb(65, 74, 81), 0)) return true;
 
         遗言后();
         return false;
@@ -7278,7 +7447,7 @@ public partial class Form2 : Form
 
         var q5 = 获取q5左下角颜色(bts, size);
 
-        if (ColorAEqualColorB(q5, Color.FromArgb(255, 45, 52, 59), 0)) return true;
+        if (ColorAEqualColorB(q5, SimpleColor.FromRgb(45, 52, 59), 0)) return true;
 
         剧毒之触后();
         return false;
@@ -7302,7 +7471,7 @@ public partial class Form2 : Form
 
         var w5 = 获取w5左下角颜色(bts, size);
 
-        if (ColorAEqualColorB(w5, Color.FromArgb(255, 45, 52, 59), 0)) return true;
+        if (ColorAEqualColorB(w5, SimpleColor.FromRgb(45, 52, 59), 0)) return true;
 
         薄葬后();
         return false;
@@ -7326,7 +7495,7 @@ public partial class Form2 : Form
 
         var e5 = 获取e5左下角颜色(bts, size);
 
-        if (ColorAEqualColorB(e5, Color.FromArgb(255, 45, 52, 59), 0)) return true;
+        if (ColorAEqualColorB(e5, SimpleColor.FromRgb(45, 52, 59), 0)) return true;
 
         暗影波后();
         return false;
@@ -7350,7 +7519,7 @@ public partial class Form2 : Form
 
         var d5 = 获取d5左下角颜色(bts, size);
 
-        if (ColorAEqualColorB(d5, Color.FromArgb(255, 45, 52, 59), 0)) return true;
+        if (ColorAEqualColorB(d5, SimpleColor.FromRgb(45, 52, 59), 0)) return true;
 
         善咒后();
         return false;
@@ -7374,7 +7543,7 @@ public partial class Form2 : Form
 
         var r5 = 获取r5左下角颜色(bts, size);
 
-        if (ColorAEqualColorB(r5, Color.FromArgb(255, 45, 52, 59), 0)) return true;
+        if (ColorAEqualColorB(r5, SimpleColor.FromRgb(45, 52, 59), 0)) return true;
 
         邪能后();
         return false;
@@ -7405,11 +7574,11 @@ public partial class Form2 : Form
 
         if (_是否魔晶)
         {
-            if (ColorAEqualColorB(q5, Color.FromArgb(255, 45, 52, 59), 0)) return true;
+            if (ColorAEqualColorB(q5, SimpleColor.FromRgb(45, 52, 59), 0)) return true;
         }
         else
         {
-            if (ColorAEqualColorB(q4, Color.FromArgb(255, 65, 74, 81), 0)) return true;
+            if (ColorAEqualColorB(q4, SimpleColor.FromRgb(65, 74, 81), 0)) return true;
         }
 
         冰火交加后();
@@ -7437,11 +7606,11 @@ public partial class Form2 : Form
 
         if (_是否魔晶)
         {
-            if (ColorAEqualColorB(w5, Color.FromArgb(255, 45, 52, 59), 0)) return true;
+            if (ColorAEqualColorB(w5, SimpleColor.FromRgb(45, 52, 59), 0)) return true;
         }
         else
         {
-            if (ColorAEqualColorB(w4, Color.FromArgb(255, 65, 74, 81), 0)) return true;
+            if (ColorAEqualColorB(w4, SimpleColor.FromRgb(65, 74, 81), 0)) return true;
         }
 
         冰封路径后();
@@ -7469,11 +7638,11 @@ public partial class Form2 : Form
 
         if (_是否魔晶)
         {
-            if (ColorAEqualColorB(r5, Color.FromArgb(255, 45, 52, 59), 0)) return true;
+            if (ColorAEqualColorB(r5, SimpleColor.FromRgb(45, 52, 59), 0)) return true;
         }
         else
         {
-            if (ColorAEqualColorB(r4, Color.FromArgb(255, 65, 74, 81), 0)) return true;
+            if (ColorAEqualColorB(r4, SimpleColor.FromRgb(65, 74, 81), 0)) return true;
         }
 
         烈焰焚身后();
@@ -7484,7 +7653,7 @@ public partial class Form2 : Form
     {
         if (根据图片以及类别使用物品(物品_吹风CD, bts, size))
         {
-            Delay(30);
+            Delay(等待延迟);
             return true;
         }
 
@@ -7531,11 +7700,11 @@ public partial class Form2 : Form
 
         if (_是否魔晶)
         {
-            if (ColorAEqualColorB(q5, Color.FromArgb(255, 45, 52, 59), 0)) return true;
+            if (ColorAEqualColorB(q5, SimpleColor.FromRgb(45, 52, 59), 0)) return true;
         }
         else
         {
-            if (ColorAEqualColorB(q4, Color.FromArgb(255, 65, 74, 81), 0)) return true;
+            if (ColorAEqualColorB(q4, SimpleColor.FromRgb(65, 74, 81), 0)) return true;
         }
 
         麻痹药剂后();
@@ -7567,11 +7736,11 @@ public partial class Form2 : Form
 
         if (_是否魔晶)
         {
-            if (ColorAEqualColorB(e5, Color.FromArgb(255, 45, 52, 59), 0)) return true;
+            if (ColorAEqualColorB(e5, SimpleColor.FromRgb(45, 52, 59), 0)) return true;
         }
         else
         {
-            if (ColorAEqualColorB(e4, Color.FromArgb(255, 65, 74, 81), 0)) return true;
+            if (ColorAEqualColorB(e4, SimpleColor.FromRgb(65, 74, 81), 0)) return true;
         }
 
         巫蛊咒术后(bts, size);
@@ -7592,11 +7761,11 @@ public partial class Form2 : Form
 
         if (_是否魔晶)
         {
-            if (ColorAEqualColorB(r5, Color.FromArgb(255, 45, 52, 59), 0)) return true;
+            if (ColorAEqualColorB(r5, SimpleColor.FromRgb(45, 52, 59), 0)) return true;
         }
         else
         {
-            if (ColorAEqualColorB(r4, Color.FromArgb(255, 65, 74, 81), 0)) return true;
+            if (ColorAEqualColorB(r4, SimpleColor.FromRgb(65, 74, 81), 0)) return true;
         }
 
         死亡守卫后(bts, size);
@@ -7617,7 +7786,7 @@ public partial class Form2 : Form
             KeyPress((uint) Keys.A);
         }
 
-        if (ColorAEqualColorB(q4, Color.FromArgb(255, 65, 74, 81), 0)) return true;
+        if (ColorAEqualColorB(q4, SimpleColor.FromRgb(65, 74, 81), 0)) return true;
 
         暗影突袭后();
         return false;
@@ -7633,7 +7802,7 @@ public partial class Form2 : Form
             RightClick();
         }
 
-        if (ColorAEqualColorB(w4, Color.FromArgb(255, 65, 74, 81), 0)) return true;
+        if (ColorAEqualColorB(w4, SimpleColor.FromRgb(65, 74, 81), 0)) return true;
 
         闪烁后();
         return false;
@@ -7649,7 +7818,7 @@ public partial class Form2 : Form
             KeyPress((uint) Keys.A);
         }
 
-        if (ColorAEqualColorB(e4, Color.FromArgb(255, 65, 74, 81), 0)) return true;
+        if (ColorAEqualColorB(e4, SimpleColor.FromRgb(65, 74, 81), 0)) return true;
 
         痛苦尖叫后();
         return false;
@@ -7665,7 +7834,7 @@ public partial class Form2 : Form
             KeyPress((uint) Keys.A);
         }
 
-        if (ColorAEqualColorB(r4, Color.FromArgb(255, 65, 74, 81), 0)) return true;
+        if (ColorAEqualColorB(r4, SimpleColor.FromRgb(65, 74, 81), 0)) return true;
 
         冲击波后();
         return false;
@@ -7694,7 +7863,7 @@ public partial class Form2 : Form
             }
         }
 
-        if (ColorAEqualColorB(q4, Color.FromArgb(255, 65, 74, 81), 0)) return true;
+        if (ColorAEqualColorB(q4, SimpleColor.FromRgb(65, 74, 81), 0)) return true;
 
         风雷之击后();
         return false;
@@ -7718,7 +7887,7 @@ public partial class Form2 : Form
             }
         }
 
-        if (ColorAEqualColorB(r4, Color.FromArgb(255, 65, 74, 81), 0)) return true;
+        if (ColorAEqualColorB(r4, SimpleColor.FromRgb(65, 74, 81), 0)) return true;
 
         静态风暴后();
         return false;
@@ -7734,7 +7903,7 @@ public partial class Form2 : Form
             RightClick();
         }
 
-        if (ColorAEqualColorB(w4, Color.FromArgb(255, 65, 74, 81), 0)) return true;
+        if (ColorAEqualColorB(w4, SimpleColor.FromRgb(65, 74, 81), 0)) return true;
 
         恶念瞥视后();
         return false;
@@ -7750,7 +7919,7 @@ public partial class Form2 : Form
             RightClick();
         }
 
-        if (ColorAEqualColorB(e4, Color.FromArgb(255, 65, 74, 81), 0)) return true;
+        if (ColorAEqualColorB(e4, SimpleColor.FromRgb(65, 74, 81), 0)) return true;
 
         动能力场后();
         return false;
@@ -7767,7 +7936,7 @@ public partial class Form2 : Form
     private static async void 一般程序循环()
     {
         while (_总循环条件)
-            if (_循环内获取图片 != null)
+            if (_循环内获取图片 != null && _总开关条件)
             {
                 _循环内获取图片(); // 更新全局Bitmap
 
@@ -7809,7 +7978,7 @@ public partial class Form2 : Form
                                 切敏捷腿循环(_全局bts, _全局size, _技能数量);
                                 Run(() =>
                                 {
-                                    Delay(125);
+                                    Delay(等待延迟 + 95);
                                     _切假腿中 = false;
                                 });
                             });
@@ -7823,7 +7992,7 @@ public partial class Form2 : Form
                                 切力量腿循环(_全局bts, _全局size, _技能数量);
                                 Run(() =>
                                 {
-                                    Delay(125);
+                                    Delay(等待延迟 + 95);
                                     _切假腿中 = false;
                                 });
                             });
@@ -7949,7 +8118,7 @@ public partial class Form2 : Form
         if (RegPicture(物品_TP效果, bts, size)) return false;
 
         KeyPress((uint) Keys.T);
-        Delay(30);
+        Delay(等待延迟);
         KeyPress((uint) Keys.T);
 
         return true;
@@ -7997,11 +8166,11 @@ public partial class Form2 : Form
     {
         _指定地点p = MousePosition;
 
-        Delay(30);
+        Delay(等待延迟);
         KeyDown((uint) Keys.LControlKey);
-        Delay(30);
+        Delay(等待延迟);
         KeyPress((uint) Keys.D9);
-        Delay(30);
+        Delay(等待延迟);
         KeyUp((uint) Keys.LControlKey);
     }
 
@@ -8303,9 +8472,9 @@ public partial class Form2 : Form
     //private static void 死灵射手净化()
     //{
     //    KeyPress((uint)Keys.D1);
-    //    delay(30);
+    //    Delay(等待延迟);
     //    KeyPress((uint)Keys.Q);
-    //    delay(30);
+    //    Delay(等待延迟);
     //    KeyPress((uint)Keys.F1);
     //}
 
@@ -8313,12 +8482,17 @@ public partial class Form2 : Form
 
     #region 使用物品
 
-    private static bool 根据图片以及类别使用物品(Bitmap bp, in byte[] bts, Size size, string mode = "4")
+    private static bool 根据图片以及类别使用物品(Bitmap bp, in byte[] bts, Size size, string mode = "4",double matchRate = 0.8)
     {
-        var list = RegPicturePoint(bp, bts, size);
-        if (list.Count <= 0) return false;
-        根据物品位置按键(list[0], mode);
-        list.Dispose();
+        //var list = RegPicturePoint(bp, bts, size, matchRate);
+        //if (list.Count <= 0) return false;
+        //根据物品位置按键(list[0], mode);
+        //list.Dispose();
+        //return true;
+
+        var p = RegPicturePointR(bp, bts, size);
+        if (p.X + p.Y <= 0) return false;
+        根据物品位置按键(p, mode);
         return true;
     }
 
@@ -8332,38 +8506,62 @@ public partial class Form2 : Form
     /// <returns></returns>
     private static bool 根据图片以及类别自我使用物品(Bitmap bp, in byte[] bts, Size size, string mode = "4")
     {
-        var list = RegPicturePoint(bp, bts, size);
-        if (list.Count <= 0) return false;
-        根据物品位置按键自我(list[0], mode);
-        list.Dispose();
+        //var list = RegPicturePoint(bp, bts, size);
+        //if (list.Count <= 0) return false;
+        //根据物品位置按键自我(list[0], mode);
+        //list.Dispose();
+        //return true;
+
+        var p = RegPicturePointR(bp, bts, size);
+        if (p.X + p.Y <= 0) return false;
+        根据物品位置按键自我(p, mode);
         return true;
     }
 
     private static bool 根据图片以及类别队列使用物品(Bitmap bp, in byte[] bts, Size size, string mode = "4")
     {
-        var list = RegPicturePoint(bp, bts, size);
-        if (list.Count <= 0) return false;
-        根据物品位置按键队列(list[0], mode);
-        list.Dispose();
+        //var list = RegPicturePoint(bp, bts, size);
+        //if (list.Count <= 0) return false;
+        //根据物品位置按键队列(list[0], mode);
+        //list.Dispose();
+        //return true;
+
+        var p = RegPicturePointR(bp, bts, size);
+        if (p.X + p.Y <= 0) return false;
+        根据物品位置按键队列(p, mode);
         return true;
     }
 
     private static bool 根据图片以及类别使用物品多次(Bitmap bp, byte[] bts, Size size, int times, int delay, string mode = "4")
     {
-        var list = RegPicturePoint(bp, bts, size);
-        if (list.Count <= 0) return false;
+        var p = RegPicturePointR(bp, bts, size);
+        if (p.X + p.Y <= 0) return false;
+
         for (var i = 0; i < times; i++)
         {
-            根据物品位置按键(list[0], mode);
+            根据物品位置按键(p, mode);
             if (i == times - 1)
             {
                 break;
             }
             Delay(delay);
         }
-
-        list.Dispose();
         return true;
+
+        //var list = RegPicturePoint(bp, bts, size);
+        //if (list.Count <= 0) return false;
+        //for (var i = 0; i < times; i++)
+        //{
+        //    根据物品位置按键(list[0], mode);
+        //    if (i == times - 1)
+        //    {
+        //        break;
+        //    }
+        //    Delay(delay);
+        //}
+
+        //list.Dispose();
+        //return true;
     }
 
     #region 根据物品使用
@@ -8714,18 +8912,19 @@ public partial class Form2 : Form
 
     /// <summary>
     /// </summary>
-    /// <param name="bp">指定图片</param>
+    /// <param name="bts">数组</param>
+    /// <param name="size">大小</param>
     /// <returns></returns>
     private static bool 阿哈利姆神杖(byte[] bts, Size size)
     {
-        var 技能点颜色 = Color.FromArgb(255, 28, 193, 254);
+        var 技能点颜色 = SimpleColor.FromRgb(28, 193, 254);
 
-        if (GetPixelBytes(bts, size, 1077 - 截图模式1X, 963 - 截图模式1Y).Equals(技能点颜色))
+        if (GetSPixelBytes(bts, size, 1077 - 截图模式1X, 963 - 截图模式1Y).Equals(技能点颜色))
             return true;
         // 4技能魔晶
 
-        return GetPixelBytes(bts, size, 1093 - 截图模式1X, 963 - 截图模式1Y).Equals(技能点颜色) ||
-               GetPixelBytes(bts, size, 1121 - 截图模式1X, 963 - 截图模式1Y).Equals(技能点颜色);
+        return GetSPixelBytes(bts, size, 1093 - 截图模式1X, 963 - 截图模式1Y).Equals(技能点颜色) ||
+               GetSPixelBytes(bts, size, 1121 - 截图模式1X, 963 - 截图模式1Y).Equals(技能点颜色);
         // 5技能A帐魔晶（A帐魔晶6技能） 6技能魔晶A
     }
 
@@ -8738,31 +8937,15 @@ public partial class Form2 : Form
         var x = 截图模式1X;
         var y = 截图模式1Y;
 
-        var 技能点颜色 = Color.FromArgb(255, 37, 181, 255);
+        var 技能点颜色 = SimpleColor.FromRgb(37, 181, 255);
 
-        if (GetPixelBytes(bts, size, 1077 - x, 996 - y).Equals(技能点颜色))
+        if (GetSPixelBytes(bts, size, 1077 - x, 996 - y).Equals(技能点颜色))
             return true;
         // 4技能魔晶
 
-        return GetPixelBytes(bts, size, 1093 - x, 996 - y).Equals(技能点颜色) ||
-               GetPixelBytes(bts, size, 1121 - x, 996 - y).Equals(技能点颜色);
+        return GetSPixelBytes(bts, size, 1093 - x, 996 - y).Equals(技能点颜色) ||
+               GetSPixelBytes(bts, size, 1121 - x, 996 - y).Equals(技能点颜色);
         // 5技能A帐魔晶（A帐魔晶6技能） // 6技能魔晶A
-    }
-
-    private static void 等待陨星锤结束()
-    {
-        var time = 获取当前时间毫秒();
-        var wait_i = 0;
-        while (wait_i == 0)
-        {
-            if (RegPicture(物品_释放陨星锤_持续施法, 785, 744, 51, 42))
-            {
-                Delay(2350);
-                wait_i = 1;
-            }
-
-            if (获取当前时间毫秒() - time > 4000) break;
-        }
     }
 
     private static void 渐隐期间放技能(uint c, int delay)
@@ -9240,7 +9423,9 @@ public partial class Form2 : Form
     /// <returns></returns>
     private static bool RegPicture(Bitmap bp, in byte[] bts, Size size, double matchRate = 0.8)
     {
-        return FindBytesParallel(GetBitmapByte(bp), bp.Size, bts, size, matchRate: matchRate).Count > 0;
+        var p = RegPicturePointR(bp, bts, size, matchRate);
+        return p.X + p.Y > 0;
+        //return FindBytesParallel(GetBitmapByte(bp), bp.Size, bts, size, matchRate: matchRate).Count > 0;
     }
 
     /// <summary>
@@ -9255,10 +9440,10 @@ public partial class Form2 : Form
         return RegPictrueSmall(bp, new Bitmap(bp1), matchRate);
     }
 
-    private static bool RegPicture(Bitmap bp, int x, int y, int width, int height, double matchRate = 0.8)
-    {
-        return FindPictureParallel(bp, CaptureScreen(x, y, width, height), matchRate: matchRate).Count > 0;
-    }
+    //private static bool RegPicture(Bitmap bp, int x, int y, int width, int height, double matchRate = 0.8)
+    //{
+    //    return FindPictureParallel(bp, CaptureScreen(x, y, width, height), matchRate: matchRate).Count > 0;
+    //}
 
     #endregion
 
@@ -9293,21 +9478,54 @@ public partial class Form2 : Form
         return new PooledList<Point>();
     }
 
+    /// <summary>
+    ///     稳定后延迟在0.2ms左右，相当的快了，而且不存在并行的各种毛病
+    /// </summary>
+    /// <param name="bp">用来对比的图片</param>
+    /// <param name="bts">大图数组</param>
+    /// <param name="size">大图尺寸</param>
+    /// <param name="matchRate">匹配率</param>
+    /// <returns></returns>
+    private static Point RegPicturePointR(Bitmap bp,in byte[] bts, Size size, double matchRate = 0.8)
+    {
+        try
+        {
+            var bts1 = GetBitmapByte(bp);
+            UIntPtr binr = (nuint)bts.Length;
+            UIntPtr binr1 = (nuint)bts1.Length;
+            var t = FindBytesR(bts, binr, Tuple.Create((uint)截图模式1W, (uint)截图模式1H), bts1, binr1,
+                Tuple.Create((uint)bp.Size.Width, (uint)bp.Size.Height), 0.8);
+            return new Point((int)t.Item1, (int)t.Item2);
+        }
+        catch
+        {
+            // ignored
+        }
+
+        return new Point(0, 0);
+    }
     #endregion
 
     #region 返回数组对应颜色
 
     private static Color GetPixelBytes(in byte[] bts, Size size, int x, int y)
     {
-        var subIndex = y * size.Width * 4 + x * 4;
-        return Color.FromArgb(bts[subIndex + 3], bts[subIndex + 2],
+        var subIndex = y * size.Width * 3 + x * 3;
+        return Color.FromArgb( bts[subIndex + 2],
             bts[subIndex + 1], bts[subIndex]);
     }
 
-    private static Color GetPixelBytes(in byte[] bts, Size size, in Point p)
+    private static SimpleColor GetSPixelBytes(in byte[] bts, Size size, int x, int y)
     {
-        var subIndex = p.Y * size.Width * 4 + p.X * 4;
-        return Color.FromArgb(bts[subIndex + 3], bts[subIndex + 2],
+        var subIndex = y * size.Width * 3 + x * 3;
+        return SimpleColor.FromRgb(bts[subIndex + 2],
+            bts[subIndex + 1], bts[subIndex]);
+    }
+
+    private static Color GetSPixelBytes(in byte[] bts, Size size, in Point p)
+    {
+        var subIndex = p.Y * size.Width * 3 + p.X * 3;
+        return Color.FromArgb( bts[subIndex + 2],
             bts[subIndex + 1], bts[subIndex]);
     }
 
@@ -9342,7 +9560,7 @@ public partial class Form2 : Form
 
     //private static void 记录买活()
     //{
-    //    var 计时颜色 = Color.FromArgb(255, 14, 19, 24);
+    //    var 计时颜色 = SimpleColor.FromRgb(14, 19, 24);
 
     //    while (true)
     //    {
@@ -9531,9 +9749,9 @@ public partial class Form2 : Form
         KeyDown((uint) Keys.LControlKey);
         KeyPress((uint) Keys.V);
         KeyUp((uint) Keys.LControlKey);
-        Delay(30);
+        Delay(等待延迟);
         KeyPress((uint) Keys.Enter);
-        Delay(30);
+        Delay(等待延迟);
     }
 
     #endregion
@@ -9571,7 +9789,7 @@ public partial class Form2 : Form
             Delay(300); // 基本延迟用于迷雾显示
 
         CaptureScreen(x, y, ref bp);
-        var bytes = new byte[4 * width * hight];
+        var bytes = new byte[3 * width * hight];
         GetBitmapByte(bp, ref bytes);
 
         var list = 获取敌方坐标(size, bytes);
@@ -9615,43 +9833,43 @@ public partial class Form2 : Form
 
     private static PooledList<Point> 获取敌方坐标(Size size, in byte[] bytes)
     {
-        var colors = new PooledList<Color>();
+        var colors = new PooledList<SimpleColor>();
         var points = new PooledList<Point>();
 
-        colors.Add(Color.FromArgb(255, 58, 28, 27));
+        colors.Add(SimpleColor.FromRgb(58, 28, 27));
         points.Add(new Point(0, 0));
 
-        colors.Add(Color.FromArgb(255, 0, 0, 0));
+        colors.Add(SimpleColor.FromRgb(0, 0, 0));
         points.Add(new Point(0, 1));
 
-        colors.Add(Color.FromArgb(255, 58, 28, 27));
+        colors.Add(SimpleColor.FromRgb(58, 28, 27));
         points.Add(new Point(99, 0));
 
-        colors.Add(Color.FromArgb(255, 0, 0, 0));
+        colors.Add(SimpleColor.FromRgb(0, 0, 0));
         points.Add(new Point(99, 1));
 
-        colors.Add(Color.FromArgb(255, 58, 28, 27));
+        colors.Add(SimpleColor.FromRgb(58, 28, 27));
         points.Add(new Point(100, 0));
 
-        colors.Add(Color.FromArgb(255, 0, 0, 0));
+        colors.Add(SimpleColor.FromRgb(0, 0, 0));
         points.Add(new Point(100, 1));
 
-        colors.Add(Color.FromArgb(255, 0, 0, 0));
+        colors.Add(SimpleColor.FromRgb(0, 0, 0));
         points.Add(new Point(0, 12));
 
-        colors.Add(Color.FromArgb(255, 0, 0, 0));
+        colors.Add(SimpleColor.FromRgb(0, 0, 0));
         points.Add(new Point(0, 13));
 
-        colors.Add(Color.FromArgb(255, 0, 0, 0));
+        colors.Add(SimpleColor.FromRgb(0, 0, 0));
         points.Add(new Point(99, 12));
 
-        colors.Add(Color.FromArgb(255, 0, 0, 0));
+        colors.Add(SimpleColor.FromRgb(0, 0, 0));
         points.Add(new Point(99, 13));
 
-        colors.Add(Color.FromArgb(255, 0, 0, 0));
+        colors.Add(SimpleColor.FromRgb(0, 0, 0));
         points.Add(new Point(100, 12));
 
-        colors.Add(Color.FromArgb(255, 0, 0, 0));
+        colors.Add(SimpleColor.FromRgb(0, 0, 0));
         points.Add(new Point(100, 13));
 #if DEBUG
         初始化全局时间(ref _全局时间);
@@ -9687,31 +9905,31 @@ public partial class Form2 : Form
 
     private static Point 获取自身坐标(Size size, in byte[] bytes)
     {
-        var colors = new PooledList<Color>();
+        var colors = new PooledList<SimpleColor>();
         var points = new PooledList<Point>();
 
-        colors.Add(Color.FromArgb(255, 35, 77, 35));
+        colors.Add(SimpleColor.FromRgb(35, 77, 35));
         points.Add(new Point(0, 0));
 
-        colors.Add(Color.FromArgb(255, 0, 0, 0));
+        colors.Add(SimpleColor.FromRgb(0, 0, 0));
         points.Add(new Point(0, 1));
 
-        colors.Add(Color.FromArgb(255, 33, 70, 33));
+        colors.Add(SimpleColor.FromRgb(33, 70, 33));
         points.Add(new Point(107, 0));
 
-        colors.Add(Color.FromArgb(255, 0, 0, 0));
+        colors.Add(SimpleColor.FromRgb(0, 0, 0));
         points.Add(new Point(107, 1));
 
-        colors.Add(Color.FromArgb(255, 0, 0, 0));
+        colors.Add(SimpleColor.FromRgb(0, 0, 0));
         points.Add(new Point(0, 18));
 
-        colors.Add(Color.FromArgb(255, 0, 1, 0));
+        colors.Add(SimpleColor.FromRgb(0, 1, 0));
         points.Add(new Point(0, 19));
 
-        colors.Add(Color.FromArgb(255, 0, 0, 0));
+        colors.Add(SimpleColor.FromRgb(0, 0, 0));
         points.Add(new Point(107, 18));
 
-        colors.Add(Color.FromArgb(255, 0, 1, 0));
+        colors.Add(SimpleColor.FromRgb(0, 1, 0));
         points.Add(new Point(107, 19));
 #if DEBUG
         初始化全局时间(ref _全局时间);
@@ -9744,8 +9962,23 @@ public partial class Form2 : Form
 
     #region 捕捉颜色
 
-    private void 测试方法()
+    private void 测试方法_寻找大勋章()
     {
+        var size = new Size(截图模式1W, 截图模式1H);
+        var bitmap = new Bitmap(截图模式1W, 截图模式1H);
+        var bts = new byte[3 * 截图模式1W * 截图模式1H];
+        CaptureScreen(截图模式1X, 截图模式1Y, ref bitmap);
+        GetBitmapByte(bitmap, ref bts);
+
+        var time1 = 获取当前时间毫秒();
+
+        //TTS.Speak(string.Concat("开始对比"));
+        for (int i = 0; i < 100; i++)
+        {
+            var t = RegPicturePointR(物品_炎阳勋章, bts, size);
+        }
+        //TTS.Speak(string.Concat("找到的x坐标", t.X + 截图模式1X, "找到的y坐标", t.Y + 截图模式1Y));
+        tb_攻速.Text = string.Concat(获取当前时间毫秒() - time1);
 
     }
 
@@ -9753,12 +9986,12 @@ public partial class Form2 : Form
     {
         var time = 获取当前时间毫秒();
 
-        var colors = new PooledList<Color>();
+        var colors = new PooledList<SimpleColor>();
         var longs = new PooledList<long>();
 
         var size = new Size(截图模式1W, 截图模式1H);
         var bitmap = new Bitmap(截图模式1W, 截图模式1H);
-        var bts = new byte[4 * 截图模式1W * 截图模式1H];
+        var bts = new byte[3 * 截图模式1W * 截图模式1H];
         // var time1 = 获取当前时间毫秒();
         CaptureScreen(截图模式1X, 截图模式1Y, ref bitmap);
         GetBitmapByte(bitmap, ref bts);
@@ -9841,16 +10074,16 @@ public partial class Form2 : Form
             };
 
             if (colors.Count == 0 || !colors[^1].Equals(p))
-                if (!ColorAEqualColorB(p, Color.FromArgb(255, 9, 10, 16), 5, 6, 12))
+                if (!ColorAEqualColorB(p, SimpleColor.FromRgb(9, 10, 16), 5, 6, 12))
                 {
                     colors.Add(p);
                     longs.Add(获取当前时间毫秒() - time);
                 }
 
             //if (
-            //    ColorAEqualColorB(q5, Color.FromArgb(255, 99,170,68), 3, 5, 20)
+            //    ColorAEqualColorB(q5, SimpleColor.FromRgb(99,170,68), 3, 5, 20)
             ////    &
-            ////    !ColorAEqualColorB(q4_n, Color.FromArgb(50, 21, 23), 0) // 沉默不释放
+            ////    !ColorAEqualColorB(q4_n, SimpleColor.FromRgb(50, 21, 23), 0) // 沉默不释放
             //    )
             //{
             //    KeyPress((uint)Keys.Q);
@@ -9916,164 +10149,164 @@ public partial class Form2 : Form
         但检测到释放后还需要等待一点时间，且不同饰品颜色不同
         释放后CD的话，变化颜色也不统一
      ***/
-    private static Color 获取q4颜色(in byte[] bts, Size size)
+    private static SimpleColor 获取q4颜色(in byte[] bts, Size size)
     {
-        return GetPixelBytes(bts, size, 828 - 截图模式1X, 956 - 截图模式1Y);
+        return GetSPixelBytes(bts, size, 828 - 截图模式1X, 956 - 截图模式1Y);
     }
 
-    private static Color 获取q4左下角颜色(in byte[] bts, Size size)
+    private static SimpleColor 获取q4左下角颜色(in byte[] bts, Size size)
     {
-        return GetPixelBytes(bts, size, 803 - 截图模式1X, 997 - 截图模式1Y);
+        return GetSPixelBytes(bts, size, 803 - 截图模式1X, 997 - 截图模式1Y);
     }
 
-    private static Color 获取q5颜色(in byte[] bts, Size size)
+    private static SimpleColor 获取q5颜色(in byte[] bts, Size size)
     {
-        return GetPixelBytes(bts, size, 811 - 截图模式1X, 956 - 截图模式1Y);
+        return GetSPixelBytes(bts, size, 811 - 截图模式1X, 956 - 截图模式1Y);
     }
 
-    private static Color 获取q5左下角颜色(in byte[] bts, Size size)
+    private static SimpleColor 获取q5左下角颜色(in byte[] bts, Size size)
     {
-        return GetPixelBytes(bts, size, 787 - 截图模式1X, 994 - 截图模式1Y);
+        return GetSPixelBytes(bts, size, 787 - 截图模式1X, 994 - 截图模式1Y);
     }
 
-    private static Color 获取q6颜色(in byte[] bts, Size size)
+    private static SimpleColor 获取q6颜色(in byte[] bts, Size size)
     {
-        return GetPixelBytes(bts, size, 781 - 截图模式1X, 956 - 截图模式1Y);
+        return GetSPixelBytes(bts, size, 781 - 截图模式1X, 956 - 截图模式1Y);
     }
 
-    private static Color 获取q6左下角颜色(in byte[] bts, Size size)
+    private static SimpleColor 获取q6左下角颜色(in byte[] bts, Size size)
     {
-        return GetPixelBytes(bts, size, 757 - 截图模式1X, 994 - 截图模式1Y);
+        return GetSPixelBytes(bts, size, 757 - 截图模式1X, 994 - 截图模式1Y);
     }
 
-    private static Color 获取w4颜色(in byte[] bts, Size size)
+    private static SimpleColor 获取w4颜色(in byte[] bts, Size size)
     {
-        return GetPixelBytes(bts, size, 893 - 截图模式1X, 956 - 截图模式1Y);
+        return GetSPixelBytes(bts, size, 893 - 截图模式1X, 956 - 截图模式1Y);
     }
 
-    private static Color 获取w4左下角颜色(in byte[] bts, Size size)
+    private static SimpleColor 获取w4左下角颜色(in byte[] bts, Size size)
     {
-        return GetPixelBytes(bts, size, 868 - 截图模式1X, 997 - 截图模式1Y);
+        return GetSPixelBytes(bts, size, 868 - 截图模式1X, 997 - 截图模式1Y);
     }
 
-    private static Color 获取w4开关颜色(in byte[] bts, Size size)
+    private static SimpleColor 获取w4开关颜色(in byte[] bts, Size size)
     {
-        return GetPixelBytes(bts, size, 863 - 截图模式1X, 1003 - 截图模式1Y);
+        return GetSPixelBytes(bts, size, 863 - 截图模式1X, 1003 - 截图模式1Y);
     }
 
-    private static Color 获取w5颜色(in byte[] bts, Size size)
+    private static SimpleColor 获取w5颜色(in byte[] bts, Size size)
     {
-        return GetPixelBytes(bts, size, 869 - 截图模式1X, 956 - 截图模式1Y);
+        return GetSPixelBytes(bts, size, 869 - 截图模式1X, 956 - 截图模式1Y);
     }
 
-    private static Color 获取w5左下角颜色(in byte[] bts, Size size)
+    private static SimpleColor 获取w5左下角颜色(in byte[] bts, Size size)
     {
-        return GetPixelBytes(bts, size, 845 - 截图模式1X, 994 - 截图模式1Y);
+        return GetSPixelBytes(bts, size, 845 - 截图模式1X, 994 - 截图模式1Y);
     }
 
-    private static Color 获取w5开关颜色(in byte[] bts, Size size)
+    private static SimpleColor 获取w5开关颜色(in byte[] bts, Size size)
     {
-        return GetPixelBytes(bts, size, 843 - 截图模式1X, 996 - 截图模式1Y);
+        return GetSPixelBytes(bts, size, 843 - 截图模式1X, 996 - 截图模式1Y);
     }
 
-    private static Color 获取w6颜色(in byte[] bts, Size size)
+    private static SimpleColor 获取w6颜色(in byte[] bts, Size size)
     {
-        return GetPixelBytes(bts, size, 839 - 截图模式1X, 956 - 截图模式1Y);
+        return GetSPixelBytes(bts, size, 839 - 截图模式1X, 956 - 截图模式1Y);
     }
 
-    private static Color 获取w6左下角颜色(in byte[] bts, Size size)
+    private static SimpleColor 获取w6左下角颜色(in byte[] bts, Size size)
     {
-        return GetPixelBytes(bts, size, 815 - 截图模式1X, 994 - 截图模式1Y);
+        return GetSPixelBytes(bts, size, 815 - 截图模式1X, 994 - 截图模式1Y);
     }
 
-    private static Color 获取e4颜色(in byte[] bts, Size size)
+    private static SimpleColor 获取e4颜色(in byte[] bts, Size size)
     {
-        return GetPixelBytes(bts, size, 958 - 截图模式1X, 956 - 截图模式1Y);
+        return GetSPixelBytes(bts, size, 958 - 截图模式1X, 956 - 截图模式1Y);
     }
 
-    private static Color 获取e4左下角颜色(in byte[] bts, Size size)
+    private static SimpleColor 获取e4左下角颜色(in byte[] bts, Size size)
     {
-        return GetPixelBytes(bts, size, 933 - 截图模式1X, 997 - 截图模式1Y);
+        return GetSPixelBytes(bts, size, 933 - 截图模式1X, 997 - 截图模式1Y);
     }
 
-    private static Color 获取e5颜色(in byte[] bts, Size size)
+    private static SimpleColor 获取e5颜色(in byte[] bts, Size size)
     {
-        return GetPixelBytes(bts, size, 927 - 截图模式1X, 956 - 截图模式1Y);
+        return GetSPixelBytes(bts, size, 927 - 截图模式1X, 956 - 截图模式1Y);
     }
 
-    private static Color 获取e5左下角颜色(in byte[] bts, Size size)
+    private static SimpleColor 获取e5左下角颜色(in byte[] bts, Size size)
     {
-        return GetPixelBytes(bts, size, 903 - 截图模式1X, 994 - 截图模式1Y);
+        return GetSPixelBytes(bts, size, 903 - 截图模式1X, 994 - 截图模式1Y);
     }
 
-    private static Color 获取e6颜色(in byte[] bts, Size size)
+    private static SimpleColor 获取e6颜色(in byte[] bts, Size size)
     {
-        return GetPixelBytes(bts, size, 897 - 截图模式1X, 956 - 截图模式1Y);
+        return GetSPixelBytes(bts, size, 897 - 截图模式1X, 956 - 截图模式1Y);
     }
 
-    private static Color 获取e6左下角颜色(in byte[] bts, Size size)
+    private static SimpleColor 获取e6左下角颜色(in byte[] bts, Size size)
     {
-        return GetPixelBytes(bts, size, 873 - 截图模式1X, 994 - 截图模式1Y);
+        return GetSPixelBytes(bts, size, 873 - 截图模式1X, 994 - 截图模式1Y);
     }
 
-    private static Color 获取r4颜色(in byte[] bts, Size size)
+    private static SimpleColor 获取r4颜色(in byte[] bts, Size size)
     {
-        return GetPixelBytes(bts, size, 1023 - 截图模式1X, 956 - 截图模式1Y);
+        return GetSPixelBytes(bts, size, 1023 - 截图模式1X, 956 - 截图模式1Y);
     }
 
-    private static Color 获取r4左下角颜色(in byte[] bts, Size size)
+    private static SimpleColor 获取r4左下角颜色(in byte[] bts, Size size)
     {
-        return GetPixelBytes(bts, size, 998 - 截图模式1X, 997 - 截图模式1Y);
+        return GetSPixelBytes(bts, size, 998 - 截图模式1X, 997 - 截图模式1Y);
     }
 
-    private static Color 获取r5颜色(in byte[] bts, Size size)
+    private static SimpleColor 获取r5颜色(in byte[] bts, Size size)
     {
-        return GetPixelBytes(bts, size, 1043 - 截图模式1X, 956 - 截图模式1Y);
+        return GetSPixelBytes(bts, size, 1043 - 截图模式1X, 956 - 截图模式1Y);
     }
 
-    private static Color 获取r5左下角颜色(in byte[] bts, Size size)
+    private static SimpleColor 获取r5左下角颜色(in byte[] bts, Size size)
     {
-        return GetPixelBytes(bts, size, 1019 - 截图模式1X, 994 - 截图模式1Y);
+        return GetSPixelBytes(bts, size, 1019 - 截图模式1X, 994 - 截图模式1Y);
     }
 
-    private static Color 获取r6颜色(in byte[] bts, Size size)
+    private static SimpleColor 获取r6颜色(in byte[] bts, Size size)
     {
-        return GetPixelBytes(bts, size, 1071 - 截图模式1X, 956 - 截图模式1Y);
+        return GetSPixelBytes(bts, size, 1071 - 截图模式1X, 956 - 截图模式1Y);
     }
 
-    private static Color 获取r6左下角颜色(in byte[] bts, Size size)
+    private static SimpleColor 获取r6左下角颜色(in byte[] bts, Size size)
     {
-        return GetPixelBytes(bts, size, 1047 - 截图模式1X, 994 - 截图模式1Y);
+        return GetSPixelBytes(bts, size, 1047 - 截图模式1X, 994 - 截图模式1Y);
     }
 
-    private static Color 获取d5颜色(in byte[] bts, Size size)
+    private static SimpleColor 获取d5颜色(in byte[] bts, Size size)
     {
-        return GetPixelBytes(bts, size, 985 - 截图模式1X, 956 - 截图模式1Y);
+        return GetSPixelBytes(bts, size, 985 - 截图模式1X, 956 - 截图模式1Y);
     }
 
-    private static Color 获取d5左下角颜色(in byte[] bts, Size size)
+    private static SimpleColor 获取d5左下角颜色(in byte[] bts, Size size)
     {
-        return GetPixelBytes(bts, size, 961 - 截图模式1X, 994 - 截图模式1Y);
+        return GetSPixelBytes(bts, size, 961 - 截图模式1X, 994 - 截图模式1Y);
     }
 
-    private static Color 获取d6颜色(in byte[] bts, Size size)
+    private static SimpleColor 获取d6颜色(in byte[] bts, Size size)
     {
-        return GetPixelBytes(bts, size, 955 - 截图模式1X, 956 - 截图模式1Y);
+        return GetSPixelBytes(bts, size, 955 - 截图模式1X, 956 - 截图模式1Y);
     }
 
-    private static Color 获取d6左下角颜色(in byte[] bts, Size size)
+    private static SimpleColor 获取d6左下角颜色(in byte[] bts, Size size)
     {
-        return GetPixelBytes(bts, size, 931 - 截图模式1X, 994 - 截图模式1Y);
+        return GetSPixelBytes(bts, size, 931 - 截图模式1X, 994 - 截图模式1Y);
     }
 
-    private static Color 获取f6颜色(in byte[] bts, Size size)
+    private static SimpleColor 获取f6颜色(in byte[] bts, Size size)
     {
-        return GetPixelBytes(bts, size, 1013 - 截图模式1X, 956 - 截图模式1Y);
+        return GetSPixelBytes(bts, size, 1013 - 截图模式1X, 956 - 截图模式1Y);
     }
 
-    private static Color 获取f6左下角颜色(in byte[] bts, Size size)
+    private static SimpleColor 获取f6左下角颜色(in byte[] bts, Size size)
     {
-        return GetPixelBytes(bts, size, 989 - 截图模式1X, 994 - 截图模式1Y);
+        return GetSPixelBytes(bts, size, 989 - 截图模式1X, 994 - 截图模式1Y);
     }
 
     #endregion
@@ -10234,6 +10467,7 @@ public partial class Form2 : Form
             tb_状态抗性.Text = "2000";
         }
 
+
         //Task.Run(记录买活);
 
         // 用于初始捕捉
@@ -10241,6 +10475,12 @@ public partial class Form2 : Form
 
         // 用于文字识别
         初始化PaddleOcr();
+
+        Run(() =>
+        {
+            _总开关条件 = !_总开关条件;
+            TTS.Speak(_总开关条件 ? "开启功能" : "关闭功能");
+        });
 
         return i;
     }
@@ -10479,4 +10719,15 @@ public partial class Form2 : Form
     //KeyboardMouseSimulateDriverAPI.KeyUp((uint)Keys.Space);
 
     #endregion
+}internal record struct NewStruct(object Item1, object Item2)
+{
+    public static implicit operator (object, object)(NewStruct value)
+    {
+        return (value.Item1, value.Item2);
+    }
+
+    public static implicit operator NewStruct((object, object) value)
+    {
+        return new NewStruct(value.Item1, value.Item2);
+    }
 }

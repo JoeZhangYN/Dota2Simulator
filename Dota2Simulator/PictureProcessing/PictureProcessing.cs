@@ -6,15 +6,32 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using Collections.Pooled;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Dota2Simulator;
+
+[StructLayout(LayoutKind.Sequential)]
+struct IntTupleSize
+{
+    public uint x;
+    public uint y;
+
+    public static implicit operator Tuple<uint, uint>(IntTupleSize t)
+    {
+        return Tuple.Create(t.x, t.y);
+    }
+
+    public static implicit operator IntTupleSize(Tuple<uint, uint> t)
+    {
+        return new IntTupleSize { x = t.Item1, y = t.Item2 };
+    }
+}
 
 /// <summary>
 ///     图片处理类
 /// </summary>
 ///
 ///
-
 
 public class PictureProcessing
 {
@@ -134,7 +151,7 @@ public class PictureProcessing
     /// <param name="parSize">图片尺寸</param>
     /// <param name="errorRange">容错范围 一般为0</param>
     /// <returns></returns>
-    public static PooledList<Point> FindColor(Color color, byte[] byteArraryPar, Size parSize, byte errorRange = 0)
+    public static PooledList<Point> FindColor(SimpleColor color, byte[] byteArraryPar, Size parSize, byte errorRange = 0)
     {
         PooledList<Point> listPoint = new();
         var parWidth = parSize.Width;
@@ -153,8 +170,8 @@ public class PictureProcessing
                 for (var i = searchLeftTop.Y; i < iMax; i++)
                 {
                     int x = j, y = i;
-                    var parIndex = i * parWidth * 4 + j * 4;
-                    var colorBig = Color.FromArgb(byteArraryPar[parIndex + 3], byteArraryPar[parIndex + 2],
+                    var parIndex = i * parWidth * 3 + j * 3;
+                    var colorBig = SimpleColor.FromRgb( byteArraryPar[parIndex + 2],
                         byteArraryPar[parIndex + 1], byteArraryPar[parIndex]);
 
                     if (!ColorAEqualColorB(colorBig, color, errorRange)) continue;
@@ -189,7 +206,7 @@ public class PictureProcessing
     /// <param name="errorRange">容错范围 一般为0</param>
     /// <param name="matchRate">匹配率，大概有多少颜色是匹配的</param>
     /// <returns></returns>
-    public static PooledList<Point> FindColors(PooledList<Color> colors, PooledList<Point> points, byte[] byteArraryPar, Size parSize, byte errorRange = 0, double matchRate = 0.9)
+    public static PooledList<Point> FindColors(PooledList<SimpleColor> colors, PooledList<Point> points, byte[] byteArraryPar, Size parSize, byte errorRange = 0, double matchRate = 0.9)
     {
         PooledList<Point> ListPoint = new();
         var subWidth = 0;
@@ -222,8 +239,8 @@ public class PictureProcessing
             for (var i = searchLeftTop.Y; i < iMax; i++)
             {
                 int x = j, y = i;
-                var parIndex = (i + points[0].X) * parWidth * 4 + (j + points[0].Y) * 4; // 第一个颜色坐标的颜色
-                var colorBig = Color.FromArgb(byteArraryPar[parIndex + 3], byteArraryPar[parIndex + 2],
+                var parIndex = (i + points[0].X) * parWidth * 3 + (j + points[0].Y) * 3; // 第一个颜色坐标的颜色
+                var colorBig = SimpleColor.FromRgb( byteArraryPar[parIndex + 2],
                     byteArraryPar[parIndex + 1], byteArraryPar[parIndex]);
                 if (!ColorAEqualColorB(colorBig, startPixelColor, errorRange)) continue;
                 smallStartX = x - smallOffsetX; //待找的点X坐标
@@ -236,8 +253,8 @@ public class PictureProcessing
                     var color = colors[m];
                     sum++;
                     int x2 = smallStartX + x1, y2 = smallStartY + y1;
-                    var parReleativeIndex = y2 * parWidth * 4 + x2 * 4; //比对大图对应的像素点的颜色
-                    var colorPixel = Color.FromArgb(byteArraryPar[parReleativeIndex + 3],
+                    var parReleativeIndex = y2 * parWidth * 3 + x2 * 3; //比对大图对应的像素点的颜色
+                    var colorPixel = SimpleColor.FromRgb(
                         byteArraryPar[parReleativeIndex + 2], byteArraryPar[parReleativeIndex + 1],
                         byteArraryPar[parReleativeIndex]);
                     if (ColorAEqualColorB(colorPixel, color, errorRange)) matchNum++;
@@ -262,21 +279,32 @@ public class PictureProcessing
 
     #region 找图
 
+    [DllImport("findpoints.dll")]
+    private static extern IntTupleSize FindBytesRust(byte[] n1, UIntPtr len1, IntTupleSize t1, byte[] n2,
+        UIntPtr len2, IntTupleSize t2, double matchRate);
+
+    public static Tuple<uint, uint> FindBytesR(byte[] n1, UIntPtr len1, Tuple<uint, uint> t1, byte[] n2,
+        UIntPtr len2, Tuple<uint, uint> t2, double matchRate)
+    {
+        return FindBytesRust(n1, len1, t1, n2, len2, t2, matchRate);
+    }
+
+    // todo: 逻辑上有问题，匹配率本身无意义
     /// <summary>
     ///     根据数组查找坐标
     /// </summary>
-    /// <param name="byteArrarySub">小图像数组</param>
-    /// <param name="byteArraryPar">大图像数组</param>
+    /// <param name="byteArraySub">小图像数组</param>
+    /// <param name="byteArrayPar">大图像数组</param>
     /// <param name="subSize">小图像尺码</param>
     /// <param name="parSize">大图像尺码</param>
     /// <param name="errorRange">误差范围</param>
     /// <param name="matchRate">匹配率</param>
     /// <returns></returns>
-    public static PooledList<Point> FindBytesParallel(byte[] byteArrarySub,
-        Size subSize,byte[] byteArraryPar, Size parSize, byte errorRange = 0,
+    public static PooledList<Point> FindBytesParallel(byte[] byteArraySub,
+        Size subSize,byte[] byteArrayPar, Size parSize, byte errorRange = 0,
         double matchRate = 0.9)
     {
-        PooledList<Point> ListPoint = new();
+        PooledList<Point> listPoint = new();
         var subWidth = subSize.Width;
         var subHeight = subSize.Height;
         var parWidth = parSize.Width;
@@ -286,16 +314,16 @@ public class PictureProcessing
         var searchLeftTop = searchRect.Location;
         var searchSize = searchRect.Size;
         // 第一个颜色
-        var startPixelColor = Color.FromArgb(byteArrarySub[3], byteArrarySub[2],
-            byteArrarySub[1], byteArrarySub[0]);
+        var startPixelColor = SimpleColor.FromRgb(byteArraySub[2],
+            byteArraySub[1], byteArraySub[0]);
 
         var iMax = searchLeftTop.Y + searchSize.Height - subSize.Height; //行
         var jMax = searchLeftTop.X + searchSize.Width - subSize.Width; //列
 
         int smallOffsetX = 0, smallOffsetY = 0;
         int smallStartX, smallStartY;
-        int pointX;
-        int pointY;
+        // int pointX;
+        // int pointY;
 
 
         var balanceLock = new object();
@@ -307,9 +335,9 @@ public class PictureProcessing
                     // for (var j = searchLeftTop.X; j < jMax; j++)
                     //大图x，y坐标处的颜色值
                     int x = j, y = i;
-                    var parIndex = i * parWidth * 4 + j * 4;
-                    var colorBig = Color.FromArgb(byteArraryPar[parIndex + 3], byteArraryPar[parIndex + 2],
-                        byteArraryPar[parIndex + 1], byteArraryPar[parIndex]);
+                    var parIndex = i * parWidth * 3 + j * 3;
+                    var colorBig = SimpleColor.FromRgb( byteArrayPar[parIndex + 2],
+                        byteArrayPar[parIndex + 1], byteArrayPar[parIndex]);
                     if (!ColorAEqualColorB(colorBig, startPixelColor, errorRange)) continue;
                     smallStartX = x - smallOffsetX; //待找的图X坐标
                     smallStartY = y - smallOffsetY; //待找的图Y坐标
@@ -319,27 +347,21 @@ public class PictureProcessing
                     for (var n = 0; n < subWidth; n++)
                     {
                         int x1 = n, y1 = m;
-                        var subIndex = m * subWidth * 4 + n * 4;
-                        var color = Color.FromArgb(byteArrarySub[subIndex + 3], byteArrarySub[subIndex + 2],
-                            byteArrarySub[subIndex + 1], byteArrarySub[subIndex]);
+                        var subIndex = m * subWidth * 3 + n * 3;
+                        var color = SimpleColor.FromRgb( byteArraySub[subIndex + 2],
+                            byteArraySub[subIndex + 1], byteArraySub[subIndex]);
 
                         sum++;
                         int x2 = smallStartX + x1, y2 = smallStartY + y1;
-                        var parReleativeIndex = y2 * parWidth * 4 + x2 * 4; //比对大图对应的像素点的颜色
-                        var colorPixel = Color.FromArgb(byteArraryPar[parReleativeIndex + 3],
-                            byteArraryPar[parReleativeIndex + 2], byteArraryPar[parReleativeIndex + 1],
-                            byteArraryPar[parReleativeIndex]);
+                        var parReleativeIndex = y2 * parWidth * 3 + x2 * 3; //比对大图对应的像素点的颜色
+                        var colorPixel = SimpleColor.FromRgb(byteArrayPar[parReleativeIndex + 2], byteArrayPar[parReleativeIndex + 1],
+                            byteArrayPar[parReleativeIndex]);
                         if (ColorAEqualColorB(colorPixel, color, errorRange)) matchNum++;
                     }
 
-                    if (!((double) matchNum / sum >= matchRate)) continue;
+                    if (!((double)matchNum / sum >= matchRate)) continue;
                     // Console.WriteLine((double)matchNum / sum);
-                    pointX = smallStartX;
-                    pointY = smallStartY;
-                    Point point = new(pointX, pointY);
-                    if (!ListPoint.Contains(point))
-                        subPoint = point;
-                    return subPoint;
+                    return new Point(smallStartX, smallStartY);
                 }
 
                 return subPoint;
@@ -351,14 +373,15 @@ public class PictureProcessing
                 lock (balanceLock)
                 {
                     if (x.X != 0) 
-                        ListPoint.Add(x);
+                        listPoint.Add(x);
                 }
             }
         );
 
-        return ListPoint;
+        return listPoint;
     }
 
+    // todo: 逻辑上有问题，匹配率本身无意义
     /// <summary>
     ///     查找图片，不能镂空
     /// </summary>
@@ -381,7 +404,7 @@ public class PictureProcessing
 
         var searchLeftTop = searchRect.Location;
         var searchSize = searchRect.Size;
-        var startPixelColor = subBitmap.GetPixel(0, 0);
+        var startPixelColor = SimpleColor.FromColor(subBitmap.GetPixel(0, 0));
         var subData = subBitmap.LockBits(new Rectangle(0, 0, subBitmap.Width, subBitmap.Height),
             ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
         var parData = parBitmap.LockBits(new Rectangle(0, 0, parBitmap.Width, parBitmap.Height),
@@ -396,8 +419,8 @@ public class PictureProcessing
 
         int smallOffsetX = 0, smallOffsetY = 0;
         int smallStartX, smallStartY;
-        int pointX;
-        int pointY;
+        // int pointX;
+        // int pointY;
 
 
         var balanceLock = new object();
@@ -410,8 +433,8 @@ public class PictureProcessing
 
                     //大图x，y坐标处的颜色值
                     int x = j, y = i;
-                    var parIndex = i * parWidth * 4 + j * 4;
-                    var colorBig = Color.FromArgb(byteArraryPar[parIndex + 3], byteArraryPar[parIndex + 2],
+                    var parIndex = i * parWidth * 3 + j * 3;
+                    var colorBig = SimpleColor.FromRgb( byteArraryPar[parIndex + 2],
                         byteArraryPar[parIndex + 1], byteArraryPar[parIndex]);
                     if (!ColorAEqualColorB(colorBig, startPixelColor, errorRange)) continue;
                     smallStartX = x - smallOffsetX; //待找的图X坐标
@@ -422,14 +445,14 @@ public class PictureProcessing
                     for (var n = 0; n < subWidth; n++)
                     {
                         int x1 = n, y1 = m;
-                        var subIndex = m * subWidth * 4 + n * 4;
-                        var color = Color.FromArgb(byteArrarySub[subIndex + 3], byteArrarySub[subIndex + 2],
+                        var subIndex = m * subWidth * 3 + n * 3;
+                        var color = SimpleColor.FromRgb( byteArrarySub[subIndex + 2],
                             byteArrarySub[subIndex + 1], byteArrarySub[subIndex]);
 
                         sum++;
                         int x2 = smallStartX + x1, y2 = smallStartY + y1;
-                        var parReleativeIndex = y2 * parWidth * 4 + x2 * 4; //比对大图对应的像素点的颜色
-                        var colorPixel = Color.FromArgb(byteArraryPar[parReleativeIndex + 3],
+                        var parReleativeIndex = y2 * parWidth * 3 + x2 * 3; //比对大图对应的像素点的颜色
+                        var colorPixel = SimpleColor.FromRgb(
                             byteArraryPar[parReleativeIndex + 2], byteArraryPar[parReleativeIndex + 1],
                             byteArraryPar[parReleativeIndex]);
                         if (ColorAEqualColorB(colorPixel, color, errorRange)) matchNum++;
@@ -437,12 +460,7 @@ public class PictureProcessing
 
                     if (!((double) matchNum / sum >= matchRate)) continue;
                     // Console.WriteLine((double)matchNum / sum);
-                    pointX = smallStartX;
-                    pointY = smallStartY;
-                    Point point = new(pointX, pointY);
-                    if (!listPoint.Contains(point))
-                        subPoint = point;
-                    return subPoint;
+                    subPoint = new Point(smallStartX, smallStartY);
                 }
 
                 return subPoint;
@@ -474,6 +492,7 @@ public class PictureProcessing
     /// <param name="searchRect">如果为empty，则默认查找整个图像</param>
     /// <param name="errorRange">容错，单个色值范围内视为正确0~255</param>
     /// <param name="matchRate">图片匹配度，默认90%</param>
+    /// <param name="isFindAll">是否全找到</param>
     /// <returns>返回查找到的图片的左上角坐标</returns>
     public static PooledList<Point> FindPicture(Bitmap subBitmap, Bitmap parBitmap,
         Rectangle searchRect = new(), byte errorRange = 0,
@@ -488,7 +507,7 @@ public class PictureProcessing
 
         var searchLeftTop = searchRect.Location;
         var searchSize = searchRect.Size;
-        var startPixelColor = subBitmap.GetPixel(0, 0);
+        var startPixelColor = SimpleColor.FromColor(subBitmap.GetPixel(0, 0));
         var subData = subBitmap.LockBits(new Rectangle(0, 0, subBitmap.Width, subBitmap.Height),
             ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
         var parData = parBitmap.LockBits(new Rectangle(0, 0, parBitmap.Width, parBitmap.Height),
@@ -511,8 +530,8 @@ public class PictureProcessing
         {
             //大图x，y坐标处的颜色值
             int x = j, y = i;
-            var parIndex = i * parWidth * 4 + j * 4;
-            var colorBig = Color.FromArgb(byteArraryPar[parIndex + 3], byteArraryPar[parIndex + 2],
+            var parIndex = i * parWidth * 3 + j * 3;
+            var colorBig = SimpleColor.FromRgb( byteArraryPar[parIndex + 2],
                 byteArraryPar[parIndex + 1], byteArraryPar[parIndex]);
             if (!ColorAEqualColorB(colorBig, startPixelColor, errorRange)) continue;
             smallStartX = x - smallOffsetX; //待找的图X坐标
@@ -523,14 +542,14 @@ public class PictureProcessing
             for (var n = 0; n < subWidth; n++)
             {
                 int x1 = n, y1 = m;
-                var subIndex = m * subWidth * 4 + n * 4;
-                var color = Color.FromArgb(byteArrarySub[subIndex + 3], byteArrarySub[subIndex + 2],
+                var subIndex = m * subWidth * 3 + n * 3;
+                var color = SimpleColor.FromRgb( byteArrarySub[subIndex + 2],
                     byteArrarySub[subIndex + 1], byteArrarySub[subIndex]);
 
                 sum++;
                 int x2 = smallStartX + x1, y2 = smallStartY + y1;
-                var parReleativeIndex = y2 * parWidth * 4 + x2 * 4; //比对大图对应的像素点的颜色
-                var colorPixel = Color.FromArgb(byteArraryPar[parReleativeIndex + 3],
+                var parReleativeIndex = y2 * parWidth * 3 + x2 * 3; //比对大图对应的像素点的颜色
+                var colorPixel = SimpleColor.FromRgb(
                     byteArraryPar[parReleativeIndex + 2], byteArraryPar[parReleativeIndex + 1],
                     byteArraryPar[parReleativeIndex]);
                 if (ColorAEqualColorB(colorPixel, color, errorRange)) matchNum++;
@@ -570,10 +589,24 @@ public class PictureProcessing
             ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
         if (bts.Length != subBitmap.Width * subBitmap.Height * 4)
         {
-            bts = new byte[subData.Stride * subData.Height];
+            bts = new byte[subData.Stride * subData.Height * 4];
         }
         Marshal.Copy(subData.Scan0, bts, 0, subData.Stride * subData.Height);
         subBitmap.UnlockBits(subData);
+        var bts1 = new byte[subData.Stride * subData.Height * 3];
+        for (var i = 0; i < subData.Stride; i++)
+        {
+            for (var j = 0; j < subData.Height; j++)
+            {
+                var index1 = j * subData.Stride * 4 + i * 4;
+                var index2 = j * subData.Stride * 3 + i * 3;
+                bts1[index2 + 2] = bts[index1 + 2];
+                bts1[index2 + 1] = bts[index1 + 1];
+                bts1[index2] = bts[index1];
+            }
+        }
+
+        bts = bts1;
     }
 
     /// <summary>
@@ -586,15 +619,55 @@ public class PictureProcessing
     {
         var subData = subBitmap.LockBits(new Rectangle(0, 0, subBitmap.Width, subBitmap.Height),
             ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
-        var bts = new byte[subData.Stride * subData.Height];
+        var bts = new byte[subData.Stride * subData.Height * 4];
         Marshal.Copy(subData.Scan0, bts, 0, subData.Stride * subData.Height);
         subBitmap.UnlockBits(subData);
-        return bts;
+        var bts1 = new byte[subData.Stride * subData.Height * 3];
+        for (var i = 0; i < subData.Stride; i++)
+        {
+            for (var j = 0; j < subData.Height; j++)
+            {
+                var index1 = j * subData.Stride * 4 + i * 4;
+                var index2 = j * subData.Stride * 3 + i * 3;
+                bts1[index2 + 2] = bts[index1 + 2];
+                bts1[index2 + 1] = bts[index1 + 1];
+                bts1[index2] = bts[index1];
+            }
+        }
+
+        bts = Array.Empty<byte>();
+        return bts1;
     }
 
     #endregion
 
     #region 颜色对比
+
+
+    public struct SimpleColor
+    {
+        public byte R;
+        public byte G;
+        public byte B;
+
+        public SimpleColor(byte red, byte green, byte blue)
+        {
+            this.R = red;
+            this.G = green;
+            this.B = blue;
+        }
+
+        public static SimpleColor FromRgb(byte red, byte green, byte blue)
+        {
+            return new SimpleColor(red, green, blue);
+        }
+
+        public static SimpleColor FromColor(Color c)
+        {
+            return new SimpleColor(c.R, c.G, c.B);
+        }
+    }
+
 
     /// <summary>
     ///     颜色对比
@@ -612,6 +685,22 @@ public class PictureProcessing
     }
 
     public static bool ColorAEqualColorB(in Color colorA,in Color colorB, byte errorR, byte errorG, byte errorB)
+    {
+        return //Math.Abs(colorA.A - colorB.A) <= errorRange &&
+            Math.Abs(colorA.R - colorB.R) <= errorR &&
+            Math.Abs(colorA.G - colorB.G) <= errorG &&
+            Math.Abs(colorA.B - colorB.B) <= errorB;
+    }
+
+    public static bool ColorAEqualColorB(in SimpleColor colorA, in SimpleColor colorB, byte errorRange = 10)
+    {
+        return //Math.Abs(colorA.A - colorB.A) <= errorRange &&
+            Math.Abs(colorA.R - colorB.R) <= errorRange &&
+            Math.Abs(colorA.G - colorB.G) <= errorRange &&
+            Math.Abs(colorA.B - colorB.B) <= errorRange;
+    }
+
+    public static bool ColorAEqualColorB(in SimpleColor colorA, in SimpleColor colorB, byte errorR, byte errorG, byte errorB)
     {
         return //Math.Abs(colorA.A - colorB.A) <= errorRange &&
             Math.Abs(colorA.R - colorB.R) <= errorR &&
@@ -655,7 +744,7 @@ public class PictureProcessing
         var RGB = new byte[length];
 
         var data = bitmap.LockBits(new Rectangle(0, 0, width, height), ImageLockMode.ReadWrite,
-            PixelFormat.Format24bppRgb);
+            PixelFormat.Format32bppArgb);
 
         var Scan0 = data.Scan0;
         Marshal.Copy(Scan0, RGB, 0, length);
@@ -696,7 +785,7 @@ public class PictureProcessing
         try
         {
             byte newColor = 0;
-            var srcData = bmp.LockBits(new Rectangle(0, 0, w, h), ImageLockMode.ReadWrite, PixelFormat.Format24bppRgb);
+            var srcData = bmp.LockBits(new Rectangle(0, 0, w, h), ImageLockMode.ReadWrite, PixelFormat.Format32bppArgb);
             unsafe
             {
                 var p = (byte*) srcData.Scan0.ToPointer();
@@ -900,7 +989,7 @@ public class PictureProcessing
 //    public (Result result, bool isBlackFrame, Image image) GetFrameImage(int timeoutInMilliseconds = 5)
 //    {
 //        //生成 C# 用图像
-//        Bitmap image = new Bitmap(textureDesc.Width, textureDesc.Height, PixelFormat.Format24bppRgb);
+//        Bitmap image = new Bitmap(textureDesc.Width, textureDesc.Height, PixelFormat.Format32bppArgb);
 //        bool isBlack = true;
 //        var result = ProcessFrame(ProcessImage);
 
@@ -910,7 +999,7 @@ public class PictureProcessing
 
 //        void ProcessImage(DataBox dataBox, Texture2DDescription texture)
 //        {
-//            BitmapData data = image.LockBits(new Rectangle(0, 0, texture.Width, texture.Height), ImageLockMode.ReadWrite, PixelFormat.Format24bppRgb);
+//            BitmapData data = image.LockBits(new Rectangle(0, 0, texture.Width, texture.Height), ImageLockMode.ReadWrite, PixelFormat.Format32bppArgb);
 
 //            unsafe
 //            {
@@ -945,7 +1034,7 @@ public class PictureProcessing
 //    public (Result result, bool isBlackFrame, byte[] bts) GetFrameBytes(int timeoutInMilliseconds = 5)
 //    {
 //        //生成 C# 用图像
-//        Bitmap image = new Bitmap(textureDesc.Width, textureDesc.Height, PixelFormat.Format24bppRgb);
+//        Bitmap image = new Bitmap(textureDesc.Width, textureDesc.Height, PixelFormat.Format32bppArgb);
 //        bool isBlack = true;
 //        var result = ProcessFrame(ProcessImage);
 
@@ -955,7 +1044,7 @@ public class PictureProcessing
 
 //        void ProcessImage(DataBox dataBox, Texture2DDescription texture)
 //        {
-//            BitmapData data = image.LockBits(new Rectangle(0, 0, texture.Width, texture.Height), ImageLockMode.ReadWrite, PixelFormat.Format24bppRgb);
+//            BitmapData data = image.LockBits(new Rectangle(0, 0, texture.Width, texture.Height), ImageLockMode.ReadWrite, PixelFormat.Format32bppArgb);
 
 //            unsafe
 //            {

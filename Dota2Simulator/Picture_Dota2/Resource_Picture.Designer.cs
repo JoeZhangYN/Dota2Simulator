@@ -63,6 +63,16 @@ namespace Dota2Simulator.Picture_Dota2 {
         /// <summary>
         ///   查找 System.Drawing.Bitmap 类型的本地化资源。
         /// </summary>
+        internal static System.Drawing.Bitmap 小精灵_幽魂buff {
+            get {
+                object obj = ResourceManager.GetObject("小精灵_幽魂buff", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
+        /// </summary>
         internal static System.Drawing.Bitmap 播报_买活 {
             get {
                 object obj = ResourceManager.GetObject("播报_买活", resourceCulture);

@@ -75,6 +75,9 @@
     <None Update="Driver\x64\KeyboardMouseSimulateDriver.dll">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </None>
+    <None Update="findpoints.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="inference1\ch_PP-OCRv3_det_infer\inference.pdiparams">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
