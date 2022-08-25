@@ -56,13 +56,17 @@ public partial class Form2 : Form
             case Keys.Home:
                 _总开关条件 = !_总开关条件;
                 TTS.Speak(_总开关条件 ? "开启功能" : "关闭功能");
+                if (!_总开关条件) 取消所有功能();
                 KeyPress((uint)Keys.End);
                 Delay(等待延迟);
-                break;
+                await Task.Delay(1);
+                return;
             case Keys.Insert:
                 取消所有功能();
-                TTS.Speak("已重置功能");
-                break;
+                KeyPress((uint)Keys.End);
+                TTS.Speak("已重置功能"); 
+                await Task.Delay(1);
+                return;
         }
 
         #endregion
@@ -363,7 +367,7 @@ public partial class Form2 : Form
                             {
                                 _条件开启切假腿 = false;
                                 初始化全局时间(ref _全局时间d);
-                                切智力腿(_技能数量);
+                                await 切智力腿(_技能数量);
                                 _条件2 = true;
                                 break;
                             }
@@ -377,7 +381,7 @@ public partial class Form2 : Form
                                 if (_循环条件1)
                                     if (RegPicture(物品_魂戒CD, _全局bts, _全局size))
                                     {
-                                        切力量腿(_全局bts, _全局size, _技能数量);
+                                        await 切力量腿(_全局bts, _全局size, _技能数量);
                                         根据图片以及类别使用物品(物品_魂戒CD, _全局bts, _全局size, _技能数量);
                                     }
 
@@ -391,7 +395,7 @@ public partial class Form2 : Form
                                 if (_循环条件2)
                                     if (RegPicture(物品_魂戒CD, _全局bts, _全局size))
                                     {
-                                        切力量腿(_全局bts, _全局size, _技能数量);
+                                        await 切力量腿(_全局bts, _全局size, _技能数量);
                                         根据图片以及类别使用物品(物品_魂戒CD, _全局bts, _全局size, _技能数量);
                                     }
 
@@ -446,25 +450,25 @@ public partial class Form2 : Form
                         case Keys.Q:
                             _条件保持假腿 = false;
                             初始化全局时间(ref _全局时间q);
-                            切智力腿(_技能数量);
+                            await 切智力腿(_技能数量);
                             _条件1 = true;
                             break;
                         case Keys.W:
                             _条件保持假腿 = false;
                             初始化全局时间(ref _全局时间q);
-                            切智力腿(_技能数量);
+                            await 切智力腿(_技能数量);
                             _条件1 = true;
                             break;
                         case Keys.E:
                             _条件保持假腿 = false;
                             初始化全局时间(ref _全局时间q);
-                            切智力腿(_技能数量);
+                            await 切智力腿(_技能数量);
                             _条件1 = true;
                             break;
                         case Keys.R:
                             _条件保持假腿 = false;
                             初始化全局时间(ref _全局时间r);
-                            切智力腿(_技能数量);
+                            await 切智力腿(_技能数量);
                             _条件1 = true;
                             break;
                         case Keys.F:
@@ -636,7 +640,7 @@ public partial class Form2 : Form
                                 _条件保持假腿 = false;
                                 根据图片以及类别使用物品(物品_勇气勋章, _全局bts, _全局size);
                                 根据图片以及类别使用物品(物品_炎阳勋章, _全局bts, _全局size);
-                                切智力腿(_技能数量);
+                                await 切智力腿(_技能数量);
                                 _全局模式w = _是否魔晶 ? 1 : 0;
                                 _条件1 = true;
                                 break;
@@ -650,7 +654,7 @@ public partial class Form2 : Form
                         case Keys.R:
                             {
                                 _条件保持假腿 = false;
-                                切智力腿(_技能数量);
+                                await 切智力腿(_技能数量);
                                 _条件3 = true;
                                 break;
                             }
@@ -708,7 +712,7 @@ public partial class Form2 : Form
                     {
                         case Keys.Q:
                             {
-                                切智力腿(_技能数量);
+                                await 切智力腿(_技能数量);
                                 _条件保持假腿 = false;
                                 _条件1 = true;
                                 初始化全局时间(ref _全局时间q);
@@ -716,7 +720,7 @@ public partial class Form2 : Form
                             }
                         case Keys.W:
                             {
-                                切智力腿(_技能数量);
+                                await 切智力腿(_技能数量);
                                 _条件保持假腿 = false;
                                 _条件2 = true;
                                 初始化全局时间(ref _全局时间w);
@@ -837,18 +841,18 @@ public partial class Form2 : Form
                         case Keys.Q:
                             _条件保持假腿 = false;
                             初始化全局时间(ref _全局时间q);
-                            切智力腿(_技能数量);
+                            await 切智力腿(_技能数量);
                             _条件1 = true;
                             break;
                         case Keys.R:
                             _条件保持假腿 = false;
                             初始化全局时间(ref _全局时间r);
-                            切智力腿(_技能数量);
+                            await 切智力腿(_技能数量);
                             _条件2 = true;
                             break;
                         case Keys.C:
                             _条件保持假腿 = false;
-                            切智力腿(_技能数量);
+                            await 切智力腿(_技能数量);
                             await Run(() =>
                             {
                                 Delay(等待延迟);
@@ -857,7 +861,7 @@ public partial class Form2 : Form
                             break;
                         case Keys.X:
                             _条件保持假腿 = false;
-                            切智力腿(_技能数量);
+                            await 切智力腿(_技能数量);
                             await Run(() =>
                             {
                                 Delay(等待延迟);
@@ -1046,14 +1050,14 @@ public partial class Form2 : Form
                     switch (e.KeyCode)
                     {
                         case Keys.Q:
-                            切敏捷腿(_技能数量);
+                            await 切敏捷腿(_技能数量);
                             break;
                         case Keys.E:
                         case Keys.R:
-                            切智力腿(_技能数量);
+                            await 切智力腿(_技能数量);
                             break;
                         case Keys.Z:
-                            if (RegPicture(物品_魂戒CD, _全局bts, _全局size)) 切力量腿(_技能数量);
+                            if (RegPicture(物品_魂戒CD, _全局bts, _全局size)) await 切力量腿(_技能数量);
                             break;
                     }
 
@@ -1101,13 +1105,13 @@ public partial class Form2 : Form
                         case Keys.W:
                             _条件保持假腿 = false;
                             初始化全局时间(ref _全局时间w);
-                            切智力腿(_技能数量);
+                            await 切智力腿(_技能数量);
                             _条件1 = true;
                             break;
                         case Keys.Q:
                             _条件保持假腿 = false;
                             初始化全局时间(ref _全局时间q);
-                            切智力腿(_技能数量);
+                            await 切智力腿(_技能数量);
                             _条件2 = true;
                             break;
                         case Keys.D3 when _条件假腿敏捷:
@@ -1170,33 +1174,33 @@ public partial class Form2 : Form
                         case Keys.Q:
                             _条件保持假腿 = false;
                             初始化全局时间(ref _全局时间q);
-                            切智力腿(_技能数量);
+                            await 切智力腿(_技能数量);
                             _条件1 = true;
                             break;
                         case Keys.W:
                             _条件保持假腿 = false;
                             初始化全局时间(ref _全局时间w);
-                            切智力腿(_技能数量);
+                            await 切智力腿(_技能数量);
                             _条件2 = true;
                             break;
                         case Keys.R:
                             _条件保持假腿 = false;
                             初始化全局时间(ref _全局时间r);
-                            切智力腿(_技能数量);
+                            await 切智力腿(_技能数量);
                             _条件4 = true;
                             break;
                         case Keys.D:
                             _条件保持假腿 = false;
                             初始化全局时间(ref _全局时间d);
-                            切智力腿(_技能数量);
+                            await 切智力腿(_技能数量);
                             _条件3 = true;
                             break;
                         case Keys.Z:
-                            if (RegPicture(物品_魂戒CD, _全局bts, _全局size)) 切力量腿(_技能数量);
+                            if (RegPicture(物品_魂戒CD, _全局bts, _全局size)) await 切力量腿(_技能数量);
                             break;
                         case Keys.D2:
                             _条件保持假腿 = false;
-                            切智力腿(_技能数量);
+                            await 切智力腿(_技能数量);
 
                             // 径直移动键位
                             KeyDown((uint)Keys.L);
@@ -1265,13 +1269,13 @@ public partial class Form2 : Form
                     {
                         case Keys.W:
                             _条件保持假腿 = false;
-                            切智力腿(_技能数量);
+                            await 切智力腿(_技能数量);
                             初始化全局时间(ref _全局时间w);
                             _条件2 = true;
                             break;
                         case Keys.E:
                             _条件保持假腿 = false;
-                            切智力腿(_技能数量);
+                            await 切智力腿(_技能数量);
                             await Run(() =>
                             {
                                 Delay(等待延迟);
@@ -1280,7 +1284,7 @@ public partial class Form2 : Form
                             break;
                         case Keys.R:
                             _条件保持假腿 = false;
-                            切智力腿(_技能数量);
+                            await 切智力腿(_技能数量);
                             初始化全局时间(ref _全局时间r);
                             _条件3 = true;
                             break;
@@ -1335,13 +1339,13 @@ public partial class Form2 : Form
                         case Keys.Q:
                             _条件保持假腿 = false;
                             初始化全局时间(ref _全局时间q);
-                            切智力腿(_技能数量);
+                            await 切智力腿(_技能数量);
                             _条件1 = true;
                             break;
                         case Keys.D:
                             _条件保持假腿 = false;
                             初始化全局时间(ref _全局时间w);
-                            切智力腿(_技能数量);
+                            await 切智力腿(_技能数量);
                             await Run(() => { KeyPress((uint)Keys.W); });
                             _条件2 = true;
                             break;
@@ -1402,25 +1406,25 @@ public partial class Form2 : Form
                     {
                         case Keys.Q:
                             _条件保持假腿 = false;
-                            切智力腿(_技能数量);
+                            await 切智力腿(_技能数量);
                             初始化全局时间(ref _全局时间q);
                             _条件1 = true;
                             break;
                         case Keys.W:
                             _条件保持假腿 = false;
-                            切智力腿(_技能数量);
+                            await 切智力腿(_技能数量);
                             初始化全局时间(ref _全局时间w);
                             _条件2 = true;
                             break;
                         case Keys.E:
                             _条件保持假腿 = false;
-                            切智力腿(_技能数量);
+                            await 切智力腿(_技能数量);
                             初始化全局时间(ref _全局时间e);
                             _条件3 = true;
                             break;
                         case Keys.D:
                             _条件保持假腿 = false;
-                            切智力腿(_技能数量);
+                            await 切智力腿(_技能数量);
                             初始化全局时间(ref _全局时间d);
                             _条件4 = true;
                             break;
@@ -1481,19 +1485,19 @@ public partial class Form2 : Form
                     {
                         case Keys.Q:
                             _条件保持假腿 = false;
-                            切智力腿(_技能数量);
+                            await 切智力腿(_技能数量);
                             初始化全局时间(ref _全局时间q);
                             _条件1 = true;
                             break;
                         case Keys.W:
                             _条件保持假腿 = false;
-                            切智力腿(_技能数量);
+                            await 切智力腿(_技能数量);
                             初始化全局时间(ref _全局时间w);
                             _条件2 = true;
                             break;
                         case Keys.R:
                             _条件保持假腿 = false;
-                            切智力腿(_技能数量);
+                            await 切智力腿(_技能数量);
                             初始化全局时间(ref _全局时间r);
                             _条件3 = true;
                             break;
@@ -1563,19 +1567,19 @@ public partial class Form2 : Form
                     {
                         case Keys.Q:
                             _条件保持假腿 = false;
-                            切智力腿(_技能数量);
+                            await 切智力腿(_技能数量);
                             初始化全局时间(ref _全局时间q);
                             _条件1 = true;
                             break;
                         case Keys.W:
                             _条件保持假腿 = false;
-                            切智力腿(_技能数量);
+                            await 切智力腿(_技能数量);
                             初始化全局时间(ref _全局时间w);
                             _条件2 = true;
                             break;
                         case Keys.E:
                             _条件保持假腿 = false;
-                            切智力腿(_技能数量);
+                            await 切智力腿(_技能数量);
                             初始化全局时间(ref _全局时间e);
                             _条件3 = true;
                             break;
@@ -1585,13 +1589,13 @@ public partial class Form2 : Form
                             break;
                         case Keys.F:
                             _条件保持假腿 = false;
-                            切智力腿(_技能数量);
+                            await 切智力腿(_技能数量);
                             初始化全局时间(ref _全局时间f);
                             _条件5 = true;
                             break;
                         case Keys.R:
                             _条件保持假腿 = false;
-                            切智力腿(_技能数量);
+                            await 切智力腿(_技能数量);
                             初始化全局时间(ref _全局时间r);
                             _条件6 = true;
                             break;
@@ -1753,13 +1757,13 @@ public partial class Form2 : Form
                     {
                         case Keys.W:
                             _条件保持假腿 = false;
-                            切智力腿(_技能数量);
+                            await 切智力腿(_技能数量);
                             初始化全局时间(ref _全局时间w);
                             _条件1 = true;
                             break;
                         case Keys.R:
                             _条件保持假腿 = false;
-                            切智力腿(_技能数量);
+                            await 切智力腿(_技能数量);
                             初始化全局时间(ref _全局时间r);
                             _条件2 = true;
                             break;
@@ -1835,13 +1839,13 @@ public partial class Form2 : Form
                     {
                         case Keys.Q:
                             _条件保持假腿 = false;
-                            切智力腿(_技能数量);
+                            await 切智力腿(_技能数量);
                             初始化全局时间(ref _全局时间q);
                             _条件1 = true;
                             break;
                         case Keys.F:
                             _条件保持假腿 = false;
-                            切智力腿(_技能数量);
+                            await 切智力腿(_技能数量);
                             初始化全局时间(ref _全局时间f);
                             _条件2 = true;
                             break;
@@ -1860,7 +1864,7 @@ public partial class Form2 : Form
                             break;
                         case Keys.R:
                             _条件保持假腿 = false;
-                            切智力腿(_技能数量);
+                            await 切智力腿(_技能数量);
                             初始化全局时间(ref _全局时间r);
                             _条件3 = true;
                             break;
@@ -1922,25 +1926,25 @@ public partial class Form2 : Form
                     {
                         case Keys.Q:
                             _条件保持假腿 = false;
-                            切智力腿(_技能数量);
+                            await 切智力腿(_技能数量);
                             初始化全局时间(ref _全局时间q);
                             _条件1 = true;
                             break;
                         case Keys.E:
                             _条件保持假腿 = false;
-                            切智力腿(_技能数量);
+                            await 切智力腿(_技能数量);
                             初始化全局时间(ref _全局时间e);
                             _条件2 = true;
                             break;
                         case Keys.D:
                             _条件保持假腿 = false;
-                            切智力腿(_技能数量);
+                            await 切智力腿(_技能数量);
                             初始化全局时间(ref _全局时间d);
                             _条件3 = true;
                             break;
                         case Keys.R:
                             _条件保持假腿 = false;
-                            切智力腿(_技能数量);
+                            await 切智力腿(_技能数量);
                             初始化全局时间(ref _全局时间r);
                             _条件4 = true;
                             break;
@@ -2001,7 +2005,7 @@ public partial class Form2 : Form
                                     break;
                                 default:
                                     _条件开启切假腿 = false;
-                                    切智力腿(_技能数量);
+                                    await 切智力腿(_技能数量);
                                     _全局模式 = 1;
                                     break;
                             }
@@ -2009,13 +2013,13 @@ public partial class Form2 : Form
                             break;
                         case Keys.W:
                             _条件保持假腿 = false;
-                            切智力腿(_技能数量);
+                            await 切智力腿(_技能数量);
                             初始化全局时间(ref _全局时间w);
                             _条件1 = true;
                             break;
                         case Keys.E:
                             _条件保持假腿 = false;
-                            切智力腿(_技能数量);
+                            await 切智力腿(_技能数量);
                             初始化全局时间(ref _全局时间e);
                             _条件2 = true;
                             break;
@@ -2024,7 +2028,7 @@ public partial class Form2 : Form
                             {
                                 TTS.Speak("发现疯脸");
                                 _条件保持假腿 = false;
-                                切智力腿(_技能数量);
+                                await 切智力腿(_技能数量);
                             }
 
                             if (根据图片以及类别使用物品(物品_疯狂面具, _全局bts, _全局size))
@@ -3072,7 +3076,7 @@ public partial class Form2 : Form
             case "切假腿":
                 {
                     if (e.KeyCode is Keys.Q or Keys.W or Keys.E or Keys.D or Keys.F or Keys.R)
-                        切智力腿();
+                        await 切智力腿();
                     break;
                 }
             case "测试":
@@ -3086,10 +3090,10 @@ public partial class Form2 : Form
                             await Run(测试方法_寻找大勋章);
                             break;
                         case Keys.D1:
-                            await Run(() =>
+                            await Run(async() =>
                             {
                                 KeyPress((uint)Keys.Space);
-                                快速选择敌方英雄(type: 1, type1: 1);
+                                await 快速选择敌方英雄(type: 1, type1: 1);
                                 KeyPress((uint)Keys.W);
                                 KeyPress((uint)Keys.Q);
                             });
@@ -3216,7 +3220,7 @@ public partial class Form2 : Form
     ///     获取图片委托
     /// </summary>
     /// <returns></returns>
-    private delegate void GetBitmap();
+    private delegate Task<bool> GetBitmap();
 
     /// <summary>
     ///     获取图片委托
@@ -3379,10 +3383,10 @@ public partial class Form2 : Form
     /// </summary>
     private readonly KeyboardHook _kHook = new();
 
-    /// <summary>
-    ///     按键钩子，用于捕获按下的键
-    /// </summary>
-    private KeyEventHandler _myKeyEventHandeler; //按键钩子
+    ///// <summary>
+    /////     按键钩子，用于捕获按下的键
+    ///// </summary>
+    //private KeyEventHandler _myKeyEventHandeler; //按键钩子
 
     /// <summary>
     ///     用于捕捉案件
@@ -3701,76 +3705,82 @@ public partial class Form2 : Form
         switch (_全局步骤)
         {
             case < 1:
+            {
+                根据图片以及类别使用物品(物品_臂章, bts, size);
+
+                根据图片以及类别使用物品(物品_魂戒CD, bts, size);
+
+                var w4 = 获取w4左下角颜色(bts, size);
+
+                if (ColorAEqualColorB(w4, SimpleColor.FromRgb(65, 74, 81), 0))
                 {
-                    _全局步骤 = 根据图片以及类别使用物品(物品_臂章, bts, size) ? 1 : 0;
-
-                    根据图片以及类别使用物品(物品_魂戒CD, bts, size);
-
-                    //if (RegPicture(军团_强攻CD, bts, size))
-                    //{
-                    //    KeyPressAlt((uint)Keys.W);
-                    //    Delay(260); // 去后摇
-                    //    RightClick();
-                    //    Delay(等待延迟);
-                    //}
-
-                    break;
+                    KeyPressAlt((uint)Keys.W);
+                    Delay(260); // 去后摇
+                    RightClick();
+                    Delay(等待延迟);
                 }
+
+                _全局步骤 = 1;
+
+                return await FromResult(true);
+            }
             case < 2 when 根据图片以及类别使用物品(物品_刃甲, bts, size):
                 return await FromResult(true);
             case < 2:
-                {
-                    if (根据图片以及类别使用物品(物品_跳刀, bts, size)) _全局步骤 = 2;
+            {
+                if (根据图片以及类别使用物品(物品_跳刀, bts, size)) _全局步骤 = 2;
 
-                    else if (根据图片以及类别使用物品(物品_跳刀_力量跳刀, bts, size)) _全局步骤 = 2;
+                else if (根据图片以及类别使用物品(物品_跳刀_力量跳刀, bts, size)) _全局步骤 = 2;
 
-                    else if (根据图片以及类别使用物品(物品_跳刀_力量跳刀, bts, size)) _全局步骤 = 2;
+                else if (根据图片以及类别使用物品(物品_跳刀_力量跳刀, bts, size)) _全局步骤 = 2;
 
-                    else if (根据图片以及类别使用物品(物品_跳刀_智力跳刀, bts, size)) _全局步骤 = 2;
+                else if (根据图片以及类别使用物品(物品_跳刀_智力跳刀, bts, size)) _全局步骤 = 2;
 
-                    return await FromResult(true);
-                }
+                return await FromResult(true);
+            }
             case < 3:
+            {
+                if (_全局模式 == 1) await 快速选择敌方英雄();
+
+                _全局步骤 = 3;
+                return await FromResult(true);
+            }
+
+            case < 4:
+            {
+                if (_全局时间 < 0)
+                    _全局时间 = 获取当前时间毫秒();
+
+                if (获取当前时间毫秒() - _全局时间 < 100)
                 {
-                    if (_全局模式 == 1) 快速选择敌方英雄();
-
-                    _全局步骤 = 3;
-                    break;
+                    根据图片以及类别使用物品(物品_勇气勋章, bts, size);
                 }
-        }
+                else
+                {
+                    _全局步骤 = 4;
+                    _全局时间 = -1;
+                }
 
-        if (_全局步骤 < 4)
-        {
-            if (_全局时间 < 0)
-                _全局时间 = 获取当前时间毫秒();
-
-            if (获取当前时间毫秒() - _全局时间 < 100)
-            {
-                根据图片以及类别使用物品(物品_勇气勋章, bts, size);
-            }
-            else
-            {
-                _全局步骤 = 4;
-                _全局时间 = -1;
+                return await FromResult(true);
             }
 
-            return await FromResult(true);
-        }
+            case < 5:
+            {
+                if (_全局时间 < 0)
+                    _全局时间 = 获取当前时间毫秒();
 
-        if (_全局步骤 < 5)
-        {
-            if (_全局时间 < 0)
-                _全局时间 = 获取当前时间毫秒();
+                var r4 = 获取r4左下角颜色(bts, size);
 
-            //if (RegPicture(军团_决斗CD, bts, size))
-            //{
-            //    KeyPress((uint)Keys.R);
-            //    Delay(等待延迟);
-            //    return 获取当前时间毫秒() - _全局时间 <= 450;
-            //}
+                if (ColorAEqualColorB(r4, SimpleColor.FromRgb(65, 74, 81), 0))
+                {
+                    KeyPress((uint)Keys.R);
+                    Delay(等待延迟);
+                    return 获取当前时间毫秒() - _全局时间 <= 450 ? await FromResult(true) : await FromResult(false);
+                }
 
-            _全局步骤 = 5;
-            return await FromResult(false);
+                _全局步骤 = 5;
+                return await FromResult(false);
+            }
         }
 
         return await FromResult(false);
@@ -3853,7 +3863,7 @@ public partial class Form2 : Form
         根据图片以及类别使用物品(物品_勇气勋章, _全局bts, _全局size, _技能数量);
         根据图片以及类别使用物品(物品_炎阳勋章, _全局bts, _全局size, _技能数量);
 
-        var p = 正面跳刀_无转身(bts, size);
+        var p = await 正面跳刀_无转身(bts, size);
 
         var point = MousePosition;
 
@@ -3883,18 +3893,18 @@ public partial class Form2 : Form
         var w5 = 获取w5左下角颜色(bts, size);
 
 
-        static void 针刺(in byte[] bts, Size size)
+        static async Task 针刺(byte[] bts, Size size)
         {
             if (_条件开启切假腿 && !_切假腿中 && 获取当前时间毫秒() - _全局时间w > 200)
             {
                 _条件开启切假腿 = false;
-                切智力腿(bts, size, _技能数量);
+                await 切智力腿(bts, size, _技能数量);
                 KeyPress((uint)Keys.W);
-                Run(() =>
+                await Run(() =>
                 {
                     Delay(_条件假腿敏捷 ? 250 : 60);
                     _条件开启切假腿 = true;
-                });
+                }).ConfigureAwait(false);
                 _全局时间w = 获取当前时间毫秒();
             }
             else
@@ -3903,18 +3913,18 @@ public partial class Form2 : Form
             _循环最终是否延迟 = true;
         }
 
-        static void 鼻涕(in byte[] bts, Size size)
+        static async Task 鼻涕(byte[] bts, Size size)
         {
             if (_条件开启切假腿 && !_切假腿中 && 获取当前时间毫秒() - _全局时间q > 200)
             {
                 _条件开启切假腿 = false;
-                切智力腿(bts, size, _技能数量);
+                await 切智力腿(bts, size, _技能数量);
                 KeyPress((uint)Keys.Q);
-                Run(() =>
+                await Run(() =>
                 {
                     Delay(_条件假腿敏捷 ? 250 : 60);
                     _条件开启切假腿 = true;
-                });
+                }).ConfigureAwait(false);
                 _全局时间q = 获取当前时间毫秒();
             }
             else
@@ -3939,7 +3949,7 @@ public partial class Form2 : Form
                         &
                         !ColorAEqualColorB(w5, SimpleColor.FromRgb(25, 29, 32), 0) // 沉默 恐惧 不能释放
                     )
-                        针刺(bts, size);
+                        await 针刺(bts, size);
 
                     break;
                 }
@@ -3950,7 +3960,7 @@ public partial class Form2 : Form
                         &
                         !ColorAEqualColorB(w4, SimpleColor.FromRgb(14, 18, 20), 0) // 沉默 恐惧 不能释放
                     )
-                        针刺(bts, size);
+                        await 针刺(bts, size);
 
                     break;
                 }
@@ -3966,9 +3976,7 @@ public partial class Form2 : Form
                             ColorAEqualColorB(q5, SimpleColor.FromRgb(45, 52, 59), 0)
                             &
                             !ColorAEqualColorB(q5, SimpleColor.FromRgb(25, 29, 32), 0))
-                            鼻涕(bts, size);
-                        else
-                            return await FromResult(true);
+                            await 鼻涕(bts, size);
                     }
                     else
                     {
@@ -3976,9 +3984,7 @@ public partial class Form2 : Form
                             ColorAEqualColorB(q4, SimpleColor.FromRgb(65, 74, 81), 0)
                             &
                             !ColorAEqualColorB(q4, SimpleColor.FromRgb(14, 18, 20), 0))
-                            鼻涕(bts, size);
-                        else
-                            return await FromResult(true);
+                            await 鼻涕(bts, size);
                     }
 
                     break;
@@ -5979,14 +5985,14 @@ public partial class Form2 : Form
 
     private static async Task<bool> 狂风去后摇(byte[] bts, Size size)
     {
-        static void 狂风后()
+        static async Task 狂风后()
         {
             _全局时间q = -1;
             switch (_全局模式)
             {
                 case 1:
                     _条件开启切假腿 = false;
-                    切智力腿(_技能数量);
+                    await 切智力腿(_技能数量);
                     break;
                 default:
                     _条件开启切假腿 = true;
@@ -6002,13 +6008,13 @@ public partial class Form2 : Form
 
         if (ColorAEqualColorB(w4, SimpleColor.FromRgb(65, 74, 81), 0)) return await FromResult(true);
 
-        狂风后();
+        await 狂风后();
         return await FromResult(false);
     }
 
     private static async Task<bool> 数箭齐发去后摇(byte[] bts, Size size)
     {
-        static void 数箭齐发后(in byte[] bts1, Size size)
+        static async Task 数箭齐发后(byte[] bts1, Size size)
         {
             _全局时间q = -1;
             var is25 = ColorAEqualColorB(GetSPixelBytes(bts1, size, 754 - 截图模式1X, 957 - 截图模式1Y),
@@ -6018,7 +6024,7 @@ public partial class Form2 : Form
             {
                 case 1:
                     _条件开启切假腿 = false;
-                    切智力腿(_技能数量);
+                    await 切智力腿(_技能数量);
                     break;
                 default:
                     _条件开启切假腿 = true;
@@ -6035,7 +6041,7 @@ public partial class Form2 : Form
 
         if (ColorAEqualColorB(e4, SimpleColor.FromRgb(65, 74, 81), 0)) return await FromResult(true);
 
-        数箭齐发后(bts, size);
+        await 数箭齐发后(bts, size);
         return await FromResult(false);
     }
 
@@ -6288,7 +6294,7 @@ public partial class Form2 : Form
                     return await FromResult(false);
                 case 1:
                     _全局模式q = 0;
-                    Run(() => { KeyPress((uint)Keys.Q); });
+                    await Run(() => { KeyPress((uint)Keys.Q); });
                     return await FromResult(false);
             }
         }
@@ -7406,7 +7412,7 @@ public partial class Form2 : Form
 
     private static async Task<bool> 奥数诅咒去后摇(byte[] bts, Size size)
     {
-        static void 奥数诅咒后(in byte[] bts, Size size)
+        static async void 奥数诅咒后(byte[] bts, Size size)
         {
             _全局时间q = -1;
             // RightClick();
@@ -7414,11 +7420,11 @@ public partial class Form2 : Form
             switch (_全局模式q)
             {
                 case < 1:
-                    大招前纷争(bts, size);
+                    await 大招前纷争(bts, size);
                     KeyPress((uint)Keys.E);
                     break;
                 case 1:
-                    大招前纷争(bts, size);
+                    await 大招前纷争(bts, size);
                     Delay(1300);
                     KeyPress((uint)Keys.E);
                     break;
@@ -7979,9 +7985,9 @@ public partial class Form2 : Form
         while (_总循环条件)
             if (_循环内获取图片 != null && _总开关条件)
             {
-                _循环内获取图片(); // 更新全局Bitmap
-
                 if (_中断条件) continue; // 中断则跳过循环
+
+                await _循环内获取图片(); // 更新全局Bitmap
 
                 if (_条件1 && _条件根据图片委托1 != null)
                     await Run(async() => { _条件1 = await _条件根据图片委托1(_全局bts, _全局size); }).ConfigureAwait(false);
@@ -8012,26 +8018,26 @@ public partial class Form2 : Form
                     case true when _条件开启切假腿:
                         {
                             if (_条件假腿敏捷)
-                                await Run(() =>
+                                await Run(async() =>
                                 {
                                     if (RegPicture(物品_假腿_敏捷腿, _全局bts, _全局size)) return;
                                     if (_切假腿中) return;
                                     _切假腿中 = true;
-                                    切敏捷腿(_全局bts, _全局size, _技能数量);
-                                    Run(() =>
+                                    await 切敏捷腿(_全局bts, _全局size, _技能数量);
+                                    await Run(() =>
                                     {
                                         Delay(250);
                                         _切假腿中 = false;
                                     }).ConfigureAwait(false);
                                 }).ConfigureAwait(false);
                             else
-                                await Run(() =>
+                                await Run(async() =>
                                 {
                                     if (RegPicture(物品_假腿_力量腿, _全局bts, _全局size)) return;
                                     if (_切假腿中) return;
                                     _切假腿中 = true;
-                                    切力量腿(_全局bts, _全局size, _技能数量);
-                                    Run(() =>
+                                    await 切力量腿(_全局bts, _全局size, _技能数量);
+                                    await Run(() =>
                                     {
                                         Delay(250);
                                         _切假腿中 = false;
@@ -8072,6 +8078,7 @@ public partial class Form2 : Form
         _条件开启切假腿 = false;
         _条件保持假腿 = false;
         _条件假腿敏捷 = false;
+        _切假腿中 = false;
         _是否魔晶 = false;
         _是否a杖 = false;
         _条件走a = false;
@@ -8107,6 +8114,7 @@ public partial class Form2 : Form
         _指定地点f = new Point(0, 0);
         _技能数量 = "4";
 
+        _循环内获取图片 = null;
         _条件根据图片委托1 = null;
         _条件根据图片委托2 = null;
         _条件根据图片委托3 = null;
@@ -8125,24 +8133,26 @@ public partial class Form2 : Form
     /// <summary>
     /// </summary>
     /// <returns></returns>
-    private static void 获取图片_1()
+    private static async Task<bool> 获取图片_1()
     {
         // 750 856 657 217 基本所有技能状态物品，7-8ms延迟
         // 具体点则为起始坐标点加与其的差值
         _全局图像 ??= new Bitmap(截图模式1W, 截图模式1H);
-        CaptureScreen(截图模式1X, 截图模式1Y, ref _全局图像);
+        _全局图像 = await CaptureScreenAsync(截图模式1X, 截图模式1Y, _全局图像.Size);
         _全局size = new Size(截图模式1W, 截图模式1H);
-        GetBitmapByte(_全局图像, ref _全局bts);
+        _全局bts = await GetBitmapByteAsync(_全局图像);
+        return await FromResult(true);
     }
 
-    private static void 获取图片_2()
+    private static async Task<bool> 获取图片_2()
     {
         // 0 0 1920 1080 全屏，25-36ms延迟
         // 具体点则为起始坐标点加与其的差值
         _全局图像 ??= new Bitmap(1920, 1080);
-        CaptureScreen(0, 0, ref _全局图像);
+        _全局图像 = await CaptureScreenAsync(截图模式1X, 截图模式1Y, _全局图像.Size);
         _全局size = new Size(1920, 1080);
-        GetBitmapByte(_全局图像, ref _全局bts);
+        _全局bts = await GetBitmapByteAsync(_全局图像);
+        return await FromResult(true);
     }
 
     #endregion
@@ -8220,7 +8230,7 @@ public partial class Form2 : Form
     ///     用于快速先手无转身
     /// </summary>
     /// <returns></returns>
-    private static Point 正面跳刀_无转身(in byte[] bts, Size size)
+    private static async Task<Point> 正面跳刀_无转身(byte[] bts, Size size)
     {
         // 坐标
         var mousePosition = MousePosition;
@@ -8230,7 +8240,7 @@ public partial class Form2 : Form
         // Y间距，自动根据X调整
         double moveY = 0;
 
-        var p = 快速获取自身坐标();
+        var p = await 快速获取自身坐标();
 
 #if DEBUG
         TTS.Speak(string.Concat("自身坐标为:", p.X + 55, "  ", p.Y + 80));
@@ -8247,7 +8257,7 @@ public partial class Form2 : Form
 
         if (Math.Abs(mousePosition.X - realX) <= 180.0) moveX = mousePosition.X;
 
-        return new Point(Convert.ToInt16(moveX), Convert.ToInt16(moveY));
+        return await FromResult(new Point(Convert.ToInt16(moveX), Convert.ToInt16(moveY)));
     }
 
     #endregion
@@ -8410,69 +8420,72 @@ public partial class Form2 : Form
 
     #region 切假腿
 
-    private static void 切智力腿(string mode = "4")
+    private static async Task 切智力腿(string mode = "4")
     {
         var 图像 = new Bitmap(截图模式1W, 截图模式1H);
-        CaptureScreen(截图模式1X, 截图模式1Y, ref 图像);
-        GetBitmapByte(图像, ref _全局假腿bts);
+        图像 = await CaptureScreenAsync(截图模式1X, 截图模式1Y, 图像.Size);
+        _全局假腿bts = await GetBitmapByteAsync(图像);
+        图像.Dispose();
         var size = new Size(截图模式1W, 截图模式1H);
 
-        切智力腿(_全局假腿bts, size, mode);
+        await 切智力腿(_全局假腿bts, size, mode);
     }
 
-    private static void 切敏捷腿(string mode = "4")
+    private static async Task 切敏捷腿(string mode = "4")
     {
         var 图像 = new Bitmap(截图模式1W, 截图模式1H);
-        CaptureScreen(截图模式1X, 截图模式1Y, ref 图像);
-        GetBitmapByte(图像, ref _全局假腿bts);
+        图像 = await CaptureScreenAsync(截图模式1X, 截图模式1Y, 图像.Size);
+        _全局假腿bts = await GetBitmapByteAsync(图像); 
+        图像.Dispose();
         var size = new Size(截图模式1W, 截图模式1H);
 
-        切敏捷腿(_全局假腿bts, size, mode);
+        await 切敏捷腿(_全局假腿bts, size, mode);
     }
 
-    private static void 切力量腿(string mode = "4")
+    private static async Task 切力量腿(string mode = "4")
     {
         var 图像 = new Bitmap(截图模式1W, 截图模式1H);
-        CaptureScreen(截图模式1X, 截图模式1Y, ref 图像);
-        GetBitmapByte(图像, ref _全局假腿bts);
+        图像 = await CaptureScreenAsync(截图模式1X, 截图模式1Y, 图像.Size);
+        _全局假腿bts = await GetBitmapByteAsync(图像);
+        图像.Dispose();
         var size = new Size(截图模式1W, 截图模式1H);
 
-        切力量腿(_全局假腿bts, size, mode);
+        await 切力量腿(_全局假腿bts, size, mode);
     }
 
-    private static bool 切智力腿(in byte[] parByte, Size size, string mode = "4")
+    private static async Task<bool> 切智力腿(byte[] parByte, Size size, string mode = "4")
     {
         var 切腿成功 = 根据图片以及类别使用物品(物品_假腿_力量腿, parByte, size, mode) ||
                    根据图片以及类别使用物品多次(物品_假腿_敏捷腿, parByte, size, 2, 0, mode);
-        return 切腿成功;
+        return 切腿成功 ? await FromResult(true) : await FromResult(false);
     }
 
-    private static bool 切敏捷腿(in byte[] parByte, Size size, string mode = "4")
+    private static async Task<bool> 切敏捷腿(byte[] parByte, Size size, string mode = "4")
     {
         var 切腿成功 = 根据图片以及类别使用物品(物品_假腿_智力腿, parByte, size, mode) ||
                    根据图片以及类别使用物品多次(物品_假腿_力量腿, parByte, size, 2, 0, mode);
-        return 切腿成功;
+        return 切腿成功 ? await FromResult(true) : await FromResult(false);
     }
 
-    private static bool 切力量腿(in byte[] parByte, Size size, string mode = "4")
+    private static async Task<bool> 切力量腿(byte[] parByte, Size size, string mode = "4")
     {
         var 切腿成功 = 根据图片以及类别使用物品(物品_假腿_敏捷腿, parByte, size, mode) ||
                    根据图片以及类别使用物品多次(物品_假腿_智力腿, parByte, size, 2, 0, mode);
-        return 切腿成功;
+        return 切腿成功 ? await FromResult(true) : await FromResult(false);
     }
 
-    private static bool 切敏捷腿循环(in byte[] parByte, Size size, string mode = "4")
+    private static async Task<bool> 切敏捷腿循环(byte[] parByte, Size size, string mode = "4")
     {
         var 切腿成功 = 根据图片以及类别使用物品(物品_假腿_智力腿, parByte, size, mode) ||
                    根据图片以及类别使用物品(物品_假腿_力量腿, parByte, size, mode);
-        return 切腿成功;
+        return 切腿成功 ? await FromResult(true) : await FromResult(false);
     }
 
-    private static bool 切力量腿循环(in byte[] parByte, Size size, string mode = "4")
+    private static async Task<bool> 切力量腿循环(byte[] parByte, Size size, string mode = "4")
     {
         var 切腿成功 = 根据图片以及类别使用物品(物品_假腿_敏捷腿, parByte, size, mode) ||
                    根据图片以及类别使用物品(物品_假腿_智力腿, parByte, size, mode);
-        return 切腿成功;
+        return 切腿成功 ? await FromResult(true) : await FromResult(false);
     }
 
     #endregion
@@ -9800,7 +9813,7 @@ public partial class Form2 : Form
     /// <param name="type">模拟移动1 直接到位0</param>
     /// <param name="type1">无视野跳刀 1 有视野 0</param>
     /// <returns></returns>
-    private static bool 快速选择敌方英雄(int width = 1920, int hight = 1080, int type = 0, int type1 = 0)
+    private static async Task<bool> 快速选择敌方英雄(int width = 1920, int hight = 1080, int type = 0, int type1 = 0)
     {
         var p = MousePosition;
         var x = 0;
@@ -9822,9 +9835,8 @@ public partial class Form2 : Form
         if (type1 == 1)
             Delay(300); // 基本延迟用于迷雾显示
 
-        CaptureScreen(x, y, ref bp);
-        var bytes = new byte[3 * width * hight];
-        GetBitmapByte(bp, ref bytes);
+        bp = await CaptureScreenAsync(x, y, bp.Size);
+        var bytes = await GetBitmapByteAsync(bp);
 
         var list = 获取敌方坐标(size, bytes);
 
@@ -9858,7 +9870,7 @@ public partial class Form2 : Form
 
         list.Dispose();
 
-        return true;
+        return await FromResult(true);
     }
 
     #endregion
@@ -9922,15 +9934,12 @@ public partial class Form2 : Form
 
     #region 快速获取自身坐标
 
-    private static Point 快速获取自身坐标(int width = 1920, int hight = 1080)
+    private static async Task<Point> 快速获取自身坐标(int width = 1920, int hight = 1080)
     {
-        var bp = new Bitmap(width, hight);
         var size = new Size(width, hight);
-
-        CaptureScreen(0, 0, ref bp);
-        var bytes = Array.Empty<byte>();
-        GetBitmapByte(bp, ref bytes);
-        return 获取自身坐标(size, bytes);
+        var bp = await CaptureScreenAsync(0, 0, size);
+        var bytes = await GetBitmapByteAsync(bp);
+        return await FromResult(获取自身坐标(size, bytes));
     }
 
     #endregion
@@ -9996,27 +10005,25 @@ public partial class Form2 : Form
 
     #region 捕捉颜色
 
-    private void 测试方法_寻找大勋章()
+    private async Task 测试方法_寻找大勋章()
     {
         var size = new Size(截图模式1W, 截图模式1H);
-        var bitmap = new Bitmap(截图模式1W, 截图模式1H);
-        var bts = new byte[3 * 截图模式1W * 截图模式1H];
-        CaptureScreen(截图模式1X, 截图模式1Y, ref bitmap);
-        GetBitmapByte(bitmap, ref bts);
+        var bitmap = await CaptureScreenAsync(截图模式1X, 截图模式1Y, size);
+        var bts = await GetBitmapByteAsync(bitmap);
 
         var time1 = 获取当前时间毫秒();
 
         //TTS.Speak(string.Concat("开始对比"));
         for (var i = 0; i < 100; i++)
         {
-            var t = RegPicturePointR(物品_炎阳勋章, bts, size);
+            var _ = RegPicturePointR(物品_炎阳勋章, bts, size);
         }
 
         //TTS.Speak(string.Concat("找到的x坐标", t.X + 截图模式1X, "找到的y坐标", t.Y + 截图模式1Y));
         tb_攻速.Text = string.Concat(获取当前时间毫秒() - time1);
     }
 
-    private void 捕捉颜色()
+    private async Task 捕捉颜色()
     {
         var time = 获取当前时间毫秒();
 
@@ -10024,17 +10031,16 @@ public partial class Form2 : Form
         var longs = new PooledList<long>();
 
         var size = new Size(截图模式1W, 截图模式1H);
-        var bitmap = new Bitmap(截图模式1W, 截图模式1H);
-        var bts = new byte[3 * 截图模式1W * 截图模式1H];
+        
         // var time1 = 获取当前时间毫秒();
-        CaptureScreen(截图模式1X, 截图模式1Y, ref bitmap);
-        GetBitmapByte(bitmap, ref bts);
+        var bitmap = await CaptureScreenAsync(截图模式1X, 截图模式1Y, size);
+        var bts = await GetBitmapByteAsync(bitmap);
         // tb_攻速.Text = string.Concat(获取当前时间毫秒() - time1);
 
         while (true)
         {
-            CaptureScreen(截图模式1X, 截图模式1Y, ref bitmap);
-            GetBitmapByte(bitmap, ref bts);
+            bitmap = await CaptureScreenAsync(截图模式1X, 截图模式1Y, size);
+            bts = await GetBitmapByteAsync(bitmap);
 
             var q4 = 获取q4颜色(bts, size);
             var q41 = 获取q4左下角颜色(bts, size);
@@ -10442,7 +10448,7 @@ public partial class Form2 : Form
         //Task.await Run(记录买活);
 
         // 用于初始捕捉
-        获取图片_1();
+        _ = 获取图片_1().Result;
 
         // 用于文字识别
         初始化PaddleOcr();
