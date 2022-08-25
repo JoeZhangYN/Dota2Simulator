@@ -19,6 +19,9 @@ using KeyEventArgs = System.Windows.Forms.KeyEventArgs;
 using KeyEventHandler = System.Windows.Forms.KeyEventHandler;
 using Keys = System.Windows.Forms.Keys;
 using System.Reflection.Metadata.Ecma335;
+using NeoSmart.AsyncLock;
+using System.Threading;
+
 // WindowsHook.KeyEventArgs
 // WindowsHook.KeyEventHandler
 // WindowsHook.Keys
@@ -3175,6 +3178,11 @@ public partial class Form2 : Form
     #region 局部全局变量
 
     #region 循环用到
+
+    /// <summary>
+    ///     图片写入异步锁
+    /// </summary>
+    private static readonly AsyncLock _图片写入AsyncLock = new AsyncLock();
 
     /// <summary>
     ///     循环条件
@@ -8135,23 +8143,32 @@ public partial class Form2 : Form
     /// <returns></returns>
     private static async Task<bool> 获取图片_1()
     {
-        // 750 856 657 217 基本所有技能状态物品，7-8ms延迟
-        // 具体点则为起始坐标点加与其的差值
-        _全局图像 ??= new Bitmap(截图模式1W, 截图模式1H);
-        _全局图像 = await CaptureScreenAsync(截图模式1X, 截图模式1Y, _全局图像.Size);
-        _全局size = new Size(截图模式1W, 截图模式1H);
-        _全局bts = await GetBitmapByteAsync(_全局图像);
+        using (await _图片写入AsyncLock.LockAsync())
+        {
+            // 750 856 657 217 基本所有技能状态物品，7-8ms延迟
+            // 具体点则为起始坐标点加与其的差值
+            _全局图像 ??= new Bitmap(截图模式1W, 截图模式1H);
+            _全局图像 = await CaptureScreenAsync(截图模式1X, 截图模式1Y, _全局图像.Size);
+            _全局size = new Size(截图模式1W, 截图模式1H);
+            _全局bts = await GetBitmapByteAsync(_全局图像);
+        }
+
         return await FromResult(true);
     }
 
+
     private static async Task<bool> 获取图片_2()
     {
-        // 0 0 1920 1080 全屏，25-36ms延迟
-        // 具体点则为起始坐标点加与其的差值
-        _全局图像 ??= new Bitmap(1920, 1080);
-        _全局图像 = await CaptureScreenAsync(截图模式1X, 截图模式1Y, _全局图像.Size);
-        _全局size = new Size(1920, 1080);
-        _全局bts = await GetBitmapByteAsync(_全局图像);
+        using (await _图片写入AsyncLock.LockAsync())
+        {
+            // 0 0 1920 1080 全屏，25-36ms延迟
+            // 具体点则为起始坐标点加与其的差值
+            _全局图像 ??= new Bitmap(1920, 1080);
+            _全局图像 = await CaptureScreenAsync(截图模式1X, 截图模式1Y, _全局图像.Size);
+            _全局size = new Size(1920, 1080);
+            _全局bts = await GetBitmapByteAsync(_全局图像);
+        }
+
         return await FromResult(true);
     }
 
