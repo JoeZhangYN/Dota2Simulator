@@ -513,19 +513,9 @@ namespace Dota2Simulator.Picture_Dota2 {
         /// <summary>
         ///   查找 System.Drawing.Bitmap 类型的本地化资源。
         /// </summary>
-        internal static System.Drawing.Bitmap 物品_缚灵锁_4 {
+        internal static System.Drawing.Bitmap 物品_缚灵锁 {
             get {
-                object obj = ResourceManager.GetObject("物品_缚灵锁_4", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   查找 System.Drawing.Bitmap 类型的本地化资源。
-        /// </summary>
-        internal static System.Drawing.Bitmap 物品_缚灵锁_4_进入CD {
-            get {
-                object obj = ResourceManager.GetObject("物品_缚灵锁_4_进入CD", resourceCulture);
+                object obj = ResourceManager.GetObject("物品_缚灵锁", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

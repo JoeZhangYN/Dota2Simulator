@@ -123,7 +123,7 @@ public class PictureProcessing
     /// <param name="width">图片的宽度</param>
     /// <param name="height">图片的长度</param>
     /// <returns></returns>
-    public static Color CaptureColor(int x, int y)
+    public static SimpleColor CaptureColor(int x, int y)
     {
         Color c;
         using Bitmap bitmap = new(1, 1);
@@ -134,7 +134,7 @@ public class PictureProcessing
 
         c = bitmap.GetPixel(0, 0);
 
-        return c;
+        return new SimpleColor(c.R, c.G, c.B);
 
         //SaveFileDialog dialog = new SaveFileDialog();
         //dialog.Filter = "Png Files|*.png";

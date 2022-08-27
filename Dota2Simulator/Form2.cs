@@ -11,6 +11,7 @@ using Collections.Pooled;
 using Dota2Simulator.KeyboardMouse;
 using NeoSmart.AsyncLock;
 using PaddleOCRSharp;
+using SharpDX.Direct3D11;
 using WindowsHook;
 using static Dota2Simulator.Picture_Dota2.Resource_Picture;
 using static Dota2Simulator.PictureProcessing;
@@ -57,13 +58,13 @@ public partial class Form2 : Form
                 _总开关条件 = !_总开关条件;
                 TTS.Speak(_总开关条件 ? "开启功能" : "关闭功能");
                 if (!_总开关条件) 取消所有功能();
-                KeyPress((uint) Keys.End);
+                KeyPress((uint)Keys.End);
                 Delay(等待延迟);
                 await Task.Delay(1);
                 return;
             case Keys.Insert:
                 取消所有功能();
-                KeyPress((uint) Keys.End);
+                KeyPress((uint)Keys.End);
                 TTS.Speak("已重置功能");
                 await Task.Delay(1);
                 return;
@@ -94,7 +95,7 @@ public partial class Form2 : Form
             case "船长" when e.KeyCode == Keys.D2:
                 label1.Text = "D2";
 
-                KeyPress((uint) Keys.Q);
+                KeyPress((uint)Keys.Q);
 
                 await Run(洪流接x回);
                 break;
@@ -109,7 +110,7 @@ public partial class Form2 : Form
                 {
                     label1.Text = "D4";
 
-                    KeyPress((uint) Keys.Q);
+                    KeyPress((uint)Keys.Q);
 
                     await Run(洪流接船);
                 }
@@ -171,10 +172,11 @@ public partial class Form2 : Form
                     await 无物品状态初始化().ConfigureAwait(false);
                 }
 
-                if (!_是否a杖) _是否a杖 = 阿哈利姆神杖(_全局bts, _全局size);
-
                 switch (e.KeyCode)
                 {
+                    case Keys.F1:
+                        _是否a杖 = 阿哈利姆神杖(_全局bts, _全局size);
+                        break;
                     case Keys.Q:
                         根据图片以及类别使用物品(物品_魂戒CD, _全局bts, _全局size, _技能数量);
                         _条件1 = true;
@@ -275,12 +277,17 @@ public partial class Form2 : Form
 
                 if (!_是否a杖)
                 {
-                    _是否a杖 = 阿哈利姆神杖(_全局bts, _全局size);
-                    if (_是否a杖) _技能数量 = "5";
                 }
 
                 switch (e.KeyCode)
                 {
+                    case Keys.F1:
+                    {
+                        _是否a杖 = 阿哈利姆神杖(_全局bts, _全局size);
+                        if (_是否a杖) _技能数量 = 5;
+                        else _技能数量 = 4;
+                        break;
+                    }
                     case Keys.G:
                         _条件1 = true;
                         break;
@@ -300,11 +307,11 @@ public partial class Form2 : Form
                         if (_是否a杖)
                         {
                             var p = MousePosition;
-                            KeyDown((uint) Keys.D);
+                            KeyDown((uint)Keys.D);
                             Delay(等待延迟);
                             MouseMove(_指定地点d);
                             Delay(等待延迟);
-                            KeyUp((uint) Keys.D);
+                            KeyUp((uint)Keys.D);
                             Delay(等待延迟);
                             MouseMove(p);
                             _条件3 = true;
@@ -315,16 +322,16 @@ public partial class Form2 : Form
                     case Keys.D4:
                         if (_是否a杖)
                         {
-                            KeyDown((uint) Keys.Space);
+                            KeyDown((uint)Keys.Space);
                             Delay(等待延迟);
-                            KeyDown((uint) Keys.W);
+                            KeyDown((uint)Keys.W);
                             Delay(等待延迟);
                             var p = MousePosition;
-                            KeyDown((uint) Keys.D);
+                            KeyDown((uint)Keys.D);
                             Delay(等待延迟);
                             MouseMove(_指定地点d);
                             Delay(等待延迟);
-                            KeyUp((uint) Keys.D);
+                            KeyUp((uint)Keys.D);
                             Delay(等待延迟);
                             MouseMove(p);
                             _条件3 = true;
@@ -350,16 +357,16 @@ public partial class Form2 : Form
                     await 无物品状态初始化().ConfigureAwait(false);
                 }
 
-                if (!_是否魔晶)
-                {
-                    _是否魔晶 = 阿哈利姆魔晶(_全局bts, _全局size);
-                    if (_是否魔晶) _技能数量 = "5";
-                }
-
-                if (!_是否a杖) _是否a杖 = 阿哈利姆神杖(_全局bts, _全局size);
-
                 switch (e.KeyCode)
                 {
+                    case Keys.F1:
+                    {
+                        _是否魔晶 = 阿哈利姆魔晶(_全局bts, _全局size);
+                        _是否a杖 = 阿哈利姆神杖(_全局bts, _全局size);
+                        if (_是否魔晶) _技能数量 = 5;
+                        else _技能数量 = 4;
+                        break;
+                    }
                     case Keys.D:
                     {
                         _条件开启切假腿 = false;
@@ -518,15 +525,15 @@ public partial class Form2 : Form
                     await 无物品状态初始化().ConfigureAwait(false);
                 }
 
-
-                if (!_是否魔晶)
-                {
-                    _是否魔晶 = 阿哈利姆魔晶(_全局bts, _全局size);
-                    if (_是否魔晶) _技能数量 = "5";
-                }
-
                 switch (e.KeyCode)
                 {
+                    case Keys.F1:
+                    {
+                        _是否魔晶 = 阿哈利姆魔晶(_全局bts, _全局size);
+                        if (_是否魔晶) _技能数量 = 5;
+                        else _技能数量 = 4;
+                        break;
+                    }
                     case Keys.D1:
                         _条件1 = true;
                         break;
@@ -548,21 +555,21 @@ public partial class Form2 : Form
 
                         break;
                     case Keys.D3:
-                        KeyPress((uint) Keys.S);
+                        KeyPress((uint)Keys.S);
                         var w4 = 获取w4开关颜色(_全局bts, _全局size);
                         var w5 = 获取w5开关颜色(_全局bts, _全局size);
                         switch (_是否魔晶)
                         {
                             case true when !ColorAEqualColorB(w5, SimpleColor.FromRgb(0, 129, 0), 0):
                             case false when !ColorAEqualColorB(w4, SimpleColor.FromRgb(0, 129, 0), 0):
-                                KeyPressWhile((uint) Keys.W, (uint) Keys.LShiftKey);
+                                KeyPressWhile((uint)Keys.W, (uint)Keys.LShiftKey);
                                 break;
                         }
 
-                        KeyPressWhile((uint) Keys.Space, (uint) Keys.LShiftKey);
+                        KeyPressWhile((uint)Keys.Space, (uint)Keys.LShiftKey);
                         根据图片以及类别队列使用物品(物品_纷争, _全局bts, _全局size, _技能数量);
                         根据图片以及类别队列使用物品(物品_虚灵之刃, _全局bts, _全局size, _技能数量);
-                        KeyPressWhile((uint) Keys.R, (uint) Keys.LShiftKey);
+                        KeyPressWhile((uint)Keys.R, (uint)Keys.LShiftKey);
                         break;
                 }
 
@@ -583,11 +590,13 @@ public partial class Form2 : Form
                     await 无物品状态初始化().ConfigureAwait(false);
                 }
 
-                if (!_是否魔晶) _是否魔晶 = 阿哈利姆魔晶(_全局bts, _全局size);
-
-
                 switch (e.KeyCode)
                 {
+                    case Keys.F1:
+                    {
+                        _是否魔晶 = 阿哈利姆魔晶(_全局bts, _全局size);
+                        break;
+                    }
                     case Keys.Q:
                     {
                         根据图片以及类别使用物品(物品_勇气勋章, _全局bts, _全局size);
@@ -627,11 +636,13 @@ public partial class Form2 : Form
                     await 无物品状态初始化().ConfigureAwait(false);
                 }
 
-                if (!_是否魔晶) _是否魔晶 = 阿哈利姆魔晶(_全局bts, _全局size);
-
-
                 switch (e.KeyCode)
                 {
+                    case Keys.F1:
+                    {
+                        _是否魔晶 = 阿哈利姆魔晶(_全局bts, _全局size);
+                        break;
+                    }
                     case Keys.W:
                     {
                         _条件保持假腿 = false;
@@ -698,15 +709,15 @@ public partial class Form2 : Form
                     await 无物品状态初始化().ConfigureAwait(false);
                 }
 
-                if (!_是否a杖)
-                {
-                    _是否a杖 = 阿哈利姆神杖(_全局bts, _全局size);
-                    if (_是否a杖) _技能数量 = "5";
-                }
-
-
                 switch (e.KeyCode)
                 {
+                    case Keys.F1:
+                    {
+                        _是否a杖 = 阿哈利姆神杖(_全局bts, _全局size);
+                        if (_是否a杖) _技能数量 = 5;
+                        else _技能数量 = 4;
+                        break;
+                    }
                     case Keys.Q:
                     {
                         await 切智力腿(_技能数量);
@@ -766,15 +777,15 @@ public partial class Form2 : Form
                     await 无物品状态初始化().ConfigureAwait(false);
                 }
 
-                if (!_是否a杖)
-                {
-                    _是否a杖 = 阿哈利姆神杖(_全局bts, _全局size);
-                    if (_是否a杖) _技能数量 = "6";
-                }
-
-
                 switch (e.KeyCode)
                 {
+                    case Keys.F1:
+                    {
+                        _是否a杖 = 阿哈利姆神杖(_全局bts, _全局size);
+                        if (_是否a杖) _技能数量 = 6;
+                        else _技能数量 = 4;
+                        break;
+                    }
                     case Keys.W:
                     {
                         if (_是否a杖) break;
@@ -926,7 +937,7 @@ public partial class Form2 : Form
                 //{
                 //    _总循环条件 = true;
                 //    await 无物品状态初始化().ConfigureAwait(false);
-                //    _技能数量 = "5";
+                //    _技能数量 = 5;
                 //}
 
                 //_条件根据图片委托1 ??= 巨魔远程飞斧接平a后切回;
@@ -934,7 +945,7 @@ public partial class Form2 : Form
                 //if (!_是否魔晶)
                 //{
                 //    _是否魔晶 = 阿哈利姆魔晶(_全局bts, _全局size);
-                //    _技能数量 = "6";
+                //    _技能数量 = 6;
                 //}
 
                 //switch (e.KeyCode)
@@ -1035,26 +1046,88 @@ public partial class Form2 : Form
                 {
                     _总循环条件 = true;
                     _全局模式 = 0;
+                    _条件根据图片委托1 ??= 附灵锁扫射;
                     await 无物品状态初始化().ConfigureAwait(false);
-                }
-
-                if (!_是否a杖)
-                {
-                    _是否a杖 = 阿哈利姆神杖(_全局bts, _全局size);
-                    if (_是否a杖) _技能数量 = "5";
                 }
 
                 switch (e.KeyCode)
                 {
+                    case Keys.F1:
+                        _是否a杖 = 阿哈利姆神杖(_全局bts, _全局size);
+                        if (_是否a杖) _技能数量 = 5;
+                        else _技能数量 = 4;
+                        break;
                     case Keys.Q:
+                        _全局模式q = 1;
+                        switch (_技能数量)
+                        {
+                            case 5:
+                            {
+                                var w5 = 获取w5左下角颜色(_全局bts, _全局size);
+                                if (w5.Equals(new SimpleColor(33, 24, 25))) KeyPress((uint)Keys.D);
+                                break;
+                            }
+                            case 4:
+                            {
+                                var w4 = 获取w4左下角颜色(_全局bts, _全局size);
+                                if (w4.Equals(new SimpleColor(35, 25, 25))) KeyPress((uint)Keys.D);
+                                break;
+                            }
+                        }
                         await 切敏捷腿(_技能数量);
+                        _全局模式q = 0;
                         break;
                     case Keys.E:
-                    case Keys.R:
                         await 切智力腿(_技能数量);
+                        break;
+                    case Keys.D:
+                        switch (_全局模式d)
+                        {
+                            case 0:
+                                _条件保持假腿 = false;
+                                if (_全局模式q == 0)
+                                    await 切智力腿(_技能数量);
+                                TTS.Speak("火箭智力腿");
+                                _全局模式d = 1;
+                                break;
+                            case 1:
+                                _条件保持假腿 = true;
+                                TTS.Speak("关闭火箭");
+                                _全局模式d = 0;
+                                break;
+                        }
                         break;
                     case Keys.Z:
                         if (RegPicture(物品_魂戒CD, _全局bts, _全局size)) await 切力量腿(_技能数量);
+                        break;
+                    case Keys.D2:
+                        根据图片以及类别使用物品(物品_缚灵锁, _全局bts, _全局size, _技能数量);
+                        _条件1 = true;
+                        break;
+                    case Keys.D3 when _条件假腿敏捷:
+                        _条件假腿敏捷 = false;
+                        _条件保持假腿 = true;
+                        TTS.Speak("切力量");
+                        break;
+                    case Keys.D3:
+                        _条件假腿敏捷 = true;
+                        TTS.Speak("切敏捷");
+                        break;
+                    case Keys.D4:
+                        switch (_条件开启切假腿)
+                        {
+                            case true:
+                                _条件开启切假腿 = false;
+                                _条件保持假腿 = false;
+                                TTS.Speak("不保持假腿");
+                                break;
+                            default:
+                                _条件开启切假腿 = true;
+                                _条件保持假腿 = true;
+                                TTS.Speak("保持假腿");
+                                break;
+                        }
+
                         break;
                 }
 
@@ -1158,16 +1231,13 @@ public partial class Form2 : Form
                     await 无物品状态初始化().ConfigureAwait(false);
                 }
 
-
-                if (!_是否魔晶)
-                {
-                    _是否魔晶 = 阿哈利姆魔晶(_全局bts, _全局size);
-                    if (_是否魔晶) _技能数量 = "5";
-                }
-
-
                 switch (e.KeyCode)
                 {
+                    case Keys.F1:
+                        _是否魔晶 = 阿哈利姆魔晶(_全局bts, _全局size);
+                        if (_是否魔晶) _技能数量 = 5;
+                        else _技能数量 = 4;
+                        break;
                     case Keys.Q:
                         _条件保持假腿 = false;
                         初始化全局时间(ref _全局时间q);
@@ -1200,13 +1270,13 @@ public partial class Form2 : Form
                         await 切智力腿(_技能数量);
 
                         // 径直移动键位
-                        KeyDown((uint) Keys.L);
+                        KeyDown((uint)Keys.L);
                         // 径直移动
                         RightClick();
                         // 基本上180°310  90°170 75°135 转身定点，配合A杖效果极佳
                         Delay(150);
-                        KeyUp((uint) Keys.L);
-                        KeyPress((uint) Keys.W);
+                        KeyUp((uint)Keys.L);
+                        KeyPress((uint)Keys.W);
 
                         _条件保持假腿 = true;
                         break;
@@ -1255,15 +1325,13 @@ public partial class Form2 : Form
                     await 无物品状态初始化().ConfigureAwait(false);
                 }
 
-
-                if (!_是否a杖)
-                {
-                    _是否a杖 = 阿哈利姆神杖(_全局bts, _全局size);
-                    if (_是否a杖) _技能数量 = "5";
-                }
-
                 switch (e.KeyCode)
                 {
+                    case Keys.F1:
+                        _是否a杖 = 阿哈利姆神杖(_全局bts, _全局size);
+                        if (_是否a杖) _技能数量 = 5;
+                        else _技能数量 = 4;
+                        break;
                     case Keys.W:
                         _条件保持假腿 = false;
                         await 切智力腿(_技能数量);
@@ -1392,14 +1460,15 @@ public partial class Form2 : Form
                     await 无物品状态初始化().ConfigureAwait(false);
                 }
 
-                if (!_是否魔晶)
-                {
-                    _是否魔晶 = 阿哈利姆魔晶(_全局bts, _全局size);
-                    if (_是否魔晶) _技能数量 = "5";
-                }
-
                 switch (e.KeyCode)
                 {
+                    case Keys.F1:
+                    {
+                        _是否魔晶 = 阿哈利姆魔晶(_全局bts, _全局size);
+                        if (_是否魔晶) _技能数量 = 5;
+                        else _技能数量 = 4;
+                        break;
+                    }
                     case Keys.Q:
                         _条件保持假腿 = false;
                         await 切智力腿(_技能数量);
@@ -1470,15 +1539,15 @@ public partial class Form2 : Form
                     await 无物品状态初始化().ConfigureAwait(false);
                 }
 
-
-                if (!_是否魔晶)
-                {
-                    _是否魔晶 = 阿哈利姆魔晶(_全局bts, _全局size);
-                    if (_是否魔晶) _技能数量 = "5";
-                }
-
                 switch (e.KeyCode)
                 {
+                    case Keys.F1:
+                    {
+                        _是否魔晶 = 阿哈利姆魔晶(_全局bts, _全局size);
+                        if (_是否魔晶) _技能数量 = 5;
+                        else _技能数量 = 4;
+                        break;
+                    }
                     case Keys.Q:
                         _条件保持假腿 = false;
                         await 切智力腿(_技能数量);
@@ -1546,21 +1615,20 @@ public partial class Form2 : Form
                     await 无物品状态初始化().ConfigureAwait(false);
                 }
 
-
-                if (!_是否a杖 || !_是否魔晶)
-                {
-                    _是否魔晶 = 阿哈利姆魔晶(_全局bts, _全局size);
-                    _是否a杖 = 阿哈利姆神杖(_全局bts, _全局size);
-                    _技能数量 = _是否魔晶 switch
-                    {
-                        true when _是否a杖 => "6",
-                        false when !_是否a杖 => "4",
-                        _ => "5"
-                    };
-                }
-
                 switch (e.KeyCode)
                 {
+                    case Keys.F1:
+                    {
+                        _是否魔晶 = 阿哈利姆魔晶(_全局bts, _全局size);
+                        _是否a杖 = 阿哈利姆神杖(_全局bts, _全局size);
+                        _技能数量 = _是否魔晶 switch
+                        {
+                            true when _是否a杖 => 6,
+                            false when !_是否a杖 => 4,
+                            _ => 5
+                        };
+                        break;
+                    }
                     case Keys.Q:
                         _条件保持假腿 = false;
                         await 切智力腿(_技能数量);
@@ -1742,15 +1810,15 @@ public partial class Form2 : Form
                     await 无物品状态初始化().ConfigureAwait(false);
                 }
 
-
-                if (!_是否魔晶)
-                {
-                    _是否魔晶 = 阿哈利姆魔晶(_全局bts, _全局size);
-                    if (_是否魔晶) _技能数量 = "5";
-                }
-
                 switch (e.KeyCode)
                 {
+                    case Keys.F1:
+                    {
+                        _是否魔晶 = 阿哈利姆魔晶(_全局bts, _全局size);
+                        if (_是否魔晶) _技能数量 = 5;
+                        else _技能数量 = 4;
+                        break;
+                    }
                     case Keys.W:
                         _条件保持假腿 = false;
                         await 切智力腿(_技能数量);
@@ -1820,19 +1888,19 @@ public partial class Form2 : Form
                     _条件根据图片委托2 ??= 如影随形去后摇;
                     _条件根据图片委托3 ??= 鬼影重重去后摇;
                     _全局模式 = 0;
-                    _技能数量 = "5";
+                    _技能数量 = 5;
                     await 无物品状态初始化().ConfigureAwait(false);
-                }
-
-
-                if (!_是否a杖)
-                {
-                    _是否a杖 = 阿哈利姆神杖(_全局bts, _全局size);
-                    if (_是否a杖) _技能数量 = "6";
                 }
 
                 switch (e.KeyCode)
                 {
+                    case Keys.F1:
+                    {
+                        _是否a杖 = 阿哈利姆神杖(_全局bts, _全局size);
+                        if (_是否a杖) _技能数量 = 6;
+                        else _技能数量 = 5;
+                        break;
+                    }
                     case Keys.Q:
                         _条件保持假腿 = false;
                         await 切智力腿(_技能数量);
@@ -1849,12 +1917,12 @@ public partial class Form2 : Form
                         await Run(() =>
                         {
                             // RightClick();
-                            KeyPress((uint) Keys.A);
+                            KeyPress((uint)Keys.A);
                             for (var i = 0; i < 4; i++)
                             {
                                 Delay(60);
                                 //RightClick();
-                                KeyPress((uint) Keys.A);
+                                KeyPress((uint)Keys.A);
                             }
                         });
                         break;
@@ -1911,15 +1979,15 @@ public partial class Form2 : Form
                     await 无物品状态初始化().ConfigureAwait(false);
                 }
 
-
-                if (!_是否魔晶)
-                {
-                    _是否魔晶 = 阿哈利姆魔晶(_全局bts, _全局size);
-                    if (_是否魔晶) _技能数量 = "5";
-                }
-
                 switch (e.KeyCode)
                 {
+                    case Keys.F1:
+                    {
+                        _是否魔晶 = 阿哈利姆魔晶(_全局bts, _全局size);
+                        if (_是否魔晶) _技能数量 = 5;
+                        else _技能数量 = 4;
+                        break;
+                    }
                     case Keys.Q:
                         _条件保持假腿 = false;
                         await 切智力腿(_技能数量);
@@ -2032,7 +2100,7 @@ public partial class Form2 : Form
                             _条件假腿敏捷 = true;
                             _条件保持假腿 = true;
                             _条件开启切假腿 = true;
-                            KeyPress((uint) Keys.A);
+                            KeyPress((uint)Keys.A);
                         }
 
                         break;
@@ -2090,7 +2158,7 @@ public partial class Form2 : Form
                 {
                     case Keys.D:
                         _中断条件 = false;
-                        KeyPress((uint) Keys.W);
+                        KeyPress((uint)Keys.W);
                         _条件1 = true;
                         break;
                     case Keys.H:
@@ -2243,12 +2311,15 @@ public partial class Form2 : Form
                     await 无物品状态初始化().ConfigureAwait(false);
                 }
 
-                if (!_是否魔晶) _是否魔晶 = 阿哈利姆魔晶(_全局bts, _全局size);
-                if (!_是否a杖) _是否a杖 = 阿哈利姆神杖(_全局bts, _全局size);
-
-
                 switch (e.KeyCode)
                 {
+                    case Keys.F1:
+                    {
+                        _是否魔晶 = 阿哈利姆魔晶(_全局bts, _全局size);
+                        if (_是否魔晶) _技能数量 = 5;
+                        else _技能数量 = 4;
+                        break;
+                    }
                     // 弧形闪电和雷击都是不朽
                     case Keys.Q when await 弧形闪电不能释放(_全局bts, _全局size):
                         _全局模式q = 1;
@@ -2405,12 +2476,12 @@ public partial class Form2 : Form
                     case Keys.D3:
                         await Run(async () =>
                         {
-                            await Run(() => { 渐隐期间放技能((uint) Keys.E, 800); });
+                            await Run(() => { 渐隐期间放技能((uint)Keys.E, 800); });
                             if (_全局模式 != 1) return;
                             Delay(650);
                             var p = MousePosition;
                             MouseMove(_指定地点p);
-                            KeyPress((uint) Keys.Space);
+                            KeyPress((uint)Keys.Space);
                             Delay(等待延迟);
                             MouseMove(p);
                             _全局模式 = 0;
@@ -2479,15 +2550,15 @@ public partial class Form2 : Form
                     await 无物品状态初始化().ConfigureAwait(false);
                 }
 
-
-                if (!_是否魔晶)
-                {
-                    _是否魔晶 = 阿哈利姆魔晶(_全局bts, _全局size);
-                    if (_是否魔晶) _技能数量 = "5";
-                }
-
                 switch (e.KeyCode)
                 {
+                    case Keys.F1:
+                    {
+                        _是否魔晶 = 阿哈利姆魔晶(_全局bts, _全局size);
+                        if (_是否魔晶) _技能数量 = 5;
+                        else _技能数量 = 4;
+                        break;
+                    }
                     case Keys.Q:
                         初始化全局时间(ref _全局时间q);
                         _中断条件 = false;
@@ -2546,7 +2617,7 @@ public partial class Form2 : Form
                     _条件根据图片委托2 ??= 活性电击去后摇;
                     _条件根据图片委托3 ??= 爆破起飞去后摇;
                     _条件根据图片委托4 ??= 爆破后接3雷粘性炸弹;
-                    _技能数量 = "5";
+                    _技能数量 = 5;
                     await 无物品状态初始化().ConfigureAwait(false);
                 }
 
@@ -2609,15 +2680,15 @@ public partial class Form2 : Form
                     await 无物品状态初始化().ConfigureAwait(false);
                 }
 
-
-                if (!_是否a杖)
-                {
-                    _是否a杖 = 阿哈利姆神杖(_全局bts, _全局size);
-                    if (_是否a杖) _技能数量 = "5";
-                }
-
                 switch (e.KeyCode)
                 {
+                    case Keys.F1:
+                    {
+                        _是否a杖 = 阿哈利姆神杖(_全局bts, _全局size);
+                        if (_是否a杖) _技能数量 = 5;
+                        else _技能数量 = 4;
+                        break;
+                    }
                     case Keys.W:
                         _条件1 = true;
                         break;
@@ -2644,8 +2715,8 @@ public partial class Form2 : Form
             #region 修补匠
 
             case "修补匠" when e.KeyCode == Keys.R:
-                KeyPress((uint) Keys.C);
-                KeyPress((uint) Keys.V);
+                KeyPress((uint)Keys.C);
+                KeyPress((uint)Keys.V);
                 await Run(刷新完跳);
                 break;
 
@@ -2780,7 +2851,7 @@ public partial class Form2 : Form
                     _条件根据图片委托3 ??= 暗影波去后摇;
                     _条件根据图片委托4 ??= 善咒去后摇;
                     _条件根据图片委托5 ??= 邪能去后摇;
-                    _技能数量 = "5";
+                    _技能数量 = 5;
                     _基础攻击前摇 = 0.3;
                     await 无物品状态初始化().ConfigureAwait(false);
                 }
@@ -2836,15 +2907,15 @@ public partial class Form2 : Form
                     await 无物品状态初始化().ConfigureAwait(false);
                 }
 
-                if (!_是否魔晶)
-                {
-                    _是否魔晶 = 阿哈利姆魔晶(_全局bts, _全局size);
-                    if (_是否魔晶) _技能数量 = "5";
-                }
-
-
                 switch (e.KeyCode)
                 {
+                    case Keys.F1:
+                    {
+                        _是否魔晶 = 阿哈利姆魔晶(_全局bts, _全局size);
+                        if (_是否魔晶) _技能数量 = 5;
+                        else _技能数量 = 4;
+                        break;
+                    }
                     case Keys.Q:
                         初始化全局时间(ref _全局时间q);
                         _条件1 = true;
@@ -2866,17 +2937,17 @@ public partial class Form2 : Form
                             // RightClick();
                             case true:
                                 if (ColorAEqualColorB(d5, SimpleColor.FromRgb(9, 38, 81), 0))
-                                    KeyPress((uint) Keys.D);
+                                    KeyPress((uint)Keys.D);
                                 else if (ColorAEqualColorB(e5, SimpleColor.FromRgb(79, 36, 7), 0))
-                                    KeyPress((uint) Keys.E);
+                                    KeyPress((uint)Keys.E);
                                 else
-                                    KeyPress((uint) Keys.A);
+                                    KeyPress((uint)Keys.A);
                                 break;
                             default:
                                 if (ColorAEqualColorB(e4, SimpleColor.FromRgb(70, 32, 8), 0))
-                                    KeyPress((uint) Keys.E);
+                                    KeyPress((uint)Keys.E);
                                 else
-                                    KeyPress((uint) Keys.A);
+                                    KeyPress((uint)Keys.A);
                                 break;
                         }
 
@@ -2904,15 +2975,15 @@ public partial class Form2 : Form
                     await 无物品状态初始化().ConfigureAwait(false);
                 }
 
-                if (!_是否魔晶)
-                {
-                    _是否魔晶 = 阿哈利姆魔晶(_全局bts, _全局size);
-                    if (_是否魔晶) _技能数量 = "5";
-                }
-
-
                 switch (e.KeyCode)
                 {
+                    case Keys.F1:
+                    {
+                        _是否魔晶 = 阿哈利姆魔晶(_全局bts, _全局size);
+                        if (_是否魔晶) _技能数量 = 5;
+                        else _技能数量 = 4;
+                        break;
+                    }
                     case Keys.Q:
                         初始化全局时间(ref _全局时间q);
                         _条件1 = true;
@@ -2935,7 +3006,7 @@ public partial class Form2 : Form
                         _条件3 = true;
                         break;
                     case Keys.D2:
-                        await Run(() => { 渐隐期间放技能((uint) Keys.R, 800); });
+                        await Run(() => { 渐隐期间放技能((uint)Keys.R, 800); });
                         break;
                     case Keys.D3:
                         switch (_全局模式q)
@@ -3095,10 +3166,10 @@ public partial class Form2 : Form
                     case Keys.D1:
                         await Run(async () =>
                         {
-                            KeyPress((uint) Keys.Space);
+                            KeyPress((uint)Keys.Space);
                             await 快速选择敌方英雄(type: 1, type1: 1);
-                            KeyPress((uint) Keys.W);
-                            KeyPress((uint) Keys.Q);
+                            KeyPress((uint)Keys.W);
+                            KeyPress((uint)Keys.Q);
                         });
                         break;
                 }
@@ -3350,7 +3421,7 @@ public partial class Form2 : Form
     /// <summary>
     ///     技能数量
     /// </summary>
-    private static string _技能数量 = "4";
+    private static int _技能数量 = 4;
 
     /// <summary>
     ///     中断条件布尔
@@ -3599,14 +3670,14 @@ public partial class Form2 : Form
 
     private static void 跳拱指定地点()
     {
-        KeyPress((uint) Keys.Space);
+        KeyPress((uint)Keys.Space);
         Delay(等待延迟);
-        KeyPress((uint) Keys.D9);
+        KeyPress((uint)Keys.D9);
         MouseMove(_指定地点p);
         Delay(等待延迟);
-        KeyPress((uint) Keys.E);
+        KeyPress((uint)Keys.E);
         Delay(等待延迟);
-        KeyPress((uint) Keys.D9);
+        KeyPress((uint)Keys.D9);
     }
 
     #endregion
@@ -3640,10 +3711,10 @@ public partial class Form2 : Form
                 switch (_是否a杖)
                 {
                     case true:
-                        KeyPress((uint) Keys.A);
+                        KeyPress((uint)Keys.A);
                         break;
                     default:
-                        KeyPress((uint) Keys.W);
+                        KeyPress((uint)Keys.W);
                         break;
                 }
             });
@@ -3699,7 +3770,7 @@ public partial class Form2 : Form
 
         var q4 = 获取q4左下角颜色(bts, size);
 
-        if (ColorAEqualColorB(q4, SimpleColor.FromRgb(65, 74, 81), 0)) KeyPress((uint) Keys.Q);
+        if (ColorAEqualColorB(q4, SimpleColor.FromRgb(65, 74, 81), 0)) KeyPress((uint)Keys.Q);
 
         return await FromResult(false);
     }
@@ -3722,7 +3793,7 @@ public partial class Form2 : Form
 
                 if (ColorAEqualColorB(w4, SimpleColor.FromRgb(65, 74, 81), 0))
                 {
-                    KeyPressAlt((uint) Keys.W);
+                    KeyPressAlt((uint)Keys.W);
                     Delay(260); // 去后摇
                     RightClick();
                     Delay(等待延迟);
@@ -3781,7 +3852,7 @@ public partial class Form2 : Form
 
                 if (ColorAEqualColorB(r4, SimpleColor.FromRgb(65, 74, 81), 0))
                 {
-                    KeyPress((uint) Keys.R);
+                    KeyPress((uint)Keys.R);
                     Delay(等待延迟);
                     return 获取当前时间毫秒() - _全局时间 <= 450 ? await FromResult(true) : await FromResult(false);
                 }
@@ -3822,7 +3893,7 @@ public partial class Form2 : Form
     {
         static async Task 摔角行家后()
         {
-            await Run(() => { KeyPress((uint) Keys.A); });
+            await Run(() => { KeyPress((uint)Keys.A); });
         }
 
         var e4 = 获取e4左下角颜色(bts, size);
@@ -3845,7 +3916,7 @@ public partial class Form2 : Form
     {
         static async Task 飞踢后()
         {
-            await Run(() => { KeyPress((uint) Keys.W); });
+            await Run(() => { KeyPress((uint)Keys.W); });
         }
 
         var d5 = 获取d5颜色(bts, size);
@@ -3878,13 +3949,13 @@ public partial class Form2 : Form
         MouseMove(p.X, p.Y);
 
         // 跳刀空格
-        KeyPress((uint) Keys.Space);
+        KeyPress((uint)Keys.Space);
 
         Delay(等待延迟);
 
         MouseMove(point.X, point.Y);
 
-        KeyPress((uint) Keys.E);
+        KeyPress((uint)Keys.E);
 #endif
         return await FromResult(false);
     }
@@ -3907,7 +3978,7 @@ public partial class Form2 : Form
             {
                 _条件开启切假腿 = false;
                 await 切智力腿(bts, size, _技能数量);
-                KeyPress((uint) Keys.W);
+                KeyPress((uint)Keys.W);
                 await Run(() =>
                 {
                     Delay(_条件假腿敏捷 ? 250 : 60);
@@ -3917,7 +3988,7 @@ public partial class Form2 : Form
             }
             else
             {
-                KeyPress((uint) Keys.W);
+                KeyPress((uint)Keys.W);
             }
 
             _循环最终是否延迟 = true;
@@ -3929,7 +4000,7 @@ public partial class Form2 : Form
             {
                 _条件开启切假腿 = false;
                 await 切智力腿(bts, size, _技能数量);
-                KeyPress((uint) Keys.Q);
+                KeyPress((uint)Keys.Q);
                 await Run(() =>
                 {
                     Delay(_条件假腿敏捷 ? 250 : 60);
@@ -3939,7 +4010,7 @@ public partial class Form2 : Form
             }
             else
             {
-                KeyPress((uint) Keys.Q);
+                KeyPress((uint)Keys.Q);
             }
 
             _循环最终是否延迟 = true;
@@ -4013,7 +4084,7 @@ public partial class Form2 : Form
         {
             _全局时间d = -1;
             //RightClick();
-            KeyPress((uint) Keys.A);
+            KeyPress((uint)Keys.A);
             _条件开启切假腿 = true;
         }
 
@@ -4045,7 +4116,7 @@ public partial class Form2 : Form
         {
         }
 
-        KeyPress((uint) Keys.Q);
+        KeyPress((uint)Keys.Q);
         return await FromResult(false);
     }
 
@@ -4060,19 +4131,19 @@ public partial class Form2 : Form
         {
             _全局时间q = -1;
             //RightClick();
-            KeyPress((uint) Keys.S);
+            KeyPress((uint)Keys.S);
             switch (_是否魔晶)
             {
                 case true when !ColorAEqualColorB(w5, SimpleColor.FromRgb(0, 129, 0), 0):
                 case false when !ColorAEqualColorB(w4, SimpleColor.FromRgb(0, 129, 0), 0):
-                    KeyPressWhile((uint) Keys.W, (uint) Keys.LShiftKey);
+                    KeyPressWhile((uint)Keys.W, (uint)Keys.LShiftKey);
                     break;
             }
 
             if (_全局模式q != 1) return;
             根据图片以及类别队列使用物品(物品_纷争_被控, _全局bts, _全局size, _技能数量);
             根据图片以及类别队列使用物品(物品_虚灵_被控, _全局bts, _全局size, _技能数量);
-            KeyPressWhile((uint) Keys.R, (uint) Keys.LShiftKey);
+            KeyPressWhile((uint)Keys.R, (uint)Keys.LShiftKey);
         }
 
         switch (_是否魔晶)
@@ -4137,11 +4208,11 @@ public partial class Form2 : Form
             switch (_全局模式w)
             {
                 case 0:
-                    KeyPress((uint) Keys.R);
+                    KeyPress((uint)Keys.R);
                     break;
                 case 1:
                     _条件保持假腿 = true;
-                    KeyPress((uint) Keys.A);
+                    KeyPress((uint)Keys.A);
                     break;
             }
         }
@@ -4175,7 +4246,7 @@ public partial class Form2 : Form
         if (!ColorAEqualColorB(w4, SimpleColor.FromRgb(65, 74, 81), 0)) return await FromResult(true);
 
 
-        KeyPress((uint) Keys.W);
+        KeyPress((uint)Keys.W);
         return await FromResult(false);
     }
 
@@ -4184,7 +4255,7 @@ public partial class Form2 : Form
         static void 雾霭后()
         {
             _条件保持假腿 = true;
-            KeyPress((uint) Keys.A);
+            KeyPress((uint)Keys.A);
         }
 
         var r4 = 获取r4左下角颜色(bts, size);
@@ -4205,7 +4276,7 @@ public partial class Form2 : Form
         {
             _全局时间q = -1;
             _条件保持假腿 = true;
-            KeyPress((uint) Keys.A);
+            KeyPress((uint)Keys.A);
         }
 
         // 超时则切回 总体释放时间
@@ -4238,7 +4309,7 @@ public partial class Form2 : Form
         {
             _全局时间w = -1;
             _条件保持假腿 = true;
-            KeyPress((uint) Keys.A);
+            KeyPress((uint)Keys.A);
         }
 
         // 超时则切回 总体释放时间
@@ -4292,11 +4363,11 @@ public partial class Form2 : Form
     {
         if (RegPicture(小精灵_幽魂buff, bts, size))
         {
-            _技能数量 = "6";
+            _技能数量 = 6;
             return await FromResult(true);
         }
 
-        _技能数量 = "4";
+        _技能数量 = 4;
         return await FromResult(false);
     }
 
@@ -4315,7 +4386,7 @@ public partial class Form2 : Form
             _全局时间q = -1;
             _条件保持假腿 = true;
             //RightClick();
-            KeyPress((uint) Keys.A);
+            KeyPress((uint)Keys.A);
         }
 
         // 超时则切回 总体释放时间
@@ -4340,7 +4411,7 @@ public partial class Form2 : Form
             _全局时间r = -1;
             _条件保持假腿 = true;
             //RightClick(); 
-            KeyPress((uint) Keys.A);
+            KeyPress((uint)Keys.A);
         }
 
         // 超时则切回 总体释放时间
@@ -4382,64 +4453,38 @@ public partial class Form2 : Form
 
     #region 小骷髅
 
-    //private void 扫射接勋章()
-    //{
-    //    var time = 获取当前时间毫秒();
+    private static async Task<bool> 附灵锁扫射(byte[] bts, Size size)
+    {
+        var q4 = 获取q4左下角颜色(bts, size);
+        var q5 = 获取q5左下角颜色(bts, size);
 
-    //    // 勋章放在c位置
-    //    while (RegPicture(Resource_Picture.物品_勇气, "C") || RegPicture(Resource_Picture.物品_炎阳, "C") ||
-    //           RegPicture(Resource_Picture.物品_紫苑, "C") || RegPicture(Resource_Picture.物品_血棘, "C") ||
-    //           RegPicture(Resource_Picture.物品_羊刀, "C"))
-    //    {
-    //        KeyPress((uint)Keys.C);
-    //        Delay(等待延迟);
-    //        if (获取当前时间毫秒() - time > 100) break;
-    //    }
+        switch (_技能数量)
+        {
+            case 5:
+            {
+                if (ColorAEqualColorB(q5, SimpleColor.FromRgb(45, 52, 59), 0))
+                {
+                    KeyPress((uint)Keys.Q);
+                    return await FromResult(false);
+                }
 
-    //    time = 获取当前时间毫秒();
+                break;
+            }
+            case 4:
+                {
+                if (ColorAEqualColorB(q4, SimpleColor.FromRgb(65, 74, 81), 0))
+                {
+                    KeyPress((uint)Keys.Q);
+                    return await FromResult(false);
+                }
 
-    //    while (RegPicture(Resource_Picture.物品_勇气, "Z") || RegPicture(Resource_Picture.物品_炎阳, "Z") ||
-    //           RegPicture(Resource_Picture.物品_紫苑, "Z") || RegPicture(Resource_Picture.物品_血棘, "Z") ||
-    //           RegPicture(Resource_Picture.物品_羊刀, "Z"))
-    //    {
-    //        KeyPress((uint)Keys.Z);
-    //        Delay(等待延迟);
-    //        if (获取当前时间毫秒() - time > 100) break;
-    //    }
+                break;
+            }
+        }
 
-    //    time = 获取当前时间毫秒();
-
-    //    while (RegPicture(Resource_Picture.物品_勇气, "SPACE") || RegPicture(Resource_Picture.物品_炎阳, "SPACE") ||
-    //           RegPicture(Resource_Picture.物品_紫苑, "SPACE") || RegPicture(Resource_Picture.物品_血棘, "SPACE") ||
-    //           RegPicture(Resource_Picture.物品_羊刀, "SPACE"))
-    //    {
-    //        KeyPress((uint)Keys.Space);
-    //        Delay(等待延迟);
-    //        if (获取当前时间毫秒() - time > 100) break;
-    //    }
-
-    //    time = 获取当前时间毫秒();
-
-    //    // 否决放在x
-    //    while (RegPicture(Resource_Picture.物品_否决, "X"))
-    //    {
-    //        KeyPress((uint)Keys.X);
-    //        Delay(等待延迟);
-    //        if (获取当前时间毫秒() - time > 100) break;
-    //    }
-
-    //    KeyPress((uint)Keys.A);
-
-    //    Delay(100);
-
-    //    切敏捷腿();
-    //}
-
-    //private static void 魂戒魔棒智力(byte[] bts, Size size)
-    //{
-    //    Delay(100);
-    //    切智力腿(bts, size);
-    //}
+        return await FromResult(true);
+    }
+    
 
     #endregion
 
@@ -4464,7 +4509,7 @@ public partial class Form2 : Form
             _全局时间w = -1;
             _条件保持假腿 = true;
             //RightClick();
-            KeyPress((uint) Keys.A);
+            KeyPress((uint)Keys.A);
         }
 
         // 超时则切回 总体释放时间
@@ -4489,7 +4534,7 @@ public partial class Form2 : Form
             _全局时间q = -1;
             _条件保持假腿 = true;
             //RightClick();
-            KeyPress((uint) Keys.A);
+            KeyPress((uint)Keys.A);
         }
 
         // 超时则切回 总体释放时间
@@ -4683,7 +4728,7 @@ public partial class Form2 : Form
 
     private static async Task<bool> 跳水a(byte[] bts, Size size)
     {
-        KeyPress((uint) Keys.A);
+        KeyPress((uint)Keys.A);
         _条件保持假腿 = true;
         return await FromResult(false);
     }
@@ -4695,7 +4740,7 @@ public partial class Form2 : Form
             _全局时间d = -1;
             _条件保持假腿 = true;
             //RightClick();
-            KeyPress((uint) Keys.A);
+            KeyPress((uint)Keys.A);
         }
 
         // 超时则切回 总体释放时间
@@ -4730,7 +4775,7 @@ public partial class Form2 : Form
             _全局时间w = -1;
             _条件保持假腿 = true;
             //RightClick();
-            KeyPress((uint) Keys.A);
+            KeyPress((uint)Keys.A);
         }
 
         // 超时则切回 总体释放时间
@@ -4766,7 +4811,7 @@ public partial class Form2 : Form
             _全局时间r = -1;
             _条件保持假腿 = true;
             //RightClick();
-            KeyPress((uint) Keys.A);
+            KeyPress((uint)Keys.A);
         }
 
         // 超时则切回 总体释放时间
@@ -4857,7 +4902,7 @@ public partial class Form2 : Form
         {
             _全局时间w = -1;
             Delay(1000);
-            KeyPress((uint) Keys.D1);
+            KeyPress((uint)Keys.D1);
             Delay(30);
             RightClick();
             KeyPress((uint)Keys.F1);
@@ -5026,7 +5071,7 @@ public partial class Form2 : Form
         {
             _全局时间e = -1;
             _条件保持假腿 = true;
-            KeyPress((uint) Keys.A);
+            KeyPress((uint)Keys.A);
         }
 
         var d5 = 获取d5左下角颜色(bts, size);
@@ -5066,7 +5111,7 @@ public partial class Form2 : Form
             _全局时间q = -1;
             _条件保持假腿 = true;
             // RightClick();
-            KeyPress((uint) Keys.A);
+            KeyPress((uint)Keys.A);
         }
 
         // 超时则切回 总体释放时间
@@ -5117,7 +5162,7 @@ public partial class Form2 : Form
             _全局时间w = -1;
             _条件保持假腿 = true;
             // RightClick();
-            KeyPress((uint) Keys.A);
+            KeyPress((uint)Keys.A);
         }
 
         // 超时则切回 总体释放时间
@@ -5168,7 +5213,7 @@ public partial class Form2 : Form
             _全局时间r = -1;
             _条件保持假腿 = true;
             // RightClick();
-            KeyPress((uint) Keys.A);
+            KeyPress((uint)Keys.A);
         }
 
         // 超时则切回 总体释放时间
@@ -5223,7 +5268,7 @@ public partial class Form2 : Form
             _全局时间q = -1;
             _条件保持假腿 = true;
             // RightClick();
-            KeyPress((uint) Keys.A);
+            KeyPress((uint)Keys.A);
         }
 
         // 超时则切回 总体释放时间
@@ -5276,7 +5321,7 @@ public partial class Form2 : Form
             _全局时间w = -1;
             _条件保持假腿 = true;
             // RightClick();
-            KeyPress((uint) Keys.A);
+            KeyPress((uint)Keys.A);
         }
 
         // 超时则切回 总体释放时间
@@ -5329,7 +5374,7 @@ public partial class Form2 : Form
             _全局时间e = -1;
             _条件保持假腿 = true;
             // RightClick();
-            KeyPress((uint) Keys.A);
+            KeyPress((uint)Keys.A);
         }
 
         // 超时则切回 总体释放时间
@@ -5381,7 +5426,7 @@ public partial class Form2 : Form
         {
             _全局时间d = -1;
             // RightClick();
-            KeyPress((uint) Keys.A);
+            KeyPress((uint)Keys.A);
         }
 
         // 超时则切回 总体释放时间
@@ -5421,7 +5466,7 @@ public partial class Form2 : Form
             _全局时间f = -1;
             _条件保持假腿 = true;
             // RightClick();
-            KeyPress((uint) Keys.A);
+            KeyPress((uint)Keys.A);
         }
 
         // 超时则切回 总体释放时间
@@ -5461,7 +5506,7 @@ public partial class Form2 : Form
             _全局时间r = -1;
             _条件保持假腿 = true;
             // RightClick();
-            KeyPress((uint) Keys.A);
+            KeyPress((uint)Keys.A);
         }
 
         // 超时则切回 总体释放时间
@@ -5518,7 +5563,7 @@ public partial class Form2 : Form
             _全局时间q = -1;
             _条件保持假腿 = true;
             // RightClick();
-            KeyPress((uint) Keys.A);
+            KeyPress((uint)Keys.A);
         }
 
         // 超时则切回 总体释放时间
@@ -5570,7 +5615,7 @@ public partial class Form2 : Form
             if (_循环条件1) return await FromResult(true);
             else return await FromResult(false);
 
-        KeyPress((uint) Keys.R);
+        KeyPress((uint)Keys.R);
         Delay(100);
         if (_循环条件1) return await FromResult(true);
         return await FromResult(false);
@@ -5589,7 +5634,7 @@ public partial class Form2 : Form
             if (_循环条件1) return await FromResult(true);
             else return await FromResult(false);
 
-        KeyPress((uint) Keys.E);
+        KeyPress((uint)Keys.E);
         Delay(等待延迟);
         if (_循环条件1) return await FromResult(true);
         return await FromResult(false);
@@ -5612,7 +5657,7 @@ public partial class Form2 : Form
 
         if (ColorAEqualColorB(q4, SimpleColor.FromRgb(65, 74, 81), 0)) return await FromResult(true);
 
-        KeyPress((uint) Keys.A);
+        KeyPress((uint)Keys.A);
         return await FromResult(false);
     }
 
@@ -5636,12 +5681,12 @@ public partial class Form2 : Form
             _全局时间w = -1;
             _条件保持假腿 = true;
             // RightClick();
-            KeyPress((uint) Keys.A);
+            KeyPress((uint)Keys.A);
 
             if (!_循环条件1) return;
-            KeyPress((uint) Keys.Q);
+            KeyPress((uint)Keys.Q);
             Delay(等待延迟);
-            KeyPress((uint) Keys.Q);
+            KeyPress((uint)Keys.Q);
         }
 
         // 超时则切回 总体释放时间
@@ -5692,12 +5737,12 @@ public partial class Form2 : Form
             _全局时间r = -1;
             _条件保持假腿 = true;
             // RightClick();
-            KeyPress((uint) Keys.A);
+            KeyPress((uint)Keys.A);
 
             if (!_循环条件1) return;
-            KeyPress((uint) Keys.Q);
+            KeyPress((uint)Keys.Q);
             Delay(等待延迟);
-            KeyPress((uint) Keys.Q);
+            KeyPress((uint)Keys.Q);
         }
 
         // 超时则切回 总体释放时间
@@ -5779,9 +5824,9 @@ public partial class Form2 : Form
             _全局时间f = -1;
             _条件保持假腿 = true;
             //RightClick();
-            KeyPress((uint) Keys.D);
+            KeyPress((uint)Keys.D);
             Delay(等待延迟);
-            KeyPress((uint) Keys.X);
+            KeyPress((uint)Keys.X);
             // KeyPress((uint)Keys.A);
         }
 
@@ -5807,7 +5852,7 @@ public partial class Form2 : Form
             _全局时间r = -1;
             _条件保持假腿 = true;
             //RightClick();
-            KeyPress((uint) Keys.A);
+            KeyPress((uint)Keys.A);
         }
 
         // 超时则切回 总体释放时间
@@ -5838,7 +5883,7 @@ public partial class Form2 : Form
             _全局时间q = -1;
             _条件保持假腿 = true;
             // RightClick();
-            KeyPress((uint) Keys.A);
+            KeyPress((uint)Keys.A);
         }
 
         // 超时则切回 总体释放时间
@@ -5888,7 +5933,7 @@ public partial class Form2 : Form
         {
             _全局时间e = -1;
             根据图片以及类别使用物品(物品_疯狂面具, bts1, size, _技能数量);
-            KeyPress((uint) Keys.A);
+            KeyPress((uint)Keys.A);
             _条件保持假腿 = true;
             // RightClick();
         }
@@ -5941,7 +5986,7 @@ public partial class Form2 : Form
             _全局时间r = -1;
             _条件保持假腿 = true;
             // RightClick();
-            KeyPress((uint) Keys.A);
+            KeyPress((uint)Keys.A);
         }
 
         // 超时则切回 总体释放时间
@@ -5992,7 +6037,7 @@ public partial class Form2 : Form
             _全局时间d = -1;
             _条件保持假腿 = true;
             // RightClick();
-            KeyPress((uint) Keys.A);
+            KeyPress((uint)Keys.A);
         }
 
         // 超时则切回 总体释放时间
@@ -6045,7 +6090,7 @@ public partial class Form2 : Form
             }
 
             // RightClick();
-            KeyPress((uint) Keys.A);
+            KeyPress((uint)Keys.A);
         }
 
         var w4 = 获取w4左下角颜色(bts, size);
@@ -6077,8 +6122,8 @@ public partial class Form2 : Form
             }
 
             // RightClick();
-            KeyPress((uint) Keys.S);
-            KeyPress((uint) Keys.A);
+            KeyPress((uint)Keys.S);
+            KeyPress((uint)Keys.A);
         }
 
         var e4 = 获取e4左下角颜色(bts, size);
@@ -6118,7 +6163,7 @@ public partial class Form2 : Form
                 初始化全局时间(ref _全局时间w);
                 RightClick();
                 Delay(150);
-                KeyPress((uint) Keys.S);
+                KeyPress((uint)Keys.S);
                 Delay(time - 3000, _全局时间w);
                 if (!_中断条件) 根据图片以及类别使用物品(物品_陨星锤, bts, size);
             });
@@ -6134,7 +6179,7 @@ public partial class Form2 : Form
     {
         static void 神智之蚀后()
         {
-            KeyPress((uint) Keys.A);
+            KeyPress((uint)Keys.A);
         }
 
         var r4 = 获取r4左下角颜色(bts, size);
@@ -6182,14 +6227,14 @@ public partial class Form2 : Form
 
     private void 刷新接凋零黑洞()
     {
-        KeyPress((uint) Keys.X);
+        KeyPress((uint)Keys.X);
 
         for (var i = 0; i < 2; i++)
         {
             Delay(等待延迟);
-            KeyPress((uint) Keys.Z);
-            KeyPress((uint) Keys.V);
-            KeyPress((uint) Keys.R);
+            KeyPress((uint)Keys.Z);
+            KeyPress((uint)Keys.V);
+            KeyPress((uint)Keys.R);
         }
     }
 
@@ -6228,7 +6273,7 @@ public partial class Form2 : Form
     private void 残影接平A()
     {
         Delay(等待延迟);
-        KeyPress((uint) Keys.A);
+        KeyPress((uint)Keys.A);
     }
 
     private static async Task<bool> 滚接平A(byte[] bts, Size size)
@@ -6249,7 +6294,7 @@ public partial class Form2 : Form
                 switch (_全局模式)
                 {
                     case < 1:
-                        KeyPress((uint) Keys.A);
+                        KeyPress((uint)Keys.A);
                         break;
                     case 1:
                         RightClick();
@@ -6310,7 +6355,7 @@ public partial class Form2 : Form
                     return await FromResult(false);
                 case 1:
                     _全局模式q = 0;
-                    await Run(() => { KeyPress((uint) Keys.Q); });
+                    await Run(() => { KeyPress((uint)Keys.Q); });
                     return await FromResult(false);
             }
         }
@@ -6324,7 +6369,7 @@ public partial class Form2 : Form
                     return await FromResult(false);
                 case 1:
                     _全局模式q = 0;
-                    await Run(() => { KeyPress((uint) Keys.Q); });
+                    await Run(() => { KeyPress((uint)Keys.Q); });
                     return await FromResult(false);
             }
         }
@@ -6338,7 +6383,7 @@ public partial class Form2 : Form
                     return await FromResult(false);
                 case 1:
                     _全局模式q = 0;
-                    await Run(() => { KeyPress((uint) Keys.Q); });
+                    await Run(() => { KeyPress((uint)Keys.Q); });
                     return await FromResult(false);
             }
         }
@@ -6355,7 +6400,7 @@ public partial class Form2 : Form
                 switch (_全局模式)
                 {
                     case < 1:
-                        KeyPress((uint) Keys.A);
+                        KeyPress((uint)Keys.A);
                         break;
                     case 1:
                         RightClick();
@@ -6399,7 +6444,7 @@ public partial class Form2 : Form
                 switch (_全局模式)
                 {
                     case < 1:
-                        KeyPress((uint) Keys.A);
+                        KeyPress((uint)Keys.A);
                         break;
                     case 1:
                         RightClick();
@@ -6440,62 +6485,62 @@ public partial class Form2 : Form
 
     private void 三冰对线()
     {
-        KeyPress((uint) Keys.Q);
+        KeyPress((uint)Keys.Q);
         Delay(等待延迟);
-        KeyPress((uint) Keys.Q);
+        KeyPress((uint)Keys.Q);
         Delay(等待延迟);
-        KeyPress((uint) Keys.Q);
+        KeyPress((uint)Keys.Q);
         Delay(等待延迟);
     }
 
     private void 三火平A()
     {
-        KeyPress((uint) Keys.E);
+        KeyPress((uint)Keys.E);
         Delay(等待延迟);
-        KeyPress((uint) Keys.E);
+        KeyPress((uint)Keys.E);
         Delay(等待延迟);
-        KeyPress((uint) Keys.E);
+        KeyPress((uint)Keys.E);
         Delay(等待延迟);
     }
 
     private void 三雷幽灵()
     {
-        KeyPress((uint) Keys.Q);
+        KeyPress((uint)Keys.Q);
         Delay(等待延迟);
-        KeyPress((uint) Keys.Q);
+        KeyPress((uint)Keys.Q);
         Delay(等待延迟);
-        KeyPress((uint) Keys.W);
+        KeyPress((uint)Keys.W);
         Delay(等待延迟);
-        KeyPress((uint) Keys.R);
+        KeyPress((uint)Keys.R);
         Delay(等待延迟);
-        KeyPress((uint) Keys.W);
+        KeyPress((uint)Keys.W);
         Delay(等待延迟);
-        KeyPress((uint) Keys.W);
+        KeyPress((uint)Keys.W);
         Delay(等待延迟);
-        KeyPress((uint) Keys.D);
+        KeyPress((uint)Keys.D);
     }
 
     private void 吹风天火()
     {
-        KeyPress((uint) Keys.W);
+        KeyPress((uint)Keys.W);
         Delay(等待延迟);
-        KeyPress((uint) Keys.W);
+        KeyPress((uint)Keys.W);
         Delay(等待延迟);
-        KeyPress((uint) Keys.Q);
+        KeyPress((uint)Keys.Q);
         Delay(等待延迟);
-        KeyPress((uint) Keys.R);
+        KeyPress((uint)Keys.R);
         Delay(等待延迟);
-        KeyPress((uint) Keys.D);
+        KeyPress((uint)Keys.D);
         Delay(等待延迟);
-        KeyPress((uint) Keys.E);
+        KeyPress((uint)Keys.E);
         Delay(等待延迟);
-        KeyPress((uint) Keys.E);
+        KeyPress((uint)Keys.E);
         Delay(等待延迟);
-        KeyPress((uint) Keys.E);
+        KeyPress((uint)Keys.E);
         Delay(等待延迟);
-        KeyPress((uint) Keys.R);
+        KeyPress((uint)Keys.R);
         Delay(600);
-        KeyPress((uint) Keys.D);
+        KeyPress((uint)Keys.D);
     }
 
     #endregion
@@ -6555,7 +6600,7 @@ public partial class Form2 : Form
 #if 检测延时
                 检测时间播报(_全局时间q, 2000);
 #endif
-                KeyPress((uint) Keys.A);
+                KeyPress((uint)Keys.A);
             });
         }
 
@@ -6603,7 +6648,7 @@ public partial class Form2 : Form
 #if 检测延时
                 检测时间播报(_全局时间r, 3000);
 #endif
-                KeyPress((uint) Keys.A);
+                KeyPress((uint)Keys.A);
             });
         }
 
@@ -6642,28 +6687,28 @@ public partial class Form2 : Form
                 TTS.Speak(string.Concat("延时", time.ToString()));
 #endif
 
-                KeyPress((uint) Keys.A);
+                KeyPress((uint)Keys.A);
 
                 switch (_全局模式w)
                 {
                     case 1:
                         Delay(time - (智力跳刀buff ? 217 : 435), _全局时间w);
-                        KeyPress((uint) Keys.E);
+                        KeyPress((uint)Keys.E);
                         break;
                     case 2:
-                        KeyPress((uint) Keys.Q);
+                        KeyPress((uint)Keys.Q);
                         break;
                     case 3:
-                        KeyPress((uint) Keys.Q);
+                        KeyPress((uint)Keys.Q);
                         Delay(time - (智力跳刀buff ? 217 : 435), _全局时间w);
-                        KeyPress((uint) Keys.E);
+                        KeyPress((uint)Keys.E);
                         break;
                     case 4:
-                        KeyPress((uint) Keys.R);
+                        KeyPress((uint)Keys.R);
                         Delay(智力跳刀buff ? 200 : 400);
-                        KeyPress((uint) Keys.Q);
+                        KeyPress((uint)Keys.Q);
                         Delay(time - (智力跳刀buff ? 217 : 435), _全局时间w);
-                        KeyPress((uint) Keys.E);
+                        KeyPress((uint)Keys.E);
                         break;
                 }
             });
@@ -6729,13 +6774,13 @@ public partial class Form2 : Form
         // 释放纷争，增加大量伤害
         //if (RegPicture(物品_纷争, "C", 7)) KeyPress((uint) Keys.C);
 
-        KeyPress((uint) Keys.M);
+        KeyPress((uint)Keys.M);
         Delay(等待延迟);
-        KeyPress((uint) Keys.D);
+        KeyPress((uint)Keys.D);
         Delay(等待延迟);
-        KeyPress((uint) Keys.W);
+        KeyPress((uint)Keys.W);
         Delay(等待延迟);
-        KeyPress((uint) Keys.W);
+        KeyPress((uint)Keys.W);
 
         //var 暗影之境_开始时间 = 获取当前时间毫秒();
 
@@ -6760,7 +6805,7 @@ public partial class Form2 : Form
     {
         static void 释放奥数鹰隼()
         {
-            KeyPress((uint) Keys.Q);
+            KeyPress((uint)Keys.Q);
             Delay(等待延迟);
         }
 
@@ -6802,7 +6847,7 @@ public partial class Form2 : Form
                     {
                         if (ColorAEqualColorB(w5, SimpleColor.FromRgb(45, 52, 59), 0))
                         {
-                            KeyPress((uint) Keys.W);
+                            KeyPress((uint)Keys.W);
                             Delay(等待延迟);
                         }
                         else
@@ -6816,7 +6861,7 @@ public partial class Form2 : Form
                     {
                         if (ColorAEqualColorB(w4, SimpleColor.FromRgb(65, 74, 81), 0))
                         {
-                            KeyPress((uint) Keys.W);
+                            KeyPress((uint)Keys.W);
                             Delay(等待延迟);
                         }
                         else
@@ -6921,11 +6966,11 @@ public partial class Form2 : Form
                 return await FromResult(true);
             }
 
-            case < 8 when 根据图片以及类别使用物品(物品_缚灵锁_4, bts, size, _技能数量):
+            case < 8 when 根据图片以及类别使用物品(物品_缚灵锁, bts, size, _技能数量):
             {
                 Delay(等待延迟);
                 RightClick();
-                if (!根据图片以及类别使用物品(物品_缚灵锁_4, bts, size, _技能数量))
+                if (!根据图片以及类别使用物品(物品_缚灵锁, bts, size, _技能数量))
                     _全局步骤 = 8;
                 return await FromResult(true);
             }
@@ -6938,7 +6983,7 @@ public partial class Form2 : Form
                     {
                         if (ColorAEqualColorB(q5, SimpleColor.FromRgb(45, 52, 59), 0))
                         {
-                            KeyPress((uint) Keys.Q);
+                            KeyPress((uint)Keys.Q);
                             Delay(等待延迟);
                         }
                         else
@@ -6952,7 +6997,7 @@ public partial class Form2 : Form
                     {
                         if (ColorAEqualColorB(q4, SimpleColor.FromRgb(65, 74, 81), 0))
                         {
-                            KeyPress((uint) Keys.Q);
+                            KeyPress((uint)Keys.Q);
                             Delay(等待延迟);
                         }
                         else
@@ -6975,7 +7020,7 @@ public partial class Form2 : Form
                     {
                         if (ColorAEqualColorB(e5, SimpleColor.FromRgb(45, 52, 59), 0))
                         {
-                            KeyPress((uint) Keys.E);
+                            KeyPress((uint)Keys.E);
                             Delay(等待延迟);
                         }
                         else
@@ -6989,7 +7034,7 @@ public partial class Form2 : Form
                     {
                         if (ColorAEqualColorB(e4, SimpleColor.FromRgb(65, 74, 81), 0))
                         {
-                            KeyPress((uint) Keys.E);
+                            KeyPress((uint)Keys.E);
                             Delay(等待延迟);
                         }
                         else
@@ -7013,7 +7058,7 @@ public partial class Form2 : Form
                     {
                         if (ColorAEqualColorB(r5, SimpleColor.FromRgb(45, 52, 59), 0))
                         {
-                            KeyPress((uint) Keys.R);
+                            KeyPress((uint)Keys.R);
                             Delay(等待延迟);
                         }
                         else
@@ -7027,7 +7072,7 @@ public partial class Form2 : Form
                     {
                         if (ColorAEqualColorB(r4, SimpleColor.FromRgb(65, 74, 81), 0))
                         {
-                            KeyPress((uint) Keys.R);
+                            KeyPress((uint)Keys.R);
                             Delay(等待延迟);
                         }
                         else
@@ -7093,7 +7138,7 @@ public partial class Form2 : Form
         static void 粘性炸弹后()
         {
             //RightClick();
-            KeyPress((uint) Keys.A);
+            KeyPress((uint)Keys.A);
         }
 
         var q5 = 获取q5左下角颜色(bts, size);
@@ -7109,7 +7154,7 @@ public partial class Form2 : Form
         static void 活性电击后()
         {
             //RightClick();
-            KeyPress((uint) Keys.A);
+            KeyPress((uint)Keys.A);
         }
 
         var w5 = 获取w5左下角颜色(bts, size);
@@ -7125,7 +7170,7 @@ public partial class Form2 : Form
         static void 爆破起飞后()
         {
             //RightClick();
-            KeyPress((uint) Keys.A);
+            KeyPress((uint)Keys.A);
             Delay(750);
 
             switch (_全局模式e)
@@ -7159,7 +7204,7 @@ public partial class Form2 : Form
         if (RegPicture(炸弹人_数字3, bts, size))
         {
             MouseMove(_指定地点r.X - 34, _指定地点r.Y - 130);
-            KeyPress((uint) Keys.R);
+            KeyPress((uint)Keys.R);
             Delay(等待延迟);
             return await FromResult(true);
         }
@@ -7167,7 +7212,7 @@ public partial class Form2 : Form
         if (RegPicture(炸弹人_数字2, bts, size))
         {
             MouseMove(_指定地点r.X - 139 - _全局步骤r, _指定地点r.Y + 96 + _全局步骤r);
-            KeyPress((uint) Keys.R);
+            KeyPress((uint)Keys.R);
             Delay(等待延迟);
             _全局步骤r += 3;
             return await FromResult(true);
@@ -7176,7 +7221,7 @@ public partial class Form2 : Form
         if (RegPicture(炸弹人_数字1, bts, size))
         {
             MouseMove(_指定地点r.X + 158 + _全局步骤r, _指定地点r.Y + 31 + _全局步骤r);
-            KeyPress((uint) Keys.R);
+            KeyPress((uint)Keys.R);
             Delay(等待延迟);
             _全局步骤r += 3;
             return await FromResult(true);
@@ -7263,7 +7308,7 @@ public partial class Form2 : Form
         static void 涤罪之焰后()
         {
             // RightClick();
-            KeyPress((uint) Keys.A);
+            KeyPress((uint)Keys.A);
         }
 
         var e4 = 获取e4左下角颜色(bts, size);
@@ -7293,7 +7338,7 @@ public partial class Form2 : Form
                     break;
                 case 1:
                     _全局模式e = 0;
-                    await Run(() => { KeyPress((uint) Keys.E); });
+                    await Run(() => { KeyPress((uint)Keys.E); });
                     break;
             }
         }
@@ -7432,9 +7477,9 @@ public partial class Form2 : Form
         static void 莱恩羊后()
         {
             if (_条件4)
-                KeyPress((uint) Keys.E);
+                KeyPress((uint)Keys.E);
             else
-                KeyPress((uint) Keys.A);
+                KeyPress((uint)Keys.A);
         }
 
         var w4 = 获取w4左下角颜色(bts, size);
@@ -7481,7 +7526,7 @@ public partial class Form2 : Form
             return await FromResult(true);
         }
 
-        KeyPress((uint) Keys.W);
+        KeyPress((uint)Keys.W);
         return await FromResult(false);
     }
 
@@ -7500,15 +7545,15 @@ public partial class Form2 : Form
             {
                 case < 1:
                     await 大招前纷争(bts, size);
-                    KeyPress((uint) Keys.E);
+                    KeyPress((uint)Keys.E);
                     break;
                 case 1:
                     await 大招前纷争(bts, size);
                     Delay(1300);
-                    KeyPress((uint) Keys.E);
+                    KeyPress((uint)Keys.E);
                     break;
                 case 2:
-                    KeyPress((uint) Keys.A);
+                    KeyPress((uint)Keys.A);
                     break;
             }
         }
@@ -7534,7 +7579,7 @@ public partial class Form2 : Form
         {
             _全局时间e = -1;
             // RightClick();
-            KeyPress((uint) Keys.A);
+            KeyPress((uint)Keys.A);
         }
 
         // 超时则切回 总体释放时间
@@ -7562,7 +7607,7 @@ public partial class Form2 : Form
         {
             _全局时间q = -1;
             // RightClick();
-            KeyPress((uint) Keys.A);
+            KeyPress((uint)Keys.A);
         }
 
         // 超时则切回 总体释放时间
@@ -7586,7 +7631,7 @@ public partial class Form2 : Form
         {
             _全局时间w = -1;
             // RightClick();
-            KeyPress((uint) Keys.A);
+            KeyPress((uint)Keys.A);
         }
 
         // 超时则切回 总体释放时间
@@ -7610,7 +7655,7 @@ public partial class Form2 : Form
         {
             _全局时间e = -1;
             // RightClick();
-            KeyPress((uint) Keys.A);
+            KeyPress((uint)Keys.A);
         }
 
         // 超时则切回 总体释放时间
@@ -7634,7 +7679,7 @@ public partial class Form2 : Form
         {
             _全局时间d = -1;
             // RightClick();
-            KeyPress((uint) Keys.A);
+            KeyPress((uint)Keys.A);
         }
 
         // 超时则切回 总体释放时间
@@ -7658,7 +7703,7 @@ public partial class Form2 : Form
         {
             _全局时间r = -1;
             // RightClick();
-            KeyPress((uint) Keys.A);
+            KeyPress((uint)Keys.A);
         }
 
         // 超时则切回 总体释放时间
@@ -7689,7 +7734,7 @@ public partial class Form2 : Form
         {
             _全局时间q = -1;
             // RightClick();
-            KeyPress((uint) Keys.D2);
+            KeyPress((uint)Keys.D2);
         }
 
         // 超时则切回 总体释放时间
@@ -7721,7 +7766,7 @@ public partial class Form2 : Form
         {
             _全局时间w = -1;
             // RightClick();
-            KeyPress((uint) Keys.D2);
+            KeyPress((uint)Keys.D2);
         }
 
         // 超时则切回 总体释放时间
@@ -7753,7 +7798,7 @@ public partial class Form2 : Form
         {
             _全局时间r = -1;
             // RightClick();
-            KeyPress((uint) Keys.D2);
+            KeyPress((uint)Keys.D2);
         }
 
         // 超时则切回 总体释放时间
@@ -7788,7 +7833,7 @@ public partial class Form2 : Form
 
         if (获取当前时间毫秒() - _全局时间 < 2500 - 650 - 600) return await FromResult(true);
 
-        KeyPress((uint) Keys.W);
+        KeyPress((uint)Keys.W);
         _全局时间 = -1;
         return await FromResult(false);
     }
@@ -7809,11 +7854,11 @@ public partial class Form2 : Form
             switch (_全局模式q)
             {
                 case 1:
-                    KeyPress((uint) Keys.E);
-                    KeyPress((uint) Keys.D2);
+                    KeyPress((uint)Keys.E);
+                    KeyPress((uint)Keys.D2);
                     break;
                 case 0:
-                    KeyPress((uint) Keys.A);
+                    KeyPress((uint)Keys.A);
                     break;
             }
         }
@@ -7847,7 +7892,7 @@ public partial class Form2 : Form
         {
             _全局时间q = -1;
             // RightClick();
-            KeyPress((uint) Keys.A);
+            KeyPress((uint)Keys.A);
 
             根据图片以及类别使用物品(物品_魂之灵龛, bts1, size, _技能数量);
             根据图片以及类别使用物品(物品_影之灵龛, bts1, size, _技能数量);
@@ -7910,7 +7955,7 @@ public partial class Form2 : Form
         static void 暗影突袭后()
         {
             _全局时间q = -1;
-            KeyPress((uint) Keys.A);
+            KeyPress((uint)Keys.A);
         }
 
         if (ColorAEqualColorB(q4, SimpleColor.FromRgb(65, 74, 81), 0)) return await FromResult(true);
@@ -7942,7 +7987,7 @@ public partial class Form2 : Form
         static void 痛苦尖叫后()
         {
             _全局时间e = -1;
-            KeyPress((uint) Keys.A);
+            KeyPress((uint)Keys.A);
         }
 
         if (ColorAEqualColorB(e4, SimpleColor.FromRgb(65, 74, 81), 0)) return await FromResult(true);
@@ -7958,7 +8003,7 @@ public partial class Form2 : Form
         static void 冲击波后()
         {
             _全局时间r = -1;
-            KeyPress((uint) Keys.A);
+            KeyPress((uint)Keys.A);
         }
 
         if (ColorAEqualColorB(r4, SimpleColor.FromRgb(65, 74, 81), 0)) return await FromResult(true);
@@ -7984,7 +8029,7 @@ public partial class Form2 : Form
                     RightClick();
                     break;
                 case 1:
-                    KeyPress((uint) Keys.R);
+                    KeyPress((uint)Keys.R);
                     break;
             }
         }
@@ -8005,10 +8050,10 @@ public partial class Form2 : Form
             switch (_全局模式q)
             {
                 case 0:
-                    KeyPress((uint) Keys.Q);
+                    KeyPress((uint)Keys.Q);
                     break;
                 case 1:
-                    KeyPress((uint) Keys.E);
+                    KeyPress((uint)Keys.E);
                     break;
             }
         }
@@ -8191,7 +8236,7 @@ public partial class Form2 : Form
         _指定地点r = new Point(0, 0);
         _指定地点d = new Point(0, 0);
         _指定地点f = new Point(0, 0);
-        _技能数量 = "4";
+        _技能数量 = 4;
 
         _循环内获取图片 = null;
         _条件根据图片委托1 = null;
@@ -8253,9 +8298,9 @@ public partial class Form2 : Form
     {
         if (RegPicture(物品_TP效果, bts, size)) return await FromResult(false);
 
-        KeyPress((uint) Keys.T);
+        KeyPress((uint)Keys.T);
         Delay(等待延迟);
-        KeyPress((uint) Keys.T);
+        KeyPress((uint)Keys.T);
 
         return await FromResult(true);
     }
@@ -8270,7 +8315,7 @@ public partial class Form2 : Form
 
         for (var i = 1; i <= 4; i++)
         {
-            KeyPress((uint) Keys.C);
+            KeyPress((uint)Keys.C);
             Delay(587);
         }
     }
@@ -8285,10 +8330,10 @@ public partial class Form2 : Form
         {
             if (获取当前时间毫秒() - time > 1850) return;
 
-            KeyDown((uint) Keys.LControlKey);
-            KeyDown((uint) Keys.C);
-            KeyUp((uint) Keys.LControlKey);
-            KeyUp((uint) Keys.C);
+            KeyDown((uint)Keys.LControlKey);
+            KeyDown((uint)Keys.C);
+            KeyUp((uint)Keys.LControlKey);
+            KeyUp((uint)Keys.C);
 
             Delay(587);
         }
@@ -8303,11 +8348,11 @@ public partial class Form2 : Form
         _指定地点p = MousePosition;
 
         Delay(等待延迟);
-        KeyDown((uint) Keys.LControlKey);
+        KeyDown((uint)Keys.LControlKey);
         Delay(等待延迟);
-        KeyPress((uint) Keys.D9);
+        KeyPress((uint)Keys.D9);
         Delay(等待延迟);
-        KeyUp((uint) Keys.LControlKey);
+        KeyUp((uint)Keys.LControlKey);
     }
 
     #endregion
@@ -8357,10 +8402,10 @@ public partial class Form2 : Form
         var 实际前摇 = _基础攻击前摇 * 100 * 1000 / _攻击速度;
         var 等待前摇 = Convert.ToInt32(实际前摇);
         var 实际间隔 = 1.7 * 100 * 1000 / _攻击速度;
-        KeyPress((uint) Keys.M);
+        KeyPress((uint)Keys.M);
         var 等待间隔 = Convert.ToInt32(实际间隔);
         Delay(等待间隔 - 等待前摇);
-        KeyPress((uint) Keys.A);
+        KeyPress((uint)Keys.A);
     }
 
     #endregion
@@ -8369,11 +8414,11 @@ public partial class Form2 : Form
 
     private void 批量扔装备()
     {
-        KeyPress((uint) Keys.S);
+        KeyPress((uint)Keys.S);
         Delay(40);
-        KeyPress((uint) Keys.F1);
+        KeyPress((uint)Keys.F1);
         Delay(40);
-        KeyPress((uint) Keys.F1);
+        KeyPress((uint)Keys.F1);
 
         using var list1 = new PooledList<string>(tb_丢装备.Text.Split(','));
 
@@ -8381,7 +8426,7 @@ public partial class Form2 : Form
         {
             switch (_技能数量)
             {
-                case "6":
+                case 6:
                     foreach (var t in list1)
                         switch (t)
                         {
@@ -8409,7 +8454,7 @@ public partial class Form2 : Form
                         }
 
                     break;
-                case "4":
+                case 4:
                     foreach (var t in list1)
                         switch (t)
                         {
@@ -8437,7 +8482,7 @@ public partial class Form2 : Form
                         }
 
                     break;
-                case "5":
+                case 5:
                     foreach (var t in list1)
                         switch (t)
                         {
@@ -8482,17 +8527,17 @@ public partial class Form2 : Form
         Delay(40);
         MouseMove(new Point(p.X + 5, p.Y + 5));
         Delay(40);
-        KeyDown((uint) Keys.Y);
+        KeyDown((uint)Keys.Y);
         Delay(40);
         LeftUp();
-        KeyUp((uint) Keys.Y);
+        KeyUp((uint)Keys.Y);
         Delay(40);
     }
 
     private void 捡装备()
     {
         using var list1 = new PooledList<string>(tb_丢装备.Text.Split(','));
-        KeyDown((uint) Keys.Y);
+        KeyDown((uint)Keys.Y);
         Delay(40);
         for (var i = 0; i < list1.Count + 2; i++)
         {
@@ -8501,14 +8546,14 @@ public partial class Form2 : Form
         }
 
         list1.Dispose();
-        KeyUp((uint) Keys.Y);
+        KeyUp((uint)Keys.Y);
     }
 
     #endregion
 
     #region 切假腿
 
-    private static async Task 切智力腿(string mode = "4")
+    private static async Task 切智力腿(int mode = 4)
     {
         var 图像 = new Bitmap(截图模式1W, 截图模式1H);
         图像 = await CaptureScreenAsync(截图模式1X, 截图模式1Y, 图像.Size);
@@ -8519,7 +8564,7 @@ public partial class Form2 : Form
         await 切智力腿(_全局假腿bts, size, mode);
     }
 
-    private static async Task 切敏捷腿(string mode = "4")
+    private static async Task 切敏捷腿(int mode = 4)
     {
         var 图像 = new Bitmap(截图模式1W, 截图模式1H);
         图像 = await CaptureScreenAsync(截图模式1X, 截图模式1Y, 图像.Size);
@@ -8530,7 +8575,7 @@ public partial class Form2 : Form
         await 切敏捷腿(_全局假腿bts, size, mode);
     }
 
-    private static async Task 切力量腿(string mode = "4")
+    private static async Task 切力量腿(int mode = 4)
     {
         var 图像 = new Bitmap(截图模式1W, 截图模式1H);
         图像 = await CaptureScreenAsync(截图模式1X, 截图模式1Y, 图像.Size);
@@ -8541,35 +8586,35 @@ public partial class Form2 : Form
         await 切力量腿(_全局假腿bts, size, mode);
     }
 
-    private static async Task<bool> 切智力腿(byte[] parByte, Size size, string mode = "4")
+    private static async Task<bool> 切智力腿(byte[] parByte, Size size, int mode = 4)
     {
         var 切腿成功 = 根据图片以及类别使用物品(物品_假腿_力量腿, parByte, size, mode) ||
                    根据图片以及类别使用物品多次(物品_假腿_敏捷腿, parByte, size, 2, 0, mode);
         return 切腿成功 ? await FromResult(true) : await FromResult(false);
     }
 
-    private static async Task<bool> 切敏捷腿(byte[] parByte, Size size, string mode = "4")
+    private static async Task<bool> 切敏捷腿(byte[] parByte, Size size, int mode = 4)
     {
         var 切腿成功 = 根据图片以及类别使用物品(物品_假腿_智力腿, parByte, size, mode) ||
                    根据图片以及类别使用物品多次(物品_假腿_力量腿, parByte, size, 2, 0, mode);
         return 切腿成功 ? await FromResult(true) : await FromResult(false);
     }
 
-    private static async Task<bool> 切力量腿(byte[] parByte, Size size, string mode = "4")
+    private static async Task<bool> 切力量腿(byte[] parByte, Size size, int mode = 4)
     {
         var 切腿成功 = 根据图片以及类别使用物品(物品_假腿_敏捷腿, parByte, size, mode) ||
                    根据图片以及类别使用物品多次(物品_假腿_智力腿, parByte, size, 2, 0, mode);
         return 切腿成功 ? await FromResult(true) : await FromResult(false);
     }
 
-    private static async Task<bool> 切敏捷腿循环(byte[] parByte, Size size, string mode = "4")
+    private static async Task<bool> 切敏捷腿循环(byte[] parByte, Size size, int mode = 4)
     {
         var 切腿成功 = 根据图片以及类别使用物品(物品_假腿_智力腿, parByte, size, mode) ||
                    根据图片以及类别使用物品(物品_假腿_力量腿, parByte, size, mode);
         return 切腿成功 ? await FromResult(true) : await FromResult(false);
     }
 
-    private static async Task<bool> 切力量腿循环(byte[] parByte, Size size, string mode = "4")
+    private static async Task<bool> 切力量腿循环(byte[] parByte, Size size, int mode = 4)
     {
         var 切腿成功 = 根据图片以及类别使用物品(物品_假腿_敏捷腿, parByte, size, mode) ||
                    根据图片以及类别使用物品(物品_假腿_智力腿, parByte, size, mode);
@@ -8582,8 +8627,8 @@ public partial class Form2 : Form
 
     private static void 切臂章()
     {
-        KeyPress((uint) Keys.Z);
-        KeyPress((uint) Keys.Z);
+        KeyPress((uint)Keys.Z);
+        KeyPress((uint)Keys.Z);
     }
 
     #endregion
@@ -8615,7 +8660,7 @@ public partial class Form2 : Form
 
     #region 使用物品
 
-    private static bool 根据图片以及类别使用物品(Bitmap bp, in byte[] bts, Size size, string mode = "4", double matchRate = 0.8)
+    private static bool 根据图片以及类别使用物品(Bitmap bp, in byte[] bts, Size size, int mode = 4, double matchRate = 0.8)
     {
         //var list = RegPicturePoint(bp, bts, size, matchRate);
         //if (list.Count <= 0) return await FromResult(false);
@@ -8637,7 +8682,7 @@ public partial class Form2 : Form
     /// <param name="size"></param>
     /// <param name="mode"></param>
     /// <returns></returns>
-    private static bool 根据图片以及类别自我使用物品(Bitmap bp, in byte[] bts, Size size, string mode = "4")
+    private static bool 根据图片以及类别自我使用物品(Bitmap bp, in byte[] bts, Size size, int mode = 4)
     {
         //var list = RegPicturePoint(bp, bts, size);
         //if (list.Count <= 0) return await FromResult(false);
@@ -8651,7 +8696,7 @@ public partial class Form2 : Form
         return true;
     }
 
-    private static bool 根据图片以及类别队列使用物品(Bitmap bp, in byte[] bts, Size size, string mode = "4")
+    private static bool 根据图片以及类别队列使用物品(Bitmap bp, in byte[] bts, Size size, int mode = 4)
     {
         //var list = RegPicturePoint(bp, bts, size);
         //if (list.Count <= 0) return await FromResult(false);
@@ -8665,7 +8710,7 @@ public partial class Form2 : Form
         return true;
     }
 
-    private static bool 根据图片以及类别使用物品多次(Bitmap bp, byte[] bts, Size size, int times, int delay, string mode = "4")
+    private static bool 根据图片以及类别使用物品多次(Bitmap bp, byte[] bts, Size size, int times, int delay, int mode = 4)
     {
         var p = RegPicturePointR(bp, bts, size);
         if (p.X + p.Y <= 0)
@@ -8699,7 +8744,7 @@ public partial class Form2 : Form
 
     #region 根据物品使用
 
-    private static void 根据物品位置按键(Point p, string mode = "4")
+    private static void 根据物品位置按键(Point p, int mode = 4)
     {
         var x = p.X + 截图模式1X;
         var y = p.Y + 截图模式1Y;
@@ -8708,16 +8753,16 @@ public partial class Form2 : Form
 
         switch (mode)
         {
-            case "4":
+            case 4:
                 if (x < 1184)
                 {
                     if (y > 第一行物品底部y)
                     {
-                        KeyPress((uint) Keys.V);
+                        KeyPress((uint)Keys.V);
                         break;
                     }
 
-                    KeyPress((uint) Keys.Z);
+                    KeyPress((uint)Keys.Z);
                     break;
                 }
 
@@ -8725,32 +8770,32 @@ public partial class Form2 : Form
                 {
                     if (y > 第一行物品底部y)
                     {
-                        KeyPress((uint) Keys.Space);
+                        KeyPress((uint)Keys.Space);
                         break;
                     }
 
-                    KeyPress((uint) Keys.C);
+                    KeyPress((uint)Keys.C);
                     break;
                 }
 
                 if (y > 第一行物品底部y)
                 {
-                    KeyPress((uint) Keys.B);
+                    KeyPress((uint)Keys.B);
                     break;
                 }
 
-                KeyPress((uint) Keys.X);
+                KeyPress((uint)Keys.X);
                 break;
-            case "5":
+            case 5:
                 if (x < 1200)
                 {
                     if (y > 第一行物品底部y)
                     {
-                        KeyPress((uint) Keys.V);
+                        KeyPress((uint)Keys.V);
                         break;
                     }
 
-                    KeyPress((uint) Keys.Z);
+                    KeyPress((uint)Keys.Z);
                     break;
                 }
 
@@ -8758,32 +8803,32 @@ public partial class Form2 : Form
                 {
                     if (y > 第一行物品底部y)
                     {
-                        KeyPress((uint) Keys.Space);
+                        KeyPress((uint)Keys.Space);
                         break;
                     }
 
-                    KeyPress((uint) Keys.C);
+                    KeyPress((uint)Keys.C);
                     break;
                 }
 
                 if (y > 第一行物品底部y)
                 {
-                    KeyPress((uint) Keys.B);
+                    KeyPress((uint)Keys.B);
                     break;
                 }
 
-                KeyPress((uint) Keys.X);
+                KeyPress((uint)Keys.X);
                 break;
-            case "6":
+            case 6:
                 if (x < 1228)
                 {
                     if (y > 第一行物品底部y)
                     {
-                        KeyPress((uint) Keys.V);
+                        KeyPress((uint)Keys.V);
                         break;
                     }
 
-                    KeyPress((uint) Keys.Z);
+                    KeyPress((uint)Keys.Z);
                     break;
                 }
 
@@ -8791,26 +8836,26 @@ public partial class Form2 : Form
                 {
                     if (y > 第一行物品底部y)
                     {
-                        KeyPress((uint) Keys.Space);
+                        KeyPress((uint)Keys.Space);
                         break;
                     }
 
-                    KeyPress((uint) Keys.C);
+                    KeyPress((uint)Keys.C);
                     break;
                 }
 
                 if (y > 第一行物品底部y)
                 {
-                    KeyPress((uint) Keys.B);
+                    KeyPress((uint)Keys.B);
                     break;
                 }
 
-                KeyPress((uint) Keys.X);
+                KeyPress((uint)Keys.X);
                 break;
         }
     }
 
-    private static void 根据物品位置按键自我(Point p, string mode = "4")
+    private static void 根据物品位置按键自我(Point p, int mode = 4)
     {
         var x = p.X + 截图模式1X;
         var y = p.Y + 截图模式1Y;
@@ -8819,16 +8864,16 @@ public partial class Form2 : Form
 
         switch (mode)
         {
-            case "4":
+            case 4:
                 if (x < 1184)
                 {
                     if (y > 第一行物品底部y)
                     {
-                        KeyPressAlt((uint) Keys.V);
+                        KeyPressAlt((uint)Keys.V);
                         break;
                     }
 
-                    KeyPressAlt((uint) Keys.Z);
+                    KeyPressAlt((uint)Keys.Z);
                     break;
                 }
 
@@ -8836,32 +8881,32 @@ public partial class Form2 : Form
                 {
                     if (y > 第一行物品底部y)
                     {
-                        KeyPressAlt((uint) Keys.Space);
+                        KeyPressAlt((uint)Keys.Space);
                         break;
                     }
 
-                    KeyPressAlt((uint) Keys.C);
+                    KeyPressAlt((uint)Keys.C);
                     break;
                 }
 
                 if (y > 第一行物品底部y)
                 {
-                    KeyPressAlt((uint) Keys.B);
+                    KeyPressAlt((uint)Keys.B);
                     break;
                 }
 
-                KeyPressAlt((uint) Keys.X);
+                KeyPressAlt((uint)Keys.X);
                 break;
-            case "5":
+            case 5:
                 if (x < 1200)
                 {
                     if (y > 第一行物品底部y)
                     {
-                        KeyPressAlt((uint) Keys.V);
+                        KeyPressAlt((uint)Keys.V);
                         break;
                     }
 
-                    KeyPressAlt((uint) Keys.Z);
+                    KeyPressAlt((uint)Keys.Z);
                     break;
                 }
 
@@ -8869,32 +8914,32 @@ public partial class Form2 : Form
                 {
                     if (y > 第一行物品底部y)
                     {
-                        KeyPressAlt((uint) Keys.Space);
+                        KeyPressAlt((uint)Keys.Space);
                         break;
                     }
 
-                    KeyPressAlt((uint) Keys.C);
+                    KeyPressAlt((uint)Keys.C);
                     break;
                 }
 
                 if (y > 第一行物品底部y)
                 {
-                    KeyPressAlt((uint) Keys.B);
+                    KeyPressAlt((uint)Keys.B);
                     break;
                 }
 
-                KeyPressAlt((uint) Keys.X);
+                KeyPressAlt((uint)Keys.X);
                 break;
-            case "6":
+            case 6:
                 if (x < 1228)
                 {
                     if (y > 第一行物品底部y)
                     {
-                        KeyPressAlt((uint) Keys.V);
+                        KeyPressAlt((uint)Keys.V);
                         break;
                     }
 
-                    KeyPressAlt((uint) Keys.Z);
+                    KeyPressAlt((uint)Keys.Z);
                     break;
                 }
 
@@ -8902,26 +8947,26 @@ public partial class Form2 : Form
                 {
                     if (y > 第一行物品底部y)
                     {
-                        KeyPressAlt((uint) Keys.Space);
+                        KeyPressAlt((uint)Keys.Space);
                         break;
                     }
 
-                    KeyPressAlt((uint) Keys.C);
+                    KeyPressAlt((uint)Keys.C);
                     break;
                 }
 
                 if (y > 第一行物品底部y)
                 {
-                    KeyPressAlt((uint) Keys.B);
+                    KeyPressAlt((uint)Keys.B);
                     break;
                 }
 
-                KeyPressAlt((uint) Keys.X);
+                KeyPressAlt((uint)Keys.X);
                 break;
         }
     }
 
-    private static void 根据物品位置按键队列(Point p, string mode = "4")
+    private static void 根据物品位置按键队列(Point p, int mode = 4)
     {
         var x = p.X + 截图模式1X;
         var y = p.Y + 截图模式1Y;
@@ -8930,16 +8975,16 @@ public partial class Form2 : Form
 
         switch (mode)
         {
-            case "4":
+            case 4:
                 if (x < 1184)
                 {
                     if (y > 第一行物品底部y)
                     {
-                        KeyPressWhile((uint) Keys.V, (uint) Keys.LShiftKey);
+                        KeyPressWhile((uint)Keys.V, (uint)Keys.LShiftKey);
                         break;
                     }
 
-                    KeyPressWhile((uint) Keys.Z, (uint) Keys.LShiftKey);
+                    KeyPressWhile((uint)Keys.Z, (uint)Keys.LShiftKey);
                     break;
                 }
 
@@ -8947,32 +8992,32 @@ public partial class Form2 : Form
                 {
                     if (y > 第一行物品底部y)
                     {
-                        KeyPressWhile((uint) Keys.Space, (uint) Keys.LShiftKey);
+                        KeyPressWhile((uint)Keys.Space, (uint)Keys.LShiftKey);
                         break;
                     }
 
-                    KeyPressWhile((uint) Keys.C, (uint) Keys.LShiftKey);
+                    KeyPressWhile((uint)Keys.C, (uint)Keys.LShiftKey);
                     break;
                 }
 
                 if (y > 第一行物品底部y)
                 {
-                    KeyPressWhile((uint) Keys.B, (uint) Keys.LShiftKey);
+                    KeyPressWhile((uint)Keys.B, (uint)Keys.LShiftKey);
                     break;
                 }
 
-                KeyPressWhile((uint) Keys.X, (uint) Keys.LShiftKey);
+                KeyPressWhile((uint)Keys.X, (uint)Keys.LShiftKey);
                 break;
-            case "5":
+            case 5:
                 if (x < 1200)
                 {
                     if (y > 第一行物品底部y)
                     {
-                        KeyPressWhile((uint) Keys.V, (uint) Keys.LShiftKey);
+                        KeyPressWhile((uint)Keys.V, (uint)Keys.LShiftKey);
                         break;
                     }
 
-                    KeyPressWhile((uint) Keys.Z, (uint) Keys.LShiftKey);
+                    KeyPressWhile((uint)Keys.Z, (uint)Keys.LShiftKey);
                     break;
                 }
 
@@ -8980,32 +9025,32 @@ public partial class Form2 : Form
                 {
                     if (y > 第一行物品底部y)
                     {
-                        KeyPressWhile((uint) Keys.Space, (uint) Keys.LShiftKey);
+                        KeyPressWhile((uint)Keys.Space, (uint)Keys.LShiftKey);
                         break;
                     }
 
-                    KeyPressWhile((uint) Keys.C, (uint) Keys.LShiftKey);
+                    KeyPressWhile((uint)Keys.C, (uint)Keys.LShiftKey);
                     break;
                 }
 
                 if (y > 第一行物品底部y)
                 {
-                    KeyPressWhile((uint) Keys.B, (uint) Keys.LShiftKey);
+                    KeyPressWhile((uint)Keys.B, (uint)Keys.LShiftKey);
                     break;
                 }
 
-                KeyPressWhile((uint) Keys.X, (uint) Keys.LShiftKey);
+                KeyPressWhile((uint)Keys.X, (uint)Keys.LShiftKey);
                 break;
-            case "6":
+            case 6:
                 if (x < 1228)
                 {
                     if (y > 第一行物品底部y)
                     {
-                        KeyPressWhile((uint) Keys.V, (uint) Keys.LShiftKey);
+                        KeyPressWhile((uint)Keys.V, (uint)Keys.LShiftKey);
                         break;
                     }
 
-                    KeyPressWhile((uint) Keys.Z, (uint) Keys.LShiftKey);
+                    KeyPressWhile((uint)Keys.Z, (uint)Keys.LShiftKey);
                     break;
                 }
 
@@ -9013,21 +9058,21 @@ public partial class Form2 : Form
                 {
                     if (y > 第一行物品底部y)
                     {
-                        KeyPressWhile((uint) Keys.Space, (uint) Keys.LShiftKey);
+                        KeyPressWhile((uint)Keys.Space, (uint)Keys.LShiftKey);
                         break;
                     }
 
-                    KeyPressWhile((uint) Keys.C, (uint) Keys.LShiftKey);
+                    KeyPressWhile((uint)Keys.C, (uint)Keys.LShiftKey);
                     break;
                 }
 
                 if (y > 第一行物品底部y)
                 {
-                    KeyPressWhile((uint) Keys.B, (uint) Keys.LShiftKey);
+                    KeyPressWhile((uint)Keys.B, (uint)Keys.LShiftKey);
                     break;
                 }
 
-                KeyPressWhile((uint) Keys.X, (uint) Keys.LShiftKey);
+                KeyPressWhile((uint)Keys.X, (uint)Keys.LShiftKey);
                 break;
         }
     }
@@ -9625,11 +9670,11 @@ public partial class Form2 : Form
         try
         {
             var bts1 = GetBitmapByte(bp);
-            UIntPtr binr = (nuint) bts.Length;
-            UIntPtr binr1 = (nuint) bts1.Length;
-            var t = FindBytesR(bts, binr, Tuple.Create((uint) 截图模式1W, (uint) 截图模式1H), bts1, binr1,
-                Tuple.Create((uint) bp.Size.Width, (uint) bp.Size.Height), 0.8);
-            return new Point((int) t.Item1, (int) t.Item2);
+            UIntPtr binr = (nuint)bts.Length;
+            UIntPtr binr1 = (nuint)bts1.Length;
+            var t = FindBytesR(bts, binr, Tuple.Create((uint)截图模式1W, (uint)截图模式1H), bts1, binr1,
+                Tuple.Create((uint)bp.Size.Width, (uint)bp.Size.Height), 0.8);
+            return new Point((int)t.Item1, (int)t.Item2);
         }
         catch
         {
@@ -9880,12 +9925,12 @@ public partial class Form2 : Form
     private static void 快速发言(string str)
     {
         Clipboard.SetText(str);
-        KeyPress((uint) Keys.Enter);
-        KeyDown((uint) Keys.LControlKey);
-        KeyPress((uint) Keys.V);
-        KeyUp((uint) Keys.LControlKey);
+        KeyPress((uint)Keys.Enter);
+        KeyDown((uint)Keys.LControlKey);
+        KeyPress((uint)Keys.V);
+        KeyUp((uint)Keys.LControlKey);
         Delay(等待延迟);
-        KeyPress((uint) Keys.Enter);
+        KeyPress((uint)Keys.Enter);
         Delay(等待延迟);
     }
 
@@ -10505,7 +10550,7 @@ public partial class Form2 : Form
         //WinIO32.Initialize();
 
         // 初始化键盘鼠标模拟，仅模仿系统函数，winIo 和 WinRing0 需要额外的操作
-        i += KeyboardMouseSimulateDriverAPI.Initialize((uint) SimulateWays.Event);
+        i += KeyboardMouseSimulateDriverAPI.Initialize((uint)SimulateWays.Event);
 
         Delay(500);
 
@@ -10620,25 +10665,25 @@ public partial class Form2 : Form
     private static void RightClick()
     {
         //SimEnigo.Rightlick();
-        KeyboardMouseSimulateDriverAPI.MouseDown((uint) Dota2Simulator.MouseButtons.RightDown);
-        KeyboardMouseSimulateDriverAPI.MouseUp((uint) Dota2Simulator.MouseButtons.RightUp);
+        KeyboardMouseSimulateDriverAPI.MouseDown((uint)Dota2Simulator.MouseButtons.RightDown);
+        KeyboardMouseSimulateDriverAPI.MouseUp((uint)Dota2Simulator.MouseButtons.RightUp);
     }
 
     private static void LeftClick()
     {
         //SimEnigo.LeftClick();
-        KeyboardMouseSimulateDriverAPI.MouseDown((uint) Dota2Simulator.MouseButtons.LeftDown);
-        KeyboardMouseSimulateDriverAPI.MouseUp((uint) Dota2Simulator.MouseButtons.LeftUp);
+        KeyboardMouseSimulateDriverAPI.MouseDown((uint)Dota2Simulator.MouseButtons.LeftDown);
+        KeyboardMouseSimulateDriverAPI.MouseUp((uint)Dota2Simulator.MouseButtons.LeftUp);
     }
 
     private static void LeftDown()
     {
-        KeyboardMouseSimulateDriverAPI.MouseDown((uint) Dota2Simulator.MouseButtons.LeftDown);
+        KeyboardMouseSimulateDriverAPI.MouseDown((uint)Dota2Simulator.MouseButtons.LeftDown);
     }
 
     private static void LeftUp()
     {
-        KeyboardMouseSimulateDriverAPI.MouseDown((uint) Dota2Simulator.MouseButtons.LeftUp);
+        KeyboardMouseSimulateDriverAPI.MouseDown((uint)Dota2Simulator.MouseButtons.LeftUp);
     }
 
     //private new static void KeyUp(uint key)
@@ -10701,7 +10746,7 @@ public partial class Form2 : Form
 
     private static void ShiftKeyPress(uint key)
     {
-        SimEnigo.KeyPressWhile(key, (uint) Keys.LShiftKey);
+        SimEnigo.KeyPressWhile(key, (uint)Keys.LShiftKey);
     }
 
     private new static void MouseMove(int x, int y, bool relative = false)
