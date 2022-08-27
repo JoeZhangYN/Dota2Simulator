@@ -275,10 +275,6 @@ public partial class Form2 : Form
                     await 无物品状态初始化().ConfigureAwait(false);
                 }
 
-                if (!_是否a杖)
-                {
-                }
-
                 switch (e.KeyCode)
                 {
                     case Keys.F1:
@@ -558,10 +554,10 @@ public partial class Form2 : Form
                         KeyPress((uint)Keys.S);
                         var w4 = 获取w4开关颜色(_全局bts, _全局size);
                         var w5 = 获取w5开关颜色(_全局bts, _全局size);
-                        switch (_是否魔晶)
+                        switch (_技能数量)
                         {
-                            case true when !ColorAEqualColorB(w5, SimpleColor.FromRgb(0, 129, 0), 0):
-                            case false when !ColorAEqualColorB(w4, SimpleColor.FromRgb(0, 129, 0), 0):
+                            case 5 when !ColorAEqualColorB(w5, SimpleColor.FromRgb(0, 129, 0), 0):
+                            case 4 when !ColorAEqualColorB(w4, SimpleColor.FromRgb(0, 129, 0), 0):
                                 KeyPressWhile((uint)Keys.W, (uint)Keys.LShiftKey);
                                 break;
                         }
@@ -2932,10 +2928,10 @@ public partial class Form2 : Form
                         var d5 = 获取d5颜色(_全局bts, _全局size);
                         var e5 = 获取e5颜色(_全局bts, _全局size);
                         var e4 = 获取e4颜色(_全局bts, _全局size);
-                        switch (_是否魔晶)
+                        switch (_技能数量)
                         {
                             // RightClick();
-                            case true:
+                            case 5:
                                 if (ColorAEqualColorB(d5, SimpleColor.FromRgb(9, 38, 81), 0))
                                     KeyPress((uint)Keys.D);
                                 else if (ColorAEqualColorB(e5, SimpleColor.FromRgb(79, 36, 7), 0))
@@ -2993,7 +2989,7 @@ public partial class Form2 : Form
                         _条件2 = true;
                         break;
                     case Keys.D:
-                        if (_是否魔晶) 根据图片以及类别自我使用物品(物品_暗影护符, _全局bts, _全局size, _技能数量);
+                        if (_技能数量 == 5) 根据图片以及类别自我使用物品(物品_暗影护符, _全局bts, _全局size, _技能数量);
                         break;
                     case Keys.R:
                         switch (_全局模式r)
@@ -3899,13 +3895,18 @@ public partial class Form2 : Form
         var e4 = 获取e4左下角颜色(bts, size);
         var e5 = 获取e5左下角颜色(bts, size);
 
-        if (_是否a杖)
+        switch (_技能数量)
         {
-            if (ColorAEqualColorB(e5, SimpleColor.FromRgb(45, 52, 59), 0)) return await FromResult(true);
-        }
-        else
-        {
-            if (ColorAEqualColorB(e4, SimpleColor.FromRgb(65, 74, 81), 0)) return await FromResult(true);
+            case 5:
+            {
+                if (ColorAEqualColorB(e5, SimpleColor.FromRgb(45, 52, 59), 0)) return await FromResult(true);
+                break;
+            }
+            case 4:
+            {
+                if (ColorAEqualColorB(e4, SimpleColor.FromRgb(65, 74, 81), 0)) return await FromResult(true);
+                break;
+            }
         }
 
         摔角行家后().Start();
@@ -4025,7 +4026,7 @@ public partial class Form2 : Form
 
         switch (_循环条件1)
         {
-            case true when _是否魔晶:
+            case true when _技能数量 == 5:
             {
                 if (
                     ColorAEqualColorB(w5, SimpleColor.FromRgb(45, 52, 59), 0)
@@ -4053,21 +4054,26 @@ public partial class Form2 : Form
         {
             case true when _循环条件2:
             {
-                if (_是否魔晶)
+                switch (_技能数量)
                 {
-                    if (
-                        ColorAEqualColorB(q5, SimpleColor.FromRgb(45, 52, 59), 0)
-                        &
-                        !ColorAEqualColorB(q5, SimpleColor.FromRgb(25, 29, 32), 0))
-                        await 鼻涕(bts, size);
-                }
-                else
-                {
-                    if (
-                        ColorAEqualColorB(q4, SimpleColor.FromRgb(65, 74, 81), 0)
-                        &
-                        !ColorAEqualColorB(q4, SimpleColor.FromRgb(14, 18, 20), 0))
-                        await 鼻涕(bts, size);
+                    case 5:
+                    {
+                        if (
+                            ColorAEqualColorB(q5, SimpleColor.FromRgb(45, 52, 59), 0)
+                            &
+                            !ColorAEqualColorB(q5, SimpleColor.FromRgb(25, 29, 32), 0))
+                            await 鼻涕(bts, size);
+                        break;
+                    }
+                    default:
+                    {
+                        if (
+                            ColorAEqualColorB(q4, SimpleColor.FromRgb(65, 74, 81), 0)
+                            &
+                            !ColorAEqualColorB(q4, SimpleColor.FromRgb(14, 18, 20), 0))
+                            await 鼻涕(bts, size);
+                        break;
+                    }
                 }
 
                 break;
@@ -4132,10 +4138,10 @@ public partial class Form2 : Form
             _全局时间q = -1;
             //RightClick();
             KeyPress((uint)Keys.S);
-            switch (_是否魔晶)
+            switch (_技能数量)
             {
-                case true when !ColorAEqualColorB(w5, SimpleColor.FromRgb(0, 129, 0), 0):
-                case false when !ColorAEqualColorB(w4, SimpleColor.FromRgb(0, 129, 0), 0):
+                case 5 when !ColorAEqualColorB(w5, SimpleColor.FromRgb(0, 129, 0), 0):
+                case 4 when !ColorAEqualColorB(w4, SimpleColor.FromRgb(0, 129, 0), 0):
                     KeyPressWhile((uint)Keys.W, (uint)Keys.LShiftKey);
                     break;
             }
@@ -4146,20 +4152,22 @@ public partial class Form2 : Form
             KeyPressWhile((uint)Keys.R, (uint)Keys.LShiftKey);
         }
 
-        switch (_是否魔晶)
+        switch (_技能数量)
         {
-            case true when ColorAEqualColorB(q5, SimpleColor.FromRgb(45, 52, 59), 0):
+            case 5 when ColorAEqualColorB(q5, SimpleColor.FromRgb(45, 52, 59), 0):
                 return await FromResult(true);
-            case true:
+            case 5:
                 钩子后(w4, w5);
                 return await FromResult(false);
 
-            case false when ColorAEqualColorB(q4, SimpleColor.FromRgb(65, 74, 81), 0):
+            case 4 when ColorAEqualColorB(q4, SimpleColor.FromRgb(65, 74, 81), 0):
                 return await FromResult(true);
-            case false:
+            case 4:
                 钩子后(w4, w5);
                 return await FromResult(false);
         }
+
+        return await FromResult(true);
     }
 
     #endregion
@@ -4289,9 +4297,9 @@ public partial class Form2 : Form
         var q4 = 获取q4左下角颜色(bts, size);
         var q5 = 获取q5左下角颜色(bts, size);
 
-        switch (_是否a杖)
+        switch (_技能数量)
         {
-            case true:
+            case 5:
                 if (ColorAEqualColorB(q5, SimpleColor.FromRgb(65, 74, 81), 0)) return await FromResult(true);
                 break;
             default:
@@ -4322,9 +4330,9 @@ public partial class Form2 : Form
         var w4 = 获取w4左下角颜色(bts, size);
         var w5 = 获取w5左下角颜色(bts, size);
 
-        switch (_是否a杖)
+        switch (_技能数量)
         {
-            case true:
+            case 5:
                 if (ColorAEqualColorB(w5, SimpleColor.FromRgb(65, 74, 81), 0)) return await FromResult(true);
                 break;
             default:
@@ -4710,20 +4718,22 @@ public partial class Form2 : Form
         var q4 = 获取q4左下角颜色(bts, size);
         var q5 = 获取q5左下角颜色(bts, size);
 
-        switch (_是否魔晶)
+        switch (_技能数量)
         {
-            case true when ColorAEqualColorB(q5, SimpleColor.FromRgb(45, 52, 59), 0):
+            case 5 when ColorAEqualColorB(q5, SimpleColor.FromRgb(45, 52, 59), 0):
                 return await FromResult(true);
-            case true:
+            case 5:
                 黑暗契约后();
                 return await FromResult(false);
 
-            case false when ColorAEqualColorB(q4, SimpleColor.FromRgb(65, 74, 81), 0):
+            case 4 when ColorAEqualColorB(q4, SimpleColor.FromRgb(65, 74, 81), 0):
                 return await FromResult(true);
-            case false:
+            case 4:
                 黑暗契约后();
                 return await FromResult(false);
         }
+
+        return await FromResult(true);
     }
 
     private static async Task<bool> 跳水a(byte[] bts, Size size)
@@ -4752,11 +4762,11 @@ public partial class Form2 : Form
 
         var d5 = 获取d5左下角颜色(bts, size);
 
-        switch (_是否魔晶)
+        switch (_技能数量)
         {
-            case true when ColorAEqualColorB(d5, SimpleColor.FromRgb(45, 52, 59), 0): // 一般技能原色颜色
+            case 5 when ColorAEqualColorB(d5, SimpleColor.FromRgb(45, 52, 59), 0): // 一般技能原色颜色
                 return await FromResult(true);
-            case true:
+            case 5:
                 深海护罩后();
                 return await FromResult(false);
         }
@@ -4788,20 +4798,22 @@ public partial class Form2 : Form
         var w4 = 获取w4左下角颜色(bts, size);
         var w5 = 获取w5左下角颜色(bts, size);
 
-        switch (_是否a杖)
+        switch (_技能数量)
         {
-            case true when ColorAEqualColorB(w5, SimpleColor.FromRgb(45, 52, 59), 0):
+            case 5 when ColorAEqualColorB(w5, SimpleColor.FromRgb(45, 52, 59), 0):
                 return await FromResult(true);
-            case true:
+            case 5:
                 闪烁后();
                 return await FromResult(false);
 
-            case false when ColorAEqualColorB(w4, SimpleColor.FromRgb(65, 74, 81), 0):
+            case 4 when ColorAEqualColorB(w4, SimpleColor.FromRgb(65, 74, 81), 0):
                 return await FromResult(true);
-            case false:
+            case 4:
                 闪烁后();
                 return await FromResult(false);
         }
+
+        return await FromResult(true);
     }
 
     private static async Task<bool> 法力虚空取消后摇(byte[] bts, Size size)
@@ -4824,23 +4836,25 @@ public partial class Form2 : Form
         var r4 = 获取r4左下角颜色(bts, size);
         var r5 = 获取r5左下角颜色(bts, size);
 
-        switch (_是否a杖)
+        switch (_技能数量)
         {
-            case true when ColorAEqualColorB(r5, SimpleColor.FromRgb(45, 52, 59), 0):
+            case 5 when ColorAEqualColorB(r5, SimpleColor.FromRgb(45, 52, 59), 0):
                 return await FromResult(true);
-            case true:
+            case 5:
             {
                 法力虚空后();
                 return await FromResult(false);
             }
-            case false when ColorAEqualColorB(r4, SimpleColor.FromRgb(65, 74, 81), 0):
+            case 4 when ColorAEqualColorB(r4, SimpleColor.FromRgb(65, 74, 81), 0):
                 return await FromResult(true);
-            case false:
+            case 4:
             {
                 法力虚空后();
                 return await FromResult(false);
             }
         }
+
+        return await FromResult(true);
     }
 
     #endregion
@@ -4947,9 +4961,9 @@ public partial class Form2 : Form
         var q4 = 获取q4左下角颜色(bts, size);
         var q5 = 获取q5左下角颜色(bts, size);
 
-        switch (_是否魔晶)
+        switch (_技能数量)
         {
-            case true:
+            case 5:
             {
                 if (!ColorAEqualColorB(q5, SimpleColor.FromRgb(45, 52, 59), 0))
                 {
@@ -4992,10 +5006,10 @@ public partial class Form2 : Form
             return await FromResult(false);
         }
 
-        switch (_是否魔晶)
+        switch (_技能数量)
         {
-            case true:
-            {
+            case 5:
+                {
                 if (!ColorAEqualColorB(w5, SimpleColor.FromRgb(45, 52, 59), 0))
                 {
                     幻影突袭后();
@@ -5038,10 +5052,10 @@ public partial class Form2 : Form
             return await FromResult(false);
         }
 
-        switch (_是否魔晶)
+        switch (_技能数量)
         {
-            case true:
-            {
+            case 5:
+                {
                 if (!ColorAEqualColorB(e5, SimpleColor.FromRgb(45, 52, 59), 0))
                 {
                     魅影无形后();
@@ -5083,10 +5097,10 @@ public partial class Form2 : Form
             return await FromResult(false);
         }
 
-        switch (_是否魔晶)
+        switch (_技能数量)
         {
-            case true:
-            {
+            case 5:
+                {
                 if (!ColorAEqualColorB(d5, SimpleColor.FromRgb(45, 52, 59), 0))
                 {
                     刀阵旋风后();
@@ -5124,10 +5138,10 @@ public partial class Form2 : Form
         var q4 = 获取q4左下角颜色(bts, size);
         var q5 = 获取q5左下角颜色(bts, size);
 
-        switch (_是否魔晶)
+        switch (_技能数量)
         {
-            case true:
-            {
+            case 5:
+                {
                 if (
                     !ColorAEqualColorB(q5, SimpleColor.FromRgb(45, 52, 59), 0)
                 )
@@ -5175,10 +5189,10 @@ public partial class Form2 : Form
         var w4 = 获取w4左下角颜色(bts, size);
         var w5 = 获取w5左下角颜色(bts, size);
 
-        switch (_是否魔晶)
+        switch (_技能数量)
         {
-            case true:
-            {
+            case 5:
+                {
                 if (
                     !ColorAEqualColorB(w5, SimpleColor.FromRgb(45, 52, 59), 0)
                 )
@@ -5226,10 +5240,10 @@ public partial class Form2 : Form
         var r4 = 获取r4左下角颜色(bts, size);
         var r5 = 获取r5左下角颜色(bts, size);
 
-        switch (_是否魔晶)
+        switch (_技能数量)
         {
-            case true:
-            {
+            case 5:
+                {
                 if (
                     !ColorAEqualColorB(r5, SimpleColor.FromRgb(45, 52, 59), 0)
                 )
@@ -5282,14 +5296,11 @@ public partial class Form2 : Form
         var q5 = 获取q5左下角颜色(bts, size);
         var q6 = 获取q6左下角颜色(bts, size);
 
-        switch (_是否魔晶 || _是否a杖)
+        switch (_技能数量)
         {
-            case true:
+            case 6:
             {
-                if (
-                    !ColorAEqualColorB(q5, SimpleColor.FromRgb(45, 52, 59), 0)
-                    && !ColorAEqualColorB(q6, SimpleColor.FromRgb(45, 52, 59), 0)
-                )
+                if (!ColorAEqualColorB(q6, SimpleColor.FromRgb(45, 52, 59), 0))
                 {
                     倒影后();
                     return await FromResult(false);
@@ -5297,16 +5308,23 @@ public partial class Form2 : Form
 
                 break;
             }
-            default:
+            case 5:
             {
-                if (
-                    !ColorAEqualColorB(q4, SimpleColor.FromRgb(65, 74, 81), 0)
-                )
+                if (!ColorAEqualColorB(q5, SimpleColor.FromRgb(45, 52, 59), 0))
                 {
                     倒影后();
                     return await FromResult(false);
                 }
 
+                break;
+            }
+            case 4:
+            {
+                if (!ColorAEqualColorB(q4, SimpleColor.FromRgb(65, 74, 81), 0))
+                {
+                    倒影后();
+                    return await FromResult(false);
+            }
                 break;
             }
         }
@@ -5335,14 +5353,11 @@ public partial class Form2 : Form
         var w5 = 获取w5左下角颜色(bts, size);
         var w6 = 获取w6左下角颜色(bts, size);
 
-        switch (_是否魔晶 || _是否a杖)
+        switch (_技能数量)
         {
-            case true:
+            case 6:
             {
-                if (
-                    !ColorAEqualColorB(w5, SimpleColor.FromRgb(45, 52, 59), 0)
-                    && !ColorAEqualColorB(w6, SimpleColor.FromRgb(45, 52, 59), 0)
-                )
+                if (!ColorAEqualColorB(w6, SimpleColor.FromRgb(45, 52, 59), 0))
                 {
                     幻惑后();
                     return await FromResult(false);
@@ -5350,16 +5365,23 @@ public partial class Form2 : Form
 
                 break;
             }
-            default:
+            case 5:
             {
-                if (
-                    !ColorAEqualColorB(w4, SimpleColor.FromRgb(65, 74, 81), 0)
-                )
+                if (!ColorAEqualColorB(w5, SimpleColor.FromRgb(45, 52, 59), 0))
                 {
                     幻惑后();
                     return await FromResult(false);
                 }
 
+                break;
+            }
+            case 4:
+            {
+                if (!ColorAEqualColorB(w4, SimpleColor.FromRgb(65, 74, 81), 0))
+                {
+                    幻惑后();
+                    return await FromResult(false);
+                }
                 break;
             }
         }
@@ -5388,14 +5410,11 @@ public partial class Form2 : Form
         var e5 = 获取e5左下角颜色(bts, size);
         var e6 = 获取e6左下角颜色(bts, size);
 
-        switch (_是否魔晶 || _是否a杖)
+        switch (_技能数量)
         {
-            case true:
+            case 6:
             {
-                if (
-                    !ColorAEqualColorB(e5, SimpleColor.FromRgb(45, 52, 59), 0)
-                    && !ColorAEqualColorB(e6, SimpleColor.FromRgb(45, 52, 59), 0)
-                )
+                if (!ColorAEqualColorB(e6, SimpleColor.FromRgb(45, 52, 59), 0))
                 {
                     魔化后();
                     return await FromResult(false);
@@ -5403,16 +5422,23 @@ public partial class Form2 : Form
 
                 break;
             }
-            default:
+            case 5:
             {
-                if (
-                    !ColorAEqualColorB(e4, SimpleColor.FromRgb(65, 74, 81), 0)
-                )
+                if (!ColorAEqualColorB(e5, SimpleColor.FromRgb(45, 52, 59), 0))
                 {
                     魔化后();
                     return await FromResult(false);
                 }
 
+                break;
+            }
+            case 4:
+            {
+                if (!ColorAEqualColorB(e4, SimpleColor.FromRgb(65, 74, 81), 0))
+                {
+                    魔化后();
+                    return await FromResult(false);
+                }
                 break;
             }
         }
@@ -5438,15 +5464,24 @@ public partial class Form2 : Form
 
         var d5 = 获取d5左下角颜色(bts, size);
         var d6 = 获取d6左下角颜色(bts, size);
+        
+        if (!_是否魔晶) return await FromResult(false);
 
-        switch (_是否魔晶)
+        switch (_技能数量)
         {
-            case true:
+            case 6:
             {
-                if (
-                    !ColorAEqualColorB(d5, SimpleColor.FromRgb(45, 52, 59), 0)
-                    && !ColorAEqualColorB(d6, SimpleColor.FromRgb(45, 52, 59), 0)
-                )
+                if (!ColorAEqualColorB(d6, SimpleColor.FromRgb(45, 52, 59), 0))
+                {
+                    恶魔狂热后();
+                    return await FromResult(false);
+                }
+
+                break;
+            }
+            case 5:
+            {
+                if (!ColorAEqualColorB(d5, SimpleColor.FromRgb(45, 52, 59), 0))
                 {
                     恶魔狂热后();
                     return await FromResult(false);
@@ -5479,14 +5514,23 @@ public partial class Form2 : Form
         var d5 = 获取d5左下角颜色(bts, size);
         var f6 = 获取f6左下角颜色(bts, size);
 
-        switch (_是否a杖)
+        if (!_是否a杖) return await FromResult(false);
+
+        switch (_技能数量)
         {
-            case true:
+            case 6:
             {
-                if (
-                    !ColorAEqualColorB(d5, SimpleColor.FromRgb(45, 52, 59), 0)
-                    && !ColorAEqualColorB(f6, SimpleColor.FromRgb(45, 52, 59), 0)
-                )
+                if (!ColorAEqualColorB(f6, SimpleColor.FromRgb(45, 52, 59), 0))
+                {
+                    恐怖心潮后();
+                    return await FromResult(false);
+                }
+
+                break;
+            }
+            case 5:
+            {
+                if (!ColorAEqualColorB(d5, SimpleColor.FromRgb(45, 52, 59), 0))
                 {
                     恐怖心潮后();
                     return await FromResult(false);
@@ -5520,14 +5564,11 @@ public partial class Form2 : Form
         var r5 = 获取r5左下角颜色(bts, size);
         var r6 = 获取r6左下角颜色(bts, size);
 
-        switch (_是否魔晶 || _是否a杖)
+        switch (_技能数量)
         {
-            case true:
+            case 6:
             {
-                if (
-                    !ColorAEqualColorB(r5, SimpleColor.FromRgb(45, 52, 59), 0)
-                    && !ColorAEqualColorB(r6, SimpleColor.FromRgb(45, 52, 59), 0)
-                )
+                if (!ColorAEqualColorB(r6, SimpleColor.FromRgb(45, 52, 59), 0))
                 {
                     魂断后();
                     return await FromResult(false);
@@ -5535,16 +5576,23 @@ public partial class Form2 : Form
 
                 break;
             }
-            default:
+            case 5:
             {
-                if (
-                    !ColorAEqualColorB(r4, SimpleColor.FromRgb(65, 74, 81), 0)
-                )
+                if (!ColorAEqualColorB(r5, SimpleColor.FromRgb(45, 52, 59), 0))
                 {
                     魂断后();
                     return await FromResult(false);
                 }
 
+                break;
+            }
+            case 4:
+            {
+                if (!ColorAEqualColorB(r4, SimpleColor.FromRgb(65, 74, 81), 0))
+                {
+                    魂断后();
+                    return await FromResult(false);
+                }
                 break;
             }
         }
@@ -5699,10 +5747,10 @@ public partial class Form2 : Form
         var w4 = 获取w4左下角颜色(bts, size);
         var w5 = 获取w5左下角颜色(bts, size);
 
-        switch (_是否魔晶)
+        switch (_技能数量)
         {
-            case true:
-            {
+            case 5:
+                {
                 if (
                     !ColorAEqualColorB(w5, SimpleColor.FromRgb(45, 52, 59), 0)
                 )
@@ -5755,10 +5803,10 @@ public partial class Form2 : Form
         var r4 = 获取r4左下角颜色(bts, size);
         var r5 = 获取r5左下角颜色(bts, size);
 
-        switch (_是否魔晶)
+        switch (_技能数量)
         {
-            case true:
-            {
+            case 5:
+                {
                 if (
                     !ColorAEqualColorB(r5, SimpleColor.FromRgb(45, 52, 59), 0)
                 )
@@ -5896,10 +5944,10 @@ public partial class Form2 : Form
         var q4 = 获取q4颜色(bts, size);
         var q5 = 获取q5颜色(bts, size);
 
-        switch (_是否魔晶)
+        switch (_技能数量)
         {
-            case true:
-            {
+            case 5:
+                {
                 if (
                     ColorAEqualColorB(q5, SimpleColor.FromRgb(94, 154, 25), 0)
                 )
@@ -5948,10 +5996,10 @@ public partial class Form2 : Form
         var e4 = 获取e4左下角颜色(bts, size);
         var e5 = 获取e5左下角颜色(bts, size);
 
-        switch (_是否魔晶)
+        switch (_技能数量)
         {
-            case true:
-            {
+            case 5:
+                {
                 if (
                     !ColorAEqualColorB(e5, SimpleColor.FromRgb(45, 52, 59), 0)
                 )
@@ -5999,10 +6047,10 @@ public partial class Form2 : Form
         var r4 = 获取r4左下角颜色(bts, size);
         var r5 = 获取r5左下角颜色(bts, size);
 
-        switch (_是否魔晶)
+        switch (_技能数量)
         {
-            case true:
-            {
+            case 5:
+                {
                 if (
                     !ColorAEqualColorB(r5, SimpleColor.FromRgb(45, 52, 59), 0)
                 )
@@ -6049,10 +6097,10 @@ public partial class Form2 : Form
 
         var d5 = 获取d5左下角颜色(bts, size);
 
-        switch (_是否魔晶)
+        switch (_技能数量)
         {
-            case true:
-            {
+            case 5:
+                {
                 if (
                     !ColorAEqualColorB(d5, SimpleColor.FromRgb(45, 52, 59), 0)
                 )
@@ -6307,28 +6355,31 @@ public partial class Form2 : Form
         var q5 = 获取q5左下角颜色(bts, size);
         var q6 = 获取q6左下角颜色(bts, size);
 
-        switch (_是否魔晶)
+        switch (_技能数量)
         {
-            case true when _是否a杖:
+            case 6:
             {
                 if (ColorAEqualColorB(q6, SimpleColor.FromRgb(45, 52, 59), 0)) return await FromResult(true);
                 弧形闪电后().Start();
                 return await FromResult(false);
             }
-            default:
+            case 5:
             {
-                if (_是否魔晶 || _是否a杖)
-                {
-                    if (ColorAEqualColorB(q5, SimpleColor.FromRgb(45, 52, 59), 0)) return await FromResult(true);
-                    弧形闪电后().Start();
-                    return await FromResult(false);
-                }
 
-                if (ColorAEqualColorB(q4, SimpleColor.FromRgb(65, 74, 81), 0)) return await FromResult(true);
+                if (ColorAEqualColorB(q5, SimpleColor.FromRgb(45, 52, 59), 0)) return await FromResult(true);
                 弧形闪电后().Start();
                 return await FromResult(false);
             }
+            case 4:
+            {
+                if (ColorAEqualColorB(q4, SimpleColor.FromRgb(65, 74, 81), 0)) return await FromResult(true);
+                弧形闪电后().Start();
+                return await FromResult(false);
+
+            }
         }
+
+        return await FromResult(true);
     }
 
     private static async Task<bool> 弧形闪电不能释放(byte[] bts, Size size)
@@ -6345,47 +6396,56 @@ public partial class Form2 : Form
         var q5 = 获取q5左下角颜色(bts, size);
         var q6 = 获取q6左下角颜色(bts, size);
 
-        if (_是否魔晶 && _是否a杖)
+        switch (_技能数量)
         {
-            if (!ColorAEqualColorB(q6, SimpleColor.FromRgb(45, 52, 59), 0)) return await FromResult(true);
-
-            switch (_全局模式q)
+            case 6:
             {
-                case 0:
-                    return await FromResult(false);
-                case 1:
-                    _全局模式q = 0;
-                    await Run(() => { KeyPress((uint)Keys.Q); });
-                    return await FromResult(false);
-            }
-        }
-        else if (_是否魔晶 || _是否a杖)
-        {
-            if (!ColorAEqualColorB(q5, SimpleColor.FromRgb(45, 52, 59), 0)) return await FromResult(true);
+                if (!ColorAEqualColorB(q6, SimpleColor.FromRgb(45, 52, 59), 0)) return await FromResult(true);
 
-            switch (_全局模式q)
-            {
-                case 0:
-                    return await FromResult(false);
-                case 1:
-                    _全局模式q = 0;
-                    await Run(() => { KeyPress((uint)Keys.Q); });
-                    return await FromResult(false);
+                switch (_全局模式q)
+                {
+                    case 0:
+                        return await FromResult(false);
+                    case 1:
+                        _全局模式q = 0;
+                        await Run(() => { KeyPress((uint)Keys.Q); });
+                        return await FromResult(false);
+                }
+                break;
             }
-        }
-        else
-        {
-            if (!ColorAEqualColorB(q4, SimpleColor.FromRgb(65, 74, 81), 0)) return await FromResult(true);
+            case 5:
+            {
 
-            switch (_全局模式q)
-            {
-                case 0:
-                    return await FromResult(false);
-                case 1:
-                    _全局模式q = 0;
-                    await Run(() => { KeyPress((uint)Keys.Q); });
-                    return await FromResult(false);
+                if (!ColorAEqualColorB(q5, SimpleColor.FromRgb(45, 52, 59), 0)) return await FromResult(true);
+
+                switch (_全局模式q)
+                {
+                    case 0:
+                        return await FromResult(false);
+                    case 1:
+                        _全局模式q = 0;
+                        await Run(() => { KeyPress((uint)Keys.Q); });
+                        return await FromResult(false);
+                }
+                break;
             }
+            case 4:
+            {
+                if (!ColorAEqualColorB(q4, SimpleColor.FromRgb(65, 74, 81), 0)) return await FromResult(true);
+
+                switch (_全局模式q)
+                {
+                    case 0:
+                        return await FromResult(false);
+                    case 1:
+                        _全局模式q = 0;
+                        await Run(() => { KeyPress((uint)Keys.Q); });
+                        return await FromResult(false);
+                }
+
+                break;
+            }
+
         }
 
         return await FromResult(true);
@@ -6413,26 +6473,32 @@ public partial class Form2 : Form
         var w5 = 获取w5左下角颜色(bts, size);
         var w6 = 获取w6左下角颜色(bts, size);
 
-        if (_是否魔晶 && _是否a杖)
-        {
-            if (ColorAEqualColorB(w6, SimpleColor.FromRgb(45, 52, 59), 0)) return await FromResult(true);
 
-            雷击后().Start();
-            return await FromResult(false);
+        switch (_技能数量)
+        {
+            case 6:
+            {
+                if (ColorAEqualColorB(w6, SimpleColor.FromRgb(45, 52, 59), 0)) return await FromResult(true);
+                雷击后().Start();
+                return await FromResult(false);
+            }
+            case 5:
+            {
+
+                if (ColorAEqualColorB(w5, SimpleColor.FromRgb(45, 52, 59), 0)) return await FromResult(true);
+                雷击后().Start();
+                return await FromResult(false);
+            }
+            case 4:
+            {
+                if (ColorAEqualColorB(w4, SimpleColor.FromRgb(65, 74, 81), 0)) return await FromResult(true);
+                雷击后().Start();
+                return await FromResult(false);
+
+            }
         }
 
-        if (_是否魔晶 || _是否a杖)
-        {
-            if (ColorAEqualColorB(w5, SimpleColor.FromRgb(45, 52, 59), 0)) return await FromResult(true);
-
-            雷击后().Start();
-            return await FromResult(false);
-        }
-
-
-        if (ColorAEqualColorB(w4, SimpleColor.FromRgb(65, 74, 81), 0)) return await FromResult(true);
-        雷击后().Start();
-        return await FromResult(false);
+        return await FromResult(true);
     }
 
     private static async Task<bool> 神圣一跳去后摇(byte[] bts, Size size)
@@ -6457,26 +6523,31 @@ public partial class Form2 : Form
         var e5 = 获取e5左下角颜色(bts, size);
         var e6 = 获取e6左下角颜色(bts, size);
 
-        if (_是否魔晶 && _是否a杖)
+        switch (_技能数量)
         {
-            if (ColorAEqualColorB(e6, SimpleColor.FromRgb(45, 52, 59), 0)) return await FromResult(true);
+            case 6:
+            {
+                if (ColorAEqualColorB(e6, SimpleColor.FromRgb(45, 52, 59), 0)) return await FromResult(true);
+                神圣一跳后().Start();
+                return await FromResult(false);
+            }
+            case 5:
+            {
 
-            神圣一跳后().Start();
-            return await FromResult(false);
+                if (ColorAEqualColorB(e5, SimpleColor.FromRgb(45, 52, 59), 0)) return await FromResult(true);
+                神圣一跳后().Start();
+                return await FromResult(false);
+            }
+            case 4:
+            {
+                if (ColorAEqualColorB(e4, SimpleColor.FromRgb(65, 74, 81), 0)) return await FromResult(true);
+                神圣一跳后().Start();
+                return await FromResult(false);
+
+            }
         }
 
-        if (_是否魔晶 || _是否a杖)
-        {
-            if (ColorAEqualColorB(e5, SimpleColor.FromRgb(45, 52, 59), 0)) return await FromResult(true);
-
-            神圣一跳后().Start();
-            return await FromResult(false);
-        }
-
-
-        if (ColorAEqualColorB(e4, SimpleColor.FromRgb(65, 74, 81), 0)) return await FromResult(true);
-        神圣一跳后().Start();
-        return await FromResult(false);
+        return await FromResult(true);
     }
 
     #endregion
@@ -6812,16 +6883,21 @@ public partial class Form2 : Form
         var q4 = 获取q4左下角颜色(bts, size);
         var q5 = 获取q5左下角颜色(bts, size);
 
-        if (_是否魔晶)
+        switch (_技能数量)
         {
-            if (!ColorAEqualColorB(q5, SimpleColor.FromRgb(45, 52, 59), 0))
+            case 5 when !ColorAEqualColorB(q5, SimpleColor.FromRgb(45, 52, 59), 0):
                 return _循环条件1 ? await FromResult(true) : await FromResult(false);
-            释放奥数鹰隼();
+            case 5:
+                释放奥数鹰隼();
+                break;
+            default:
+            {
+                if (!ColorAEqualColorB(q4, SimpleColor.FromRgb(65, 74, 81), 0))
+                    return _循环条件1 ? await FromResult(true) : await FromResult(false);
+                释放奥数鹰隼();
+                break;
+            }
         }
-
-        if (!ColorAEqualColorB(q4, SimpleColor.FromRgb(65, 74, 81), 0))
-            return _循环条件1 ? await FromResult(true) : await FromResult(false);
-        释放奥数鹰隼();
 
         return _循环条件1 ? await FromResult(true) : await FromResult(false);
     }
@@ -6841,9 +6917,9 @@ public partial class Form2 : Form
         {
             case < 1:
             {
-                switch (_是否魔晶)
+                switch (_技能数量)
                 {
-                    case true:
+                    case 5:
                     {
                         if (ColorAEqualColorB(w5, SimpleColor.FromRgb(45, 52, 59), 0))
                         {
@@ -6977,9 +7053,9 @@ public partial class Form2 : Form
 
             case < 9:
             {
-                switch (_是否魔晶)
+                switch (_技能数量)
                 {
-                    case true:
+                    case 5:
                     {
                         if (ColorAEqualColorB(q5, SimpleColor.FromRgb(45, 52, 59), 0))
                         {
@@ -7014,11 +7090,11 @@ public partial class Form2 : Form
 
             case < 10:
             {
-                switch (_是否魔晶)
+                switch (_技能数量)
                 {
-                    case true:
+                    case 5:
                     {
-                        if (ColorAEqualColorB(e5, SimpleColor.FromRgb(45, 52, 59), 0))
+                                if (ColorAEqualColorB(e5, SimpleColor.FromRgb(45, 52, 59), 0))
                         {
                             KeyPress((uint)Keys.E);
                             Delay(等待延迟);
@@ -7052,11 +7128,11 @@ public partial class Form2 : Form
 
             case < 11:
             {
-                switch (_是否魔晶)
+                switch (_技能数量)
                 {
-                    case true:
+                    case 5:
                     {
-                        if (ColorAEqualColorB(r5, SimpleColor.FromRgb(45, 52, 59), 0))
+                                if (ColorAEqualColorB(r5, SimpleColor.FromRgb(45, 52, 59), 0))
                         {
                             KeyPress((uint)Keys.R);
                             Delay(等待延迟);
@@ -7113,20 +7189,23 @@ public partial class Form2 : Form
         var q4 = 获取q4左下角颜色(bts, size);
         var q5 = 获取q5左下角颜色(bts, size);
 
-        switch (_是否魔晶)
+
+        switch (_技能数量)
         {
-            case true when ColorAEqualColorB(q5, SimpleColor.FromRgb(45, 52, 59), 0):
+            case 5 when ColorAEqualColorB(q5, SimpleColor.FromRgb(45, 52, 59), 0):
                 return await FromResult(true);
-            case true:
+            case 5:
                 奥数鹰隼后();
                 return await FromResult(false);
 
-            case false when ColorAEqualColorB(q4, SimpleColor.FromRgb(65, 74, 81), 0):
+            case 4 when ColorAEqualColorB(q4, SimpleColor.FromRgb(65, 74, 81), 0):
                 return await FromResult(true);
-            case false:
+            case 4:
                 奥数鹰隼后();
                 return await FromResult(false);
         }
+
+        return await FromResult(true);
     }
 
     #endregion
@@ -7280,52 +7359,60 @@ public partial class Form2 : Form
 
     private static async Task<bool> 命运敕令去后摇(byte[] bts, Size size)
     {
-        static void 命运敕令后()
+        static async Task 命运敕令后()
         {
-            RightClick();
+            await Run(() => { RightClick(); });
+            
             // KeyPress((uint)Keys.A);
         }
 
         var w4 = 获取w4左下角颜色(bts, size);
         var w5 = 获取w5左下角颜色(bts, size);
 
-        if (_是否a杖)
+        switch (_技能数量)
         {
-            if (ColorAEqualColorB(w5, SimpleColor.FromRgb(45, 52, 59), 0)) return await FromResult(true);
-
-            命运敕令后();
-            return await FromResult(false);
+            case 5 when ColorAEqualColorB(w5, SimpleColor.FromRgb(45, 52, 59), 0):
+                return await FromResult(true);
+            case 5:
+                命运敕令后().Start();
+                return await FromResult(false);
+            case 4 when ColorAEqualColorB(w4, SimpleColor.FromRgb(65, 74, 81), 0):
+                return await FromResult(true);
+            case 4:
+                命运敕令后().Start();
+                return await FromResult(false);
         }
 
-        if (ColorAEqualColorB(w4, SimpleColor.FromRgb(65, 74, 81), 0)) return await FromResult(true);
-
-        命运敕令后();
-        return await FromResult(false);
+        return await FromResult(true);
     }
 
     private static async Task<bool> 涤罪之焰去后摇(byte[] bts, Size size)
     {
-        static void 涤罪之焰后()
+        static async Task 涤罪之焰后()
         {
+            await Run(() => { KeyPress((uint)Keys.A); });
             // RightClick();
-            KeyPress((uint)Keys.A);
         }
 
         var e4 = 获取e4左下角颜色(bts, size);
         var e5 = 获取e5左下角颜色(bts, size);
 
-        if (_是否a杖)
-        {
-            if (ColorAEqualColorB(e5, SimpleColor.FromRgb(45, 52, 59), 0)) return await FromResult(true);
 
-            涤罪之焰后();
-            return await FromResult(false);
+        switch (_技能数量)
+        {
+            case 5 when ColorAEqualColorB(e5, SimpleColor.FromRgb(45, 52, 59), 0):
+                return await FromResult(true);
+            case 5:
+                涤罪之焰后().Start();
+                return await FromResult(false);
+            case 4 when ColorAEqualColorB(e4, SimpleColor.FromRgb(65, 74, 81), 0):
+                return await FromResult(true);
+            case 4:
+                涤罪之焰后().Start();
+                return await FromResult(false);
         }
 
-        if (ColorAEqualColorB(e4, SimpleColor.FromRgb(65, 74, 81), 0)) return await FromResult(true);
-
-        涤罪之焰后();
-        return await FromResult(false);
+        return await FromResult(true);
     }
 
     private static async Task<bool> 涤罪之焰不可释放(byte[] bts, Size size)
@@ -7346,42 +7433,49 @@ public partial class Form2 : Form
         var e4 = 获取e4左下角颜色(bts, size);
         var e5 = 获取e5左下角颜色(bts, size);
 
-        if (_是否a杖)
+        switch (_技能数量)
         {
-            if (!ColorAEqualColorB(e5, SimpleColor.FromRgb(45, 52, 59), 0)) return await FromResult(true);
-            涤罪之焰释放().Start();
-
-            return await FromResult(false);
+            case 5 when ColorAEqualColorB(e5, SimpleColor.FromRgb(45, 52, 59), 0):
+                return await FromResult(true);
+            case 5:
+                涤罪之焰释放().Start();
+                return await FromResult(false);
+            case 4 when ColorAEqualColorB(e4, SimpleColor.FromRgb(65, 74, 81), 0):
+                return await FromResult(true);
+            case 4:
+                涤罪之焰释放().Start();
+                return await FromResult(false);
         }
 
-        if (!ColorAEqualColorB(e4, SimpleColor.FromRgb(65, 74, 81), 0)) return await FromResult(true);
-        涤罪之焰释放().Start();
-        return await FromResult(false);
+        return await FromResult(true);
     }
 
     private static async Task<bool> 虚妄之诺去后摇(byte[] bts, Size size)
     {
-        static void 虚妄之诺后()
+        static async Task 虚妄之诺后()
         {
-            RightClick();
+            await Run(() => { KeyPress((uint)Keys.A); });
             // KeyPress((uint)Keys.A);
         }
 
         var r4 = 获取r4左下角颜色(bts, size);
         var r5 = 获取r5左下角颜色(bts, size);
 
-        if (_是否a杖)
+        switch (_技能数量)
         {
-            if (ColorAEqualColorB(r5, SimpleColor.FromRgb(45, 52, 59), 0)) return await FromResult(true);
-
-            虚妄之诺后();
-            return await FromResult(false);
+            case 5 when ColorAEqualColorB(r5, SimpleColor.FromRgb(45, 52, 59), 0):
+                return await FromResult(true);
+            case 5:
+                虚妄之诺后().Start();
+                return await FromResult(false);
+            case 4 when ColorAEqualColorB(r4, SimpleColor.FromRgb(65, 74, 81), 0):
+                return await FromResult(true);
+            case 4:
+                虚妄之诺后().Start();
+                return await FromResult(false);
         }
-
-        if (ColorAEqualColorB(r4, SimpleColor.FromRgb(65, 74, 81), 0)) return await FromResult(true);
-
-        虚妄之诺后();
-        return await FromResult(false);
+        
+        return await FromResult(true);
     }
 
     private static async Task<bool> 天命之雨去后摇(byte[] bts, Size size)
@@ -7744,13 +7838,18 @@ public partial class Form2 : Form
             return await FromResult(false);
         }
 
-        if (_是否魔晶)
+        switch (_技能数量)
         {
-            if (ColorAEqualColorB(q5, SimpleColor.FromRgb(45, 52, 59), 0)) return await FromResult(true);
-        }
-        else
-        {
-            if (ColorAEqualColorB(q4, SimpleColor.FromRgb(65, 74, 81), 0)) return await FromResult(true);
+            case 5:
+            {
+                if (ColorAEqualColorB(q5, SimpleColor.FromRgb(45, 52, 59), 0)) return await FromResult(true);
+                break;
+            }
+            default:
+            {
+                if (ColorAEqualColorB(q4, SimpleColor.FromRgb(65, 74, 81), 0)) return await FromResult(true);
+                break;
+            }
         }
 
         冰火交加后();
@@ -7776,13 +7875,18 @@ public partial class Form2 : Form
             return await FromResult(false);
         }
 
-        if (_是否魔晶)
+        switch (_技能数量)
         {
-            if (ColorAEqualColorB(w5, SimpleColor.FromRgb(45, 52, 59), 0)) return await FromResult(true);
-        }
-        else
-        {
-            if (ColorAEqualColorB(w4, SimpleColor.FromRgb(65, 74, 81), 0)) return await FromResult(true);
+            case 5:
+            {
+                if (ColorAEqualColorB(w5, SimpleColor.FromRgb(45, 52, 59), 0)) return await FromResult(true);
+                break;
+            }
+            default:
+            {
+                if (ColorAEqualColorB(w4, SimpleColor.FromRgb(65, 74, 81), 0)) return await FromResult(true);
+                break;
+            }
         }
 
         冰封路径后();
@@ -7808,13 +7912,18 @@ public partial class Form2 : Form
             return await FromResult(false);
         }
 
-        if (_是否魔晶)
+        switch (_技能数量)
         {
-            if (ColorAEqualColorB(r5, SimpleColor.FromRgb(45, 52, 59), 0)) return await FromResult(true);
-        }
-        else
-        {
-            if (ColorAEqualColorB(r4, SimpleColor.FromRgb(65, 74, 81), 0)) return await FromResult(true);
+            case 5:
+            {
+                if (ColorAEqualColorB(r5, SimpleColor.FromRgb(45, 52, 59), 0)) return await FromResult(true);
+                break;
+            }
+            default:
+            {
+                if (ColorAEqualColorB(r4, SimpleColor.FromRgb(65, 74, 81), 0)) return await FromResult(true);
+                break;
+            }
         }
 
         烈焰焚身后();
@@ -7870,13 +7979,18 @@ public partial class Form2 : Form
             return await FromResult(false);
         }
 
-        if (_是否魔晶)
+        switch (_技能数量)
         {
-            if (ColorAEqualColorB(q5, SimpleColor.FromRgb(45, 52, 59), 0)) return await FromResult(true);
-        }
-        else
-        {
-            if (ColorAEqualColorB(q4, SimpleColor.FromRgb(65, 74, 81), 0)) return await FromResult(true);
+            case 5:
+            {
+                if (ColorAEqualColorB(q5, SimpleColor.FromRgb(45, 52, 59), 0)) return await FromResult(true);
+                break;
+            }
+            default:
+            {
+                if (ColorAEqualColorB(q4, SimpleColor.FromRgb(65, 74, 81), 0)) return await FromResult(true);
+                break;
+            }
         }
 
         麻痹药剂后();
@@ -7906,13 +8020,18 @@ public partial class Form2 : Form
             return await FromResult(false);
         }
 
-        if (_是否魔晶)
+        switch (_技能数量)
         {
-            if (ColorAEqualColorB(e5, SimpleColor.FromRgb(45, 52, 59), 0)) return await FromResult(true);
-        }
-        else
-        {
-            if (ColorAEqualColorB(e4, SimpleColor.FromRgb(65, 74, 81), 0)) return await FromResult(true);
+            case 5:
+            {
+                if (ColorAEqualColorB(e5, SimpleColor.FromRgb(45, 52, 59), 0)) return await FromResult(true);
+                break;
+            }
+            default:
+            {
+                if (ColorAEqualColorB(e4, SimpleColor.FromRgb(65, 74, 81), 0)) return await FromResult(true);
+                break;
+            }
         }
 
         巫蛊咒术后(bts, size);
@@ -7931,13 +8050,18 @@ public partial class Form2 : Form
             if (!RegPicture(物品_暗影护符buff, bts1, size)) 根据图片以及类别自我使用物品(物品_暗影护符, bts1, size, _技能数量);
         }
 
-        if (_是否魔晶)
+        switch (_技能数量)
         {
-            if (ColorAEqualColorB(r5, SimpleColor.FromRgb(45, 52, 59), 0)) return await FromResult(true);
-        }
-        else
-        {
-            if (ColorAEqualColorB(r4, SimpleColor.FromRgb(65, 74, 81), 0)) return await FromResult(true);
+            case 5:
+            {
+                if (ColorAEqualColorB(r5, SimpleColor.FromRgb(45, 52, 59), 0)) return await FromResult(true);
+                break;
+            }
+            default:
+            {
+                if (ColorAEqualColorB(r4, SimpleColor.FromRgb(65, 74, 81), 0)) return await FromResult(true);
+                break;
+            }
         }
 
         死亡守卫后(bts, size);
