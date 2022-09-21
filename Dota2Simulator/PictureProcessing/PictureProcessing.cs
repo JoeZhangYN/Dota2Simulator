@@ -598,7 +598,7 @@ public class PictureProcessing
 
         Marshal.Copy(subData.Scan0, bts, 0, subData.Stride * subData.Height);
         subBitmap.UnlockBits(subData);
-        var bts1 = new byte[subData.Stride * subData.Height * 3];
+        var bts1 = new byte[subData.Stride * subData.Height * 3]; // todo: 实际上这步就错了，生成了一个比原先还大的数组
         for (var i = 0; i < subData.Stride; i++)
         {
             for (var j = 0; j < subData.Height; j++)
