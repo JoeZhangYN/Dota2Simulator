@@ -4301,7 +4301,7 @@ public partial class Form2 : Form
                         _全局步骤 = 1;
                         return await FromResult(true);
                     }
-                    
+
                     _全局步骤 = 1;
                     return await FromResult(true);
                 }
@@ -6941,6 +6941,9 @@ public partial class Form2 : Form
         Color 不朽释放颜色4 = Color.FromArgb(186, 199, 207);
         Color 不朽释放颜色56 = Color.FromArgb(222, 230, 237);
 
+        Color 释放颜色4 = Color.FromArgb(241, 240, 231);
+        Color 释放颜色56 = Color.FromArgb(247, 247, 242);
+
         static void 提前释放()
         {
             Delay(2700);
@@ -6956,7 +6959,7 @@ public partial class Form2 : Form
                 if (!ColorAEqualColorB(q41, 技能4CD颜色))
                     return await FromResult(false);
 
-                if (!ColorAEqualColorB(q4, 不朽释放颜色4))
+                if (!ColorAEqualColorB(q4, 不朽释放颜色4) && !ColorAEqualColorB(q4, 释放颜色4))
                     return await FromResult(true);
                 break;
             case 5:
@@ -6965,7 +6968,7 @@ public partial class Form2 : Form
                 if (!ColorAEqualColorB(q51, 技能56CD颜色))
                     return await FromResult(false);
 
-                if (!ColorAEqualColorB(q5, 不朽释放颜色56))
+                if (!ColorAEqualColorB(q5, 不朽释放颜色56) && !ColorAEqualColorB(q5, 释放颜色56))
                     return await FromResult(true);
                 break;
             case 6:
@@ -6974,7 +6977,7 @@ public partial class Form2 : Form
                 if (!ColorAEqualColorB(q61, 技能56CD颜色))
                     return await FromResult(false);
 
-                if (!ColorAEqualColorB(q6, 不朽释放颜色56))
+                if (!ColorAEqualColorB(q6, 不朽释放颜色56) && !ColorAEqualColorB(q6, 释放颜色56))
                     return await FromResult(true);
                 break;
         }
