@@ -13,12 +13,15 @@ using NeoSmart.AsyncLock;
 using PaddleOCRSharp;
 using SharpDX.Direct3D11;
 using WindowsHook;
+using Xamarin.Essentials;
 using static Dota2Simulator.Picture_Dota2.Resource_Picture;
-using static Dota2Simulator.PictureProcessing;
+using static Dota2Simulator.PictureProcessing.PictureProcessing;
 using static Dota2Simulator.SetWindowTop;
 using static System.Threading.Tasks.Task;
+using Clipboard = System.Windows.Forms.Clipboard;
 using KeyEventArgs = System.Windows.Forms.KeyEventArgs;
 using Keys = System.Windows.Forms.Keys;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.TaskbarClock;
 
 // WindowsHook.KeyEventArgs
 // WindowsHook.KeyEventHandler
@@ -30,11 +33,22 @@ public partial class Form2 : Form
 {
     /// 动态肖像 法线贴图 地面视差 主界面高画质 计算器渲染器 纹理、特效、阴影 中 渲染 70% 高级水面效果
     private const int 截图模式1X = 750;
-
     private const int 截图模式1Y = 856;
     private const int 截图模式1W = 657;
     private const int 截图模式1H = 217;
-    private const int 等待延迟 = 30;
+    private const int 等待延迟 = 13;
+
+    // 根据截图模式不同，用于判断技能 和 物品的具体x, y值随之变化 涉及到 全局假腿，技能位置，使用物品位置，判断神杖、魔晶 中立道具
+    private const int 坐标偏移x = 750;
+    private const int 坐标偏移y = 856;
+
+    // 65 74 81 4技能CD就绪颜色
+    private static Color 技能4CD颜色;
+    // 45 52 59 56技能CD就绪颜色
+    private static Color 技能56CD颜色;
+    // 0 129 0  56技能状态激活颜色
+    private static Color 技能56状态颜色;
+
 
     #region 触发重载
 
@@ -50,32 +64,32 @@ public partial class Form2 : Form
     /// <param name="e"></param>
     private async void Hook_KeyDown(object sender, KeyEventArgs e)
     {
-        #region 总开关
+        #region 总开关（不使用）
 
-        switch (e.KeyCode)
-        {
-            case Keys.Home:
-                _总开关条件 = !_总开关条件;
-                TTS.Speak(_总开关条件 ? "开启功能" : "关闭功能");
-                if (!_总开关条件) 取消所有功能();
-                KeyPress((uint)Keys.End);
-                Delay(等待延迟);
-                await Task.Delay(1);
-                return;
-            case Keys.Insert:
-                取消所有功能();
-                KeyPress((uint)Keys.End);
-                TTS.Speak("已重置功能");
-                await Task.Delay(1);
-                return;
-        }
+        //switch (e.KeyCode)
+        //{
+        //    case Keys.Home:
+        //        _总开关条件 = !_总开关条件;
+        //        TTS.Speak(_总开关条件 ? "开启功能" : "关闭功能");
+        //        if (!_总开关条件) 取消所有功能();
+        //        KeyPress((uint)Keys.End);
+        //        Delay(等待延迟);
+        //        await Task.Delay(1);
+        //        return;
+        //    case Keys.Insert:
+        //        取消所有功能();
+        //        KeyPress((uint)Keys.End);
+        //        TTS.Speak("已重置功能");
+        //        await Task.Delay(1);
+        //        return;
+        //}
 
         #endregion
 
         #region 打字时屏蔽功能 (未使用)
 
         //if (false
-        //    // && CaptureColor(572, 771).Equals(SimpleColor.FromRgb(237, 222, 190))
+        //    // && CaptureColor(572, 771).Equals(Color.FromArgb(237, 222, 190))
         //   )
         //{
         //}
@@ -83,6 +97,24 @@ public partial class Form2 : Form
         #endregion
 
         #region 记录时间 (未使用)
+
+        #endregion
+
+        #region 隐藏界面
+
+        switch (e.KeyCode)
+        {
+            case Keys.End:
+                if (WindowState == FormWindowState.Normal)
+                {
+                    WindowState = FormWindowState.Minimized;
+                }
+                else
+                {
+                    WindowState = FormWindowState.Normal;
+                }
+                break;
+        }
 
         #endregion
 
@@ -105,127 +137,135 @@ public partial class Form2 : Form
                 await Run(最大化x伤害控制);
                 break;
             case "船长":
-            {
-                if (e.KeyCode == Keys.D4)
                 {
-                    label1.Text = "D4";
+                    if (e.KeyCode == Keys.D4)
+                    {
+                        label1.Text = "D4";
 
-                    KeyPress((uint)Keys.Q);
+                        KeyPress((uint)Keys.Q);
 
-                    await Run(洪流接船);
+                        await Run(洪流接船);
+                    }
+
+                    break;
                 }
-
-                break;
-            }
 
             #endregion
 
             #region 军团
 
             case "军团":
-            {
-                if (!_总循环条件)
                 {
-                    _条件根据图片委托1 ??= 决斗;
-                    _总循环条件 = true;
-                    await 无物品状态初始化().ConfigureAwait(false);
-                }
+                    if (!_总循环条件)
+                    {
+                        _条件根据图片委托1 ??= 决斗;
+                        _条件根据图片委托2 ??= 强攻去后摇;
+                        _总循环条件 = true;
+                        await 无物品状态初始化().ConfigureAwait(false);
+                    }
 
-                switch (e.KeyCode)
-                {
-                    case Keys.E:
-                        _全局时间 = -1;
-                        _全局步骤 = 0;
-                        _中断条件 = false;
-                        _条件1 = true;
-                        break;
-                    case Keys.D2 when _全局模式 == 0:
-                        TTS.Speak("切换无视野模式");
-                        _全局模式 = 1;
-                        break;
-                    case Keys.D2:
-                        TTS.Speak("切换有视野模式");
-                        _全局模式 = 0;
-                        break;
-                    case Keys.H:
-                        _中断条件 = true;
-                        _条件1 = false;
-                        break;
-                }
+                    switch (e.KeyCode)
+                    {
+                        case Keys.W:
+                            _中断条件 = false;
+                            _条件2 = true;
+                            break;
+                        case Keys.D:
+                            _指定地点e = MousePosition;
+                            break;
+                        case Keys.F:
+                            await 切智力腿();
+                            _全局时间 = -1;
+                            _全局步骤 = 0;
+                            _中断条件 = false;
+                            _条件1 = true;
+                            break;
+                        case Keys.D2 when _全局模式 == 0:
+                            TTS.Speak("跳刀决斗");
+                            _全局模式 = 1;
+                            break;
+                        case Keys.D2:
+                            TTS.Speak("直接决斗");
+                            _全局模式 = 0;
+                            break;
+                        case Keys.H:
+                            _中断条件 = true;
+                            _条件1 = false;
+                            break;
+                    }
 
-                break;
-            }
+                    break;
+                }
 
             #endregion
 
             #region 斧王
 
             case "斧王":
-            {
-                if (!_总循环条件)
                 {
-                    _条件根据图片委托1 ??= 吼去后摇;
-                    _条件根据图片委托2 ??= 战斗饥渴去后摇;
-                    _条件根据图片委托2 ??= 淘汰之刃去后摇;
-                    _条件根据图片委托4 ??= 跳吼;
-                    _总循环条件 = true;
-                    await 无物品状态初始化().ConfigureAwait(false);
+                    if (!_总循环条件)
+                    {
+                        _条件根据图片委托1 ??= 吼去后摇;
+                        _条件根据图片委托2 ??= 战斗饥渴去后摇;
+                        _条件根据图片委托2 ??= 淘汰之刃去后摇;
+                        _条件根据图片委托4 ??= 跳吼;
+                        _总循环条件 = true;
+                        await 无物品状态初始化().ConfigureAwait(false);
+                    }
+
+                    switch (e.KeyCode)
+                    {
+                        case Keys.F1:
+                            _是否a杖 = 阿哈利姆神杖(_全局bts, _全局size);
+                            break;
+                        case Keys.Q:
+                            根据图片以及类别使用物品(物品_魂戒CD, _全局bts, _全局size, _技能数量);
+                            _条件1 = true;
+                            break;
+                        case Keys.W:
+                            根据图片以及类别使用物品(物品_魂戒CD, _全局bts, _全局size, _技能数量);
+                            _条件2 = true;
+                            break;
+                        case Keys.E:
+                            _条件4 = true;
+                            break;
+                        case Keys.R:
+                            根据图片以及类别使用物品(物品_魂戒CD, _全局bts, _全局size, _技能数量);
+                            _条件3 = true;
+                            break;
+                        case Keys.D2:
+                            switch (_全局模式q)
+                            {
+                                case 1:
+                                    _全局模式q = 0;
+                                    TTS.Speak("吼不接刃甲");
+                                    break;
+                                case 0:
+                                    _全局模式q = 1;
+                                    TTS.Speak("吼接刃甲");
+                                    break;
+                            }
+                            break;
+                    }
+
+                    break;
                 }
-
-                switch (e.KeyCode)
-                {
-                    case Keys.F1:
-                        _是否a杖 = 阿哈利姆神杖(_全局bts, _全局size);
-                        break;
-                    case Keys.Q:
-                        根据图片以及类别使用物品(物品_魂戒CD, _全局bts, _全局size, _技能数量);
-                        _条件1 = true;
-                        break;
-                    case Keys.W:
-                        根据图片以及类别使用物品(物品_魂戒CD, _全局bts, _全局size, _技能数量);
-                        _条件2 = true;
-                        break;
-                    case Keys.E:
-                        _条件4 = true;
-                        break;
-                    case Keys.R:
-                        根据图片以及类别使用物品(物品_魂戒CD, _全局bts, _全局size, _技能数量);
-                        _条件3 = true;
-                        break;
-                    case Keys.D2:
-                        switch (_全局模式q)
-                        {
-                            case 1:
-                                _全局模式q = 0;
-                                TTS.Speak("吼不接刃甲");
-                                break;
-                            case 0:
-                                _全局模式q = 1;
-                                TTS.Speak("吼接刃甲");
-                                break;
-                        }
-
-                        break;
-                }
-
-                break;
-            }
 
             #endregion
 
             #region 孽主
 
             case "孽主":
-            {
-                if (e.KeyCode == Keys.E)
                 {
-                    label1.Text = "E";
+                    if (e.KeyCode == Keys.E)
+                    {
+                        label1.Text = "E";
 
-                    await Run(深渊火雨阿托斯);
+                        await Run(深渊火雨阿托斯);
+                    }
+
+                    break;
                 }
-
-                break;
-            }
 
             #endregion
 
@@ -242,583 +282,610 @@ public partial class Form2 : Form
                 await Run(心炎平a);
                 break;
             case "哈斯卡":
-            {
-                if (e.KeyCode == Keys.R)
                 {
-                    label1.Text = "R";
+                    if (e.KeyCode == Keys.R)
+                    {
+                        label1.Text = "R";
 
-                    //if (RegPicture(物品_臂章, "Z"))
-                    //{
-                    //    KeyPress((uint) Keys.Z);
-                    //    Delay(等待延迟);
-                    //}
+                        //if (RegPicture(物品_臂章, "Z"))
+                        //{
+                        //    KeyPress((uint) Keys.Z);
+                        //    Delay(等待延迟);
+                        //}
 
-                    await Run(牺牲平a刃甲);
+                        await Run(牺牲平a刃甲);
+                    }
+
+                    break;
                 }
-
-                break;
-            }
 
             #endregion
 
             #region 海民
 
             case "海民":
-            {
-                if (!_总循环条件)
                 {
-                    _条件根据图片委托1 ??= 跳接勋章接摔角行家;
-                    _条件根据图片委托2 ??= 摔角行家去后摇;
-                    _条件根据图片委托3 ??= 飞踢接雪球;
-                    _总循环条件 = true;
-                    _全局模式 = 0;
-                    await 无物品状态初始化().ConfigureAwait(false);
-                }
-
-                switch (e.KeyCode)
-                {
-                    case Keys.F1:
+                    if (!_总循环条件)
                     {
-                        _是否a杖 = 阿哈利姆神杖(_全局bts, _全局size);
-                        if (_是否a杖) _技能数量 = 5;
-                        else _技能数量 = 4;
-                        break;
+                        _条件根据图片委托1 ??= 跳接勋章接摔角行家;
+                        _条件根据图片委托2 ??= 摔角行家去后摇;
+                        _条件根据图片委托3 ??= 飞踢接雪球;
+                        _总循环条件 = true;
+                        _全局模式 = 0;
+                        await 无物品状态初始化().ConfigureAwait(false);
                     }
-                    case Keys.G:
-                        _条件1 = true;
-                        break;
-                    case Keys.E:
-                        根据图片以及类别使用物品(物品_勇气勋章, _全局bts, _全局size, _技能数量);
-                        根据图片以及类别使用物品(物品_炎阳勋章, _全局bts, _全局size, _技能数量);
-                        _条件2 = true;
-                        break;
-                    case Keys.D:
-                        _条件3 = true;
-                        break;
-                    case Keys.D2:
-                        _指定地点d = MousePosition;
-                        TTS.Speak("已指定地点");
-                        break;
-                    case Keys.D3:
-                        if (_是否a杖)
-                        {
-                            var p = MousePosition;
-                            KeyDown((uint)Keys.D);
-                            Delay(等待延迟);
-                            MouseMove(_指定地点d);
-                            Delay(等待延迟);
-                            KeyUp((uint)Keys.D);
-                            Delay(等待延迟);
-                            MouseMove(p);
+
+                    switch (e.KeyCode)
+                    {
+                        case Keys.F1:
+                            {
+                                _是否a杖 = 阿哈利姆神杖(_全局bts, _全局size);
+                                if (_是否a杖) _技能数量 = 5;
+                                else _技能数量 = 4;
+                                break;
+                            }
+                        case Keys.G:
+                            _条件1 = true;
+                            break;
+                        case Keys.E:
+                            根据图片以及类别使用物品(物品_勇气勋章, _全局bts, _全局size, _技能数量);
+                            根据图片以及类别使用物品(物品_炎阳勋章, _全局bts, _全局size, _技能数量);
+                            _条件2 = true;
+                            break;
+                        case Keys.D:
                             _条件3 = true;
-                        }
+                            break;
+                        case Keys.D2:
+                            _指定地点d = MousePosition;
+                            TTS.Speak("已指定地点");
+                            break;
+                        case Keys.D3:
+                            if (_是否a杖)
+                            {
+                                var p = MousePosition;
+                                KeyDown((uint)Keys.D);
+                                Delay(等待延迟);
+                                MouseMove(_指定地点d);
+                                Delay(等待延迟);
+                                KeyUp((uint)Keys.D);
+                                Delay(等待延迟);
+                                MouseMove(p);
+                                _条件3 = true;
+                            }
 
-                        break;
+                            break;
 
-                    case Keys.D4:
-                        if (_是否a杖)
-                        {
-                            KeyDown((uint)Keys.Space);
-                            Delay(等待延迟);
-                            KeyDown((uint)Keys.W);
-                            Delay(等待延迟);
-                            var p = MousePosition;
-                            KeyDown((uint)Keys.D);
-                            Delay(等待延迟);
-                            MouseMove(_指定地点d);
-                            Delay(等待延迟);
-                            KeyUp((uint)Keys.D);
-                            Delay(等待延迟);
-                            MouseMove(p);
-                            _条件3 = true;
-                        }
+                        case Keys.D4:
+                            if (_是否a杖)
+                            {
+                                KeyDown((uint)Keys.Space);
+                                Delay(等待延迟);
+                                KeyDown((uint)Keys.W);
+                                Delay(等待延迟);
+                                var p = MousePosition;
+                                KeyDown((uint)Keys.D);
+                                Delay(等待延迟);
+                                MouseMove(_指定地点d);
+                                Delay(等待延迟);
+                                KeyUp((uint)Keys.D);
+                                Delay(等待延迟);
+                                MouseMove(p);
+                                _条件3 = true;
+                            }
 
-                        break;
+                            break;
+                    }
+
+                    break;
                 }
-
-                break;
-            }
 
             #endregion
 
             #region 钢背
 
             case "钢背":
-            {
-                if (!_总循环条件)
                 {
-                    _总循环条件 = true;
-                    _条件根据图片委托1 ??= 鼻涕针刺循环;
-                    _条件根据图片委托2 ??= 毛团去后摇;
-                    await 无物品状态初始化().ConfigureAwait(false);
-                }
+                    if (!_总循环条件)
+                    {
+                        _总循环条件 = true;
+                        _条件根据图片委托1 ??= 鼻涕针刺循环;
+                        _条件根据图片委托2 ??= 毛团去后摇;
+                        await 无物品状态初始化().ConfigureAwait(false);
+                    }
 
-                switch (e.KeyCode)
-                {
-                    case Keys.F1:
+                    switch (e.KeyCode)
                     {
-                        _是否魔晶 = 阿哈利姆魔晶(_全局bts, _全局size);
-                        _是否a杖 = 阿哈利姆神杖(_全局bts, _全局size);
-                        if (_是否魔晶) _技能数量 = 5;
-                        else _技能数量 = 4;
-                        break;
-                    }
-                    case Keys.D:
-                    {
-                        _条件开启切假腿 = false;
-                        初始化全局时间(ref _全局时间d);
-                        await 切智力腿(_技能数量);
-                        _条件2 = true;
-                        break;
-                    }
-                    case Keys.D2:
-                    {
-                        if (!_条件1)
-                            _条件1 = true;
-                        _循环条件1 = !_循环条件1;
-                        // 基本上魂戒可以放4下，只浪费10点蓝
-                        // 配合一次鼻涕就一次也不浪费
-                        if (_循环条件1)
-                            if (RegPicture(物品_魂戒CD, _全局bts, _全局size))
+                        case Keys.F1:
                             {
-                                await 切力量腿(_全局bts, _全局size, _技能数量);
-                                根据图片以及类别使用物品(物品_魂戒CD, _全局bts, _全局size, _技能数量);
+                                _是否魔晶 = 阿哈利姆魔晶(_全局bts, _全局size);
+                                _是否a杖 = 阿哈利姆神杖(_全局bts, _全局size);
+                                if (_是否魔晶) _技能数量 = 5;
+                                else _技能数量 = 4;
+                                break;
                             }
-
-                        break;
-                    }
-                    case Keys.D3:
-                    {
-                        if (!_条件1)
-                            _条件1 = true;
-                        _循环条件2 = !_循环条件2;
-                        if (_循环条件2)
-                            if (RegPicture(物品_魂戒CD, _全局bts, _全局size))
+                        case Keys.D:
                             {
-                                await 切力量腿(_全局bts, _全局size, _技能数量);
-                                根据图片以及类别使用物品(物品_魂戒CD, _全局bts, _全局size, _技能数量);
-                            }
-
-                        break;
-                    }
-                    case Keys.D4:
-                        switch (_条件开启切假腿)
-                        {
-                            case true:
                                 _条件开启切假腿 = false;
-                                _条件保持假腿 = false;
-                                TTS.Speak("不保持假腿");
+                                初始化全局时间(ref _全局时间d);
+                                await 切智力腿(_技能数量);
+                                _条件2 = true;
                                 break;
-                            default:
-                                _条件开启切假腿 = true;
-                                _条件保持假腿 = true;
-                                TTS.Speak("保持假腿");
-                                break;
-                        }
+                            }
+                        case Keys.D2:
+                            {
+                                if (!_条件1)
+                                    _条件1 = true;
+                                _循环条件1 = !_循环条件1;
+                                // 基本上魂戒可以放4下，只浪费10点蓝
+                                // 配合一次鼻涕就一次也不浪费
+                                if (_循环条件1)
+                                    if (RegPicture(物品_魂戒CD, _全局bts, _全局size))
+                                    {
+                                        await 切力量腿(_全局bts, _全局size, _技能数量);
+                                        根据图片以及类别使用物品(物品_魂戒CD, _全局bts, _全局size, _技能数量);
+                                    }
 
-                        break;
-                    case Keys.D5 when _条件假腿敏捷:
-                        _条件假腿敏捷 = false;
-                        TTS.Speak("切力量");
-                        break;
-                    case Keys.D5:
-                        _条件假腿敏捷 = true;
-                        TTS.Speak("切敏捷");
-                        break;
+                                break;
+                            }
+                        case Keys.D3:
+                            {
+                                if (!_条件1)
+                                    _条件1 = true;
+                                _循环条件2 = !_循环条件2;
+                                if (_循环条件2)
+                                    if (RegPicture(物品_魂戒CD, _全局bts, _全局size))
+                                    {
+                                        await 切力量腿(_全局bts, _全局size, _技能数量);
+                                        根据图片以及类别使用物品(物品_魂戒CD, _全局bts, _全局size, _技能数量);
+                                    }
+
+                                break;
+                            }
+                        case Keys.D4:
+                            switch (_条件开启切假腿)
+                            {
+                                case true:
+                                    _条件开启切假腿 = false;
+                                    _条件保持假腿 = false;
+                                    TTS.Speak("不保持假腿");
+                                    break;
+                                default:
+                                    _条件开启切假腿 = true;
+                                    _条件保持假腿 = true;
+                                    TTS.Speak("保持假腿");
+                                    break;
+                            }
+
+                            break;
+                        case Keys.D5 when _条件假腿敏捷:
+                            _条件假腿敏捷 = false;
+                            TTS.Speak("切力量");
+                            break;
+                        case Keys.D5:
+                            _条件假腿敏捷 = true;
+                            TTS.Speak("切敏捷");
+                            break;
+                    }
+
+                    break;
                 }
-
-                break;
-            }
 
             #endregion
 
             #region 猛犸
 
             case "猛犸":
-            {
-                if (!_总循环条件)
                 {
-                    _总循环条件 = true;
-                    _条件根据图片委托1 = 切回假腿;
-                    _全局模式 = 0;
-                    await 无物品状态初始化().ConfigureAwait(false);
+                    if (!_总循环条件)
+                    {
+                        _总循环条件 = true;
+                        _条件根据图片委托1 = 切回假腿;
+                        _全局模式 = 0;
+                        await 无物品状态初始化().ConfigureAwait(false);
+                    }
+
+
+                    switch (e.KeyCode)
+                    {
+                        case Keys.Q:
+                            _条件保持假腿 = false;
+                            初始化全局时间(ref _全局时间q);
+                            await 切智力腿(_技能数量);
+                            _条件1 = true;
+                            break;
+                        case Keys.W:
+                            _条件保持假腿 = false;
+                            初始化全局时间(ref _全局时间q);
+                            await 切智力腿(_技能数量);
+                            _条件1 = true;
+                            break;
+                        case Keys.E:
+                            _条件保持假腿 = false;
+                            初始化全局时间(ref _全局时间q);
+                            await 切智力腿(_技能数量);
+                            _条件1 = true;
+                            break;
+                        case Keys.R:
+                            _条件保持假腿 = false;
+                            初始化全局时间(ref _全局时间r);
+                            await 切智力腿(_技能数量);
+                            _条件1 = true;
+                            break;
+                        case Keys.F:
+                            await Run(跳拱指定地点);
+                            break;
+                        case Keys.D2:
+                            await Run(指定地点);
+                            break;
+                        case Keys.D3 when _条件假腿敏捷:
+                            _条件假腿敏捷 = false;
+                            TTS.Speak("切力量");
+                            break;
+                        case Keys.D3:
+                            _条件假腿敏捷 = true;
+                            TTS.Speak("切敏捷");
+                            break;
+                        case Keys.D4:
+                            switch (_条件开启切假腿)
+                            {
+                                case true:
+                                    _条件开启切假腿 = false;
+                                    _条件保持假腿 = false;
+                                    TTS.Speak("不保持假腿");
+                                    break;
+                                default:
+                                    _条件开启切假腿 = true;
+                                    _条件保持假腿 = true;
+                                    TTS.Speak("保持假腿");
+                                    break;
+                            }
+
+                            break;
+                    }
+
+                    break;
                 }
-
-
-                switch (e.KeyCode)
-                {
-                    case Keys.Q:
-                        _条件保持假腿 = false;
-                        初始化全局时间(ref _全局时间q);
-                        await 切智力腿(_技能数量);
-                        _条件1 = true;
-                        break;
-                    case Keys.W:
-                        _条件保持假腿 = false;
-                        初始化全局时间(ref _全局时间q);
-                        await 切智力腿(_技能数量);
-                        _条件1 = true;
-                        break;
-                    case Keys.E:
-                        _条件保持假腿 = false;
-                        初始化全局时间(ref _全局时间q);
-                        await 切智力腿(_技能数量);
-                        _条件1 = true;
-                        break;
-                    case Keys.R:
-                        _条件保持假腿 = false;
-                        初始化全局时间(ref _全局时间r);
-                        await 切智力腿(_技能数量);
-                        _条件1 = true;
-                        break;
-                    case Keys.F:
-                        await Run(跳拱指定地点);
-                        break;
-                    case Keys.D2:
-                        await Run(指定地点);
-                        break;
-                    case Keys.D3 when _条件假腿敏捷:
-                        _条件假腿敏捷 = false;
-                        TTS.Speak("切力量");
-                        break;
-                    case Keys.D3:
-                        _条件假腿敏捷 = true;
-                        TTS.Speak("切敏捷");
-                        break;
-                    case Keys.D4:
-                        switch (_条件开启切假腿)
-                        {
-                            case true:
-                                _条件开启切假腿 = false;
-                                _条件保持假腿 = false;
-                                TTS.Speak("不保持假腿");
-                                break;
-                            default:
-                                _条件开启切假腿 = true;
-                                _条件保持假腿 = true;
-                                TTS.Speak("保持假腿");
-                                break;
-                        }
-
-                        break;
-                }
-
-                break;
-            }
 
             #endregion
 
             #region 屠夫
 
             case "屠夫":
-            {
-                if (!_总循环条件)
                 {
-                    _总循环条件 = true;
-                    _条件根据图片委托1 ??= 阿托斯接钩子;
-                    _条件根据图片委托2 ??= 钩子去僵直;
-                    _全局模式 = 0;
-                    await 无物品状态初始化().ConfigureAwait(false);
-                }
-
-                switch (e.KeyCode)
-                {
-                    case Keys.F1:
+                    if (!_总循环条件)
                     {
-                        _是否魔晶 = 阿哈利姆魔晶(_全局bts, _全局size);
-                        if (_是否魔晶) _技能数量 = 5;
-                        else _技能数量 = 4;
-                        break;
+                        _总循环条件 = true;
+                        _条件根据图片委托1 ??= 阿托斯接钩子;
+                        _条件根据图片委托2 ??= 钩子去僵直;
+                        _全局模式 = 0;
+                        await 无物品状态初始化().ConfigureAwait(false);
                     }
-                    case Keys.D1:
-                        _条件1 = true;
-                        break;
-                    case Keys.Q:
-                        _条件2 = true;
-                        break;
-                    case Keys.D2:
-                        switch (_全局模式q)
-                        {
-                            case 0:
-                                _全局模式q = 1;
-                                TTS.Speak("勾接咬");
-                                break;
-                            case 1:
-                                _全局模式q = 0;
-                                TTS.Speak("勾不接咬");
-                                break;
-                        }
 
-                        break;
-                    case Keys.D3:
-                        KeyPress((uint)Keys.S);
-                        var w4 = 获取w4开关颜色(_全局bts, _全局size);
-                        var w5 = 获取w5开关颜色(_全局bts, _全局size);
-                        switch (_技能数量)
-                        {
-                            case 5 when !ColorAEqualColorB(w5, SimpleColor.FromRgb(0, 129, 0), 0):
-                            case 4 when !ColorAEqualColorB(w4, SimpleColor.FromRgb(0, 129, 0), 0):
-                                KeyPressWhile((uint)Keys.W, (uint)Keys.LShiftKey);
+                    switch (e.KeyCode)
+                    {
+                        case Keys.F1:
+                            {
+                                _是否魔晶 = 阿哈利姆魔晶(_全局bts, _全局size);
+                                if (_是否魔晶) _技能数量 = 5;
+                                else _技能数量 = 4;
                                 break;
-                        }
+                            }
+                        case Keys.D1:
+                            _条件1 = true;
+                            break;
+                        case Keys.Q:
+                            _条件2 = true;
+                            break;
+                        case Keys.D2:
+                            switch (_全局模式q)
+                            {
+                                case 0:
+                                    _全局模式q = 1;
+                                    TTS.Speak("勾接咬");
+                                    break;
+                                case 1:
+                                    _全局模式q = 0;
+                                    TTS.Speak("勾不接咬");
+                                    break;
+                            }
 
-                        KeyPressWhile((uint)Keys.Space, (uint)Keys.LShiftKey);
-                        根据图片以及类别队列使用物品(物品_纷争, _全局bts, _全局size, _技能数量);
-                        根据图片以及类别队列使用物品(物品_虚灵之刃, _全局bts, _全局size, _技能数量);
-                        KeyPressWhile((uint)Keys.R, (uint)Keys.LShiftKey);
-                        break;
+                            break;
+                        case Keys.D3:
+                            KeyPress((uint)Keys.S);
+                            var w4 = 获取w4开关颜色(_全局bts, _全局size);
+                            var w5 = 获取w5开关颜色(_全局bts, _全局size);
+                            switch (_技能数量)
+                            {
+                                case 5 when !ColorAEqualColorB(w5, Color.FromArgb(0, 129, 0), 0):
+                                case 4 when !ColorAEqualColorB(w4, Color.FromArgb(0, 129, 0), 0):
+                                    KeyPressWhile((uint)Keys.W, (uint)Keys.LShiftKey);
+                                    break;
+                            }
+
+                            KeyPressWhile((uint)Keys.Space, (uint)Keys.LShiftKey);
+                            根据图片以及类别队列使用物品(物品_纷争, _全局bts, _全局size, _技能数量);
+                            根据图片以及类别队列使用物品(物品_虚灵之刃, _全局bts, _全局size, _技能数量);
+                            KeyPressWhile((uint)Keys.R, (uint)Keys.LShiftKey);
+                            break;
+                    }
+
+                    break;
                 }
-
-                break;
-            }
 
             #endregion
 
             #region 破晓晨星
 
             case "破晓晨星":
-            {
-                if (!_总循环条件)
                 {
-                    _总循环条件 = true;
-                    _条件根据图片委托1 ??= 石破天惊使用物品;
-                    _条件根据图片委托2 ??= 上界重锤去后摇;
-                    await 无物品状态初始化().ConfigureAwait(false);
+                    if (!_总循环条件)
+                    {
+                        _总循环条件 = true;
+                        _条件根据图片委托1 ??= 石破天惊使用物品;
+                        _条件根据图片委托2 ??= 上界重锤去后摇;
+                        await 无物品状态初始化().ConfigureAwait(false);
+                    }
+
+                    switch (e.KeyCode)
+                    {
+                        case Keys.F1:
+                            {
+                                _是否魔晶 = 阿哈利姆魔晶(_全局bts, _全局size);
+                                break;
+                            }
+                        case Keys.Q:
+                            {
+                                根据图片以及类别使用物品(物品_勇气勋章, _全局bts, _全局size);
+                                根据图片以及类别使用物品(物品_炎阳勋章, _全局bts, _全局size);
+                                if (_是否魔晶) _条件1 = true;
+
+                                break;
+                            }
+                        case Keys.W:
+                            {
+                                根据图片以及类别使用物品(物品_魂戒CD, _全局bts, _全局size);
+                                _条件2 = true;
+                                break;
+                            }
+                        case Keys.R:
+                            {
+                                根据图片以及类别使用物品(物品_魂戒CD, _全局bts, _全局size);
+                                break;
+                            }
+                    }
+
+                    break;
                 }
-
-                switch (e.KeyCode)
-                {
-                    case Keys.F1:
-                    {
-                        _是否魔晶 = 阿哈利姆魔晶(_全局bts, _全局size);
-                        break;
-                    }
-                    case Keys.Q:
-                    {
-                        根据图片以及类别使用物品(物品_勇气勋章, _全局bts, _全局size);
-                        根据图片以及类别使用物品(物品_炎阳勋章, _全局bts, _全局size);
-                        if (_是否魔晶) _条件1 = true;
-
-                        break;
-                    }
-                    case Keys.W:
-                    {
-                        根据图片以及类别使用物品(物品_魂戒CD, _全局bts, _全局size);
-                        _条件2 = true;
-                        break;
-                    }
-                    case Keys.R:
-                    {
-                        根据图片以及类别使用物品(物品_魂戒CD, _全局bts, _全局size);
-                        break;
-                    }
-                }
-
-                break;
-            }
 
             #endregion
 
             #region 大鱼人
 
             case "大鱼人":
-            {
-                if (!_总循环条件)
                 {
-                    _总循环条件 = true;
-                    _条件根据图片委托1 ??= 踩去后摇;
-                    _条件根据图片委托2 ??= 跳刀接踩;
-                    _条件根据图片委托3 ??= 雾霭去后摇;
-                    await 无物品状态初始化().ConfigureAwait(false);
-                }
+                    if (!_总循环条件)
+                    {
+                        _总循环条件 = true;
+                        _条件根据图片委托1 ??= 踩去后摇;
+                        _条件根据图片委托2 ??= 跳刀接踩;
+                        _条件根据图片委托3 ??= 雾霭去后摇;
+                        await 无物品状态初始化().ConfigureAwait(false);
+                    }
 
-                switch (e.KeyCode)
-                {
-                    case Keys.F1:
+                    switch (e.KeyCode)
                     {
-                        _是否魔晶 = 阿哈利姆魔晶(_全局bts, _全局size);
-                        break;
-                    }
-                    case Keys.W:
-                    {
-                        _条件保持假腿 = false;
-                        根据图片以及类别使用物品(物品_勇气勋章, _全局bts, _全局size);
-                        根据图片以及类别使用物品(物品_炎阳勋章, _全局bts, _全局size);
-                        await 切智力腿(_技能数量);
-                        _全局模式w = _是否魔晶 ? 1 : 0;
-                        _条件1 = true;
-                        break;
-                    }
-                    case Keys.E:
-                    {
-                        _条件保持假腿 = false;
-                        _条件2 = true;
-                        break;
-                    }
-                    case Keys.R:
-                    {
-                        _条件保持假腿 = false;
-                        await 切智力腿(_技能数量);
-                        _条件3 = true;
-                        break;
-                    }
-                    case Keys.D3 when _条件假腿敏捷:
-                        _条件假腿敏捷 = false;
-                        TTS.Speak("切力量");
-                        break;
-                    case Keys.D3:
-                        _条件假腿敏捷 = true;
-                        TTS.Speak("切敏捷");
-                        break;
-                    case Keys.D4:
-                        switch (_条件开启切假腿)
-                        {
-                            case true:
-                                _条件开启切假腿 = false;
+                        case Keys.F1:
+                            {
+                                _是否魔晶 = 阿哈利姆魔晶(_全局bts, _全局size);
+                                break;
+                            }
+                        case Keys.W:
+                            {
                                 _条件保持假腿 = false;
-                                TTS.Speak("不保持假腿");
+                                根据图片以及类别使用物品(物品_勇气勋章, _全局bts, _全局size);
+                                根据图片以及类别使用物品(物品_炎阳勋章, _全局bts, _全局size);
+                                await 切智力腿(_技能数量);
+                                _全局模式w = _是否魔晶 ? 1 : 0;
+                                _条件1 = true;
                                 break;
-                            default:
-                                _条件开启切假腿 = true;
-                                _条件保持假腿 = true;
-                                TTS.Speak("保持假腿");
+                            }
+                        case Keys.E:
+                            {
+                                _条件保持假腿 = false;
+                                _条件2 = true;
                                 break;
-                        }
+                            }
+                        case Keys.R:
+                            {
+                                _条件保持假腿 = false;
+                                await 切智力腿(_技能数量);
+                                _条件3 = true;
+                                break;
+                            }
+                        case Keys.D3 when _条件假腿敏捷:
+                            _条件假腿敏捷 = false;
+                            TTS.Speak("切力量");
+                            break;
+                        case Keys.D3:
+                            _条件假腿敏捷 = true;
+                            TTS.Speak("切敏捷");
+                            break;
+                        case Keys.D4:
+                            switch (_条件开启切假腿)
+                            {
+                                case true:
+                                    _条件开启切假腿 = false;
+                                    _条件保持假腿 = false;
+                                    TTS.Speak("不保持假腿");
+                                    break;
+                                default:
+                                    _条件开启切假腿 = true;
+                                    _条件保持假腿 = true;
+                                    TTS.Speak("保持假腿");
+                                    break;
+                            }
 
-                        break;
+                            break;
+                    }
+
+                    break;
                 }
-
-                break;
-            }
 
             #endregion
 
             #region 小小
 
             case "小小":
-            {
-                if (!_总循环条件)
                 {
-                    _总循环条件 = true;
-                    _条件根据图片委托1 ??= 山崩去后摇;
-                    _条件根据图片委托2 ??= 投掷去后摇;
-                    await 无物品状态初始化().ConfigureAwait(false);
-                }
+                    if (!_总循环条件)
+                    {
+                        _总循环条件 = true;
+                        _条件根据图片委托1 ??= 山崩去后摇;
+                        _条件根据图片委托2 ??= 投掷去后摇;
+                        await 无物品状态初始化().ConfigureAwait(false);
+                    }
 
-                switch (e.KeyCode)
-                {
-                    case Keys.F1:
+                    switch (e.KeyCode)
                     {
-                        _是否a杖 = 阿哈利姆神杖(_全局bts, _全局size);
-                        if (_是否a杖) _技能数量 = 5;
-                        else _技能数量 = 4;
-                        break;
-                    }
-                    case Keys.Q:
-                    {
-                        await 切智力腿(_技能数量);
-                        _条件保持假腿 = false;
-                        _条件1 = true;
-                        初始化全局时间(ref _全局时间q);
-                        break;
-                    }
-                    case Keys.W:
-                    {
-                        await 切智力腿(_技能数量);
-                        _条件保持假腿 = false;
-                        _条件2 = true;
-                        初始化全局时间(ref _全局时间w);
-                        break;
-                    }
-                    case Keys.D3 when _条件假腿敏捷:
-                        _条件假腿敏捷 = false;
-                        TTS.Speak("切力量");
-                        break;
-                    case Keys.D3:
-                        _条件假腿敏捷 = true;
-                        TTS.Speak("切敏捷");
-                        break;
-                    case Keys.D4:
-                        switch (_条件开启切假腿)
-                        {
-                            case true:
-                                _条件开启切假腿 = false;
+                        case Keys.F1:
+                            {
+                                _是否a杖 = 阿哈利姆神杖(_全局bts, _全局size);
+                                if (_是否a杖) _技能数量 = 5;
+                                else _技能数量 = 4;
+                                break;
+                            }
+                        case Keys.Q:
+                            {
+                                await 切智力腿(_技能数量);
                                 _条件保持假腿 = false;
-                                TTS.Speak("不保持假腿");
+                                _条件1 = true;
+                                初始化全局时间(ref _全局时间q);
                                 break;
-                            default:
-                                _条件开启切假腿 = true;
-                                _条件保持假腿 = true;
-                                TTS.Speak("保持假腿");
+                            }
+                        case Keys.W:
+                            {
+                                await 切智力腿(_技能数量);
+                                _条件保持假腿 = false;
+                                _条件2 = true;
+                                初始化全局时间(ref _全局时间w);
                                 break;
-                        }
+                            }
+                        case Keys.D3 when _条件假腿敏捷:
+                            _条件假腿敏捷 = false;
+                            TTS.Speak("切力量");
+                            break;
+                        case Keys.D3:
+                            _条件假腿敏捷 = true;
+                            TTS.Speak("切敏捷");
+                            break;
+                        case Keys.D4:
+                            switch (_条件开启切假腿)
+                            {
+                                case true:
+                                    _条件开启切假腿 = false;
+                                    _条件保持假腿 = false;
+                                    TTS.Speak("不保持假腿");
+                                    break;
+                                default:
+                                    _条件开启切假腿 = true;
+                                    _条件保持假腿 = true;
+                                    TTS.Speak("保持假腿");
+                                    break;
+                            }
 
-                        break;
+                            break;
+                    }
+
+                    break;
                 }
-
-                break;
-            }
 
             #endregion
 
             #region 小精灵
 
             case "小精灵":
-            {
-                if (!_总循环条件)
                 {
-                    _总循环条件 = true;
-                    _条件根据图片委托1 ??= 循环续勋章;
-                    _条件根据图片委托2 ??= 幽魂检测;
-                    await 无物品状态初始化().ConfigureAwait(false);
+                    if (!_总循环条件)
+                    {
+                        _总循环条件 = true;
+                        _条件根据图片委托1 ??= 循环续勋章;
+                        _条件根据图片委托2 ??= 幽魂检测;
+                        await 无物品状态初始化().ConfigureAwait(false);
+                    }
+
+                    switch (e.KeyCode)
+                    {
+                        case Keys.F1:
+                            {
+                                _是否a杖 = 阿哈利姆神杖(_全局bts, _全局size);
+                                if (_是否a杖) _技能数量 = 6;
+                                else _技能数量 = 4;
+                                break;
+                            }
+                        case Keys.W:
+                            {
+                                if (_是否a杖) break;
+                                _条件2 = true;
+                                break;
+                            }
+                        case Keys.D2:
+                            {
+                                if (_循环条件1)
+                                {
+                                    _条件1 = false;
+                                    _循环条件1 = false;
+                                    TTS.Speak("关闭续勋章");
+                                }
+                                else
+                                {
+                                    _条件1 = true;
+                                    _循环条件1 = true;
+                                    TTS.Speak("开启续勋章");
+                                }
+
+                                break;
+                            }
+                        case Keys.D3:
+                            {
+                                if (_选择队友头像 < 9)
+                                    _选择队友头像 += 1;
+                                else
+                                    _选择队友头像 = 0;
+
+                                TTS.Speak(string.Concat("选择第", _选择队友头像 + 1, "个人"));
+                                break;
+                            }
+                    }
+
+                    break;
                 }
 
-                switch (e.KeyCode)
+            #endregion
+
+            #region 马尔斯
+
+            case "马尔斯":
                 {
-                    case Keys.F1:
+                    if (!_总循环条件)
                     {
-                        _是否a杖 = 阿哈利姆神杖(_全局bts, _全局size);
-                        if (_是否a杖) _技能数量 = 6;
-                        else _技能数量 = 4;
-                        break;
+                        _总循环条件 = true;
+                        _条件根据图片委托1 ??= 矛接盾留人;
+                        _技能数量 = 4;
+                        await 无物品状态初始化().ConfigureAwait(false);
                     }
-                    case Keys.W:
-                    {
-                        if (_是否a杖) break;
-                        _条件2 = true;
-                        break;
-                    }
-                    case Keys.D2:
-                    {
-                        if (_循环条件1)
-                        {
-                            _条件1 = false;
-                            _循环条件1 = false;
-                            TTS.Speak("关闭续勋章");
-                        }
-                        else
-                        {
-                            _条件1 = true;
-                            _循环条件1 = true;
-                            TTS.Speak("开启续勋章");
-                        }
 
-                        break;
-                    }
-                    case Keys.D3:
+                    switch (e.KeyCode)
                     {
-                        if (_选择队友头像 < 9)
-                            _选择队友头像 += 1;
-                        else
-                            _选择队友头像 = 0;
-
-                        TTS.Speak(string.Concat("选择第", _选择队友头像 + 1, "个人"));
-                        break;
+                        case Keys.D2:
+                            {
+                                KeyPress((uint)Keys.Q);
+                                _条件1 = true;
+                                break;
+                            }
                     }
+
+                    break;
                 }
-
-                break;
-            }
 
             #endregion
 
@@ -829,78 +896,60 @@ public partial class Form2 : Form
             #region 露娜
 
             case "露娜":
-            {
-                if (!_总循环条件)
                 {
-                    _总循环条件 = true;
-                    _条件根据图片委托1 ??= 月光后敏捷平a;
-                    _条件根据图片委托2 ??= 月蚀后敏捷平a;
-                    _全局模式 = 0;
-                    await 无物品状态初始化().ConfigureAwait(false);
-                }
+                    if (!_总循环条件)
+                    {
+                        _总循环条件 = true;
+                        _条件根据图片委托1 ??= 月光后敏捷平a;
+                        _条件根据图片委托2 ??= 月蚀后敏捷平a;
+                        _全局模式 = 0;
+                        await 无物品状态初始化().ConfigureAwait(false);
+                    }
 
 
-                switch (e.KeyCode)
-                {
-                    case Keys.Q:
-                        _条件保持假腿 = false;
-                        初始化全局时间(ref _全局时间q);
-                        await 切智力腿(_技能数量);
-                        _条件1 = true;
-                        break;
-                    case Keys.R:
-                        _条件保持假腿 = false;
-                        初始化全局时间(ref _全局时间r);
-                        await 切智力腿(_技能数量);
-                        _条件2 = true;
-                        break;
-                    case Keys.C:
-                        _条件保持假腿 = false;
-                        await 切智力腿(_技能数量);
-                        await Run(() =>
-                        {
-                            Delay(等待延迟);
+                    switch (e.KeyCode)
+                    {
+                        case Keys.Q:
+                            _条件保持假腿 = false;
+                            初始化全局时间(ref _全局时间q);
+                            await 切智力腿(_技能数量);
+                            _条件1 = true;
+                            break;
+                        case Keys.R:
+                            _条件保持假腿 = false;
+                            初始化全局时间(ref _全局时间r);
+                            await 切智力腿(_技能数量);
+                            _条件2 = true;
+                            break;
+                        case Keys.D3 when _条件假腿敏捷:
+                            _条件假腿敏捷 = false;
                             _条件保持假腿 = true;
-                        });
-                        break;
-                    case Keys.X:
-                        _条件保持假腿 = false;
-                        await 切智力腿(_技能数量);
-                        await Run(() =>
-                        {
-                            Delay(等待延迟);
-                            _条件保持假腿 = true;
-                        });
-                        break;
-                    case Keys.D3 when _条件假腿敏捷:
-                        _条件假腿敏捷 = false;
-                        _条件保持假腿 = true;
-                        TTS.Speak("切力量");
-                        break;
-                    case Keys.D3:
-                        _条件假腿敏捷 = true;
-                        TTS.Speak("切敏捷");
-                        break;
-                    case Keys.D4:
-                        switch (_条件开启切假腿)
-                        {
-                            case true:
-                                _条件开启切假腿 = false;
-                                _条件保持假腿 = false;
-                                TTS.Speak("不保持假腿");
-                                break;
-                            default:
-                                _条件开启切假腿 = true;
-                                _条件保持假腿 = true;
-                                TTS.Speak("保持假腿");
-                                break;
-                        }
+                            TTS.Speak("切力量");
+                            break;
+                        case Keys.D3:
+                            _条件假腿敏捷 = true;
+                            TTS.Speak("切敏捷");
+                            break;
+                        case Keys.D4:
+                            switch (_条件开启切假腿)
+                            {
+                                case true:
+                                    _条件开启切假腿 = false;
+                                    _条件保持假腿 = false;
+                                    TTS.Speak("不保持假腿");
+                                    break;
+                                default:
+                                    _条件开启切假腿 = true;
+                                    _条件保持假腿 = true;
+                                    TTS.Speak("保持假腿");
+                                    break;
+                            }
 
-                        break;
+                            break;
+                    }
+
+                    break;
                 }
-
-                break;
-            }
 
             #endregion
 
@@ -927,208 +976,193 @@ public partial class Form2 : Form
             #region 巨魔
 
             case "巨魔":
-            {
-                // todo:巨魔逻辑适配 （但这英雄实在太弟弟了）
-                //if (!_总循环条件)
-                //{
-                //    _总循环条件 = true;
-                //    await 无物品状态初始化().ConfigureAwait(false);
-                //    _技能数量 = 5;
-                //}
+                {
+                    if (!_总循环条件)
+                    {
+                        _总循环条件 = true;
+                        _全局模式 = 0;
+                        _条件根据图片委托2 ??= 旋风飞斧远程;
+                        _条件根据图片委托3 ??= 旋风飞斧近战;
+                        _条件根据图片委托4 ??= 横行无忌去后摇;
+                        _技能数量 = 5;
+                        await 无物品状态初始化().ConfigureAwait(false);
+                    }
 
-                //_条件根据图片委托1 ??= 巨魔远程飞斧接平a后切回;
+                    switch (e.KeyCode)
+                    {
+                        case Keys.F1:
+                            _是否魔晶 = 阿哈利姆魔晶(_全局bts, _全局size);
+                            if (_是否魔晶) _技能数量 = 6;
+                            else _技能数量 = 5;
+                            break;
+                        case Keys.W:
+                            if (_条件开启切假腿)
+                            {
+                                _条件保持假腿 = false;
+                                await 切智力腿(_全局bts, _全局size);
+                                初始化全局时间(ref _全局时间w);
+                            }
 
-                //if (!_是否魔晶)
-                //{
-                //    _是否魔晶 = 阿哈利姆魔晶(_全局bts, _全局size);
-                //    _技能数量 = 6;
-                //}
+                            _条件2 = true;
+                            break;
+                        case Keys.E:
+                            if (_条件开启切假腿)
+                            {
+                                _条件保持假腿 = false;
+                                await 切智力腿(_全局bts, _全局size);
+                                初始化全局时间(ref _全局时间e);
+                            }
 
-                //switch (e.KeyCode)
-                //{
-                //    case Keys.W:
-                //        {
-                //            if (_全局步骤q == 0)
-                //            {
-                //                var q5 = 获取q5颜色(_全局bts, _全局size);
-                //                var q6 = 获取q6颜色(_全局bts, _全局size);
-                //                var color = SimpleColor.FromRgb(56, 80, 80); // 远程形态 颜色
-                //                if (_是否魔晶)
-                //                {
-                //                    if (!ColorAEqualColorB(color, q6, 0))
-                //                    {
-                //                        KeyPress((uint)Keys.Q);
-                //                    }
-                //                    else
-                //                    {
-                //                        _全局步骤q = 3;
-                //                        _全局时间 = 获取当前时间毫秒();
-                //                    }
+                            _条件3 = true;
+                            break;
+                        case Keys.F:
+                            if (_条件开启切假腿)
+                            {
+                                _条件保持假腿 = false;
+                                await 切智力腿(_全局bts, _全局size);
+                                初始化全局时间(ref _全局时间f);
+                            }
 
-                //                }
-                //                else
-                //                {
-                //                    if (!ColorAEqualColorB(color, q5, 0))
-                //                    {
-                //                        KeyPress((uint)Keys.Q);
-                //                    }
-                //                    else
-                //                    {
-                //                        _全局步骤q = 3;
-                //                        _全局时间 = 获取当前时间毫秒();
-                //                    }
-                //                }
+                            _条件4 = true;
+                            break;
+                        case Keys.D2 when _条件假腿敏捷:
+                            _条件假腿敏捷 = false;
+                            _条件保持假腿 = true;
+                            TTS.Speak("切力量");
+                            break;
+                        case Keys.D2:
+                            _条件假腿敏捷 = true;
+                            TTS.Speak("切敏捷");
+                            break;
+                        case Keys.D3:
+                            switch (_条件开启切假腿)
+                            {
+                                case true:
+                                    _条件开启切假腿 = false;
+                                    _条件保持假腿 = false;
+                                    TTS.Speak("不保持假腿");
+                                    break;
+                                default:
+                                    _条件开启切假腿 = true;
+                                    _条件保持假腿 = true;
+                                    TTS.Speak("保持假腿");
+                                    break;
+                            }
 
-                //                _条件1 = true;
-                //            }
+                            break;
+                    }
 
-                //            break;
-                //        }
-                //    case Keys.E:
-                //        {
-                //            var q5 = 获取q5颜色(_全局bts, _全局size);
-                //            var q6 = 获取q6颜色(_全局bts, _全局size);
-                //            var color = SimpleColor.FromRgb(128, 51, 12); // 近战形态 颜色
-                //            if (_是否魔晶)
-                //            {
-                //                if (!ColorAEqualColorB(color, q6, 0))
-                //                {
-                //                    KeyPress((uint)Keys.Q);
-                //                }
-                //            }
-                //            else
-                //            {
-                //                if (!ColorAEqualColorB(color, q5, 0))
-                //                {
-                //                    KeyPress((uint)Keys.Q);
-                //                }
-                //            }
-
-                //            break;
-                //        }
-                //    case Keys.R:
-                //        {
-                //            根据图片以及类别使用物品(物品_相位, _全局bts, _全局size);
-                //            根据图片以及类别使用物品(物品_否决, _全局bts, _全局size);
-                //            根据图片以及类别使用物品(物品_散失, _全局bts, _全局size);
-                //            根据图片以及类别使用物品(物品_羊刀, _全局bts, _全局size);
-                //            根据图片以及类别使用物品(物品_紫苑, _全局bts, _全局size);
-                //            根据图片以及类别使用物品(物品_血棘, _全局bts, _全局size);
-                //            根据图片以及类别使用物品(物品_深渊之刃, _全局bts, _全局size);
-                //            根据图片以及类别使用物品(物品_勇气勋章, _全局bts, _全局size);
-                //            根据图片以及类别使用物品(物品_炎阳勋章, _全局bts, _全局size);
-                //            break;
-                //        }
-                //    case Keys.D2 when _全局模式 != 1:
-                //        _全局模式 = 1;
-                //        TTS.Speak("开启切假腿");
-                //        break;
-                //    case Keys.D2:
-                //        _全局模式 = 0;
-                //        TTS.Speak("关闭切假腿");
-                //        break;
-                //}
-
-                break;
-            }
+                    break;
+                }
 
             #endregion
 
             #region 小骷髅
 
             case "小骷髅":
-            {
-                if (!_总循环条件)
                 {
-                    _总循环条件 = true;
-                    _全局模式 = 0;
-                    _条件根据图片委托1 ??= 附灵锁扫射;
-                    await 无物品状态初始化().ConfigureAwait(false);
-                }
+                    if (!_总循环条件)
+                    {
+                        _总循环条件 = true;
+                        _全局模式 = 0;
+                        _条件根据图片委托1 ??= 附灵锁扫射;
+                        _技能数量 = 4;
+                        await 无物品状态初始化().ConfigureAwait(false);
+                    }
 
-                switch (e.KeyCode)
-                {
-                    case Keys.F1:
-                        _是否a杖 = 阿哈利姆神杖(_全局bts, _全局size);
-                        if (_是否a杖) _技能数量 = 5;
-                        else _技能数量 = 4;
-                        break;
-                    case Keys.Q:
-                        _全局模式q = 1;
-                        switch (_技能数量)
-                        {
-                            case 5:
+                    switch (e.KeyCode)
+                    {
+                        case Keys.F1:
+                            _是否a杖 = 阿哈利姆神杖(_全局bts, _全局size);
+                            if (_是否a杖) _技能数量 = 5;
+                            else _技能数量 = 4;
+                            break;
+                        case Keys.Q:
+                            _全局模式q = 1;
+                            switch (_技能数量)
                             {
-                                var w5 = 获取w5左下角颜色(_全局bts, _全局size);
-                                if (w5.Equals(new SimpleColor(33, 24, 25))) KeyPress((uint)Keys.D);
-                                break;
+                                case 5:
+                                    {
+                                        var w5 = 获取w5左下角颜色(_全局bts, _全局size);
+                                        if (w5.Equals(Color.FromArgb(33, 24, 25))) KeyPress((uint)Keys.D);
+                                        break;
+                                    }
+                                case 4:
+                                    {
+                                        var w4 = 获取w4左下角颜色(_全局bts, _全局size);
+                                        if (w4.Equals(Color.FromArgb(35, 25, 25))) KeyPress((uint)Keys.D);
+                                        break;
+                                    }
                             }
-                            case 4:
+
+                            if (_条件开启切假腿)
+                                await 切敏捷腿(_技能数量);
+                            _全局模式q = 0;
+                            break;
+                        case Keys.E:
+                            if (_条件开启切假腿)
+                                await 切智力腿(_技能数量);
+                            break;
+                        case Keys.D:
+
+                            if (_条件开启切假腿)
+                                switch (_全局模式d)
+                                {
+                                    case 0:
+                                        _条件开启切假腿 = false;
+                                        _条件保持假腿 = false;
+                                        if (_全局模式d == 0)
+                                            await 切智力腿(_技能数量);
+                                        TTS.Speak("火箭智力腿");
+                                        KeyPress((uint)Keys.D8);
+                                        _全局模式d = 1;
+                                        break;
+                                    case 1:
+                                        _条件开启切假腿 = true;
+                                        _条件保持假腿 = true;
+                                        TTS.Speak("关闭火箭");
+                                        KeyPress((uint)Keys.D8);
+                                        _全局模式d = 0;
+                                        break;
+                                }
+
+                            break;
+                        case Keys.Z:
+                            if (_条件开启切假腿 && RegPicture(物品_魂戒CD, _全局bts, _全局size)) await 切力量腿(_技能数量);
+                            break;
+                        case Keys.D2:
+                            根据图片以及类别使用物品(物品_缚灵锁, _全局bts, _全局size, _技能数量);
+                            _条件1 = true;
+                            break;
+                        case Keys.D3 when _条件假腿敏捷:
+                            _条件假腿敏捷 = false;
+                            _条件保持假腿 = true;
+                            TTS.Speak("切力量");
+                            break;
+                        case Keys.D3:
+                            _条件假腿敏捷 = true;
+                            TTS.Speak("切敏捷");
+                            break;
+                        case Keys.D4:
+                            switch (_条件开启切假腿)
                             {
-                                var w4 = 获取w4左下角颜色(_全局bts, _全局size);
-                                if (w4.Equals(new SimpleColor(35, 25, 25))) KeyPress((uint)Keys.D);
-                                break;
+                                case true:
+                                    _条件开启切假腿 = false;
+                                    _条件保持假腿 = false;
+                                    TTS.Speak("不保持假腿");
+                                    break;
+                                default:
+                                    _条件开启切假腿 = true;
+                                    _条件保持假腿 = true;
+                                    TTS.Speak("保持假腿");
+                                    break;
                             }
-                        }
-                        await 切敏捷腿(_技能数量);
-                        _全局模式q = 0;
-                        break;
-                    case Keys.E:
-                        await 切智力腿(_技能数量);
-                        break;
-                    case Keys.D:
-                        switch (_全局模式d)
-                        {
-                            case 0:
-                                _条件保持假腿 = false;
-                                if (_全局模式q == 0)
-                                    await 切智力腿(_技能数量);
-                                TTS.Speak("火箭智力腿");
-                                _全局模式d = 1;
-                                break;
-                            case 1:
-                                _条件保持假腿 = true;
-                                TTS.Speak("关闭火箭");
-                                _全局模式d = 0;
-                                break;
-                        }
-                        break;
-                    case Keys.Z:
-                        if (RegPicture(物品_魂戒CD, _全局bts, _全局size)) await 切力量腿(_技能数量);
-                        break;
-                    case Keys.D2:
-                        根据图片以及类别使用物品(物品_缚灵锁, _全局bts, _全局size, _技能数量);
-                        _条件1 = true;
-                        break;
-                    case Keys.D3 when _条件假腿敏捷:
-                        _条件假腿敏捷 = false;
-                        _条件保持假腿 = true;
-                        TTS.Speak("切力量");
-                        break;
-                    case Keys.D3:
-                        _条件假腿敏捷 = true;
-                        TTS.Speak("切敏捷");
-                        break;
-                    case Keys.D4:
-                        switch (_条件开启切假腿)
-                        {
-                            case true:
-                                _条件开启切假腿 = false;
-                                _条件保持假腿 = false;
-                                TTS.Speak("不保持假腿");
-                                break;
-                            default:
-                                _条件开启切假腿 = true;
-                                _条件保持假腿 = true;
-                                TTS.Speak("保持假腿");
-                                break;
-                        }
 
-                        break;
+                            break;
+                    }
+
+                    break;
                 }
-
-                break;
-            }
 
             #endregion
 
@@ -1140,995 +1174,1063 @@ public partial class Form2 : Form
                 await Run(捆接种树);
                 break;
             case "小松鼠":
-            {
-                if (e.KeyCode == Keys.D3)
                 {
-                    label1.Text = "D3";
+                    if (e.KeyCode == Keys.D3)
+                    {
+                        label1.Text = "D3";
 
-                    await Run(飞镖接捆接种树);
+                        await Run(飞镖接捆接种树);
+                    }
+
+                    break;
                 }
-
-                break;
-            }
 
             #endregion
 
             #region 拍拍
 
             case "拍拍":
-            {
-                if (!_总循环条件)
                 {
-                    _总循环条件 = true;
-                    _条件根据图片委托1 ??= 超强力量平a;
-                    _条件根据图片委托2 ??= 震撼大地接平a;
-                    _全局模式 = 0;
-                    await 无物品状态初始化().ConfigureAwait(false);
-                }
+                    if (!_总循环条件)
+                    {
+                        _总循环条件 = true;
+                        _条件根据图片委托1 ??= 超强力量平a;
+                        _条件根据图片委托2 ??= 震撼大地接平a;
+                        _条件根据图片委托3 ??= 跳拍;
+                        _全局模式 = 0;
+                        await 无物品状态初始化().ConfigureAwait(false);
+                    }
 
-                switch (e.KeyCode)
-                {
-                    case Keys.W:
-                        _条件保持假腿 = false;
-                        初始化全局时间(ref _全局时间w);
-                        await 切智力腿(_技能数量);
-                        _条件1 = true;
-                        break;
-                    case Keys.Q:
-                        _条件保持假腿 = false;
-                        初始化全局时间(ref _全局时间q);
-                        await 切智力腿(_技能数量);
-                        _条件2 = true;
-                        break;
-                    case Keys.D3 when _条件假腿敏捷:
-                        _条件假腿敏捷 = false;
-                        _条件保持假腿 = true;
-                        TTS.Speak("切力量");
-                        break;
-                    case Keys.D3:
-                        _条件假腿敏捷 = true;
-                        TTS.Speak("切敏捷");
-                        break;
-                    case Keys.D4:
-                        switch (_条件开启切假腿)
-                        {
-                            case true:
-                                _条件开启切假腿 = false;
+                    switch (e.KeyCode)
+                    {
+                        case Keys.W:
+                            if (_条件开启切假腿)
+                            {
                                 _条件保持假腿 = false;
-                                TTS.Speak("不保持假腿");
-                                break;
-                            default:
-                                _条件开启切假腿 = true;
-                                _条件保持假腿 = true;
-                                TTS.Speak("保持假腿");
-                                break;
-                        }
+                                初始化全局时间(ref _全局时间w);
+                                await 切智力腿(_技能数量);
+                            }
+                            _条件1 = true;
+                            break;
+                        case Keys.Q:
+                            if (_条件开启切假腿)
+                            {
+                                _条件保持假腿 = false;
+                                初始化全局时间(ref _全局时间q);
+                                await 切智力腿(_技能数量);
+                            }
+                            _条件2 = true;
+                            break;
+                        case Keys.E:
+                            _条件3 = true;
+                            break;
+                        case Keys.D3 when _条件假腿敏捷:
+                            _条件假腿敏捷 = false;
+                            _条件保持假腿 = true;
+                            TTS.Speak("切力量");
+                            break;
+                        case Keys.D3:
+                            _条件假腿敏捷 = true;
+                            TTS.Speak("切敏捷");
+                            break;
+                        case Keys.D4:
+                            switch (_条件开启切假腿)
+                            {
+                                case true:
+                                    _条件开启切假腿 = false;
+                                    _条件保持假腿 = false;
+                                    TTS.Speak("不保持假腿");
+                                    break;
+                                default:
+                                    _条件开启切假腿 = true;
+                                    _条件保持假腿 = true;
+                                    TTS.Speak("保持假腿");
+                                    break;
+                            }
 
-                        break;
+                            break;
+                    }
+
+                    break;
                 }
-
-                break;
-            }
 
             #endregion
 
             #region 小鱼人
 
             case "小鱼人":
-            {
-                if (!_总循环条件)
                 {
-                    _总循环条件 = true;
-                    _条件根据图片委托1 ??= 黑暗契约平a;
-                    _条件根据图片委托2 ??= 跳水a;
-                    _条件根据图片委托3 ??= 深海护罩a;
-                    _条件根据图片委托4 ??= 跳水a;
-                    _全局模式 = 0;
-                    await 无物品状态初始化().ConfigureAwait(false);
-                }
+                    if (!_总循环条件)
+                    {
+                        _总循环条件 = true;
+                        _条件根据图片委托1 ??= 黑暗契约平a;
+                        _条件根据图片委托2 ??= 跳水a;
+                        _条件根据图片委托3 ??= 深海护罩a;
+                        _条件根据图片委托4 ??= 跳水a;
+                        _全局模式 = 0;
+                        能量转移被动计数 = 0;
+                        _基础攻击间隔 = 1.7;
+                        _基础攻击前摇 = 0.5;
+                        _基础额外攻速 = 1.2;
+                        lb_状态抗性.Text = "转移层数";
+                        await 无物品状态初始化().ConfigureAwait(false);
+                    }
 
-                switch (e.KeyCode)
-                {
-                    case Keys.F1:
-                        _是否魔晶 = 阿哈利姆魔晶(_全局bts, _全局size);
-                        if (_是否魔晶) _技能数量 = 5;
-                        else _技能数量 = 4;
-                        break;
-                    case Keys.Q:
-                        _条件保持假腿 = false;
-                        初始化全局时间(ref _全局时间q);
-                        await 切智力腿(_技能数量);
-                        _条件1 = true;
-                        break;
-                    case Keys.W:
-                        _条件保持假腿 = false;
-                        初始化全局时间(ref _全局时间w);
-                        await 切智力腿(_技能数量);
-                        _条件2 = true;
-                        break;
-                    case Keys.R:
-                        _条件保持假腿 = false;
-                        初始化全局时间(ref _全局时间r);
-                        await 切智力腿(_技能数量);
-                        _条件4 = true;
-                        break;
-                    case Keys.D:
-                        _条件保持假腿 = false;
-                        初始化全局时间(ref _全局时间d);
-                        await 切智力腿(_技能数量);
-                        _条件3 = true;
-                        break;
-                    case Keys.Z:
-                        if (RegPicture(物品_魂戒CD, _全局bts, _全局size)) await 切力量腿(_技能数量);
-                        break;
-                    case Keys.D2:
-                        _条件保持假腿 = false;
-                        await 切智力腿(_技能数量);
-
-                        // 径直移动键位
-                        KeyDown((uint)Keys.L);
-                        // 径直移动
-                        RightClick();
-                        // 基本上180°310  90°170 75°135 转身定点，配合A杖效果极佳
-                        Delay(150);
-                        KeyUp((uint)Keys.L);
-                        KeyPress((uint)Keys.W);
-
-                        _条件保持假腿 = true;
-                        break;
-                    case Keys.D3 when _条件假腿敏捷:
-                        _条件假腿敏捷 = false;
-                        _条件保持假腿 = true;
-                        TTS.Speak("切力量");
-                        break;
-                    case Keys.D3:
-                        _条件假腿敏捷 = true;
-                        TTS.Speak("切敏捷");
-                        break;
-                    case Keys.D4:
-                        switch (_条件开启切假腿)
-                        {
-                            case true:
-                                _条件开启切假腿 = false;
+                    switch (e.KeyCode)
+                    {
+                        case Keys.F1:
+                            _是否魔晶 = 阿哈利姆魔晶(_全局bts, _全局size);
+                            if (_是否魔晶) _技能数量 = 5;
+                            else _技能数量 = 4;
+                            break;
+                        case Keys.Q:
+                            if (_条件开启切假腿)
+                            {
                                 _条件保持假腿 = false;
-                                TTS.Speak("不保持假腿");
-                                break;
-                            default:
-                                _条件开启切假腿 = true;
-                                _条件保持假腿 = true;
-                                TTS.Speak("保持假腿");
-                                break;
-                        }
+                                初始化全局时间(ref _全局时间q);
+                                await 切智力腿(_技能数量);
+                            }
+                            _条件1 = true;
+                            break;
+                        case Keys.W:
+                            if (_条件开启切假腿)
+                            {
+                                _条件保持假腿 = false;
+                                初始化全局时间(ref _全局时间w);
+                                await 切智力腿(_技能数量);
+                            }
 
-                        break;
+                            _条件2 = true;
+                            break;
+                        case Keys.R:
+                            if (_条件开启切假腿)
+                            {
+                                _条件保持假腿 = false;
+                                初始化全局时间(ref _全局时间r);
+                                await 切智力腿(_技能数量);
+                            }
+
+                            _条件4 = true;
+                            break;
+                        case Keys.D:
+                            if (_条件开启切假腿)
+                            {
+                                _条件保持假腿 = false;
+                                初始化全局时间(ref _全局时间d);
+                                await 切智力腿(_技能数量);
+                            }
+
+                            _条件3 = true;
+                            break;
+                        case Keys.D2:
+                            _条件保持假腿 = false;
+                            await 切智力腿(_技能数量);
+                            // 径直移动键位
+                            KeyDown((uint)Keys.L);
+                            Delay(等待延迟);
+                            RightClick();
+                            Delay(等待延迟);
+                            RightClick();
+                            // 基本上180°310  90°170 75°135 转身定点，配合A杖效果极佳
+                            Delay(等待延迟);
+                            KeyUp((uint)Keys.L);
+                            Delay(110);
+                            KeyPress((uint)Keys.W);
+                            Delay(等待延迟);
+                            KeyPress((uint)Keys.W);
+                            _条件保持假腿 = true;
+                            break;
+                        case Keys.D3 when _条件假腿敏捷:
+                            _条件假腿敏捷 = false;
+                            _条件保持假腿 = true;
+                            TTS.Speak("切力量");
+                            break;
+                        case Keys.D3:
+                            _条件假腿敏捷 = true;
+                            TTS.Speak("切敏捷");
+                            break;
+                        case Keys.D4:
+                            switch (_条件开启切假腿)
+                            {
+                                case true:
+                                    _条件开启切假腿 = false;
+                                    _条件保持假腿 = false;
+                                    TTS.Speak("不保持假腿");
+                                    break;
+                                default:
+                                    _条件开启切假腿 = true;
+                                    _条件保持假腿 = true;
+                                    TTS.Speak("保持假腿");
+                                    break;
+                            }
+                            break;
+                    }
+
+                    break;
                 }
-
-                break;
-            }
 
             #endregion
 
             #region 敌法
 
             case "敌法":
-            {
-                if (!_总循环条件)
                 {
-                    _总循环条件 = true;
-                    _条件根据图片委托2 ??= 闪烁敏捷;
-                    _条件根据图片委托3 ??= 法力虚空取消后摇;
-                    _全局模式 = 0;
-                    await 无物品状态初始化().ConfigureAwait(false);
-                }
+                    if (!_总循环条件)
+                    {
+                        _总循环条件 = true;
+                        _条件根据图片委托2 ??= 闪烁敏捷;
+                        _条件根据图片委托3 ??= 法力虚空取消后摇;
+                        _全局模式 = 0;
+                        await 无物品状态初始化().ConfigureAwait(false);
+                    }
 
-                switch (e.KeyCode)
-                {
-                    case Keys.F1:
-                        _是否a杖 = 阿哈利姆神杖(_全局bts, _全局size);
-                        if (_是否a杖) _技能数量 = 5;
-                        else _技能数量 = 4;
-                        break;
-                    case Keys.W:
-                        _条件保持假腿 = false;
-                        await 切智力腿(_技能数量);
-                        初始化全局时间(ref _全局时间w);
-                        _条件2 = true;
-                        break;
-                    case Keys.E:
-                        _条件保持假腿 = false;
-                        await 切智力腿(_技能数量);
-                        await Run(() =>
-                        {
-                            Delay(等待延迟);
-                            _条件保持假腿 = true;
-                        }).ConfigureAwait(false);
-                        break;
-                    case Keys.R:
-                        _条件保持假腿 = false;
-                        await 切智力腿(_技能数量);
-                        初始化全局时间(ref _全局时间r);
-                        _条件3 = true;
-                        break;
-                    case Keys.D3 when _条件假腿敏捷:
-                        _条件假腿敏捷 = false;
-                        _条件保持假腿 = true;
-                        TTS.Speak("切力量");
-                        break;
-                    case Keys.D3:
-                        _条件假腿敏捷 = true;
-                        TTS.Speak("切敏捷");
-                        break;
-                    case Keys.D4:
-                        switch (_条件开启切假腿)
-                        {
-                            case true:
-                                _条件开启切假腿 = false;
-                                _条件保持假腿 = false;
-                                TTS.Speak("不保持假腿");
-                                break;
-                            default:
-                                _条件开启切假腿 = true;
+                    switch (e.KeyCode)
+                    {
+                        case Keys.F1:
+                            _是否a杖 = 阿哈利姆神杖(_全局bts, _全局size);
+                            if (_是否a杖) _技能数量 = 5;
+                            else _技能数量 = 4;
+                            break;
+                        case Keys.W:
+                            _条件保持假腿 = false;
+                            await 切智力腿(_技能数量);
+                            初始化全局时间(ref _全局时间w);
+                            _条件2 = true;
+                            break;
+                        case Keys.E:
+                            _条件保持假腿 = false;
+                            await 切智力腿(_技能数量);
+                            await Run(() =>
+                            {
+                                Delay(等待延迟);
                                 _条件保持假腿 = true;
-                                TTS.Speak("保持假腿");
-                                break;
-                        }
+                            }).ConfigureAwait(false);
+                            break;
+                        case Keys.R:
+                            _条件保持假腿 = false;
+                            await 切智力腿(_技能数量);
+                            初始化全局时间(ref _全局时间r);
+                            _条件3 = true;
+                            break;
+                        case Keys.D3 when _条件假腿敏捷:
+                            _条件假腿敏捷 = false;
+                            _条件保持假腿 = true;
+                            TTS.Speak("切力量");
+                            break;
+                        case Keys.D3:
+                            _条件假腿敏捷 = true;
+                            TTS.Speak("切敏捷");
+                            break;
+                        case Keys.D4:
+                            switch (_条件开启切假腿)
+                            {
+                                case true:
+                                    _条件开启切假腿 = false;
+                                    _条件保持假腿 = false;
+                                    TTS.Speak("不保持假腿");
+                                    break;
+                                default:
+                                    _条件开启切假腿 = true;
+                                    _条件保持假腿 = true;
+                                    TTS.Speak("保持假腿");
+                                    break;
+                            }
 
-                        break;
+                            break;
+                    }
+
+                    break;
                 }
-
-                break;
-            }
 
             #endregion
 
             #region 猴子
 
             case "猴子":
-            {
-                if (!_总循环条件)
                 {
-                    _总循环条件 = true;
-                    _条件根据图片委托1 ??= 灵魂之矛敏捷;
-                    _条件根据图片委托2 ??= 神行百变选择幻象;
-                    _全局模式 = 0;
-                    await 无物品状态初始化().ConfigureAwait(false);
+                    if (!_总循环条件)
+                    {
+                        _总循环条件 = true;
+                        _条件根据图片委托1 ??= 灵魂之矛敏捷;
+                        _条件根据图片委托2 ??= 神行百变选择幻象;
+                        _全局模式 = 0;
+                        await 无物品状态初始化().ConfigureAwait(false);
+                    }
+
+
+                    switch (e.KeyCode)
+                    {
+                        case Keys.Q:
+                            _条件保持假腿 = false;
+                            初始化全局时间(ref _全局时间q);
+                            await 切智力腿(_技能数量);
+                            _条件1 = true;
+                            break;
+                        case Keys.W:
+                            _条件保持假腿 = false;
+                            初始化全局时间(ref _全局时间w);
+                            await 切力量腿(_技能数量);
+                            _条件2 = true;
+                            break;
+                        case Keys.D3 when _条件假腿敏捷:
+                            _条件假腿敏捷 = false;
+                            _条件保持假腿 = true;
+                            TTS.Speak("切力量");
+                            break;
+                        case Keys.D3:
+                            _条件假腿敏捷 = true;
+                            TTS.Speak("切敏捷");
+                            break;
+                        case Keys.D4:
+                            switch (_条件开启切假腿)
+                            {
+                                case true:
+                                    _条件开启切假腿 = false;
+                                    _条件保持假腿 = false;
+                                    TTS.Speak("不保持假腿");
+                                    break;
+                                default:
+                                    _条件开启切假腿 = true;
+                                    _条件保持假腿 = true;
+                                    TTS.Speak("保持假腿");
+                                    break;
+                            }
+
+                            break;
+                    }
+
+                    break;
                 }
-
-
-                switch (e.KeyCode)
-                {
-                    case Keys.Q:
-                        _条件保持假腿 = false;
-                        初始化全局时间(ref _全局时间q);
-                        await 切智力腿(_技能数量);
-                        _条件1 = true;
-                        break;
-                    case Keys.W:
-                        _条件保持假腿 = false;
-                        初始化全局时间(ref _全局时间w);
-                        await 切力量腿(_技能数量);
-                        _条件2 = true;
-                        break;
-                    case Keys.D3 when _条件假腿敏捷:
-                        _条件假腿敏捷 = false;
-                        _条件保持假腿 = true;
-                        TTS.Speak("切力量");
-                        break;
-                    case Keys.D3:
-                        _条件假腿敏捷 = true;
-                        TTS.Speak("切敏捷");
-                        break;
-                    case Keys.D4:
-                        switch (_条件开启切假腿)
-                        {
-                            case true:
-                                _条件开启切假腿 = false;
-                                _条件保持假腿 = false;
-                                TTS.Speak("不保持假腿");
-                                break;
-                            default:
-                                _条件开启切假腿 = true;
-                                _条件保持假腿 = true;
-                                TTS.Speak("保持假腿");
-                                break;
-                        }
-
-                        break;
-                }
-
-                break;
-            }
 
             #endregion
 
             #region 幻刺
 
             case "幻刺":
-            {
-                if (!_总循环条件)
                 {
-                    _总循环条件 = true;
-                    _条件根据图片委托1 ??= 窒息短匕敏捷;
-                    _条件根据图片委托2 ??= 幻影突袭敏捷;
-                    _条件根据图片委托3 ??= 魅影无形敏捷;
-                    _条件根据图片委托4 ??= 刀阵旋风敏捷;
-                    _全局模式 = 0;
-                    await 无物品状态初始化().ConfigureAwait(false);
-                }
-
-                switch (e.KeyCode)
-                {
-                    case Keys.F1:
+                    if (!_总循环条件)
                     {
-                        _是否魔晶 = 阿哈利姆魔晶(_全局bts, _全局size);
-                        if (_是否魔晶) _技能数量 = 5;
-                        else _技能数量 = 4;
-                        break;
+                        _总循环条件 = true;
+                        _条件根据图片委托1 ??= 窒息短匕敏捷;
+                        _条件根据图片委托2 ??= 幻影突袭敏捷;
+                        _条件根据图片委托3 ??= 魅影无形敏捷;
+                        _条件根据图片委托4 ??= 刀阵旋风敏捷;
+                        _全局模式 = 0;
+                        await 无物品状态初始化().ConfigureAwait(false);
                     }
-                    case Keys.Q:
-                        _条件保持假腿 = false;
-                        await 切智力腿(_技能数量);
-                        初始化全局时间(ref _全局时间q);
-                        _条件1 = true;
-                        break;
-                    case Keys.W:
-                        _条件保持假腿 = false;
-                        await 切智力腿(_技能数量);
-                        初始化全局时间(ref _全局时间w);
-                        _条件2 = true;
-                        break;
-                    case Keys.E:
-                        _条件保持假腿 = false;
-                        await 切智力腿(_技能数量);
-                        初始化全局时间(ref _全局时间e);
-                        _条件3 = true;
-                        break;
-                    case Keys.D:
-                        _条件保持假腿 = false;
-                        await 切智力腿(_技能数量);
-                        初始化全局时间(ref _全局时间d);
-                        _条件4 = true;
-                        break;
-                    case Keys.D3 when _条件假腿敏捷:
-                        _条件假腿敏捷 = false;
-                        _条件保持假腿 = true;
-                        TTS.Speak("切力量");
-                        break;
-                    case Keys.D3:
-                        _条件假腿敏捷 = true;
-                        TTS.Speak("切敏捷");
-                        break;
-                    case Keys.D4:
-                        switch (_条件开启切假腿)
-                        {
-                            case true:
-                                _条件开启切假腿 = false;
+
+                    switch (e.KeyCode)
+                    {
+                        case Keys.F1:
+                            {
+                                _是否魔晶 = 阿哈利姆魔晶(_全局bts, _全局size);
+                                _是否a杖 = 阿哈利姆神杖(_全局bts, _全局size);
+                                if (_是否魔晶) _技能数量 = 5;
+                                else _技能数量 = 4;
+                                break;
+                            }
+                        case Keys.Q:
+                            if (_条件开启切假腿)
+                            {
                                 _条件保持假腿 = false;
-                                TTS.Speak("不保持假腿");
-                                break;
-                            default:
-                                _条件开启切假腿 = true;
-                                _条件保持假腿 = true;
-                                TTS.Speak("保持假腿");
-                                break;
-                        }
+                                await 切智力腿(_技能数量);
+                                初始化全局时间(ref _全局时间q);
+                            }
 
-                        break;
+                            _条件1 = true;
+                            break;
+                        case Keys.W:
+                            if (_条件开启切假腿)
+                            {
+                                _条件保持假腿 = false;
+                                await 切智力腿(_技能数量);
+                                初始化全局时间(ref _全局时间w);
+                            }
+
+                            // 触发激怒机制，2.3秒内不吸引仇恨
+                            KeyPress((uint)Keys.A);
+                            _条件2 = true;
+                            break;
+                        case Keys.E:
+                            if (_条件开启切假腿)
+                            {
+                                _条件保持假腿 = false;
+                                await 切智力腿(_技能数量);
+                                初始化全局时间(ref _全局时间e);
+                            }
+
+                            _条件3 = true;
+                            break;
+                        case Keys.D:
+                            if (_条件开启切假腿)
+                            {
+                                _条件保持假腿 = false;
+                                await 切智力腿(_技能数量);
+                                初始化全局时间(ref _全局时间d);
+                            }
+
+                            _条件4 = true;
+                            break;
+                        case Keys.D3 when _条件假腿敏捷:
+                            _条件假腿敏捷 = false;
+                            _条件保持假腿 = true;
+                            TTS.Speak("切力量");
+                            break;
+                        case Keys.D3:
+                            _条件假腿敏捷 = true;
+                            TTS.Speak("切敏捷");
+                            break;
+                        case Keys.D4:
+                            switch (_条件开启切假腿)
+                            {
+                                case true:
+                                    _条件开启切假腿 = false;
+                                    _条件保持假腿 = false;
+                                    TTS.Speak("不保持假腿");
+                                    break;
+                                default:
+                                    _条件开启切假腿 = true;
+                                    _条件保持假腿 = true;
+                                    TTS.Speak("保持假腿");
+                                    break;
+                            }
+
+                            break;
+                    }
+
+                    break;
                 }
-
-                break;
-            }
 
             #endregion
 
             #region 虚空
 
             case "虚空":
-            {
-                if (!_总循环条件)
                 {
-                    _总循环条件 = true;
-                    _条件根据图片委托1 ??= 时间漫游敏捷;
-                    _条件根据图片委托2 ??= 时间膨胀敏捷;
-                    _条件根据图片委托3 ??= 时间结界敏捷;
-                    _全局模式 = 0;
-                    await 无物品状态初始化().ConfigureAwait(false);
-                }
-
-                switch (e.KeyCode)
-                {
-                    case Keys.F1:
+                    if (!_总循环条件)
                     {
-                        _是否魔晶 = 阿哈利姆魔晶(_全局bts, _全局size);
-                        if (_是否魔晶) _技能数量 = 5;
-                        else _技能数量 = 4;
-                        break;
+                        _总循环条件 = true;
+                        _条件根据图片委托1 ??= 时间漫游敏捷;
+                        _条件根据图片委托2 ??= 时间膨胀敏捷;
+                        _条件根据图片委托3 ??= 时间结界敏捷;
+                        _全局模式 = 0;
+                        await 无物品状态初始化().ConfigureAwait(false);
                     }
-                    case Keys.Q:
-                        _条件保持假腿 = false;
-                        await 切智力腿(_技能数量);
-                        初始化全局时间(ref _全局时间q);
-                        _条件1 = true;
-                        break;
-                    case Keys.W:
-                        _条件保持假腿 = false;
-                        await 切智力腿(_技能数量);
-                        初始化全局时间(ref _全局时间w);
-                        _条件2 = true;
-                        break;
-                    case Keys.R:
-                        _条件保持假腿 = false;
-                        await 切智力腿(_技能数量);
-                        初始化全局时间(ref _全局时间r);
-                        _条件3 = true;
-                        break;
-                    case Keys.D3 when _条件假腿敏捷:
-                        _条件假腿敏捷 = false;
-                        _条件保持假腿 = true;
-                        TTS.Speak("切力量");
-                        break;
-                    case Keys.D3:
-                        _条件假腿敏捷 = true;
-                        TTS.Speak("切敏捷");
-                        break;
-                    case Keys.D4:
-                        switch (_条件开启切假腿)
-                        {
-                            case true:
-                                _条件开启切假腿 = false;
-                                _条件保持假腿 = false;
-                                TTS.Speak("不保持假腿");
-                                break;
-                            default:
-                                _条件开启切假腿 = true;
-                                _条件保持假腿 = true;
-                                TTS.Speak("保持假腿");
-                                break;
-                        }
 
-                        break;
+                    switch (e.KeyCode)
+                    {
+                        case Keys.F1:
+                            {
+                                _是否魔晶 = 阿哈利姆魔晶(_全局bts, _全局size);
+                                if (_是否魔晶) _技能数量 = 5;
+                                else _技能数量 = 4;
+                                break;
+                            }
+                        case Keys.Q:
+                            _条件保持假腿 = false;
+                            await 切智力腿(_技能数量);
+                            初始化全局时间(ref _全局时间q);
+                            _条件1 = true;
+                            break;
+                        case Keys.W:
+                            _条件保持假腿 = false;
+                            await 切智力腿(_技能数量);
+                            初始化全局时间(ref _全局时间w);
+                            _条件2 = true;
+                            break;
+                        case Keys.R:
+                            _条件保持假腿 = false;
+                            await 切智力腿(_技能数量);
+                            初始化全局时间(ref _全局时间r);
+                            _条件3 = true;
+                            break;
+                        case Keys.D3 when _条件假腿敏捷:
+                            _条件假腿敏捷 = false;
+                            _条件保持假腿 = true;
+                            TTS.Speak("切力量");
+                            break;
+                        case Keys.D3:
+                            _条件假腿敏捷 = true;
+                            TTS.Speak("切敏捷");
+                            break;
+                        case Keys.D4:
+                            switch (_条件开启切假腿)
+                            {
+                                case true:
+                                    _条件开启切假腿 = false;
+                                    _条件保持假腿 = false;
+                                    TTS.Speak("不保持假腿");
+                                    break;
+                                default:
+                                    _条件开启切假腿 = true;
+                                    _条件保持假腿 = true;
+                                    TTS.Speak("保持假腿");
+                                    break;
+                            }
+
+                            break;
+                    }
+
+                    break;
                 }
-
-                break;
-            }
 
             #endregion
 
             #region TB
 
             case "TB":
-            {
-                if (!_总循环条件)
                 {
-                    _总循环条件 = true;
-                    _条件根据图片委托1 ??= 倒影敏捷;
-                    _条件根据图片委托2 ??= 幻惑敏捷;
-                    _条件根据图片委托3 ??= 魔化敏捷;
-                    _条件根据图片委托4 ??= 恶魔狂热去后摇;
-                    _条件根据图片委托5 ??= 恐怖心潮敏捷;
-                    _全局模式 = 0;
-                    _条件根据图片委托6 ??= 断魂敏捷;
-                    await 无物品状态初始化().ConfigureAwait(false);
-                }
-
-                switch (e.KeyCode)
-                {
-                    case Keys.F1:
+                    if (!_总循环条件)
                     {
-                        _是否魔晶 = 阿哈利姆魔晶(_全局bts, _全局size);
-                        _是否a杖 = 阿哈利姆神杖(_全局bts, _全局size);
-                        _技能数量 = _是否魔晶 switch
-                        {
-                            true when _是否a杖 => 6,
-                            false when !_是否a杖 => 4,
-                            _ => 5
-                        };
-                        break;
+                        _总循环条件 = true;
+                        _条件根据图片委托1 ??= 倒影敏捷;
+                        _条件根据图片委托2 ??= 幻惑敏捷;
+                        _条件根据图片委托3 ??= 魔化敏捷;
+                        _条件根据图片委托4 ??= 恶魔狂热去后摇;
+                        _条件根据图片委托5 ??= 恐怖心潮敏捷;
+                        _全局模式 = 0;
+                        _条件根据图片委托6 ??= 断魂敏捷;
+                        await 无物品状态初始化().ConfigureAwait(false);
                     }
-                    case Keys.Q:
-                        _条件保持假腿 = false;
-                        await 切智力腿(_技能数量);
-                        初始化全局时间(ref _全局时间q);
-                        _条件1 = true;
-                        break;
-                    case Keys.W:
-                        _条件保持假腿 = false;
-                        await 切智力腿(_技能数量);
-                        初始化全局时间(ref _全局时间w);
-                        _条件2 = true;
-                        break;
-                    case Keys.E:
-                        _条件保持假腿 = false;
-                        await 切智力腿(_技能数量);
-                        初始化全局时间(ref _全局时间e);
-                        _条件3 = true;
-                        break;
-                    case Keys.D:
-                        初始化全局时间(ref _全局时间d);
-                        _条件4 = true;
-                        break;
-                    case Keys.F:
-                        _条件保持假腿 = false;
-                        await 切智力腿(_技能数量);
-                        初始化全局时间(ref _全局时间f);
-                        _条件5 = true;
-                        break;
-                    case Keys.R:
-                        _条件保持假腿 = false;
-                        await 切智力腿(_技能数量);
-                        初始化全局时间(ref _全局时间r);
-                        _条件6 = true;
-                        break;
-                    case Keys.D3 when _条件假腿敏捷:
-                        _条件假腿敏捷 = false;
-                        _条件保持假腿 = true;
-                        TTS.Speak("切力量");
-                        break;
-                    case Keys.D3:
-                        _条件假腿敏捷 = true;
-                        TTS.Speak("切敏捷");
-                        break;
-                    case Keys.D4:
-                        switch (_条件开启切假腿)
-                        {
-                            case true:
-                                _条件开启切假腿 = false;
-                                _条件保持假腿 = false;
-                                TTS.Speak("不保持假腿");
-                                break;
-                            default:
-                                _条件开启切假腿 = true;
-                                _条件保持假腿 = true;
-                                TTS.Speak("保持假腿");
-                                break;
-                        }
 
-                        break;
+                    switch (e.KeyCode)
+                    {
+                        case Keys.F1:
+                            {
+                                _是否魔晶 = 阿哈利姆魔晶(_全局bts, _全局size);
+                                _是否a杖 = 阿哈利姆神杖(_全局bts, _全局size);
+                                _技能数量 = _是否魔晶 switch
+                                {
+                                    true when _是否a杖 => 6,
+                                    false when !_是否a杖 => 4,
+                                    _ => 5
+                                };
+                                break;
+                            }
+                        case Keys.Q:
+                            _条件保持假腿 = false;
+                            await 切智力腿(_技能数量);
+                            初始化全局时间(ref _全局时间q);
+                            _条件1 = true;
+                            break;
+                        case Keys.W:
+                            _条件保持假腿 = false;
+                            await 切智力腿(_技能数量);
+                            初始化全局时间(ref _全局时间w);
+                            _条件2 = true;
+                            break;
+                        case Keys.E:
+                            _条件保持假腿 = false;
+                            await 切智力腿(_技能数量);
+                            初始化全局时间(ref _全局时间e);
+                            _条件3 = true;
+                            break;
+                        case Keys.D:
+                            初始化全局时间(ref _全局时间d);
+                            _条件4 = true;
+                            break;
+                        case Keys.F:
+                            _条件保持假腿 = false;
+                            await 切智力腿(_技能数量);
+                            初始化全局时间(ref _全局时间f);
+                            _条件5 = true;
+                            break;
+                        case Keys.R:
+                            _条件保持假腿 = false;
+                            await 切智力腿(_技能数量);
+                            初始化全局时间(ref _全局时间r);
+                            _条件6 = true;
+                            break;
+                        case Keys.D3 when _条件假腿敏捷:
+                            _条件假腿敏捷 = false;
+                            _条件保持假腿 = true;
+                            TTS.Speak("切力量");
+                            break;
+                        case Keys.D3:
+                            _条件假腿敏捷 = true;
+                            TTS.Speak("切敏捷");
+                            break;
+                        case Keys.D4:
+                            switch (_条件开启切假腿)
+                            {
+                                case true:
+                                    _条件开启切假腿 = false;
+                                    _条件保持假腿 = false;
+                                    TTS.Speak("不保持假腿");
+                                    break;
+                                default:
+                                    _条件开启切假腿 = true;
+                                    _条件保持假腿 = true;
+                                    TTS.Speak("保持假腿");
+                                    break;
+                            }
+
+                            break;
+                    }
+
+                    break;
                 }
-
-                break;
-            }
 
             #endregion
 
             #region 赏金
 
             case "赏金":
-            {
-                if (!_总循环条件)
                 {
-                    _总循环条件 = true;
-                    _条件根据图片委托1 ??= 飞镖接平a;
-                    _条件根据图片委托2 ??= 标记去后摇;
-                    _条件根据图片委托3 ??= 循环标记;
-                    _全局模式 = 0;
-                    await 无物品状态初始化().ConfigureAwait(false);
+                    if (!_总循环条件)
+                    {
+                        _总循环条件 = true;
+                        _条件根据图片委托1 ??= 飞镖接平a;
+                        _条件根据图片委托2 ??= 标记去后摇;
+                        _条件根据图片委托3 ??= 循环标记;
+                        _全局模式 = 0;
+                        await 无物品状态初始化().ConfigureAwait(false);
+                    }
+
+
+                    switch (e.KeyCode)
+                    {
+                        case Keys.Q:
+                            _条件1 = true;
+                            break;
+                        case Keys.R:
+                            _条件2 = true;
+                            break;
+                        case Keys.D3:
+                            if (!_条件3)
+                            {
+                                _循环条件1 = true;
+                                _条件3 = true;
+                            }
+                            else
+                            {
+                                _循环条件1 = false;
+                                _条件3 = false;
+                            }
+
+                            break;
+                    }
+
+                    break;
                 }
-
-
-                switch (e.KeyCode)
-                {
-                    case Keys.Q:
-                        _条件1 = true;
-                        break;
-                    case Keys.R:
-                        _条件2 = true;
-                        break;
-                    case Keys.D3:
-                        if (!_条件3)
-                        {
-                            _循环条件1 = true;
-                            _条件3 = true;
-                        }
-                        else
-                        {
-                            _循环条件1 = false;
-                            _条件3 = false;
-                        }
-
-                        break;
-                }
-
-                break;
-            }
 
             #endregion
 
             #region 剧毒
 
             case "剧毒":
-            {
-                if (!_总循环条件)
                 {
-                    _总循环条件 = true;
-                    _条件根据图片委托1 ??= 瘴气去后摇;
-                    _条件根据图片委托2 ??= 蛇棒去后摇;
-                    _条件根据图片委托3 ??= 剧毒新星去后摇;
-                    _条件根据图片委托4 ??= 循环蛇棒;
-                    _全局模式 = 0;
-                    await 无物品状态初始化().ConfigureAwait(false);
-                }
-
-
-                switch (e.KeyCode)
-                {
-                    case Keys.Q:
-                        _中断条件 = false;
-                        _条件1 = true;
-                        break;
-                    case Keys.E:
-                        _中断条件 = false;
-                        _条件2 = true;
-                        break;
-                    case Keys.R:
-                        _中断条件 = false;
-                        _条件3 = true;
-                        break;
-                    case Keys.D3:
+                    if (!_总循环条件)
                     {
-                        _中断条件 = false;
-                        if (!_条件4)
-                        {
-                            _循环条件1 = true;
-                            _条件4 = true;
-                        }
-                        else
-                        {
-                            _循环条件1 = false;
-                            _条件4 = false;
-                        }
-
-                        break;
+                        _总循环条件 = true;
+                        _条件根据图片委托1 ??= 瘴气去后摇;
+                        _条件根据图片委托2 ??= 蛇棒去后摇;
+                        _条件根据图片委托3 ??= 剧毒新星去后摇;
+                        _条件根据图片委托4 ??= 循环蛇棒;
+                        _全局模式 = 0;
+                        await 无物品状态初始化().ConfigureAwait(false);
                     }
-                    case Keys.S:
-                        _中断条件 = true;
-                        _条件1 = false;
-                        _条件2 = false;
-                        _条件3 = false;
-                        _条件4 = false;
-                        break;
-                }
 
-                break;
-            }
+
+                    switch (e.KeyCode)
+                    {
+                        case Keys.Q:
+                            _中断条件 = false;
+                            _条件1 = true;
+                            break;
+                        case Keys.E:
+                            _中断条件 = false;
+                            _条件2 = true;
+                            break;
+                        case Keys.R:
+                            _中断条件 = false;
+                            _条件3 = true;
+                            break;
+                        case Keys.D3:
+                            {
+                                _中断条件 = false;
+                                if (!_条件4)
+                                {
+                                    _循环条件1 = true;
+                                    _条件4 = true;
+                                }
+                                else
+                                {
+                                    _循环条件1 = false;
+                                    _条件4 = false;
+                                }
+
+                                break;
+                            }
+                        case Keys.S:
+                            _中断条件 = true;
+                            _条件1 = false;
+                            _条件2 = false;
+                            _条件3 = false;
+                            _条件4 = false;
+                            break;
+                    }
+
+                    break;
+                }
 
             #endregion
 
             #region 美杜莎
 
             case "美杜莎":
-            {
-                if (!_总循环条件)
                 {
-                    _总循环条件 = true;
-                    _条件根据图片委托1 ??= 秘术异蛇去后摇;
-                    _条件根据图片委托2 ??= 石化凝视去后摇;
-                    await 无物品状态初始化().ConfigureAwait(false);
-                }
-
-                switch (e.KeyCode)
-                {
-                    case Keys.F1:
+                    if (!_总循环条件)
                     {
-                        _是否魔晶 = 阿哈利姆魔晶(_全局bts, _全局size);
-                        if (_是否魔晶) _技能数量 = 5;
-                        else _技能数量 = 4;
-                        break;
+                        _总循环条件 = true;
+                        _条件根据图片委托1 ??= 秘术异蛇去后摇;
+                        _条件根据图片委托2 ??= 石化凝视去后摇;
+                        await 无物品状态初始化().ConfigureAwait(false);
                     }
-                    case Keys.W:
-                        _条件保持假腿 = false;
-                        await 切智力腿(_技能数量);
-                        初始化全局时间(ref _全局时间w);
-                        _条件1 = true;
-                        break;
-                    case Keys.R:
-                        _条件保持假腿 = false;
-                        await 切智力腿(_技能数量);
-                        初始化全局时间(ref _全局时间r);
-                        _条件2 = true;
-                        break;
-                    case Keys.D3 when _条件假腿敏捷:
-                        _条件假腿敏捷 = false;
-                        _条件保持假腿 = true;
-                        TTS.Speak("切力量");
-                        break;
-                    case Keys.D3:
-                        _条件假腿敏捷 = true;
-                        TTS.Speak("切敏捷");
-                        break;
-                    case Keys.D4:
-                        switch (_条件开启切假腿)
-                        {
-                            case true:
-                                _条件开启切假腿 = false;
-                                _条件保持假腿 = false;
-                                TTS.Speak("不保持假腿");
-                                break;
-                            default:
-                                _条件开启切假腿 = true;
-                                _条件保持假腿 = true;
-                                TTS.Speak("保持假腿");
-                                break;
-                        }
 
-                        break;
-                    case Keys.D5:
-                        switch (_循环条件1)
-                        {
-                            case true:
-                                _循环条件1 = false;
-                                TTS.Speak("关闭切分裂箭");
+                    switch (e.KeyCode)
+                    {
+                        case Keys.F1:
+                            {
+                                _是否魔晶 = 阿哈利姆魔晶(_全局bts, _全局size);
+                                if (_是否魔晶) _技能数量 = 5;
+                                else _技能数量 = 4;
                                 break;
-                            default:
-                                _循环条件1 = true;
-                                TTS.Speak("开启切分裂箭");
-                                break;
-                        }
+                            }
+                        case Keys.W:
+                            _条件保持假腿 = false;
+                            await 切智力腿(_技能数量);
+                            初始化全局时间(ref _全局时间w);
+                            _条件1 = true;
+                            break;
+                        case Keys.R:
+                            _条件保持假腿 = false;
+                            await 切智力腿(_技能数量);
+                            初始化全局时间(ref _全局时间r);
+                            _条件2 = true;
+                            break;
+                        case Keys.D3 when _条件假腿敏捷:
+                            _条件假腿敏捷 = false;
+                            _条件保持假腿 = true;
+                            TTS.Speak("切力量");
+                            break;
+                        case Keys.D3:
+                            _条件假腿敏捷 = true;
+                            TTS.Speak("切敏捷");
+                            break;
+                        case Keys.D4:
+                            switch (_条件开启切假腿)
+                            {
+                                case true:
+                                    _条件开启切假腿 = false;
+                                    _条件保持假腿 = false;
+                                    TTS.Speak("不保持假腿");
+                                    break;
+                                default:
+                                    _条件开启切假腿 = true;
+                                    _条件保持假腿 = true;
+                                    TTS.Speak("保持假腿");
+                                    break;
+                            }
 
-                        break;
+                            break;
+                        case Keys.D5:
+                            switch (_循环条件1)
+                            {
+                                case true:
+                                    _循环条件1 = false;
+                                    TTS.Speak("关闭切分裂箭");
+                                    break;
+                                default:
+                                    _循环条件1 = true;
+                                    TTS.Speak("开启切分裂箭");
+                                    break;
+                            }
+
+                            break;
+                    }
+
+                    break;
                 }
-
-                break;
-            }
 
             #endregion
 
             #region 幽鬼
 
             case "幽鬼":
-            {
-                if (!_总循环条件)
                 {
-                    _总循环条件 = true;
-                    _条件根据图片委托1 ??= 幽鬼之刃去后摇;
-                    _条件根据图片委托2 ??= 如影随形去后摇;
-                    _条件根据图片委托3 ??= 鬼影重重去后摇;
-                    _全局模式 = 0;
-                    _技能数量 = 5;
-                    await 无物品状态初始化().ConfigureAwait(false);
-                }
-
-                switch (e.KeyCode)
-                {
-                    case Keys.F1:
+                    if (!_总循环条件)
                     {
-                        _是否a杖 = 阿哈利姆神杖(_全局bts, _全局size);
-                        if (_是否a杖) _技能数量 = 6;
-                        else _技能数量 = 5;
-                        break;
+                        _总循环条件 = true;
+                        _条件根据图片委托1 ??= 幽鬼之刃去后摇;
+                        _条件根据图片委托2 ??= 如影随形去后摇;
+                        _条件根据图片委托3 ??= 鬼影重重去后摇;
+                        _全局模式 = 0;
+                        _技能数量 = 5;
+                        await 无物品状态初始化().ConfigureAwait(false);
                     }
-                    case Keys.Q:
-                        _条件保持假腿 = false;
-                        await 切智力腿(_技能数量);
-                        初始化全局时间(ref _全局时间q);
-                        _条件1 = true;
-                        break;
-                    case Keys.F:
-                        _条件保持假腿 = false;
-                        await 切智力腿(_技能数量);
-                        初始化全局时间(ref _全局时间f);
-                        _条件2 = true;
-                        break;
-                    case Keys.D:
-                        await Run(() =>
-                        {
-                            // RightClick();
-                            KeyPress((uint)Keys.A);
-                            for (var i = 0; i < 4; i++)
+
+                    switch (e.KeyCode)
+                    {
+                        case Keys.F1:
                             {
-                                Delay(60);
-                                //RightClick();
-                                KeyPress((uint)Keys.A);
+                                _是否a杖 = 阿哈利姆神杖(_全局bts, _全局size);
+                                if (_是否a杖) _技能数量 = 6;
+                                else _技能数量 = 5;
+                                break;
                             }
-                        });
-                        break;
-                    case Keys.R:
-                        _条件保持假腿 = false;
-                        await 切智力腿(_技能数量);
-                        初始化全局时间(ref _全局时间r);
-                        _条件3 = true;
-                        break;
-                    case Keys.D3 when _条件假腿敏捷:
-                        _条件假腿敏捷 = false;
-                        _条件保持假腿 = true;
-                        TTS.Speak("切力量");
-                        break;
-                    case Keys.D3:
-                        _条件假腿敏捷 = true;
-                        TTS.Speak("切敏捷");
-                        break;
-                    case Keys.D4:
-                        switch (_条件开启切假腿)
-                        {
-                            case true:
-                                _条件开启切假腿 = false;
+                        case Keys.Q:
+                            if (_条件开启切假腿)
+                            {
                                 _条件保持假腿 = false;
-                                TTS.Speak("不保持假腿");
-                                break;
-                            default:
-                                _条件开启切假腿 = true;
-                                _条件保持假腿 = true;
-                                TTS.Speak("保持假腿");
-                                break;
-                        }
+                                await 切智力腿(_技能数量);
+                                初始化全局时间(ref _全局时间q);
+                            }
+                            _条件1 = true;
+                            break;
+                        case Keys.D:
+                            /// 测试有可以换的位置的时候，换位置后有僵直，快速平A不能取消，要稍微等一会
+                            await Run(() =>
+                            {
+                                Delay(75);
+                                KeyPress((uint)Keys.A);
+                            }).ConfigureAwait(false);
+                            break;
+                        case Keys.D2:
+                            switch (_全局模式f)
+                            {
+                                case 1:
+                                    _全局模式f = 0;
+                                    TTS.Speak("关闭传送分身");
+                                    break;
+                                default:
+                                    _全局模式f = 1;
+                                    TTS.Speak("开启传送分身");
+                                    break;
+                            }
+                            break;
+                        case Keys.F:
+                            _条件2 = true;
+                            break;
+                        case Keys.R:
+                            _条件3 = true;
+                            break;
+                        case Keys.D3 when _条件假腿敏捷:
+                            _条件假腿敏捷 = false;
+                            _条件保持假腿 = true;
+                            TTS.Speak("切力量");
+                            break;
+                        case Keys.D3:
+                            _条件假腿敏捷 = true;
+                            TTS.Speak("切敏捷");
+                            break;
+                        case Keys.D8:
+                            switch (_条件开启切假腿)
+                            {
+                                case true:
+                                    _条件开启切假腿 = false;
+                                    _条件保持假腿 = false;
+                                    TTS.Speak("不保持假腿");
+                                    break;
+                                default:
+                                    _条件开启切假腿 = true;
+                                    _条件保持假腿 = true;
+                                    TTS.Speak("保持假腿");
+                                    break;
+                            }
 
-                        break;
+                            break;
+                    }
+
+                    break;
                 }
-
-                break;
-            }
 
             #endregion
 
             #region 火枪
 
             case "火枪":
-            {
-                if (!_总循环条件)
                 {
-                    _总循环条件 = true;
-                    _条件根据图片委托1 ??= 流霰弹去后摇;
-                    _条件根据图片委托2 ??= 瞄准去后摇;
-                    _条件根据图片委托3 ??= 震荡手雷去后摇;
-                    _条件根据图片委托4 ??= 暗杀去后摇;
-                    _全局模式 = 0;
-                    await 无物品状态初始化().ConfigureAwait(false);
-                }
-
-                switch (e.KeyCode)
-                {
-                    case Keys.F1:
+                    if (!_总循环条件)
                     {
-                        _是否魔晶 = 阿哈利姆魔晶(_全局bts, _全局size);
-                        if (_是否魔晶) _技能数量 = 5;
-                        else _技能数量 = 4;
-                        break;
+                        _总循环条件 = true;
+                        _条件根据图片委托1 ??= 流霰弹去后摇;
+                        _条件根据图片委托2 ??= 瞄准去后摇;
+                        _条件根据图片委托3 ??= 震荡手雷去后摇;
+                        _条件根据图片委托4 ??= 暗杀去后摇;
+                        _全局模式 = 0;
+                        await 无物品状态初始化().ConfigureAwait(false);
                     }
-                    case Keys.Q:
-                        _条件保持假腿 = false;
-                        await 切智力腿(_技能数量);
-                        初始化全局时间(ref _全局时间q);
-                        _条件1 = true;
-                        break;
-                    case Keys.E:
-                        _条件保持假腿 = false;
-                        await 切智力腿(_技能数量);
-                        初始化全局时间(ref _全局时间e);
-                        _条件2 = true;
-                        break;
-                    case Keys.D:
-                        _条件保持假腿 = false;
-                        await 切智力腿(_技能数量);
-                        初始化全局时间(ref _全局时间d);
-                        _条件3 = true;
-                        break;
-                    case Keys.R:
-                        _条件保持假腿 = false;
-                        await 切智力腿(_技能数量);
-                        初始化全局时间(ref _全局时间r);
-                        _条件4 = true;
-                        break;
-                    case Keys.D3 when _条件假腿敏捷:
-                        _条件假腿敏捷 = false;
-                        _条件保持假腿 = true;
-                        TTS.Speak("切力量");
-                        break;
-                    case Keys.D3:
-                        _条件假腿敏捷 = true;
-                        TTS.Speak("切敏捷");
-                        break;
-                    case Keys.D4:
-                        switch (_条件开启切假腿)
-                        {
-                            case true:
-                                _条件开启切假腿 = false;
-                                _条件保持假腿 = false;
-                                TTS.Speak("不保持假腿");
-                                break;
-                            default:
-                                _条件开启切假腿 = true;
-                                _条件保持假腿 = true;
-                                TTS.Speak("保持假腿");
-                                break;
-                        }
 
-                        break;
+                    switch (e.KeyCode)
+                    {
+                        case Keys.F1:
+                            {
+                                _是否魔晶 = 阿哈利姆魔晶(_全局bts, _全局size);
+                                if (_是否魔晶) _技能数量 = 5;
+                                else _技能数量 = 4;
+                                break;
+                            }
+                        case Keys.Q:
+                            _条件保持假腿 = false;
+                            await 切智力腿(_技能数量);
+                            初始化全局时间(ref _全局时间q);
+                            _条件1 = true;
+                            break;
+                        case Keys.E:
+                            _条件保持假腿 = false;
+                            await 切智力腿(_技能数量);
+                            初始化全局时间(ref _全局时间e);
+                            _条件2 = true;
+                            break;
+                        case Keys.D:
+                            _条件保持假腿 = false;
+                            await 切智力腿(_技能数量);
+                            初始化全局时间(ref _全局时间d);
+                            _条件3 = true;
+                            break;
+                        case Keys.R:
+                            _条件保持假腿 = false;
+                            await 切智力腿(_技能数量);
+                            初始化全局时间(ref _全局时间r);
+                            _条件4 = true;
+                            break;
+                        case Keys.D3 when _条件假腿敏捷:
+                            _条件假腿敏捷 = false;
+                            _条件保持假腿 = true;
+                            TTS.Speak("切力量");
+                            break;
+                        case Keys.D3:
+                            _条件假腿敏捷 = true;
+                            TTS.Speak("切敏捷");
+                            break;
+                        case Keys.D4:
+                            switch (_条件开启切假腿)
+                            {
+                                case true:
+                                    _条件开启切假腿 = false;
+                                    _条件保持假腿 = false;
+                                    TTS.Speak("不保持假腿");
+                                    break;
+                                default:
+                                    _条件开启切假腿 = true;
+                                    _条件保持假腿 = true;
+                                    TTS.Speak("保持假腿");
+                                    break;
+                            }
+
+                            break;
+                    }
+
+                    break;
                 }
-
-                break;
-            }
 
             #endregion
 
             #region 小黑
 
             case "小黑":
-            {
-                if (!_总循环条件)
                 {
-                    _总循环条件 = true;
-                    _条件根据图片委托1 ??= 狂风去后摇;
-                    _条件根据图片委托2 ??= 数箭齐发去后摇;
-                    _全局模式 = 0;
-                    await 无物品状态初始化().ConfigureAwait(false);
-                }
+                    if (!_总循环条件)
+                    {
+                        _总循环条件 = true;
+                        _条件根据图片委托1 ??= 狂风去后摇;
+                        _条件根据图片委托2 ??= 数箭齐发去后摇;
+                        _全局模式 = 0;
+                        await 无物品状态初始化().ConfigureAwait(false);
+                    }
 
 
-                switch (e.KeyCode)
-                {
-                    case Keys.D:
-                        switch (_全局模式)
-                        {
-                            case 1:
-                                _条件开启切假腿 = true;
-                                _全局模式 = 0;
-                                break;
-                            default:
-                                _条件开启切假腿 = false;
-                                await 切智力腿(_技能数量);
-                                _全局模式 = 1;
-                                break;
-                        }
+                    switch (e.KeyCode)
+                    {
+                        case Keys.F1:
+                            _全局模式e = ColorAEqualColorB(GetPixelBytes(_全局bts, _全局size, 754 - 坐标偏移x, 957 - 坐标偏移y),
+                                Color.FromArgb(246, 178, 60), 0) ? 1 : 0;
+                            break;
+                        case Keys.D:
+                            switch (_全局模式)
+                            {
+                                case 0:
+                                    _条件开启切假腿 = false;
+                                    _条件保持假腿 = false;
+                                    await 切智力腿(_技能数量);
+                                    _全局模式 = 1;
+                                    TTS.Speak("开启冰箭");
+                                    break;
+                                default:
+                                    _条件开启切假腿 = true;
+                                    _条件保持假腿 = true;
+                                    _全局模式 = 0;
+                                    TTS.Speak("关闭冰箭");
+                                    break;
+                            }
 
-                        break;
-                    case Keys.W:
-                        _条件保持假腿 = false;
-                        await 切智力腿(_技能数量);
-                        初始化全局时间(ref _全局时间w);
-                        _条件1 = true;
-                        break;
-                    case Keys.E:
-                        _条件保持假腿 = false;
-                        await 切智力腿(_技能数量);
-                        初始化全局时间(ref _全局时间e);
-                        _条件2 = true;
-                        break;
-                    case Keys.D2:
-                        if (RegPicture(物品_疯狂面具, _全局bts, _全局size))
-                        {
-                            TTS.Speak("发现疯脸");
-                            _条件保持假腿 = false;
-                            await 切智力腿(_技能数量);
-                        }
-
-                        if (根据图片以及类别使用物品(物品_疯狂面具, _全局bts, _全局size))
-                        {
-                            _条件假腿敏捷 = true;
-                            _条件保持假腿 = true;
-                            _条件开启切假腿 = true;
-                            KeyPress((uint)Keys.A);
-                        }
-
-                        break;
-                    case Keys.D3 when _条件假腿敏捷:
-                        _条件假腿敏捷 = false;
-                        _条件保持假腿 = true;
-                        TTS.Speak("切力量");
-                        break;
-                    case Keys.D3:
-                        _条件假腿敏捷 = true;
-                        TTS.Speak("切敏捷");
-                        break;
-                    case Keys.D4:
-                        switch (_条件开启切假腿)
-                        {
-                            case true:
-                                _条件开启切假腿 = false;
+                            break;
+                        case Keys.W:
+                            if (_条件开启切假腿)
+                            {
                                 _条件保持假腿 = false;
-                                TTS.Speak("不保持假腿");
-                                break;
-                            default:
-                                _条件开启切假腿 = true;
+                                await 切智力腿(_技能数量);
+                            }
+
+                            _条件1 = true;
+                            break;
+                        case Keys.E:
+                            if (_条件开启切假腿)
+                            {
+                                _条件保持假腿 = false;
+                                await 切智力腿(_技能数量);
+                                初始化全局时间(ref _全局时间e);
+                            }
+
+                            _条件2 = true;
+                            break;
+                        case Keys.D2:
+                            if (RegPicture(物品_疯狂面具, _全局bts, _全局size))
+                            {
+                                TTS.Speak("发现疯脸");
+                                _条件保持假腿 = false;
+                                await 切智力腿(_技能数量);
+                            }
+
+                            if (根据图片以及类别使用物品(物品_疯狂面具, _全局bts, _全局size))
+                            {
+                                _条件假腿敏捷 = true;
                                 _条件保持假腿 = true;
-                                TTS.Speak("保持假腿");
-                                break;
-                        }
+                                _条件开启切假腿 = true;
+                                KeyPress((uint)Keys.A);
+                            }
 
-                        break;
+                            break;
+                        case Keys.D3 when _条件假腿敏捷:
+                            _条件假腿敏捷 = false;
+                            _条件保持假腿 = true;
+                            TTS.Speak("切力量");
+                            break;
+                        case Keys.D3:
+                            _条件假腿敏捷 = true;
+                            TTS.Speak("切敏捷");
+                            break;
+                        case Keys.D4:
+                            switch (_条件开启切假腿)
+                            {
+                                case true:
+                                    _条件开启切假腿 = false;
+                                    _条件保持假腿 = false;
+                                    TTS.Speak("不保持假腿");
+                                    break;
+                                default:
+                                    _条件开启切假腿 = true;
+                                    _条件保持假腿 = true;
+                                    TTS.Speak("保持假腿");
+                                    break;
+                            }
+
+                            break;
+                    }
+
+                    break;
                 }
-
-                break;
-            }
 
             #endregion
 
@@ -2136,42 +2238,163 @@ public partial class Form2 : Form
 
             #region 智力
 
+            #region 光法
+
+            case "光法":
+                {
+                    if (!_总循环条件)
+                    {
+                        _总循环条件 = true;
+                        _条件根据图片委托1 ??= 减少300毫秒蓄力;
+                        _条件根据图片委托2 ??= 炎阳之缚去后摇;
+                        _条件根据图片委托3 ??= 查克拉魔法去后摇;
+                        _条件根据图片委托4 ??= 循环查克拉;
+                        _条件根据图片委托5 ??= 致盲之光去后摇;
+                        _条件根据图片委托6 ??= 灵光去后摇接炎阳;
+
+                        _全局模式r = 0;
+                        _全局模式e = 0;
+                        _全局模式 = 0;
+                        await 无物品状态初始化().ConfigureAwait(false);
+                    }
+
+                    static void 灵魂形态持续()
+                    {
+                        Delay(_全局模式 == 1 ? 55000 : 40000);
+                        _是否a杖 = 阿哈利姆神杖(_全局bts, _全局size);
+                        _全局模式r = 0;
+                        if (_是否a杖)
+                        {
+                            _技能数量 = 5 + _全局模式r;
+                        }
+                        else
+                        {
+                            _技能数量 = 4 + _全局模式r;
+                        }
+                    }
+
+                    switch (e.KeyCode)
+                    {
+                        case Keys.F1:
+                            _是否a杖 = 阿哈利姆神杖(_全局bts, _全局size);
+                            if (_是否a杖)
+                            {
+                                _技能数量 = 5 + _全局模式r;
+                            }
+                            else
+                            {
+                                _技能数量 = 4 + _全局模式r;
+                            }
+
+                            break;
+                        case Keys.Q:
+                            _条件1 = true;
+                            break;
+                        case Keys.W:
+                            _条件2 = true;
+                            break;
+                        case Keys.E:
+                            _条件3 = true;
+                            break;
+                        case Keys.D:
+                            _条件5 = true;
+                            break;
+                        case Keys.F:
+                            _条件6 = true;
+                            break;
+                        case Keys.D2:
+                            switch (_全局模式e)
+                            {
+                                case 0:
+                                    _条件4 = true;
+                                    _全局模式e = 1;
+                                    TTS.Speak("开启循环查克拉");
+                                    break;
+                                case 1:
+                                    _条件4 = false;
+                                    _全局模式e = 0;
+                                    TTS.Speak("关闭循环查克拉");
+                                    break;
+                            }
+                            break;
+                        case Keys.D3:
+                            switch (_全局模式)
+                            {
+                                case 0:
+                                    _全局模式 = 1;
+                                    TTS.Speak("+15秒灵魂形态时间");
+                                    break;
+                                case 1:
+                                    _全局模式 = 0;
+                                    TTS.Speak("默认时间");
+                                    break;
+                            }
+                            break;
+                        case Keys.D9:
+                            await Run(() => { RightClick(); }).ConfigureAwait(false);
+                            break;
+                        case Keys.R:
+                            _是否a杖 = 阿哈利姆神杖(_全局bts, _全局size);
+                            if (_是否a杖)
+                            {
+                                _全局模式r = 1;
+                                _技能数量 = 5 + _全局模式r;
+                                await Run(灵魂形态持续).ConfigureAwait(false);
+                            }
+                            else
+                            {
+                                _全局模式r = 1;
+                                _技能数量 = 4 + _全局模式r;
+                                await Run(灵魂形态持续).ConfigureAwait(false);
+                            }
+
+                            break;
+                    }
+
+                    break;
+                }
+
+            #endregion
+
             #region 黑鸟
 
             case "黑鸟":
-            {
-                if (!_总循环条件)
                 {
-                    _总循环条件 = true;
-                    _条件根据图片委托1 ??= 关接陨星锤;
-                    _条件根据图片委托2 ??= 神智之蚀去后摇;
-                    _条件根据图片委托3 ??= 关接跳;
-                    await 无物品状态初始化().ConfigureAwait(false);
+                    if (!_总循环条件)
+                    {
+                        _总循环条件 = true;
+                        _条件根据图片委托1 ??= 关接陨星锤;
+                        _条件根据图片委托2 ??= 神智之蚀去后摇;
+                        _条件根据图片委托3 ??= 关接跳;
+                        await 无物品状态初始化().ConfigureAwait(false);
+                    }
+
+
+                    switch (e.KeyCode)
+                    {
+                        case Keys.D:
+                            _中断条件 = false;
+                            KeyPress((uint)Keys.W);
+                            _条件1 = true;
+                            break;
+                        case Keys.H:
+                            _中断条件 = true;
+                            break;
+                        case Keys.W:
+                            根据图片以及类别使用物品(物品_纷争, _全局bts, _全局size, _技能数量);
+                            break;
+                        case Keys.E:
+                            _中断条件 = false;
+                            _条件3 = true;
+                            break;
+                        case Keys.R:
+                            _中断条件 = false;
+                            _条件2 = true;
+                            break;
+                    }
+
+                    break;
                 }
-
-
-                switch (e.KeyCode)
-                {
-                    case Keys.D:
-                        _中断条件 = false;
-                        KeyPress((uint)Keys.W);
-                        _条件1 = true;
-                        break;
-                    case Keys.H:
-                        _中断条件 = true;
-                        break;
-                    case Keys.E:
-                        _条件3 = true;
-                        break;
-                    case Keys.R:
-                        _中断条件 = true;
-                        根据图片以及类别使用物品(物品_纷争, _全局bts, _全局size, _技能数量);
-                        _条件2 = true;
-                        break;
-                }
-
-                break;
-            }
 
             #endregion
 
@@ -2182,203 +2405,251 @@ public partial class Form2 : Form
                 await Run(跳秒接午夜凋零黑洞);
                 break;
             case "谜团":
-            {
-                if (e.KeyCode == Keys.F)
                 {
-                    label1.Text = "F";
-                    await Run(刷新接凋零黑洞);
-                }
+                    if (e.KeyCode == Keys.F)
+                    {
+                        label1.Text = "F";
+                        await Run(刷新接凋零黑洞);
+                    }
 
-                break;
-            }
+                    break;
+                }
 
             #endregion
 
             #region 冰女
 
             case "冰女":
-            {
-                break;
-            }
+                {
+                    break;
+                }
 
             #endregion
 
             #region 火女
 
             case "火女":
-            {
-                if (!_总循环条件)
                 {
-                    _总循环条件 = true;
-                    _条件根据图片委托1 ??= 龙破斩去后摇;
-                    _条件根据图片委托2 ??= 光击阵去后摇;
-                    _条件根据图片委托3 ??= 神灭斩去后摇;
-                    await 无物品状态初始化().ConfigureAwait(false);
+                    if (!_总循环条件)
+                    {
+                        _总循环条件 = true;
+                        _条件根据图片委托1 ??= 龙破斩去后摇;
+                        _条件根据图片委托2 ??= 光击阵去后摇;
+                        _条件根据图片委托3 ??= 神灭斩去后摇;
+                        _技能数量 = 4;
+                        await 无物品状态初始化().ConfigureAwait(false);
+                    }
+
+
+                    switch (e.KeyCode)
+                    {
+                        case Keys.F1:
+                            _是否a杖 = 阿哈利姆神杖(_全局bts, _全局size);
+                            if (_是否a杖) _技能数量 = 5;
+                            else _技能数量 = 4;
+                            break;
+                        case Keys.Q:
+                            _中断条件 = false;
+                            _条件1 = true;
+                            break;
+                        case Keys.W:
+                            _中断条件 = false;
+                            _条件2 = true;
+                            break;
+                        case Keys.R:
+                            _中断条件 = false;
+                            _条件3 = true;
+                            break;
+                    }
+
+                    break;
                 }
-
-
-                switch (e.KeyCode)
-                {
-                    case Keys.Q:
-                        _中断条件 = false;
-                        _条件1 = true;
-                        break;
-                    case Keys.W:
-                        _中断条件 = false;
-                        _条件2 = true;
-                        break;
-                    case Keys.R:
-                        _中断条件 = false;
-                        _条件3 = true;
-                        break;
-                    case Keys.S:
-                        _中断条件 = true;
-                        _条件1 = false;
-                        _条件2 = false;
-                        _条件3 = false;
-                        break;
-                }
-
-                break;
-            }
 
             #endregion
 
             #region 蓝猫
 
             case "蓝猫":
-            {
-                if (!_总循环条件)
                 {
-                    _总循环条件 = true;
-                    _条件根据图片委托1 ??= 拉接平A;
-                    _条件根据图片委托2 ??= 滚接平A;
-                    _条件根据图片委托3 ??= 快速回城;
-                    await 无物品状态初始化().ConfigureAwait(false);
+                    if (!_总循环条件)
+                    {
+                        _总循环条件 = true;
+                        _条件根据图片委托1 ??= 拉接平A;
+                        _条件根据图片委托2 ??= 滚接平A;
+                        _条件根据图片委托3 ??= 快速回城;
+                        await 无物品状态初始化().ConfigureAwait(false);
+                    }
+
+
+                    switch (e.KeyCode)
+                    {
+                        case Keys.Q:
+                            await Run(残影接平A);
+                            break;
+                        case Keys.W:
+                            _条件1 = true;
+                            break;
+                        case Keys.R:
+                            _条件2 = true;
+                            break;
+                        case Keys.D4:
+                            _条件3 = true;
+                            break;
+                        //else if (e.KeyCode == Keys.F)
+                        //{
+                        //    label1.Text = "F";
+                        //    Task.await Run(原地滚A);
+                        //}
+                        case Keys.F when !_丢装备条件:
+                            await Run(批量扔装备);
+                            _丢装备条件 = !_丢装备条件;
+                            break;
+                        case Keys.F:
+                            await Run(捡装备);
+                            _丢装备条件 = !_丢装备条件;
+                            break;
+                    }
+
+                    break;
                 }
-
-
-                switch (e.KeyCode)
-                {
-                    case Keys.Q:
-                        await Run(残影接平A);
-                        break;
-                    case Keys.W:
-                        _条件1 = true;
-                        break;
-                    case Keys.R:
-                        _条件2 = true;
-                        break;
-                    case Keys.D4:
-                        _条件3 = true;
-                        break;
-                    //else if (e.KeyCode == Keys.F)
-                    //{
-                    //    label1.Text = "F";
-                    //    Task.await Run(原地滚A);
-                    //}
-                    case Keys.F when !_丢装备条件:
-                        await Run(批量扔装备);
-                        _丢装备条件 = !_丢装备条件;
-                        break;
-                    case Keys.F:
-                        await Run(捡装备);
-                        _丢装备条件 = !_丢装备条件;
-                        break;
-                }
-
-                break;
-            }
 
             #endregion
 
             #region 宙斯
 
             case "宙斯":
-            {
-                if (!_总循环条件)
                 {
-                    _总循环条件 = true;
-                    _条件根据图片委托1 ??= 弧形闪电去后摇;
-                    _条件根据图片委托2 ??= 雷击去后摇;
-                    _条件根据图片委托3 ??= 弧形闪电不能释放;
-                    _条件根据图片委托4 ??= 神圣一跳去后摇;
-                    _全局模式 = 0;
-                    await 无物品状态初始化().ConfigureAwait(false);
-                }
-
-                switch (e.KeyCode)
-                {
-                    case Keys.F1:
+                    if (!_总循环条件)
                     {
-                        _是否魔晶 = 阿哈利姆魔晶(_全局bts, _全局size);
-                        if (_是否魔晶) _技能数量 = 5;
-                        else _技能数量 = 4;
-                        break;
+                        _总循环条件 = true;
+                        _条件根据图片委托1 ??= 弧形闪电去后摇;
+                        _条件根据图片委托2 ??= 雷击去后摇;
+                        _条件根据图片委托3 ??= 弧形闪电不能释放;
+                        _条件根据图片委托4 ??= 神圣一跳去后摇;
+                        _全局模式 = 0;
+                        await 无物品状态初始化().ConfigureAwait(false);
                     }
-                    // 弧形闪电和雷击都是不朽
-                    case Keys.Q when await 弧形闪电不能释放(_全局bts, _全局size):
-                        _全局模式q = 1;
-                        _条件3 = true;
-                        break;
-                    case Keys.Q:
-                        _条件1 = true;
-                        break;
-                    case Keys.W:
-                        _条件2 = true;
-                        break;
-                    case Keys.E:
-                        _条件4 = true;
-                        break;
-                    case Keys.D2:
-                        switch (_全局模式)
-                        {
-                            case < 1:
-                                _全局模式 = 1;
-                                TTS.Speak("去后摇移动");
-                                break;
-                            case 1:
-                                _全局模式 = 0;
-                                TTS.Speak("去后摇接平A");
-                                break;
-                        }
 
-                        break;
+                    switch (e.KeyCode)
+                    {
+                        case Keys.F1:
+                            {
+                                _是否魔晶 = 阿哈利姆魔晶(_全局bts, _全局size);
+                                if (_是否魔晶) _技能数量 = 5;
+                                else _技能数量 = 4;
+                                break;
+                            }
+                        // 弧形闪电和雷击都是不朽
+                        case Keys.Q when await 弧形闪电不能释放(_全局bts, _全局size):
+                            _全局模式q = 1;
+                            _条件3 = true;
+                            break;
+                        case Keys.Q:
+                            _条件1 = true;
+                            break;
+                        case Keys.W:
+                            _条件2 = true;
+                            break;
+                        case Keys.E:
+                            _条件4 = true;
+                            break;
+                        case Keys.D2:
+                            switch (_全局模式)
+                            {
+                                case < 1:
+                                    _全局模式 = 1;
+                                    TTS.Speak("去后摇移动");
+                                    break;
+                                case 1:
+                                    _全局模式 = 0;
+                                    TTS.Speak("去后摇接平A");
+                                    break;
+                            }
+
+                            break;
+                    }
+
+                    break;
                 }
-
-                break;
-            }
 
             #endregion
 
             #region 卡尔
 
-            case "卡尔" when e.KeyCode == Keys.D2:
-                label1.Text = "D2";
-
-                await Run(三冰对线);
-                break;
-            case "卡尔" when e.KeyCode == Keys.D3:
-                label1.Text = "D2";
-
-                await Run(三火平A);
-                break;
-            case "卡尔" when e.KeyCode == Keys.D1:
-                label1.Text = "D2";
-
-                await Run(三雷幽灵);
-                break;
             case "卡尔":
-            {
-                if (e.KeyCode == Keys.D4)
                 {
-                    label1.Text = "D2";
+                    if (!_总循环条件)
+                    {
+                        _总循环条件 = true;
+                        _全局模式 = 0;
+                        _条件根据图片委托1 ??= 三冰对线;
+                        _条件根据图片委托2 ??= 三雷对线;
+                        _条件根据图片委托3 ??= 三雷幽灵;
+                        _条件根据图片委托4 ??= 极冷吹风陨星锤雷暴;
+                        await 无物品状态初始化().ConfigureAwait(false);
+                    }
 
-                    await Run(吹风天火);
+                    switch (e.KeyCode)
+                    {
+                        case Keys.D1:
+                            _条件1 = true;
+                            break;
+                        case Keys.D2:
+                            _条件2 = true;
+                            break;
+                        case Keys.D3:
+                            _全局模式e = 0;
+                            _条件3 = true;
+                            break;
+                        case Keys.D4:
+                            _全局模式f = 0;
+                            _条件4 = true;
+                            break;
+                    }
+
+                    break;
                 }
 
-                break;
-            }
+            #endregion
+
+            #region 骨法
+
+            case "骨法":
+                {
+                    if (!_总循环条件)
+                    {
+                        _总循环条件 = true;
+                        _条件根据图片委托1 ??= 龙破斩去后摇;
+                        _条件根据图片委托2 ??= 光击阵去后摇;
+                        _条件根据图片委托3 ??= 神灭斩去后摇;
+                        _技能数量 = 4;
+                        await 无物品状态初始化().ConfigureAwait(false);
+                    }
+
+
+                    switch (e.KeyCode)
+                    {
+                        case Keys.F1:
+                            _是否a杖 = 阿哈利姆神杖(_全局bts, _全局size);
+                            if (_是否a杖) _技能数量 = 5;
+                            else _技能数量 = 4;
+                            break;
+                        case Keys.Q:
+                            _中断条件 = false;
+                            _条件1 = true;
+                            break;
+                        case Keys.W:
+                            _中断条件 = false;
+                            _条件2 = true;
+                            break;
+                        case Keys.R:
+                            _中断条件 = false;
+                            _条件3 = true;
+                            break;
+                    }
+
+                    break;
+                }
 
             #endregion
 
@@ -2392,319 +2663,346 @@ public partial class Form2 : Form
                 await Run(吹风接撕裂大地);
                 break;
             case "拉席克":
-            {
-                if (e.KeyCode == Keys.S) _中断条件 = true;
+                {
+                    if (e.KeyCode == Keys.S) _中断条件 = true;
 
-                break;
-            }
+                    break;
+                }
 
             #endregion
 
             #region 暗影萨满
 
             case "暗影萨满":
-            {
-                if (!_总循环条件)
                 {
-                    _总循环条件 = true;
-                    _条件根据图片委托1 ??= 苍穹振击取消后摇;
-                    _条件根据图片委托2 ??= 变羊取消后摇;
-                    _条件根据图片委托3 ??= 释放群蛇守卫取消后摇;
-                    _条件根据图片委托4 ??= 推推破林肯秒羊;
-                    _条件根据图片委托5 ??= 枷锁持续施法隐身;
-                    await 无物品状态初始化().ConfigureAwait(false);
+                    if (!_总循环条件)
+                    {
+                        _总循环条件 = true;
+                        _条件根据图片委托1 ??= 苍穹振击取消后摇;
+                        _条件根据图片委托2 ??= 变羊取消后摇;
+                        _条件根据图片委托3 ??= 释放群蛇守卫取消后摇;
+                        _条件根据图片委托4 ??= 推推破林肯秒羊;
+                        _条件根据图片委托5 ??= 枷锁持续施法隐身;
+                        _全局模式q = 0;
+                        await 无物品状态初始化().ConfigureAwait(false);
+                    }
+
+
+                    switch (e.KeyCode)
+                    {
+                        case Keys.Q:
+                            _全局步骤q = 0;
+                            初始化全局时间(ref _全局时间q);
+                            _条件1 = true;
+                            break;
+                        case Keys.W:
+                            var i = Convert.ToDouble(tb_状态抗性.Text.Trim());
+                            _状态抗性倍数 = (100 - (i > 100 ? 0 : i)) / 100;
+                            if (RegPicture(物品_祭礼长袍, _全局bts, _全局size)) _状态抗性倍数 *= 1.1;
+                            if (RegPicture(物品_永恒遗物, _全局bts, _全局size)) _状态抗性倍数 *= 1.2;
+                            if (await 智力跳刀buff(_全局bts, _全局size)) _状态抗性倍数 *= 1.2;
+                            _条件2 = true;
+                            break;
+                        case Keys.E:
+                            初始化全局时间(ref _全局时间e);
+                            if (!RegPicture(物品_暗影护符buff, _全局bts, _全局size)) 根据图片以及类别自我使用物品(物品_暗影护符, _全局bts, _全局size, _技能数量);
+                            _条件5 = true;
+                            break;
+                        case Keys.R:
+                            初始化全局时间(ref _全局时间r);
+                            _条件3 = true;
+                            break;
+                        case Keys.D1:
+                            switch (_全局模式w)
+                            {
+                                case 0:
+                                    _全局模式w = 1;
+                                    TTS.Speak("羊拉");
+                                    break;
+                                case 1:
+                                    _全局模式w = 2;
+                                    TTS.Speak("羊电");
+                                    break;
+                                case 2:
+                                    _全局模式w = 3;
+                                    TTS.Speak("羊电拉");
+                                    break;
+                                case 3:
+                                    _全局模式w = 4;
+                                    TTS.Speak("羊电大拉");
+                                    break;
+                                case 4:
+                                    _全局模式w = 0;
+                                    TTS.Speak("羊接平A");
+                                    break;
+                            }
+
+                            break;
+                        case Keys.D2:
+                            _条件4 = true;
+                            break;
+                        case Keys.D3:
+                            switch (_全局模式q)
+                            {
+                                case 1:
+                                    _全局模式q = 0;
+                                    TTS.Speak("关电羊");
+                                    break;
+                                default:
+                                    _全局模式q = 1;
+                                    TTS.Speak("开电羊");
+                                    break;
+                            }
+                            break;
+                        case Keys.D4:
+                            await Run(() =>
+                            {
+                                Run(() => { 渐隐期间放技能((uint)Keys.E, 800); });
+                                if (_全局模式 != 1) return;
+                                Delay(500);
+                                var p = MousePosition;
+                                MouseMove(_指定地点p);
+                                KeyPress((uint)Keys.Space);
+                                Delay(100);
+                                MouseMove(p);
+                                _全局模式 = 0;
+                            });
+                            break;
+                        case Keys.D5:
+                            await Run(() =>
+                            {
+                                _指定地点p = MousePosition;
+                                _全局模式 = 1;
+                                TTS.Speak("指定地点");
+                            });
+                            break;
+                    }
+
+                    break;
                 }
-
-
-                switch (e.KeyCode)
-                {
-                    case Keys.Q:
-                        _全局步骤q = 0;
-                        初始化全局时间(ref _全局时间q);
-                        _条件1 = true;
-                        break;
-                    case Keys.W:
-                        var i = Convert.ToDouble(tb_状态抗性.Text.Trim());
-                        _状态抗性倍数 = (100 - (i > 100 ? 0 : i)) / 100;
-                        if (RegPicture(物品_祭礼长袍, _全局bts, _全局size)) _状态抗性倍数 *= 1.1;
-                        if (RegPicture(物品_永恒遗物, _全局bts, _全局size)) _状态抗性倍数 *= 1.2;
-                        if (await 智力跳刀buff(_全局bts, _全局size)) _状态抗性倍数 *= 1.2;
-                        _条件2 = true;
-                        break;
-                    case Keys.E:
-                        初始化全局时间(ref _全局时间e);
-                        if (!RegPicture(物品_暗影护符buff, _全局bts, _全局size)) 根据图片以及类别自我使用物品(物品_暗影护符, _全局bts, _全局size, _技能数量);
-                        _条件5 = true;
-                        break;
-                    case Keys.R:
-                        初始化全局时间(ref _全局时间r);
-                        _条件3 = true;
-                        break;
-                    case Keys.D1:
-                        switch (_全局模式w)
-                        {
-                            case 0:
-                                _全局模式w = 1;
-                                TTS.Speak("羊拉");
-                                break;
-                            case 1:
-                                _全局模式w = 2;
-                                TTS.Speak("羊电");
-                                break;
-                            case 2:
-                                _全局模式w = 3;
-                                TTS.Speak("羊电拉");
-                                break;
-                            case 3:
-                                _全局模式w = 4;
-                                TTS.Speak("羊电大拉");
-                                break;
-                            case 4:
-                                _全局模式w = 0;
-                                TTS.Speak("羊接平A");
-                                break;
-                        }
-
-                        break;
-                    case Keys.D2:
-                        _条件4 = true;
-                        break;
-                    case Keys.D3:
-                        await Run(async () =>
-                        {
-                            await Run(() => { 渐隐期间放技能((uint)Keys.E, 800); });
-                            if (_全局模式 != 1) return;
-                            Delay(650);
-                            var p = MousePosition;
-                            MouseMove(_指定地点p);
-                            KeyPress((uint)Keys.Space);
-                            Delay(等待延迟);
-                            MouseMove(p);
-                            _全局模式 = 0;
-                        });
-                        break;
-                    case Keys.D4:
-                        await Run(() =>
-                        {
-                            _指定地点p = MousePosition;
-                            _全局模式 = 1;
-                        });
-                        break;
-                    case Keys.D5:
-                        _条件6 = true;
-                        break;
-                }
-
-                break;
-            }
 
             #endregion
 
             #region 小仙女
 
             case "小仙女":
-            {
-                switch (e.KeyCode)
                 {
-                    case Keys.D2:
-                        label1.Text = "D2";
+                    switch (e.KeyCode)
+                    {
+                        case Keys.D2:
+                            label1.Text = "D2";
 
-                        _循环条件2 = true;
+                            _循环条件2 = true;
 
-                        await Run(诅咒皇冠吹风);
-                        break;
-                    case Keys.D9:
-                        label1.Text = "D3";
+                            await Run(诅咒皇冠吹风);
+                            break;
+                        case Keys.D9:
+                            label1.Text = "D3";
 
-                        _循环条件2 = true;
+                            _循环条件2 = true;
 
-                        await Run(作祟暗影之境最大化伤害);
-                        break;
-                    case Keys.S:
-                        _循环条件2 = false;
-                        break;
-                    case Keys.E:
-                        await Run(皇冠延时计时);
-                        break;
+                            await Run(作祟暗影之境最大化伤害);
+                            break;
+                        case Keys.S:
+                            _循环条件2 = false;
+                            break;
+                        case Keys.E:
+                            await Run(皇冠延时计时);
+                            break;
+                    }
+
+                    break;
                 }
-
-                break;
-            }
 
             #endregion
 
             #region 天怒
 
             case "天怒":
-            {
-                if (!_总循环条件)
                 {
-                    _总循环条件 = true;
-                    _条件根据图片委托1 ??= 循环奥数鹰隼;
-                    _条件根据图片委托2 ??= 天怒秒人连招;
-                    _条件根据图片委托3 ??= 奥数鹰隼去后摇;
-                    await 无物品状态初始化().ConfigureAwait(false);
-                }
-
-                switch (e.KeyCode)
-                {
-                    case Keys.F1:
+                    if (!_总循环条件)
                     {
-                        _是否魔晶 = 阿哈利姆魔晶(_全局bts, _全局size);
-                        if (_是否魔晶) _技能数量 = 5;
-                        else _技能数量 = 4;
-                        break;
-                    }
-                    case Keys.Q:
-                        初始化全局时间(ref _全局时间q);
-                        _中断条件 = false;
-                        _条件3 = true;
-                        break;
-                    case Keys.D3:
+                        _总循环条件 = true;
+                        _条件根据图片委托1 ??= 循环奥数鹰隼;
                         _条件根据图片委托2 ??= 天怒秒人连招;
-                        _全局步骤 = 0;
-                        _中断条件 = false;
-                        _条件2 = true;
-                        break;
-                    case Keys.D2:
-                        switch (_循环条件1)
-                        {
-                            case true:
-                                _中断条件 = true;
-                                _条件1 = false;
-                                _循环条件1 = false;
-                                break;
-                            default:
-                                _中断条件 = false;
-                                _条件1 = true;
-                                _循环条件1 = true;
-                                break;
-                        }
-
-                        break;
-                    case Keys.S:
-                    {
-                        for (var i = 0; i < 2; i++)
-                        {
-                            _条件根据图片委托2 = null;
-                            _中断条件 = true;
-                            _条件3 = false;
-                            _条件2 = false;
-                            Delay(60); // 等待程序内延迟结束
-                        }
-
-                        break;
+                        _条件根据图片委托3 ??= 奥数鹰隼去后摇;
+                        _条件根据图片委托4 ??= 上古封印去后摇;
+                        await 无物品状态初始化().ConfigureAwait(false);
                     }
-                }
 
-                break;
-            }
+                    switch (e.KeyCode)
+                    {
+                        case Keys.F1:
+                            {
+                                _是否魔晶 = 阿哈利姆魔晶(_全局bts, _全局size);
+                                if (_是否魔晶) _技能数量 = 5;
+                                else _技能数量 = 4;
+                                break;
+                            }
+                        case Keys.Q:
+                            初始化全局时间(ref _全局时间q);
+                            _中断条件 = false;
+                            _条件3 = true;
+                            break;
+                        case Keys.W:
+                            await Run((() =>
+                            {
+                                KeyPress((uint)Keys.A);
+                                RightClick();
+                            })).ConfigureAwait(false);
+                            break;
+                        case Keys.E:
+                            初始化全局时间(ref _全局时间e);
+                            _中断条件 = false;
+                            _条件4 = true;
+                            break;
+                        case Keys.D3:
+                            _中断条件 = false;
+                            _全局步骤 = 0;
+                            _条件2 = true;
+                            break;
+                        case Keys.D2:
+                            switch (_循环条件1)
+                            {
+                                case true:
+                                    _中断条件 = true;
+                                    _条件1 = false;
+                                    _循环条件1 = false;
+                                    break;
+                                default:
+                                    _中断条件 = false;
+                                    _条件1 = true;
+                                    _循环条件1 = true;
+                                    break;
+                            }
+
+                            break;
+                        case Keys.S:
+                            {
+                                for (var i = 0; i < 2; i++)
+                                {
+                                    _条件根据图片委托2 = null;
+                                    _中断条件 = true;
+                                    _条件4 = false;
+                                    _条件3 = false;
+                                    _条件2 = false;
+                                    Delay(60); // 等待程序内延迟结束
+                                }
+
+                                _中断条件 = false;
+                                _条件根据图片委托2 ??= 天怒秒人连招;
+                                break;
+                            }
+                    }
+
+                    break;
+                }
 
             #endregion
 
             #region 炸弹人
 
             case "炸弹人":
-            {
-                if (!_总循环条件)
                 {
-                    _总循环条件 = true;
-                    _条件根据图片委托1 ??= 粘性炸弹去后摇;
-                    _条件根据图片委托2 ??= 活性电击去后摇;
-                    _条件根据图片委托3 ??= 爆破起飞去后摇;
-                    _条件根据图片委托4 ??= 爆破后接3雷粘性炸弹;
-                    _技能数量 = 5;
-                    await 无物品状态初始化().ConfigureAwait(false);
-                }
-
-
-                switch (e.KeyCode)
-                {
-                    case Keys.Q:
-                        _条件1 = true;
-                        break;
-                    case Keys.W:
-                        _条件2 = true;
-                        break;
-                    case Keys.E:
-                        根据图片以及类别使用物品(物品_纷争, _全局bts, _全局size, _技能数量);
-                        _条件3 = true;
-                        break;
-                    case Keys.D2:
+                    if (!_总循环条件)
                     {
-                        switch (_全局模式e)
-                        {
-                            case 0:
-                                _全局模式e = 1;
-                                TTS.Speak("起飞后接3连炸弹");
-                                break;
-                            case 1:
-                                _全局模式e = 0;
-                                TTS.Speak("起飞后不接3连炸弹");
-                                break;
-                        }
-
-                        break;
+                        _总循环条件 = true;
+                        _条件根据图片委托1 ??= 粘性炸弹去后摇;
+                        _条件根据图片委托2 ??= 活性电击去后摇;
+                        _条件根据图片委托3 ??= 爆破起飞去后摇;
+                        _条件根据图片委托4 ??= 爆破后接3雷粘性炸弹;
+                        _技能数量 = 5;
+                        await 无物品状态初始化().ConfigureAwait(false);
                     }
-                    case Keys.D when !_丢装备条件:
-                        await Run(批量扔装备);
-                        _丢装备条件 = !_丢装备条件;
-                        break;
-                    case Keys.D:
-                        await Run(捡装备);
-                        _丢装备条件 = !_丢装备条件;
-                        break;
-                }
 
-                break;
-            }
+
+                    switch (e.KeyCode)
+                    {
+                        case Keys.Q:
+                            _条件1 = true;
+                            break;
+                        case Keys.W:
+                            _条件2 = true;
+                            break;
+                        case Keys.E:
+                            根据图片以及类别使用物品(物品_纷争, _全局bts, _全局size, _技能数量);
+                            _条件3 = true;
+                            break;
+                        case Keys.D2:
+                            {
+                                switch (_全局模式e)
+                                {
+                                    case 0:
+                                        _全局模式e = 1;
+                                        TTS.Speak("起飞后接3连炸弹");
+                                        break;
+                                    case 1:
+                                        _全局模式e = 0;
+                                        TTS.Speak("起飞后不接3连炸弹");
+                                        break;
+                                }
+
+                                break;
+                            }
+                        case Keys.D when !_丢装备条件:
+                            await Run(批量扔装备);
+                            _丢装备条件 = !_丢装备条件;
+                            break;
+                        case Keys.D:
+                            await Run(捡装备);
+                            _丢装备条件 = !_丢装备条件;
+                            break;
+                    }
+
+                    break;
+                }
 
             #endregion
 
             #region 神域
 
             case "神域":
-            {
-                if (!_总循环条件)
                 {
-                    _总循环条件 = true;
-                    _条件根据图片委托1 ??= 命运敕令去后摇;
-                    _条件根据图片委托2 ??= 涤罪之焰去后摇;
-                    _条件根据图片委托3 ??= 虚妄之诺去后摇;
-                    _条件根据图片委托4 ??= 涤罪之焰不可释放;
-                    _条件根据图片委托5 ??= 天命之雨去后摇;
-                    await 无物品状态初始化().ConfigureAwait(false);
-                }
-
-                switch (e.KeyCode)
-                {
-                    case Keys.F1:
+                    if (!_总循环条件)
                     {
-                        _是否a杖 = 阿哈利姆神杖(_全局bts, _全局size);
-                        if (_是否a杖) _技能数量 = 5;
-                        else _技能数量 = 4;
-                        break;
+                        _总循环条件 = true;
+                        _条件根据图片委托1 ??= 命运敕令去后摇;
+                        _条件根据图片委托2 ??= 涤罪之焰去后摇;
+                        _条件根据图片委托3 ??= 虚妄之诺去后摇;
+                        _条件根据图片委托4 ??= 涤罪之焰不可释放;
+                        _条件根据图片委托5 ??= 天命之雨去后摇;
+                        await 无物品状态初始化().ConfigureAwait(false);
                     }
-                    case Keys.W:
-                        _条件1 = true;
-                        break;
-                    case Keys.E when await 涤罪之焰不可释放(_全局bts, _全局size):
-                        _全局模式e = 1;
-                        _条件4 = true;
-                        break;
-                    case Keys.E:
-                        _条件2 = true;
-                        break;
-                    case Keys.D:
-                        _条件5 = true;
-                        break;
-                    case Keys.R:
-                        _条件3 = true;
-                        break;
-                }
 
-                break;
-            }
+                    switch (e.KeyCode)
+                    {
+                        case Keys.F1:
+                            {
+                                _是否a杖 = 阿哈利姆神杖(_全局bts, _全局size);
+                                if (_是否a杖) _技能数量 = 5;
+                                else _技能数量 = 4;
+                                break;
+                            }
+                        case Keys.W:
+                            _条件1 = true;
+                            break;
+                        case Keys.E when await 涤罪之焰不可释放(_全局bts, _全局size):
+                            _全局模式e = 1;
+                            _条件4 = true;
+                            break;
+                        case Keys.E:
+                            _条件2 = true;
+                            break;
+                        case Keys.D:
+                            _条件5 = true;
+                            break;
+                        case Keys.R:
+                            _条件3 = true;
+                            break;
+                    }
+
+                    break;
+                }
 
             #endregion
 
@@ -2717,425 +3015,583 @@ public partial class Form2 : Form
                 break;
 
             case "修补匠" when e.KeyCode == Keys.D1:
-            {
-                _条件1 = !_条件1;
-                TTS.Speak(_条件1 ? "开启刷导弹" : "关闭刷导弹");
-                break;
-            }
+                {
+                    _条件1 = !_条件1;
+                    TTS.Speak(_条件1 ? "开启刷导弹" : "关闭刷导弹");
+                    break;
+                }
             case "修补匠" when e.KeyCode == Keys.D2:
-            {
-                _条件2 = !_条件2;
-                TTS.Speak(_条件2 ? "开启刷跳" : "关闭刷跳");
-                break;
-            }
+                {
+                    _条件2 = !_条件2;
+                    TTS.Speak(_条件2 ? "开启刷跳" : "关闭刷跳");
+                    break;
+                }
             case "修补匠" when e.KeyCode == Keys.D3:
-            {
-                _条件3 = !_条件3;
-                TTS.Speak(_条件3 ? "开启希瓦" : "关闭希瓦");
-                break;
-            }
+                {
+                    _条件3 = !_条件3;
+                    TTS.Speak(_条件3 ? "开启希瓦" : "关闭希瓦");
+                    break;
+                }
             case "修补匠" when e.KeyCode == Keys.X:
                 await Run(推推接刷新);
                 break;
             case "修补匠":
-            {
-                if (e.KeyCode == Keys.D1) await Run(检测敌方英雄自动导弹);
+                {
+                    if (e.KeyCode == Keys.D1) await Run(检测敌方英雄自动导弹);
 
-                break;
-            }
+                    break;
+                }
 
             #endregion
 
             #region 莱恩
 
             case "莱恩":
-            {
-                if (!_总循环条件)
                 {
-                    _总循环条件 = true;
-                    _条件根据图片委托1 ??= 莱恩羊接技能;
-                    _条件根据图片委托2 ??= 死亡一指去后摇;
-                    _条件根据图片委托3 ??= 推推破林肯秒羊;
-                    await 无物品状态初始化().ConfigureAwait(false);
+                    if (!_总循环条件)
+                    {
+                        _总循环条件 = true;
+                        _条件根据图片委托1 ??= 莱恩羊接技能;
+                        _条件根据图片委托2 ??= 死亡一指去后摇;
+                        _条件根据图片委托3 ??= 推推破林肯秒羊;
+                        _条件根据图片委托4 ??= 羊刺刷新秒人;
+
+                        await 无物品状态初始化().ConfigureAwait(false);
+                    }
+
+
+                    switch (e.KeyCode)
+                    {
+                        case Keys.W:
+                            _中断条件 = false;
+                            _条件1 = true;
+                            break;
+                        case Keys.R:
+                            _中断条件 = false;
+                            await 大招前纷争(_全局bts, _全局size);
+                            _条件2 = true;
+                            break;
+                        case Keys.E:
+                            if (!RegPicture(物品_暗影护符buff, _全局bts, _全局size)) 根据图片以及类别自我使用物品(物品_暗影护符, _全局bts, _全局size, _技能数量);
+                            break;
+                        case Keys.D2:
+                            _中断条件 = false;
+                            _条件3 = true;
+                            break;
+                        case Keys.S:
+                            _中断条件 = true;
+                            break;
+                        case Keys.D3:
+                            _全局模式 = 0;
+                            _中断条件 = false;
+                            _条件4 = true;
+                            break;
+                        case Keys.D4 when !_条件5:
+                            _条件5 = true;
+                            TTS.Speak("开启刷新秒人");
+                            break;
+                        case Keys.D4:
+                            _条件5 = false;
+                            TTS.Speak("关闭刷新秒人");
+                            break;
+                        case Keys.D5 when !_条件6:
+                            _条件6 = true;
+                            TTS.Speak("开启羊接吸");
+                            break;
+                        case Keys.D5:
+                            _条件6 = false;
+                            TTS.Speak("开启羊接A");
+                            break;
+                    }
+
+                    break;
                 }
-
-
-                switch (e.KeyCode)
-                {
-                    case Keys.W:
-                        _条件1 = true;
-                        break;
-                    case Keys.R:
-                        await 大招前纷争(_全局bts, _全局size);
-                        _条件2 = true;
-                        break;
-                    case Keys.D2:
-                        _条件3 = true;
-                        break;
-                    case Keys.D3 when !_条件4:
-                        _条件4 = true;
-                        TTS.Speak("开启羊接吸");
-                        break;
-                    case Keys.D3:
-                        _条件4 = false;
-                        TTS.Speak("开启羊接A");
-                        break;
-                }
-
-                break;
-            }
 
             #endregion
 
             #region 沉默
 
             case "沉默":
-            {
-                if (!_总循环条件)
                 {
-                    _总循环条件 = true;
-                    _条件根据图片委托1 ??= 奥数诅咒去后摇;
-                    _条件根据图片委托2 ??= 遗言去后摇;
-                    await 无物品状态初始化().ConfigureAwait(false);
+                    if (!_总循环条件)
+                    {
+                        _总循环条件 = true;
+                        _条件根据图片委托1 ??= 奥数诅咒去后摇;
+                        _条件根据图片委托2 ??= 遗言去后摇;
+                        await 无物品状态初始化().ConfigureAwait(false);
+                    }
+
+
+                    switch (e.KeyCode)
+                    {
+                        case Keys.Q:
+                            初始化全局时间(ref _全局时间q);
+                            _条件1 = true;
+                            break;
+                        case Keys.E:
+                            初始化全局时间(ref _全局时间q);
+                            _条件2 = true;
+                            break;
+                        case Keys.D2:
+                            switch (_全局模式q)
+                            {
+                                case < 1:
+                                    _全局模式q = 1;
+                                    TTS.Speak("奥数诅咒最大化接遗言");
+                                    break;
+                                case 1:
+                                    _全局模式q = 2;
+                                    TTS.Speak("奥数诅咒接平A");
+                                    break;
+                                case 2:
+                                    _全局模式q = 0;
+                                    TTS.Speak("奥数诅咒快速接遗言");
+                                    break;
+                            }
+
+                            break;
+                    }
+
+                    break;
                 }
-
-
-                switch (e.KeyCode)
-                {
-                    case Keys.Q:
-                        初始化全局时间(ref _全局时间q);
-                        _条件1 = true;
-                        break;
-                    case Keys.E:
-                        初始化全局时间(ref _全局时间q);
-                        _条件2 = true;
-                        break;
-                    case Keys.D2:
-                        switch (_全局模式q)
-                        {
-                            case < 1:
-                                _全局模式q = 1;
-                                TTS.Speak("奥数诅咒最大化接遗言");
-                                break;
-                            case 1:
-                                _全局模式q = 2;
-                                TTS.Speak("奥数诅咒接平A");
-                                break;
-                            case 2:
-                                _全局模式q = 0;
-                                TTS.Speak("奥数诅咒快速接遗言");
-                                break;
-                        }
-
-                        break;
-                }
-
-                break;
-            }
 
             #endregion
 
             #region 戴泽
 
             case "戴泽":
-            {
-                if (!_总循环条件)
                 {
-                    _总循环条件 = true;
-                    _条件根据图片委托1 ??= 剧毒之触去后摇;
-                    _条件根据图片委托2 ??= 薄葬去后摇;
-                    _条件根据图片委托3 ??= 暗影波去后摇;
-                    _条件根据图片委托4 ??= 善咒去后摇;
-                    _条件根据图片委托5 ??= 邪能去后摇;
-                    _技能数量 = 5;
-                    _基础攻击前摇 = 0.3;
-                    await 无物品状态初始化().ConfigureAwait(false);
+                    if (!_总循环条件)
+                    {
+                        _总循环条件 = true;
+                        _条件根据图片委托1 ??= 剧毒之触去后摇;
+                        _条件根据图片委托2 ??= 薄葬去后摇;
+                        _条件根据图片委托3 ??= 暗影波去后摇;
+                        _条件根据图片委托4 ??= 善咒去后摇;
+                        _条件根据图片委托5 ??= 邪能去后摇;
+                        _技能数量 = 5;
+                        _基础攻击前摇 = 0.3;
+                        _基础攻击间隔 = 1.7;
+                        _基础额外攻速 = 1;
+                        await 无物品状态初始化().ConfigureAwait(false);
+                    }
+
+
+                    switch (e.KeyCode)
+                    {
+                        case Keys.Q:
+                            初始化全局时间(ref _全局时间q);
+                            _条件1 = true;
+                            break;
+                        case Keys.W:
+                            初始化全局时间(ref _全局时间w);
+                            _条件2 = true;
+                            break;
+                        case Keys.E:
+                            初始化全局时间(ref _全局时间e);
+                            _条件3 = true;
+                            break;
+                        case Keys.D:
+                            初始化全局时间(ref _全局时间d);
+                            _条件4 = true;
+                            break;
+                        case Keys.R:
+                            初始化全局时间(ref _全局时间r);
+                            _条件5 = true;
+                            break;
+                        case Keys.D1:
+                            tb_攻速.Text = 获取图片文字(537, 510, 27, 16).Trim();
+                            _攻击速度 = Convert.ToDouble(tb_攻速.Text);
+                            break;
+                        case Keys.Tab:
+                            _实际出手时间 = 获取当前时间毫秒();
+                            await Run(() =>
+                            {
+                                _ = 走A去等待后摇();
+                            }).ConfigureAwait(false);
+                            break;
+                    }
+
+                    break;
                 }
-
-
-                switch (e.KeyCode)
-                {
-                    case Keys.Q:
-                        初始化全局时间(ref _全局时间q);
-                        _条件1 = true;
-                        break;
-                    case Keys.W:
-                        初始化全局时间(ref _全局时间w);
-                        _条件2 = true;
-                        break;
-                    case Keys.E:
-                        初始化全局时间(ref _全局时间e);
-                        _条件3 = true;
-                        break;
-                    case Keys.D:
-                        初始化全局时间(ref _全局时间d);
-                        _条件4 = true;
-                        break;
-                    case Keys.R:
-                        初始化全局时间(ref _全局时间r);
-                        _条件5 = true;
-                        break;
-                    case Keys.D1:
-                        tb_攻速.Text = 获取图片文字(537, 510, 27, 16).Trim();
-                        _攻击速度 = Convert.ToDouble(tb_攻速.Text);
-                        break;
-                    case Keys.D2:
-                        await Run(续走A);
-                        break;
-                }
-
-                break;
-            }
 
             #endregion
 
             #region 双头龙
 
             case "双头龙":
-            {
-                if (!_总循环条件)
                 {
-                    _总循环条件 = true;
-                    _条件根据图片委托1 ??= 冰火交加去后摇;
-                    _条件根据图片委托2 ??= 冰封路径去后摇;
-                    _条件根据图片委托3 ??= 烈焰焚身去后摇;
-                    _条件根据图片委托4 ??= 吹风接冰封路径;
-                    await 无物品状态初始化().ConfigureAwait(false);
-                }
-
-                switch (e.KeyCode)
-                {
-                    case Keys.F1:
+                    if (!_总循环条件)
                     {
-                        _是否魔晶 = 阿哈利姆魔晶(_全局bts, _全局size);
-                        if (_是否魔晶) _技能数量 = 5;
-                        else _技能数量 = 4;
-                        break;
+                        _总循环条件 = true;
+                        _条件根据图片委托1 ??= 冰火交加去后摇;
+                        _条件根据图片委托2 ??= 冰封路径去后摇;
+                        _条件根据图片委托3 ??= 烈焰焚身去后摇;
+                        _条件根据图片委托4 ??= 吹风接冰封路径;
+                        await 无物品状态初始化().ConfigureAwait(false);
                     }
-                    case Keys.Q:
-                        初始化全局时间(ref _全局时间q);
-                        _条件1 = true;
-                        break;
-                    case Keys.W:
-                        初始化全局时间(ref _全局时间w);
-                        _条件2 = true;
-                        break;
-                    case Keys.R:
-                        初始化全局时间(ref _全局时间r);
-                        _条件3 = true;
-                        break;
-                    case Keys.D2:
-                        var d5 = 获取d5颜色(_全局bts, _全局size);
-                        var e5 = 获取e5颜色(_全局bts, _全局size);
-                        var e4 = 获取e4颜色(_全局bts, _全局size);
-                        switch (_技能数量)
-                        {
-                            // RightClick();
-                            case 5:
-                                if (ColorAEqualColorB(d5, SimpleColor.FromRgb(9, 38, 81), 0))
-                                    KeyPress((uint)Keys.D);
-                                else if (ColorAEqualColorB(e5, SimpleColor.FromRgb(79, 36, 7), 0))
-                                    KeyPress((uint)Keys.E);
-                                else
-                                    KeyPress((uint)Keys.A);
-                                break;
-                            default:
-                                if (ColorAEqualColorB(e4, SimpleColor.FromRgb(70, 32, 8), 0))
-                                    KeyPress((uint)Keys.E);
-                                else
-                                    KeyPress((uint)Keys.A);
-                                break;
-                        }
 
-                        break;
-                    case Keys.D3:
-                        _条件4 = true;
-                        break;
+                    switch (e.KeyCode)
+                    {
+                        case Keys.F1:
+                            {
+                                _是否魔晶 = 阿哈利姆魔晶(_全局bts, _全局size);
+                                if (_是否魔晶) _技能数量 = 5;
+                                else _技能数量 = 4;
+                                break;
+                            }
+                        case Keys.Q:
+                            初始化全局时间(ref _全局时间q);
+                            _条件1 = true;
+                            break;
+                        case Keys.W:
+                            初始化全局时间(ref _全局时间w);
+                            _条件2 = true;
+                            break;
+                        case Keys.R:
+                            初始化全局时间(ref _全局时间r);
+                            _条件3 = true;
+                            break;
+                        case Keys.D2:
+                            var d5 = 获取d5颜色(_全局bts, _全局size);
+                            var e5 = 获取e5颜色(_全局bts, _全局size);
+                            var e4 = 获取e4颜色(_全局bts, _全局size);
+                            switch (_技能数量)
+                            {
+                                // RightClick();
+                                case 5:
+                                    if (ColorAEqualColorB(d5, Color.FromArgb(9, 38, 81), 0))
+                                        KeyPress((uint)Keys.D);
+                                    else if (ColorAEqualColorB(e5, Color.FromArgb(79, 36, 7), 0))
+                                        KeyPress((uint)Keys.E);
+                                    else
+                                        KeyPress((uint)Keys.A);
+                                    break;
+                                default:
+                                    if (ColorAEqualColorB(e4, Color.FromArgb(70, 32, 8), 0))
+                                        KeyPress((uint)Keys.E);
+                                    else
+                                        KeyPress((uint)Keys.A);
+                                    break;
+                            }
+
+                            break;
+                        case Keys.D3:
+                            _条件4 = true;
+                            break;
+                    }
+
+                    break;
                 }
-
-                break;
-            }
 
             #endregion
 
             #region 巫医
 
             case "巫医":
-            {
-                if (!_总循环条件)
                 {
-                    _总循环条件 = true;
-                    _条件根据图片委托1 ??= 麻痹药剂去后摇;
-                    _条件根据图片委托2 ??= 巫蛊咒术去后摇;
-                    _条件根据图片委托3 ??= 死亡守卫隐身;
-                    await 无物品状态初始化().ConfigureAwait(false);
-                }
-
-                switch (e.KeyCode)
-                {
-                    case Keys.F1:
+                    if (!_总循环条件)
                     {
-                        _是否魔晶 = 阿哈利姆魔晶(_全局bts, _全局size);
-                        if (_是否魔晶) _技能数量 = 5;
-                        else _技能数量 = 4;
-                        break;
+                        _总循环条件 = true;
+                        _条件根据图片委托1 ??= 麻痹药剂去后摇;
+                        _条件根据图片委托2 ??= 巫蛊咒术去后摇;
+                        _条件根据图片委托3 ??= 死亡守卫隐身;
+                        await 无物品状态初始化().ConfigureAwait(false);
                     }
-                    case Keys.Q:
-                        初始化全局时间(ref _全局时间q);
-                        _条件1 = true;
-                        break;
-                    case Keys.E:
-                        初始化全局时间(ref _全局时间e);
-                        _条件2 = true;
-                        break;
-                    case Keys.D:
-                        if (_技能数量 == 5) 根据图片以及类别自我使用物品(物品_暗影护符, _全局bts, _全局size, _技能数量);
-                        break;
-                    case Keys.R:
-                        switch (_全局模式r)
-                        {
-                            case 1:
-                                根据图片以及类别使用物品(物品_黑黄杖, _全局bts, _全局size, _技能数量);
-                                break;
-                        }
 
-                        _条件3 = true;
-                        break;
-                    case Keys.D2:
-                        await Run(() => { 渐隐期间放技能((uint)Keys.R, 800); });
-                        break;
-                    case Keys.D3:
-                        switch (_全局模式q)
-                        {
-                            case 1:
-                                _全局模式q = 0;
-                                TTS.Speak("药剂平A");
+                    switch (e.KeyCode)
+                    {
+                        case Keys.F1:
+                            {
+                                _是否魔晶 = 阿哈利姆魔晶(_全局bts, _全局size);
+                                if (_是否魔晶) _技能数量 = 5;
+                                else _技能数量 = 4;
                                 break;
-                            case 0:
-                                _全局模式q = 1;
-                                TTS.Speak("药剂巫术死亡守卫");
-                                break;
-                        }
+                            }
+                        case Keys.Q:
+                            初始化全局时间(ref _全局时间q);
+                            _条件1 = true;
+                            break;
+                        case Keys.E:
+                            初始化全局时间(ref _全局时间e);
+                            _条件2 = true;
+                            break;
+                        case Keys.D:
+                            if (_技能数量 == 5) 根据图片以及类别自我使用物品(物品_暗影护符, _全局bts, _全局size, _技能数量);
+                            break;
+                        case Keys.R:
+                            switch (_全局模式r)
+                            {
+                                case 1:
+                                    根据图片以及类别使用物品(物品_黑黄杖, _全局bts, _全局size, _技能数量);
+                                    break;
+                            }
 
-                        break;
-                    case Keys.D4:
-                        switch (_全局模式r)
-                        {
-                            case 1:
-                                _全局模式r = 0;
-                                TTS.Speak("不开BKB");
-                                break;
-                            case 0:
-                                _全局模式r = 1;
-                                TTS.Speak("开BKB");
-                                break;
-                        }
+                            _条件3 = true;
+                            break;
+                        case Keys.D2:
+                            await Run(() => { 渐隐期间放技能((uint)Keys.R, 800); });
+                            break;
+                        case Keys.D3:
+                            switch (_全局模式q)
+                            {
+                                case 1:
+                                    _全局模式q = 0;
+                                    TTS.Speak("药剂平A");
+                                    break;
+                                case 0:
+                                    _全局模式q = 1;
+                                    TTS.Speak("药剂巫术死亡守卫");
+                                    break;
+                            }
 
-                        break;
+                            break;
+                        case Keys.D4:
+                            switch (_全局模式r)
+                            {
+                                case 1:
+                                    _全局模式r = 0;
+                                    TTS.Speak("不开BKB");
+                                    break;
+                                case 0:
+                                    _全局模式r = 1;
+                                    TTS.Speak("开BKB");
+                                    break;
+                            }
+
+                            break;
+                    }
+
+                    break;
                 }
-
-                break;
-            }
 
             #endregion
 
             #region 女王
 
             case "女王":
-            {
-                if (!_总循环条件)
                 {
-                    _总循环条件 = true;
-                    _条件根据图片委托1 ??= 暗影突袭去后摇;
-                    _条件根据图片委托2 ??= 闪烁去后摇;
-                    _条件根据图片委托3 ??= 痛苦尖叫去后摇;
-                    _条件根据图片委托4 ??= 冲击波去后摇;
-                    await 无物品状态初始化().ConfigureAwait(false);
+                    if (!_总循环条件)
+                    {
+                        _总循环条件 = true;
+                        _条件根据图片委托1 ??= 暗影突袭去后摇;
+                        _条件根据图片委托2 ??= 闪烁去后摇;
+                        _条件根据图片委托3 ??= 痛苦尖叫去后摇;
+                        _条件根据图片委托4 ??= 冲击波去后摇;
+                        await 无物品状态初始化().ConfigureAwait(false);
+                    }
+
+
+                    switch (e.KeyCode)
+                    {
+                        case Keys.Q:
+                            _中断条件 = false;
+                            _条件1 = true;
+                            break;
+                        case Keys.W:
+                            _中断条件 = false;
+                            _条件2 = true;
+                            break;
+                        case Keys.E:
+                            _中断条件 = false;
+                            _条件3 = true;
+                            break;
+                        case Keys.R:
+                            _中断条件 = false;
+                            _条件4 = true;
+                            break;
+                        case Keys.S:
+                            _中断条件 = true;
+                            break;
+                    }
+
+                    break;
                 }
-
-
-                switch (e.KeyCode)
-                {
-                    case Keys.Q:
-                        _中断条件 = false;
-                        _条件1 = true;
-                        break;
-                    case Keys.W:
-                        _中断条件 = false;
-                        _条件2 = true;
-                        break;
-                    case Keys.E:
-                        _中断条件 = false;
-                        _条件3 = true;
-                        break;
-                    case Keys.R:
-                        _中断条件 = false;
-                        _条件4 = true;
-                        break;
-                    case Keys.S:
-                        _中断条件 = true;
-                        break;
-                }
-
-                break;
-            }
 
             #endregion
 
             #region 干扰者
 
             case "干扰者":
-            {
-                if (!_总循环条件)
                 {
-                    _总循环条件 = true;
-                    _条件根据图片委托1 ??= 风雷之击去后摇;
-                    _条件根据图片委托2 ??= 恶念瞥视去后摇;
-                    _条件根据图片委托3 ??= 动能力场去后摇;
-                    _条件根据图片委托4 ??= 静态风暴去后摇;
-                    await 无物品状态初始化().ConfigureAwait(false);
+                    if (!_总循环条件)
+                    {
+                        _总循环条件 = true;
+                        _条件根据图片委托1 ??= 风雷之击去后摇;
+                        _条件根据图片委托2 ??= 恶念瞥视去后摇;
+                        _条件根据图片委托3 ??= 动能力场去后摇;
+                        _条件根据图片委托4 ??= 静态风暴去后摇;
+                        await 无物品状态初始化().ConfigureAwait(false);
+                    }
+
+
+                    switch (e.KeyCode)
+                    {
+                        case Keys.Q:
+                            _中断条件 = false;
+                            _条件1 = true;
+                            break;
+                        case Keys.W:
+                            _中断条件 = false;
+                            _条件2 = true;
+                            break;
+                        case Keys.E:
+                            _中断条件 = false;
+                            _条件3 = true;
+                            break;
+                        case Keys.R:
+                            _中断条件 = false;
+                            _条件4 = true;
+                            break;
+                        case Keys.S:
+                            _中断条件 = true;
+                            break;
+                        case Keys.D2:
+                            switch (_全局模式q)
+                            {
+                                case 0:
+                                    TTS.Speak("电接大接框");
+                                    _全局模式q = 1;
+                                    break;
+                                case 1:
+                                    TTS.Speak("电接A");
+                                    _全局模式q = 0;
+                                    break;
+                            }
+
+                            break;
+                    }
+
+                    break;
                 }
 
+            #endregion
 
-                switch (e.KeyCode)
+            #region 蓝胖
+
+            case "蓝胖":
                 {
-                    case Keys.Q:
-                        _中断条件 = false;
-                        _条件1 = true;
-                        break;
-                    case Keys.W:
-                        _中断条件 = false;
-                        _条件2 = true;
-                        break;
-                    case Keys.E:
-                        _中断条件 = false;
-                        _条件3 = true;
-                        break;
-                    case Keys.R:
-                        _中断条件 = false;
-                        _条件4 = true;
-                        break;
-                    case Keys.S:
-                        _中断条件 = true;
-                        break;
-                    case Keys.D2:
-                        switch (_全局模式q)
-                        {
-                            case 0:
-                                TTS.Speak("电接大接框");
-                                _全局模式q = 1;
-                                break;
-                            case 1:
-                                TTS.Speak("电接A");
-                                _全局模式q = 0;
-                                break;
-                        }
+                    if (!_总循环条件)
+                    {
+                        _总循环条件 = true;
+                        _条件根据图片委托1 ??= 火焰轰爆去后摇;
+                        _条件根据图片委托2 ??= 引燃去后摇;
+                        _条件根据图片委托3 ??= 嗜血术去后摇;
+                        _条件根据图片委托4 ??= 烈火护盾去后摇;
+                        _条件根据图片委托5 ??= 未精通火焰轰爆去后摇;
+                        _全局模式w = 0;
+                        _技能数量 = 4;
+                        await 无物品状态初始化().ConfigureAwait(false);
+                    }
 
-                        break;
+
+                    switch (e.KeyCode)
+                    {
+                        case Keys.F1:
+                            _是否魔晶 = 阿哈利姆魔晶(_全局bts, _全局size);
+                            _是否a杖 = 阿哈利姆神杖(_全局bts, _全局size);
+                            _技能数量 = 4 + (_是否魔晶 ? 1 : 0) + (_是否a杖 ? 1 : 0);
+                            //TTS.Speak(string.Concat("技能数量",_技能数量.ToString()));
+                            break;
+                        case Keys.Q:
+                            _中断条件 = false;
+                            _条件1 = true;
+                            break;
+                        case Keys.W:
+                            _中断条件 = false;
+                            _条件2 = true;
+                            break;
+                        case Keys.F:
+                            _中断条件 = false;
+                            _条件4 = true;
+                            break;
+                        case Keys.D:
+                            _中断条件 = false;
+                            _条件5 = true;
+                            break;
+                        case Keys.D2:
+                            switch (_全局模式w)
+                            {
+                                case 0:
+                                    TTS.Speak("引燃接轰爆");
+                                    _全局模式w = 1;
+                                    break;
+                                case 1:
+                                    TTS.Speak("引燃不接轰爆");
+                                    _全局模式w = 0;
+                                    break;
+                            }
+
+                            break;
+                    }
+
+                    break;
                 }
 
-                break;
-            }
+            #endregion
+
+            #region 祸乱之源
+
+            case "祸乱之源":
+                {
+                    if (!_总循环条件)
+                    {
+                        _总循环条件 = true;
+                        _条件根据图片委托1 ??= 虚弱去后摇;
+                        _条件根据图片委托2 ??= 噬脑去后摇;
+                        _条件根据图片委托3 ??= 噩梦接平A锤;
+                        _全局模式w = 0;
+                        _技能数量 = 4;
+                        await 无物品状态初始化().ConfigureAwait(false);
+                    }
+
+
+                    switch (e.KeyCode)
+                    {
+                        case Keys.Q:
+                            _中断条件 = false;
+                            _条件1 = true;
+                            break;
+                        case Keys.W:
+                            _中断条件 = false;
+                            _条件2 = true;
+                            break;
+                        case Keys.E:
+                            var 技能点颜色 = Color.FromArgb(203, 183, 124);
+                            _全局时间 = 0;
+                            if (ColorAEqualColorB(GetPixelBytes(_全局bts, _全局size, 971 - 坐标偏移x, 1008 - 坐标偏移y), 技能点颜色, 0))
+                                _全局时间 = 7000;
+                            else if (ColorAEqualColorB(GetPixelBytes(_全局bts, _全局size, 964 - 坐标偏移x, 1008 - 坐标偏移y), 技能点颜色, 0))
+                                _全局时间 = 6000;
+                            else if (ColorAEqualColorB(GetPixelBytes(_全局bts, _全局size, 947 - 坐标偏移x, 1008 - 坐标偏移y), 技能点颜色, 0))
+                                _全局时间 = 5000;
+                            else if (ColorAEqualColorB(GetPixelBytes(_全局bts, _全局size, 935 - 坐标偏移x, 1008 - 坐标偏移y), 技能点颜色, 0))
+                                _全局时间 = 4000;
+                            _中断条件 = false;
+                            _全局模式 = 0;
+                            _条件3 = true;
+                            break;
+                        case Keys.S:
+                            _中断条件 = true;
+                            _全局模式e = 0;
+                            break;
+                        case Keys.D2:
+                            switch (_全局模式e)
+                            {
+                                case 0:
+                                    _全局模式e = 1;
+                                    TTS.Speak("睡接陨星锤");
+                                    break;
+                                case 1:
+                                    _全局模式e = 0;
+                                    TTS.Speak("睡不接陨星锤");
+                                    break;
+                            }
+                            break;
+                    }
+
+                    break;
+                }
 
             #endregion
 
@@ -3143,37 +3599,31 @@ public partial class Form2 : Form
 
             #region 其他
 
-            case "切假腿":
-            {
-                if (e.KeyCode is Keys.Q or Keys.W or Keys.E or Keys.D or Keys.F or Keys.R)
-                    await 切智力腿();
-                break;
-            }
             case "测试":
-            {
-                switch (e.KeyCode)
                 {
-                    case Keys.D2:
-                        await Run(捕捉颜色);
-                        break;
-                    case Keys.D3:
-                        await Run(测试方法_寻找大勋章);
-                        break;
-                    case Keys.D1:
-                        await Run(async () =>
-                        {
-                            KeyPress((uint)Keys.Space);
-                            await 快速选择敌方英雄(type: 1, type1: 1);
-                            KeyPress((uint)Keys.W);
-                            KeyPress((uint)Keys.Q);
-                        });
-                        break;
+                    switch (e.KeyCode)
+                    {
+                        case Keys.D2:
+                            await Run(捕捉颜色);
+                            break;
+                        case Keys.D3:
+                            await Run(测试方法);
+                            break;
+                            //case Keys.D1:
+                            //    await Run(async () =>
+                            //    {
+                            //        KeyPress((uint)Keys.Space);
+                            //        await 快速选择敌方英雄(type: 1, type1: 1);
+                            //        KeyPress((uint)Keys.W);
+                            //        KeyPress((uint)Keys.Q);
+                            //    });
+                            //    break;
+                    }
+
+                    break;
                 }
 
-                break;
-            }
-
-            #endregion
+                #endregion
         }
     }
 
@@ -3211,7 +3661,7 @@ public partial class Form2 : Form
 
     #region 按钮捕捉颜色
 
-    private async void button1_Click(object sender, EventArgs e)
+    private async void Button1_Click(object sender, EventArgs e)
     {
         await Run(捕捉颜色);
     }
@@ -3225,7 +3675,7 @@ public partial class Form2 : Form
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="e"></param>
-    private void tb_delay_TextChanged(object sender, EventArgs e)
+    private void Tb_delay_TextChanged(object sender, EventArgs e)
     {
         if (tb_name.Text.Trim() != "测试") return;
 
@@ -3256,10 +3706,10 @@ public partial class Form2 : Form
     /// </summary>
     private static bool _总循环条件;
 
-    /// <summary>
-    ///     循环开关条件
-    /// </summary>
-    private static bool _总开关条件;
+    ///// <summary>
+    /////     循环开关条件
+    ///// </summary>
+    //private static bool _总开关条件;
 
     /// <summary>
     ///     循环计数1
@@ -3279,12 +3729,22 @@ public partial class Form2 : Form
     /// <summary>
     ///     全局bytes
     /// </summary>
-    private static byte[] _全局bts = new byte[3 * 截图模式1W * 截图模式1H];
+    private static byte[] _全局bts;
+
+    /// <summary>
+    ///     全局假腿图像
+    /// </summary>
+    private static Bitmap _全局假腿图像;
 
     /// <summary>
     ///     全局假腿bytes
     /// </summary>
-    private static byte[] _全局假腿bts = new byte[3 * 截图模式1W * 截图模式1H];
+    private static byte[] _全局假腿bts;
+
+    /// <summary>
+    ///     全局假腿bytes
+    /// </summary>
+    private static Size _全局假腿size;
 
     /// <summary>
     ///     全局size
@@ -3350,6 +3810,11 @@ public partial class Form2 : Form
     private static ConditionDelegateBitmap _条件根据图片委托8;
 
     /// <summary>
+    ///     条件9委托
+    /// </summary>
+    private static ConditionDelegateBitmap _条件根据图片委托9;
+
+    /// <summary>
     ///     条件布尔
     /// </summary>
     private static bool _条件1;
@@ -3392,6 +3857,11 @@ public partial class Form2 : Form
     /// <summary>
     ///     条件布尔
     /// </summary>
+    private static bool _条件9;
+
+    /// <summary>
+    ///     条件布尔
+    /// </summary>
     private static bool _条件保持假腿;
 
     /// <summary>
@@ -3412,7 +3882,7 @@ public partial class Form2 : Form
     /// <summary>
     ///     条件走A
     /// </summary>
-    private static bool _条件走a;
+    private static bool _循环走a;
 
     /// <summary>
     ///     技能数量
@@ -3430,9 +3900,29 @@ public partial class Form2 : Form
     private static double _基础攻击前摇 = 0.3;
 
     /// <summary>
+    ///     攻击前摇
+    /// </summary>
+    private static double _基础攻击间隔 = 1.7;
+
+    /// <summary>
+    ///     基础额外攻速
+    /// </summary>
+    private static double _基础额外攻速 = 1;
+
+    /// <summary>
     ///     攻击速度
     /// </summary>
     private static double _攻击速度 = 100;
+
+    /// <summary>
+    ///     当前出手时间
+    /// </summary>
+    private static long _实际出手时间;
+
+    /// <summary>
+    ///     能量转移
+    /// </summary>
+    private static int 能量转移被动计数 = 0;
 
     /// <summary>
     ///     状态抗性
@@ -3611,7 +4101,9 @@ public partial class Form2 : Form
     /// <summary>
     ///     用于不同设定
     /// </summary>
+#pragma warning disable CS0414 // 字段“Form2._全局模式f”已被赋值，但从未使用过它的值
     private static int _全局模式f;
+#pragma warning restore CS0414 // 字段“Form2._全局模式f”已被赋值，但从未使用过它的值
 
     /// <summary>
     ///     用于阶段性
@@ -3621,17 +4113,23 @@ public partial class Form2 : Form
     /// <summary>
     ///     用于阶段性
     /// </summary>
+#pragma warning disable CS0414 // 字段“Form2._全局步骤q”已被赋值，但从未使用过它的值
     private static int _全局步骤q;
+#pragma warning restore CS0414 // 字段“Form2._全局步骤q”已被赋值，但从未使用过它的值
 
     /// <summary>
     ///     用于阶段性
     /// </summary>
+#pragma warning disable CS0414 // 字段“Form2._全局步骤w”已被赋值，但从未使用过它的值
     private static int _全局步骤w;
+#pragma warning restore CS0414 // 字段“Form2._全局步骤w”已被赋值，但从未使用过它的值
 
     /// <summary>
     ///     用于阶段性
     /// </summary>
+#pragma warning disable CS0414 // 字段“Form2._全局步骤e”已被赋值，但从未使用过它的值
     private static int _全局步骤e;
+#pragma warning restore CS0414 // 字段“Form2._全局步骤e”已被赋值，但从未使用过它的值
 
     /// <summary>
     ///     用于阶段性
@@ -3641,12 +4139,16 @@ public partial class Form2 : Form
     /// <summary>
     ///     用于阶段性
     /// </summary>
+#pragma warning disable CS0414 // 字段“Form2._全局步骤d”已被赋值，但从未使用过它的值
     private static int _全局步骤d;
+#pragma warning restore CS0414 // 字段“Form2._全局步骤d”已被赋值，但从未使用过它的值
 
     /// <summary>
     ///     用于阶段性
     /// </summary>
+#pragma warning disable CS0414 // 字段“Form2._全局步骤f”已被赋值，但从未使用过它的值
     private static int _全局步骤f;
+#pragma warning restore CS0414 // 字段“Form2._全局步骤f”已被赋值，但从未使用过它的值
 
     #endregion
 
@@ -3702,7 +4204,11 @@ public partial class Form2 : Form
         {
             await Run(() =>
             {
-                if (_全局模式q == 1) 根据图片以及类别使用物品(物品_刃甲, bts, size, _技能数量);
+                if (_全局模式q == 1)
+                {
+                    根据图片以及类别使用物品(物品_刃甲, bts, size, _技能数量);
+                    根据图片以及类别使用物品(物品_永世法衣, bts, size, _技能数量);
+                }
 
                 switch (_是否a杖)
                 {
@@ -3718,7 +4224,7 @@ public partial class Form2 : Form
 
         var q4 = 获取q4左下角颜色(bts, size);
 
-        if (ColorAEqualColorB(q4, SimpleColor.FromRgb(65, 74, 81), 0)) return await FromResult(true);
+        if (ColorAEqualColorB(q4, 技能4CD颜色, 0)) return await FromResult(true);
 
         await 吼后Async(bts, size);
         return await FromResult(false);
@@ -3733,7 +4239,7 @@ public partial class Form2 : Form
 
         var w4 = 获取w4左下角颜色(bts, size);
 
-        if (ColorAEqualColorB(w4, SimpleColor.FromRgb(65, 74, 81), 0)) return await FromResult(true);
+        if (ColorAEqualColorB(w4, 技能4CD颜色, 0)) return await FromResult(true);
 
         await 战斗饥渴后Async();
         return await FromResult(false);
@@ -3748,7 +4254,7 @@ public partial class Form2 : Form
 
         var r4 = 获取r4左下角颜色(bts, size);
 
-        if (ColorAEqualColorB(r4, SimpleColor.FromRgb(65, 74, 81), 0)) return await FromResult(true);
+        if (ColorAEqualColorB(r4, 技能4CD颜色, 0)) return await FromResult(true);
 
         await 淘汰之刃后();
         return await FromResult(false);
@@ -3760,13 +4266,12 @@ public partial class Form2 : Form
             || 根据图片以及类别使用物品(物品_跳刀_力量跳刀, bts, size, _技能数量)
             || 根据图片以及类别使用物品(物品_跳刀_智力跳刀, bts, size, _技能数量))
         {
-            Delay(等待延迟);
             return await FromResult(true);
         }
 
         var q4 = 获取q4左下角颜色(bts, size);
 
-        if (ColorAEqualColorB(q4, SimpleColor.FromRgb(65, 74, 81), 0)) KeyPress((uint)Keys.Q);
+        if (ColorAEqualColorB(q4, 技能4CD颜色, 0)) KeyPress((uint)Keys.Q);
 
         return await FromResult(false);
     }
@@ -3780,85 +4285,189 @@ public partial class Form2 : Form
         switch (_全局步骤)
         {
             case < 1:
-            {
-                根据图片以及类别使用物品(物品_臂章, bts, size);
-
-                根据图片以及类别使用物品(物品_魂戒CD, bts, size);
-
-                var w4 = 获取w4左下角颜色(bts, size);
-
-                if (ColorAEqualColorB(w4, SimpleColor.FromRgb(65, 74, 81), 0))
                 {
-                    KeyPressAlt((uint)Keys.W);
-                    Delay(260); // 去后摇
-                    RightClick();
-                    Delay(等待延迟);
+                    根据图片以及类别使用物品(物品_臂章, bts, size);
+
+                    根据图片以及类别使用物品(物品_魂戒CD, bts, size);
+
+                    根据图片以及类别使用物品(物品_相位鞋, bts, size);
+
+                    var w4 = 获取w4左下角颜色(bts, size);
+
+                    if (ColorAEqualColorB(w4, 技能4CD颜色, 0))
+                    {
+                        KeyPress((uint)Keys.W);
+                        KeyPressAlt((uint)Keys.W);
+                        _全局步骤 = 1;
+                        return await FromResult(true);
+                    }
+                    
+                    _全局步骤 = 1;
+                    return await FromResult(true);
                 }
-
-                _全局步骤 = 1;
-
-                return await FromResult(true);
-            }
-            case < 2 when 根据图片以及类别使用物品(物品_刃甲, bts, size):
-                return await FromResult(true);
             case < 2:
-            {
-                if (根据图片以及类别使用物品(物品_跳刀, bts, size)) _全局步骤 = 2;
+                {
+                    var w4 = 获取w4左下角颜色(bts, size);
 
-                else if (根据图片以及类别使用物品(物品_跳刀_力量跳刀, bts, size)) _全局步骤 = 2;
+                    if (!ColorAEqualColorB(w4, 技能4CD颜色, 0))
+                    {
+                        _全局步骤 = 2;
+                        return await FromResult(true);
+                    }
 
-                else if (根据图片以及类别使用物品(物品_跳刀_力量跳刀, bts, size)) _全局步骤 = 2;
-
-                else if (根据图片以及类别使用物品(物品_跳刀_智力跳刀, bts, size)) _全局步骤 = 2;
-
+                    return await FromResult(true);
+                }
+            case < 3 when 根据图片以及类别使用物品(物品_刃甲, bts, size):
                 return await FromResult(true);
-            }
-            case < 3:
-            {
-                if (_全局模式 == 1) await 快速选择敌方英雄();
+            case < 3 when _全局模式 == 1:
+                {
+                    var p = MousePosition;
 
-                _全局步骤 = 3;
-                return await FromResult(true);
-            }
+                    if (_指定地点e.X != -1)
+                    {
+                        MouseMove(_指定地点e);
+                    }
+
+                    if (根据图片以及类别使用物品(物品_跳刀, bts, size)) _全局步骤 = 3;
+
+                    else if (根据图片以及类别使用物品(物品_跳刀_力量跳刀, bts, size)) _全局步骤 = 3;
+
+                    else if (根据图片以及类别使用物品(物品_跳刀_力量跳刀, bts, size)) _全局步骤 = 3;
+
+                    else if (根据图片以及类别使用物品(物品_跳刀_智力跳刀, bts, size)) _全局步骤 = 3;
+
+                    if (_指定地点e.X != -1)
+                    {
+                        Delay(60);
+
+                        MouseMove(p);
+
+                        _指定地点e = new Point(-1, -1);
+                    }
+
+                    return await FromResult(true);
+                }
+            //case < 3:
+            //    {
+            //        if (_全局模式 == 1) await 快速选择敌方英雄();
+
+            //        _全局步骤 = 3;
+            //        return await FromResult(true);
+            //    }
 
             case < 4:
-            {
-                if (_全局时间 < 0)
-                    _全局时间 = 获取当前时间毫秒();
-
-                if (获取当前时间毫秒() - _全局时间 < 100)
                 {
-                    根据图片以及类别使用物品(物品_勇气勋章, bts, size);
-                }
-                else
-                {
-                    _全局步骤 = 4;
-                    _全局时间 = -1;
-                }
+                    if (_全局时间 < 0)
+                    {
+                        _全局时间 = 获取当前时间毫秒();
+                        _全局步骤e = 0;
 
-                return await FromResult(true);
-            }
+                        if (RegPicture(物品_深渊之刃, bts, size))
+                        {
+                            _全局步骤e++;
+                        }
+                        if (RegPicture(物品_勇气勋章, bts, size))
+                        {
+                            _全局步骤e++;
+                        }
+                        if (RegPicture(物品_散失, bts, size))
+                        {
+                            _全局步骤e++;
+                        }
+                        if (RegPicture(物品_紫苑, bts, size))
+                        {
+                            _全局步骤e++;
+                        }
+                        if (RegPicture(物品_血棘, bts, size))
+                        {
+                            _全局步骤e++;
+                        }
+                        if (RegPicture(物品_否决, bts, size))
+                        {
+                            _全局步骤e++;
+                        }
+                    }
+
+                    if (获取当前时间毫秒() - _全局时间 < (_全局步骤e * 15))
+                    {
+                        if (根据图片以及类别使用物品(物品_深渊之刃, bts, size))
+                        {
+                            Delay(等待延迟);
+                        }
+                        if (根据图片以及类别使用物品(物品_勇气勋章, bts, size))
+                        {
+                            Delay(等待延迟);
+                        }
+                        if (根据图片以及类别使用物品(物品_散失, bts, size))
+                        {
+                            Delay(等待延迟);
+                        }
+                        if (根据图片以及类别使用物品(物品_紫苑, bts, size))
+                        {
+                            Delay(等待延迟);
+                        }
+                        if (根据图片以及类别使用物品(物品_血棘, bts, size))
+                        {
+                            Delay(等待延迟);
+                        }
+                        if (根据图片以及类别使用物品(物品_否决, bts, size))
+                        {
+                            Delay(等待延迟);
+                        }
+                    }
+                    else
+                    {
+                        _全局步骤 = 4;
+                        _全局时间 = -1;
+
+                        await 切敏捷腿(bts, size);
+                    }
+
+                    return await FromResult(true);
+                }
 
             case < 5:
-            {
-                if (_全局时间 < 0)
-                    _全局时间 = 获取当前时间毫秒();
-
-                var r4 = 获取r4左下角颜色(bts, size);
-
-                if (ColorAEqualColorB(r4, SimpleColor.FromRgb(65, 74, 81), 0))
                 {
-                    KeyPress((uint)Keys.R);
-                    Delay(等待延迟);
-                    return 获取当前时间毫秒() - _全局时间 <= 450 ? await FromResult(true) : await FromResult(false);
-                }
+                    if (_全局时间 < 0)
+                        _全局时间 = 获取当前时间毫秒();
 
-                _全局步骤 = 5;
-                return await FromResult(false);
-            }
+                    var r4 = 获取r4左下角颜色(bts, size);
+
+
+                    // 触发激怒，让周围的小兵都攻击你
+                    KeyPress((uint)Keys.A);
+
+                    if (ColorAEqualColorB(r4, 技能4CD颜色, 0))
+                    {
+                        KeyPress((uint)Keys.R);
+                        Delay(等待延迟);
+                        return 获取当前时间毫秒() - _全局时间 <= 450 ? await FromResult(true) : await FromResult(false);
+                    }
+
+                    _全局步骤 = 5;
+                    return await FromResult(false);
+                }
         }
 
         return await FromResult(false);
+    }
+
+    private static async Task<bool> 强攻去后摇(byte[] bts, Size size)
+    {
+        static void 强攻后()
+        {
+            KeyPress((uint)Keys.M);
+        }
+
+        var w4 = 获取w4左下角颜色(bts, size);
+
+        if (!ColorAEqualColorB(w4, 技能4CD颜色, 0))
+        {
+            强攻后();
+            return await FromResult(false);
+        }
+
+        return await FromResult(true);
     }
 
     #endregion
@@ -3898,15 +4507,15 @@ public partial class Form2 : Form
         switch (_技能数量)
         {
             case 5:
-            {
-                if (ColorAEqualColorB(e5, SimpleColor.FromRgb(45, 52, 59), 0)) return await FromResult(true);
-                break;
-            }
+                {
+                    if (ColorAEqualColorB(e5, 技能56CD颜色, 0)) return await FromResult(true);
+                    break;
+                }
             case 4:
-            {
-                if (ColorAEqualColorB(e4, SimpleColor.FromRgb(65, 74, 81), 0)) return await FromResult(true);
-                break;
-            }
+                {
+                    if (ColorAEqualColorB(e4, 技能4CD颜色, 0)) return await FromResult(true);
+                    break;
+                }
         }
 
         摔角行家后().Start();
@@ -3922,7 +4531,7 @@ public partial class Form2 : Form
 
         var d5 = 获取d5颜色(bts, size);
 
-        if (!ColorAEqualColorB(d5, SimpleColor.FromRgb(72, 73, 73), 0, 1, 1)) return await FromResult(true);
+        if (!ColorAEqualColorB(d5, Color.FromArgb(72, 73, 73), 0, 1, 1)) return await FromResult(true);
 
         飞踢后().Start();
         return await FromResult(false);
@@ -3931,7 +4540,7 @@ public partial class Form2 : Form
     private static async Task<bool> 跳接勋章接摔角行家(byte[] bts, Size size)
     {
 #if DEBUG
-        var p = 正面跳刀_无转身(bts, size);
+        var p = 正面跳刀_无转身(bts, size).Result;
 
         var point = MousePosition;
         MouseMove(p.X, p.Y);
@@ -4020,64 +4629,64 @@ public partial class Form2 : Form
         static void 循环末尾()
         {
             if (!_循环最终是否延迟) return;
-            Delay(30);
+            Delay(等待延迟);
         }
 
 
         switch (_循环条件1)
         {
             case true when _技能数量 == 5:
-            {
-                if (
-                    ColorAEqualColorB(w5, SimpleColor.FromRgb(45, 52, 59), 0)
-                    &
-                    !ColorAEqualColorB(w5, SimpleColor.FromRgb(25, 29, 32), 0) // 沉默 恐惧 不能释放
-                )
-                    await 针刺(bts, size);
+                {
+                    if (
+                        ColorAEqualColorB(w5, 技能56CD颜色, 0)
+                        &
+                        !ColorAEqualColorB(w5, Color.FromArgb(25, 29, 32), 0) // 沉默 恐惧 不能释放
+                    )
+                        await 针刺(bts, size);
 
-                break;
-            }
+                    break;
+                }
             case true:
-            {
-                if (
-                    ColorAEqualColorB(w4, SimpleColor.FromRgb(65, 74, 81), 0)
-                    &
-                    !ColorAEqualColorB(w4, SimpleColor.FromRgb(14, 18, 20), 0) // 沉默 恐惧 不能释放
-                )
-                    await 针刺(bts, size);
+                {
+                    if (
+                        ColorAEqualColorB(w4, 技能4CD颜色, 0)
+                        &
+                        !ColorAEqualColorB(w4, Color.FromArgb(14, 18, 20), 0) // 沉默 恐惧 不能释放
+                    )
+                        await 针刺(bts, size);
 
-                break;
-            }
+                    break;
+                }
         }
 
         switch (_是否a杖)
         {
             case true when _循环条件2:
-            {
-                switch (_技能数量)
                 {
-                    case 5:
+                    switch (_技能数量)
                     {
-                        if (
-                            ColorAEqualColorB(q5, SimpleColor.FromRgb(45, 52, 59), 0)
-                            &
-                            !ColorAEqualColorB(q5, SimpleColor.FromRgb(25, 29, 32), 0))
-                            await 鼻涕(bts, size);
-                        break;
+                        case 5:
+                            {
+                                if (
+                                    ColorAEqualColorB(q5, 技能56CD颜色, 0)
+                                    &
+                                    !ColorAEqualColorB(q5, Color.FromArgb(25, 29, 32), 0))
+                                    await 鼻涕(bts, size);
+                                break;
+                            }
+                        default:
+                            {
+                                if (
+                                    ColorAEqualColorB(q4, 技能4CD颜色, 0)
+                                    &
+                                    !ColorAEqualColorB(q4, Color.FromArgb(14, 18, 20), 0))
+                                    await 鼻涕(bts, size);
+                                break;
+                            }
                     }
-                    default:
-                    {
-                        if (
-                            ColorAEqualColorB(q4, SimpleColor.FromRgb(65, 74, 81), 0)
-                            &
-                            !ColorAEqualColorB(q4, SimpleColor.FromRgb(14, 18, 20), 0))
-                            await 鼻涕(bts, size);
-                        break;
-                    }
-                }
 
-                break;
-            }
+                    break;
+                }
         }
 
         循环末尾();
@@ -4102,7 +4711,7 @@ public partial class Form2 : Form
 
         var d5 = 获取d5左下角颜色(bts, size);
 
-        if (ColorAEqualColorB(d5, SimpleColor.FromRgb(45, 52, 59), 0)) return await FromResult(true);
+        if (ColorAEqualColorB(d5, 技能56CD颜色, 0)) return await FromResult(true);
 
         毛团后();
         return await FromResult(false);
@@ -4133,15 +4742,15 @@ public partial class Form2 : Form
         var w4 = 获取w4开关颜色(bts, size);
         var w5 = 获取w5开关颜色(bts, size);
 
-        static void 钩子后(SimpleColor w4, SimpleColor w5)
+        static void 钩子后(Color w4, Color w5)
         {
             _全局时间q = -1;
             //RightClick();
             KeyPress((uint)Keys.S);
             switch (_技能数量)
             {
-                case 5 when !ColorAEqualColorB(w5, SimpleColor.FromRgb(0, 129, 0), 0):
-                case 4 when !ColorAEqualColorB(w4, SimpleColor.FromRgb(0, 129, 0), 0):
+                case 5 when !ColorAEqualColorB(w5, Color.FromArgb(0, 129, 0), 0):
+                case 4 when !ColorAEqualColorB(w4, Color.FromArgb(0, 129, 0), 0):
                     KeyPressWhile((uint)Keys.W, (uint)Keys.LShiftKey);
                     break;
             }
@@ -4154,13 +4763,13 @@ public partial class Form2 : Form
 
         switch (_技能数量)
         {
-            case 5 when ColorAEqualColorB(q5, SimpleColor.FromRgb(45, 52, 59), 0):
+            case 5 when ColorAEqualColorB(q5, 技能56CD颜色, 0):
                 return await FromResult(true);
             case 5:
                 钩子后(w4, w5);
                 return await FromResult(false);
 
-            case 4 when ColorAEqualColorB(q4, SimpleColor.FromRgb(65, 74, 81), 0):
+            case 4 when ColorAEqualColorB(q4, 技能4CD颜色, 0):
                 return await FromResult(true);
             case 4:
                 钩子后(w4, w5);
@@ -4184,7 +4793,7 @@ public partial class Form2 : Form
 
         var q4 = 获取q4左下角颜色(bts, size);
 
-        if (ColorAEqualColorB(q4, SimpleColor.FromRgb(65, 74, 81), 0)) return await FromResult(true);
+        if (ColorAEqualColorB(q4, 技能4CD颜色, 0)) return await FromResult(true);
 
         石破天惊后(bts, size);
         return await FromResult(false);
@@ -4199,7 +4808,7 @@ public partial class Form2 : Form
 
         var w4 = 获取w4左下角颜色(bts, size);
 
-        if (ColorAEqualColorB(w4, SimpleColor.FromRgb(65, 74, 81), 0)) return await FromResult(true);
+        if (ColorAEqualColorB(w4, 技能4CD颜色, 0)) return await FromResult(true);
 
         上界重锤后();
         return await FromResult(false);
@@ -4227,7 +4836,7 @@ public partial class Form2 : Form
 
         var w4 = 获取w4左下角颜色(bts, size);
 
-        if (ColorAEqualColorB(w4, SimpleColor.FromRgb(65, 74, 81), 0)) return await FromResult(true);
+        if (ColorAEqualColorB(w4, 技能4CD颜色, 0)) return await FromResult(true);
 
         鱼人碎击后();
         return await FromResult(false);
@@ -4251,7 +4860,7 @@ public partial class Form2 : Form
 
         var w4 = 获取w4左下角颜色(bts, size);
 
-        if (!ColorAEqualColorB(w4, SimpleColor.FromRgb(65, 74, 81), 0)) return await FromResult(true);
+        if (!ColorAEqualColorB(w4, 技能4CD颜色, 0)) return await FromResult(true);
 
 
         KeyPress((uint)Keys.W);
@@ -4268,7 +4877,7 @@ public partial class Form2 : Form
 
         var r4 = 获取r4左下角颜色(bts, size);
 
-        if (ColorAEqualColorB(r4, SimpleColor.FromRgb(65, 74, 81), 0)) return await FromResult(true);
+        if (ColorAEqualColorB(r4, 技能4CD颜色, 0)) return await FromResult(true);
 
         雾霭后();
         return await FromResult(false);
@@ -4300,10 +4909,10 @@ public partial class Form2 : Form
         switch (_技能数量)
         {
             case 5:
-                if (ColorAEqualColorB(q5, SimpleColor.FromRgb(65, 74, 81), 0)) return await FromResult(true);
+                if (ColorAEqualColorB(q5, 技能4CD颜色, 0)) return await FromResult(true);
                 break;
             default:
-                if (ColorAEqualColorB(q4, SimpleColor.FromRgb(65, 74, 81), 0)) return await FromResult(true);
+                if (ColorAEqualColorB(q4, 技能4CD颜色, 0)) return await FromResult(true);
                 break;
         }
 
@@ -4333,10 +4942,10 @@ public partial class Form2 : Form
         switch (_技能数量)
         {
             case 5:
-                if (ColorAEqualColorB(w5, SimpleColor.FromRgb(65, 74, 81), 0)) return await FromResult(true);
+                if (ColorAEqualColorB(w5, 技能4CD颜色, 0)) return await FromResult(true);
                 break;
             default:
-                if (ColorAEqualColorB(w4, SimpleColor.FromRgb(65, 74, 81), 0)) return await FromResult(true);
+                if (ColorAEqualColorB(w4, 技能4CD颜色, 0)) return await FromResult(true);
                 break;
         }
 
@@ -4381,6 +4990,36 @@ public partial class Form2 : Form
 
     #endregion
 
+    #region 马尔斯
+
+    private static async Task<bool> 矛接盾留人(byte[] bts, Size size)
+    {
+        static void 矛后()
+        {
+            _全局时间q = -1;
+            _条件保持假腿 = true;
+            RightClick();
+            Delay(60);
+            KeyPress((uint)Keys.W);
+        }
+
+        // 超时则切回 总体释放时间
+        if (获取当前时间毫秒() - _全局时间q > 500 && _全局时间q != -1)
+        {
+            矛后();
+            return await FromResult(false);
+        }
+
+        var q4 = 获取q4左下角颜色(bts, size);
+
+        if (ColorAEqualColorB(q4, 技能4CD颜色, 0)) return await FromResult(true);
+
+        矛后();
+        return await FromResult(false);
+    }
+
+    #endregion
+
     #endregion
 
     #region 敏捷
@@ -4406,7 +5045,7 @@ public partial class Form2 : Form
 
         var q4 = 获取q4左下角颜色(bts, size);
 
-        if (ColorAEqualColorB(q4, SimpleColor.FromRgb(65, 74, 81), 0)) return await FromResult(true);
+        if (ColorAEqualColorB(q4, 技能4CD颜色, 0)) return await FromResult(true);
 
         月光后();
         return await FromResult(false);
@@ -4431,7 +5070,7 @@ public partial class Form2 : Form
 
         var r4 = 获取r4左下角颜色(bts, size);
 
-        if (ColorAEqualColorB(r4, SimpleColor.FromRgb(65, 74, 81), 0)) return await FromResult(true);
+        if (ColorAEqualColorB(r4, 技能4CD颜色, 0)) return await FromResult(true);
 
         月蚀后();
         return await FromResult(false);
@@ -4459,6 +5098,202 @@ public partial class Form2 : Form
 
     #endregion
 
+    #region 巨魔
+
+    private static async Task<bool> 旋风飞斧远程(byte[] bts, Size size)
+    {
+        static void 旋风飞斧远程后()
+        {
+            _全局时间w = -1;
+            if (_条件开启切假腿)
+            {
+                _条件保持假腿 = true;
+            }
+
+            KeyPress((uint)Keys.A);
+            Delay(100);
+            KeyPress((uint)Keys.Q);
+            Delay(等待延迟);
+            KeyPress((uint)Keys.A);
+        }
+
+        // 超时则切回 总体释放时间
+        if (获取当前时间毫秒() - _全局时间w > 400 && _全局时间w != -1 && _条件开启切假腿)
+        {
+            旋风飞斧远程后();
+            return await FromResult(false);
+        }
+
+        var q52 = 获取q5状态颜色(bts, size);
+        var q62 = 获取q6状态颜色(bts, size);
+
+        var w5 = 获取w5左下角颜色(bts, size);
+        var w6 = 获取w6左下角颜色(bts, size);
+
+        switch (_技能数量)
+        {
+            case 5:
+                {
+                    if (!ColorAEqualColorB(q52, 技能56状态颜色, 0))
+                    {
+                        if (ColorAEqualColorB(w5, 技能56CD颜色, 0))
+                        {
+                            KeyPress((uint)Keys.W);
+                            // 技能前摇200ms
+                            Delay(60);
+                            return await FromResult(true);
+                        }
+                        else
+                        {
+                            旋风飞斧远程后();
+                            return await FromResult(false);
+                        }
+                    }
+                    else
+                    {
+                        KeyPress((uint)Keys.Q);
+                        Delay(60);
+                        return await FromResult(true);
+                    }
+                }
+            case 6:
+                {
+                    if (!ColorAEqualColorB(q62, 技能56状态颜色, 0))
+                    {
+                        if (ColorAEqualColorB(w6, 技能56CD颜色, 0))
+                        {
+                            KeyPress((uint)Keys.W);
+                            // 技能前摇200ms
+                            Delay(60);
+                            return await FromResult(true);
+                        }
+                        else
+                        {
+                            旋风飞斧远程后();
+                            return await FromResult(false);
+                        }
+                    }
+                    else
+                    {
+                        KeyPress((uint)Keys.Q);
+                        Delay(60);
+                        return await FromResult(true);
+                    }
+                }
+        }
+
+        return await FromResult(true);
+    }
+
+    private static async Task<bool> 旋风飞斧近战(byte[] bts, Size size)
+    {
+        static void 旋风飞斧近战后()
+        {
+            _全局时间e = -1;
+            if (_条件开启切假腿)
+            {
+                _条件保持假腿 = true;
+            }
+
+            KeyPress((uint)Keys.A);
+        }
+
+        // 超时则切回 总体释放时间
+        if (获取当前时间毫秒() - _全局时间e > 400 && _全局时间e != -1 && _条件开启切假腿)
+        {
+            旋风飞斧近战后();
+            return await FromResult(false);
+        }
+
+        var q52 = 获取q5状态颜色(bts, size);
+        var q62 = 获取q6状态颜色(bts, size);
+
+        var e5 = 获取e5左下角颜色(bts, size);
+        var e6 = 获取e6左下角颜色(bts, size);
+
+        switch (_技能数量)
+        {
+            case 5:
+                {
+                    if (ColorAEqualColorB(q52, 技能56状态颜色, 0))
+                    {
+                        if (ColorAEqualColorB(e5, 技能56CD颜色, 0))
+                        {
+                            KeyPress((uint)Keys.E);
+                            return await FromResult(true);
+                        }
+                        else
+                        {
+                            旋风飞斧近战后();
+                            return await FromResult(false);
+                        }
+                    }
+                    else
+                    {
+                        KeyPress((uint)Keys.Q);
+                        Delay(60);
+                        return await FromResult(true);
+                    }
+                }
+            case 6:
+                {
+                    if (ColorAEqualColorB(q62, 技能56状态颜色, 0))
+                    {
+                        if (ColorAEqualColorB(e6, 技能56CD颜色, 0))
+                        {
+                            KeyPress((uint)Keys.E);
+                            return await FromResult(true);
+                        }
+                        else
+                        {
+                            旋风飞斧近战后();
+                            return await FromResult(false);
+                        }
+                    }
+                    else
+                    {
+                        KeyPress((uint)Keys.Q);
+                        Delay(60);
+                        return await FromResult(true);
+                    }
+                }
+        }
+
+        return await FromResult(true);
+    }
+
+    private static async Task<bool> 横行无忌去后摇(byte[] bts, Size size)
+    {
+        static void 横行无忌后()
+        {
+            _全局时间f = -1;
+            if (_条件开启切假腿)
+            {
+                _条件保持假腿 = true;
+            }
+
+            KeyPress((uint)Keys.A);
+        }
+
+        // 超时则切回 总体释放时间
+        if (获取当前时间毫秒() - _全局时间f > 400 && _全局时间f != -1 && _条件开启切假腿)
+        {
+            横行无忌后();
+            return await FromResult(false);
+        }
+
+        var f6 = 获取f6左下角颜色(bts, size);
+        if (!ColorAEqualColorB(f6, 技能56CD颜色, 0))
+        {
+            横行无忌后();
+            return await FromResult(false);
+        }
+
+        return await FromResult(true);
+    }
+
+    #endregion
+
     #region 小骷髅
 
     private static async Task<bool> 附灵锁扫射(byte[] bts, Size size)
@@ -4469,30 +5304,30 @@ public partial class Form2 : Form
         switch (_技能数量)
         {
             case 5:
-            {
-                if (ColorAEqualColorB(q5, SimpleColor.FromRgb(45, 52, 59), 0))
                 {
-                    KeyPress((uint)Keys.Q);
-                    return await FromResult(false);
-                }
+                    if (ColorAEqualColorB(q5, 技能56CD颜色, 0))
+                    {
+                        KeyPress((uint)Keys.Q);
+                        return await FromResult(false);
+                    }
 
-                break;
-            }
+                    break;
+                }
             case 4:
                 {
-                if (ColorAEqualColorB(q4, SimpleColor.FromRgb(65, 74, 81), 0))
-                {
-                    KeyPress((uint)Keys.Q);
-                    return await FromResult(false);
-                }
+                    if (ColorAEqualColorB(q4, 技能4CD颜色, 0))
+                    {
+                        KeyPress((uint)Keys.Q);
+                        return await FromResult(false);
+                    }
 
-                break;
-            }
+                    break;
+                }
         }
 
         return await FromResult(true);
     }
-    
+
 
     #endregion
 
@@ -4515,13 +5350,14 @@ public partial class Form2 : Form
         static void 超强力量后()
         {
             _全局时间w = -1;
-            _条件保持假腿 = true;
+            if (_条件开启切假腿)
+                _条件保持假腿 = true;
             //RightClick();
             KeyPress((uint)Keys.A);
         }
 
         // 超时则切回 总体释放时间
-        if (获取当前时间毫秒() - _全局时间w > 600 && _全局时间w != -1)
+        if (获取当前时间毫秒() - _全局时间w > 600 && _全局时间w != -1 && _条件开启切假腿)
         {
             超强力量后();
             return await FromResult(false);
@@ -4529,7 +5365,7 @@ public partial class Form2 : Form
 
         var w4 = 获取w4左下角颜色(bts, size);
 
-        if (ColorAEqualColorB(w4, SimpleColor.FromRgb(65, 74, 81), 0)) return await FromResult(true);
+        if (ColorAEqualColorB(w4, 技能4CD颜色, 0)) return await FromResult(true);
 
         超强力量后();
         return await FromResult(false);
@@ -4540,13 +5376,14 @@ public partial class Form2 : Form
         static void 震撼大地后()
         {
             _全局时间q = -1;
-            _条件保持假腿 = true;
+            if (_条件开启切假腿)
+                _条件保持假腿 = true;
             //RightClick();
             KeyPress((uint)Keys.A);
         }
 
         // 超时则切回 总体释放时间
-        if (获取当前时间毫秒() - _全局时间q > 600 && _全局时间q != -1)
+        if (获取当前时间毫秒() - _全局时间q > 600 && _全局时间q != -1 && _条件开启切假腿)
         {
             震撼大地后();
             return await FromResult(false);
@@ -4554,145 +5391,29 @@ public partial class Form2 : Form
 
         var q4 = 获取q4左下角颜色(bts, size);
 
-        if (ColorAEqualColorB(q4, SimpleColor.FromRgb(65, 74, 81), 0)) return await FromResult(true);
+        if (ColorAEqualColorB(q4, 技能4CD颜色, 0)) return await FromResult(true);
 
         震撼大地后();
         return await FromResult(false);
     }
 
-    #endregion
+    private static async Task<bool> 跳拍(byte[] bts, Size size)
+    {
+        if (根据图片以及类别使用物品(物品_跳刀, bts, size, _技能数量)
+            || 根据图片以及类别使用物品(物品_跳刀_力量跳刀, bts, size, _技能数量)
+            || 根据图片以及类别使用物品(物品_跳刀_智力跳刀, bts, size, _技能数量))
+        {
+            return await FromResult(true);
+        }
 
-    #region 巨魔
+        KeyPress((uint)Keys.A);
 
-    //private static async Task<bool> 巨魔远程飞斧接平a后切回(byte[] bts, Size size)
-    //{
-    //    var q5 = 获取q5颜色(bts, size);
-    //    var q6 = 获取q6颜色(bts, size);
-    //    var w5 = 获取w5颜色(bts, size);
-    //    var w6 = 获取w6颜色(bts, size);
+        var q4 = 获取q4左下角颜色(bts, size);
 
-    //    var 远程q颜色 = SimpleColor.FromRgb(56, 80, 80); // 远程形态 颜色
-    //    var 远程飞斧可以释放颜色 = SimpleColor.FromRgb(87, 105, 97); // 技能可以释放颜色
-    //    var 释放二阶段颜色 = SimpleColor.FromRgb(68, 165, 76); // 释放颜色
-    //    var 技能进入CD颜色 = SimpleColor.FromRgb(255, 255, 255); // 释放完颜色
-    //    var A杖技能进入CD颜色 = SimpleColor.FromRgb(1, 1, 1); // A杖释放完颜色
+        if (ColorAEqualColorB(q4, 技能4CD颜色, 0)) KeyPress((uint)Keys.Q);
 
-    //    switch (_全局步骤q)
-    //    {
-    //        case < 1:
-    //        {
-    //            if (_是否魔晶)
-    //            {
-    //                if (ColorAEqualColorB(远程q颜色, q6, 0))
-    //                {
-    //                    _全局步骤q = 1;
-    //                }
-    //            }
-    //            else if (ColorAEqualColorB(远程q颜色, q5, 0))
-    //            {
-    //                _全局步骤q = 1;
-    //            }
-
-    //            return await FromResult(true);
-    //        }
-    //        case < 2:
-    //        {
-    //            if (_是否魔晶)
-    //            {
-    //                if (ColorAEqualColorB(远程飞斧可以释放颜色, w6, 0))
-    //                {
-    //                    _全局步骤q = 2;
-    //                    _全局时间 = 获取当前时间毫秒();
-    //                }
-    //            }
-    //            else if (ColorAEqualColorB(远程飞斧可以释放颜色, w5, 0))
-    //            {
-    //                _全局步骤q = 2;
-    //                _全局时间 = 获取当前时间毫秒();
-    //            }
-
-    //            return await FromResult(true);
-    //        }
-    //        case < 4:
-    //        {
-    //            if (_是否魔晶)
-    //            {
-    //                if (ColorAEqualColorB(释放二阶段颜色,  w6, 0))
-    //                {
-    //                    _全局步骤q = 4;
-    //                }
-
-    //                KeyPress((uint)Keys.W);
-    //                Delay(等待延迟);
-    //            }
-    //            else
-    //            {
-    //                if (ColorAEqualColorB(释放二阶段颜色, w5, 0))
-    //                {
-    //                    _全局步骤q = 4;
-    //                }
-
-    //                KeyPress((uint)Keys.W);
-    //                Delay(等待延迟);
-    //            }
-
-    //            if (_全局时间 != -1 && 获取当前时间毫秒() - _全局时间 <= 500) return await FromResult(true);
-
-    //            _全局时间 = -1;
-    //            _全局步骤q = 0;
-    //            return await FromResult(false);
-    //        }
-    //        case < 5:
-    //        {
-    //            if (_是否魔晶)
-    //            {
-    //                if (ColorAEqualColorB(A杖技能进入CD颜色,  w6, 0)
-    //                    || ColorAEqualColorB(技能进入CD颜色, w6, 0))
-    //                {
-    //                    await Run(() =>
-    //                    {
-    //                        KeyPress((uint)Keys.A);
-    //                        Delay(230);
-    //                        KeyPress((uint)Keys.Q);
-    //                        KeyPress((uint)Keys.M);
-    //                        Delay(150);
-    //                        KeyPress((uint)Keys.A);
-    //                    });
-    //                    _全局时间 = -1;
-    //                    _全局步骤q = 0;
-    //                    return await FromResult(false);
-    //                }
-    //            }
-    //            else
-    //            {
-    //                if (ColorAEqualColorB(A杖技能进入CD颜色,  w5, 0)
-    //                    || ColorAEqualColorB(技能进入CD颜色, w5, 0))
-    //                {
-    //                    await Run(() =>
-    //                    {
-    //                        KeyPress((uint)Keys.A);
-    //                        Delay(230);
-    //                        KeyPress((uint)Keys.Q);
-    //                        KeyPress((uint)Keys.M);
-    //                        Delay(150);
-    //                        KeyPress((uint)Keys.A);
-    //                    });
-    //                    _全局时间 = -1;
-    //                    _全局步骤q = 0;
-    //                    return await FromResult(false);
-    //                }
-    //            }
-
-    //            if (_全局时间 != -1 && 获取当前时间毫秒() - _全局时间 <= 500) return await FromResult(true);
-
-    //            _全局时间 = -1;
-    //            _全局步骤q = 0;
-    //            return await FromResult(false);
-    //        }
-    //        default:
-    //            return await FromResult(true);
-    //    }
-    //}
+        return await FromResult(false);
+    }
 
     #endregion
 
@@ -4703,13 +5424,15 @@ public partial class Form2 : Form
         static void 黑暗契约后()
         {
             _全局时间q = -1;
-            _条件保持假腿 = true;
-            RightClick();
-            // KeyPress((uint) Keys.A);
+            if (_条件开启切假腿)
+            {
+                _条件保持假腿 = true;
+            }
+            KeyPress((uint)Keys.A);
         }
 
         // 超时则切回 总体释放时间
-        if (获取当前时间毫秒() - _全局时间q > 300 && _全局时间q != -1)
+        if (获取当前时间毫秒() - _全局时间q > 300 && _全局时间q != -1 && _条件开启切假腿)
         {
             黑暗契约后();
             return await FromResult(false);
@@ -4720,13 +5443,13 @@ public partial class Form2 : Form
 
         switch (_技能数量)
         {
-            case 5 when ColorAEqualColorB(q5, SimpleColor.FromRgb(45, 52, 59), 0):
+            case 5 when ColorAEqualColorB(q5, 技能56CD颜色, 0):
                 return await FromResult(true);
             case 5:
                 黑暗契约后();
                 return await FromResult(false);
 
-            case 4 when ColorAEqualColorB(q4, SimpleColor.FromRgb(65, 74, 81), 0):
+            case 4 when ColorAEqualColorB(q4, 技能4CD颜色, 0):
                 return await FromResult(true);
             case 4:
                 黑暗契约后();
@@ -4748,13 +5471,18 @@ public partial class Form2 : Form
         static void 深海护罩后()
         {
             _全局时间d = -1;
-            _条件保持假腿 = true;
+
+            if (_条件开启切假腿)
+            {
+                _条件保持假腿 = true;
+            }
+
             //RightClick();
             KeyPress((uint)Keys.A);
         }
 
         // 超时则切回 总体释放时间
-        if (获取当前时间毫秒() - _全局时间d > 500 && _全局时间d != -1)
+        if (获取当前时间毫秒() - _全局时间d > 500 && _全局时间d != -1 && _条件开启切假腿)
         {
             深海护罩后();
             return await FromResult(false);
@@ -4764,7 +5492,7 @@ public partial class Form2 : Form
 
         switch (_技能数量)
         {
-            case 5 when ColorAEqualColorB(d5, SimpleColor.FromRgb(45, 52, 59), 0): // 一般技能原色颜色
+            case 5 when ColorAEqualColorB(d5, 技能56CD颜色, 0): // 一般技能原色颜色
                 return await FromResult(true);
             case 5:
                 深海护罩后();
@@ -4800,13 +5528,13 @@ public partial class Form2 : Form
 
         switch (_技能数量)
         {
-            case 5 when ColorAEqualColorB(w5, SimpleColor.FromRgb(45, 52, 59), 0):
+            case 5 when ColorAEqualColorB(w5, 技能56CD颜色, 0):
                 return await FromResult(true);
             case 5:
                 闪烁后();
                 return await FromResult(false);
 
-            case 4 when ColorAEqualColorB(w4, SimpleColor.FromRgb(65, 74, 81), 0):
+            case 4 when ColorAEqualColorB(w4, 技能4CD颜色, 0):
                 return await FromResult(true);
             case 4:
                 闪烁后();
@@ -4838,20 +5566,20 @@ public partial class Form2 : Form
 
         switch (_技能数量)
         {
-            case 5 when ColorAEqualColorB(r5, SimpleColor.FromRgb(45, 52, 59), 0):
+            case 5 when ColorAEqualColorB(r5, 技能56CD颜色, 0):
                 return await FromResult(true);
             case 5:
-            {
-                法力虚空后();
-                return await FromResult(false);
-            }
-            case 4 when ColorAEqualColorB(r4, SimpleColor.FromRgb(65, 74, 81), 0):
+                {
+                    法力虚空后();
+                    return await FromResult(false);
+                }
+            case 4 when ColorAEqualColorB(r4, 技能4CD颜色, 0):
                 return await FromResult(true);
             case 4:
-            {
-                法力虚空后();
-                return await FromResult(false);
-            }
+                {
+                    法力虚空后();
+                    return await FromResult(false);
+                }
         }
 
         return await FromResult(true);
@@ -4879,7 +5607,7 @@ public partial class Form2 : Form
 
         var q4 = 获取q4左下角颜色(bts, size);
 
-        if (ColorAEqualColorB(q4, SimpleColor.FromRgb(65, 74, 81), 0)) return await FromResult(true);
+        if (ColorAEqualColorB(q4, 技能4CD颜色, 0)) return await FromResult(true);
 
         灵魂之矛后();
         return await FromResult(false);
@@ -4904,7 +5632,7 @@ public partial class Form2 : Form
 
         var w4 = 获取w4左下角颜色(bts, size);
 
-        if (ColorAEqualColorB(w4, SimpleColor.FromRgb(65, 74, 81), 0)) return await FromResult(true);
+        if (ColorAEqualColorB(w4, 技能4CD颜色, 0)) return await FromResult(true);
 
         神行百变后();
         return await FromResult(false);
@@ -4917,7 +5645,7 @@ public partial class Form2 : Form
             _全局时间w = -1;
             Delay(1000);
             KeyPress((uint)Keys.D1);
-            Delay(30);
+            Delay(等待延迟);
             RightClick();
             KeyPress((uint)Keys.F1);
             _条件保持假腿 = true;
@@ -4932,7 +5660,7 @@ public partial class Form2 : Form
 
         var w4 = 获取w4左下角颜色(bts, size);
 
-        if (ColorAEqualColorB(w4, SimpleColor.FromRgb(65, 74, 81), 0)) return await FromResult(true);
+        if (ColorAEqualColorB(w4, 技能4CD颜色, 0)) return await FromResult(true);
 
         神行百变后();
         return await FromResult(false);
@@ -4946,43 +5674,48 @@ public partial class Form2 : Form
     {
         static void 匕首后()
         {
-            _全局时间q = -1;
-            _条件保持假腿 = true;
+            if (_条件开启切假腿)
+            {
+                _全局时间q = -1;
+                _条件保持假腿 = true;
+            }
+
+            KeyPress((uint)Keys.A);
             RightClick();
         }
 
         // 超时则切回 总体释放时间
-        if (获取当前时间毫秒() - _全局时间q > 1200 && _全局时间q != -1)
+        if (获取当前时间毫秒() - _全局时间q > 700 && _全局时间q != -1 && _条件开启切假腿)
         {
             匕首后();
             return await FromResult(false);
         }
 
-        var q4 = 获取q4左下角颜色(bts, size);
-        var q5 = 获取q5左下角颜色(bts, size);
 
         switch (_技能数量)
         {
             case 5:
-            {
-                if (!ColorAEqualColorB(q5, SimpleColor.FromRgb(45, 52, 59), 0))
                 {
-                    匕首后();
-                    return await FromResult(false);
-                }
+                    var q5 = 获取q5左下角颜色(bts, size);
+                    if (!ColorAEqualColorB(q5, 技能56CD颜色, 0))
+                    {
+                        匕首后();
+                        return await FromResult(false);
+                    }
 
-                break;
-            }
+                    break;
+                }
             default:
-            {
-                if (!ColorAEqualColorB(q4, SimpleColor.FromRgb(65, 74, 81), 0))
                 {
-                    匕首后();
-                    return await FromResult(false);
-                }
+                    var q4 = 获取q4左下角颜色(bts, size);
+                    if (!ColorAEqualColorB(q4, 技能4CD颜色, 0))
+                    {
+                        匕首后();
+                        return await FromResult(false);
+                    }
 
-                break;
-            }
+                    break;
+                }
         }
 
         return await FromResult(true);
@@ -4992,15 +5725,16 @@ public partial class Form2 : Form
     {
         static void 幻影突袭后()
         {
-            _全局时间w = -1;
-            _条件保持假腿 = true;
+            if (_条件开启切假腿)
+            {
+                _全局时间w = -1;
+                _条件保持假腿 = true;
+            }
         }
 
-        var w4 = 获取w4左下角颜色(bts, size);
-        var w5 = 获取w5左下角颜色(bts, size);
 
         // 超时则切回 总体释放时间
-        if (获取当前时间毫秒() - _全局时间w > 1200 && _全局时间w != -1)
+        if (获取当前时间毫秒() - _全局时间w > 700 && _全局时间w != -1 && _条件开启切假腿)
         {
             幻影突袭后();
             return await FromResult(false);
@@ -5010,24 +5744,26 @@ public partial class Form2 : Form
         {
             case 5:
                 {
-                if (!ColorAEqualColorB(w5, SimpleColor.FromRgb(45, 52, 59), 0))
-                {
-                    幻影突袭后();
-                    return await FromResult(false);
-                }
+                    var w5 = 获取w5左下角颜色(bts, size);
+                    if (!ColorAEqualColorB(w5, 技能56CD颜色, 0))
+                    {
+                        幻影突袭后();
+                        return await FromResult(false);
+                    }
 
-                break;
-            }
+                    break;
+                }
             default:
-            {
-                if (!ColorAEqualColorB(w4, SimpleColor.FromRgb(65, 74, 81), 0))
                 {
-                    幻影突袭后();
-                    return await FromResult(false);
-                }
+                    var w4 = 获取w4左下角颜色(bts, size);
+                    if (!ColorAEqualColorB(w4, 技能4CD颜色, 0))
+                    {
+                        幻影突袭后();
+                        return await FromResult(false);
+                    }
 
-                break;
-            }
+                    break;
+                }
         }
 
         return await FromResult(true);
@@ -5037,16 +5773,19 @@ public partial class Form2 : Form
     {
         static void 魅影无形后()
         {
-            _全局时间e = -1;
-            _条件保持假腿 = true;
+            if (_条件开启切假腿)
+            {
+                _全局时间e = -1;
+                _条件保持假腿 = true;
+            }
+
+            KeyPress((uint)Keys.A);
             RightClick();
         }
 
-        var e4 = 获取e4左下角颜色(bts, size);
-        var e5 = 获取e5左下角颜色(bts, size);
 
         // 超时则切回 总体释放时间
-        if (获取当前时间毫秒() - _全局时间e > 1200 && _全局时间e != -1)
+        if (获取当前时间毫秒() - _全局时间e > (_是否a杖 ? 100 : 500) && _全局时间e != -1 && _条件开启切假腿)
         {
             魅影无形后();
             return await FromResult(false);
@@ -5056,24 +5795,26 @@ public partial class Form2 : Form
         {
             case 5:
                 {
-                if (!ColorAEqualColorB(e5, SimpleColor.FromRgb(45, 52, 59), 0))
-                {
-                    魅影无形后();
-                    return await FromResult(false);
-                }
+                    var e5 = 获取e5左下角颜色(bts, size);
+                    if (!ColorAEqualColorB(e5, 技能56CD颜色, 0))
+                    {
+                        魅影无形后();
+                        return await FromResult(false);
+                    }
 
-                break;
-            }
+                    break;
+                }
             default:
-            {
-                if (!ColorAEqualColorB(e4, SimpleColor.FromRgb(65, 74, 81), 0))
                 {
-                    魅影无形后();
-                    return await FromResult(false);
-                }
+                    var e4 = 获取e4左下角颜色(bts, size);
+                    if (!ColorAEqualColorB(e4, 技能4CD颜色, 0))
+                    {
+                        魅影无形后();
+                        return await FromResult(false);
+                    }
 
-                break;
-            }
+                    break;
+                }
         }
 
         return await FromResult(true);
@@ -5083,15 +5824,19 @@ public partial class Form2 : Form
     {
         static void 刀阵旋风后()
         {
-            _全局时间e = -1;
-            _条件保持假腿 = true;
+            if (_条件开启切假腿)
+            {
+                _全局时间e = -1;
+                _条件保持假腿 = true;
+            }
+
+            RightClick();
             KeyPress((uint)Keys.A);
         }
 
-        var d5 = 获取d5左下角颜色(bts, size);
 
         // 超时则切回 总体释放时间
-        if (获取当前时间毫秒() - _全局时间e > 1200 && _全局时间e != -1)
+        if (获取当前时间毫秒() - _全局时间e > 300 && _全局时间e != -1 && _条件开启切假腿)
         {
             刀阵旋风后();
             return await FromResult(false);
@@ -5101,14 +5846,15 @@ public partial class Form2 : Form
         {
             case 5:
                 {
-                if (!ColorAEqualColorB(d5, SimpleColor.FromRgb(45, 52, 59), 0))
-                {
-                    刀阵旋风后();
-                    return await FromResult(false);
-                }
+                    var d5 = 获取d5左下角颜色(bts, size);
+                    if (!ColorAEqualColorB(d5, 技能56CD颜色, 0))
+                    {
+                        刀阵旋风后();
+                        return await FromResult(false);
+                    }
 
-                break;
-            }
+                    break;
+                }
         }
 
         return await FromResult(true);
@@ -5142,28 +5888,28 @@ public partial class Form2 : Form
         {
             case 5:
                 {
-                if (
-                    !ColorAEqualColorB(q5, SimpleColor.FromRgb(45, 52, 59), 0)
-                )
-                {
-                    时间漫游后();
-                    return await FromResult(false);
-                }
+                    if (
+                        !ColorAEqualColorB(q5, 技能56CD颜色, 0)
+                    )
+                    {
+                        时间漫游后();
+                        return await FromResult(false);
+                    }
 
-                break;
-            }
+                    break;
+                }
             default:
-            {
-                if (
-                    !ColorAEqualColorB(q4, SimpleColor.FromRgb(65, 74, 81), 0)
-                )
                 {
-                    时间漫游后();
-                    return await FromResult(false);
-                }
+                    if (
+                        !ColorAEqualColorB(q4, 技能4CD颜色, 0)
+                    )
+                    {
+                        时间漫游后();
+                        return await FromResult(false);
+                    }
 
-                break;
-            }
+                    break;
+                }
         }
 
         return await FromResult(true);
@@ -5193,28 +5939,28 @@ public partial class Form2 : Form
         {
             case 5:
                 {
-                if (
-                    !ColorAEqualColorB(w5, SimpleColor.FromRgb(45, 52, 59), 0)
-                )
-                {
-                    时间膨胀后();
-                    return await FromResult(false);
-                }
+                    if (
+                        !ColorAEqualColorB(w5, 技能56CD颜色, 0)
+                    )
+                    {
+                        时间膨胀后();
+                        return await FromResult(false);
+                    }
 
-                break;
-            }
+                    break;
+                }
             default:
-            {
-                if (
-                    !ColorAEqualColorB(w4, SimpleColor.FromRgb(65, 74, 81), 0)
-                )
                 {
-                    时间膨胀后();
-                    return await FromResult(false);
-                }
+                    if (
+                        !ColorAEqualColorB(w4, 技能4CD颜色, 0)
+                    )
+                    {
+                        时间膨胀后();
+                        return await FromResult(false);
+                    }
 
-                break;
-            }
+                    break;
+                }
         }
 
         return await FromResult(true);
@@ -5244,28 +5990,28 @@ public partial class Form2 : Form
         {
             case 5:
                 {
-                if (
-                    !ColorAEqualColorB(r5, SimpleColor.FromRgb(45, 52, 59), 0)
-                )
-                {
-                    时间结界后();
-                    return await FromResult(false);
-                }
+                    if (
+                        !ColorAEqualColorB(r5, 技能56CD颜色, 0)
+                    )
+                    {
+                        时间结界后();
+                        return await FromResult(false);
+                    }
 
-                break;
-            }
+                    break;
+                }
             default:
-            {
-                if (
-                    !ColorAEqualColorB(r4, SimpleColor.FromRgb(65, 74, 81), 0)
-                )
                 {
-                    时间结界后();
-                    return await FromResult(false);
-                }
+                    if (
+                        !ColorAEqualColorB(r4, 技能4CD颜色, 0)
+                    )
+                    {
+                        时间结界后();
+                        return await FromResult(false);
+                    }
 
-                break;
-            }
+                    break;
+                }
         }
 
         return await FromResult(true);
@@ -5299,34 +6045,34 @@ public partial class Form2 : Form
         switch (_技能数量)
         {
             case 6:
-            {
-                if (!ColorAEqualColorB(q6, SimpleColor.FromRgb(45, 52, 59), 0))
                 {
-                    倒影后();
-                    return await FromResult(false);
-                }
+                    if (!ColorAEqualColorB(q6, 技能56CD颜色, 0))
+                    {
+                        倒影后();
+                        return await FromResult(false);
+                    }
 
-                break;
-            }
+                    break;
+                }
             case 5:
-            {
-                if (!ColorAEqualColorB(q5, SimpleColor.FromRgb(45, 52, 59), 0))
                 {
-                    倒影后();
-                    return await FromResult(false);
-                }
+                    if (!ColorAEqualColorB(q5, 技能56CD颜色, 0))
+                    {
+                        倒影后();
+                        return await FromResult(false);
+                    }
 
-                break;
-            }
+                    break;
+                }
             case 4:
-            {
-                if (!ColorAEqualColorB(q4, SimpleColor.FromRgb(65, 74, 81), 0))
                 {
-                    倒影后();
-                    return await FromResult(false);
-            }
-                break;
-            }
+                    if (!ColorAEqualColorB(q4, 技能4CD颜色, 0))
+                    {
+                        倒影后();
+                        return await FromResult(false);
+                    }
+                    break;
+                }
         }
 
         return await FromResult(true);
@@ -5356,34 +6102,34 @@ public partial class Form2 : Form
         switch (_技能数量)
         {
             case 6:
-            {
-                if (!ColorAEqualColorB(w6, SimpleColor.FromRgb(45, 52, 59), 0))
                 {
-                    幻惑后();
-                    return await FromResult(false);
-                }
+                    if (!ColorAEqualColorB(w6, 技能56CD颜色, 0))
+                    {
+                        幻惑后();
+                        return await FromResult(false);
+                    }
 
-                break;
-            }
+                    break;
+                }
             case 5:
-            {
-                if (!ColorAEqualColorB(w5, SimpleColor.FromRgb(45, 52, 59), 0))
                 {
-                    幻惑后();
-                    return await FromResult(false);
-                }
+                    if (!ColorAEqualColorB(w5, 技能56CD颜色, 0))
+                    {
+                        幻惑后();
+                        return await FromResult(false);
+                    }
 
-                break;
-            }
-            case 4:
-            {
-                if (!ColorAEqualColorB(w4, SimpleColor.FromRgb(65, 74, 81), 0))
-                {
-                    幻惑后();
-                    return await FromResult(false);
+                    break;
                 }
-                break;
-            }
+            case 4:
+                {
+                    if (!ColorAEqualColorB(w4, 技能4CD颜色, 0))
+                    {
+                        幻惑后();
+                        return await FromResult(false);
+                    }
+                    break;
+                }
         }
 
         return await FromResult(true);
@@ -5413,34 +6159,34 @@ public partial class Form2 : Form
         switch (_技能数量)
         {
             case 6:
-            {
-                if (!ColorAEqualColorB(e6, SimpleColor.FromRgb(45, 52, 59), 0))
                 {
-                    魔化后();
-                    return await FromResult(false);
-                }
+                    if (!ColorAEqualColorB(e6, 技能56CD颜色, 0))
+                    {
+                        魔化后();
+                        return await FromResult(false);
+                    }
 
-                break;
-            }
+                    break;
+                }
             case 5:
-            {
-                if (!ColorAEqualColorB(e5, SimpleColor.FromRgb(45, 52, 59), 0))
                 {
-                    魔化后();
-                    return await FromResult(false);
-                }
+                    if (!ColorAEqualColorB(e5, 技能56CD颜色, 0))
+                    {
+                        魔化后();
+                        return await FromResult(false);
+                    }
 
-                break;
-            }
-            case 4:
-            {
-                if (!ColorAEqualColorB(e4, SimpleColor.FromRgb(65, 74, 81), 0))
-                {
-                    魔化后();
-                    return await FromResult(false);
+                    break;
                 }
-                break;
-            }
+            case 4:
+                {
+                    if (!ColorAEqualColorB(e4, 技能4CD颜色, 0))
+                    {
+                        魔化后();
+                        return await FromResult(false);
+                    }
+                    break;
+                }
         }
 
         return await FromResult(true);
@@ -5464,31 +6210,31 @@ public partial class Form2 : Form
 
         var d5 = 获取d5左下角颜色(bts, size);
         var d6 = 获取d6左下角颜色(bts, size);
-        
+
         if (!_是否魔晶) return await FromResult(false);
 
         switch (_技能数量)
         {
             case 6:
-            {
-                if (!ColorAEqualColorB(d6, SimpleColor.FromRgb(45, 52, 59), 0))
                 {
-                    恶魔狂热后();
-                    return await FromResult(false);
-                }
+                    if (!ColorAEqualColorB(d6, 技能56CD颜色, 0))
+                    {
+                        恶魔狂热后();
+                        return await FromResult(false);
+                    }
 
-                break;
-            }
+                    break;
+                }
             case 5:
-            {
-                if (!ColorAEqualColorB(d5, SimpleColor.FromRgb(45, 52, 59), 0))
                 {
-                    恶魔狂热后();
-                    return await FromResult(false);
-                }
+                    if (!ColorAEqualColorB(d5, 技能56CD颜色, 0))
+                    {
+                        恶魔狂热后();
+                        return await FromResult(false);
+                    }
 
-                break;
-            }
+                    break;
+                }
         }
 
         return await FromResult(true);
@@ -5519,25 +6265,25 @@ public partial class Form2 : Form
         switch (_技能数量)
         {
             case 6:
-            {
-                if (!ColorAEqualColorB(f6, SimpleColor.FromRgb(45, 52, 59), 0))
                 {
-                    恐怖心潮后();
-                    return await FromResult(false);
-                }
+                    if (!ColorAEqualColorB(f6, 技能56CD颜色, 0))
+                    {
+                        恐怖心潮后();
+                        return await FromResult(false);
+                    }
 
-                break;
-            }
+                    break;
+                }
             case 5:
-            {
-                if (!ColorAEqualColorB(d5, SimpleColor.FromRgb(45, 52, 59), 0))
                 {
-                    恐怖心潮后();
-                    return await FromResult(false);
-                }
+                    if (!ColorAEqualColorB(d5, 技能56CD颜色, 0))
+                    {
+                        恐怖心潮后();
+                        return await FromResult(false);
+                    }
 
-                break;
-            }
+                    break;
+                }
         }
 
         return await FromResult(true);
@@ -5567,34 +6313,34 @@ public partial class Form2 : Form
         switch (_技能数量)
         {
             case 6:
-            {
-                if (!ColorAEqualColorB(r6, SimpleColor.FromRgb(45, 52, 59), 0))
                 {
-                    魂断后();
-                    return await FromResult(false);
-                }
+                    if (!ColorAEqualColorB(r6, 技能56CD颜色, 0))
+                    {
+                        魂断后();
+                        return await FromResult(false);
+                    }
 
-                break;
-            }
+                    break;
+                }
             case 5:
-            {
-                if (!ColorAEqualColorB(r5, SimpleColor.FromRgb(45, 52, 59), 0))
                 {
-                    魂断后();
-                    return await FromResult(false);
-                }
+                    if (!ColorAEqualColorB(r5, 技能56CD颜色, 0))
+                    {
+                        魂断后();
+                        return await FromResult(false);
+                    }
 
-                break;
-            }
-            case 4:
-            {
-                if (!ColorAEqualColorB(r4, SimpleColor.FromRgb(65, 74, 81), 0))
-                {
-                    魂断后();
-                    return await FromResult(false);
+                    break;
                 }
-                break;
-            }
+            case 4:
+                {
+                    if (!ColorAEqualColorB(r4, 技能4CD颜色, 0))
+                    {
+                        魂断后();
+                        return await FromResult(false);
+                    }
+                    break;
+                }
         }
 
         return await FromResult(true);
@@ -5623,7 +6369,7 @@ public partial class Form2 : Form
 
         var q4 = 获取q4左下角颜色(bts, size);
 
-        if (ColorAEqualColorB(q4, SimpleColor.FromRgb(65, 74, 81), 0)) return await FromResult(true);
+        if (ColorAEqualColorB(q4, 技能4CD颜色, 0)) return await FromResult(true);
 
         飞镖后();
         return await FromResult(false);
@@ -5648,7 +6394,7 @@ public partial class Form2 : Form
 
         var r4 = 获取r4左下角颜色(bts, size);
 
-        if (ColorAEqualColorB(r4, SimpleColor.FromRgb(65, 74, 81), 0)) return await FromResult(true);
+        if (ColorAEqualColorB(r4, 技能4CD颜色, 0)) return await FromResult(true);
 
         标记后();
         return await FromResult(false);
@@ -5658,7 +6404,7 @@ public partial class Form2 : Form
     {
         var r4 = 获取r4左下角颜色(bts, size);
         if (
-            !ColorAEqualColorB(r4, SimpleColor.FromRgb(65, 74, 81), 0)
+            !ColorAEqualColorB(r4, 技能4CD颜色, 0)
         )
             if (_循环条件1) return await FromResult(true);
             else return await FromResult(false);
@@ -5677,7 +6423,7 @@ public partial class Form2 : Form
     {
         var e4 = 获取e4左下角颜色(bts, size);
         if (
-            !ColorAEqualColorB(e4, SimpleColor.FromRgb(65, 74, 81), 0)
+            !ColorAEqualColorB(e4, 技能4CD颜色, 0)
         )
             if (_循环条件1) return await FromResult(true);
             else return await FromResult(false);
@@ -5692,7 +6438,7 @@ public partial class Form2 : Form
     {
         var e4 = 获取e4左下角颜色(bts, size);
 
-        if (ColorAEqualColorB(e4, SimpleColor.FromRgb(65, 74, 81), 0)) return await FromResult(true);
+        if (ColorAEqualColorB(e4, 技能4CD颜色, 0)) return await FromResult(true);
 
         RightClick();
 
@@ -5703,7 +6449,7 @@ public partial class Form2 : Form
     {
         var q4 = 获取q4左下角颜色(bts, size);
 
-        if (ColorAEqualColorB(q4, SimpleColor.FromRgb(65, 74, 81), 0)) return await FromResult(true);
+        if (ColorAEqualColorB(q4, 技能4CD颜色, 0)) return await FromResult(true);
 
         KeyPress((uint)Keys.A);
         return await FromResult(false);
@@ -5713,7 +6459,7 @@ public partial class Form2 : Form
     {
         var r4 = 获取r4左下角颜色(bts, size);
 
-        if (ColorAEqualColorB(r4, SimpleColor.FromRgb(65, 74, 81), 0)) return await FromResult(true);
+        if (ColorAEqualColorB(r4, 技能4CD颜色, 0)) return await FromResult(true);
         RightClick();
         return await FromResult(false);
     }
@@ -5751,28 +6497,28 @@ public partial class Form2 : Form
         {
             case 5:
                 {
-                if (
-                    !ColorAEqualColorB(w5, SimpleColor.FromRgb(45, 52, 59), 0)
-                )
-                {
-                    秘术银蛇后();
-                    return await FromResult(false);
-                }
+                    if (
+                        !ColorAEqualColorB(w5, 技能56CD颜色, 0)
+                    )
+                    {
+                        秘术银蛇后();
+                        return await FromResult(false);
+                    }
 
-                break;
-            }
+                    break;
+                }
             default:
-            {
-                if (
-                    !ColorAEqualColorB(w4, SimpleColor.FromRgb(65, 74, 81), 0)
-                )
                 {
-                    秘术银蛇后();
-                    return await FromResult(false);
-                }
+                    if (
+                        !ColorAEqualColorB(w4, 技能4CD颜色, 0)
+                    )
+                    {
+                        秘术银蛇后();
+                        return await FromResult(false);
+                    }
 
-                break;
-            }
+                    break;
+                }
         }
 
         return await FromResult(true);
@@ -5807,28 +6553,28 @@ public partial class Form2 : Form
         {
             case 5:
                 {
-                if (
-                    !ColorAEqualColorB(r5, SimpleColor.FromRgb(45, 52, 59), 0)
-                )
-                {
-                    石化凝视后();
-                    return await FromResult(false);
-                }
+                    if (
+                        !ColorAEqualColorB(r5, 技能56CD颜色, 0)
+                    )
+                    {
+                        石化凝视后();
+                        return await FromResult(false);
+                    }
 
-                break;
-            }
+                    break;
+                }
             default:
-            {
-                if (
-                    !ColorAEqualColorB(r4, SimpleColor.FromRgb(65, 74, 81), 0)
-                )
                 {
-                    石化凝视后();
-                    return await FromResult(false);
-                }
+                    if (
+                        !ColorAEqualColorB(r4, 技能4CD颜色, 0)
+                    )
+                    {
+                        石化凝视后();
+                        return await FromResult(false);
+                    }
 
-                break;
-            }
+                    break;
+                }
         }
 
         return await FromResult(true);
@@ -5858,8 +6604,8 @@ public partial class Form2 : Form
         var q5 = 获取q5左下角颜色(bts, size);
         var q6 = 获取q6左下角颜色(bts, size);
 
-        if (ColorAEqualColorB(q6, SimpleColor.FromRgb(45, 52, 59), 0) ||
-            ColorAEqualColorB(q5, SimpleColor.FromRgb(45, 52, 59), 0)) return await FromResult(true);
+        if (ColorAEqualColorB(q6, 技能56CD颜色, 0) ||
+            ColorAEqualColorB(q5, 技能56CD颜色, 0)) return await FromResult(true);
 
         幽鬼之刃后();
         return await FromResult(false);
@@ -5867,56 +6613,55 @@ public partial class Form2 : Form
 
     private static async Task<bool> 如影随形去后摇(byte[] bts, Size size)
     {
-        static void 如影随形后()
+        static void 如影随形后(byte[] bts, Size size)
         {
             _全局时间f = -1;
-            _条件保持假腿 = true;
-            //RightClick();
-            KeyPress((uint)Keys.D);
-            Delay(等待延迟);
-            KeyPress((uint)Keys.X);
-            // KeyPress((uint)Keys.A);
-        }
 
-        // 超时则切回 总体释放时间
-        if (获取当前时间毫秒() - _全局时间f > 1200 && _全局时间f != -1)
-        {
-            如影随形后();
-            return await FromResult(false);
+            if (_全局模式f == 1)
+            {
+                KeyPress((uint)Keys.D);
+                if (根据图片以及类别使用物品(物品_幻影斧, bts, size, 6))
+                {
+                    分身一齐攻击();
+                }
+
+                Delay(60);
+                根据图片以及类别使用物品(物品_否决, bts, size, 6);
+                KeyPress((uint)Keys.A);
+            }
         }
 
         var f6 = 获取f6左下角颜色(bts, size);
 
-        if (ColorAEqualColorB(f6, SimpleColor.FromRgb(45, 52, 59), 0)) return await FromResult(true);
+        if (ColorAEqualColorB(f6, 技能56CD颜色, 0)) return await FromResult(true);
 
-        如影随形后();
+        如影随形后(bts, size);
         return await FromResult(false);
     }
 
     private static async Task<bool> 鬼影重重去后摇(byte[] bts, Size size)
     {
-        static void 鬼影重重后()
+        static void 鬼影重重后(byte[] bts, Size size)
         {
             _全局时间r = -1;
             _条件保持假腿 = true;
             //RightClick();
-            KeyPress((uint)Keys.A);
         }
 
         // 超时则切回 总体释放时间
         if (获取当前时间毫秒() - _全局时间r > 1200 && _全局时间r != -1)
         {
-            鬼影重重后();
+            鬼影重重后(bts, size);
             return await FromResult(false);
         }
 
         var r5 = 获取r5左下角颜色(bts, size);
         var r6 = 获取r6左下角颜色(bts, size);
 
-        if (ColorAEqualColorB(r6, SimpleColor.FromRgb(45, 52, 59), 0) ||
-            ColorAEqualColorB(r5, SimpleColor.FromRgb(45, 52, 59), 0)) return await FromResult(true);
+        if (ColorAEqualColorB(r6, 技能56CD颜色, 0) ||
+            ColorAEqualColorB(r5, 技能56CD颜色, 0)) return await FromResult(true);
 
-        鬼影重重后();
+        鬼影重重后(bts, size);
         return await FromResult(false);
     }
 
@@ -5948,28 +6693,28 @@ public partial class Form2 : Form
         {
             case 5:
                 {
-                if (
-                    ColorAEqualColorB(q5, SimpleColor.FromRgb(94, 154, 25), 0)
-                )
-                {
-                    流霰弹后();
-                    return await FromResult(false);
-                }
+                    if (
+                        ColorAEqualColorB(q5, Color.FromArgb(94, 154, 25), 0)
+                    )
+                    {
+                        流霰弹后();
+                        return await FromResult(false);
+                    }
 
-                break;
-            }
+                    break;
+                }
             default:
-            {
-                if (
-                    ColorAEqualColorB(q4, SimpleColor.FromRgb(72, 150, 11), 0)
-                )
                 {
-                    流霰弹后();
-                    return await FromResult(false);
-                }
+                    if (
+                        ColorAEqualColorB(q4, Color.FromArgb(72, 150, 11), 0)
+                    )
+                    {
+                        流霰弹后();
+                        return await FromResult(false);
+                    }
 
-                break;
-            }
+                    break;
+                }
         }
 
         return await FromResult(true);
@@ -6000,28 +6745,28 @@ public partial class Form2 : Form
         {
             case 5:
                 {
-                if (
-                    !ColorAEqualColorB(e5, SimpleColor.FromRgb(45, 52, 59), 0)
-                )
-                {
-                    瞄准后(bts, size);
-                    return await FromResult(false);
-                }
+                    if (
+                        !ColorAEqualColorB(e5, 技能56CD颜色, 0)
+                    )
+                    {
+                        瞄准后(bts, size);
+                        return await FromResult(false);
+                    }
 
-                break;
-            }
+                    break;
+                }
             default:
-            {
-                if (
-                    !ColorAEqualColorB(e4, SimpleColor.FromRgb(65, 74, 81), 0)
-                )
                 {
-                    瞄准后(bts, size);
-                    return await FromResult(false);
-                }
+                    if (
+                        !ColorAEqualColorB(e4, 技能4CD颜色, 0)
+                    )
+                    {
+                        瞄准后(bts, size);
+                        return await FromResult(false);
+                    }
 
-                break;
-            }
+                    break;
+                }
         }
 
         return await FromResult(true);
@@ -6051,28 +6796,28 @@ public partial class Form2 : Form
         {
             case 5:
                 {
-                if (
-                    !ColorAEqualColorB(r5, SimpleColor.FromRgb(45, 52, 59), 0)
-                )
-                {
-                    暗杀后();
-                    return await FromResult(false);
-                }
+                    if (
+                        !ColorAEqualColorB(r5, 技能56CD颜色, 0)
+                    )
+                    {
+                        暗杀后();
+                        return await FromResult(false);
+                    }
 
-                break;
-            }
+                    break;
+                }
             default:
-            {
-                if (
-                    !ColorAEqualColorB(r4, SimpleColor.FromRgb(65, 74, 81), 0)
-                )
                 {
-                    暗杀后();
-                    return await FromResult(false);
-                }
+                    if (
+                        !ColorAEqualColorB(r4, 技能4CD颜色, 0)
+                    )
+                    {
+                        暗杀后();
+                        return await FromResult(false);
+                    }
 
-                break;
-            }
+                    break;
+                }
         }
 
         return await FromResult(true);
@@ -6101,16 +6846,16 @@ public partial class Form2 : Form
         {
             case 5:
                 {
-                if (
-                    !ColorAEqualColorB(d5, SimpleColor.FromRgb(45, 52, 59), 0)
-                )
-                {
-                    震荡手雷后();
-                    return await FromResult(false);
-                }
+                    if (
+                        !ColorAEqualColorB(d5, 技能56CD颜色, 0)
+                    )
+                    {
+                        震荡手雷后();
+                        return await FromResult(false);
+                    }
 
-                break;
-            }
+                    break;
+                }
         }
 
         return await FromResult(true);
@@ -6124,26 +6869,28 @@ public partial class Form2 : Form
     {
         static async Task 狂风后()
         {
-            _全局时间q = -1;
+            // RightClick();
+            KeyPress((uint)Keys.A);
+
             switch (_全局模式)
             {
                 case 1:
-                    _条件开启切假腿 = false;
-                    await 切智力腿(_技能数量);
+                    if (_条件开启切假腿)
+                    {
+                        _条件开启切假腿 = false;
+                        await 切智力腿(_技能数量);
+                    }
+
                     break;
                 default:
-                    _条件开启切假腿 = true;
                     _条件保持假腿 = true;
                     break;
             }
-
-            // RightClick();
-            KeyPress((uint)Keys.A);
         }
 
         var w4 = 获取w4左下角颜色(bts, size);
 
-        if (ColorAEqualColorB(w4, SimpleColor.FromRgb(65, 74, 81), 0)) return await FromResult(true);
+        if (ColorAEqualColorB(w4, 技能4CD颜色, 0)) return await FromResult(true);
 
         await 狂风后();
         return await FromResult(false);
@@ -6153,30 +6900,29 @@ public partial class Form2 : Form
     {
         static async Task 数箭齐发后(byte[] bts1, Size size)
         {
-            _全局时间q = -1;
-            var is25 = ColorAEqualColorB(GetSPixelBytes(bts1, size, 754 - 截图模式1X, 957 - 截图模式1Y),
-                SimpleColor.FromRgb(246, 178, 60), 0);
-            Delay(is25 ? 2600 : 1300);
-            switch (_全局模式)
-            {
-                case 1:
-                    _条件开启切假腿 = false;
-                    await 切智力腿(_技能数量);
-                    break;
-                default:
-                    _条件开启切假腿 = true;
-                    _条件保持假腿 = true;
-                    break;
-            }
-
+            Delay(_全局模式e == 1 ? 2600 : 1300);
             // RightClick();
             KeyPress((uint)Keys.S);
             KeyPress((uint)Keys.A);
+
+            switch (_全局模式)
+            {
+                case 1:
+                    if (_条件开启切假腿)
+                    {
+                        _条件开启切假腿 = false;
+                        await 切智力腿(_技能数量);
+                    }
+                    break;
+                default:
+                    _条件保持假腿 = true;
+                    break;
+            }
         }
 
         var e4 = 获取e4左下角颜色(bts, size);
 
-        if (ColorAEqualColorB(e4, SimpleColor.FromRgb(65, 74, 81), 0)) return await FromResult(true);
+        if (ColorAEqualColorB(e4, 技能4CD颜色, 0)) return await FromResult(true);
 
         await 数箭齐发后(bts, size);
         return await FromResult(false);
@@ -6188,6 +6934,204 @@ public partial class Form2 : Form
 
     #region 智力
 
+    #region 光法
+
+    private static async Task<bool> 减少300毫秒蓄力(byte[] bts, Size size)
+    {
+        Color 不朽释放颜色4 = Color.FromArgb(186, 199, 207);
+        Color 不朽释放颜色56 = Color.FromArgb(222, 230, 237);
+
+        static void 提前释放()
+        {
+            Delay(2700);
+            KeyPress((uint)Keys.D9);
+        }
+
+        /// 需要搭配不朽使用 4 186,199,207 5、6 222,230,237 蓄力颜色
+        switch (_技能数量)
+        {
+            case 4:
+                var q4 = 获取q4颜色(bts, size);
+                var q41 = 获取q4左下角颜色(bts, size);
+                if (!ColorAEqualColorB(q41, 技能4CD颜色))
+                    return await FromResult(false);
+
+                if (!ColorAEqualColorB(q4, 不朽释放颜色4))
+                    return await FromResult(true);
+                break;
+            case 5:
+                var q5 = 获取q5颜色(bts, size);
+                var q51 = 获取q5左下角颜色(bts, size);
+                if (!ColorAEqualColorB(q51, 技能56CD颜色))
+                    return await FromResult(false);
+
+                if (!ColorAEqualColorB(q5, 不朽释放颜色56))
+                    return await FromResult(true);
+                break;
+            case 6:
+                var q6 = 获取q6颜色(bts, size);
+                var q61 = 获取q6左下角颜色(bts, size);
+                if (!ColorAEqualColorB(q61, 技能56CD颜色))
+                    return await FromResult(false);
+
+                if (!ColorAEqualColorB(q6, 不朽释放颜色56))
+                    return await FromResult(true);
+                break;
+        }
+
+        await Run(提前释放).ConfigureAwait(false);
+        return await FromResult(false);
+    }
+
+    private static async Task<bool> 炎阳之缚去后摇(byte[] bts, Size size)
+    {
+        static void 炎阳之缚去后摇()
+        {
+            RightClick();
+        }
+
+        switch (_技能数量)
+        {
+            case 4:
+                var w41 = 获取w4左下角颜色(bts, size);
+                if (ColorAEqualColorB(w41, 技能4CD颜色))
+                    return await FromResult(true);
+                break;
+            case 5:
+                var w51 = 获取w5左下角颜色(bts, size);
+                if (ColorAEqualColorB(w51, 技能56CD颜色))
+                    return await FromResult(true);
+                break;
+            case 6:
+                var w61 = 获取w6左下角颜色(bts, size);
+                if (ColorAEqualColorB(w61, 技能56CD颜色))
+                    return await FromResult(true);
+                break;
+        }
+
+        炎阳之缚去后摇();
+        return await FromResult(false);
+    }
+
+    private static async Task<bool> 查克拉魔法去后摇(byte[] bts, Size size)
+    {
+        static void 查克拉去后摇()
+        {
+            RightClick();
+        }
+
+        switch (_技能数量)
+        {
+            case 4:
+                var e41 = 获取e4左下角颜色(bts, size);
+                if (ColorAEqualColorB(e41, 技能4CD颜色))
+                    return await FromResult(true);
+                break;
+            case 5:
+                var e51 = 获取e5左下角颜色(bts, size);
+                if (ColorAEqualColorB(e51, 技能56CD颜色))
+                    return await FromResult(true);
+                break;
+            case 6:
+                var e61 = 获取e6左下角颜色(bts, size);
+                if (ColorAEqualColorB(e61, 技能56CD颜色))
+                    return await FromResult(true);
+                break;
+        }
+
+        查克拉去后摇();
+        return await FromResult(false);
+    }
+    private static async Task<bool> 致盲之光去后摇(byte[] bts, Size size)
+    {
+        static void 致盲之光去后摇()
+        {
+            RightClick();
+        }
+
+        switch (_技能数量)
+        {
+            case 5:
+                var d51 = 获取d5左下角颜色(bts, size);
+                if (ColorAEqualColorB(d51, 技能56CD颜色))
+                    return await FromResult(true);
+                break;
+            case 6:
+                var d61 = 获取d6左下角颜色(bts, size);
+                if (ColorAEqualColorB(d61, 技能56CD颜色))
+                    return await FromResult(true);
+                break;
+        }
+
+        致盲之光去后摇();
+        return await FromResult(false);
+    }
+
+    private static async Task<bool> 灵光去后摇接炎阳(byte[] bts, Size size)
+    {
+        static void 灵光去后摇接炎阳()
+        {
+            KeyPress((uint)Keys.W);
+        }
+
+        switch (_技能数量)
+        {
+            case 5:
+                var f51 = 获取d5左下角颜色(bts, size);
+                if (ColorAEqualColorB(f51, 技能56CD颜色))
+                    return await FromResult(true);
+                break;
+            case 6:
+                var f61 = 获取f6左下角颜色(bts, size);
+                if (ColorAEqualColorB(f61, 技能56CD颜色))
+                    return await FromResult(true);
+                break;
+        }
+
+        灵光去后摇接炎阳();
+        return await FromResult(false);
+    }
+
+    private static async Task<bool> 循环查克拉(byte[] bts, Size size)
+    {
+        if (_全局模式e == 0)
+        {
+            return await FromResult(false);
+        }
+
+        switch (_技能数量)
+        {
+            case 4:
+                var e41 = 获取e4左下角颜色(bts, size);
+                if (ColorAEqualColorB(e41, 技能4CD颜色))
+                {
+                    KeyPress((uint)Keys.E);
+                    Delay(200);
+                }
+                break;
+            case 5:
+                var e51 = 获取e5左下角颜色(bts, size);
+                if (ColorAEqualColorB(e51, 技能56CD颜色))
+                {
+                    KeyPress((uint)Keys.E);
+                    Delay(200);
+                }
+                break;
+            case 6:
+                var e61 = 获取e6左下角颜色(bts, size);
+                if (ColorAEqualColorB(e61, 技能56CD颜色))
+                {
+                    KeyPress((uint)Keys.E);
+                    Delay(200);
+                }
+                break;
+        }
+
+        return await FromResult(true);
+    }
+
+    #endregion
+
     #region 黑鸟
 
     private static async Task<bool> 关接陨星锤(byte[] bts, Size size)
@@ -6196,30 +7140,29 @@ public partial class Form2 : Form
 
         var time = 0;
 
-        var 技能点颜色 = SimpleColor.FromRgb(203, 183, 124);
+        var 技能点颜色 = Color.FromArgb(203, 183, 124);
+        // 默认技能图标，因为有点数，所以只能是这种
+        var 关释放颜色 = Color.FromArgb(183, 242, 203);
 
-        if (ColorAEqualColorB(GetSPixelBytes(bts, size, 909 - 截图模式1X, 1008 - 截图模式1Y), 技能点颜色, 0))
+        if (ColorAEqualColorB(GetPixelBytes(bts, size, 909 - 坐标偏移x, 1008 - 坐标偏移y), 技能点颜色, 0))
             time = 4000;
-        else if (ColorAEqualColorB(GetSPixelBytes(bts, size, 897 - 截图模式1X, 1008 - 截图模式1Y), 技能点颜色, 0))
+        else if (ColorAEqualColorB(GetPixelBytes(bts, size, 897 - 坐标偏移x, 1008 - 坐标偏移y), 技能点颜色, 0))
             time = 3250;
 
-        static async Task 关后(int time, byte[] bts, Size size)
+        static void 关后(int time, in byte[] bts, Size size)
         {
-            await Run(() =>
-            {
-                Delay(110);
-                初始化全局时间(ref _全局时间w);
-                RightClick();
-                Delay(150);
-                KeyPress((uint)Keys.S);
-                Delay(time - 3000, _全局时间w);
-                if (!_中断条件) 根据图片以及类别使用物品(物品_陨星锤, bts, size);
-            });
+            Delay(110);
+            初始化全局时间(ref _全局时间w);
+            RightClick();
+            Delay(150);
+            KeyPress((uint)Keys.S);
+            Delay(time - 3000, _全局时间w);
+            if (!_中断条件) 根据图片以及类别使用物品(物品_陨星锤, bts, size);
         }
 
-        if (!ColorAEqualColorB(w4, SimpleColor.FromRgb(183, 242, 203), 0)) return await FromResult(true);
+        if (!ColorAEqualColorB(w4, 关释放颜色, 0)) return await FromResult(true);
 
-        关后(time, bts, size).Start();
+        关后(time, bts, size);
         return await FromResult(false);
     }
 
@@ -6232,7 +7175,7 @@ public partial class Form2 : Form
 
         var r4 = 获取r4左下角颜色(bts, size);
 
-        if (ColorAEqualColorB(r4, SimpleColor.FromRgb(65, 74, 81), 0)) return await FromResult(true);
+        if (ColorAEqualColorB(r4, 技能4CD颜色, 0)) return await FromResult(true);
 
         神智之蚀后();
         return await FromResult(false);
@@ -6296,17 +7239,87 @@ public partial class Form2 : Form
 
     private static async Task<bool> 龙破斩去后摇(byte[] bts, Size size)
     {
-        return await FromResult(false);
+        static void 龙破斩后()
+        {
+            KeyPress((uint)Keys.A);
+        }
+
+        var q4 = 获取q4左下角颜色(bts, size);
+        var q5 = 获取q5左下角颜色(bts, size);
+
+        switch (_技能数量)
+        {
+            case 5 when ColorAEqualColorB(q5, 技能56CD颜色, 0):
+                return await FromResult(true);
+            case 5:
+                龙破斩后();
+                return await FromResult(false);
+
+            case 4 when ColorAEqualColorB(q4, 技能4CD颜色, 0):
+                return await FromResult(true);
+            case 4:
+                龙破斩后();
+                return await FromResult(false);
+        }
+
+        return await FromResult(true);
     }
 
     private static async Task<bool> 光击阵去后摇(byte[] bts, Size size)
     {
-        return await FromResult(false);
+
+        static void 光击阵后()
+        {
+            KeyPress((uint)Keys.A);
+        }
+
+        var w4 = 获取w4左下角颜色(bts, size);
+        var w5 = 获取w5左下角颜色(bts, size);
+
+        switch (_技能数量)
+        {
+            case 5 when ColorAEqualColorB(w5, 技能56CD颜色, 0):
+                return await FromResult(true);
+            case 5:
+                光击阵后();
+                return await FromResult(false);
+
+            case 4 when ColorAEqualColorB(w4, 技能4CD颜色, 0):
+                return await FromResult(true);
+            case 4:
+                光击阵后();
+                return await FromResult(false);
+        }
+
+        return await FromResult(true);
     }
 
     private static async Task<bool> 神灭斩去后摇(byte[] bts, Size size)
     {
-        return await FromResult(false);
+        static void 神灭斩后()
+        {
+            KeyPress((uint)Keys.A);
+        }
+
+        var r4 = 获取r4左下角颜色(bts, size);
+        var r5 = 获取r5左下角颜色(bts, size);
+
+        switch (_技能数量)
+        {
+            case 5 when ColorAEqualColorB(r5, 技能56CD颜色, 0):
+                return await FromResult(true);
+            case 5:
+                神灭斩后();
+                return await FromResult(false);
+
+            case 4 when ColorAEqualColorB(r4, 技能4CD颜色, 0):
+                return await FromResult(true);
+            case 4:
+                神灭斩后();
+                return await FromResult(false);
+        }
+
+        return await FromResult(true);
     }
 
     #endregion
@@ -6358,25 +7371,25 @@ public partial class Form2 : Form
         switch (_技能数量)
         {
             case 6:
-            {
-                if (ColorAEqualColorB(q6, SimpleColor.FromRgb(45, 52, 59), 0)) return await FromResult(true);
-                弧形闪电后().Start();
-                return await FromResult(false);
-            }
+                {
+                    if (ColorAEqualColorB(q6, 技能56CD颜色, 0)) return await FromResult(true);
+                    弧形闪电后().Start();
+                    return await FromResult(false);
+                }
             case 5:
-            {
+                {
 
-                if (ColorAEqualColorB(q5, SimpleColor.FromRgb(45, 52, 59), 0)) return await FromResult(true);
-                弧形闪电后().Start();
-                return await FromResult(false);
-            }
+                    if (ColorAEqualColorB(q5, 技能56CD颜色, 0)) return await FromResult(true);
+                    弧形闪电后().Start();
+                    return await FromResult(false);
+                }
             case 4:
-            {
-                if (ColorAEqualColorB(q4, SimpleColor.FromRgb(65, 74, 81), 0)) return await FromResult(true);
-                弧形闪电后().Start();
-                return await FromResult(false);
+                {
+                    if (ColorAEqualColorB(q4, 技能4CD颜色, 0)) return await FromResult(true);
+                    弧形闪电后().Start();
+                    return await FromResult(false);
 
-            }
+                }
         }
 
         return await FromResult(true);
@@ -6399,52 +7412,52 @@ public partial class Form2 : Form
         switch (_技能数量)
         {
             case 6:
-            {
-                if (!ColorAEqualColorB(q6, SimpleColor.FromRgb(45, 52, 59), 0)) return await FromResult(true);
-
-                switch (_全局模式q)
                 {
-                    case 0:
-                        return await FromResult(false);
-                    case 1:
-                        _全局模式q = 0;
-                        await Run(() => { KeyPress((uint)Keys.Q); });
-                        return await FromResult(false);
+                    if (!ColorAEqualColorB(q6, 技能56CD颜色, 0)) return await FromResult(true);
+
+                    switch (_全局模式q)
+                    {
+                        case 0:
+                            return await FromResult(false);
+                        case 1:
+                            _全局模式q = 0;
+                            await Run(() => { KeyPress((uint)Keys.Q); });
+                            return await FromResult(false);
+                    }
+                    break;
                 }
-                break;
-            }
             case 5:
-            {
-
-                if (!ColorAEqualColorB(q5, SimpleColor.FromRgb(45, 52, 59), 0)) return await FromResult(true);
-
-                switch (_全局模式q)
                 {
-                    case 0:
-                        return await FromResult(false);
-                    case 1:
-                        _全局模式q = 0;
-                        await Run(() => { KeyPress((uint)Keys.Q); });
-                        return await FromResult(false);
+
+                    if (!ColorAEqualColorB(q5, 技能56CD颜色, 0)) return await FromResult(true);
+
+                    switch (_全局模式q)
+                    {
+                        case 0:
+                            return await FromResult(false);
+                        case 1:
+                            _全局模式q = 0;
+                            await Run(() => { KeyPress((uint)Keys.Q); });
+                            return await FromResult(false);
+                    }
+                    break;
                 }
-                break;
-            }
             case 4:
-            {
-                if (!ColorAEqualColorB(q4, SimpleColor.FromRgb(65, 74, 81), 0)) return await FromResult(true);
-
-                switch (_全局模式q)
                 {
-                    case 0:
-                        return await FromResult(false);
-                    case 1:
-                        _全局模式q = 0;
-                        await Run(() => { KeyPress((uint)Keys.Q); });
-                        return await FromResult(false);
-                }
+                    if (!ColorAEqualColorB(q4, 技能4CD颜色, 0)) return await FromResult(true);
 
-                break;
-            }
+                    switch (_全局模式q)
+                    {
+                        case 0:
+                            return await FromResult(false);
+                        case 1:
+                            _全局模式q = 0;
+                            await Run(() => { KeyPress((uint)Keys.Q); });
+                            return await FromResult(false);
+                    }
+
+                    break;
+                }
 
         }
 
@@ -6477,25 +7490,25 @@ public partial class Form2 : Form
         switch (_技能数量)
         {
             case 6:
-            {
-                if (ColorAEqualColorB(w6, SimpleColor.FromRgb(45, 52, 59), 0)) return await FromResult(true);
-                雷击后().Start();
-                return await FromResult(false);
-            }
+                {
+                    if (ColorAEqualColorB(w6, 技能56CD颜色, 0)) return await FromResult(true);
+                    雷击后().Start();
+                    return await FromResult(false);
+                }
             case 5:
-            {
+                {
 
-                if (ColorAEqualColorB(w5, SimpleColor.FromRgb(45, 52, 59), 0)) return await FromResult(true);
-                雷击后().Start();
-                return await FromResult(false);
-            }
+                    if (ColorAEqualColorB(w5, 技能56CD颜色, 0)) return await FromResult(true);
+                    雷击后().Start();
+                    return await FromResult(false);
+                }
             case 4:
-            {
-                if (ColorAEqualColorB(w4, SimpleColor.FromRgb(65, 74, 81), 0)) return await FromResult(true);
-                雷击后().Start();
-                return await FromResult(false);
+                {
+                    if (ColorAEqualColorB(w4, 技能4CD颜色, 0)) return await FromResult(true);
+                    雷击后().Start();
+                    return await FromResult(false);
 
-            }
+                }
         }
 
         return await FromResult(true);
@@ -6526,25 +7539,25 @@ public partial class Form2 : Form
         switch (_技能数量)
         {
             case 6:
-            {
-                if (ColorAEqualColorB(e6, SimpleColor.FromRgb(45, 52, 59), 0)) return await FromResult(true);
-                神圣一跳后().Start();
-                return await FromResult(false);
-            }
+                {
+                    if (ColorAEqualColorB(e6, 技能56CD颜色, 0)) return await FromResult(true);
+                    神圣一跳后().Start();
+                    return await FromResult(false);
+                }
             case 5:
-            {
+                {
 
-                if (ColorAEqualColorB(e5, SimpleColor.FromRgb(45, 52, 59), 0)) return await FromResult(true);
-                神圣一跳后().Start();
-                return await FromResult(false);
-            }
+                    if (ColorAEqualColorB(e5, 技能56CD颜色, 0)) return await FromResult(true);
+                    神圣一跳后().Start();
+                    return await FromResult(false);
+                }
             case 4:
-            {
-                if (ColorAEqualColorB(e4, SimpleColor.FromRgb(65, 74, 81), 0)) return await FromResult(true);
-                神圣一跳后().Start();
-                return await FromResult(false);
+                {
+                    if (ColorAEqualColorB(e4, 技能4CD颜色, 0)) return await FromResult(true);
+                    神圣一跳后().Start();
+                    return await FromResult(false);
 
-            }
+                }
         }
 
         return await FromResult(true);
@@ -6553,8 +7566,7 @@ public partial class Form2 : Form
     #endregion
 
     #region 卡尔
-
-    private void 三冰对线()
+    private static async Task<bool> 三冰对线(byte[] bts, Size size)
     {
         KeyPress((uint)Keys.Q);
         Delay(等待延迟);
@@ -6562,57 +7574,99 @@ public partial class Form2 : Form
         Delay(等待延迟);
         KeyPress((uint)Keys.Q);
         Delay(等待延迟);
+        return await FromResult(false);
     }
 
-    private void 三火平A()
-    {
-        KeyPress((uint)Keys.E);
-        Delay(等待延迟);
-        KeyPress((uint)Keys.E);
-        Delay(等待延迟);
-        KeyPress((uint)Keys.E);
-        Delay(等待延迟);
-    }
-
-    private void 三雷幽灵()
-    {
-        KeyPress((uint)Keys.Q);
-        Delay(等待延迟);
-        KeyPress((uint)Keys.Q);
-        Delay(等待延迟);
-        KeyPress((uint)Keys.W);
-        Delay(等待延迟);
-        KeyPress((uint)Keys.R);
-        Delay(等待延迟);
-        KeyPress((uint)Keys.W);
-        Delay(等待延迟);
-        KeyPress((uint)Keys.W);
-        Delay(等待延迟);
-        KeyPress((uint)Keys.D);
-    }
-
-    private void 吹风天火()
+    private static async Task<bool> 三雷对线(byte[] bts, Size size)
     {
         KeyPress((uint)Keys.W);
         Delay(等待延迟);
         KeyPress((uint)Keys.W);
         Delay(等待延迟);
-        KeyPress((uint)Keys.Q);
+        KeyPress((uint)Keys.W);
         Delay(等待延迟);
-        KeyPress((uint)Keys.R);
-        Delay(等待延迟);
-        KeyPress((uint)Keys.D);
-        Delay(等待延迟);
-        KeyPress((uint)Keys.E);
-        Delay(等待延迟);
-        KeyPress((uint)Keys.E);
-        Delay(等待延迟);
-        KeyPress((uint)Keys.E);
-        Delay(等待延迟);
-        KeyPress((uint)Keys.R);
-        Delay(600);
-        KeyPress((uint)Keys.D);
+        return await FromResult(false);
     }
+
+
+    private static async Task<bool> 三雷幽灵(byte[] bts, Size size)
+    {
+
+        if (_全局模式e == 0)
+        {
+            KeyPress((uint)Keys.Q);
+            Delay(等待延迟);
+            KeyPress((uint)Keys.Q);
+            Delay(等待延迟);
+            KeyPress((uint)Keys.W);
+            Delay(等待延迟);
+            KeyPress((uint)Keys.R);
+            Delay(等待延迟);
+            KeyPress((uint)Keys.W);
+            Delay(等待延迟);
+            KeyPress((uint)Keys.W);
+            Delay(等待延迟);
+            _全局模式e = 1;
+        }
+
+        if (RegPicture(卡尔_幽灵漫步, bts, size))
+        {
+            KeyPress((uint)Keys.D);
+            return await FromResult(false);
+        }
+
+        return await FromResult(true);
+    }
+
+    private static async Task<bool> 极冷吹风陨星锤雷暴(byte[] bts, Size size)
+    {
+        if (_全局模式f == 0)
+        {
+            KeyPress((uint)Keys.W);
+            Delay(等待延迟);
+            KeyPress((uint)Keys.W);
+            Delay(等待延迟);
+            KeyPress((uint)Keys.W);
+            Delay(等待延迟);
+            _全局模式f = 1;
+        }
+
+        if (RegPicture(卡尔_极速冷却, bts, size))
+        {
+            KeyPress((uint)Keys.D);
+            Delay(等待延迟);
+            return await FromResult(true);
+        }
+
+        if (RegPicture(卡尔_强袭飓风, bts, size))
+        {
+            KeyPress((uint)Keys.F);
+            Delay(等待延迟);
+            return await FromResult(true);
+        }
+
+        if (RegPicture(卡尔_电磁脉冲, bts, size) && _全局模式f == 2)
+        {
+            KeyPress((uint)Keys.D);
+            Delay(等待延迟);
+            KeyPress((uint)Keys.A);
+            RightClick();
+            return await FromResult(false);
+        }
+        else
+        {
+            KeyPress((uint)Keys.R);
+            Delay(等待延迟);
+            _全局模式f = 2;
+            return await FromResult(true);
+        }
+    }
+
+
+    #endregion
+
+    #region 骨法
+
 
     #endregion
 
@@ -6664,22 +7718,24 @@ public partial class Form2 : Form
     /// <returns></returns>
     private static async Task<bool> 苍穹振击取消后摇(byte[] bts, Size size)
     {
-        static async Task 苍穹振击后()
+        static void 苍穹振击后()
         {
-            await Run(() =>
+            switch (_全局模式q)
             {
-#if 检测延时
-                检测时间播报(_全局时间q, 2000);
-#endif
-                KeyPress((uint)Keys.A);
-            });
+                case 1:
+                    KeyPress((uint)Keys.W);
+                    break;
+                default:
+                    KeyPress((uint)Keys.A);
+                    break;
+            }
         }
 
         var q4 = 获取q4左下角颜色(bts, size);
 
-        if (ColorAEqualColorB(q4, SimpleColor.FromRgb(65, 74, 81), 0)) return await FromResult(true);
+        if (ColorAEqualColorB(q4, 技能4CD颜色, 0)) return await FromResult(true);
 
-        苍穹振击后().Start();
+        苍穹振击后();
         return await FromResult(false);
     }
 
@@ -6691,68 +7747,56 @@ public partial class Form2 : Form
     /// <returns></returns>
     private static async Task<bool> 枷锁持续施法隐身(byte[] bts, Size size)
     {
-        static async Task 枷锁后Async(byte[] bts, Size size)
+        static void 枷锁后(in byte[] bts, Size size)
         {
-            await Run(() =>
-            {
-#if 检测延时
-                检测时间播报(_全局时间e, 4000);
-#endif
-                if (!RegPicture(物品_暗影护符buff, bts, size)) 根据图片以及类别自我使用物品(物品_暗影护符, bts, size, _技能数量);
-            });
+            if (!RegPicture(物品_暗影护符buff, bts, size)) 根据图片以及类别自我使用物品(物品_暗影护符, bts, size, _技能数量);
         }
 
         var e4 = 获取e4左下角颜色(bts, size);
 
-        if (ColorAEqualColorB(e4, SimpleColor.FromRgb(65, 74, 81), 0)) return await FromResult(true);
+        if (ColorAEqualColorB(e4, 技能4CD颜色, 0)) return await FromResult(true);
 
-        枷锁后Async(bts, size).Start();
+        枷锁后(bts, size);
         return await FromResult(false);
     }
 
     private static async Task<bool> 释放群蛇守卫取消后摇(byte[] bts, Size size)
     {
-        static async Task 群蛇守卫后()
+        static void 群蛇守卫后()
         {
-            await Run(() =>
-            {
-#if 检测延时
-                检测时间播报(_全局时间r, 3000);
-#endif
-                KeyPress((uint)Keys.A);
-            });
+            KeyPress((uint)Keys.A);
         }
 
         var r4 = 获取r4左下角颜色(bts, size);
 
-        if (ColorAEqualColorB(r4, SimpleColor.FromRgb(65, 74, 81), 0)) return await FromResult(true);
+        if (ColorAEqualColorB(r4, 技能4CD颜色, 0)) return await FromResult(true);
 
-        群蛇守卫后().Start();
+        群蛇守卫后();
         return await FromResult(false);
     }
 
     private static async Task<bool> 变羊取消后摇(byte[] bts, Size size)
     {
-        static async Task 萨满变羊后(byte[] bts, Size size)
+        static void 萨满变羊后(byte[] bts, Size size)
         {
             初始化全局时间(ref _全局时间w);
 
-            await Run(async () =>
+            Run(() =>
             {
                 var time = 1250;
 
-                var 技能点颜色 = SimpleColor.FromRgb(203, 183, 124);
+                var 技能点颜色 = Color.FromArgb(203, 183, 124);
 
-                if (ColorAEqualColorB(GetSPixelBytes(bts, size, 909 - 截图模式1X, 1008 - 截图模式1Y), 技能点颜色, 0))
-                    time = 3500;
-                else if (ColorAEqualColorB(GetSPixelBytes(bts, size, 897 - 截图模式1X, 1008 - 截图模式1Y), 技能点颜色, 0))
-                    time = 2750;
-                else if (ColorAEqualColorB(GetSPixelBytes(bts, size, 885 - 截图模式1X, 1008 - 截图模式1Y), 技能点颜色, 0))
-                    time = 2000;
-                else if (ColorAEqualColorB(GetSPixelBytes(bts, size, 875 - 截图模式1X, 1008 - 截图模式1Y), 技能点颜色, 0))
-                    time = 1300;
+                if (ColorAEqualColorB(GetPixelBytes(bts, size, 909 - 坐标偏移x, 1008 - 坐标偏移y), 技能点颜色, 0))
+                    time = 3400;
+                else if (ColorAEqualColorB(GetPixelBytes(bts, size, 897 - 坐标偏移x, 1008 - 坐标偏移y), 技能点颜色, 0))
+                    time = 2650;
+                else if (ColorAEqualColorB(GetPixelBytes(bts, size, 885 - 坐标偏移x, 1008 - 坐标偏移y), 技能点颜色, 0))
+                    time = 1900;
+                else if (ColorAEqualColorB(GetPixelBytes(bts, size, 875 - 坐标偏移x, 1008 - 坐标偏移y), 技能点颜色, 0))
+                    time = 1150;
 
-                var 智力跳刀buff = await Form2.智力跳刀buff(bts, size);
+                var 智力跳刀buff = Form2.智力跳刀buff(bts, size).Result;
                 time = Convert.ToInt32(_状态抗性倍数 * time);
 #if 检测延时
                 TTS.Speak(string.Concat("延时", time.ToString()));
@@ -6787,9 +7831,9 @@ public partial class Form2 : Form
 
         var w4 = 获取w4左下角颜色(bts, size);
 
-        if (ColorAEqualColorB(w4, SimpleColor.FromRgb(65, 74, 81), 0)) return await FromResult(true);
+        if (ColorAEqualColorB(w4, 技能4CD颜色, 0)) return await FromResult(true);
 
-        萨满变羊后(bts, size).Start();
+        萨满变羊后(bts, size);
         return await FromResult(false);
     }
 
@@ -6885,18 +7929,18 @@ public partial class Form2 : Form
 
         switch (_技能数量)
         {
-            case 5 when !ColorAEqualColorB(q5, SimpleColor.FromRgb(45, 52, 59), 0):
+            case 5 when !ColorAEqualColorB(q5, 技能56CD颜色, 0):
                 return _循环条件1 ? await FromResult(true) : await FromResult(false);
             case 5:
                 释放奥数鹰隼();
                 break;
             default:
-            {
-                if (!ColorAEqualColorB(q4, SimpleColor.FromRgb(65, 74, 81), 0))
-                    return _循环条件1 ? await FromResult(true) : await FromResult(false);
-                释放奥数鹰隼();
-                break;
-            }
+                {
+                    if (!ColorAEqualColorB(q4, 技能4CD颜色, 0))
+                        return _循环条件1 ? await FromResult(true) : await FromResult(false);
+                    释放奥数鹰隼();
+                    break;
+                }
         }
 
         return _循环条件1 ? await FromResult(true) : await FromResult(false);
@@ -6904,269 +7948,268 @@ public partial class Form2 : Form
 
     private static async Task<bool> 天怒秒人连招(byte[] bts, Size size)
     {
-        var q4 = 获取q4左下角颜色(bts, size);
-        var q5 = 获取q5左下角颜色(bts, size);
-        var w4 = 获取w4左下角颜色(bts, size);
-        var w5 = 获取w5左下角颜色(bts, size);
-        var e4 = 获取e4左下角颜色(bts, size);
-        var e5 = 获取e5左下角颜色(bts, size);
-        var r4 = 获取r4左下角颜色(bts, size);
-        var r5 = 获取r5左下角颜色(bts, size);
-
         switch (_全局步骤)
         {
             case < 1:
-            {
-                switch (_技能数量)
                 {
-                    case 5:
+                    switch (_技能数量)
                     {
-                        if (ColorAEqualColorB(w5, SimpleColor.FromRgb(45, 52, 59), 0))
-                        {
-                            KeyPress((uint)Keys.W);
-                            Delay(等待延迟);
-                        }
-                        else
-                        {
-                            _全局步骤 = 1;
-                        }
+                        case 5:
+                            {
+                                var w5 = 获取w5左下角颜色(bts, size);
+                                if (ColorAEqualColorB(w5, 技能56CD颜色, 0))
+                                {
+                                    KeyPress((uint)Keys.W);
+                                    Delay(等待延迟);
+                                }
+                                else
+                                {
+                                    _全局步骤 = 1;
+                                }
 
-                        break;
-                    }
-                    default:
-                    {
-                        if (ColorAEqualColorB(w4, SimpleColor.FromRgb(65, 74, 81), 0))
-                        {
-                            KeyPress((uint)Keys.W);
-                            Delay(等待延迟);
-                        }
-                        else
-                        {
-                            _全局步骤 = 1;
-                        }
+                                break;
+                            }
+                        default:
+                            {
+                                var w4 = 获取w4左下角颜色(bts, size);
+                                if (ColorAEqualColorB(w4, 技能4CD颜色, 0))
+                                {
+                                    KeyPress((uint)Keys.W);
+                                    Delay(等待延迟);
+                                }
+                                else
+                                {
+                                    _全局步骤 = 1;
+                                }
 
-                        break;
+                                break;
+                            }
                     }
+
+                    return await FromResult(true);
+                }
+            case < 2 when 根据图片以及类别使用物品(物品_血精石, bts, size, _技能数量):
+                {
+                    Delay(等待延迟);
+                    RightClick();
+                    if (!根据图片以及类别使用物品(物品_血精石, bts, size, _技能数量))
+                        _全局步骤 = 2;
+                    return await FromResult(true);
                 }
 
-                return await FromResult(true);
-            }
-            case < 2 when 根据图片以及类别使用物品(物品_血精石, bts, size, _技能数量):
-            {
-                Delay(等待延迟);
-                RightClick();
-                if (!根据图片以及类别使用物品(物品_血精石, bts, size, _技能数量))
-                    _全局步骤 = 2;
-                return await FromResult(true);
-            }
-
             case < 3 when 根据图片以及类别使用物品(物品_虚灵之刃, bts, size, _技能数量):
-            {
-                Delay(等待延迟);
-                RightClick();
-                if (!根据图片以及类别使用物品(物品_虚灵之刃, bts, size, _技能数量))
-                    _全局步骤 = 3;
-                return await FromResult(true);
-            }
+                {
+                    Delay(等待延迟);
+                    RightClick();
+                    if (!根据图片以及类别使用物品(物品_虚灵之刃, bts, size, _技能数量))
+                        _全局步骤 = 3;
+                    return await FromResult(true);
+                }
 
             case < 4 when 根据图片以及类别使用物品(物品_红杖, bts, size, _技能数量):
-            {
-                Delay(等待延迟);
-                RightClick();
-                if (!根据图片以及类别使用物品(物品_红杖, bts, size, _技能数量))
-                    _全局步骤 = 4;
-                return await FromResult(true);
-            }
+                {
+                    Delay(等待延迟);
+                    RightClick();
+                    if (!根据图片以及类别使用物品(物品_红杖, bts, size, _技能数量))
+                        _全局步骤 = 4;
+                    return await FromResult(true);
+                }
 
             case < 4 when 根据图片以及类别使用物品(物品_红杖2, bts, size, _技能数量):
-            {
-                Delay(等待延迟);
-                RightClick();
-                if (!根据图片以及类别使用物品(物品_红杖2, bts, size, _技能数量))
-                    _全局步骤 = 4;
-                return await FromResult(true);
-            }
+                {
+                    Delay(等待延迟);
+                    RightClick();
+                    if (!根据图片以及类别使用物品(物品_红杖2, bts, size, _技能数量))
+                        _全局步骤 = 4;
+                    return await FromResult(true);
+                }
 
             case < 4 when 根据图片以及类别使用物品(物品_红杖3, bts, size, _技能数量):
-            {
-                Delay(等待延迟);
-                RightClick();
-                if (!根据图片以及类别使用物品(物品_红杖3, bts, size, _技能数量))
-                    _全局步骤 = 4;
-                return await FromResult(true);
-            }
+                {
+                    Delay(等待延迟);
+                    RightClick();
+                    if (!根据图片以及类别使用物品(物品_红杖3, bts, size, _技能数量))
+                        _全局步骤 = 4;
+                    return await FromResult(true);
+                }
 
             case < 4 when 根据图片以及类别使用物品(物品_红杖4, bts, size, _技能数量):
-            {
-                Delay(等待延迟);
-                RightClick();
-                if (!根据图片以及类别使用物品(物品_红杖4, bts, size, _技能数量))
-                    _全局步骤 = 4;
-                return await FromResult(true);
-            }
+                {
+                    Delay(等待延迟);
+                    RightClick();
+                    if (!根据图片以及类别使用物品(物品_红杖4, bts, size, _技能数量))
+                        _全局步骤 = 4;
+                    return await FromResult(true);
+                }
 
             case < 4 when 根据图片以及类别使用物品(物品_红杖5, bts, size, _技能数量):
-            {
-                Delay(等待延迟);
-                RightClick();
-                if (!根据图片以及类别使用物品(物品_红杖5, bts, size, _技能数量))
-                    _全局步骤 = 4;
-                return await FromResult(true);
-            }
+                {
+                    Delay(等待延迟);
+                    RightClick();
+                    if (!根据图片以及类别使用物品(物品_红杖5, bts, size, _技能数量))
+                        _全局步骤 = 4;
+                    return await FromResult(true);
+                }
 
             case < 5 when 根据图片以及类别使用物品(物品_羊刀, bts, size, _技能数量):
-            {
-                Delay(等待延迟);
-                RightClick();
-                if (!根据图片以及类别使用物品(物品_羊刀, bts, size, _技能数量))
-                    _全局步骤 = 5;
-                return await FromResult(true);
-            }
+                {
+                    Delay(等待延迟);
+                    RightClick();
+                    if (!根据图片以及类别使用物品(物品_羊刀, bts, size, _技能数量))
+                        _全局步骤 = 5;
+                    return await FromResult(true);
+                }
 
 
             case < 6 when 根据图片以及类别使用物品(物品_纷争, bts, size, _技能数量):
-            {
-                Delay(等待延迟);
-                RightClick();
-                if (!根据图片以及类别使用物品(物品_纷争, bts, size, _技能数量))
-                    _全局步骤 = 6;
-                return await FromResult(true);
-            }
+                {
+                    Delay(等待延迟);
+                    RightClick();
+                    if (!根据图片以及类别使用物品(物品_纷争, bts, size, _技能数量))
+                        _全局步骤 = 6;
+                    return await FromResult(true);
+                }
 
             case < 7 when 根据图片以及类别使用物品(物品_阿托斯之棍_4, bts, size, _技能数量):
-            {
-                Delay(等待延迟);
-                RightClick();
-                if (!根据图片以及类别使用物品(物品_阿托斯之棍_4, bts, size, _技能数量))
-                    _全局步骤 = 7;
-                return await FromResult(true);
-            }
+                {
+                    Delay(等待延迟);
+                    RightClick();
+                    if (!根据图片以及类别使用物品(物品_阿托斯之棍_4, bts, size, _技能数量))
+                        _全局步骤 = 7;
+                    return await FromResult(true);
+                }
 
             case < 8 when 根据图片以及类别使用物品(物品_缚灵锁, bts, size, _技能数量):
-            {
-                Delay(等待延迟);
-                RightClick();
-                if (!根据图片以及类别使用物品(物品_缚灵锁, bts, size, _技能数量))
-                    _全局步骤 = 8;
-                return await FromResult(true);
-            }
+                {
+                    Delay(等待延迟);
+                    RightClick();
+                    if (!根据图片以及类别使用物品(物品_缚灵锁, bts, size, _技能数量))
+                        _全局步骤 = 8;
+                    return await FromResult(true);
+                }
 
             case < 9:
-            {
-                switch (_技能数量)
                 {
-                    case 5:
+                    switch (_技能数量)
                     {
-                        if (ColorAEqualColorB(q5, SimpleColor.FromRgb(45, 52, 59), 0))
-                        {
-                            KeyPress((uint)Keys.Q);
-                            Delay(等待延迟);
-                        }
-                        else
-                        {
-                            _全局步骤 = 9;
-                        }
+                        case 5:
+                            {
+                                var q5 = 获取q5左下角颜色(bts, size);
+                                if (ColorAEqualColorB(q5, 技能56CD颜色, 0))
+                                {
+                                    KeyPress((uint)Keys.Q);
+                                    Delay(等待延迟);
+                                }
+                                else
+                                {
+                                    _全局步骤 = 9;
+                                }
 
-                        break;
-                    }
-                    default:
-                    {
-                        if (ColorAEqualColorB(q4, SimpleColor.FromRgb(65, 74, 81), 0))
-                        {
-                            KeyPress((uint)Keys.Q);
-                            Delay(等待延迟);
-                        }
-                        else
-                        {
-                            _全局步骤 = 9;
-                        }
+                                break;
+                            }
+                        default:
+                            {
+                                var q4 = 获取q4左下角颜色(bts, size);
+                                if (ColorAEqualColorB(q4, 技能4CD颜色, 0))
+                                {
+                                    KeyPress((uint)Keys.Q);
+                                    Delay(等待延迟);
+                                }
+                                else
+                                {
+                                    _全局步骤 = 9;
+                                }
 
-                        break;
+                                break;
+                            }
                     }
+
+                    return await FromResult(true);
                 }
-
-                return await FromResult(true);
-            }
 
             case < 10:
-            {
-                switch (_技能数量)
                 {
-                    case 5:
+                    switch (_技能数量)
                     {
-                                if (ColorAEqualColorB(e5, SimpleColor.FromRgb(45, 52, 59), 0))
-                        {
-                            KeyPress((uint)Keys.E);
-                            Delay(等待延迟);
-                        }
-                        else
-                        {
-                            _全局步骤 = 10;
-                        }
+                        case 5:
+                            {
+                                var e5 = 获取e5左下角颜色(bts, size);
+                                if (ColorAEqualColorB(e5, 技能56CD颜色, 0))
+                                {
+                                    KeyPress((uint)Keys.E);
+                                    Delay(等待延迟);
+                                }
+                                else
+                                {
+                                    _全局步骤 = 10;
+                                }
 
-                        break;
-                    }
-                    default:
-                    {
-                        if (ColorAEqualColorB(e4, SimpleColor.FromRgb(65, 74, 81), 0))
-                        {
-                            KeyPress((uint)Keys.E);
-                            Delay(等待延迟);
-                        }
-                        else
-                        {
-                            _全局步骤 = 10;
-                        }
+                                break;
+                            }
+                        default:
+                            {
+                                var e4 = 获取e4左下角颜色(bts, size);
+                                if (ColorAEqualColorB(e4, 技能4CD颜色, 0))
+                                {
+                                    KeyPress((uint)Keys.E);
+                                    Delay(等待延迟);
+                                }
+                                else
+                                {
+                                    _全局步骤 = 10;
+                                }
 
-                        break;
+                                break;
+                            }
                     }
+
+                    return await FromResult(true);
                 }
-
-                return await FromResult(true);
-            }
 
 
             case < 11:
-            {
-                switch (_技能数量)
                 {
-                    case 5:
+                    switch (_技能数量)
                     {
-                                if (ColorAEqualColorB(r5, SimpleColor.FromRgb(45, 52, 59), 0))
-                        {
-                            KeyPress((uint)Keys.R);
-                            Delay(等待延迟);
-                        }
-                        else
-                        {
-                            _全局步骤 = 11;
-                        }
+                        case 5:
+                            {
+                                var r5 = 获取r5左下角颜色(bts, size);
+                                if (ColorAEqualColorB(r5, 技能56CD颜色, 0))
+                                {
+                                    KeyPress((uint)Keys.R);
+                                    Delay(等待延迟);
+                                }
+                                else
+                                {
+                                    _全局步骤 = 11;
+                                }
 
-                        break;
-                    }
-                    default:
-                    {
-                        if (ColorAEqualColorB(r4, SimpleColor.FromRgb(65, 74, 81), 0))
-                        {
-                            KeyPress((uint)Keys.R);
-                            Delay(等待延迟);
-                        }
-                        else
-                        {
-                            _全局步骤 = 11;
-                        }
+                                break;
+                            }
+                        default:
+                            {
+                                var r4 = 获取r4左下角颜色(bts, size);
+                                if (ColorAEqualColorB(r4, 技能4CD颜色, 0))
+                                {
+                                    KeyPress((uint)Keys.R);
+                                    Delay(等待延迟);
+                                }
+                                else
+                                {
+                                    _全局步骤 = 11;
+                                }
 
-                        break;
+                                break;
+                            }
                     }
+
+                    return await FromResult(true);
                 }
 
-                return await FromResult(true);
-            }
-
             case 11:
-            {
-                return await FromResult(false);
-            }
+                {
+                    return await FromResult(false);
+                }
         }
 
         return await FromResult(true);
@@ -7177,6 +8220,7 @@ public partial class Form2 : Form
         static void 奥数鹰隼后()
         {
             KeyPress((uint)Keys.A);
+            RightClick();
         }
 
         // 超时则切回 总体释放时间
@@ -7192,16 +8236,53 @@ public partial class Form2 : Form
 
         switch (_技能数量)
         {
-            case 5 when ColorAEqualColorB(q5, SimpleColor.FromRgb(45, 52, 59), 0):
+            case 5 when ColorAEqualColorB(q5, 技能56CD颜色, 0):
                 return await FromResult(true);
             case 5:
                 奥数鹰隼后();
                 return await FromResult(false);
 
-            case 4 when ColorAEqualColorB(q4, SimpleColor.FromRgb(65, 74, 81), 0):
+            case 4 when ColorAEqualColorB(q4, 技能4CD颜色, 0):
                 return await FromResult(true);
             case 4:
                 奥数鹰隼后();
+                return await FromResult(false);
+        }
+
+        return await FromResult(true);
+    }
+
+    private static async Task<bool> 上古封印去后摇(byte[] bts, Size size)
+    {
+        static void 上古封印后()
+        {
+            KeyPress((uint)Keys.A);
+            RightClick();
+        }
+
+        // 超时则切回 总体释放时间
+        if (获取当前时间毫秒() - _全局时间e > 300 && _全局时间e != -1)
+        {
+            上古封印后();
+            return await FromResult(false);
+        }
+
+        var e4 = 获取e4左下角颜色(bts, size);
+        var e5 = 获取e5左下角颜色(bts, size);
+
+
+        switch (_技能数量)
+        {
+            case 5 when ColorAEqualColorB(e5, 技能56CD颜色, 0):
+                return await FromResult(true);
+            case 5:
+                上古封印后();
+                return await FromResult(false);
+
+            case 4 when ColorAEqualColorB(e4, 技能4CD颜色, 0):
+                return await FromResult(true);
+            case 4:
+                上古封印后();
                 return await FromResult(false);
         }
 
@@ -7222,7 +8303,7 @@ public partial class Form2 : Form
 
         var q5 = 获取q5左下角颜色(bts, size);
 
-        if (ColorAEqualColorB(q5, SimpleColor.FromRgb(45, 52, 59), 0)) return await FromResult(true);
+        if (ColorAEqualColorB(q5, 技能56CD颜色, 0)) return await FromResult(true);
 
         粘性炸弹后();
         return await FromResult(false);
@@ -7238,7 +8319,7 @@ public partial class Form2 : Form
 
         var w5 = 获取w5左下角颜色(bts, size);
 
-        if (ColorAEqualColorB(w5, SimpleColor.FromRgb(45, 52, 59), 0)) return await FromResult(true);
+        if (ColorAEqualColorB(w5, 技能56CD颜色, 0)) return await FromResult(true);
 
         活性电击后();
         return await FromResult(false);
@@ -7266,7 +8347,7 @@ public partial class Form2 : Form
 
         var e5 = 获取e5左下角颜色(bts, size);
 
-        if (ColorAEqualColorB(e5, SimpleColor.FromRgb(45, 52, 59), 0)) return await FromResult(true);
+        if (ColorAEqualColorB(e5, 技能56CD颜色, 0)) return await FromResult(true);
 
         爆破起飞后();
         return await FromResult(false);
@@ -7362,7 +8443,7 @@ public partial class Form2 : Form
         static async Task 命运敕令后()
         {
             await Run(() => { RightClick(); });
-            
+
             // KeyPress((uint)Keys.A);
         }
 
@@ -7371,12 +8452,12 @@ public partial class Form2 : Form
 
         switch (_技能数量)
         {
-            case 5 when ColorAEqualColorB(w5, SimpleColor.FromRgb(45, 52, 59), 0):
+            case 5 when ColorAEqualColorB(w5, 技能56CD颜色, 0):
                 return await FromResult(true);
             case 5:
                 命运敕令后().Start();
                 return await FromResult(false);
-            case 4 when ColorAEqualColorB(w4, SimpleColor.FromRgb(65, 74, 81), 0):
+            case 4 when ColorAEqualColorB(w4, 技能4CD颜色, 0):
                 return await FromResult(true);
             case 4:
                 命运敕令后().Start();
@@ -7400,12 +8481,12 @@ public partial class Form2 : Form
 
         switch (_技能数量)
         {
-            case 5 when ColorAEqualColorB(e5, SimpleColor.FromRgb(45, 52, 59), 0):
+            case 5 when ColorAEqualColorB(e5, 技能56CD颜色, 0):
                 return await FromResult(true);
             case 5:
                 涤罪之焰后().Start();
                 return await FromResult(false);
-            case 4 when ColorAEqualColorB(e4, SimpleColor.FromRgb(65, 74, 81), 0):
+            case 4 when ColorAEqualColorB(e4, 技能4CD颜色, 0):
                 return await FromResult(true);
             case 4:
                 涤罪之焰后().Start();
@@ -7435,12 +8516,12 @@ public partial class Form2 : Form
 
         switch (_技能数量)
         {
-            case 5 when ColorAEqualColorB(e5, SimpleColor.FromRgb(45, 52, 59), 0):
+            case 5 when ColorAEqualColorB(e5, 技能56CD颜色, 0):
                 return await FromResult(true);
             case 5:
                 涤罪之焰释放().Start();
                 return await FromResult(false);
-            case 4 when ColorAEqualColorB(e4, SimpleColor.FromRgb(65, 74, 81), 0):
+            case 4 when ColorAEqualColorB(e4, 技能4CD颜色, 0):
                 return await FromResult(true);
             case 4:
                 涤罪之焰释放().Start();
@@ -7463,18 +8544,18 @@ public partial class Form2 : Form
 
         switch (_技能数量)
         {
-            case 5 when ColorAEqualColorB(r5, SimpleColor.FromRgb(45, 52, 59), 0):
+            case 5 when ColorAEqualColorB(r5, 技能56CD颜色, 0):
                 return await FromResult(true);
             case 5:
                 虚妄之诺后().Start();
                 return await FromResult(false);
-            case 4 when ColorAEqualColorB(r4, SimpleColor.FromRgb(65, 74, 81), 0):
+            case 4 when ColorAEqualColorB(r4, 技能4CD颜色, 0):
                 return await FromResult(true);
             case 4:
                 虚妄之诺后().Start();
                 return await FromResult(false);
         }
-        
+
         return await FromResult(true);
     }
 
@@ -7490,7 +8571,7 @@ public partial class Form2 : Form
 
         if (!_是否a杖) return await FromResult(false);
 
-        if (ColorAEqualColorB(d5, SimpleColor.FromRgb(45, 52, 59), 0)) return await FromResult(true);
+        if (ColorAEqualColorB(d5, 技能56CD颜色, 0)) return await FromResult(true);
 
         天命之雨后();
         return await FromResult(false);
@@ -7570,7 +8651,7 @@ public partial class Form2 : Form
     {
         static void 莱恩羊后()
         {
-            if (_条件4)
+            if (_条件6)
                 KeyPress((uint)Keys.E);
             else
                 KeyPress((uint)Keys.A);
@@ -7578,7 +8659,7 @@ public partial class Form2 : Form
 
         var w4 = 获取w4左下角颜色(bts, size);
 
-        if (ColorAEqualColorB(w4, SimpleColor.FromRgb(65, 74, 81), 0)) return await FromResult(true);
+        if (ColorAEqualColorB(w4, 技能4CD颜色, 0)) return await FromResult(true);
 
         莱恩羊后();
         return await FromResult(false);
@@ -7588,13 +8669,13 @@ public partial class Form2 : Form
     {
         static void 死亡一指后()
         {
-            RightClick();
-            // KeyPress((uint)Keys.A);
+            //RightClick();
+            KeyPress((uint)Keys.A);
         }
 
         var r4 = 获取r4左下角颜色(bts, size);
 
-        if (ColorAEqualColorB(r4, SimpleColor.FromRgb(65, 74, 81), 0)) return await FromResult(true);
+        if (ColorAEqualColorB(r4, 技能4CD颜色, 0)) return await FromResult(true);
 
         死亡一指后();
         return await FromResult(false);
@@ -7621,6 +8702,69 @@ public partial class Form2 : Form
         }
 
         KeyPress((uint)Keys.W);
+        return await FromResult(false);
+    }
+
+    private static async Task<bool> 羊刺刷新秒人(byte[] bts, Size size)
+    {
+        var w4 = 获取w4左下角颜色(bts, size);
+        var q4 = 获取q4左下角颜色(bts, size);
+        var r4 = 获取r4左下角颜色(bts, size);
+
+        if (_全局模式 == 1 && 根据图片以及类别使用物品(物品_奥术鞋, bts, size)) return await FromResult(true);
+
+        if (_全局模式 == 1 && 根据图片以及类别使用物品(物品_魂戒CD, bts, size)) return await FromResult(true);
+
+        if (_全局模式 == 1 && ColorAEqualColorB(q4, 技能4CD颜色))
+        {
+            KeyPress((uint)Keys.Q);
+            Delay(60);
+            return await FromResult(true);
+        }
+
+        if (_全局模式 == 1 && ColorAEqualColorB(r4, 技能4CD颜色))
+        {
+            KeyPress((uint)Keys.R);
+            Delay(60);
+            return await FromResult(true);
+        }
+
+        if (_全局模式 == 0 && 根据图片以及类别使用物品(物品_跳刀, bts, size)) return await FromResult(true);
+
+        if (_全局模式 == 0 && 根据图片以及类别使用物品(物品_跳刀_智力跳刀, bts, size)) return await FromResult(true);
+
+        if (_全局模式 == 0 && ColorAEqualColorB(w4, 技能4CD颜色))
+        {
+            KeyPress((uint)Keys.W);
+            Delay(等待延迟);
+            return await FromResult(true);
+        }
+
+        if (_全局模式 == 0 && ColorAEqualColorB(q4, 技能4CD颜色))
+        {
+            KeyPress((uint)Keys.Q);
+            Delay(60);
+            return await FromResult(true);
+        }
+
+        if (_全局模式 == 0 && 根据图片以及类别使用物品(物品_奥术鞋, bts, size)) return await FromResult(true);
+
+        if (_全局模式 == 0 && 根据图片以及类别使用物品(物品_魂戒CD, bts, size)) return await FromResult(true);
+
+        if (_全局模式 == 0 && ColorAEqualColorB(r4, 技能4CD颜色))
+        {
+            KeyPress((uint)Keys.R);
+            Delay(60);
+            return await FromResult(true);
+        }
+
+        if (_全局模式 == 0 && _条件5 && 根据图片以及类别使用物品(物品_刷新球, bts, size))
+        {
+            _全局模式 = 1;
+            Delay(120);
+            return await FromResult(true);
+        }
+
         return await FromResult(false);
     }
 
@@ -7661,7 +8805,7 @@ public partial class Form2 : Form
 
         var q4 = 获取q4左下角颜色(bts, size);
 
-        if (ColorAEqualColorB(q4, SimpleColor.FromRgb(65, 74, 81), 0)) return await FromResult(true);
+        if (ColorAEqualColorB(q4, 技能4CD颜色, 0)) return await FromResult(true);
 
         奥数诅咒后(bts, size);
         return await FromResult(false);
@@ -7685,7 +8829,7 @@ public partial class Form2 : Form
 
         var e4 = 获取e4左下角颜色(bts, size);
 
-        if (ColorAEqualColorB(e4, SimpleColor.FromRgb(65, 74, 81), 0)) return await FromResult(true);
+        if (ColorAEqualColorB(e4, 技能4CD颜色, 0)) return await FromResult(true);
 
         遗言后();
         return await FromResult(false);
@@ -7713,7 +8857,7 @@ public partial class Form2 : Form
 
         var q5 = 获取q5左下角颜色(bts, size);
 
-        if (ColorAEqualColorB(q5, SimpleColor.FromRgb(45, 52, 59), 0)) return await FromResult(true);
+        if (ColorAEqualColorB(q5, 技能56CD颜色, 0)) return await FromResult(true);
 
         剧毒之触后();
         return await FromResult(false);
@@ -7737,7 +8881,7 @@ public partial class Form2 : Form
 
         var w5 = 获取w5左下角颜色(bts, size);
 
-        if (ColorAEqualColorB(w5, SimpleColor.FromRgb(45, 52, 59), 0)) return await FromResult(true);
+        if (ColorAEqualColorB(w5, 技能56CD颜色, 0)) return await FromResult(true);
 
         薄葬后();
         return await FromResult(false);
@@ -7761,7 +8905,7 @@ public partial class Form2 : Form
 
         var e5 = 获取e5左下角颜色(bts, size);
 
-        if (ColorAEqualColorB(e5, SimpleColor.FromRgb(45, 52, 59), 0)) return await FromResult(true);
+        if (ColorAEqualColorB(e5, 技能56CD颜色, 0)) return await FromResult(true);
 
         暗影波后();
         return await FromResult(false);
@@ -7785,7 +8929,7 @@ public partial class Form2 : Form
 
         var d5 = 获取d5左下角颜色(bts, size);
 
-        if (ColorAEqualColorB(d5, SimpleColor.FromRgb(45, 52, 59), 0)) return await FromResult(true);
+        if (ColorAEqualColorB(d5, 技能56CD颜色, 0)) return await FromResult(true);
 
         善咒后();
         return await FromResult(false);
@@ -7809,7 +8953,7 @@ public partial class Form2 : Form
 
         var r5 = 获取r5左下角颜色(bts, size);
 
-        if (ColorAEqualColorB(r5, SimpleColor.FromRgb(45, 52, 59), 0)) return await FromResult(true);
+        if (ColorAEqualColorB(r5, 技能56CD颜色, 0)) return await FromResult(true);
 
         邪能后();
         return await FromResult(false);
@@ -7841,15 +8985,15 @@ public partial class Form2 : Form
         switch (_技能数量)
         {
             case 5:
-            {
-                if (ColorAEqualColorB(q5, SimpleColor.FromRgb(45, 52, 59), 0)) return await FromResult(true);
-                break;
-            }
+                {
+                    if (ColorAEqualColorB(q5, 技能56CD颜色, 0)) return await FromResult(true);
+                    break;
+                }
             default:
-            {
-                if (ColorAEqualColorB(q4, SimpleColor.FromRgb(65, 74, 81), 0)) return await FromResult(true);
-                break;
-            }
+                {
+                    if (ColorAEqualColorB(q4, 技能4CD颜色, 0)) return await FromResult(true);
+                    break;
+                }
         }
 
         冰火交加后();
@@ -7878,15 +9022,15 @@ public partial class Form2 : Form
         switch (_技能数量)
         {
             case 5:
-            {
-                if (ColorAEqualColorB(w5, SimpleColor.FromRgb(45, 52, 59), 0)) return await FromResult(true);
-                break;
-            }
+                {
+                    if (ColorAEqualColorB(w5, 技能56CD颜色, 0)) return await FromResult(true);
+                    break;
+                }
             default:
-            {
-                if (ColorAEqualColorB(w4, SimpleColor.FromRgb(65, 74, 81), 0)) return await FromResult(true);
-                break;
-            }
+                {
+                    if (ColorAEqualColorB(w4, 技能4CD颜色, 0)) return await FromResult(true);
+                    break;
+                }
         }
 
         冰封路径后();
@@ -7915,15 +9059,15 @@ public partial class Form2 : Form
         switch (_技能数量)
         {
             case 5:
-            {
-                if (ColorAEqualColorB(r5, SimpleColor.FromRgb(45, 52, 59), 0)) return await FromResult(true);
-                break;
-            }
+                {
+                    if (ColorAEqualColorB(r5, 技能56CD颜色, 0)) return await FromResult(true);
+                    break;
+                }
             default:
-            {
-                if (ColorAEqualColorB(r4, SimpleColor.FromRgb(65, 74, 81), 0)) return await FromResult(true);
-                break;
-            }
+                {
+                    if (ColorAEqualColorB(r4, 技能4CD颜色, 0)) return await FromResult(true);
+                    break;
+                }
         }
 
         烈焰焚身后();
@@ -7982,15 +9126,15 @@ public partial class Form2 : Form
         switch (_技能数量)
         {
             case 5:
-            {
-                if (ColorAEqualColorB(q5, SimpleColor.FromRgb(45, 52, 59), 0)) return await FromResult(true);
-                break;
-            }
+                {
+                    if (ColorAEqualColorB(q5, 技能56CD颜色, 0)) return await FromResult(true);
+                    break;
+                }
             default:
-            {
-                if (ColorAEqualColorB(q4, SimpleColor.FromRgb(65, 74, 81), 0)) return await FromResult(true);
-                break;
-            }
+                {
+                    if (ColorAEqualColorB(q4, 技能4CD颜色, 0)) return await FromResult(true);
+                    break;
+                }
         }
 
         麻痹药剂后();
@@ -8023,15 +9167,15 @@ public partial class Form2 : Form
         switch (_技能数量)
         {
             case 5:
-            {
-                if (ColorAEqualColorB(e5, SimpleColor.FromRgb(45, 52, 59), 0)) return await FromResult(true);
-                break;
-            }
+                {
+                    if (ColorAEqualColorB(e5, 技能56CD颜色, 0)) return await FromResult(true);
+                    break;
+                }
             default:
-            {
-                if (ColorAEqualColorB(e4, SimpleColor.FromRgb(65, 74, 81), 0)) return await FromResult(true);
-                break;
-            }
+                {
+                    if (ColorAEqualColorB(e4, 技能4CD颜色, 0)) return await FromResult(true);
+                    break;
+                }
         }
 
         巫蛊咒术后(bts, size);
@@ -8053,15 +9197,15 @@ public partial class Form2 : Form
         switch (_技能数量)
         {
             case 5:
-            {
-                if (ColorAEqualColorB(r5, SimpleColor.FromRgb(45, 52, 59), 0)) return await FromResult(true);
-                break;
-            }
+                {
+                    if (ColorAEqualColorB(r5, 技能56CD颜色, 0)) return await FromResult(true);
+                    break;
+                }
             default:
-            {
-                if (ColorAEqualColorB(r4, SimpleColor.FromRgb(65, 74, 81), 0)) return await FromResult(true);
-                break;
-            }
+                {
+                    if (ColorAEqualColorB(r4, 技能4CD颜色, 0)) return await FromResult(true);
+                    break;
+                }
         }
 
         死亡守卫后(bts, size);
@@ -8082,7 +9226,7 @@ public partial class Form2 : Form
             KeyPress((uint)Keys.A);
         }
 
-        if (ColorAEqualColorB(q4, SimpleColor.FromRgb(65, 74, 81), 0)) return await FromResult(true);
+        if (ColorAEqualColorB(q4, 技能4CD颜色, 0)) return await FromResult(true);
 
         暗影突袭后();
         return await FromResult(false);
@@ -8098,7 +9242,7 @@ public partial class Form2 : Form
             RightClick();
         }
 
-        if (ColorAEqualColorB(w4, SimpleColor.FromRgb(65, 74, 81), 0)) return await FromResult(true);
+        if (ColorAEqualColorB(w4, 技能4CD颜色, 0)) return await FromResult(true);
 
         闪烁后();
         return await FromResult(false);
@@ -8114,7 +9258,7 @@ public partial class Form2 : Form
             KeyPress((uint)Keys.A);
         }
 
-        if (ColorAEqualColorB(e4, SimpleColor.FromRgb(65, 74, 81), 0)) return await FromResult(true);
+        if (ColorAEqualColorB(e4, 技能4CD颜色, 0)) return await FromResult(true);
 
         痛苦尖叫后();
         return await FromResult(false);
@@ -8130,7 +9274,7 @@ public partial class Form2 : Form
             KeyPress((uint)Keys.A);
         }
 
-        if (ColorAEqualColorB(r4, SimpleColor.FromRgb(65, 74, 81), 0)) return await FromResult(true);
+        if (ColorAEqualColorB(r4, 技能4CD颜色, 0)) return await FromResult(true);
 
         冲击波后();
         return await FromResult(false);
@@ -8158,7 +9302,7 @@ public partial class Form2 : Form
             }
         }
 
-        if (ColorAEqualColorB(q4, SimpleColor.FromRgb(65, 74, 81), 0)) return await FromResult(true);
+        if (ColorAEqualColorB(q4, 技能4CD颜色, 0)) return await FromResult(true);
 
         风雷之击后();
         return await FromResult(false);
@@ -8182,7 +9326,7 @@ public partial class Form2 : Form
             }
         }
 
-        if (ColorAEqualColorB(r4, SimpleColor.FromRgb(65, 74, 81), 0)) return await FromResult(true);
+        if (ColorAEqualColorB(r4, 技能4CD颜色, 0)) return await FromResult(true);
 
         静态风暴后();
         return await FromResult(false);
@@ -8198,7 +9342,7 @@ public partial class Form2 : Form
             RightClick();
         }
 
-        if (ColorAEqualColorB(w4, SimpleColor.FromRgb(65, 74, 81), 0)) return await FromResult(true);
+        if (ColorAEqualColorB(w4, 技能4CD颜色, 0)) return await FromResult(true);
 
         恶念瞥视后();
         return await FromResult(false);
@@ -8214,9 +9358,213 @@ public partial class Form2 : Form
             RightClick();
         }
 
-        if (ColorAEqualColorB(e4, SimpleColor.FromRgb(65, 74, 81), 0)) return await FromResult(true);
+        if (ColorAEqualColorB(e4, 技能4CD颜色, 0)) return await FromResult(true);
 
         动能力场后();
+        return await FromResult(false);
+    }
+
+    #endregion
+
+    #region 蓝胖
+
+    private static async Task<bool> 火焰轰爆去后摇(byte[] bts, Size size)
+    {
+        static void 火焰轰爆后()
+        {
+            RightClick();
+        }
+
+        switch (_技能数量)
+        {
+            case 4:
+                var q4 = 获取q4左下角颜色(bts, size);
+                if (ColorAEqualColorB(q4, 技能4CD颜色, 0)) return await FromResult(true);
+                break;
+            case 5:
+                var q5 = 获取q5左下角颜色(bts, size);
+                if (ColorAEqualColorB(q5, 技能56CD颜色, 0)) return await FromResult(true);
+                break;
+            case 6:
+                var q6 = 获取q6左下角颜色(bts, size);
+                if (ColorAEqualColorB(q6, 技能56CD颜色, 0)) return await FromResult(true);
+                break;
+        }
+
+        火焰轰爆后();
+        return await FromResult(false);
+    }
+
+    private static async Task<bool> 引燃去后摇(byte[] bts, Size size)
+    {
+        static void 引燃后()
+        {
+            switch (_全局模式w)
+            {
+                case 1:
+                    KeyPress((uint)Keys.Q);
+                    break;
+                default:
+                    RightClick();
+                    break;
+            }
+        }
+
+        switch (_技能数量)
+        {
+            case 4:
+                var w4 = 获取w4左下角颜色(bts, size);
+                if (ColorAEqualColorB(w4, 技能4CD颜色, 0)) return await FromResult(true);
+                break;
+            case 5:
+                var w5 = 获取w5左下角颜色(bts, size);
+                if (ColorAEqualColorB(w5, 技能56CD颜色, 0)) return await FromResult(true);
+                break;
+            case 6:
+                var w6 = 获取w6左下角颜色(bts, size);
+                if (ColorAEqualColorB(w6, 技能56CD颜色, 0)) return await FromResult(true);
+                break;
+        }
+
+        引燃后();
+        return await FromResult(false);
+    }
+
+    private static async Task<bool> 嗜血术去后摇(byte[] bts, Size size)
+    {
+        static void 嗜血术后()
+        {
+            RightClick();
+        }
+
+        switch (_技能数量)
+        {
+            case 4:
+                var e4 = 获取e4左下角颜色(bts, size);
+                if (ColorAEqualColorB(e4, 技能4CD颜色, 0)) return await FromResult(true);
+                break;
+            case 5:
+                var e5 = 获取e5左下角颜色(bts, size);
+                if (ColorAEqualColorB(e5, 技能56CD颜色, 0)) return await FromResult(true);
+                break;
+            case 6:
+                var e6 = 获取e6左下角颜色(bts, size);
+                if (ColorAEqualColorB(e6, 技能56CD颜色, 0)) return await FromResult(true);
+                break;
+        }
+
+        嗜血术后();
+        return await FromResult(false);
+    }
+
+    private static async Task<bool> 未精通火焰轰爆去后摇(byte[] bts, Size size)
+    {
+        static void 未精通火焰轰爆后()
+        {
+            RightClick();
+        }
+
+        switch (_技能数量)
+        {
+            case 5:
+                var d5 = 获取d5左下角颜色(bts, size);
+                if (ColorAEqualColorB(d5, 技能56CD颜色, 0)) return await FromResult(true);
+                break;
+            case 6:
+                var d6 = 获取d6左下角颜色(bts, size);
+                if (ColorAEqualColorB(d6, 技能56CD颜色, 0)) return await FromResult(true);
+                break;
+        }
+
+        未精通火焰轰爆后();
+        return await FromResult(false);
+    }
+
+    private static async Task<bool> 烈火护盾去后摇(byte[] bts, Size size)
+    {
+        static void 烈火护盾后()
+        {
+            RightClick();
+        }
+
+        switch (_技能数量)
+        {
+            case 5:
+                var f5 = 获取d5左下角颜色(bts, size);
+                if (ColorAEqualColorB(f5, 技能56CD颜色, 0)) return await FromResult(true);
+                break;
+            case 6:
+                var f6 = 获取f6左下角颜色(bts, size);
+                if (ColorAEqualColorB(f6, 技能56CD颜色, 0)) return await FromResult(true);
+                break;
+        }
+
+        烈火护盾后();
+        return await FromResult(false);
+    }
+
+    #endregion
+
+    #region 祸乱之源
+
+    private static async Task<bool> 虚弱去后摇(byte[] bts, Size size)
+    {
+        static void 虚弱后()
+        {
+            KeyPress((uint)Keys.A);
+            RightClick();
+        }
+
+        var q4 = 获取q4左下角颜色(bts, size);
+        if (ColorAEqualColorB(q4, 技能4CD颜色, 0)) return await FromResult(true);
+
+        虚弱后();
+        return await FromResult(false);
+    }
+
+    private static async Task<bool> 噬脑去后摇(byte[] bts, Size size)
+    {
+        static void 噬脑后()
+        {
+            RightClick();
+            KeyPress((uint)Keys.A);
+        }
+
+        var w4 = 获取w4左下角颜色(bts, size);
+        if (ColorAEqualColorB(w4, 技能4CD颜色, 0)) return await FromResult(true);
+
+
+        噬脑后();
+        return await FromResult(false);
+    }
+
+    private static async Task<bool> 噩梦接平A锤(byte[] bts, Size size)
+    {
+        var 替换颜色 = GetPixelBytes(bts, size, 956 - 坐标偏移x, 1009 - 坐标偏移y);
+
+        if (!ColorAEqualColorB(替换颜色, Color.FromArgb(180, 162, 107), 0))
+        {
+            return await FromResult(true);
+        }
+
+
+        if (_全局模式 == 0)
+        {
+            _全局模式 = 1;
+            根据图片以及类别使用物品(物品_纷争, bts, size);
+            KeyPress((uint)Keys.M);
+            初始化全局时间(ref _全局时间e);
+            Delay(1000);
+            KeyPress((uint)Keys.A);
+        }
+
+        if (RegPicture(物品_陨星锤, bts, size) && _全局模式e == 1)
+        {
+            Delay((int)_全局时间 - 2600, _全局时间e);
+            if (_全局模式e == 1)
+                根据图片以及类别使用物品(物品_陨星锤, bts, size);
+        }
+
         return await FromResult(false);
     }
 
@@ -8228,76 +9576,109 @@ public partial class Form2 : Form
 
     #region 循环
 
+    /// <summary>
+    ///     实际上并没啥用，不覆盖界面就行
+    /// </summary>
+    /// <param name="bts"></param>
+    /// <param name="size"></param>
+    /// <returns></returns>
+    private static bool 是否自己的单位(in byte[] bts, Size size)
+    {
+        var 旗子颜色4 = Color.FromArgb(239, 176, 104);
+        var 旗子颜色56 = Color.FromArgb(232, 155, 91);
+
+        return _技能数量 switch
+        {
+            4 => 获取旗子4颜色(bts, size).Equals(旗子颜色4),
+            5 => 获取旗子5颜色(bts, size).Equals(旗子颜色56),
+            6 => 获取旗子6颜色(bts, size).Equals(旗子颜色56),
+            _ => false
+        };
+    }
+
     private static async Task 一般程序循环()
     {
         while (_总循环条件)
-            if (_循环内获取图片 is not null && _总开关条件)
+        {
+            if (_循环内获取图片 is not null) // && _总开关条件
             {
-                if (_中断条件) continue; // 中断则跳过循环
+                if (_中断条件)
+                {
+                    await Task.Delay(1);
+                    continue; // 中断则跳过循环
+                }
 
                 await _循环内获取图片(); // 更新全局Bitmap
 
-                if (_条件1 && _条件根据图片委托1 is not null)
-                    await Run(async () => { _条件1 = await _条件根据图片委托1(_全局bts, _全局size); }).ConfigureAwait(false);
-
-                if (_条件2 && _条件根据图片委托2 is not null)
-                    await Run(async () => { _条件2 = await _条件根据图片委托2(_全局bts, _全局size); }).ConfigureAwait(false);
-
-                if (_条件3 && _条件根据图片委托3 is not null)
-                    await Run(async () => { _条件3 = await _条件根据图片委托3(_全局bts, _全局size); }).ConfigureAwait(false);
-
-                if (_条件4 && _条件根据图片委托4 is not null)
-                    await Run(async () => { _条件4 = await _条件根据图片委托4(_全局bts, _全局size); }).ConfigureAwait(false);
-
-                if (_条件5 && _条件根据图片委托5 is not null)
-                    await Run(async () => { _条件5 = await _条件根据图片委托5(_全局bts, _全局size); }).ConfigureAwait(false);
-
-                if (_条件6 && _条件根据图片委托6 is not null)
-                    await Run(async () => { _条件6 = await _条件根据图片委托6(_全局bts, _全局size); }).ConfigureAwait(false);
-
-                if (_条件7 && _条件根据图片委托7 is not null)
-                    await Run(async () => { _条件7 = await _条件根据图片委托7(_全局bts, _全局size); }).ConfigureAwait(false);
-
-                if (_条件8 && _条件根据图片委托8 is not null)
-                    await Run(async () => { _条件8 = await _条件根据图片委托8(_全局bts, _全局size); }).ConfigureAwait(false);
-
-                switch (_条件保持假腿)
+                if (true || 是否自己的单位(_全局bts, _全局size))
                 {
-                    case true when _条件开启切假腿:
+                    if (_条件1 && _条件根据图片委托1 is not null)
+                        await Run(async () => { _条件1 = await _条件根据图片委托1(_全局bts, _全局size); }).ConfigureAwait(false);
+
+                    if (_条件2 && _条件根据图片委托2 is not null)
+                        await Run(async () => { _条件2 = await _条件根据图片委托2(_全局bts, _全局size); }).ConfigureAwait(false);
+
+                    if (_条件3 && _条件根据图片委托3 is not null)
+                        await Run(async () => { _条件3 = await _条件根据图片委托3(_全局bts, _全局size); }).ConfigureAwait(false);
+
+                    if (_条件4 && _条件根据图片委托4 is not null)
+                        await Run(async () => { _条件4 = await _条件根据图片委托4(_全局bts, _全局size); }).ConfigureAwait(false);
+
+                    if (_条件5 && _条件根据图片委托5 is not null)
+                        await Run(async () => { _条件5 = await _条件根据图片委托5(_全局bts, _全局size); }).ConfigureAwait(false);
+
+                    if (_条件6 && _条件根据图片委托6 is not null)
+                        await Run(async () => { _条件6 = await _条件根据图片委托6(_全局bts, _全局size); }).ConfigureAwait(false);
+
+                    if (_条件7 && _条件根据图片委托7 is not null)
+                        await Run(async () => { _条件7 = await _条件根据图片委托7(_全局bts, _全局size); }).ConfigureAwait(false);
+
+                    if (_条件8 && _条件根据图片委托8 is not null)
+                        await Run(async () => { _条件8 = await _条件根据图片委托8(_全局bts, _全局size); }).ConfigureAwait(false);
+
+                    if (_条件9 && _条件根据图片委托9 is not null)
+                        await Run(async () => { _条件9 = await _条件根据图片委托9(_全局bts, _全局size); }).ConfigureAwait(false);
+
+                    switch (_条件保持假腿)
                     {
-                        if (_条件假腿敏捷)
-                            await Run(async () =>
+                        case true when _条件开启切假腿:
                             {
-                                if (RegPicture(物品_假腿_敏捷腿, _全局bts, _全局size)) return;
-                                if (_切假腿中) return;
-                                _切假腿中 = true;
-                                await 切敏捷腿(_全局bts, _全局size, _技能数量);
-                                await Run(() =>
-                                {
-                                    Delay(250);
-                                    _切假腿中 = false;
-                                }).ConfigureAwait(false);
-                            }).ConfigureAwait(false);
-                        else
-                            await Run(async () =>
-                            {
-                                if (RegPicture(物品_假腿_力量腿, _全局bts, _全局size)) return;
-                                if (_切假腿中) return;
-                                _切假腿中 = true;
-                                await 切力量腿(_全局bts, _全局size, _技能数量);
-                                await Run(() =>
-                                {
-                                    Delay(250);
-                                    _切假腿中 = false;
-                                }).ConfigureAwait(false);
-                            }).ConfigureAwait(false);
-                        break;
+                                if (_条件假腿敏捷)
+                                    await Run(async () =>
+                                    {
+                                        if (RegPicture(物品_假腿_敏捷腿, _全局bts, _全局size)) return;
+                                        if (_切假腿中) return;
+                                        _切假腿中 = true;
+                                        await 切敏捷腿(_全局bts, _全局size, _技能数量);
+                                        await Run(() =>
+                                        {
+                                            Delay(250);
+                                            _切假腿中 = false;
+                                        }).ConfigureAwait(false);
+                                    }).ConfigureAwait(false);
+                                else
+                                    await Run(async () =>
+                                    {
+                                        if (RegPicture(物品_假腿_力量腿, _全局bts, _全局size)) return;
+                                        if (_切假腿中) return;
+                                        _切假腿中 = true;
+                                        await 切力量腿(_全局bts, _全局size, _技能数量);
+                                        await Run(() =>
+                                        {
+                                            Delay(250);
+                                            _切假腿中 = false;
+                                        }).ConfigureAwait(false);
+                                    }).ConfigureAwait(false);
+                                break;
+                            }
                     }
                 }
 
-                // 优化着 优化着 直接不行了 必须等待 否则直接卡死
-                await Task.Delay(1);
             }
+
+            // 优化着 优化着 直接不行了 必须等待 否则直接卡死
+            await Task.Delay(1);
+        }
     }
 
     private static async Task 无物品状态初始化()
@@ -8323,13 +9704,14 @@ public partial class Form2 : Form
         _条件6 = false;
         _条件7 = false;
         _条件8 = false;
+        _条件9 = false;
         _条件开启切假腿 = false;
         _条件保持假腿 = false;
         _条件假腿敏捷 = false;
         _切假腿中 = false;
         _是否魔晶 = false;
         _是否a杖 = false;
-        _条件走a = false;
+        _循环走a = false;
         _全局步骤 = 0;
         _全局步骤q = 0;
         _全局步骤w = 0;
@@ -8351,8 +9733,10 @@ public partial class Form2 : Form
         _全局时间r = -1;
         _全局时间d = -1;
         _全局时间f = -1;
-        _攻击速度 = 0;
-        _基础攻击前摇 = 0;
+        _攻击速度 = 100;
+        _基础攻击前摇 = 0.3;
+        _基础攻击间隔 = 1.7;
+        _基础额外攻速 = 1;
         _指定地点p = new Point(0, 0);
         _指定地点q = new Point(0, 0);
         _指定地点w = new Point(0, 0);
@@ -8371,6 +9755,7 @@ public partial class Form2 : Form
         _条件根据图片委托6 = null;
         _条件根据图片委托7 = null;
         _条件根据图片委托8 = null;
+        _条件根据图片委托9 = null;
         _切假腿中 = false;
     }
 
@@ -8379,19 +9764,18 @@ public partial class Form2 : Form
     #region 获取图片
 
     /// <summary>
+    ///     获取时间为6.524ms
     /// </summary>
     /// <returns></returns>
     private static async Task<bool> 获取图片_1()
     {
-        using (await _图片写入AsyncLock.LockAsync())
-        {
-            // 750 856 657 217 基本所有技能状态物品，7-8ms延迟
-            // 具体点则为起始坐标点加与其的差值
-            _全局图像 ??= new Bitmap(截图模式1W, 截图模式1H);
-            _全局图像 = await CaptureScreenAsync(截图模式1X, 截图模式1Y, _全局图像.Size);
-            _全局size = new Size(截图模式1W, 截图模式1H);
-            _全局bts = await GetBitmapByteAsync(_全局图像);
-        }
+        // 750 856 657 217 基本所有技能状态物品，7-8ms延迟
+        // 具体点则为起始坐标点加与其的差值
+        _全局size = new Size(截图模式1W, 截图模式1H);
+        _全局图像 ??= new Bitmap(截图模式1W, 截图模式1H);
+        _全局bts ??= new byte[截图模式1W * 截图模式1H * 4];
+        CaptureScreen_固定大小(ref _全局图像, 截图模式1X, 截图模式1Y);
+        GetBitmapByte_固定数组(in _全局图像, ref _全局bts);
 
         return await FromResult(true);
     }
@@ -8399,17 +9783,57 @@ public partial class Form2 : Form
 
     private static async Task<bool> 获取图片_2()
     {
-        using (await _图片写入AsyncLock.LockAsync())
-        {
-            // 0 0 1920 1080 全屏，25-36ms延迟
-            // 具体点则为起始坐标点加与其的差值
-            _全局图像 ??= new Bitmap(1920, 1080);
-            _全局图像 = await CaptureScreenAsync(截图模式1X, 截图模式1Y, _全局图像.Size);
-            _全局size = new Size(1920, 1080);
-            _全局bts = await GetBitmapByteAsync(_全局图像);
-        }
+        // 0 0 1920 1080 全屏，25-36ms延迟
+        // 具体点则为起始坐标点加与其的差值
+        _全局size = new Size(1920, 1080);
+        _全局图像 ??= new Bitmap(1920, 1080);
+        _全局bts ??= new byte[1920 * 1080 * 4];
+        CaptureScreen_固定大小(ref _全局图像, 0, 0);
+        GetBitmapByte_固定数组(in _全局图像, ref _全局bts);
 
         return await FromResult(true);
+    }
+
+    /// <summary>
+    ///     更少更多的截图基本时间一致但对比时间有区别
+    /// </summary>
+    /// <param name="mode"></param>
+    /// <returns></returns>
+
+    private static async Task 根据技能数量更新假腿需要图片(int mode = 4)
+    {
+        //var left_x = 1118;
+        //var right_x = 1362;
+        //var top_y = 943;
+        //var bottom_y = 1034;
+        //switch (mode)
+        //{
+        //    case 4:
+        //        left_x = 1118;
+        //        right_x = 1362;
+        //        break;
+        //    case 5:
+        //        left_x = 1134;
+        //        right_x = 1380;
+        //        break;
+        //    case 6:
+        //        left_x = 1162;
+        //        right_x = 1409;
+        //        break;
+        //}
+
+        //_全局假腿size = new Size(right_x - left_x, bottom_y - top_y);
+        //var 图像 = new Bitmap(_全局假腿size.Width, _全局假腿size.Height);
+        //图像 = await CaptureScreenAsync(left_x, top_y, 图像.Size);
+        //_全局假腿bts = await GetBitmapByteAsync(图像);
+
+        _全局假腿size = new Size(截图模式1W, 截图模式1H);
+        _全局假腿bts ??= new byte[截图模式1W * 截图模式1H * 4];
+        _全局假腿图像 ??= new Bitmap(截图模式1W, 截图模式1H);
+        CaptureScreen_固定大小(ref _全局假腿图像, 截图模式1X, 截图模式1Y);
+        GetBitmapByte_固定数组(in _全局假腿图像, ref _全局假腿bts);
+
+        await Task.Delay(0);
     }
 
     #endregion
@@ -8521,15 +9945,29 @@ public partial class Form2 : Form
 
     #region 续走A
 
-    private static void 续走A()
+    /// <summary>
+    ///     根据攻速去后摇
+    /// </summary>
+    /// <param name="额外攻速"></param>
+    /// <returns></returns>
+    private static async Task 走A去等待后摇(double 额外攻速 = 0)
     {
-        var 实际前摇 = _基础攻击前摇 * 100 * 1000 / _攻击速度;
+        var 实际前摇 = _基础攻击前摇 * 100 * 1000 / (_攻击速度 + 额外攻速);
         var 等待前摇 = Convert.ToInt32(实际前摇);
-        var 实际间隔 = 1.7 * 100 * 1000 / _攻击速度;
-        KeyPress((uint)Keys.M);
+        var 实际间隔 = _基础攻击间隔 * 100 * 1000 / (_攻击速度 + 额外攻速);
         var 等待间隔 = Convert.ToInt32(实际间隔);
-        Delay(等待间隔 - 等待前摇);
-        KeyPress((uint)Keys.A);
+
+        KeyPress((uint)Keys.M);
+
+        while (true)
+            if (获取当前时间毫秒() - _实际出手时间 > (等待间隔 - 等待前摇))
+            {
+                KeyPress((uint)Keys.A);
+                break;
+            }
+
+
+        await Task.Delay(0);
     }
 
     #endregion
@@ -8677,37 +10115,30 @@ public partial class Form2 : Form
 
     #region 切假腿
 
+    /// <summary>
+    ///     6ms 主要是重新截图时间，不然的话只需要0.5ms
+    /// </summary>
+    /// <param name="mode"></param>
+    /// <returns></returns>
     private static async Task 切智力腿(int mode = 4)
     {
-        var 图像 = new Bitmap(截图模式1W, 截图模式1H);
-        图像 = await CaptureScreenAsync(截图模式1X, 截图模式1Y, 图像.Size);
-        _全局假腿bts = await GetBitmapByteAsync(图像);
-        图像.Dispose();
-        var size = new Size(截图模式1W, 截图模式1H);
+        await 根据技能数量更新假腿需要图片(mode);
 
-        await 切智力腿(_全局假腿bts, size, mode);
+        await 切智力腿(_全局假腿bts, _全局假腿size, mode);
     }
 
     private static async Task 切敏捷腿(int mode = 4)
     {
-        var 图像 = new Bitmap(截图模式1W, 截图模式1H);
-        图像 = await CaptureScreenAsync(截图模式1X, 截图模式1Y, 图像.Size);
-        _全局假腿bts = await GetBitmapByteAsync(图像);
-        图像.Dispose();
-        var size = new Size(截图模式1W, 截图模式1H);
+        await 根据技能数量更新假腿需要图片(mode);
 
-        await 切敏捷腿(_全局假腿bts, size, mode);
+        await 切敏捷腿(_全局假腿bts, _全局假腿size, mode);
     }
 
     private static async Task 切力量腿(int mode = 4)
     {
-        var 图像 = new Bitmap(截图模式1W, 截图模式1H);
-        图像 = await CaptureScreenAsync(截图模式1X, 截图模式1Y, 图像.Size);
-        _全局假腿bts = await GetBitmapByteAsync(图像);
-        图像.Dispose();
-        var size = new Size(截图模式1W, 截图模式1H);
+        await 根据技能数量更新假腿需要图片(mode);
 
-        await 切力量腿(_全局假腿bts, size, mode);
+        await 切力量腿(_全局假腿bts, _全局假腿size, mode);
     }
 
     private static async Task<bool> 切智力腿(byte[] parByte, Size size, int mode = 4)
@@ -8759,26 +10190,16 @@ public partial class Form2 : Form
 
     #region 分身一齐攻击
 
-    //private void 分身一齐攻击()
-    //{
-    //    Delay(140);
-    //    KeyDown((uint)Keys.LControlKey);
-    //    KeyPress((uint)Keys.A);
-    //    KeyUp((uint)Keys.LControlKey);
-    //}
-
-    #endregion
-
-    #region 死灵射手净化
-
-    //private static void 死灵射手净化()
-    //{
-    //    KeyPress((uint)Keys.D1);
-    //    Delay(等待延迟);
-    //    KeyPress((uint)Keys.Q);
-    //    Delay(等待延迟);
-    //    KeyPress((uint)Keys.F1);
-    //}
+    /// <summary>
+    ///     因为有0.1秒的分裂时间，所以必须等待
+    /// </summary>
+    private static void 分身一齐攻击()
+    {
+        Delay(140);
+        KeyDown((uint)Keys.LControlKey);
+        KeyPress((uint)Keys.A);
+        KeyUp((uint)Keys.LControlKey);
+    }
 
     #endregion
 
@@ -8870,8 +10291,8 @@ public partial class Form2 : Form
 
     private static void 根据物品位置按键(Point p, int mode = 4)
     {
-        var x = p.X + 截图模式1X;
-        var y = p.Y + 截图模式1Y;
+        var x = p.X + 坐标偏移x;
+        var y = p.Y + 坐标偏移y;
 
         const int 第一行物品底部y = 987;
 
@@ -8981,8 +10402,8 @@ public partial class Form2 : Form
 
     private static void 根据物品位置按键自我(Point p, int mode = 4)
     {
-        var x = p.X + 截图模式1X;
-        var y = p.Y + 截图模式1Y;
+        var x = p.X + 坐标偏移x;
+        var y = p.Y + 坐标偏移y;
 
         const int 第一行物品底部y = 987;
 
@@ -9092,8 +10513,8 @@ public partial class Form2 : Form
 
     private static void 根据物品位置按键队列(Point p, int mode = 4)
     {
-        var x = p.X + 截图模式1X;
-        var y = p.Y + 截图模式1Y;
+        var x = p.X + 坐标偏移x;
+        var y = p.Y + 坐标偏移y;
 
         const int 第一行物品底部y = 987;
 
@@ -9219,14 +10640,14 @@ public partial class Form2 : Form
     /// <returns></returns>
     private static bool 阿哈利姆神杖(byte[] bts, Size size)
     {
-        var 技能点颜色 = SimpleColor.FromRgb(28, 193, 254);
+        var 技能点颜色 = Color.FromArgb(28, 193, 254);
 
-        if (GetSPixelBytes(bts, size, 1077 - 截图模式1X, 963 - 截图模式1Y).Equals(技能点颜色))
+        if (GetPixelBytes(bts, size, 1077 - 坐标偏移x, 963 - 坐标偏移y).Equals(技能点颜色))
             return true;
         // 4技能魔晶
 
-        return GetSPixelBytes(bts, size, 1093 - 截图模式1X, 963 - 截图模式1Y).Equals(技能点颜色) ||
-               GetSPixelBytes(bts, size, 1121 - 截图模式1X, 963 - 截图模式1Y).Equals(技能点颜色);
+        return GetPixelBytes(bts, size, 1093 - 坐标偏移x, 963 - 坐标偏移y).Equals(技能点颜色) ||
+               GetPixelBytes(bts, size, 1121 - 坐标偏移x, 963 - 坐标偏移y).Equals(技能点颜色);
         // 5技能A帐魔晶（A帐魔晶6技能） 6技能魔晶A
     }
 
@@ -9236,17 +10657,14 @@ public partial class Form2 : Form
     /// <returns></returns>
     private static bool 阿哈利姆魔晶(byte[] bts, Size size)
     {
-        var x = 截图模式1X;
-        var y = 截图模式1Y;
+        var 技能点颜色 = Color.FromArgb(37, 181, 255);
 
-        var 技能点颜色 = SimpleColor.FromRgb(37, 181, 255);
-
-        if (GetSPixelBytes(bts, size, 1077 - x, 996 - y).Equals(技能点颜色))
+        if (GetPixelBytes(bts, size, 1077 - 坐标偏移x, 996 - 坐标偏移y).Equals(技能点颜色))
             return true;
         // 4技能魔晶
 
-        return GetSPixelBytes(bts, size, 1093 - x, 996 - y).Equals(技能点颜色) ||
-               GetSPixelBytes(bts, size, 1121 - x, 996 - y).Equals(技能点颜色);
+        return GetPixelBytes(bts, size, 1093 - 坐标偏移x, 996 - 坐标偏移y).Equals(技能点颜色) ||
+               GetPixelBytes(bts, size, 1121 - 坐标偏移x, 996 - 坐标偏移y).Equals(技能点颜色);
         // 5技能A帐魔晶（A帐魔晶6技能） // 6技能魔晶A
     }
 
@@ -9796,7 +11214,7 @@ public partial class Form2 : Form
             var bts1 = GetBitmapByte(bp);
             UIntPtr binr = (nuint)bts.Length;
             UIntPtr binr1 = (nuint)bts1.Length;
-            var t = FindBytesR(bts, binr, Tuple.Create((uint)截图模式1W, (uint)截图模式1H), bts1, binr1,
+            var t = FindBytesR(bts, binr, Tuple.Create((uint)size.Width, (uint)size.Height), bts1, binr1,
                 Tuple.Create((uint)bp.Size.Width, (uint)bp.Size.Height), 0.8);
             return new Point((int)t.Item1, (int)t.Item2);
         }
@@ -9814,21 +11232,14 @@ public partial class Form2 : Form
 
     private static Color GetPixelBytes(in byte[] bts, Size size, int x, int y)
     {
-        var subIndex = y * size.Width * 3 + x * 3;
+        var subIndex = y * size.Width * 4 + x * 4;
         return Color.FromArgb(bts[subIndex + 2],
-            bts[subIndex + 1], bts[subIndex]);
-    }
-
-    private static SimpleColor GetSPixelBytes(in byte[] bts, Size size, int x, int y)
-    {
-        var subIndex = y * size.Width * 3 + x * 3;
-        return SimpleColor.FromRgb(bts[subIndex + 2],
             bts[subIndex + 1], bts[subIndex]);
     }
 
     private static Color GetSPixelBytes(in byte[] bts, Size size, in Point p)
     {
-        var subIndex = p.Y * size.Width * 3 + p.X * 3;
+        var subIndex = p.Y * size.Width * 4 + p.X * 4;
         return Color.FromArgb(bts[subIndex + 2],
             bts[subIndex + 1], bts[subIndex]);
     }
@@ -9864,7 +11275,7 @@ public partial class Form2 : Form
 
     //private static void 记录买活()
     //{
-    //    var 计时颜色 = SimpleColor.FromRgb(14, 19, 24);
+    //    var 计时颜色 = Color.FromArgb(14, 19, 24);
 
     //    while (true)
     //    {
@@ -10136,43 +11547,43 @@ public partial class Form2 : Form
 
     private static PooledList<Point> 获取敌方坐标(Size size, in byte[] bytes)
     {
-        var colors = new PooledList<SimpleColor>();
+        var colors = new PooledList<Color>();
         var points = new PooledList<Point>();
 
-        colors.Add(SimpleColor.FromRgb(58, 28, 27));
+        colors.Add(Color.FromArgb(58, 28, 27));
         points.Add(new Point(0, 0));
 
-        colors.Add(SimpleColor.FromRgb(0, 0, 0));
+        colors.Add(Color.FromArgb(0, 0, 0));
         points.Add(new Point(0, 1));
 
-        colors.Add(SimpleColor.FromRgb(58, 28, 27));
+        colors.Add(Color.FromArgb(58, 28, 27));
         points.Add(new Point(99, 0));
 
-        colors.Add(SimpleColor.FromRgb(0, 0, 0));
+        colors.Add(Color.FromArgb(0, 0, 0));
         points.Add(new Point(99, 1));
 
-        colors.Add(SimpleColor.FromRgb(58, 28, 27));
+        colors.Add(Color.FromArgb(58, 28, 27));
         points.Add(new Point(100, 0));
 
-        colors.Add(SimpleColor.FromRgb(0, 0, 0));
+        colors.Add(Color.FromArgb(0, 0, 0));
         points.Add(new Point(100, 1));
 
-        colors.Add(SimpleColor.FromRgb(0, 0, 0));
+        colors.Add(Color.FromArgb(0, 0, 0));
         points.Add(new Point(0, 12));
 
-        colors.Add(SimpleColor.FromRgb(0, 0, 0));
+        colors.Add(Color.FromArgb(0, 0, 0));
         points.Add(new Point(0, 13));
 
-        colors.Add(SimpleColor.FromRgb(0, 0, 0));
+        colors.Add(Color.FromArgb(0, 0, 0));
         points.Add(new Point(99, 12));
 
-        colors.Add(SimpleColor.FromRgb(0, 0, 0));
+        colors.Add(Color.FromArgb(0, 0, 0));
         points.Add(new Point(99, 13));
 
-        colors.Add(SimpleColor.FromRgb(0, 0, 0));
+        colors.Add(Color.FromArgb(0, 0, 0));
         points.Add(new Point(100, 12));
 
-        colors.Add(SimpleColor.FromRgb(0, 0, 0));
+        colors.Add(Color.FromArgb(0, 0, 0));
         points.Add(new Point(100, 13));
 #if DEBUG
         初始化全局时间(ref _全局时间);
@@ -10205,31 +11616,31 @@ public partial class Form2 : Form
 
     private static Point 获取自身坐标(Size size, in byte[] bytes)
     {
-        var colors = new PooledList<SimpleColor>();
+        var colors = new PooledList<Color>();
         var points = new PooledList<Point>();
 
-        colors.Add(SimpleColor.FromRgb(35, 77, 35));
+        colors.Add(Color.FromArgb(35, 77, 35));
         points.Add(new Point(0, 0));
 
-        colors.Add(SimpleColor.FromRgb(0, 0, 0));
+        colors.Add(Color.FromArgb(0, 0, 0));
         points.Add(new Point(0, 1));
 
-        colors.Add(SimpleColor.FromRgb(33, 70, 33));
+        colors.Add(Color.FromArgb(33, 70, 33));
         points.Add(new Point(107, 0));
 
-        colors.Add(SimpleColor.FromRgb(0, 0, 0));
+        colors.Add(Color.FromArgb(0, 0, 0));
         points.Add(new Point(107, 1));
 
-        colors.Add(SimpleColor.FromRgb(0, 0, 0));
+        colors.Add(Color.FromArgb(0, 0, 0));
         points.Add(new Point(0, 18));
 
-        colors.Add(SimpleColor.FromRgb(0, 1, 0));
+        colors.Add(Color.FromArgb(0, 1, 0));
         points.Add(new Point(0, 19));
 
-        colors.Add(SimpleColor.FromRgb(0, 0, 0));
+        colors.Add(Color.FromArgb(0, 0, 0));
         points.Add(new Point(107, 18));
 
-        colors.Add(SimpleColor.FromRgb(0, 1, 0));
+        colors.Add(Color.FromArgb(0, 1, 0));
         points.Add(new Point(107, 19));
 #if DEBUG
         初始化全局时间(ref _全局时间);
@@ -10262,29 +11673,45 @@ public partial class Form2 : Form
 
     #region 捕捉颜色
 
-    private async Task 测试方法_寻找大勋章()
+    private async Task 测试方法()
     {
-        var size = new Size(截图模式1W, 截图模式1H);
-        var bitmap = await CaptureScreenAsync(截图模式1X, 截图模式1Y, size);
-        var bts = await GetBitmapByteAsync(bitmap);
-
         var time1 = 获取当前时间毫秒();
 
-        //TTS.Speak(string.Concat("开始对比"));
+        //_ = 获取图片_2().Result;
+
+        //var c = 获取q4左下角颜色(_全局bts, _全局size);
+
+        //tb_x.Text = c.ToString();
+
+
+
         for (var i = 0; i < 100; i++)
         {
-            var _ = RegPicturePointR(物品_炎阳勋章, bts, size);
+            //FindBitmaPoint(_全局图像, 物品_假腿_敏捷腿);
+
+            //_全局size = new Size(1920, 1080);
+            //_全局图像 = new Bitmap(1920, 1080);
+            //_全局图像 = await CaptureScreenAsync(0, 0, _全局图像.Size);
+            //_全局bts = await GetBitmapByteAsync(_全局图像);
+
+            // _ = RegPicturePointR(物品_假腿_敏捷腿, _全局bts, _全局size);
+            // await 切智力腿(_全局bts, _全局size).ConfigureAwait(false);
+
+            //var size = new Size(100, 100);
+            //var bitmap = await CaptureScreenAsync(截图模式1X, 截图模式1Y, size);
+            //var bts = await GetBitmapByteAsync(bitmap);
         }
 
-        //TTS.Speak(string.Concat("找到的x坐标", t.X + 截图模式1X, "找到的y坐标", t.Y + 截图模式1Y));
         tb_攻速.Text = string.Concat(获取当前时间毫秒() - time1);
+
+        await Task.Delay(0);
     }
 
     private async Task 捕捉颜色()
     {
         var time = 获取当前时间毫秒();
 
-        var colors = new PooledList<SimpleColor>();
+        var colors = new PooledList<Color>();
         var longs = new PooledList<long>();
 
         var size = new Size(截图模式1W, 截图模式1H);
@@ -10301,13 +11728,17 @@ public partial class Form2 : Form
 
             var q4 = 获取q4颜色(bts, size);
             var q41 = 获取q4左下角颜色(bts, size);
+            var q42 = 获取q4上方颜色(bts, size);
             var q5 = 获取q5颜色(bts, size);
             var q51 = 获取q5左下角颜色(bts, size);
+            var q52 = 获取q5状态颜色(bts, size);
             var q6 = 获取q6颜色(bts, size);
             var q61 = 获取q6左下角颜色(bts, size);
+            var q62 = 获取q6状态颜色(bts, size);
 
             var w4 = 获取w4颜色(bts, size);
             var w41 = 获取w4左下角颜色(bts, size);
+            var w42 = 获取w4上方颜色(bts, size);
             var w5 = 获取w5颜色(bts, size);
             var w51 = 获取w5左下角颜色(bts, size);
             var w6 = 获取w6颜色(bts, size);
@@ -10335,16 +11766,25 @@ public partial class Form2 : Form
             var f6 = 获取f6颜色(bts, size);
             var f61 = 获取f6左下角颜色(bts, size);
 
+            var qz4 = 获取旗子4颜色(bts, size);
+            var qz5 = 获取旗子5颜色(bts, size);
+            var qz6 = 获取旗子6颜色(bts, size);
+
+
             var p = tb_丢装备.Text.Trim() switch
             {
                 "q4" => q4,
                 "q41" => q41,
+                "q42" => q42,
                 "q5" => q5,
                 "q51" => q51,
+                "q52" => q52,
                 "q6" => q6,
                 "q61" => q61,
+                "q62" => q62,
                 "w4" => w4,
                 "w41" => w41,
+                "w42" => w42,
                 "w5" => w5,
                 "w51" => w51,
                 "w6" => w6,
@@ -10367,20 +11807,31 @@ public partial class Form2 : Form
                 "d61" => d61,
                 "f6" => f6,
                 "f61" => f61,
+                "qz4" => qz4,
+                "qz5" => qz5,
+                "qz6" => qz6,
                 _ => q4
             };
 
             if (colors.Count == 0 || !colors[^1].Equals(p))
-                if (!ColorAEqualColorB(p, SimpleColor.FromRgb(9, 10, 16), 5, 6, 12))
+                if (!ColorAEqualColorB(p, Color.FromArgb(9, 10, 16), 5, 6, 12))
                 {
                     colors.Add(p);
                     longs.Add(获取当前时间毫秒() - time);
                 }
 
+            /// 技能上方颜色 129, 137, 144 为CD好，否则没好
+            /// 技能左下角颜色 65, 74, 81 为CD好，否则没好
+            /// 实际上时间上差不多，而且左下角更容易定位。也稍微块一点点（误差）
+            //if (q41.Equals(技能4CD颜色))
+            //{
+            //    KeyPress((uint)Keys.Q);
+            //}
+
             //if (
-            //    ColorAEqualColorB(q5, SimpleColor.FromRgb(99,170,68), 3, 5, 20)
+            //    ColorAEqualColorB(q5, Color.FromArgb(99,170,68), 3, 5, 20)
             ////    &
-            ////    !ColorAEqualColorB(q4_n, SimpleColor.FromRgb(50, 21, 23), 0) // 沉默不释放
+            ////    !ColorAEqualColorB(q4_n, Color.FromArgb(50, 21, 23), 0) // 沉默不释放
             //    )
             //{
             //    KeyPress((uint)Keys.Q);
@@ -10409,6 +11860,10 @@ public partial class Form2 : Form
     #region 获取颜色
 
     /***
+     *
+     *  物品 4 1118 943 1309 1034
+     *  物品 5 1134 943 1324 1034
+     *  物品 6 1162 943 1353 1034
         代表	q左	q右	w左	w右	e左	e右	r左	r右
         宙斯	799	856	864	921	929	986	994	1051
         827.5		892.5		957.5		1022.5
@@ -10433,177 +11888,223 @@ public partial class Form2 : Form
         技能坐标 左下角 +4 边框长度
 
         沉默 恐惧 不能释放 颜色 吹风等其他控制依旧是原色
-        14,18,20
+        14, 18, 20
 
         默认颜色 不释放 释放中 都不变色
         改变颜色说明已经释放，只要释放出后颜色就会改变无关框大小
         变回改色说明已可以释放，优先级高于白色刷新，且后续不变色
-        65,74,81
+        4 技能 65, 74, 81
+        5 6 技能 45, 52, 59
+
+        状态颜色 11,17,8 未开启 0,129,0 已开启
+
 
         逻辑上是简单而且通用，但延时方面稍微逊色
         基本延时在40-90之间
         反观直接判断技能颜色延时在22-40之间
         但检测到释放后还需要等待一点时间，且不同饰品颜色不同
         释放后CD的话，变化颜色也不统一
+
+    
+        232, 155, 91 旗子颜色，是自己才有旗子（并不是，有工会的都有。。）
+
+        129, 137, 144 技能上方颜色，此颜色为CD就绪，反之进入CD
+        数组找色基本不耗时间
      ***/
-    private static SimpleColor 获取q4颜色(in byte[] bts, Size size)
+    private static Color 获取q4颜色(in byte[] bts, Size size)
     {
-        return GetSPixelBytes(bts, size, 828 - 截图模式1X, 956 - 截图模式1Y);
+        return GetPixelBytes(bts, size, 828 - 坐标偏移x, 956 - 坐标偏移y);
     }
 
-    private static SimpleColor 获取q4左下角颜色(in byte[] bts, Size size)
+
+    private static Color 获取q4左下角颜色(in byte[] bts, Size size)
     {
-        return GetSPixelBytes(bts, size, 803 - 截图模式1X, 997 - 截图模式1Y);
+        return GetPixelBytes(bts, size, 803 - 坐标偏移x, 997 - 坐标偏移y);
     }
 
-    private static SimpleColor 获取q5颜色(in byte[] bts, Size size)
+    private static Color 获取q4上方颜色(in byte[] bts, Size size)
     {
-        return GetSPixelBytes(bts, size, 811 - 截图模式1X, 956 - 截图模式1Y);
+        return GetPixelBytes(bts, size, 841 - 坐标偏移x, 946 - 坐标偏移y);
     }
 
-    private static SimpleColor 获取q5左下角颜色(in byte[] bts, Size size)
+    private static Color 获取q5颜色(in byte[] bts, Size size)
     {
-        return GetSPixelBytes(bts, size, 787 - 截图模式1X, 994 - 截图模式1Y);
+        return GetPixelBytes(bts, size, 811 - 坐标偏移x, 956 - 坐标偏移y);
     }
 
-    private static SimpleColor 获取q6颜色(in byte[] bts, Size size)
+    private static Color 获取q5左下角颜色(in byte[] bts, Size size)
     {
-        return GetSPixelBytes(bts, size, 781 - 截图模式1X, 956 - 截图模式1Y);
+        return GetPixelBytes(bts, size, 787 - 坐标偏移x, 994 - 坐标偏移y);
     }
 
-    private static SimpleColor 获取q6左下角颜色(in byte[] bts, Size size)
+    private static Color 获取q5状态颜色(in byte[] bts, Size size)
     {
-        return GetSPixelBytes(bts, size, 757 - 截图模式1X, 994 - 截图模式1Y);
+        return GetPixelBytes(bts, size, 784 - 坐标偏移x, 997 - 坐标偏移y);
     }
 
-    private static SimpleColor 获取w4颜色(in byte[] bts, Size size)
+    private static Color 获取q6颜色(in byte[] bts, Size size)
     {
-        return GetSPixelBytes(bts, size, 893 - 截图模式1X, 956 - 截图模式1Y);
+        return GetPixelBytes(bts, size, 781 - 坐标偏移x, 956 - 坐标偏移y);
     }
 
-    private static SimpleColor 获取w4左下角颜色(in byte[] bts, Size size)
+    private static Color 获取q6左下角颜色(in byte[] bts, Size size)
     {
-        return GetSPixelBytes(bts, size, 868 - 截图模式1X, 997 - 截图模式1Y);
+        return GetPixelBytes(bts, size, 757 - 坐标偏移x, 994 - 坐标偏移y);
     }
 
-    private static SimpleColor 获取w4开关颜色(in byte[] bts, Size size)
+    private static Color 获取q6状态颜色(in byte[] bts, Size size)
     {
-        return GetSPixelBytes(bts, size, 863 - 截图模式1X, 1003 - 截图模式1Y);
+        return GetPixelBytes(bts, size, 754 - 坐标偏移x, 997 - 坐标偏移y);
     }
 
-    private static SimpleColor 获取w5颜色(in byte[] bts, Size size)
+    private static Color 获取w4颜色(in byte[] bts, Size size)
     {
-        return GetSPixelBytes(bts, size, 869 - 截图模式1X, 956 - 截图模式1Y);
+        return GetPixelBytes(bts, size, 893 - 坐标偏移x, 956 - 坐标偏移y);
     }
 
-    private static SimpleColor 获取w5左下角颜色(in byte[] bts, Size size)
+    private static Color 获取w4左下角颜色(in byte[] bts, Size size)
     {
-        return GetSPixelBytes(bts, size, 845 - 截图模式1X, 994 - 截图模式1Y);
+        return GetPixelBytes(bts, size, 868 - 坐标偏移x, 997 - 坐标偏移y);
     }
 
-    private static SimpleColor 获取w5开关颜色(in byte[] bts, Size size)
+    private static Color 获取w4开关颜色(in byte[] bts, Size size)
     {
-        return GetSPixelBytes(bts, size, 843 - 截图模式1X, 996 - 截图模式1Y);
+        return GetPixelBytes(bts, size, 863 - 坐标偏移x, 1003 - 坐标偏移y);
     }
 
-    private static SimpleColor 获取w6颜色(in byte[] bts, Size size)
+    private static Color 获取w4上方颜色(in byte[] bts, Size size)
     {
-        return GetSPixelBytes(bts, size, 839 - 截图模式1X, 956 - 截图模式1Y);
+        return GetPixelBytes(bts, size, 919 - 坐标偏移x, 946 - 坐标偏移y);
     }
 
-    private static SimpleColor 获取w6左下角颜色(in byte[] bts, Size size)
+    private static Color 获取w5颜色(in byte[] bts, Size size)
     {
-        return GetSPixelBytes(bts, size, 815 - 截图模式1X, 994 - 截图模式1Y);
+        return GetPixelBytes(bts, size, 869 - 坐标偏移x, 956 - 坐标偏移y);
     }
 
-    private static SimpleColor 获取e4颜色(in byte[] bts, Size size)
+    private static Color 获取w5左下角颜色(in byte[] bts, Size size)
     {
-        return GetSPixelBytes(bts, size, 958 - 截图模式1X, 956 - 截图模式1Y);
+        return GetPixelBytes(bts, size, 845 - 坐标偏移x, 994 - 坐标偏移y);
     }
 
-    private static SimpleColor 获取e4左下角颜色(in byte[] bts, Size size)
+    private static Color 获取w5开关颜色(in byte[] bts, Size size)
     {
-        return GetSPixelBytes(bts, size, 933 - 截图模式1X, 997 - 截图模式1Y);
+        return GetPixelBytes(bts, size, 843 - 坐标偏移x, 996 - 坐标偏移y);
     }
 
-    private static SimpleColor 获取e5颜色(in byte[] bts, Size size)
+    private static Color 获取w6颜色(in byte[] bts, Size size)
     {
-        return GetSPixelBytes(bts, size, 927 - 截图模式1X, 956 - 截图模式1Y);
+        return GetPixelBytes(bts, size, 839 - 坐标偏移x, 956 - 坐标偏移y);
     }
 
-    private static SimpleColor 获取e5左下角颜色(in byte[] bts, Size size)
+    private static Color 获取w6左下角颜色(in byte[] bts, Size size)
     {
-        return GetSPixelBytes(bts, size, 903 - 截图模式1X, 994 - 截图模式1Y);
+        return GetPixelBytes(bts, size, 815 - 坐标偏移x, 994 - 坐标偏移y);
     }
 
-    private static SimpleColor 获取e6颜色(in byte[] bts, Size size)
+    private static Color 获取e4颜色(in byte[] bts, Size size)
     {
-        return GetSPixelBytes(bts, size, 897 - 截图模式1X, 956 - 截图模式1Y);
+        return GetPixelBytes(bts, size, 958 - 坐标偏移x, 956 - 坐标偏移y);
     }
 
-    private static SimpleColor 获取e6左下角颜色(in byte[] bts, Size size)
+    private static Color 获取e4左下角颜色(in byte[] bts, Size size)
     {
-        return GetSPixelBytes(bts, size, 873 - 截图模式1X, 994 - 截图模式1Y);
+        return GetPixelBytes(bts, size, 933 - 坐标偏移x, 997 - 坐标偏移y);
     }
 
-    private static SimpleColor 获取r4颜色(in byte[] bts, Size size)
+    private static Color 获取e5颜色(in byte[] bts, Size size)
     {
-        return GetSPixelBytes(bts, size, 1023 - 截图模式1X, 956 - 截图模式1Y);
+        return GetPixelBytes(bts, size, 927 - 坐标偏移x, 956 - 坐标偏移y);
     }
 
-    private static SimpleColor 获取r4左下角颜色(in byte[] bts, Size size)
+    private static Color 获取e5左下角颜色(in byte[] bts, Size size)
     {
-        return GetSPixelBytes(bts, size, 998 - 截图模式1X, 997 - 截图模式1Y);
+        return GetPixelBytes(bts, size, 903 - 坐标偏移x, 994 - 坐标偏移y);
     }
 
-    private static SimpleColor 获取r5颜色(in byte[] bts, Size size)
+    private static Color 获取e6颜色(in byte[] bts, Size size)
     {
-        return GetSPixelBytes(bts, size, 1043 - 截图模式1X, 956 - 截图模式1Y);
+        return GetPixelBytes(bts, size, 897 - 坐标偏移x, 956 - 坐标偏移y);
     }
 
-    private static SimpleColor 获取r5左下角颜色(in byte[] bts, Size size)
+    private static Color 获取e6左下角颜色(in byte[] bts, Size size)
     {
-        return GetSPixelBytes(bts, size, 1019 - 截图模式1X, 994 - 截图模式1Y);
+        return GetPixelBytes(bts, size, 873 - 坐标偏移x, 994 - 坐标偏移y);
     }
 
-    private static SimpleColor 获取r6颜色(in byte[] bts, Size size)
+    private static Color 获取r4颜色(in byte[] bts, Size size)
     {
-        return GetSPixelBytes(bts, size, 1071 - 截图模式1X, 956 - 截图模式1Y);
+        return GetPixelBytes(bts, size, 1023 - 坐标偏移x, 956 - 坐标偏移y);
     }
 
-    private static SimpleColor 获取r6左下角颜色(in byte[] bts, Size size)
+    private static Color 获取r4左下角颜色(in byte[] bts, Size size)
     {
-        return GetSPixelBytes(bts, size, 1047 - 截图模式1X, 994 - 截图模式1Y);
+        return GetPixelBytes(bts, size, 998 - 坐标偏移x, 997 - 坐标偏移y);
     }
 
-    private static SimpleColor 获取d5颜色(in byte[] bts, Size size)
+    private static Color 获取r5颜色(in byte[] bts, Size size)
     {
-        return GetSPixelBytes(bts, size, 985 - 截图模式1X, 956 - 截图模式1Y);
+        return GetPixelBytes(bts, size, 1043 - 坐标偏移x, 956 - 坐标偏移y);
     }
 
-    private static SimpleColor 获取d5左下角颜色(in byte[] bts, Size size)
+    private static Color 获取r5左下角颜色(in byte[] bts, Size size)
     {
-        return GetSPixelBytes(bts, size, 961 - 截图模式1X, 994 - 截图模式1Y);
+        return GetPixelBytes(bts, size, 1019 - 坐标偏移x, 994 - 坐标偏移y);
     }
 
-    private static SimpleColor 获取d6颜色(in byte[] bts, Size size)
+    private static Color 获取r6颜色(in byte[] bts, Size size)
     {
-        return GetSPixelBytes(bts, size, 955 - 截图模式1X, 956 - 截图模式1Y);
+        return GetPixelBytes(bts, size, 1071 - 坐标偏移x, 956 - 坐标偏移y);
     }
 
-    private static SimpleColor 获取d6左下角颜色(in byte[] bts, Size size)
+    private static Color 获取r6左下角颜色(in byte[] bts, Size size)
     {
-        return GetSPixelBytes(bts, size, 931 - 截图模式1X, 994 - 截图模式1Y);
+        return GetPixelBytes(bts, size, 1047 - 坐标偏移x, 994 - 坐标偏移y);
     }
 
-    private static SimpleColor 获取f6颜色(in byte[] bts, Size size)
+    private static Color 获取d5颜色(in byte[] bts, Size size)
     {
-        return GetSPixelBytes(bts, size, 1013 - 截图模式1X, 956 - 截图模式1Y);
+        return GetPixelBytes(bts, size, 985 - 坐标偏移x, 956 - 坐标偏移y);
     }
 
-    private static SimpleColor 获取f6左下角颜色(in byte[] bts, Size size)
+    private static Color 获取d5左下角颜色(in byte[] bts, Size size)
     {
-        return GetSPixelBytes(bts, size, 989 - 截图模式1X, 994 - 截图模式1Y);
+        return GetPixelBytes(bts, size, 961 - 坐标偏移x, 994 - 坐标偏移y);
+    }
+
+    private static Color 获取d6颜色(in byte[] bts, Size size)
+    {
+        return GetPixelBytes(bts, size, 955 - 坐标偏移x, 956 - 坐标偏移y);
+    }
+
+    private static Color 获取d6左下角颜色(in byte[] bts, Size size)
+    {
+        return GetPixelBytes(bts, size, 931 - 坐标偏移x, 994 - 坐标偏移y);
+    }
+
+    private static Color 获取f6颜色(in byte[] bts, Size size)
+    {
+        return GetPixelBytes(bts, size, 1013 - 坐标偏移x, 956 - 坐标偏移y);
+    }
+
+    private static Color 获取f6左下角颜色(in byte[] bts, Size size)
+    {
+        return GetPixelBytes(bts, size, 989 - 坐标偏移x, 994 - 坐标偏移y);
+    }
+
+    private static Color 获取旗子4颜色(in byte[] bts, Size size)
+    {
+        return GetPixelBytes(bts, size, 1215 - 坐标偏移x, 906 - 坐标偏移y);
+    }
+
+    private static Color 获取旗子5颜色(in byte[] bts, Size size)
+    {
+        return GetPixelBytes(bts, size, 1222 - 坐标偏移x, 906 - 坐标偏移y);
+    }
+
+    private static Color 获取旗子6颜色(in byte[] bts, Size size)
+    {
+        return GetPixelBytes(bts, size, 1250 - 坐标偏移x, 906 - 坐标偏移y);
     }
 
     #endregion
@@ -10629,6 +12130,22 @@ public partial class Form2 : Form
     #endregion
 
     #region 其他
+
+    #endregion
+
+    #region 攻速更改
+
+    private void Tb_攻速_TextChanged(object sender, EventArgs e)
+    {
+        try
+        {
+            _攻击速度 = Convert.ToDouble(tb_攻速.Text);
+        }
+        catch
+        {
+            _攻击速度 = 100.0;
+        }
+    }
 
     #endregion
 
@@ -10691,14 +12208,18 @@ public partial class Form2 : Form
         // 338 987 只显示四行
         // 设置窗口位置
         Location = new Point(338, 987);
+        Width = 136;
 
         if (tb_name.Text.Trim() == "测试")
         {
+            // 797 基本显示完全
             Location = new Point(338, 797);
-            label3.Text = "模式例:q4";
-            label7.Text = "超时时间";
+            lb_下装备.Text = "模式例:q4";
+            lb_状态抗性.Text = "超时时间";
             tb_丢装备.Text = "q4";
             tb_状态抗性.Text = "2000";
+            label6.Text = "颜色";
+            tb_delay.Text = "";
         }
 
 
@@ -10710,11 +12231,15 @@ public partial class Form2 : Form
         // 用于文字识别
         初始化PaddleOcr();
 
-        Run(() =>
-        {
-            _总开关条件 = !_总开关条件;
-            TTS.Speak(_总开关条件 ? "开启功能" : "关闭功能");
-        });
+        //Run(() =>
+        //{
+        //    _总开关条件 = !_总开关条件;
+        //    TTS.Speak(_总开关条件 ? "开启功能" : "关闭功能");
+        //});
+
+        技能4CD颜色 = Color.FromArgb(65, 74, 81);
+        技能56CD颜色 = Color.FromArgb(45, 52, 59);
+        技能56状态颜色 = Color.FromArgb(0, 129, 0);
 
         return i;
     }
@@ -10726,7 +12251,7 @@ public partial class Form2 : Form
         //服务器中英文模型
         var config = new OCRModelConfig();
         var root = Environment.CurrentDirectory;
-        var modelPathroot = root + @"\inference1";
+        var modelPathroot = root + @"\inference";
         config.det_infer = modelPathroot + @"\ch_PP-OCRv3_det_infer";
         config.cls_infer = modelPathroot + @"\ch_ppocr_mobile_v2.0_cls_infer";
         config.rec_infer = modelPathroot + @"\ch_PP-OCRv3_rec_infer";
@@ -10737,9 +12262,9 @@ public partial class Form2 : Form
         var oCRParameter = new OCRParameter
         {
             numThread = 6, //预测并发线程数
-            Enable_mkldnn = 1, //web部署该值建议设置为0,否则出错，内存如果使用很大，建议该值也设置为0.
-            use_angle_cls = 1, //是否开启方向检测，用于检测识别180旋转
-            det_db_score_mode = 1 //是否使用多段线，即文字区域是用多段线还是用矩形，
+            Enable_mkldnn = 0, //web部署该值建议设置为0,否则出错，内存如果使用很大，建议该值也设置为0.
+            use_angle_cls = 0, //是否开启方向检测，用于检测识别180旋转
+            det_db_score_mode = 0 //是否使用多段线，即文字区域是用多段线还是用矩形，
         };
 
         //建议程序全局初始化一次即可，不必每次识别都初始化，容易报错。  
@@ -10784,30 +12309,32 @@ public partial class Form2 : Form
     #region 模拟按键
 
     /// <summary>
-    ///     单个耗时 0.8-1ms
+    ///     单个耗时 16ms、对比其他功能时间是很长。原API和现API区别不大
     /// </summary>
     private static void RightClick()
     {
-        //SimEnigo.Rightlick();
-        KeyboardMouseSimulateDriverAPI.MouseDown((uint)Dota2Simulator.MouseButtons.RightDown);
-        KeyboardMouseSimulateDriverAPI.MouseUp((uint)Dota2Simulator.MouseButtons.RightUp);
+        SimEnigo.Rightlick();
+        //KeyboardMouseSimulateDriverAPI.MouseDown((uint)Dota2Simulator.MouseButtons.RightDown);
+        //KeyboardMouseSimulateDriverAPI.MouseUp((uint)Dota2Simulator.MouseButtons.RightUp);
     }
 
     private static void LeftClick()
     {
-        //SimEnigo.LeftClick();
-        KeyboardMouseSimulateDriverAPI.MouseDown((uint)Dota2Simulator.MouseButtons.LeftDown);
-        KeyboardMouseSimulateDriverAPI.MouseUp((uint)Dota2Simulator.MouseButtons.LeftUp);
+        SimEnigo.LeftClick();
+        //KeyboardMouseSimulateDriverAPI.MouseDown((uint)Dota2Simulator.MouseButtons.LeftDown);
+        //KeyboardMouseSimulateDriverAPI.MouseUp((uint)Dota2Simulator.MouseButtons.LeftUp);
     }
 
     private static void LeftDown()
     {
-        KeyboardMouseSimulateDriverAPI.MouseDown((uint)Dota2Simulator.MouseButtons.LeftDown);
+        SimEnigo.LeftDown();
+        //KeyboardMouseSimulateDriverAPI.MouseDown((uint)Dota2Simulator.MouseButtons.LeftDown);
     }
 
     private static void LeftUp()
     {
-        KeyboardMouseSimulateDriverAPI.MouseDown((uint)Dota2Simulator.MouseButtons.LeftUp);
+        SimEnigo.RightDown();
+        //KeyboardMouseSimulateDriverAPI.MouseDown((uint)Dota2Simulator.MouseButtons.LeftUp);
     }
 
     //private new static void KeyUp(uint key)
@@ -10953,4 +12480,5 @@ public partial class Form2 : Form
     //KeyboardMouseSimulateDriverAPI.KeyUp((uint)Keys.Space);
 
     #endregion
+
 }

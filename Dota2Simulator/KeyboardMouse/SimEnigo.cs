@@ -29,5 +29,11 @@ public class SimEnigo
     public static extern void LeftClick();
 
     [DllImport("simengio.dll")]
+    public static extern void LeftDown();
+
+    [DllImport("simengio.dll")]
     public static extern void Rightlick();
+
+    [DllImport("simengio.dll")]
+    public static extern void RightDown();
 }
