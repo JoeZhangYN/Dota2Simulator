@@ -12,32 +12,13 @@ using Xamarin.Essentials;
 using OpenCvSharp;
 using Point = System.Drawing.Point;
 using Size = System.Drawing.Size;
+using System.Runtime.CompilerServices;
 
 namespace Dota2Simulator.PictureProcessing;
-
-[StructLayout(LayoutKind.Sequential)]
-struct IntTupleSize
-{
-    public uint x;
-    public uint y;
-
-    public static implicit operator Tuple<uint, uint>(IntTupleSize t)
-    {
-        return Tuple.Create(t.x, t.y);
-    }
-
-    public static implicit operator IntTupleSize(Tuple<uint, uint> t)
-    {
-        return new IntTupleSize { x = t.Item1, y = t.Item2 };
-    }
-}
 
 /// <summary>
 ///     图片处理类
 /// </summary>
-///
-///
-
 public class PictureProcessing
 {
     #region 图片处理
@@ -53,26 +34,6 @@ public class PictureProcessing
 
     [DllImport("rscaptrs.dll")]
     public static extern IEnumerable<Bgr8> GetColor(uint i);
-
-    [DllImport("rscaptrs.dll")]
-    public static extern IntTuple GetSize();
-
-    [StructLayout(LayoutKind.Sequential)]
-    public struct IntTuple
-    {
-        private uint x;
-        private uint y;
-
-        public static implicit operator Tuple<uint, uint>(IntTuple t)
-        {
-            return Tuple.Create(t.x, t.y);
-        }
-
-        public static implicit operator IntTuple(Tuple<uint, uint> t)
-        {
-            return new IntTuple { x = t.Item1, y = t.Item2 };
-        }
-    };
 
     /// <summary>
     ///     屏幕截图，单操作耗时6.251ms，能一次解决的不要并行（因为有锁，基本时间是翻倍的）
@@ -320,13 +281,79 @@ public class PictureProcessing
     #region 找图
 
     [DllImport("findpoints.dll")]
-    private static extern IntTupleSize FindBytesRust(byte[] n1, UIntPtr len1, IntTupleSize t1, byte[] n2,
-        UIntPtr len2, IntTupleSize t2, double matchRate);
+    private static extern Tuple FindBytesRust(
+        byte[] n1,
+        UIntPtr len1,
+        Tuple t1,
+        byte[] n2,
+        UIntPtr len2,
+        Tuple t2,
+        double matchRate
+    );
 
-    public static Tuple<uint, uint> FindBytesR(byte[] n1, UIntPtr len1, Tuple<uint, uint> t1, byte[] n2,
-        UIntPtr len2, Tuple<uint, uint> t2, double matchRate)
+    [DllImport("findpoints.dll")]
+    public static extern MatchResults FindBytesRusts(
+        byte[] n1,
+        UIntPtr len1,
+        Tuple tup1,
+        byte[] n2,
+        UIntPtr len2,
+        Tuple tup2,
+        double match_rate
+    );
+
+    [DllImport("findpoints.dll")]
+    public static extern void free_matches(IntPtr matches, UIntPtr len);
+
+    [StructLayout(LayoutKind.Sequential)]
+    public struct Tuple
+    {
+        public uint x;
+        public uint y;
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    public struct MatchResult
+    {
+        public uint x;
+        public uint y;
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    public struct MatchResults
+    {
+        public UIntPtr count;
+        public IntPtr results;
+    }
+
+    public static Tuple FindBytesR(byte[] n1, UIntPtr len1, Tuple t1, byte[] n2,
+        UIntPtr len2, Tuple t2, double matchRate)
     {
         return FindBytesRust(n1, len1, t1, n2, len2, t2, matchRate);
+    }
+
+    public static MatchResult[] FindBytesRs(byte[] n1, UIntPtr len1, Tuple t1, byte[] n2,
+        UIntPtr len2, Tuple t2, double matchRate)
+    {
+        // 调用FindBytesRust函数并获取MatchResults结构体
+        MatchResults matchResults = FindBytesRusts(n1, len1, t1, n2, len2, t2, matchRate);
+
+        // 将指针转换为MatchResult数组
+        int matchesCount = (int)matchResults.count;
+        MatchResult[] matches = new MatchResult[matchesCount];
+
+        for (int i = 0; i < matchesCount; i++)
+        {
+            matches[i] = Marshal.PtrToStructure<MatchResult>(matchResults.results + i * Marshal.SizeOf<MatchResult>());
+        }
+
+        // 使用结果
+        // ...
+
+        // 释放Rust端分配的内存
+        free_matches(matchResults.results, matchResults.count);
+
+        return matches;
     }
 
     /// <summary>

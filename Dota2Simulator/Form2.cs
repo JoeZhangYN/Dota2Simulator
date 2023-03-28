@@ -11,9 +11,6 @@ using Collections.Pooled;
 using Dota2Simulator.KeyboardMouse;
 using NeoSmart.AsyncLock;
 using PaddleOCRSharp;
-using SharpDX.Direct3D11;
-using WindowsHook;
-using Xamarin.Essentials;
 using static Dota2Simulator.Picture_Dota2.Resource_Picture;
 using static Dota2Simulator.PictureProcessing.PictureProcessing;
 using static Dota2Simulator.SetWindowTop;
@@ -21,7 +18,7 @@ using static System.Threading.Tasks.Task;
 using Clipboard = System.Windows.Forms.Clipboard;
 using KeyEventArgs = System.Windows.Forms.KeyEventArgs;
 using Keys = System.Windows.Forms.Keys;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.TaskbarClock;
+using Tuple = Dota2Simulator.PictureProcessing.PictureProcessing.Tuple;
 
 // WindowsHook.KeyEventArgs
 // WindowsHook.KeyEventHandler
@@ -2024,7 +2021,7 @@ public partial class Form2 : Form
                             _条件假腿敏捷 = true;
                             TTS.Speak("切敏捷");
                             break;
-                        case Keys.D8:
+                        case Keys.D4:
                             switch (_条件开启切假腿)
                             {
                                 case true:
@@ -2151,17 +2148,23 @@ public partial class Form2 : Form
                             switch (_全局模式)
                             {
                                 case 0:
-                                    _条件开启切假腿 = false;
-                                    _条件保持假腿 = false;
-                                    await 切智力腿(_技能数量);
-                                    _全局模式 = 1;
-                                    TTS.Speak("开启冰箭");
+                                    if (_条件开启切假腿)
+                                    {
+                                        _条件保持假腿 = false;
+                                        await 切智力腿(_技能数量);
+                                        _全局模式 = 1;
+                                        TTS.Speak("开启冰箭");
+                                    }
+
                                     break;
                                 default:
-                                    _条件开启切假腿 = true;
-                                    _条件保持假腿 = true;
-                                    _全局模式 = 0;
-                                    TTS.Speak("关闭冰箭");
+                                    if (_条件开启切假腿)
+                                    {
+                                        _条件保持假腿 = true;
+                                        _全局模式 = 0;
+                                        TTS.Speak("关闭冰箭");
+                                    }
+
                                     break;
                             }
 
@@ -2184,23 +2187,6 @@ public partial class Form2 : Form
                             }
 
                             _条件2 = true;
-                            break;
-                        case Keys.D2:
-                            if (RegPicture(物品_疯狂面具, _全局bts, _全局size))
-                            {
-                                TTS.Speak("发现疯脸");
-                                _条件保持假腿 = false;
-                                await 切智力腿(_技能数量);
-                            }
-
-                            if (根据图片以及类别使用物品(物品_疯狂面具, _全局bts, _全局size))
-                            {
-                                _条件假腿敏捷 = true;
-                                _条件保持假腿 = true;
-                                _条件开启切假腿 = true;
-                                KeyPress((uint)Keys.A);
-                            }
-
                             break;
                         case Keys.D3 when _条件假腿敏捷:
                             _条件假腿敏捷 = false;
@@ -2705,6 +2691,7 @@ public partial class Form2 : Form
                             break;
                         case Keys.E:
                             初始化全局时间(ref _全局时间e);
+                            根据图片以及类别使用物品(物品_勇气勋章, _全局bts, _全局size, _技能数量);
                             if (!RegPicture(物品_暗影护符buff, _全局bts, _全局size)) 根据图片以及类别自我使用物品(物品_暗影护符, _全局bts, _全局size, _技能数量);
                             _条件5 = true;
                             break;
@@ -3697,11 +3684,6 @@ public partial class Form2 : Form
     #region 循环用到
 
     /// <summary>
-    ///     图片写入异步锁
-    /// </summary>
-    private static readonly AsyncLock _图片写入AsyncLock = new();
-
-    /// <summary>
     ///     循环条件
     /// </summary>
     private static bool _总循环条件;
@@ -3731,10 +3713,10 @@ public partial class Form2 : Form
     /// </summary>
     private static byte[] _全局bts;
 
-    /// <summary>
-    ///     全局假腿图像
-    /// </summary>
-    private static Bitmap _全局假腿图像;
+    ///// <summary>
+    /////     全局假腿图像
+    ///// </summary>
+    //private static Bitmap _全局假腿图像;
 
     /// <summary>
     ///     全局假腿bytes
@@ -3882,7 +3864,9 @@ public partial class Form2 : Form
     /// <summary>
     ///     条件走A
     /// </summary>
+#pragma warning disable CS0414 // 字段“Form2._循环走a”已被赋值，但从未使用过它的值
     private static bool _循环走a;
+#pragma warning restore CS0414 // 字段“Form2._循环走a”已被赋值，但从未使用过它的值
 
     /// <summary>
     ///     技能数量
@@ -3907,7 +3891,9 @@ public partial class Form2 : Form
     /// <summary>
     ///     基础额外攻速
     /// </summary>
+#pragma warning disable CS0414 // 字段“Form2._基础额外攻速”已被赋值，但从未使用过它的值
     private static double _基础额外攻速 = 1;
+#pragma warning restore CS0414 // 字段“Form2._基础额外攻速”已被赋值，但从未使用过它的值
 
     /// <summary>
     ///     攻击速度
@@ -3922,7 +3908,9 @@ public partial class Form2 : Form
     /// <summary>
     ///     能量转移
     /// </summary>
+#pragma warning disable CS0414 // 字段“Form2.能量转移被动计数”已被赋值，但从未使用过它的值
     private static int 能量转移被动计数 = 0;
+#pragma warning restore CS0414 // 字段“Form2.能量转移被动计数”已被赋值，但从未使用过它的值
 
     /// <summary>
     ///     状态抗性
@@ -3953,10 +3941,10 @@ public partial class Form2 : Form
     ///// </summary>
     //private KeyEventHandler _myKeyEventHandeler; //按键钩子
 
-    /// <summary>
-    ///     用于捕捉案件
-    /// </summary>
-    private IKeyboardMouseEvents _mGlobalHook = Hook.GlobalEvents();
+    ///// <summary>
+    /////     用于捕捉按键
+    ///// </summary>
+    //private IKeyboardMouseEvents _mGlobalHook = Hook.GlobalEvents();
 
     /// <summary>
     /// </summary>
@@ -6641,7 +6629,7 @@ public partial class Form2 : Form
 
     private static async Task<bool> 鬼影重重去后摇(byte[] bts, Size size)
     {
-        static void 鬼影重重后(byte[] bts, Size size)
+        static void 鬼影重重后()
         {
             _全局时间r = -1;
             _条件保持假腿 = true;
@@ -6651,7 +6639,7 @@ public partial class Form2 : Form
         // 超时则切回 总体释放时间
         if (获取当前时间毫秒() - _全局时间r > 1200 && _全局时间r != -1)
         {
-            鬼影重重后(bts, size);
+            鬼影重重后();
             return await FromResult(false);
         }
 
@@ -6661,7 +6649,7 @@ public partial class Form2 : Form
         if (ColorAEqualColorB(r6, 技能56CD颜色, 0) ||
             ColorAEqualColorB(r5, 技能56CD颜色, 0)) return await FromResult(true);
 
-        鬼影重重后(bts, size);
+        鬼影重重后();
         return await FromResult(false);
     }
 
@@ -6869,7 +6857,7 @@ public partial class Form2 : Form
     {
         static async Task 狂风后()
         {
-            // RightClick();
+            RightClick();
             KeyPress((uint)Keys.A);
 
             switch (_全局模式)
@@ -6877,13 +6865,17 @@ public partial class Form2 : Form
                 case 1:
                     if (_条件开启切假腿)
                     {
-                        _条件开启切假腿 = false;
+                        _条件保持假腿 = false;
                         await 切智力腿(_技能数量);
                     }
 
                     break;
                 default:
-                    _条件保持假腿 = true;
+                    if (_条件开启切假腿)
+                    {
+                        _条件保持假腿 = true;
+                    }
+
                     break;
             }
         }
@@ -6901,8 +6893,8 @@ public partial class Form2 : Form
         static async Task 数箭齐发后(byte[] bts1, Size size)
         {
             Delay(_全局模式e == 1 ? 2600 : 1300);
-            // RightClick();
             KeyPress((uint)Keys.S);
+            RightClick();
             KeyPress((uint)Keys.A);
 
             switch (_全局模式)
@@ -6910,12 +6902,15 @@ public partial class Form2 : Form
                 case 1:
                     if (_条件开启切假腿)
                     {
-                        _条件开启切假腿 = false;
+                        _条件保持假腿 = false;
                         await 切智力腿(_技能数量);
                     }
                     break;
                 default:
-                    _条件保持假腿 = true;
+                    if (_条件开启切假腿)
+                    {
+                        _条件保持假腿 = true;
+                    }
                     break;
             }
         }
@@ -9830,11 +9825,14 @@ public partial class Form2 : Form
         //图像 = await CaptureScreenAsync(left_x, top_y, 图像.Size);
         //_全局假腿bts = await GetBitmapByteAsync(图像);
 
+        //_全局假腿size = new Size(截图模式1W, 截图模式1H);
+        //_全局假腿bts ??= new byte[截图模式1W * 截图模式1H * 4];
+        //_全局假腿图像 ??= new Bitmap(截图模式1W, 截图模式1H);
+        //CaptureScreen_固定大小(ref _全局假腿图像, 截图模式1X, 截图模式1Y);
+        //GetBitmapByte_固定数组(in _全局假腿图像, ref _全局假腿bts);
+
         _全局假腿size = new Size(截图模式1W, 截图模式1H);
-        _全局假腿bts ??= new byte[截图模式1W * 截图模式1H * 4];
-        _全局假腿图像 ??= new Bitmap(截图模式1W, 截图模式1H);
-        CaptureScreen_固定大小(ref _全局假腿图像, 截图模式1X, 截图模式1Y);
-        GetBitmapByte_固定数组(in _全局假腿图像, ref _全局假腿bts);
+        _全局假腿bts = _全局bts;
 
         await Task.Delay(0);
     }
@@ -10216,7 +10214,7 @@ public partial class Form2 : Form
         //list.Dispose();
         //return await FromResult(true);
 
-        var p = RegPicturePointR(bp, bts, size);
+        var p = RegPicturePointR(bp, bts, size, matchRate);
         if (p.X + p.Y <= 0) return false;
         根据物品位置按键(p, mode);
         return true;
@@ -11217,9 +11215,9 @@ public partial class Form2 : Form
             var bts1 = GetBitmapByte(bp);
             UIntPtr binr = (nuint)bts.Length;
             UIntPtr binr1 = (nuint)bts1.Length;
-            var t = FindBytesR(bts, binr, Tuple.Create((uint)size.Width, (uint)size.Height), bts1, binr1,
-                Tuple.Create((uint)bp.Size.Width, (uint)bp.Size.Height), 0.8);
-            return new Point((int)t.Item1, (int)t.Item2);
+            var t = FindBytesR(bts, binr, new Tuple { x = (uint)size.Width, y = (uint)size.Height }, bts1, binr1,
+                new Tuple { x = (uint)bp.Width, y = (uint)bp.Height }, matchRate);
+            return new Point((int)t.x, (int)t.y);
         }
         catch
         {
@@ -12264,10 +12262,10 @@ public partial class Form2 : Form
 
         var oCRParameter = new OCRParameter
         {
-            numThread = 6, //预测并发线程数
-            Enable_mkldnn = 0, //web部署该值建议设置为0,否则出错，内存如果使用很大，建议该值也设置为0.
-            use_angle_cls = 0, //是否开启方向检测，用于检测识别180旋转
-            det_db_score_mode = 0 //是否使用多段线，即文字区域是用多段线还是用矩形，
+            numThread = 12, //预测并发线程数
+            Enable_mkldnn = true, //web部署该值建议设置为0,否则出错，内存如果使用很大，建议该值也设置为0.
+            use_angle_cls = false, //是否开启方向检测，用于检测识别180旋转
+            det_db_score_mode = false //是否使用多段线，即文字区域是用多段线还是用矩形，
         };
 
         //建议程序全局初始化一次即可，不必每次识别都初始化，容易报错。  
