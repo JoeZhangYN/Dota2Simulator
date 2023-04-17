@@ -780,6 +780,34 @@ public class PictureProcessing
 
     #region 颜色对比
 
+    [StructLayout(LayoutKind.Sequential)]
+    public struct Rgba
+    {
+        public byte R;
+        public byte G;
+        public byte B;
+        public byte A;
+    }
+
+    [DllImport("findpoints.dll", CallingConvention = CallingConvention.Cdecl)]
+    public static extern bool color_a_equal_color_b(
+        in Rgba colorA,
+        in Rgba colorB,
+        int errorRange
+    );
+
+    [DllImport("findpoints.dll", CallingConvention = CallingConvention.Cdecl)]
+    public static extern bool color_a_equal_color_b_rgb(
+        in Rgba colorA,
+        in Rgba colorB,
+        int error_r,
+        int error_g,
+        int error_b
+    );
+
+    [DllImport("findpoints.dll", CallingConvention = CallingConvention.Cdecl)]
+    public static extern Rgba rgba_new(byte r, byte g, byte b, byte a);
+
     /// <summary>
     ///     颜色对比
     /// </summary>
@@ -789,18 +817,24 @@ public class PictureProcessing
     /// <returns></returns>
     public static bool ColorAEqualColorB(in Color colorA, in Color colorB, byte errorRange = 10)
     {
-        return //Math.Abs(colorA.A - colorB.A) <= errorRange &&
-            Math.Abs(colorA.R - colorB.R) <= errorRange &&
-            Math.Abs(colorA.G - colorB.G) <= errorRange &&
-            Math.Abs(colorA.B - colorB.B) <= errorRange;
+        var a = rgba_new(colorA.R, colorA.G, colorA.B, colorA.A);
+        var b = rgba_new(colorB.R, colorB.G, colorB.B, colorB.A);
+        return color_a_equal_color_b(a, b, errorRange);
+        //return //Math.Abs(colorA.A - colorB.A) <= errorRange &&
+        //    Math.Abs(colorA.R - colorB.R) <= errorRange &&
+        //    Math.Abs(colorA.G - colorB.G) <= errorRange &&
+        //    Math.Abs(colorA.B - colorB.B) <= errorRange;
     }
 
     public static bool ColorAEqualColorB(in Color colorA, in Color colorB, byte errorR, byte errorG, byte errorB)
     {
-        return //Math.Abs(colorA.A - colorB.A) <= errorRange &&
-            Math.Abs(colorA.R - colorB.R) <= errorR &&
-            Math.Abs(colorA.G - colorB.G) <= errorG &&
-            Math.Abs(colorA.B - colorB.B) <= errorB;
+        var a = rgba_new(colorA.R, colorA.G, colorA.B, colorA.A);
+        var b = rgba_new(colorB.R, colorB.G, colorB.B, colorB.A);
+        return color_a_equal_color_b_rgb(a, b, errorR, errorG, errorB);
+        //    return //Math.Abs(colorA.A - colorB.A) <= errorRange &&
+        //        Math.Abs(colorA.R - colorB.R) <= errorR &&
+        //        Math.Abs(colorA.G - colorB.G) <= errorG &&
+        //        Math.Abs(colorA.B - colorB.B) <= errorB;
     }
 
     #endregion
@@ -914,11 +948,6 @@ public class PictureProcessing
 
     #endregion
 
-    public static string FormatColor(Color c)
-    {
-        return string.Concat(c.R.ToString(), ",", c.G.ToString(), ",", c.B.ToString());
-    }
-
     #endregion
 
     #region 减少图片大小对比
@@ -948,7 +977,7 @@ public class PictureProcessing
     private static Bitmap ReduceSize(Bitmap bitMap, int width = 8, int height = 8)
     {
         Image img = bitMap;
-        return (Bitmap)img.GetThumbnailImage(width, height, () => { return false; }, IntPtr.Zero);
+        return (Bitmap)img.GetThumbnailImage(width, height, () => false, IntPtr.Zero);
     }
 
     // Step 2 : Reduce Color
