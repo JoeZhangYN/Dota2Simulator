@@ -159,6 +159,7 @@ public partial class Form2 : Form
                         _条件根据图片委托1 ??= 决斗;
                         _条件根据图片委托2 ??= 强攻去后摇;
                         _总循环条件 = true;
+                        _指定地点e = new Point(-1, -1);
                         await 无物品状态初始化().ConfigureAwait(false);
                     }
 
@@ -4505,6 +4506,9 @@ public partial class Form2 : Form
                         Delay(等待延迟);
                         return 获取当前时间毫秒() - _全局时间 <= 450 ? await FromResult(true) : await FromResult(false);
                     }
+
+
+                    _指定地点e = new Point(-1, -1);
 
                     _全局步骤 = 5;
                     return await FromResult(false);
