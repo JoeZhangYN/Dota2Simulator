@@ -20,6 +20,7 @@ using KeyEventArgs = System.Windows.Forms.KeyEventArgs;
 using Keys = System.Windows.Forms.Keys;
 using Tuple = Dota2Simulator.PictureProcessing.PictureProcessing.Tuple;
 using System.Drawing.Imaging;
+using Dota2Simulator.Resources;
 
 // WindowsHook.KeyEventArgs
 // WindowsHook.KeyEventHandler
@@ -3670,6 +3671,13 @@ public partial class Form2 : Form
                             break;
                         case Keys.D3:
                             await Run(测试方法);
+                            break;
+                        case Keys.D4:
+                            _全局模式d = 1;
+                            await Run(吃药);
+                            break;
+                        case Keys.D5:
+                            _全局模式d = 0;
                             break;
                             //case Keys.D1:
                             //    await Run(async () =>
@@ -11995,6 +12003,21 @@ public partial class Form2 : Form
         tb_攻速.Text = string.Concat(获取当前时间毫秒() - time1);
 
         await Task.Delay(0);
+    }
+
+    private async Task 吃药()
+    {
+        for (int i = 0; i < 2000; i++)
+        {
+            MouseMove(3181,568);
+            LeftClick();
+            Delay(50);
+            MouseMove(2249, 1569);
+            LeftClick();
+            Delay(50);
+            if (_全局模式d == 0)
+                return;
+        }
     }
 
     private async Task 捕捉颜色()

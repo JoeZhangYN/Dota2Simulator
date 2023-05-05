@@ -124,7 +124,13 @@
   <data name="最后一张" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>最后一张.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="确定" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>确定.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
   <data name="红心" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>红心.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="药" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>药.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
 </root>
