@@ -33,11 +33,11 @@
     <PackageReference Include="OpenCvSharp4" Version="4.7.0.20230115" />
     <PackageReference Include="OpenCvSharp4.Extensions" Version="4.7.0.20230115" />
     <PackageReference Include="OpenCvSharp4.runtime.win" Version="4.7.0.20230115" />
-    <PackageReference Include="PaddleOCRSharp" Version="2.3.0" />
+    <PackageReference Include="PaddleOCRSharp" Version="3.1.0" />
     <PackageReference Include="SharpDX.Direct3D11" Version="4.2.0" />
-    <PackageReference Include="System.Speech" Version="8.0.0-preview.2.23128.3" />
+    <PackageReference Include="System.Speech" Version="8.0.0-preview.4.23259.5" />
     <PackageReference Include="WindowsHook" Version="1.0.1" />
-    <PackageReference Include="Xamarin.Essentials" Version="1.7.5" />
+    <PackageReference Include="Xamarin.Essentials" Version="1.8.0-preview1" />
   </ItemGroup>
 
   <ItemGroup>
@@ -84,36 +84,6 @@
     </None>
     <None Update="findpoints.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="inference1\ch_PP-OCRv3_det_infer\inference.pdiparams">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="inference1\ch_PP-OCRv3_det_infer\inference.pdiparams.info">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="inference1\ch_PP-OCRv3_det_infer\inference.pdmodel">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="inference1\ch_PP-OCRv3_rec_infer\inference.pdiparams">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="inference1\ch_PP-OCRv3_rec_infer\inference.pdiparams.info">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="inference1\ch_PP-OCRv3_rec_infer\inference.pdmodel">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="inference1\ch_ppocr_mobile_v2.0_cls_infer\inference.pdiparams">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="inference1\ch_ppocr_mobile_v2.0_cls_infer\inference.pdiparams.info">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="inference1\ch_ppocr_mobile_v2.0_cls_infer\inference.pdmodel">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="inference1\ppocr_keys.txt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="KeyboardMouseSimulateDriver.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
