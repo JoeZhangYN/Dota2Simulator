@@ -18,6 +18,7 @@ using Clipboard = System.Windows.Forms.Clipboard;
 using KeyEventArgs = System.Windows.Forms.KeyEventArgs;
 using Keys = System.Windows.Forms.Keys;
 using Tuple = Dota2Simulator.PictureProcessing.PictureProcessing.Tuple;
+using System.Collections.Generic;
 
 // WindowsHook.KeyEventArgs
 // WindowsHook.KeyEventHandler
@@ -9829,13 +9830,14 @@ public partial class Form2 : Form
     private static bool 是否自己的单位(in byte[] bts, Size size)
     {
         var 旗子颜色4 = Color.FromArgb(239, 176, 104);
-        var 旗子颜色56 = Color.FromArgb(232, 155, 91);
+        var 旗子颜色567 = Color.FromArgb(232, 155, 91);
 
         return _技能数量 switch
         {
             4 => 获取旗子4颜色(bts, size).Equals(旗子颜色4),
-            5 => 获取旗子5颜色(bts, size).Equals(旗子颜色56),
-            6 => 获取旗子6颜色(bts, size).Equals(旗子颜色56),
+            5 => 获取旗子5颜色(bts, size).Equals(旗子颜色567),
+            6 => 获取旗子6颜色(bts, size).Equals(旗子颜色567),
+            7 => 获取旗子7颜色(bts, size).Equals(旗子颜色567),
             _ => false
         };
     }
@@ -9883,38 +9885,23 @@ public partial class Form2 : Form
                     if (_条件9 && _条件根据图片委托9 is not null)
                         await Run(async () => { _条件9 = await _条件根据图片委托9(_全局bts, _全局size); }).ConfigureAwait(false);
 
-                    switch (_条件保持假腿)
+                    if (_条件保持假腿 && _条件开启切假腿)
                     {
-                        case true when _条件开启切假腿:
+                        Bitmap targetLeg = _条件假腿敏捷 ? 物品_假腿_敏捷腿 : 物品_假腿_力量腿;
+                        Func<byte[], Size, int, Task> switchLegFunc = _条件假腿敏捷 ? 切敏捷腿 : 切力量腿;
+
+                        await Run(async () =>
+                        {
+                            if (RegPicture(targetLeg, _全局bts, _全局size)) return;
+                            if (_切假腿中) return;
+                            _切假腿中 = true;
+                            await switchLegFunc(_全局bts, _全局size, _技能数量);
+                            await Run(() =>
                             {
-                                if (_条件假腿敏捷)
-                                    await Run(async () =>
-                                    {
-                                        if (RegPicture(物品_假腿_敏捷腿, _全局bts, _全局size)) return;
-                                        if (_切假腿中) return;
-                                        _切假腿中 = true;
-                                        await 切敏捷腿(_全局bts, _全局size, _技能数量);
-                                        await Run(() =>
-                                        {
-                                            Delay(250);
-                                            _切假腿中 = false;
-                                        }).ConfigureAwait(false);
-                                    }).ConfigureAwait(false);
-                                else
-                                    await Run(async () =>
-                                    {
-                                        if (RegPicture(物品_假腿_力量腿, _全局bts, _全局size)) return;
-                                        if (_切假腿中) return;
-                                        _切假腿中 = true;
-                                        await 切力量腿(_全局bts, _全局size, _技能数量);
-                                        await Run(() =>
-                                        {
-                                            Delay(250);
-                                            _切假腿中 = false;
-                                        }).ConfigureAwait(false);
-                                    }).ConfigureAwait(false);
-                                break;
-                            }
+                                Delay(250);
+                                _切假腿中 = false;
+                            }).ConfigureAwait(false);
+                        }).ConfigureAwait(false);
                     }
                 }
 
@@ -12548,6 +12535,11 @@ public partial class Form2 : Form
     private static Color 获取旗子6颜色(in byte[] bts, Size size)
     {
         return GetPixelBytes(bts, size, 1250 - 坐标偏移x, 906 - 坐标偏移y);
+    }
+
+    private static Color 获取旗子7颜色(in byte[] bts, Size size)
+    {
+        return GetPixelBytes(bts, size, 1280 - 坐标偏移x, 906 - 坐标偏移y);
     }
 
     #endregion
