@@ -3978,7 +3978,7 @@ internal partial class Form2 : Form
         //await Run(捕捉颜色);
         //await Run(HF2_补给);
         long a = 获取当前时间毫秒();
-        string str = PaddleOcr.获取图片文字(198, 807, 600, 50);
+        string str = PaddleOcr.获取图片文字(399, 1153, 899, 417);
         _ = MessageBox.Show(str + "耗时:" + (获取当前时间毫秒() - a));
 
         await Run(() => { Delay(1); }).ConfigureAwait(true);
@@ -9116,7 +9116,7 @@ internal partial class Form2 : Form
     private static void 获取时间塔防()
     {
         using Bitmap bp = CaptureScreen(930, 21, 58, 16);
-        string str = PaddleOcr.获取图片文字(GetBitmapByte(bp));
+        string str = PaddleOcr.获取图片文字(bp);
         str = string.Concat("塔防刷新", str.Replace("：", ":"));
         Delay(500);
         快速发言(str);

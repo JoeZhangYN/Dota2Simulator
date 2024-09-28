@@ -311,7 +311,7 @@ internal class PictureProcessing
     #region 找图
 
     [StructLayout(LayoutKind.Sequential)]
-    internal struct Tuple
+    public struct Tuple
     {
         public uint x;
         public uint y;
@@ -319,10 +319,10 @@ internal class PictureProcessing
 
     [DllImport("findpoints.dll")]
     private static extern Tuple FindBytesRust(
-        byte[] n1,
+        [In] byte[] n1,
         UIntPtr len1,
         Tuple t1,
-        byte[] n2,
+        [In] byte[] n2,
         UIntPtr len2,
         Tuple t2,
         double matchRate,
@@ -333,10 +333,10 @@ internal class PictureProcessing
 
     [DllImport("findpoints.dll")]
     private static extern Tuple FindBytesTolerance(
-        byte[] n1,
+        [In] byte[] n1,
         UIntPtr len1,
         Tuple t1,
-        byte[] n2,
+        [In] byte[] n2,
         UIntPtr len2,
         Tuple t2,
         double matchRate,
@@ -353,9 +353,9 @@ internal class PictureProcessing
     }
 
     public static Tuple FindBytesRTolerance(byte[] n1, UIntPtr len1, Tuple t1, byte[] n2,
-        UIntPtr len2, Tuple t2, double matchRate, byte ignore_r, byte ignore_g, byte ignore_b, byte Tolerance)
+        UIntPtr len2, Tuple t2, double matchRate, byte ignore_r, byte ignore_g, byte ignore_b, byte tolerance)
     {
-        return FindBytesTolerance(n1, len1, t1, n2, len2, t2, matchRate, ignore_r, ignore_g, ignore_b, Tolerance);
+        return FindBytesTolerance(n1, len1, t1, n2, len2, t2, matchRate, ignore_r, ignore_g, ignore_b, tolerance);
     }
 
     public static Point FindBitmaPoint(in Bitmap bp1, in Bitmap bp2)

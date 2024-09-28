@@ -1,4 +1,8 @@
-﻿using OpenCvSharp;
+﻿using System;
+using System.Drawing;
+using System.Drawing.Imaging;
+using System.Runtime.InteropServices;
+using OpenCvSharp;
 using Sdcb.PaddleInference;
 using Sdcb.PaddleOCR;
 using Sdcb.PaddleOCR.Models.Local;
@@ -51,25 +55,78 @@ internal abstract class PaddleOcr
         return result.Text;
     }
 
-    public static string 获取图片文字(byte[] bts)
+    public static string 获取图片文字(Bitmap bp)
     {
         if (!_isStart) _ = 初始化PaddleOcr();
 
-        // Load local file by following code:
-        // using (Mat src = Cv2.ImRead(@"J:\Desktop\1.bmp"))
-        using Mat src = Cv2.ImDecode(bts, ImreadModes.Color);
-        PaddleOcrResult result = _PaddleOcrAll.Run(src);
+        // 将 RGBA 数组转换为 Mat 对象
+        using Mat src = new Mat(BitmapToMat(bp));
+        // 如果 PaddleOCR 期望 BGR 格式，则进行颜色空间转换
+        using Mat bgrMat = new Mat();
+        Cv2.CvtColor(src, bgrMat, ColorConversionCodes.RGBA2BGR);
+
+        PaddleOcrResult result = _PaddleOcrAll.Run(bgrMat);
         return result.Text;
-        // Console.WriteLine("Detected all texts: \n" + result.Text);
-        //foreach (PaddleOcrResultRegion region in result.Regions)
-        //{
-        //    Console.WriteLine($"Text: {region.Text}, Score: {region.Score}, RectCenter: {region.Rect.Center}, RectSize:    {region.Rect.Size}, Angle: {region.Rect.Angle}");
-        //}
+    }
+
+    private static Mat BitmapToMat(Bitmap bitmap)
+    {
+        // 锁定 Bitmap 的位图数据
+        BitmapData bmpData = bitmap.LockBits(new Rectangle(0, 0, bitmap.Width, bitmap.Height), ImageLockMode.ReadOnly,
+            bitmap.PixelFormat);
+
+        try
+        {
+            // 创建 Mat 对象
+            Mat mat = new Mat(bitmap.Height, bitmap.Width, MatType.CV_8UC4);
+
+            // 使用 Marshal.Copy 来填充 Mat 数据
+            byte[] bytes = new byte[bmpData.Stride * bitmap.Height];
+            Marshal.Copy(bmpData.Scan0, bytes, 0, bytes.Length);
+            Marshal.Copy(bytes, 0, mat.DataStart, bytes.Length);
+
+            // 创建 Mat 的深拷贝
+            Mat result = new Mat();
+            mat.CopyTo(result);
+
+            return result;
+        }
+        finally
+        {
+            // 解锁位图数据
+            bitmap.UnlockBits(bmpData);
+        }
+    }
+
+    public static string 获取图片文字(byte[] bts, int width, int height)
+    {
+        if (!_isStart) _ = 初始化PaddleOcr();
+
+        if (bts == null || bts.Length == 0)
+            throw new ArgumentException("Input byte array is null or empty.");
+
+        if (bts.Length != width * height * 4)
+            throw new ArgumentException(
+                $"Input byte array length ({bts.Length}) does not match the expected size ({width * height * 4}).");
+
+        // 直接从字节数组创建 Mat，指定正确的大小和类型
+        using Mat argbMat = new Mat(height, width, MatType.CV_8UC4);
+
+        // 使用 Marshal.Copy 来填充 Mat 数据
+        Marshal.Copy(bts, 0, argbMat.DataStart, bts.Length);
+
+        // 转换为 BGR 格式
+        using Mat bgrMat = new Mat();
+        Cv2.CvtColor(argbMat, bgrMat, ColorConversionCodes.BGRA2BGR);
+
+        // 运行 OCR
+        PaddleOcrResult result = _PaddleOcrAll.Run(bgrMat);
+        return result.Text;
     }
 
     public static string 获取图片文字(int x, int y, int width, int height)
     {
-        return 获取图片文字(PictureProcessing.CaptureScreenAllByte(x, y, width, height));
+        return 获取图片文字(PictureProcessing.CaptureScreenAllByte(x, y, width, height), width, height);
     }
 
     #endregion
