@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 
 namespace Dota2Simulator;
 
-public static class SetWindowTop
+internal static class SetWindowTop
 {
     // 设置此窗体为活动窗体：
     // 将创建指定窗口的线程带到前台并激活该窗口。键盘输入直接指向窗口，并为用户更改各种视觉提示。
@@ -18,6 +18,6 @@ public static class SetWindowTop
 
     // 设置窗体位置
     [DllImport("user32.dll", CharSet = CharSet.Auto)]
-    public static extern int SetWindowPos(IntPtr hWnd, int hWndInsertAfter, int x, int y, int Width, int Height,
+    public static extern int SetWindowPos(IntPtr hWnd, int hWndInsertAfter, int x, int y, int width, int height,
         int flags);
 }

@@ -14,7 +14,7 @@ namespace TestKeyboard.DriverStageHelper;
 ///     5.管理员打开程序
 ///     https://blog.csdn.net/no99es/article/details/50537102
 /// </summary>
-public class WinIO32
+internal class WinIO32
 {
     private const int KBC_KEY_CMD = 0x64;
     private const int KBC_KEY_DATA = 0x60;
@@ -39,14 +39,14 @@ public class WinIO32
         }
         else
         {
-            MessageBox.Show("Load WinIO Failed!");
+            _ = MessageBox.Show("Load WinIO Failed!");
         }
     }
 
     public static void Shutdown()
     {
-        if (IsInitialize)
-            ShutdownWinIo();
+        if (IsInitialize) ShutdownWinIo();
+
         IsInitialize = false;
     }
 
@@ -55,10 +55,10 @@ public class WinIO32
     /// </summary>
     private static void KBCWait4IBE()
     {
-        var dwVal = 0;
+        int dwVal;
         do
         {
-            var flag = GetPortVal((IntPtr) 0x64, out dwVal, 1);
+            _ = GetPortVal(0x64, out dwVal, 1);
         } while ((dwVal & 0x2) > 0);
     }
 
@@ -69,17 +69,15 @@ public class WinIO32
     public static void KeyDown(Keys vKeyCoad)
     {
         if (!IsInitialize) return;
-
-        var btScancode = 0;
-        btScancode = MapVirtualKey((uint) vKeyCoad, 0);
+        int btScancode = MapVirtualKey((uint)vKeyCoad, 0);
         KBCWait4IBE();
         //SetPortVal(KBC_KEY_CMD, (IntPtr)0xD2, 1);
         //KBCWait4IBE();
         //SetPortVal(KBC_KEY_DATA, (IntPtr)0x60, 1);
         //KBCWait4IBE();
-        SetPortVal(KBC_KEY_CMD, (IntPtr) 0xD2, 1);
+        _ = SetPortVal(KBC_KEY_CMD, 0xD2, 1);
         KBCWait4IBE();
-        SetPortVal(KBC_KEY_DATA, (IntPtr) btScancode, 1);
+        _ = SetPortVal(KBC_KEY_DATA, btScancode, 1);
     }
 
     /// <summary>
@@ -89,17 +87,15 @@ public class WinIO32
     public static void KeyUp(Keys vKeyCoad)
     {
         if (!IsInitialize) return;
-
-        var btScancode = 0;
-        btScancode = MapVirtualKey((uint) vKeyCoad, 0);
+        int btScancode = MapVirtualKey((uint)vKeyCoad, 0);
         //KBCWait4IBE();
         //SetPortVal(KBC_KEY_CMD, (IntPtr)0xD2, 1);
         //KBCWait4IBE();
         //SetPortVal(KBC_KEY_DATA, (IntPtr)0x60, 1);
         KBCWait4IBE();
-        SetPortVal(KBC_KEY_CMD, (IntPtr) 0xD2, 1);
+        _ = SetPortVal(KBC_KEY_CMD, 0xD2, 1);
         KBCWait4IBE();
-        SetPortVal(KBC_KEY_DATA, (IntPtr) (btScancode | 0x80), 1);
+        _ = SetPortVal(KBC_KEY_DATA, btScancode | 0x80, 1);
     }
 
     #region WinIo32.dll

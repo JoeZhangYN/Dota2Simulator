@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <root>
   <!--
-    Microsoft ResX Schema 
+    Microsoft ResX Schema
 
     Version 2.0
 
@@ -18,7 +18,7 @@
     <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
     <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
     <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
-    <data name="Color1" type="System.Drawing.Color, System.Drawing"">Blue</data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
     <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
         <value>[base64 mime encoded serialized .NET Framework object]</value>
     </data>
@@ -48,7 +48,7 @@
     value   : The object must be serialized with
             : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
             : and then encoded with base64 encoding.
-    
+
     mimetype: application/x-microsoft.net.object.soap.base64
     value   : The object must be serialized with
             : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
@@ -163,7 +163,7 @@
     <value>4</value>
   </data>
   <data name="tb_name.Text" xml:space="preserve">
-    <value>莱恩</value>
+    <value>测试</value>
   </data>
   <data name="&gt;&gt;tb_name.Name" xml:space="preserve">
     <value>tb_name</value>
@@ -177,31 +177,31 @@
   <data name="&gt;&gt;tb_name.ZOrder" xml:space="preserve">
     <value>14</value>
   </data>
-  <data name="tb_丢装备.Location" type="System.Drawing.Point, System.Drawing">
+  <data name="tb_阵营.Location" type="System.Drawing.Point, System.Drawing">
     <value>66, 19</value>
   </data>
-  <data name="tb_丢装备.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
+  <data name="tb_阵营.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
     <value>4, 4, 4, 4</value>
   </data>
-  <data name="tb_丢装备.Size" type="System.Drawing.Size, System.Drawing">
+  <data name="tb_阵营.Size" type="System.Drawing.Size, System.Drawing">
     <value>65, 23</value>
   </data>
-  <data name="tb_丢装备.TabIndex" type="System.Int32, mscorlib">
+  <data name="tb_阵营.TabIndex" type="System.Int32, mscorlib">
     <value>5</value>
   </data>
-  <data name="tb_丢装备.Text" xml:space="preserve">
-    <value>1,2,3</value>
+  <data name="tb_阵营.Text" xml:space="preserve">
+    <value>0</value>
   </data>
-  <data name="&gt;&gt;tb_丢装备.Name" xml:space="preserve">
-    <value>tb_丢装备</value>
+  <data name="&gt;&gt;tb_阵营.Name" xml:space="preserve">
+    <value>tb_阵营</value>
   </data>
-  <data name="&gt;&gt;tb_丢装备.Type" xml:space="preserve">
+  <data name="&gt;&gt;tb_阵营.Type" xml:space="preserve">
     <value>System.Windows.Forms.TextBox, System.Windows.Forms, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <data name="&gt;&gt;tb_丢装备.Parent" xml:space="preserve">
+  <data name="&gt;&gt;tb_阵营.Parent" xml:space="preserve">
     <value>$this</value>
   </data>
-  <data name="&gt;&gt;tb_丢装备.ZOrder" xml:space="preserve">
+  <data name="&gt;&gt;tb_阵营.ZOrder" xml:space="preserve">
     <value>13</value>
   </data>
   <data name="pictureBox1.Location" type="System.Drawing.Point, System.Drawing">
@@ -211,7 +211,7 @@
     <value>4, 4, 4, 4</value>
   </data>
   <data name="pictureBox1.Size" type="System.Drawing.Size, System.Drawing">
-    <value>129, 62</value>
+    <value>129, 48</value>
   </data>
   <data name="pictureBox1.TabIndex" type="System.Int32, mscorlib">
     <value>1</value>
@@ -258,34 +258,34 @@
   <data name="&gt;&gt;lb_name.ZOrder" xml:space="preserve">
     <value>12</value>
   </data>
-  <data name="lb_下装备.AutoSize" type="System.Boolean, mscorlib">
+  <data name="lb_阵营.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
   </data>
-  <data name="lb_下装备.Location" type="System.Drawing.Point, System.Drawing">
+  <data name="lb_阵营.Location" type="System.Drawing.Point, System.Drawing">
     <value>2, 22</value>
   </data>
-  <data name="lb_下装备.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
+  <data name="lb_阵营.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
     <value>4, 0, 4, 0</value>
   </data>
-  <data name="lb_下装备.Size" type="System.Drawing.Size, System.Drawing">
-    <value>44, 17</value>
+  <data name="lb_阵营.Size" type="System.Drawing.Size, System.Drawing">
+    <value>63, 17</value>
   </data>
-  <data name="lb_下装备.TabIndex" type="System.Int32, mscorlib">
+  <data name="lb_阵营.TabIndex" type="System.Int32, mscorlib">
     <value>7</value>
   </data>
-  <data name="lb_下装备.Text" xml:space="preserve">
-    <value>下装备</value>
+  <data name="lb_阵营.Text" xml:space="preserve">
+    <value>阵营0天辉</value>
   </data>
-  <data name="&gt;&gt;lb_下装备.Name" xml:space="preserve">
-    <value>lb_下装备</value>
+  <data name="&gt;&gt;lb_阵营.Name" xml:space="preserve">
+    <value>lb_阵营</value>
   </data>
-  <data name="&gt;&gt;lb_下装备.Type" xml:space="preserve">
+  <data name="&gt;&gt;lb_阵营.Type" xml:space="preserve">
     <value>System.Windows.Forms.Label, System.Windows.Forms, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <data name="&gt;&gt;lb_下装备.Parent" xml:space="preserve">
+  <data name="&gt;&gt;lb_阵营.Parent" xml:space="preserve">
     <value>$this</value>
   </data>
-  <data name="&gt;&gt;lb_下装备.ZOrder" xml:space="preserve">
+  <data name="&gt;&gt;lb_阵营.ZOrder" xml:space="preserve">
     <value>11</value>
   </data>
   <data name="label4.AutoSize" type="System.Boolean, mscorlib">
@@ -608,7 +608,7 @@
     <value>GrowAndShrink</value>
   </data>
   <data name="$this.ClientSize" type="System.Drawing.Size, System.Drawing">
-    <value>136, 277</value>
+    <value>138, 255</value>
   </data>
   <data name="$this.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
     <value>4, 4, 4, 4</value>

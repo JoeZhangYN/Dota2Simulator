@@ -1,11 +1,11 @@
 ﻿using System.Speech.Synthesis;
 
-namespace Dota2Simulator;
+namespace Dota2Simulator.TTS;
 
 /// <summary>
-///     <see cref="TTS" /> TTS 类
+///     <see cref="Tts" /> TTS 类
 /// </summary>
-public class TTS
+internal class Tts
 {
     #region 语音播放
 
@@ -15,16 +15,14 @@ public class TTS
     /// <param name="str">The string.</param>
     /// <param name="rate">The rate. -10 to 10</param>
     /// <param name="volume">The volume. 0 to 100</param>
-    /// <param name="index">The index.</param>
-    /// <param name="limitTime">The limit time.</param>
     public static void Speak(string str, int rate = 4, int volume = 100)
     {
-        var synthesizer = new SpeechSynthesizer
+        SpeechSynthesizer synthesizer = new()
         {
             Rate = rate,
             Volume = volume
         };
-        synthesizer.SpeakAsync(str);
+        _ = synthesizer.SpeakAsync(str);
     }
 
     #endregion 语音播放

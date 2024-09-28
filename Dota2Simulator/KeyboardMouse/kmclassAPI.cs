@@ -2,7 +2,7 @@
 
 namespace Dota2Simulator.KeyboardMouse;
 
-public class kmclassAPI
+internal class kmclassAPI
 {
     private const string DriverFileName = "kmclassdll.dll";
 

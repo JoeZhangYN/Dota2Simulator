@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Runtime.InteropServices;
-using System.Windows.Forms;
 
 namespace Dota2Simulator;
 
@@ -8,12 +7,12 @@ namespace Dota2Simulator;
 ///     检测委托
 /// </summary>
 /// <returns></returns>
-public delegate ulong CheckoutDeletage();
+internal delegate ulong CheckoutDeletage();
 
 /// <summary>
 ///     鼠标按键
 /// </summary>
-public enum MouseButtons : uint
+internal enum MouseButtons : uint
 {
     Move = 0x0001,
     LeftDown = 0x0002,
@@ -32,7 +31,7 @@ public enum MouseButtons : uint
 /// <summary>
 ///     参数
 /// </summary>
-public struct Parameters
+internal struct Parameters
 {
     public int m_nPeriod;
     public int m_nDuration;
@@ -47,7 +46,7 @@ public struct Parameters
 /// <summary>
 ///     模拟方式
 /// </summary>
-public enum SimulateWays : uint
+internal enum SimulateWays : uint
 {
     Unknow = 0x00,
     WinRing0 = 0x01,
@@ -59,7 +58,7 @@ public enum SimulateWays : uint
 ///     位置坐标
 /// </summary>
 [StructLayout(LayoutKind.Sequential)]
-public struct Position
+internal struct Position
 {
     public int m_nX;
     public int m_nY;
@@ -71,7 +70,7 @@ public struct Position
 /// <summary>
 ///     APIs
 /// </summary>
-public class KeyboardMouseSimulateDriverAPI
+internal class KeyboardMouseSimulateDriverAPI
 {
     private const string DriverFileName = "KeyboardMouseSimulateDriver.dll";
 
@@ -133,11 +132,9 @@ public class KeyboardMouseSimulateDriverAPI
     [DllImport("kernel32.dll", CharSet = CharSet.Ansi, SetLastError = true, ExactSpelling = false)]
     public static extern IntPtr GetProcAddress(IntPtr nModule, [MarshalAs(UnmanagedType.LPStr)] string strProcName);
 
-    public Delegate GetDelegate(IntPtr nMoudle, string strProcName, Type procType)
+    public static Delegate GetDelegate(IntPtr nMoudle, string strProcName, Type procType)
     {
-        var ptr = GetProcAddress(nMoudle, strProcName);
-        if (IntPtr.Zero != ptr)
-            return Marshal.GetDelegateForFunctionPointer(ptr, procType);
-        return null;
+        nint ptr = GetProcAddress(nMoudle, strProcName);
+        return IntPtr.Zero != ptr ? Marshal.GetDelegateForFunctionPointer(ptr, procType) : null;
     }
 }

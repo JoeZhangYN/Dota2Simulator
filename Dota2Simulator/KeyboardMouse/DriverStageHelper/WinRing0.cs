@@ -10,7 +10,7 @@ namespace TestKeyboard.DriverStageHelper;
 ///     2.将WinRing0x64.dll和WinRing0x64.sys拷贝到程序运行的根目录下
 ///     3.使用管理员打开程序
 /// </summary>
-public class WinRing0
+internal class WinRing0
 {
     private static Ols ols;
 
@@ -20,7 +20,7 @@ public class WinRing0
     public static bool init()
     {
         ols = new Ols();
-        return ols.GetStatus() == (uint) Ols.Status.NO_ERROR;
+        return ols.GetStatus() == (uint)Ols.Status.NO_ERROR;
     }
 
     private static void KBCWait4IBE()
@@ -28,40 +28,40 @@ public class WinRing0
         byte dwVal = 0;
         do
         {
-            ols.ReadIoPortByteEx(0x64, ref dwVal);
+            _ = ols.ReadIoPortByteEx(0x64, ref dwVal);
         } while ((dwVal & 0x2) > 0);
     }
 
     public static void KeyDown(char ch)
     {
-        Console.WriteLine("Down ch 16进制: {0:X}", (byte) ch);
-        var btScancode = MapVirtualKey(ch, 0);
+        Console.WriteLine("Down ch 16进制: {0:X}", (byte)ch);
+        int btScancode = MapVirtualKey(ch, 0);
         Console.WriteLine(btScancode);
-        Console.WriteLine("Down btScancode 16进制: {0:X}", (byte) btScancode);
+        Console.WriteLine("Down btScancode 16进制: {0:X}", (byte)btScancode);
         KBCWait4IBE();
         ols.WriteIoPortByte(0x64, 0xd2);
         KBCWait4IBE();
-        ols.WriteIoPortByte(0x60, (byte) btScancode);
+        ols.WriteIoPortByte(0x60, (byte)btScancode);
     }
 
     public static void KeyUp(char ch)
     {
-        var btScancode = MapVirtualKey(ch, 0);
+        int btScancode = MapVirtualKey(ch, 0);
         KBCWait4IBE();
         ols.WriteIoPortByte(0x64, 0xd2);
         KBCWait4IBE();
-        ols.WriteIoPortByte(0x60, (byte) (btScancode | 0x80));
+        ols.WriteIoPortByte(0x60, (byte)(btScancode | 0x80));
         //Console.WriteLine("Up 16进制: {0:X}", (byte)(btScancode | 0x80));
     }
 }
 
-public class Ols : IDisposable
+internal class Ols : IDisposable
 {
     private const string dllNameX64 = "WinRing0x64.dll";
     private const string dllName = "WinRing0.dll";
 
     // for this support library
-    public enum Status
+    internal enum Status
     {
         NO_ERROR = 0,
         DLL_NOT_FOUND = 1,
@@ -70,7 +70,7 @@ public class Ols : IDisposable
     }
 
     // for WinRing0
-    public enum OlsDllStatus
+    internal enum OlsDllStatus
     {
         OLS_DLL_NO_ERROR = 0,
         OLS_DLL_UNSUPPORTED_PLATFORM = 1,
@@ -82,7 +82,7 @@ public class Ols : IDisposable
     }
 
     // for WinRing0
-    public enum OlsDriverType
+    internal enum OlsDriverType
     {
         OLS_DRIVER_TYPE_UNKNOWN = 0,
         OLS_DRIVER_TYPE_WIN_9X = 1,
@@ -93,7 +93,7 @@ public class Ols : IDisposable
     }
 
     // for WinRing0
-    public enum OlsErrorPci : uint
+    internal enum OlsErrorPci : uint
     {
         OLS_ERROR_PCI_BUS_NOT_EXIST = 0xE0000001,
         OLS_ERROR_PCI_NO_DEVICE = 0xE0000002,
@@ -102,25 +102,25 @@ public class Ols : IDisposable
     }
 
     // Bus Number, Device Number and Function Number to PCI Device Address
-    public uint PciBusDevFunc(uint bus, uint dev, uint func)
+    public static uint PciBusDevFunc(uint bus, uint dev, uint func)
     {
         return ((bus & 0xFF) << 8) | ((dev & 0x1F) << 3) | (func & 7);
     }
 
     // PCI Device Address to Bus Number
-    public uint PciGetBus(uint address)
+    public static uint PciGetBus(uint address)
     {
         return (address >> 8) & 0xFF;
     }
 
     // PCI Device Address to Device Number
-    public uint PciGetDev(uint address)
+    public static uint PciGetDev(uint address)
     {
         return (address >> 3) & 0x1F;
     }
 
     // PCI Device Address to Function Number
-    public uint PciGetFunc(uint address)
+    public static uint PciGetFunc(uint address)
     {
         return address & 7;
     }
@@ -136,98 +136,92 @@ public class Ols : IDisposable
     private static extern IntPtr GetProcAddress(IntPtr hModule, [MarshalAs(UnmanagedType.LPStr)] string lpProcName);
 
     private IntPtr module = IntPtr.Zero;
-    private readonly uint status = (uint) Status.NO_ERROR;
+    private readonly uint status = (uint)Status.NO_ERROR;
 
     public Ols()
     {
-        string fileName;
-
-        if (IntPtr.Size == 8)
-            fileName = dllNameX64;
-        else
-            fileName = dllName;
-
+        string fileName = IntPtr.Size == 8 ? dllNameX64 : dllName;
         module = LoadLibrary(fileName);
         if (module == IntPtr.Zero)
         {
-            status = (uint) Status.DLL_NOT_FOUND;
+            status = (uint)Status.DLL_NOT_FOUND;
         }
         else
         {
-            GetDllStatus = (_GetDllStatus) GetDelegate("GetDllStatus", typeof(_GetDllStatus));
-            GetDllVersion = (_GetDllVersion) GetDelegate("GetDllVersion", typeof(_GetDllVersion));
-            GetDriverVersion = (_GetDriverVersion) GetDelegate("GetDriverVersion", typeof(_GetDriverVersion));
-            GetDriverType = (_GetDriverType) GetDelegate("GetDriverType", typeof(_GetDriverType));
+            GetDllStatus = (_GetDllStatus)GetDelegate("GetDllStatus", typeof(_GetDllStatus));
+            GetDllVersion = (_GetDllVersion)GetDelegate("GetDllVersion", typeof(_GetDllVersion));
+            GetDriverVersion = (_GetDriverVersion)GetDelegate("GetDriverVersion", typeof(_GetDriverVersion));
+            GetDriverType = (_GetDriverType)GetDelegate("GetDriverType", typeof(_GetDriverType));
 
-            InitializeOls = (_InitializeOls) GetDelegate("InitializeOls", typeof(_InitializeOls));
-            DeinitializeOls = (_DeinitializeOls) GetDelegate("DeinitializeOls", typeof(_DeinitializeOls));
+            InitializeOls = (_InitializeOls)GetDelegate("InitializeOls", typeof(_InitializeOls));
+            DeinitializeOls = (_DeinitializeOls)GetDelegate("DeinitializeOls", typeof(_DeinitializeOls));
 
-            IsCpuid = (_IsCpuid) GetDelegate("IsCpuid", typeof(_IsCpuid));
-            IsMsr = (_IsMsr) GetDelegate("IsMsr", typeof(_IsMsr));
-            IsTsc = (_IsTsc) GetDelegate("IsTsc", typeof(_IsTsc));
-            Hlt = (_Hlt) GetDelegate("Hlt", typeof(_Hlt));
-            HltTx = (_HltTx) GetDelegate("HltTx", typeof(_HltTx));
-            HltPx = (_HltPx) GetDelegate("HltPx", typeof(_HltPx));
-            Rdmsr = (_Rdmsr) GetDelegate("Rdmsr", typeof(_Rdmsr));
-            RdmsrTx = (_RdmsrTx) GetDelegate("RdmsrTx", typeof(_RdmsrTx));
-            RdmsrPx = (_RdmsrPx) GetDelegate("RdmsrPx", typeof(_RdmsrPx));
-            Wrmsr = (_Wrmsr) GetDelegate("Wrmsr", typeof(_Wrmsr));
-            WrmsrTx = (_WrmsrTx) GetDelegate("WrmsrTx", typeof(_WrmsrTx));
-            WrmsrPx = (_WrmsrPx) GetDelegate("WrmsrPx", typeof(_WrmsrPx));
-            Rdpmc = (_Rdpmc) GetDelegate("Rdpmc", typeof(_Rdpmc));
-            RdpmcTx = (_RdpmcTx) GetDelegate("RdpmcTx", typeof(_RdpmcTx));
-            RdpmcPx = (_RdpmcPx) GetDelegate("RdpmcPx", typeof(_RdpmcPx));
-            Cpuid = (_Cpuid) GetDelegate("Cpuid", typeof(_Cpuid));
-            CpuidTx = (_CpuidTx) GetDelegate("CpuidTx", typeof(_CpuidTx));
-            CpuidPx = (_CpuidPx) GetDelegate("CpuidPx", typeof(_CpuidPx));
-            Rdtsc = (_Rdtsc) GetDelegate("Rdtsc", typeof(_Rdtsc));
-            RdtscTx = (_RdtscTx) GetDelegate("RdtscTx", typeof(_RdtscTx));
-            RdtscPx = (_RdtscPx) GetDelegate("RdtscPx", typeof(_RdtscPx));
+            IsCpuid = (_IsCpuid)GetDelegate("IsCpuid", typeof(_IsCpuid));
+            IsMsr = (_IsMsr)GetDelegate("IsMsr", typeof(_IsMsr));
+            IsTsc = (_IsTsc)GetDelegate("IsTsc", typeof(_IsTsc));
+            Hlt = (_Hlt)GetDelegate("Hlt", typeof(_Hlt));
+            HltTx = (_HltTx)GetDelegate("HltTx", typeof(_HltTx));
+            HltPx = (_HltPx)GetDelegate("HltPx", typeof(_HltPx));
+            Rdmsr = (_Rdmsr)GetDelegate("Rdmsr", typeof(_Rdmsr));
+            RdmsrTx = (_RdmsrTx)GetDelegate("RdmsrTx", typeof(_RdmsrTx));
+            RdmsrPx = (_RdmsrPx)GetDelegate("RdmsrPx", typeof(_RdmsrPx));
+            Wrmsr = (_Wrmsr)GetDelegate("Wrmsr", typeof(_Wrmsr));
+            WrmsrTx = (_WrmsrTx)GetDelegate("WrmsrTx", typeof(_WrmsrTx));
+            WrmsrPx = (_WrmsrPx)GetDelegate("WrmsrPx", typeof(_WrmsrPx));
+            Rdpmc = (_Rdpmc)GetDelegate("Rdpmc", typeof(_Rdpmc));
+            RdpmcTx = (_RdpmcTx)GetDelegate("RdpmcTx", typeof(_RdpmcTx));
+            RdpmcPx = (_RdpmcPx)GetDelegate("RdpmcPx", typeof(_RdpmcPx));
+            Cpuid = (_Cpuid)GetDelegate("Cpuid", typeof(_Cpuid));
+            CpuidTx = (_CpuidTx)GetDelegate("CpuidTx", typeof(_CpuidTx));
+            CpuidPx = (_CpuidPx)GetDelegate("CpuidPx", typeof(_CpuidPx));
+            Rdtsc = (_Rdtsc)GetDelegate("Rdtsc", typeof(_Rdtsc));
+            RdtscTx = (_RdtscTx)GetDelegate("RdtscTx", typeof(_RdtscTx));
+            RdtscPx = (_RdtscPx)GetDelegate("RdtscPx", typeof(_RdtscPx));
 
-            ReadIoPortByte = (_ReadIoPortByte) GetDelegate("ReadIoPortByte", typeof(_ReadIoPortByte));
-            ReadIoPortWord = (_ReadIoPortWord) GetDelegate("ReadIoPortWord", typeof(_ReadIoPortWord));
-            ReadIoPortDword = (_ReadIoPortDword) GetDelegate("ReadIoPortDword", typeof(_ReadIoPortDword));
-            ReadIoPortByteEx = (_ReadIoPortByteEx) GetDelegate("ReadIoPortByteEx", typeof(_ReadIoPortByteEx));
-            ReadIoPortWordEx = (_ReadIoPortWordEx) GetDelegate("ReadIoPortWordEx", typeof(_ReadIoPortWordEx));
-            ReadIoPortDwordEx = (_ReadIoPortDwordEx) GetDelegate("ReadIoPortDwordEx", typeof(_ReadIoPortDwordEx));
+            ReadIoPortByte = (_ReadIoPortByte)GetDelegate("ReadIoPortByte", typeof(_ReadIoPortByte));
+            ReadIoPortWord = (_ReadIoPortWord)GetDelegate("ReadIoPortWord", typeof(_ReadIoPortWord));
+            ReadIoPortDword = (_ReadIoPortDword)GetDelegate("ReadIoPortDword", typeof(_ReadIoPortDword));
+            ReadIoPortByteEx = (_ReadIoPortByteEx)GetDelegate("ReadIoPortByteEx", typeof(_ReadIoPortByteEx));
+            ReadIoPortWordEx = (_ReadIoPortWordEx)GetDelegate("ReadIoPortWordEx", typeof(_ReadIoPortWordEx));
+            ReadIoPortDwordEx = (_ReadIoPortDwordEx)GetDelegate("ReadIoPortDwordEx", typeof(_ReadIoPortDwordEx));
 
-            WriteIoPortByte = (_WriteIoPortByte) GetDelegate("WriteIoPortByte", typeof(_WriteIoPortByte));
-            WriteIoPortWord = (_WriteIoPortWord) GetDelegate("WriteIoPortWord", typeof(_WriteIoPortWord));
-            WriteIoPortDword = (_WriteIoPortDword) GetDelegate("WriteIoPortDword", typeof(_WriteIoPortDword));
-            WriteIoPortByteEx = (_WriteIoPortByteEx) GetDelegate("WriteIoPortByteEx", typeof(_WriteIoPortByteEx));
-            WriteIoPortWordEx = (_WriteIoPortWordEx) GetDelegate("WriteIoPortWordEx", typeof(_WriteIoPortWordEx));
-            WriteIoPortDwordEx = (_WriteIoPortDwordEx) GetDelegate("WriteIoPortDwordEx", typeof(_WriteIoPortDwordEx));
+            WriteIoPortByte = (_WriteIoPortByte)GetDelegate("WriteIoPortByte", typeof(_WriteIoPortByte));
+            WriteIoPortWord = (_WriteIoPortWord)GetDelegate("WriteIoPortWord", typeof(_WriteIoPortWord));
+            WriteIoPortDword = (_WriteIoPortDword)GetDelegate("WriteIoPortDword", typeof(_WriteIoPortDword));
+            WriteIoPortByteEx = (_WriteIoPortByteEx)GetDelegate("WriteIoPortByteEx", typeof(_WriteIoPortByteEx));
+            WriteIoPortWordEx = (_WriteIoPortWordEx)GetDelegate("WriteIoPortWordEx", typeof(_WriteIoPortWordEx));
+            WriteIoPortDwordEx = (_WriteIoPortDwordEx)GetDelegate("WriteIoPortDwordEx", typeof(_WriteIoPortDwordEx));
 
-            SetPciMaxBusIndex = (_SetPciMaxBusIndex) GetDelegate("SetPciMaxBusIndex", typeof(_SetPciMaxBusIndex));
-            ReadPciConfigByte = (_ReadPciConfigByte) GetDelegate("ReadPciConfigByte", typeof(_ReadPciConfigByte));
-            ReadPciConfigWord = (_ReadPciConfigWord) GetDelegate("ReadPciConfigWord", typeof(_ReadPciConfigWord));
-            ReadPciConfigDword = (_ReadPciConfigDword) GetDelegate("ReadPciConfigDword", typeof(_ReadPciConfigDword));
+            SetPciMaxBusIndex = (_SetPciMaxBusIndex)GetDelegate("SetPciMaxBusIndex", typeof(_SetPciMaxBusIndex));
+            ReadPciConfigByte = (_ReadPciConfigByte)GetDelegate("ReadPciConfigByte", typeof(_ReadPciConfigByte));
+            ReadPciConfigWord = (_ReadPciConfigWord)GetDelegate("ReadPciConfigWord", typeof(_ReadPciConfigWord));
+            ReadPciConfigDword = (_ReadPciConfigDword)GetDelegate("ReadPciConfigDword", typeof(_ReadPciConfigDword));
             ReadPciConfigByteEx =
-                (_ReadPciConfigByteEx) GetDelegate("ReadPciConfigByteEx", typeof(_ReadPciConfigByteEx));
+                (_ReadPciConfigByteEx)GetDelegate("ReadPciConfigByteEx", typeof(_ReadPciConfigByteEx));
             ReadPciConfigWordEx =
-                (_ReadPciConfigWordEx) GetDelegate("ReadPciConfigWordEx", typeof(_ReadPciConfigWordEx));
+                (_ReadPciConfigWordEx)GetDelegate("ReadPciConfigWordEx", typeof(_ReadPciConfigWordEx));
             ReadPciConfigDwordEx =
-                (_ReadPciConfigDwordEx) GetDelegate("ReadPciConfigDwordEx", typeof(_ReadPciConfigDwordEx));
-            WritePciConfigByte = (_WritePciConfigByte) GetDelegate("WritePciConfigByte", typeof(_WritePciConfigByte));
-            WritePciConfigWord = (_WritePciConfigWord) GetDelegate("WritePciConfigWord", typeof(_WritePciConfigWord));
+                (_ReadPciConfigDwordEx)GetDelegate("ReadPciConfigDwordEx", typeof(_ReadPciConfigDwordEx));
+            WritePciConfigByte = (_WritePciConfigByte)GetDelegate("WritePciConfigByte", typeof(_WritePciConfigByte));
+            WritePciConfigWord = (_WritePciConfigWord)GetDelegate("WritePciConfigWord", typeof(_WritePciConfigWord));
             WritePciConfigDword =
-                (_WritePciConfigDword) GetDelegate("WritePciConfigDword", typeof(_WritePciConfigDword));
+                (_WritePciConfigDword)GetDelegate("WritePciConfigDword", typeof(_WritePciConfigDword));
             WritePciConfigByteEx =
-                (_WritePciConfigByteEx) GetDelegate("WritePciConfigByteEx", typeof(_WritePciConfigByteEx));
+                (_WritePciConfigByteEx)GetDelegate("WritePciConfigByteEx", typeof(_WritePciConfigByteEx));
             WritePciConfigWordEx =
-                (_WritePciConfigWordEx) GetDelegate("WritePciConfigWordEx", typeof(_WritePciConfigWordEx));
+                (_WritePciConfigWordEx)GetDelegate("WritePciConfigWordEx", typeof(_WritePciConfigWordEx));
             WritePciConfigDwordEx =
-                (_WritePciConfigDwordEx) GetDelegate("WritePciConfigDwordEx", typeof(_WritePciConfigDwordEx));
-            FindPciDeviceById = (_FindPciDeviceById) GetDelegate("FindPciDeviceById", typeof(_FindPciDeviceById));
+                (_WritePciConfigDwordEx)GetDelegate("WritePciConfigDwordEx", typeof(_WritePciConfigDwordEx));
+            FindPciDeviceById = (_FindPciDeviceById)GetDelegate("FindPciDeviceById", typeof(_FindPciDeviceById));
             FindPciDeviceByClass =
-                (_FindPciDeviceByClass) GetDelegate("FindPciDeviceByClass", typeof(_FindPciDeviceByClass));
+                (_FindPciDeviceByClass)GetDelegate("FindPciDeviceByClass", typeof(_FindPciDeviceByClass));
 
 #if _PHYSICAL_MEMORY_SUPPORT
-                ReadDmiMemory = (_ReadDmiMemory)GetDelegate("ReadDmiMemory", typeof(_ReadDmiMemory));
-                ReadPhysicalMemory =
- (_ReadPhysicalMemory)GetDelegate("ReadPhysicalMemory", typeof(_ReadPhysicalMemory));
-                WritePhysicalMemory =
- (_WritePhysicalMemory)GetDelegate("WritePhysicalMemory", typeof(_WritePhysicalMemory));
+                    ReadDmiMemory = (_ReadDmiMemory)GetDelegate("ReadDmiMemory", typeof(_ReadDmiMemory));
+                    ReadPhysicalMemory =
+     (_ReadPhysicalMemory)GetDelegate("ReadPhysicalMemory", typeof(_ReadPhysicalMemory));
+                    WritePhysicalMemory =
+     (_WritePhysicalMemory)GetDelegate("WritePhysicalMemory", typeof(_WritePhysicalMemory));
 #endif
             if (!(
                     GetDllStatus != null
@@ -285,14 +279,14 @@ public class Ols : IDisposable
                     && FindPciDeviceById != null
                     && FindPciDeviceByClass != null
 #if _PHYSICAL_MEMORY_SUPPORT
-                && ReadDmiMemory != null
-                && ReadPhysicalMemory != null
-                && WritePhysicalMemory != null
+                    && ReadDmiMemory != null
+                    && ReadPhysicalMemory != null
+                    && WritePhysicalMemory != null
 #endif
                 ))
-                status = (uint) Status.DLL_INCORRECT_VERSION;
+                status = (uint)Status.DLL_INCORRECT_VERSION;
 
-            if (InitializeOls() == 0) status = (uint) Status.DLL_INITIALIZE_ERROR;
+            if (InitializeOls() == 0) status = (uint)Status.DLL_INITIALIZE_ERROR;
         }
     }
 
@@ -306,38 +300,38 @@ public class Ols : IDisposable
         if (module != IntPtr.Zero)
         {
             DeinitializeOls();
-            FreeLibrary(module);
+            _ = FreeLibrary(module);
             module = IntPtr.Zero;
         }
     }
 
     public Delegate GetDelegate(string procName, Type delegateType)
     {
-        var ptr = GetProcAddress(module, procName);
+        nint ptr = GetProcAddress(module, procName);
         if (ptr != IntPtr.Zero)
         {
-            var d = Marshal.GetDelegateForFunctionPointer(ptr, delegateType);
+            Delegate d = Marshal.GetDelegateForFunctionPointer(ptr, delegateType);
             return d;
         }
 
-        var result = Marshal.GetHRForLastWin32Error();
+        int result = Marshal.GetHRForLastWin32Error();
         throw Marshal.GetExceptionForHR(result);
     }
 
     //-----------------------------------------------------------------------------
     // DLL Information
     //-----------------------------------------------------------------------------
-    public delegate uint _GetDllStatus();
+    internal delegate uint _GetDllStatus();
 
-    public delegate uint _GetDllVersion(ref byte major, ref byte minor, ref byte revision, ref byte release);
+    internal delegate uint _GetDllVersion(ref byte major, ref byte minor, ref byte revision, ref byte release);
 
-    public delegate uint _GetDriverVersion(ref byte major, ref byte minor, ref byte revision, ref byte release);
+    internal delegate uint _GetDriverVersion(ref byte major, ref byte minor, ref byte revision, ref byte release);
 
-    public delegate uint _GetDriverType();
+    internal delegate uint _GetDriverType();
 
-    public delegate int _InitializeOls();
+    internal delegate int _InitializeOls();
 
-    public delegate void _DeinitializeOls();
+    internal delegate void _DeinitializeOls();
 
     public _GetDllStatus GetDllStatus;
     public _GetDriverType GetDriverType;
@@ -350,49 +344,49 @@ public class Ols : IDisposable
     //-----------------------------------------------------------------------------
     // CPU
     //-----------------------------------------------------------------------------
-    public delegate int _IsCpuid();
+    internal delegate int _IsCpuid();
 
-    public delegate int _IsMsr();
+    internal delegate int _IsMsr();
 
-    public delegate int _IsTsc();
+    internal delegate int _IsTsc();
 
-    public delegate int _Hlt();
+    internal delegate int _Hlt();
 
-    public delegate int _HltTx(UIntPtr threadAffinityMask);
+    internal delegate int _HltTx(UIntPtr threadAffinityMask);
 
-    public delegate int _HltPx(UIntPtr processAffinityMask);
+    internal delegate int _HltPx(UIntPtr processAffinityMask);
 
-    public delegate int _Rdmsr(uint index, ref uint eax, ref uint edx);
+    internal delegate int _Rdmsr(uint index, ref uint eax, ref uint edx);
 
-    public delegate int _RdmsrTx(uint index, ref uint eax, ref uint edx, UIntPtr threadAffinityMask);
+    internal delegate int _RdmsrTx(uint index, ref uint eax, ref uint edx, UIntPtr threadAffinityMask);
 
-    public delegate int _RdmsrPx(uint index, ref uint eax, ref uint edx, UIntPtr processAffinityMask);
+    internal delegate int _RdmsrPx(uint index, ref uint eax, ref uint edx, UIntPtr processAffinityMask);
 
-    public delegate int _Wrmsr(uint index, uint eax, uint edx);
+    internal delegate int _Wrmsr(uint index, uint eax, uint edx);
 
-    public delegate int _WrmsrTx(uint index, uint eax, uint edx, UIntPtr threadAffinityMask);
+    internal delegate int _WrmsrTx(uint index, uint eax, uint edx, UIntPtr threadAffinityMask);
 
-    public delegate int _WrmsrPx(uint index, uint eax, uint edx, UIntPtr processAffinityMask);
+    internal delegate int _WrmsrPx(uint index, uint eax, uint edx, UIntPtr processAffinityMask);
 
-    public delegate int _Rdpmc(uint index, ref uint eax, ref uint edx);
+    internal delegate int _Rdpmc(uint index, ref uint eax, ref uint edx);
 
-    public delegate int _RdpmcTx(uint index, ref uint eax, ref uint edx, UIntPtr threadAffinityMask);
+    internal delegate int _RdpmcTx(uint index, ref uint eax, ref uint edx, UIntPtr threadAffinityMask);
 
-    public delegate int _RdpmcPx(uint index, ref uint eax, ref uint edx, UIntPtr processAffinityMask);
+    internal delegate int _RdpmcPx(uint index, ref uint eax, ref uint edx, UIntPtr processAffinityMask);
 
-    public delegate int _Cpuid(uint index, ref uint eax, ref uint ebx, ref uint ecx, ref uint edx);
+    internal delegate int _Cpuid(uint index, ref uint eax, ref uint ebx, ref uint ecx, ref uint edx);
 
-    public delegate int _CpuidTx(uint index, ref uint eax, ref uint ebx, ref uint ecx, ref uint edx,
+    internal delegate int _CpuidTx(uint index, ref uint eax, ref uint ebx, ref uint ecx, ref uint edx,
         UIntPtr threadAffinityMask);
 
-    public delegate int _CpuidPx(uint index, ref uint eax, ref uint ebx, ref uint ecx, ref uint edx,
+    internal delegate int _CpuidPx(uint index, ref uint eax, ref uint ebx, ref uint ecx, ref uint edx,
         UIntPtr processAffinityMask);
 
-    public delegate int _Rdtsc(ref uint eax, ref uint edx);
+    internal delegate int _Rdtsc(ref uint eax, ref uint edx);
 
-    public delegate int _RdtscTx(ref uint eax, ref uint edx, UIntPtr threadAffinityMask);
+    internal delegate int _RdtscTx(ref uint eax, ref uint edx, UIntPtr threadAffinityMask);
 
-    public delegate int _RdtscPx(ref uint eax, ref uint edx, UIntPtr processAffinityMask);
+    internal delegate int _RdtscPx(ref uint eax, ref uint edx, UIntPtr processAffinityMask);
 
     public _IsCpuid IsCpuid;
     public _IsMsr IsMsr;
@@ -419,41 +413,41 @@ public class Ols : IDisposable
     //-----------------------------------------------------------------------------
     // I/O
     //-----------------------------------------------------------------------------
-    public delegate byte _ReadIoPortByte(ushort port);
+    internal delegate byte _ReadIoPortByte(ushort port);
 
-    public delegate ushort _ReadIoPortWord(ushort port);
+    internal delegate ushort _ReadIoPortWord(ushort port);
 
-    public delegate uint _ReadIoPortDword(ushort port);
+    internal delegate uint _ReadIoPortDword(ushort port);
 
     public _ReadIoPortByte ReadIoPortByte;
     public _ReadIoPortWord ReadIoPortWord;
     public _ReadIoPortDword ReadIoPortDword;
 
-    public delegate int _ReadIoPortByteEx(ushort port, ref byte value);
+    internal delegate int _ReadIoPortByteEx(ushort port, ref byte value);
 
-    public delegate int _ReadIoPortWordEx(ushort port, ref ushort value);
+    internal delegate int _ReadIoPortWordEx(ushort port, ref ushort value);
 
-    public delegate int _ReadIoPortDwordEx(ushort port, ref uint value);
+    internal delegate int _ReadIoPortDwordEx(ushort port, ref uint value);
 
     public _ReadIoPortByteEx ReadIoPortByteEx;
     public _ReadIoPortWordEx ReadIoPortWordEx;
     public _ReadIoPortDwordEx ReadIoPortDwordEx;
 
-    public delegate void _WriteIoPortByte(ushort port, byte value);
+    internal delegate void _WriteIoPortByte(ushort port, byte value);
 
-    public delegate void _WriteIoPortWord(ushort port, ushort value);
+    internal delegate void _WriteIoPortWord(ushort port, ushort value);
 
-    public delegate void _WriteIoPortDword(ushort port, uint value);
+    internal delegate void _WriteIoPortDword(ushort port, uint value);
 
     public _WriteIoPortByte WriteIoPortByte;
     public _WriteIoPortWord WriteIoPortWord;
     public _WriteIoPortDword WriteIoPortDword;
 
-    public delegate int _WriteIoPortByteEx(ushort port, byte value);
+    internal delegate int _WriteIoPortByteEx(ushort port, byte value);
 
-    public delegate int _WriteIoPortWordEx(ushort port, ushort value);
+    internal delegate int _WriteIoPortWordEx(ushort port, ushort value);
 
-    public delegate int _WriteIoPortDwordEx(ushort port, uint value);
+    internal delegate int _WriteIoPortDwordEx(ushort port, uint value);
 
     public _WriteIoPortByteEx WriteIoPortByteEx;
     public _WriteIoPortWordEx WriteIoPortWordEx;
@@ -462,53 +456,53 @@ public class Ols : IDisposable
     //-----------------------------------------------------------------------------
     // PCI
     //-----------------------------------------------------------------------------
-    public delegate void _SetPciMaxBusIndex(byte max);
+    internal delegate void _SetPciMaxBusIndex(byte max);
 
     public _SetPciMaxBusIndex SetPciMaxBusIndex;
 
-    public delegate byte _ReadPciConfigByte(uint pciAddress, byte regAddress);
+    internal delegate byte _ReadPciConfigByte(uint pciAddress, byte regAddress);
 
-    public delegate ushort _ReadPciConfigWord(uint pciAddress, byte regAddress);
+    internal delegate ushort _ReadPciConfigWord(uint pciAddress, byte regAddress);
 
-    public delegate uint _ReadPciConfigDword(uint pciAddress, byte regAddress);
+    internal delegate uint _ReadPciConfigDword(uint pciAddress, byte regAddress);
 
     public _ReadPciConfigByte ReadPciConfigByte;
     public _ReadPciConfigWord ReadPciConfigWord;
     public _ReadPciConfigDword ReadPciConfigDword;
 
-    public delegate int _ReadPciConfigByteEx(uint pciAddress, uint regAddress, ref byte value);
+    internal delegate int _ReadPciConfigByteEx(uint pciAddress, uint regAddress, ref byte value);
 
-    public delegate int _ReadPciConfigWordEx(uint pciAddress, uint regAddress, ref ushort value);
+    internal delegate int _ReadPciConfigWordEx(uint pciAddress, uint regAddress, ref ushort value);
 
-    public delegate int _ReadPciConfigDwordEx(uint pciAddress, uint regAddress, ref uint value);
+    internal delegate int _ReadPciConfigDwordEx(uint pciAddress, uint regAddress, ref uint value);
 
     public _ReadPciConfigByteEx ReadPciConfigByteEx;
     public _ReadPciConfigWordEx ReadPciConfigWordEx;
     public _ReadPciConfigDwordEx ReadPciConfigDwordEx;
 
-    public delegate void _WritePciConfigByte(uint pciAddress, byte regAddress, byte value);
+    internal delegate void _WritePciConfigByte(uint pciAddress, byte regAddress, byte value);
 
-    public delegate void _WritePciConfigWord(uint pciAddress, byte regAddress, ushort value);
+    internal delegate void _WritePciConfigWord(uint pciAddress, byte regAddress, ushort value);
 
-    public delegate void _WritePciConfigDword(uint pciAddress, byte regAddress, uint value);
+    internal delegate void _WritePciConfigDword(uint pciAddress, byte regAddress, uint value);
 
     public _WritePciConfigByte WritePciConfigByte;
     public _WritePciConfigWord WritePciConfigWord;
     public _WritePciConfigDword WritePciConfigDword;
 
-    public delegate int _WritePciConfigByteEx(uint pciAddress, uint regAddress, byte value);
+    internal delegate int _WritePciConfigByteEx(uint pciAddress, uint regAddress, byte value);
 
-    public delegate int _WritePciConfigWordEx(uint pciAddress, uint regAddress, ushort value);
+    internal delegate int _WritePciConfigWordEx(uint pciAddress, uint regAddress, ushort value);
 
-    public delegate int _WritePciConfigDwordEx(uint pciAddress, uint regAddress, uint value);
+    internal delegate int _WritePciConfigDwordEx(uint pciAddress, uint regAddress, uint value);
 
     public _WritePciConfigByteEx WritePciConfigByteEx;
     public _WritePciConfigWordEx WritePciConfigWordEx;
     public _WritePciConfigDwordEx WritePciConfigDwordEx;
 
-    public delegate uint _FindPciDeviceById(ushort vendorId, ushort deviceId, byte index);
+    internal delegate uint _FindPciDeviceById(ushort vendorId, ushort deviceId, byte index);
 
-    public delegate uint _FindPciDeviceByClass(byte baseClass, byte subClass, byte programIf, byte index);
+    internal delegate uint _FindPciDeviceByClass(byte baseClass, byte subClass, byte programIf, byte index);
 
     public _FindPciDeviceById FindPciDeviceById;
     public _FindPciDeviceByClass FindPciDeviceByClass;
@@ -517,13 +511,13 @@ public class Ols : IDisposable
     // Physical Memory (unsafe)
     //-----------------------------------------------------------------------------
 #if _PHYSICAL_MEMORY_SUPPORT
-        public unsafe delegate uint _ReadDmiMemory(byte* buffer, uint count, uint unitSize);
-        public _ReadDmiMemory ReadDmiMemory;
+            public unsafe delegate uint _ReadDmiMemory(byte* buffer, uint count, uint unitSize);
+            public _ReadDmiMemory ReadDmiMemory;
 
-        public unsafe delegate uint _ReadPhysicalMemory(UIntPtr address, byte* buffer, uint count, uint unitSize);
-        public unsafe delegate uint _WritePhysicalMemory(UIntPtr address, byte* buffer, uint count, uint unitSize);
+            public unsafe delegate uint _ReadPhysicalMemory(UIntPtr address, byte* buffer, uint count, uint unitSize);
+            public unsafe delegate uint _WritePhysicalMemory(UIntPtr address, byte* buffer, uint count, uint unitSize);
 
-        public _ReadPhysicalMemory ReadPhysicalMemory;
-        public _WritePhysicalMemory WritePhysicalMemory;
+            public _ReadPhysicalMemory ReadPhysicalMemory;
+            public _WritePhysicalMemory WritePhysicalMemory;
 #endif
 }
