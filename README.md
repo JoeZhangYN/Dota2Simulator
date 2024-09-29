@@ -1,8 +1,8 @@
 # Dota2Simulator
 
-需要安装.net core 7 runtime 以及 vs c++ 具体多少版本没搞清楚  
+需要安装.net core 9 runtime 以及 vs c++ 具体多少版本没搞清楚  
 反正3dm运行库一次搞定  
-基于 KeyboardMouseSimulateDriver.dll simengio.dll findpoints.dll 以及 .net core7 的模拟操作程序  
+基于 simengio.dll findpoints.dll 以及 .net core9 的模拟操作程序  --KeyboardMouseSimulateDriver.dll
 实际作用就是减少操作失误  
 能不能赢还是得看队友  
 还有一堆别的依托于C#的Nugget  
