@@ -4,7 +4,7 @@ using TestKeyboard.DriverStageHelper;
 
 namespace TestKeyboard.PressKey;
 
-public class PressKeyByWinIO : IPressKey
+internal class PressKeyByWinIO : IPressKey
 {
     private EnumWindowsType mWinType;
 
@@ -31,10 +31,10 @@ public class PressKeyByWinIO : IPressKey
         switch (mWinType)
         {
             case EnumWindowsType.Win64:
-                WinIO64.KeyDown((Keys) key); //按下
+                WinIO64.KeyDown((Keys)key); //按下
                 break;
             case EnumWindowsType.Win32:
-                WinIO32.KeyDown((Keys) key); //按下
+                WinIO32.KeyDown((Keys)key); //按下
                 break;
         }
     }
@@ -53,10 +53,10 @@ public class PressKeyByWinIO : IPressKey
         switch (mWinType)
         {
             case EnumWindowsType.Win64:
-                WinIO64.KeyUp((Keys) key); //按下
+                WinIO64.KeyUp((Keys)key); //按下
                 break;
             case EnumWindowsType.Win32:
-                WinIO32.KeyUp((Keys) key); //按下
+                WinIO32.KeyUp((Keys)key); //按下
                 break;
         }
     }
@@ -64,8 +64,11 @@ public class PressKeyByWinIO : IPressKey
 
     private static void Delay(int nMilliSeconds)
     {
-        var dt = DateTime.Now;
+        DateTime dt = DateTime.Now;
         dt = dt.AddMilliseconds(nMilliSeconds);
-        while (DateTime.Now < dt) Application.DoEvents(); //转让控制权            
+        while (DateTime.Now < dt)
+        {
+            Application.DoEvents(); //转让控制权            
+        }
     }
 }

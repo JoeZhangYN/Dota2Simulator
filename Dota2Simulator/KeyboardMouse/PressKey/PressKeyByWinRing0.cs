@@ -1,9 +1,10 @@
 ﻿using System.Threading;
 using TestKeyboard.DriverStageHelper;
+using TestKeyboard.PressKey;
 
-namespace TestKeyboard.PressKey;
+namespace Dota2Simulator.KeyboardMouse.PressKey;
 
-public class PressKeyByWinRing0 : IPressKey
+internal class PressKeyByWinRing0 : IPressKey
 {
     public bool Initialize(EnumWindowsType winType)
     {

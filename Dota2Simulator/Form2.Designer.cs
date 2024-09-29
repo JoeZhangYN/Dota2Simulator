@@ -32,10 +32,10 @@ namespace Dota2Simulator
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form2));
             label1 = new System.Windows.Forms.Label();
             tb_name = new System.Windows.Forms.TextBox();
-            tb_丢装备 = new System.Windows.Forms.TextBox();
+            tb_阵营 = new System.Windows.Forms.TextBox();
             pictureBox1 = new System.Windows.Forms.PictureBox();
             lb_name = new System.Windows.Forms.Label();
-            lb_下装备 = new System.Windows.Forms.Label();
+            lb_阵营 = new System.Windows.Forms.Label();
             label4 = new System.Windows.Forms.Label();
             tb_x = new System.Windows.Forms.TextBox();
             label5 = new System.Windows.Forms.Label();
@@ -61,10 +61,11 @@ namespace Dota2Simulator
             tb_name.Name = "tb_name";
             tb_name.TextChanged += Tb_name_TextChanged;
             // 
-            // tb_丢装备
+            // tb_阵营
             // 
-            resources.ApplyResources(tb_丢装备, "tb_丢装备");
-            tb_丢装备.Name = "tb_丢装备";
+            resources.ApplyResources(tb_阵营, "tb_阵营");
+            tb_阵营.Name = "tb_阵营";
+            tb_阵营.TextChanged += tb_阵营_TextChanged;
             // 
             // pictureBox1
             // 
@@ -77,10 +78,10 @@ namespace Dota2Simulator
             resources.ApplyResources(lb_name, "lb_name");
             lb_name.Name = "lb_name";
             // 
-            // lb_下装备
+            // lb_阵营
             // 
-            resources.ApplyResources(lb_下装备, "lb_下装备");
-            lb_下装备.Name = "lb_下装备";
+            resources.ApplyResources(lb_阵营, "lb_阵营");
+            lb_阵营.Name = "lb_阵营";
             // 
             // label4
             // 
@@ -122,6 +123,7 @@ namespace Dota2Simulator
             // 
             resources.ApplyResources(tb_状态抗性, "tb_状态抗性");
             tb_状态抗性.Name = "tb_状态抗性";
+            tb_状态抗性.TextChanged += tb_状态抗性_TextChanged;
             // 
             // button1
             // 
@@ -156,9 +158,9 @@ namespace Dota2Simulator
             Controls.Add(tb_y);
             Controls.Add(label4);
             Controls.Add(tb_x);
-            Controls.Add(lb_下装备);
+            Controls.Add(lb_阵营);
             Controls.Add(lb_name);
-            Controls.Add(tb_丢装备);
+            Controls.Add(tb_阵营);
             Controls.Add(tb_name);
             Controls.Add(label1);
             Controls.Add(pictureBox1);
@@ -174,9 +176,9 @@ namespace Dota2Simulator
         private System.Windows.Forms.PictureBox pictureBox1;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.TextBox tb_name;
-        private System.Windows.Forms.TextBox tb_丢装备;
+        private System.Windows.Forms.TextBox tb_阵营;
         private System.Windows.Forms.Label lb_name;
-        private System.Windows.Forms.Label lb_下装备;
+        private System.Windows.Forms.Label lb_阵营;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.TextBox tb_x;
         private System.Windows.Forms.Label label5;

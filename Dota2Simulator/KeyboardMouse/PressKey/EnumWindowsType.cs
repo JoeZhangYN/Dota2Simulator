@@ -1,6 +1,6 @@
 ﻿namespace TestKeyboard.PressKey;
 
-public enum EnumWindowsType
+internal enum EnumWindowsType
 {
     Win64,
     Win32

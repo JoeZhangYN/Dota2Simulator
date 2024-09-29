@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 
 namespace TestKeyboard.DriverStageHelper;
 
-public class SendInputHelper
+internal class SendInputHelper
 {
     private const int KeyEvent_InputType = 1; // INPUT 键盘类型 1
 
@@ -52,44 +52,46 @@ public class SendInputHelper
 
     public static void SimulateInputString(string sText)
     {
-        var cText = sText.ToCharArray();
-        foreach (var c in cText)
+        char[] cText = sText.ToCharArray();
+        foreach (char c in cText)
         {
-            var input = new INPUT[2];
+            INPUT[] input = new INPUT[2];
             if (c >= 0 && c < 256) //a-z A-Z
             {
-                var num = VkKeyScan(c); //获取虚拟键码值
+                short num = VkKeyScan(c); //获取虚拟键码值
                 if (num != -1)
                 {
-                    var shift = ((num >> 8) & 1) !=
-                                0; //num >>8表示 高位字节上当状态，如果为1则按下Shift，否则没有按下Shift，即大写键CapsLk没有开启时，是否需要按下Shift。
+                    bool shift = ((num >> 8) & 1) !=
+                                 0; //num >>8表示 高位字节上当状态，如果为1则按下Shift，否则没有按下Shift，即大写键CapsLk没有开启时，是否需要按下Shift。
                     if ((GetKeyState(20) & 1) != 0 &&
                         ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z'))) //Win32API.GetKeyState(20)获取CapsLk大写键状态
+                    {
                         shift = !shift;
+                    }
 
                     if (shift)
                     {
                         input[0].type = 1; //模拟键盘
                         input[0].ki.WVk = 16; //Shift键
                         input[0].ki.DwFlags = 0; //按下
-                        SendInput(1u, input, Marshal.SizeOf(default(INPUT)));
+                        _ = SendInput(1u, input, Marshal.SizeOf(default(INPUT)));
                     }
 
                     input[0].type = 1;
-                    input[0].ki.WVk = (short) (num & 0xFF);
+                    input[0].ki.WVk = (short)(num & 0xFF);
                     input[0].ki.DwFlags = 0;
 
                     input[1].type = 1;
-                    input[1].ki.WVk = (short) (num & 0xFF);
+                    input[1].ki.WVk = (short)(num & 0xFF);
                     input[1].ki.DwFlags = 2;
-                    SendInput(2u, input, Marshal.SizeOf(default(INPUT)));
+                    _ = SendInput(2u, input, Marshal.SizeOf(default(INPUT)));
 
                     if (shift)
                     {
                         input[0].type = 1;
                         input[0].ki.WVk = 16;
                         input[0].ki.DwFlags = 2; //抬起
-                        SendInput(1u, input, Marshal.SizeOf(default(INPUT)));
+                        _ = SendInput(1u, input, Marshal.SizeOf(default(INPUT)));
                     }
 
                     continue;
@@ -98,22 +100,22 @@ public class SendInputHelper
 
             input[0].type = 1;
             input[0].ki.WVk = 0; //dwFlags 为KEYEVENTF_UNICODE 即4时，wVk必须为0
-            input[0].ki.WScan = (short) c;
+            input[0].ki.WScan = (short)c;
             input[0].ki.DwFlags = 4; //输入UNICODE字符
             input[0].ki.Time = 0;
             input[0].ki.DwExtraInfo = IntPtr.Zero;
             input[1].type = 1;
             input[1].ki.WVk = 0;
-            input[1].ki.WScan = (short) c;
+            input[1].ki.WScan = (short)c;
             input[1].ki.DwFlags = 6;
             input[1].ki.Time = 0;
             input[1].ki.DwExtraInfo = IntPtr.Zero;
-            SendInput(2u, input, Marshal.SizeOf(default(INPUT)));
+            _ = SendInput(2u, input, Marshal.SizeOf(default(INPUT)));
         }
     }
 
     [StructLayout(LayoutKind.Explicit)]
-    public struct INPUT
+    internal struct INPUT
     {
         /// <summary>
         ///     0 为模拟鼠标 1 为模拟键盘
@@ -133,7 +135,7 @@ public class SendInputHelper
         [FieldOffset(4)] public Hardwareinput hi;
     }
 
-    public struct MOUSEINPUT
+    internal struct MOUSEINPUT
     {
         /// <summary>
         ///     <para>坐标x</para>
@@ -166,7 +168,7 @@ public class SendInputHelper
         public IntPtr dwExtraInfo;
     }
 
-    public struct Keybdinput
+    internal struct Keybdinput
     {
         /// <summary>
         ///     <para>按键对应short码</para>
@@ -197,7 +199,7 @@ public class SendInputHelper
         public IntPtr DwExtraInfo;
     }
 
-    public struct Hardwareinput
+    internal struct Hardwareinput
     {
         public int UMsg;
 
