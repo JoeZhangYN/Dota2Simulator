@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Dota2Simulator": {
+      "commandName": "Project",
+      "nativeDebugging": true
+    }
+  }
+}

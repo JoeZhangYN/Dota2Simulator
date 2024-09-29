@@ -361,3 +361,6 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+/Dota2Simulator/Form1.cs
+/Dota2Simulator/Form1.Designer.cs
+/Dota2Simulator/Form1.resx
