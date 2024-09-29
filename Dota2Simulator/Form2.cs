@@ -11330,8 +11330,6 @@ namespace Dota2Simulator
                 return false;
             }
 
-            Logger.Info($"{当前释放颜色.R} {当前释放颜色.G} {当前释放颜色.B}");
-
             if (释放中判断)
             {
                 // 技能释放中
@@ -11346,7 +11344,7 @@ namespace Dota2Simulator
                     else
                     {
                         更新释放判断和颜色(技能位置, false, true, 释放前Color, 释放后Color);
-                        记录技能释放信息(技能位置, "已释放完毕", false, true, 释放前Color, 释放后Color, 当前释放颜色);
+                        // 记录技能释放信息(技能位置, "已释放完毕", false, true, 释放前Color, 释放后Color, 当前释放颜色);
                         return false;
                     }
                 }
@@ -11357,18 +11355,16 @@ namespace Dota2Simulator
             {
                 if (ColorAEqualColorB(释放前Color, 当前释放颜色, 0))
                 {
-                    Logger.Info("技能未释放");
                     更新释放判断和颜色(技能位置, false, false, 释放前Color, 释放后Color);
                     return true;
                 }
                 else
                 {
-                    Logger.Info("技能释放或CD，但不进入判断");
                     if ((释放后Color != Color.Empty && ColorAEqualColorB(释放后Color, 当前释放颜色, 0))
                         || DOTA2释放颜色前后对比(释放前Color, 当前释放颜色))
                     {
                         更新释放判断和颜色(技能位置, true, false, 释放前Color, 当前释放颜色);
-                        记录技能释放信息(技能位置, "释放中", true, false, 释放前Color, 当前释放颜色, 当前释放颜色);
+                        // 记录技能释放信息(技能位置, "释放中", true, false, 释放前Color, 当前释放颜色, 当前释放颜色);
                     }
 
                     return true;
