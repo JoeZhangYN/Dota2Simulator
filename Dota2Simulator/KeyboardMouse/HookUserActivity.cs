@@ -842,7 +842,9 @@ internal class HookUserActivity
             //double clicks
             int clickCount = 0;
             if (button != System.Windows.Forms.MouseButtons.None)
+            {
                 clickCount = wParam == WM_LBUTTONDBLCLK || wParam == WM_RBUTTONDBLCLK ? 2 : 1;
+            }
 
             //generate event 
             MouseEventArgs e = new(
@@ -888,10 +890,19 @@ internal class HookUserActivity
         int handling = 0;
 
         if (HookScope == HookScopeType.FormScope && Form.ActiveForm == ActivityForm)
+        {
             handling = KeyboardEventHandling(nCode, wParam, lParam);
+        }
+
         if (HookScope == HookScopeType.Application && Process.GetCurrentProcess().Id == GetForegroundWindowProcessID())
+        {
             handling = KeyboardEventHandling(nCode, wParam, lParam);
-        if (HookScope == HookScopeType.GlobalScope) handling = KeyboardEventHandling(nCode, wParam, lParam);
+        }
+
+        if (HookScope == HookScopeType.GlobalScope)
+        {
+            handling = KeyboardEventHandling(nCode, wParam, lParam);
+        }
 
         return handling;
     }
@@ -954,7 +965,10 @@ internal class HookUserActivity
                         MyKeyboardHookStruct.flags) == 1)
                 {
                     char key = (char)inBuffer[0];
-                    if (isDownCapslock ^ isDownShift && char.IsLetter(key)) key = char.ToUpper(key);
+                    if (isDownCapslock ^ isDownShift && char.IsLetter(key))
+                    {
+                        key = char.ToUpper(key);
+                    }
 
                     KeyPressEventArgs e = new(key);
                     KeyPress(this, e);

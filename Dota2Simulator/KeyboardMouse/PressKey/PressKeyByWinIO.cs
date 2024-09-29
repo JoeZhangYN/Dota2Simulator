@@ -66,6 +66,9 @@ internal class PressKeyByWinIO : IPressKey
     {
         DateTime dt = DateTime.Now;
         dt = dt.AddMilliseconds(nMilliSeconds);
-        while (DateTime.Now < dt) Application.DoEvents(); //转让控制权            
+        while (DateTime.Now < dt)
+        {
+            Application.DoEvents(); //转让控制权            
+        }
     }
 }

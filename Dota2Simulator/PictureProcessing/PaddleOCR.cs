@@ -48,7 +48,10 @@ internal abstract class PaddleOcr
 
     public static string 获取图片文字(string path)
     {
-        if (!_isStart) _ = 初始化PaddleOcr();
+        if (!_isStart)
+        {
+            _ = 初始化PaddleOcr();
+        }
 
         using Mat src = Cv2.ImRead(path);
         PaddleOcrResult result = _PaddleOcrAll.Run(src);
@@ -57,7 +60,10 @@ internal abstract class PaddleOcr
 
     public static string 获取图片文字(Bitmap bp)
     {
-        if (!_isStart) _ = 初始化PaddleOcr();
+        if (!_isStart)
+        {
+            _ = 初始化PaddleOcr();
+        }
 
         // 将 RGBA 数组转换为 Mat 对象
         using Mat src = new Mat(BitmapToMat(bp));
@@ -100,14 +106,21 @@ internal abstract class PaddleOcr
 
     public static string 获取图片文字(byte[] bts, int width, int height)
     {
-        if (!_isStart) _ = 初始化PaddleOcr();
+        if (!_isStart)
+        {
+            _ = 初始化PaddleOcr();
+        }
 
         if (bts == null || bts.Length == 0)
+        {
             throw new ArgumentException("Input byte array is null or empty.");
+        }
 
         if (bts.Length != width * height * 4)
+        {
             throw new ArgumentException(
                 $"Input byte array length ({bts.Length}) does not match the expected size ({width * height * 4}).");
+        }
 
         // 直接从字节数组创建 Mat，指定正确的大小和类型
         using Mat argbMat = new Mat(height, width, MatType.CV_8UC4);

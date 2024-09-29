@@ -56,9 +56,13 @@ internal class ScreenCaptureDX : IDisposable
             catch (SharpDXException ex)
             {
                 if (ex.ResultCode.Code == ResultCode.NotCurrentlyAvailable.Code)
+                {
                     throw new NotSupportedException("Desktop duplication is not supported on this device.");
+                }
                 else
+                {
                     throw;
+                }
             }
         }
         catch (Exception ex)

@@ -45,7 +45,10 @@ internal class WinIO32
 
     public static void Shutdown()
     {
-        if (IsInitialize) ShutdownWinIo();
+        if (IsInitialize)
+        {
+            ShutdownWinIo();
+        }
 
         IsInitialize = false;
     }
@@ -68,7 +71,11 @@ internal class WinIO32
     /// <param name="vKeyCoad"></param>
     public static void KeyDown(Keys vKeyCoad)
     {
-        if (!IsInitialize) return;
+        if (!IsInitialize)
+        {
+            return;
+        }
+
         int btScancode = MapVirtualKey((uint)vKeyCoad, 0);
         KBCWait4IBE();
         //SetPortVal(KBC_KEY_CMD, (IntPtr)0xD2, 1);
@@ -86,7 +93,11 @@ internal class WinIO32
     /// <param name="vKeyCoad"></param>
     public static void KeyUp(Keys vKeyCoad)
     {
-        if (!IsInitialize) return;
+        if (!IsInitialize)
+        {
+            return;
+        }
+
         int btScancode = MapVirtualKey((uint)vKeyCoad, 0);
         //KBCWait4IBE();
         //SetPortVal(KBC_KEY_CMD, (IntPtr)0xD2, 1);

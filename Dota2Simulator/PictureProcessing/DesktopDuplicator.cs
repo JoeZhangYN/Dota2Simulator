@@ -116,9 +116,15 @@ internal class DesktopDuplicator : IDisposable
         }
         finally
         {
-            if (desktopResource != null) desktopResource.Dispose();
+            if (desktopResource != null)
+            {
+                desktopResource.Dispose();
+            }
 
-            if (tempResource != null) tempResource.Dispose();
+            if (tempResource != null)
+            {
+                tempResource.Dispose();
+            }
 
             outputDuplication.ReleaseFrame();
         }

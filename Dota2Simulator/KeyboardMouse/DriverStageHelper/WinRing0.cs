@@ -284,9 +284,14 @@ internal class Ols : IDisposable
                     && WritePhysicalMemory != null
 #endif
                 ))
+            {
                 status = (uint)Status.DLL_INCORRECT_VERSION;
+            }
 
-            if (InitializeOls() == 0) status = (uint)Status.DLL_INITIALIZE_ERROR;
+            if (InitializeOls() == 0)
+            {
+                status = (uint)Status.DLL_INITIALIZE_ERROR;
+            }
         }
     }
 

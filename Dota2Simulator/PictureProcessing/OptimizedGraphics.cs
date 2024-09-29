@@ -10,11 +10,9 @@ public unsafe class OptimizedGraphics : IDisposable
     // 缓存 ScreenDC
     private static readonly IntPtr s_screenDC = NativeMethods.GetDC(IntPtr.Zero);
     private bool _disposed;
-    private IntPtr _hdc;
 
-    public OptimizedGraphics(IntPtr hdc)
+    private OptimizedGraphics()
     {
-        _hdc = hdc;
     }
 
     public void Dispose()
@@ -23,71 +21,97 @@ public unsafe class OptimizedGraphics : IDisposable
         GC.SuppressFinalize(this);
     }
 
-    //public void CopyFromScreen(int sourceX, int sourceY, int destinationX, int destinationY, Size blockRegionSize, CopyPixelOperation copyPixelOperation)
-    //{
-    //    if (_disposed)
-    //    {
-    //        throw new ObjectDisposedException(nameof(OptimizedGraphics));
-    //    }
+    [DllImport("gdi32.dll")]
+    static extern int GetDIBits(IntPtr hdc, IntPtr hbmp, uint uStartScan, uint cScanLines, [Out] byte[] lpvBits, ref BITMAPINFO lpbi, uint uUsage);
 
-    //    if (!Enum.IsDefined(typeof(CopyPixelOperation), copyPixelOperation))
-    //    {
-    //        throw new InvalidEnumArgumentException(nameof(copyPixelOperation), (int)copyPixelOperation, typeof(CopyPixelOperation));
-    //    }
+    [DllImport("gdi32.dll")]
+    static extern IntPtr CreateCompatibleBitmap(IntPtr hdc, int nWidth, int nHeight);
 
-    //    RECT rect = new RECT
-    //    {
-    //        left = sourceX,
-    //        top = sourceY,
-    //        right = sourceX + blockRegionSize.Width,
-    //        bottom = sourceY + blockRegionSize.Height
-    //    };
+    [DllImport("gdi32.dll")]
+    static extern IntPtr CreateCompatibleDC(IntPtr hdc);
 
-    //    if (!NativeMethods.BitBlt(
-    //        _hdc,
-    //        destinationX,
-    //        destinationY,
-    //        rect.right - rect.left,
-    //        rect.bottom - rect.top,
-    //        s_screenDC,
-    //        rect.left,
-    //        rect.top,
-    //        (uint)copyPixelOperation))
-    //    {
-    //        throw new Win32Exception(Marshal.GetLastWin32Error());
-    //    }
-    //}
+    [DllImport("gdi32.dll")]
+    static extern IntPtr SelectObject(IntPtr hdc, IntPtr hgdiobj);
+
+    [DllImport("gdi32.dll")]
+    static extern bool DeleteObject(IntPtr hObject);
+
+    [DllImport("gdi32.dll")]
+    static extern bool DeleteDC(IntPtr hdc);
+
+    [StructLayout(LayoutKind.Sequential)]
+    public struct BITMAPINFO
+    {
+        public Int32 biSize;
+        public Int32 biWidth;
+        public Int32 biHeight;
+        public Int16 biPlanes;
+        public Int16 biBitCount;
+        public Int32 biCompression;
+        public Int32 biSizeImage;
+        public Int32 biXPelsPerMeter;
+        public Int32 biYPelsPerMeter;
+        public Int32 biClrUsed;
+        public Int32 biClrImportant;
+        public Int32 colors1;
+        public Int32 colors2;
+        public Int32 colors3;
+        public Int32 colors4;
+    }
 
     public void CaptureScreenToExistingBitmap(ref Bitmap bitmap, int sourceX, int sourceY)
     {
         if (_disposed) throw new ObjectDisposedException(nameof(OptimizedGraphics));
 
-        ArgumentNullException.ThrowIfNull(bitmap);
-
-        BitmapData bitmapData = bitmap.LockBits(
-            new Rectangle(0, 0, bitmap.Width, bitmap.Height),
-            ImageLockMode.WriteOnly,
+        BitmapData bitmapData = bitmap.LockBits(new Rectangle(0, 0, bitmap.Width, bitmap.Height), ImageLockMode.WriteOnly,
             PixelFormat.Format32bppArgb);
 
         try
         {
-            IntPtr ptr = bitmapData.Scan0;
-            int width = bitmap.Width;
-            int height = bitmap.Height;
+            IntPtr hScreenDC = NativeMethods.GetDC(IntPtr.Zero);
+            IntPtr hMemDC = CreateCompatibleDC(hScreenDC);
+            IntPtr hBitmap = CreateCompatibleBitmap(hScreenDC, bitmap.Width, bitmap.Height);
+            IntPtr hOldBitmap = SelectObject(hMemDC, hBitmap);
 
-            if (!NativeMethods.BitBlt(
-                    _hdc,
-                    0, 0,
-                    width, height,
-                    s_screenDC,
-                    sourceX, sourceY,
+            try
+            {
+                // 复制屏幕内容到内存DC
+                if (!NativeMethods.BitBlt(hMemDC, 0, 0, bitmap.Width, bitmap.Height, hScreenDC, sourceX, sourceY,
                     (uint)CopyPixelOperation.SourceCopy))
-                throw new Win32Exception(Marshal.GetLastWin32Error());
+                {
+                    throw new Win32Exception(Marshal.GetLastWin32Error());
+                }
 
-            // 设置 Alpha 通道为 255（完全不透明）
-            int bytes = bitmapData.Stride * height;
-            byte* ptrByte = (byte*)ptr.ToPointer();
-            for (int i = 3; i < bytes; i += 4) ptrByte[i] = 255;
+                // 准备 BITMAPINFO 结构
+                BITMAPINFO bmi = new BITMAPINFO();
+                bmi.biSize = Marshal.SizeOf(typeof(BITMAPINFO));
+                bmi.biWidth = bitmap.Width;
+                bmi.biHeight = -bitmap.Height;  // 负值表示自顶向下的位图
+                bmi.biPlanes = 1;
+                bmi.biBitCount = 32;
+                bmi.biCompression = 0;  // BI_RGB
+                bmi.biSizeImage = bitmap.Width * bitmap.Height * 4;
+
+                // 创建一个字节数组来存储位图数据
+                int bytes = bitmap.Width * bitmap.Height * 4;
+                byte[] pixelData = new byte[bytes];
+
+                // 使用 GetDIBits 将位图数据复制到 pixelData 数组
+                if (GetDIBits(hMemDC, hBitmap, 0, (uint)bitmap.Height, pixelData, ref bmi, 0) == 0)
+                {
+                    throw new Win32Exception(Marshal.GetLastWin32Error());
+                }
+
+                // 将处理后的数据复制回 bitmapData
+                Marshal.Copy(pixelData, 0, bitmapData.Scan0, bytes);
+            }
+            finally
+            {
+                SelectObject(hMemDC, hOldBitmap);
+                DeleteObject(hBitmap);
+                DeleteDC(hMemDC);
+                NativeMethods.ReleaseDC(IntPtr.Zero, hScreenDC);
+            }
         }
         finally
         {
@@ -105,13 +129,50 @@ public unsafe class OptimizedGraphics : IDisposable
 
         try
         {
-            IntPtr ptr = bitmapData.Scan0;
-            if (!NativeMethods.BitBlt(_hdc, 0, 0, width, height, s_screenDC, sourceX, sourceY,
-                    (uint)CopyPixelOperation.SourceCopy)) throw new Win32Exception(Marshal.GetLastWin32Error());
+            IntPtr hScreenDC = NativeMethods.GetDC(IntPtr.Zero);
+            IntPtr hMemDC = CreateCompatibleDC(hScreenDC);
+            IntPtr hBitmap = CreateCompatibleBitmap(hScreenDC, width, height);
+            IntPtr hOldBitmap = SelectObject(hMemDC, hBitmap);
 
-            int bytes = bitmapData.Stride * height;
-            byte* ptrByte = (byte*)ptr.ToPointer();
-            for (int i = 0; i < bytes; i += 4) ptrByte[i] = 255; // Alpha channel
+            try
+            {
+                // 复制屏幕内容到内存DC
+                if (!NativeMethods.BitBlt(hMemDC, 0, 0, width, height, hScreenDC, sourceX, sourceY,
+                    (uint)CopyPixelOperation.SourceCopy))
+                {
+                    throw new Win32Exception(Marshal.GetLastWin32Error());
+                }
+
+                // 准备 BITMAPINFO 结构
+                BITMAPINFO bmi = new BITMAPINFO();
+                bmi.biSize = Marshal.SizeOf(typeof(BITMAPINFO));
+                bmi.biWidth = width;
+                bmi.biHeight = -height;  // 负值表示自顶向下的位图
+                bmi.biPlanes = 1;
+                bmi.biBitCount = 32;
+                bmi.biCompression = 0;  // BI_RGB
+                bmi.biSizeImage = width * height * 4;
+
+                // 创建一个字节数组来存储位图数据
+                int bytes = bitmapData.Stride * height;
+                byte[] pixelData = new byte[bytes];
+
+                // 使用 GetDIBits 将位图数据复制到 pixelData 数组
+                if (GetDIBits(hMemDC, hBitmap, 0, (uint)height, pixelData, ref bmi, 0) == 0)
+                {
+                    throw new Win32Exception(Marshal.GetLastWin32Error());
+                }
+
+                // 将处理后的数据复制回 bitmapData
+                Marshal.Copy(pixelData, 0, bitmapData.Scan0, bytes);
+            }
+            finally
+            {
+                SelectObject(hMemDC, hOldBitmap);
+                DeleteObject(hBitmap);
+                DeleteDC(hMemDC);
+                NativeMethods.ReleaseDC(IntPtr.Zero, hScreenDC);
+            }
 
             return bitmap;
         }
@@ -121,45 +182,58 @@ public unsafe class OptimizedGraphics : IDisposable
         }
     }
 
-    public unsafe byte[] CaptureScreenToBytes(int sourceX, int sourceY, int width, int height)
+    public unsafe bool CaptureScreenToBytes(int sourceX, int sourceY, int width, int height,ref byte[] bts)
     {
+        if (bts.Length != width * height * 4) return false;
         if (_disposed) throw new ObjectDisposedException(nameof(OptimizedGraphics));
 
-        int bytesPerPixel = 4;
-        int byteCount = width * height * bytesPerPixel;
-        byte[] bytes = new byte[byteCount];
+        IntPtr hScreenDC = NativeMethods.GetDC(IntPtr.Zero);
+        IntPtr hMemDC = CreateCompatibleDC(hScreenDC);
+        IntPtr hBitmap = CreateCompatibleBitmap(hScreenDC, width, height);
+        IntPtr hOldBitmap = SelectObject(hMemDC, hBitmap);
 
-        fixed (byte* pBytes = bytes)
+        try
         {
-            IntPtr ptr = (IntPtr)pBytes;
-            using (Bitmap tempBitmap = new(width, height, width * bytesPerPixel, PixelFormat.Format32bppArgb, ptr))
+            // 复制屏幕内容到内存DC
+            if (!NativeMethods.BitBlt(hMemDC, 0, 0, width, height, hScreenDC, sourceX, sourceY,
+                    (uint)CopyPixelOperation.SourceCopy))
             {
-                using (Graphics g = Graphics.FromImage(tempBitmap))
-                {
-                    IntPtr hdc = g.GetHdc();
-                    try
-                    {
-                        if (!NativeMethods.BitBlt(hdc, 0, 0, width, height, s_screenDC, sourceX, sourceY,
-                                (uint)CopyPixelOperation.SourceCopy))
-                            throw new Win32Exception(Marshal.GetLastWin32Error());
-                    }
-                    finally
-                    {
-                        g.ReleaseHdc(hdc);
-                    }
-                }
+                throw new Win32Exception(Marshal.GetLastWin32Error());
             }
 
-            // Set alpha channel to 255
-            for (int i = 3; i < byteCount; i += 4) pBytes[i] = 255;
+            // 准备 BITMAPINFO 结构
+            BITMAPINFO bmi = new BITMAPINFO();
+            bmi.biSize = Marshal.SizeOf(typeof(BITMAPINFO));
+            bmi.biWidth = width;
+            bmi.biHeight = -height; // 负值表示自顶向下的位图
+            bmi.biPlanes = 1;
+            bmi.biBitCount = 32;
+            bmi.biCompression = 0; // BI_RGB
+            bmi.biSizeImage = width * height * 4;
+
+            // 使用 GetDIBits 将位图数据复制到 bts 数组
+            if (GetDIBits(hMemDC, hBitmap, 0, (uint)height, bts, ref bmi, 0) == 0)
+            {
+                throw new Win32Exception(Marshal.GetLastWin32Error());
+            }
+        }
+        finally
+        {
+            SelectObject(hMemDC, hOldBitmap);
+            DeleteObject(hBitmap);
+            DeleteDC(hMemDC);
+            NativeMethods.ReleaseDC(IntPtr.Zero, hScreenDC);
         }
 
-        return bytes;
+        return true;
     }
 
     public static unsafe byte[] BitmapToByteArray(Bitmap bitmap)
     {
-        if (bitmap == null) throw new ArgumentNullException(nameof(bitmap));
+        if (bitmap == null)
+        {
+            throw new ArgumentNullException(nameof(bitmap));
+        }
 
         int width = bitmap.Width;
         int height = bitmap.Height;
@@ -177,17 +251,27 @@ public unsafe class OptimizedGraphics : IDisposable
 
             // 使用并行处理来加速大图像的处理
             if (height > 64)
+            {
                 _ = Parallel.For(0, height, y =>
                 {
                     int rowOffset = y * stride;
-                    for (int x = 0; x < stride; x++) result[rowOffset + x] = ptr[y * bmpData.Stride + x];
+                    for (int x = 0; x < stride; x++)
+                    {
+                        result[rowOffset + x] = ptr[y * bmpData.Stride + x];
+                    }
                 });
+            }
             else
+            {
                 for (int y = 0; y < height; y++)
                 {
                     int rowOffset = y * stride;
-                    for (int x = 0; x < stride; x++) result[rowOffset + x] = ptr[y * bmpData.Stride + x];
+                    for (int x = 0; x < stride; x++)
+                    {
+                        result[rowOffset + x] = ptr[y * bmpData.Stride + x];
+                    }
                 }
+            }
 
             return result;
         }
@@ -197,74 +281,20 @@ public unsafe class OptimizedGraphics : IDisposable
         }
     }
 
-    // 可选：添加一个方法来处理不同的像素格式
-    public static unsafe byte[] BitmapToByteArray(Bitmap bitmap, PixelFormat targetFormat)
-    {
-        if (bitmap == null) throw new ArgumentNullException(nameof(bitmap));
-
-        int width = bitmap.Width;
-        int height = bitmap.Height;
-        int bytesPerPixel = Image.GetPixelFormatSize(targetFormat) / 8;
-        int stride = width * bytesPerPixel;
-        byte[] result = new byte[stride * height];
-
-        Bitmap targetBitmap = bitmap;
-        if (bitmap.PixelFormat != targetFormat)
-        {
-            targetBitmap = new Bitmap(width, height, targetFormat);
-            using (Graphics g = Graphics.FromImage(targetBitmap))
-            {
-                g.DrawImage(bitmap, new Rectangle(0, 0, width, height));
-            }
-        }
-
-        BitmapData bmpData = targetBitmap.LockBits(
-            new Rectangle(0, 0, width, height),
-            ImageLockMode.ReadOnly,
-            targetFormat);
-
-        try
-        {
-            byte* ptr = (byte*)bmpData.Scan0;
-
-            if (height > 64)
-                _ = Parallel.For(0, height, y =>
-                {
-                    int rowOffset = y * stride;
-                    for (int x = 0; x < stride; x++) result[rowOffset + x] = ptr[y * bmpData.Stride + x];
-                });
-            else
-                for (int y = 0; y < height; y++)
-                {
-                    int rowOffset = y * stride;
-                    for (int x = 0; x < stride; x++) result[rowOffset + x] = ptr[y * bmpData.Stride + x];
-                }
-
-            return result;
-        }
-        finally
-        {
-            targetBitmap.UnlockBits(bmpData);
-            if (targetBitmap != bitmap) targetBitmap.Dispose();
-        }
-    }
-
     public IntPtr GetHdc()
     {
-        if (_disposed) throw new ObjectDisposedException(nameof(OptimizedGraphics));
-
-        return _hdc;
+        return _disposed ? throw new ObjectDisposedException(nameof(OptimizedGraphics)) : s_screenDC;
     }
 
     protected virtual void Dispose(bool disposing)
     {
         if (!_disposed)
         {
-            if (_hdc != IntPtr.Zero)
-            {
-                _ = NativeMethods.DeleteDC(_hdc);
-                _hdc = IntPtr.Zero;
-            }
+            //if (s_screenDC != IntPtr.Zero)
+            //{
+            //    _ = NativeMethods.DeleteDC(_hdc);
+            //    _hdc = IntPtr.Zero;
+            //}
 
             _disposed = true;
         }
@@ -275,25 +305,9 @@ public unsafe class OptimizedGraphics : IDisposable
         Dispose(false);
     }
 
-    public static OptimizedGraphics FromHdc(IntPtr hdc)
-    {
-        return new OptimizedGraphics(hdc);
-    }
-
     public static OptimizedGraphics CreateGraphics()
     {
-        IntPtr hdc = NativeMethods.CreateCompatibleDC(IntPtr.Zero);
-        if (hdc == IntPtr.Zero) throw new Win32Exception(Marshal.GetLastWin32Error());
-        return new OptimizedGraphics(hdc);
-    }
-
-    [StructLayout(LayoutKind.Sequential)]
-    private struct RECT
-    {
-        public int left;
-        public int top;
-        public int right;
-        public int bottom;
+        return new OptimizedGraphics();
     }
 
     private static class NativeMethods

@@ -78,7 +78,9 @@ internal partial class Form1 : Form
         }
 
         foreach (KeyValuePair<int, List<string>> group in groupDic)
+        {
             textBox4.Text += group.Key.ToString() + Environment.NewLine + string.Join(Environment.NewLine, group.Value);
+        }
     }
 
     /// <summary>
@@ -89,7 +91,10 @@ internal partial class Form1 : Form
     private void Hook_KeyDown(object sender, KeyEventArgs e)
     {
         // 最好是不常用的快捷键
-        if (e.KeyCode != Keys.F9) return;
+        if (e.KeyCode != Keys.F9)
+        {
+            return;
+        }
 
         switch (comboBox3.Text)
         {
@@ -164,10 +169,16 @@ internal partial class Form1 : Form
         foreach (object match in matchCollection)
         {
             string str = match.ToString()?.Trim();
-            if (str == null) continue;
+            if (str == null)
+            {
+                continue;
+            }
 
             str = Regex.Replace(str, @"(\r?\n|\r)", "");
-            if (str.Length != 0) listStr.Add(str);
+            if (str.Length != 0)
+            {
+                listStr.Add(str);
+            }
         }
 
         Point p = MousePosition;
@@ -182,7 +193,10 @@ internal partial class Form1 : Form
 
         Delay(50);
 
-        for (int i = 0; i < 7; i++) SimKeyBoard.KeyPress(Keys.Tab);
+        for (int i = 0; i < 7; i++)
+        {
+            SimKeyBoard.KeyPress(Keys.Tab);
+        }
 
         Delay(50);
 
@@ -269,10 +283,16 @@ internal partial class Form1 : Form
         foreach (object match in matchCollection)
         {
             string str = match.ToString()?.Trim();
-            if (str == null) continue;
+            if (str == null)
+            {
+                continue;
+            }
 
             str = Regex.Replace(str, @"(\r?\n|\r)", "");
-            if (str.Length != 0) listStr.Add(str);
+            if (str.Length != 0)
+            {
+                listStr.Add(str);
+            }
         }
 
         Point p = MousePosition;
@@ -281,7 +301,10 @@ internal partial class Form1 : Form
         SimKeyBoard.MouseLeftClick();
         Delay(50);
 
-        for (int i = 0; i < 5; i++) SimKeyBoard.KeyPress(Keys.Tab);
+        for (int i = 0; i < 5; i++)
+        {
+            SimKeyBoard.KeyPress(Keys.Tab);
+        }
 
         Delay(50);
 
@@ -331,10 +354,16 @@ internal partial class Form1 : Form
         foreach (object match in matchCollection)
         {
             string str = match.ToString()?.Trim();
-            if (str == null) continue;
+            if (str == null)
+            {
+                continue;
+            }
 
             str = Regex.Replace(str, @"(\r?\n|\r)", "");
-            if (str.Length != 0) listStr.Add(str);
+            if (str.Length != 0)
+            {
+                listStr.Add(str);
+            }
         }
 
         _ = Task.Run(() =>
@@ -377,7 +406,10 @@ internal partial class Form1 : Form
             Invoke(() => { Clipboard.SetText(listStr[14]); });
             SimKeyBoard.KeyPressWhile(Keys.V, Keys.Control);
 
-            for (int i = 0; i < 6; i++) SimKeyBoard.KeyPress(Keys.Tab);
+            for (int i = 0; i < 6; i++)
+            {
+                SimKeyBoard.KeyPress(Keys.Tab);
+            }
 
             Delay(50);
             Invoke(() => { Clipboard.SetText(listStr[10]); });
@@ -393,7 +425,10 @@ internal partial class Form1 : Form
 
             while (processCount < 1)
             {
-                if (PaddleOcr.获取图片文字(2961, 892, 49, 27) == "对公") processCount++;
+                if (PaddleOcr.获取图片文字(2961, 892, 49, 27) == "对公")
+                {
+                    processCount++;
+                }
 
                 Delay(25);
             }
@@ -410,7 +445,10 @@ internal partial class Form1 : Form
 
             while (processCount < 2)
             {
-                if (PaddleOcr.获取图片文字(2206, 1404, 55, 31) == "取消") processCount++;
+                if (PaddleOcr.获取图片文字(2206, 1404, 55, 31) == "取消")
+                {
+                    processCount++;
+                }
 
                 Delay(25);
             }
@@ -425,7 +463,10 @@ internal partial class Form1 : Form
 
             while (processCount < 3)
             {
-                if (PaddleOcr.获取图片文字(368, 487, 120, 48) == "冻结信息") processCount++;
+                if (PaddleOcr.获取图片文字(368, 487, 120, 48) == "冻结信息")
+                {
+                    processCount++;
+                }
 
                 Delay(25);
             }
@@ -436,7 +477,10 @@ internal partial class Form1 : Form
 
             while (processCount < 4)
             {
-                if (PaddleOcr.获取图片文字(2206, 1404, 55, 31) == "取消") processCount++;
+                if (PaddleOcr.获取图片文字(2206, 1404, 55, 31) == "取消")
+                {
+                    processCount++;
+                }
 
                 Delay(25);
             }
@@ -467,7 +511,10 @@ internal partial class Form1 : Form
 
             while (processCount < 5)
             {
-                if (PaddleOcr.获取图片文字(1177, 478, 180, 39) == "选择经办警官") processCount++;
+                if (PaddleOcr.获取图片文字(1177, 478, 180, 39) == "选择经办警官")
+                {
+                    processCount++;
+                }
 
                 Delay(25);
             }
@@ -516,10 +563,16 @@ internal partial class Form1 : Form
         foreach (object match in matchCollection)
         {
             string str = match.ToString()?.Trim();
-            if (str == null) continue;
+            if (str == null)
+            {
+                continue;
+            }
 
             str = Regex.Replace(str, @"(\r?\n|\r)", "");
-            if (str.Length != 0) listStr.Add(str);
+            if (str.Length != 0)
+            {
+                listStr.Add(str);
+            }
         }
 
         Point p = MousePosition;
@@ -534,7 +587,10 @@ internal partial class Form1 : Form
 
             while (processCount < 1)
             {
-                if (PaddleOcr.获取图片文字(1537, 737, 50, 34) == "打印") processCount++;
+                if (PaddleOcr.获取图片文字(1537, 737, 50, 34) == "打印")
+                {
+                    processCount++;
+                }
 
                 Delay(25);
             }
@@ -555,7 +611,10 @@ internal partial class Form1 : Form
 
             while (processCount < 2)
             {
-                if (PaddleOcr.获取图片文字(32, 704, 36, 27) == "放大") processCount++;
+                if (PaddleOcr.获取图片文字(32, 704, 36, 27) == "放大")
+                {
+                    processCount++;
+                }
 
                 Delay(25);
             }
@@ -566,7 +625,10 @@ internal partial class Form1 : Form
 
             while (processCount < 3)
             {
-                if (PaddleOcr.获取图片文字(1298, 1661, 107, 41) == "隐藏文件夹") processCount++;
+                if (PaddleOcr.获取图片文字(1298, 1661, 107, 41) == "隐藏文件夹")
+                {
+                    processCount++;
+                }
 
                 Delay(25);
             }
@@ -581,7 +643,10 @@ internal partial class Form1 : Form
 
             while (processCount < 4)
             {
-                if (File.Exists("Z:\\desktop\\" + listStr[3] + "_冻结.jpg")) processCount++;
+                if (File.Exists("Z:\\desktop\\" + listStr[3] + "_冻结.jpg"))
+                {
+                    processCount++;
+                }
 
                 Delay(25);
             }
@@ -590,7 +655,10 @@ internal partial class Form1 : Form
 
             while (processCount < 5)
             {
-                if (PaddleOcr.获取图片文字(50, 110, 50, 33) == "周报") processCount++;
+                if (PaddleOcr.获取图片文字(50, 110, 50, 33) == "周报")
+                {
+                    processCount++;
+                }
 
                 Delay(25);
             }
@@ -618,10 +686,16 @@ internal partial class Form1 : Form
         foreach (object match in matchCollection)
         {
             string str = match.ToString()?.Trim();
-            if (str == null) continue;
+            if (str == null)
+            {
+                continue;
+            }
 
             str = Regex.Replace(str, @"(\r?\n|\r)", "");
-            if (str.Length != 0) listStr.Add(str);
+            if (str.Length != 0)
+            {
+                listStr.Add(str);
+            }
         }
 
         Point p = MousePosition;
@@ -636,7 +710,10 @@ internal partial class Form1 : Form
 
             while (processCount < 1)
             {
-                if (PaddleOcr.获取图片文字(1537, 737, 50, 34) == "打印") processCount++;
+                if (PaddleOcr.获取图片文字(1537, 737, 50, 34) == "打印")
+                {
+                    processCount++;
+                }
 
                 Delay(25);
             }
@@ -647,7 +724,10 @@ internal partial class Form1 : Form
 
             while (processCount < 2)
             {
-                if (PaddleOcr.获取图片文字(32, 704, 36, 27) == "放大") processCount++;
+                if (PaddleOcr.获取图片文字(32, 704, 36, 27) == "放大")
+                {
+                    processCount++;
+                }
 
                 Delay(25);
             }
@@ -658,7 +738,10 @@ internal partial class Form1 : Form
 
             while (processCount < 3)
             {
-                if (PaddleOcr.获取图片文字(1298, 1661, 107, 41) == "隐藏文件夹") processCount++;
+                if (PaddleOcr.获取图片文字(1298, 1661, 107, 41) == "隐藏文件夹")
+                {
+                    processCount++;
+                }
 
                 Delay(25);
             }
@@ -673,7 +756,10 @@ internal partial class Form1 : Form
 
             while (processCount < 4)
             {
-                if (File.Exists("Z:\\desktop\\" + listStr[3] + "_冻结呈请.jpg")) processCount++;
+                if (File.Exists("Z:\\desktop\\" + listStr[3] + "_冻结呈请.jpg"))
+                {
+                    processCount++;
+                }
 
                 Delay(25);
             }
@@ -682,7 +768,10 @@ internal partial class Form1 : Form
 
             while (processCount < 5)
             {
-                if (PaddleOcr.获取图片文字(50, 110, 50, 33) == "周报") processCount++;
+                if (PaddleOcr.获取图片文字(50, 110, 50, 33) == "周报")
+                {
+                    processCount++;
+                }
 
                 Delay(25);
             }
@@ -805,8 +894,12 @@ internal partial class Form1 : Form
         gRexGroups = LoadDate();
 
         if (gRexGroups != null)
+        {
             foreach (RexGroup rexGroup in gRexGroups.Groups)
+            {
                 _ = comboBox1.Items.Add(rexGroup.Group);
+            }
+        }
     }
 
 
@@ -822,7 +915,10 @@ internal partial class Form1 : Form
 
         comboBox1.Items.Clear();
 
-        foreach (RexGroup rexGroup in gRexGroups.Groups) _ = comboBox1.Items.Add(rexGroup.Group);
+        foreach (RexGroup rexGroup in gRexGroups.Groups)
+        {
+            _ = comboBox1.Items.Add(rexGroup.Group);
+        }
 
         comboBox2.Items.Clear();
     }
@@ -839,7 +935,10 @@ internal partial class Form1 : Form
         if (index != -1)
         {
             comboBox2.Items.Clear();
-            foreach (RexTitle rexTitle in gRexGroups.Groups[index].Titles) _ = comboBox2.Items.Add(rexTitle.Title);
+            foreach (RexTitle rexTitle in gRexGroups.Groups[index].Titles)
+            {
+                _ = comboBox2.Items.Add(rexTitle.Title);
+            }
         }
     }
 
@@ -885,19 +984,26 @@ internal partial class Form1 : Form
     /// <param name="e"></param>
     private void comboBox2_SelectedIndexChanged(object sender, EventArgs e)
     {
-        if (comboBox2.SelectedItem == null) return;
+        if (comboBox2.SelectedItem == null)
+        {
+            return;
+        }
 
         string selectStr = comboBox2.SelectedItem.ToString();
 
         foreach (RexGroup rexGroup in gRexGroups.Groups)
-        foreach (RexTitle rexTitle in rexGroup.Titles)
-            if (rexTitle.Title == selectStr)
+        {
+            foreach (RexTitle rexTitle in rexGroup.Titles)
+            {
+                if (rexTitle.Title == selectStr)
             {
                 textBox1.Text = rexTitle.Text;
                 textBox2.Text = rexTitle.ReplacementsReg;
                 textBox3.Text = rexTitle.ReplacementsText;
                 break;
             }
+            }
+        }
     }
 
     /// <summary>

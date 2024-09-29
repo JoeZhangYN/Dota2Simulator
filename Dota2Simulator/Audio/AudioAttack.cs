@@ -39,7 +39,10 @@ internal class AudioAttack
         Buffer.BlockCopy(e.Buffer, 0, buffer, 0, e.BytesRecorded);
 
         // 比较样本
-        if (IsAttackSound(buffer)) Console.WriteLine("Attack sound detected");
+        if (IsAttackSound(buffer))
+        {
+            Console.WriteLine("Attack sound detected");
+        }
         // 处理检测到攻击音效后的逻辑
     }
 
@@ -47,19 +50,27 @@ internal class AudioAttack
     {
         // 简单的波形对比示例
         // 可以使用更复杂的算法进行特征提取和匹配
-        if (buffer.Length < attackSoundSample.Length) return false;
+        if (buffer.Length < attackSoundSample.Length)
+        {
+            return false;
+        }
 
         for (int i = 0; i <= buffer.Length - attackSoundSample.Length; i++)
         {
             bool match = true;
             for (int j = 0; j < attackSoundSample.Length; j++)
+            {
                 if (Math.Abs(buffer[i + j] - attackSoundSample[j]) > 0.01f)
                 {
                     match = false;
                     break;
                 }
+            }
 
-            if (match) return true;
+            if (match)
+            {
+                return true;
+            }
         }
 
         return false;

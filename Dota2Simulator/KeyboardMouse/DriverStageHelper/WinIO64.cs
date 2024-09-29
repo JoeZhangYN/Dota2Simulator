@@ -45,7 +45,10 @@ internal class WinIO64
 
     public static void Shutdown()
     {
-        if (IsInitialize) ShutdownWinIo();
+        if (IsInitialize)
+        {
+            ShutdownWinIo();
+        }
 
         IsInitialize = false;
     }
@@ -63,7 +66,11 @@ internal class WinIO64
     /// 模拟键盘标按下
     public static void KeyDown(Keys vKeyCoad)
     {
-        if (!IsInitialize) return;
+        if (!IsInitialize)
+        {
+            return;
+        }
+
         int btScancode = MapVirtualKey((uint)vKeyCoad, 0);
         KBCWait4IBE();
         _ = SetPortVal(KBC_KEY_CMD, 0xD2, 1);
@@ -78,7 +85,11 @@ internal class WinIO64
     /// 模拟键盘弹出
     public static void KeyUp(Keys vKeyCoad)
     {
-        if (!IsInitialize) return;
+        if (!IsInitialize)
+        {
+            return;
+        }
+
         int btScancode = MapVirtualKey((uint)vKeyCoad, 0);
         KBCWait4IBE();
         _ = SetPortVal(KBC_KEY_CMD, 0xD2, 1);

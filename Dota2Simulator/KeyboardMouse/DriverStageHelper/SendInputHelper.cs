@@ -65,7 +65,9 @@ internal class SendInputHelper
                                  0; //num >>8表示 高位字节上当状态，如果为1则按下Shift，否则没有按下Shift，即大写键CapsLk没有开启时，是否需要按下Shift。
                     if ((GetKeyState(20) & 1) != 0 &&
                         ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z'))) //Win32API.GetKeyState(20)获取CapsLk大写键状态
+                    {
                         shift = !shift;
+                    }
 
                     if (shift)
                     {
