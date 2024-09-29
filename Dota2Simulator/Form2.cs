@@ -104,268 +104,268 @@ namespace Dota2Simulator
                 #region 大牛
 
                 case "大牛":
-                {
-                    if (!_总循环条件)
                     {
-                        _条件根据图片委托1 ??= 回音践踏去后摇;
-                        _条件根据图片委托2 ??= 灵体游魂去后摇;
-                        _条件根据图片委托3 ??= 裂地沟壑去后摇;
-                        _总循环条件 = true;
-                        await 状态初始化().ConfigureAwait(false);
-                        _切假腿配置.修改配置(Keys.E, false);
+                        if (!_总循环条件)
+                        {
+                            _条件根据图片委托1 ??= 回音践踏去后摇;
+                            _条件根据图片委托2 ??= 灵体游魂去后摇;
+                            _条件根据图片委托3 ??= 裂地沟壑去后摇;
+                            _总循环条件 = true;
+                            await 状态初始化().ConfigureAwait(false);
+                            _切假腿配置.修改配置(Keys.E, false);
+                        }
+
+                        await 根据按键判断技能释放前通用逻辑(e).ConfigureAwait(true);
+
+                        switch (e.KeyCode)
+                        {
+                            case Keys.Q:
+                                _条件1 = true;
+                                break;
+                            case Keys.W:
+                                // 用于回收时按W
+                                SimKeyBoard.KeyPress(Keys.A);
+                                _条件2 = true;
+                                break;
+                            case Keys.R:
+                                _条件3 = true;
+                                break;
+                        }
+
+                        break;
                     }
-
-                    await 根据按键判断技能释放前通用逻辑(e).ConfigureAwait(true);
-
-                    switch (e.KeyCode)
-                    {
-                        case Keys.Q:
-                            _条件1 = true;
-                            break;
-                        case Keys.W:
-                            // 用于回收时按W
-                            SimKeyBoard.KeyPress(Keys.A);
-                            _条件2 = true;
-                            break;
-                        case Keys.R:
-                            _条件3 = true;
-                            break;
-                    }
-
-                    break;
-                }
 
                 #endregion
 
                 #region 尸王
 
                 case "尸王":
-                {
-                    if (!_总循环条件)
                     {
-                        _条件根据图片委托1 ??= 腐朽去后摇;
-                        _条件根据图片委托2 ??= 噬魂去后摇;
-                        _条件根据图片委托3 ??= 墓碑去后摇;
-                        _条件根据图片委托4 ??= 血肉傀儡去后摇;
-                        _总循环条件 = true;
-                        await 状态初始化().ConfigureAwait(false);
+                        if (!_总循环条件)
+                        {
+                            _条件根据图片委托1 ??= 腐朽去后摇;
+                            _条件根据图片委托2 ??= 噬魂去后摇;
+                            _条件根据图片委托3 ??= 墓碑去后摇;
+                            _条件根据图片委托4 ??= 血肉傀儡去后摇;
+                            _总循环条件 = true;
+                            await 状态初始化().ConfigureAwait(false);
+                        }
+
+                        await 根据按键判断技能释放前通用逻辑(e).ConfigureAwait(true);
+
+                        switch (e.KeyCode)
+                        {
+                            case Keys.Q:
+                                _条件1 = true;
+                                break;
+                            case Keys.W:
+                                _条件2 = true;
+                                break;
+                            case Keys.E:
+                                _条件3 = true;
+                                break;
+                            case Keys.R:
+                                _条件4 = true;
+                                break;
+                        }
+
+                        break;
                     }
-
-                    await 根据按键判断技能释放前通用逻辑(e).ConfigureAwait(true);
-
-                    switch (e.KeyCode)
-                    {
-                        case Keys.Q:
-                            _条件1 = true;
-                            break;
-                        case Keys.W:
-                            _条件2 = true;
-                            break;
-                        case Keys.E:
-                            _条件3 = true;
-                            break;
-                        case Keys.R:
-                            _条件4 = true;
-                            break;
-                    }
-
-                    break;
-                }
 
                 #endregion
 
                 #region 伐木机
 
                 case "伐木机":
-                {
-                    if (!_总循环条件)
                     {
-                        _命石根据图片委托 ??= 伐木机获取命石;
-                        _条件根据图片委托1 ??= 死亡旋风去后摇;
-                        _条件根据图片委托2 ??= 伐木聚链去后摇;
-                        _条件根据图片委托3 ??= 锯齿轮旋去后摇;
-                        _条件根据图片委托4 ??= 喷火装置去后摇;
-                        _条件根据图片委托5 ??= 锯齿飞轮去后摇;
-                        _总循环条件 = true;
-                        await 状态初始化().ConfigureAwait(false);
-                    }
+                        if (!_总循环条件)
+                        {
+                            _命石根据图片委托 ??= 伐木机获取命石;
+                            _条件根据图片委托1 ??= 死亡旋风去后摇;
+                            _条件根据图片委托2 ??= 伐木聚链去后摇;
+                            _条件根据图片委托3 ??= 锯齿轮旋去后摇;
+                            _条件根据图片委托4 ??= 喷火装置去后摇;
+                            _条件根据图片委托5 ??= 锯齿飞轮去后摇;
+                            _总循环条件 = true;
+                            await 状态初始化().ConfigureAwait(false);
+                        }
 
-                    await 根据按键判断技能释放前通用逻辑(e).ConfigureAwait(true);
+                        await 根据按键判断技能释放前通用逻辑(e).ConfigureAwait(true);
 
-                    switch (e.KeyCode)
-                    {
-                        case Keys.Q:
-                            _条件1 = true;
-                            break;
-                        case Keys.W:
-                            _条件2 = true;
-                            break;
-                        case Keys.D:
-                            if (_命石选择 == 2)
+                        switch (e.KeyCode)
+                        {
+                            case Keys.Q:
+                                _条件1 = true;
+                                break;
+                            case Keys.W:
+                                _条件2 = true;
+                                break;
+                            case Keys.D:
+                                if (_命石选择 == 2)
                                 {
                                     _条件3 = true;
                                 }
 
                                 break;
-                        case Keys.F:
-                            _条件4 = true;
-                            break;
-                        case Keys.R:
-                            _条件5 = true;
-                            break;
-                    }
+                            case Keys.F:
+                                _条件4 = true;
+                                break;
+                            case Keys.R:
+                                _条件5 = true;
+                                break;
+                        }
 
-                    break;
-                }
+                        break;
+                    }
 
                 #endregion
 
                 #region 全能
 
                 case "全能":
-                {
-                    if (!_总循环条件)
                     {
-                        _条件根据图片委托1 ??= 洗礼去后摇;
-                        _条件根据图片委托2 ??= 驱逐去后摇;
-                        _条件根据图片委托3 ??= 守护天使去后摇;
-                        _总循环条件 = true;
-                        _切假腿配置.修改配置(Keys.E, false);
-                        await 状态初始化().ConfigureAwait(false);
+                        if (!_总循环条件)
+                        {
+                            _条件根据图片委托1 ??= 洗礼去后摇;
+                            _条件根据图片委托2 ??= 驱逐去后摇;
+                            _条件根据图片委托3 ??= 守护天使去后摇;
+                            _总循环条件 = true;
+                            _切假腿配置.修改配置(Keys.E, false);
+                            await 状态初始化().ConfigureAwait(false);
+                        }
+
+                        await 根据按键判断技能释放前通用逻辑(e).ConfigureAwait(true);
+
+                        switch (e.KeyCode)
+                        {
+                            case Keys.Q:
+                                _条件1 = true;
+                                break;
+                            case Keys.W:
+                                _条件2 = true;
+                                break;
+                            case Keys.R:
+                                _条件3 = true;
+                                break;
+                        }
+
+                        break;
                     }
-
-                    await 根据按键判断技能释放前通用逻辑(e).ConfigureAwait(true);
-
-                    switch (e.KeyCode)
-                    {
-                        case Keys.Q:
-                            _条件1 = true;
-                            break;
-                        case Keys.W:
-                            _条件2 = true;
-                            break;
-                        case Keys.R:
-                            _条件3 = true;
-                            break;
-                    }
-
-                    break;
-                }
 
                 #endregion
 
                 #region 军团
 
                 case "军团":
-                {
-                    if (!_总循环条件)
                     {
-                        _条件根据图片委托1 ??= 压倒性优势去后摇;
-                        _条件根据图片委托2 ??= 强攻去后摇;
-                        _条件根据图片委托3 ??= 决斗;
-                        _条件根据图片委托4 ??= 决斗去后摇;
-                        _总循环条件 = true;
-                        _全局步骤 = -1;
-                        _切假腿配置.修改配置(Keys.E, false);
-                        await 状态初始化().ConfigureAwait(false);
+                        if (!_总循环条件)
+                        {
+                            _条件根据图片委托1 ??= 压倒性优势去后摇;
+                            _条件根据图片委托2 ??= 强攻去后摇;
+                            _条件根据图片委托3 ??= 决斗;
+                            _条件根据图片委托4 ??= 决斗去后摇;
+                            _总循环条件 = true;
+                            _全局步骤 = -1;
+                            _切假腿配置.修改配置(Keys.E, false);
+                            await 状态初始化().ConfigureAwait(false);
+                        }
+
+                        await 根据按键判断技能释放前通用逻辑(e).ConfigureAwait(true);
+
+                        switch (e.KeyCode)
+                        {
+                            case Keys.Q:
+                                _条件1 = true;
+                                break;
+                            case Keys.W:
+                                _条件2 = true;
+                                break;
+                            case Keys.R:
+                                _条件4 = true;
+                                break;
+                            case Keys.F:
+                                if (_全局步骤 == -1)
+                                {
+                                    _全局步骤 = 0;
+                                    _条件3 = true;
+                                }
+
+                                break;
+                            case Keys.D2:
+                                _全局模式 = 1 - _全局模式;
+                                Tts.Speak(_全局模式 == 1 ? "跳刀决斗" : "直接决斗");
+                                break;
+                        }
+
+                        break;
                     }
-
-                    await 根据按键判断技能释放前通用逻辑(e).ConfigureAwait(true);
-
-                    switch (e.KeyCode)
-                    {
-                        case Keys.Q:
-                            _条件1 = true;
-                            break;
-                        case Keys.W:
-                            _条件2 = true;
-                            break;
-                        case Keys.R:
-                            _条件4 = true;
-                            break;
-                        case Keys.F:
-                            if (_全局步骤 == -1)
-                            {
-                                _全局步骤 = 0;
-                                _条件3 = true;
-                            }
-
-                            break;
-                        case Keys.D2:
-                            _全局模式 = 1 - _全局模式;
-                            Tts.Speak(_全局模式 == 1 ? "跳刀决斗" : "直接决斗");
-                            break;
-                    }
-
-                    break;
-                }
 
                 #endregion
 
                 #region 骷髅王
 
                 case "骷髅王":
-                {
-                    if (!_总循环条件)
                     {
-                        _命石根据图片委托 ??= 骷髅王获取命石;
-                        _条件根据图片委托1 ??= 冥火爆击去后摇;
-                        _条件根据图片委托2 ??= 白骨守卫去后摇;
-                        _总循环条件 = true;
-                        _切假腿配置.修改配置(Keys.W, false);
-                        _切假腿配置.修改配置(Keys.E, false);
-                        await 状态初始化().ConfigureAwait(false);
+                        if (!_总循环条件)
+                        {
+                            _命石根据图片委托 ??= 骷髅王获取命石;
+                            _条件根据图片委托1 ??= 冥火爆击去后摇;
+                            _条件根据图片委托2 ??= 白骨守卫去后摇;
+                            _总循环条件 = true;
+                            _切假腿配置.修改配置(Keys.W, false);
+                            _切假腿配置.修改配置(Keys.E, false);
+                            await 状态初始化().ConfigureAwait(false);
+                        }
+
+                        await 根据按键判断技能释放前通用逻辑(e).ConfigureAwait(true);
+
+                        switch (e.KeyCode)
+                        {
+                            case Keys.Q:
+                                _条件1 = true;
+                                break;
+                            case Keys.W:
+                                if (_命石选择 == 1)
+                                {
+                                    _切假腿配置.修改配置(Keys.W, true);
+                                    _条件2 = true;
+                                }
+
+                                break;
+                        }
+
+                        break;
                     }
-
-                    await 根据按键判断技能释放前通用逻辑(e).ConfigureAwait(true);
-
-                    switch (e.KeyCode)
-                    {
-                        case Keys.Q:
-                            _条件1 = true;
-                            break;
-                        case Keys.W:
-                            if (_命石选择 == 1)
-                            {
-                                _切假腿配置.修改配置(Keys.W, true);
-                                _条件2 = true;
-                            }
-
-                            break;
-                    }
-
-                    break;
-                }
 
                 #endregion
 
                 #region 人马
 
                 case "人马":
-                {
-                    if (!_总循环条件)
                     {
-                        _条件根据图片委托1 ??= 马蹄践踏接平A;
-                        _条件根据图片委托2 ??= 双刃剑去后摇;
-                        _总循环条件 = true;
-                        _切假腿配置.修改配置(Keys.E, false);
-                        await 状态初始化().ConfigureAwait(false);
+                        if (!_总循环条件)
+                        {
+                            _条件根据图片委托1 ??= 马蹄践踏接平A;
+                            _条件根据图片委托2 ??= 双刃剑去后摇;
+                            _总循环条件 = true;
+                            _切假腿配置.修改配置(Keys.E, false);
+                            await 状态初始化().ConfigureAwait(false);
+                        }
+
+                        await 根据按键判断技能释放前通用逻辑(e).ConfigureAwait(true);
+
+                        switch (e.KeyCode)
+                        {
+                            case Keys.Q:
+                                _条件1 = true;
+                                break;
+                            case Keys.W:
+                                _条件2 = true;
+                                break;
+                        }
+
+                        break;
                     }
-
-                    await 根据按键判断技能释放前通用逻辑(e).ConfigureAwait(true);
-
-                    switch (e.KeyCode)
-                    {
-                        case Keys.Q:
-                            _条件1 = true;
-                            break;
-                        case Keys.W:
-                            _条件2 = true;
-                            break;
-                    }
-
-                    break;
-                }
 
                 #endregion
 
@@ -400,595 +400,595 @@ namespace Dota2Simulator
                 #region 小狗
 
                 case "小狗":
-                {
-                    if (!_总循环条件)
                     {
-                        _条件根据图片委托1 ??= 狂暴去后摇;
-                        _条件根据图片委托2 ??= 撕裂伤口去后摇;
-                        _总循环条件 = true;
-                        _切假腿配置.修改配置(Keys.E, false);
-                        await 状态初始化().ConfigureAwait(false);
+                        if (!_总循环条件)
+                        {
+                            _条件根据图片委托1 ??= 狂暴去后摇;
+                            _条件根据图片委托2 ??= 撕裂伤口去后摇;
+                            _总循环条件 = true;
+                            _切假腿配置.修改配置(Keys.E, false);
+                            await 状态初始化().ConfigureAwait(false);
+                        }
+
+                        await 根据按键判断技能释放前通用逻辑(e).ConfigureAwait(true);
+
+                        switch (e.KeyCode)
+                        {
+                            case Keys.Q:
+                                _条件1 = true;
+                                break;
+                            case Keys.W:
+                                _条件2 = true;
+                                break;
+                        }
+
+                        break;
                     }
-
-                    await 根据按键判断技能释放前通用逻辑(e).ConfigureAwait(true);
-
-                    switch (e.KeyCode)
-                    {
-                        case Keys.Q:
-                            _条件1 = true;
-                            break;
-                        case Keys.W:
-                            _条件2 = true;
-                            break;
-                    }
-
-                    break;
-                }
 
                 #endregion
 
                 #region 土猫
 
                 case "土猫":
-                {
-                    if (!_总循环条件)
                     {
-                        _条件根据图片委托1 ??= 巨石冲击去后摇;
-                        _条件根据图片委托2 ??= 地磁之握去后摇;
-                        _条件根据图片委托3 ??= 磁化去后摇;
-                        _总循环条件 = true;
-                        await 状态初始化().ConfigureAwait(false);
+                        if (!_总循环条件)
+                        {
+                            _条件根据图片委托1 ??= 巨石冲击去后摇;
+                            _条件根据图片委托2 ??= 地磁之握去后摇;
+                            _条件根据图片委托3 ??= 磁化去后摇;
+                            _总循环条件 = true;
+                            await 状态初始化().ConfigureAwait(false);
+                        }
+
+                        await 根据按键判断技能释放前通用逻辑(e).ConfigureAwait(true);
+
+                        switch (e.KeyCode)
+                        {
+                            case Keys.Q:
+                                _条件1 = true;
+                                break;
+                            case Keys.E:
+                                _条件2 = true;
+                                break;
+                            case Keys.R:
+                                _条件3 = true;
+                                break;
+                        }
+
+                        break;
                     }
-
-                    await 根据按键判断技能释放前通用逻辑(e).ConfigureAwait(true);
-
-                    switch (e.KeyCode)
-                    {
-                        case Keys.Q:
-                            _条件1 = true;
-                            break;
-                        case Keys.E:
-                            _条件2 = true;
-                            break;
-                        case Keys.R:
-                            _条件3 = true;
-                            break;
-                    }
-
-                    break;
-                }
 
                 #endregion
 
                 #region 孽主
 
                 case "孽主":
-                {
-                    if (!_总循环条件)
                     {
-                        _条件根据图片委托1 ??= 火焰风暴去后摇;
-                        _条件根据图片委托2 ??= 怨念深渊去后摇;
-                        _总循环条件 = true;
-                        await 状态初始化().ConfigureAwait(false);
+                        if (!_总循环条件)
+                        {
+                            _条件根据图片委托1 ??= 火焰风暴去后摇;
+                            _条件根据图片委托2 ??= 怨念深渊去后摇;
+                            _总循环条件 = true;
+                            await 状态初始化().ConfigureAwait(false);
+                        }
+
+                        await 根据按键判断技能释放前通用逻辑(e).ConfigureAwait(true);
+
+                        switch (e.KeyCode)
+                        {
+                            case Keys.Q:
+                                _条件1 = true;
+                                break;
+                            case Keys.W:
+                                _条件2 = true;
+                                break;
+                        }
+
+                        break;
                     }
-
-                    await 根据按键判断技能释放前通用逻辑(e).ConfigureAwait(true);
-
-                    switch (e.KeyCode)
-                    {
-                        case Keys.Q:
-                            _条件1 = true;
-                            break;
-                        case Keys.W:
-                            _条件2 = true;
-                            break;
-                    }
-
-                    break;
-                }
 
                 #endregion
 
                 #region 小小
 
                 case "小小":
-                {
-                    if (!_总循环条件)
                     {
-                        _总循环条件 = true;
-                        _条件根据图片委托1 ??= 山崩去后摇;
-                        _条件根据图片委托2 ??= 投掷去后摇;
-                        _切假腿配置.修改配置(Keys.E, false);
-                        _切假腿配置.修改配置(Keys.R, false);
-                        await 状态初始化().ConfigureAwait(false);
+                        if (!_总循环条件)
+                        {
+                            _总循环条件 = true;
+                            _条件根据图片委托1 ??= 山崩去后摇;
+                            _条件根据图片委托2 ??= 投掷去后摇;
+                            _切假腿配置.修改配置(Keys.E, false);
+                            _切假腿配置.修改配置(Keys.R, false);
+                            await 状态初始化().ConfigureAwait(false);
+                        }
+
+                        await 根据按键判断技能释放前通用逻辑(e).ConfigureAwait(true);
+
+                        switch (e.KeyCode)
+                        {
+                            case Keys.Q:
+                                _条件1 = true;
+                                break;
+                            case Keys.W:
+                                _条件2 = true;
+                                break;
+                        }
+
+                        break;
                     }
-
-                    await 根据按键判断技能释放前通用逻辑(e).ConfigureAwait(true);
-
-                    switch (e.KeyCode)
-                    {
-                        case Keys.Q:
-                            _条件1 = true;
-                            break;
-                        case Keys.W:
-                            _条件2 = true;
-                            break;
-                    }
-
-                    break;
-                }
 
                 #endregion
 
                 #region 海民
 
                 case "海民":
-                {
-                    if (!_总循环条件)
                     {
-                        _命石根据图片委托 ??= 海民获取命石;
-                        _条件根据图片委托1 ??= 冰片去后摇;
-                        _条件根据图片委托2 ??= 摔角行家去后摇;
-                        _条件根据图片委托3 ??= 海象神拳接雪球;
-                        _条件根据图片委托4 ??= 酒友去后摇;
-                        _总循环条件 = true;
-                        await 状态初始化().ConfigureAwait(false);
-                    }
+                        if (!_总循环条件)
+                        {
+                            _命石根据图片委托 ??= 海民获取命石;
+                            _条件根据图片委托1 ??= 冰片去后摇;
+                            _条件根据图片委托2 ??= 摔角行家去后摇;
+                            _条件根据图片委托3 ??= 海象神拳接雪球;
+                            _条件根据图片委托4 ??= 酒友去后摇;
+                            _总循环条件 = true;
+                            await 状态初始化().ConfigureAwait(false);
+                        }
 
-                    await 根据按键判断技能释放前通用逻辑(e).ConfigureAwait(true);
+                        await 根据按键判断技能释放前通用逻辑(e).ConfigureAwait(true);
 
-                    switch (e.KeyCode)
-                    {
-                        case Keys.Q:
-                            _条件1 = true;
-                            break;
-                        case Keys.E:
-                            switch (_命石选择)
-                            {
-                                case 1:
-                                    _条件2 = true;
-                                    break;
-                                case 2:
-                                    _条件4 = true;
-                                    break;
-                            }
+                        switch (e.KeyCode)
+                        {
+                            case Keys.Q:
+                                _条件1 = true;
+                                break;
+                            case Keys.E:
+                                switch (_命石选择)
+                                {
+                                    case 1:
+                                        _条件2 = true;
+                                        break;
+                                    case 2:
+                                        _条件4 = true;
+                                        break;
+                                }
 
-                            break;
-                        case Keys.F:
-                            if (_命石选择 == 1)
+                                break;
+                            case Keys.F:
+                                if (_命石选择 == 1)
                                 {
                                     DOTA2释放CD就绪技能(Keys.E, in _全局数组);
                                 }
 
                                 _条件3 = true;
-                            break;
-                        case Keys.D2:
-                            _指定地点d = MousePosition;
-                            Tts.Speak("确定指定地点");
-                            break;
-                    }
+                                break;
+                            case Keys.D2:
+                                _指定地点d = MousePosition;
+                                Tts.Speak("确定指定地点");
+                                break;
+                        }
 
-                    break;
-                }
+                        break;
+                    }
 
                 #endregion
 
                 #region 屠夫
 
                 case "屠夫":
-                {
-                    if (!_总循环条件)
                     {
-                        _总循环条件 = true;
-                        _条件根据图片委托1 ??= 钩子去僵直;
-                        _条件根据图片委托2 ??= 肢解检测状态;
-                        _条件根据图片委托3 ??= 快速接肢解;
-                        await 状态初始化().ConfigureAwait(false);
+                        if (!_总循环条件)
+                        {
+                            _总循环条件 = true;
+                            _条件根据图片委托1 ??= 钩子去僵直;
+                            _条件根据图片委托2 ??= 肢解检测状态;
+                            _条件根据图片委托3 ??= 快速接肢解;
+                            await 状态初始化().ConfigureAwait(false);
+                        }
+
+                        await 根据按键判断技能释放前通用逻辑(e).ConfigureAwait(true);
+
+                        switch (e.KeyCode)
+                        {
+                            case Keys.Q:
+                                _条件1 = true;
+                                break;
+                            case Keys.R:
+                                _条件2 = true;
+                                break;
+                            case Keys.D2:
+                                _全局模式q = 1 - _全局模式q;
+                                Tts.Speak(_全局模式q == 1 ? "勾接咬" : "勾接平A");
+                                break;
+                        }
+
+                        break;
                     }
-
-                    await 根据按键判断技能释放前通用逻辑(e).ConfigureAwait(true);
-
-                    switch (e.KeyCode)
-                    {
-                        case Keys.Q:
-                            _条件1 = true;
-                            break;
-                        case Keys.R:
-                            _条件2 = true;
-                            break;
-                        case Keys.D2:
-                            _全局模式q = 1 - _全局模式q;
-                            Tts.Speak(_全局模式q == 1 ? "勾接咬" : "勾接平A");
-                            break;
-                    }
-
-                    break;
-                }
 
                 #endregion
 
                 #region 斧王
 
                 case "斧王":
-                {
-                    if (!_总循环条件)
                     {
-                        _条件根据图片委托1 ??= 吼去后摇;
-                        _条件根据图片委托2 ??= 战斗饥渴去后摇;
-                        _条件根据图片委托2 ??= 淘汰之刃去后摇;
-                        _条件根据图片委托4 ??= 跳吼;
-                        _总循环条件 = true;
-                        _切假腿配置.修改配置(Keys.E, false);
-                        await 状态初始化().ConfigureAwait(false);
+                        if (!_总循环条件)
+                        {
+                            _条件根据图片委托1 ??= 吼去后摇;
+                            _条件根据图片委托2 ??= 战斗饥渴去后摇;
+                            _条件根据图片委托2 ??= 淘汰之刃去后摇;
+                            _条件根据图片委托4 ??= 跳吼;
+                            _总循环条件 = true;
+                            _切假腿配置.修改配置(Keys.E, false);
+                            await 状态初始化().ConfigureAwait(false);
+                        }
+
+                        await 根据按键判断技能释放前通用逻辑(e).ConfigureAwait(true);
+
+                        switch (e.KeyCode)
+                        {
+                            case Keys.Q:
+                                根据图片使用物品(物品_魂戒_数组);
+                                _条件1 = true;
+                                break;
+                            case Keys.W:
+                                根据图片使用物品(物品_魂戒_数组);
+                                _条件2 = true;
+                                break;
+                            case Keys.E:
+                                _条件4 = true;
+                                break;
+                            case Keys.R:
+                                根据图片使用物品(物品_魂戒_数组);
+                                _条件3 = true;
+                                break;
+                            case Keys.D2:
+                                _全局模式q = 1 - _全局模式q;
+                                Tts.Speak(_全局模式q == 1 ? "吼接刃甲" : "吼不接刃甲");
+                                break;
+                            case Keys.D3:
+                                快速触发激怒();
+                                break;
+                        }
+
+                        break;
                     }
-
-                    await 根据按键判断技能释放前通用逻辑(e).ConfigureAwait(true);
-
-                    switch (e.KeyCode)
-                    {
-                        case Keys.Q:
-                            根据图片使用物品(物品_魂戒_数组);
-                            _条件1 = true;
-                            break;
-                        case Keys.W:
-                            根据图片使用物品(物品_魂戒_数组);
-                            _条件2 = true;
-                            break;
-                        case Keys.E:
-                            _条件4 = true;
-                            break;
-                        case Keys.R:
-                            根据图片使用物品(物品_魂戒_数组);
-                            _条件3 = true;
-                            break;
-                        case Keys.D2:
-                            _全局模式q = 1 - _全局模式q;
-                            Tts.Speak(_全局模式q == 1 ? "吼接刃甲" : "吼不接刃甲");
-                            break;
-                        case Keys.D3:
-                            快速触发激怒();
-                            break;
-                    }
-
-                    break;
-                }
 
                 #endregion
 
                 #region 大鱼人
 
                 case "大鱼人":
-                {
-                    if (!_总循环条件)
                     {
-                        _总循环条件 = true;
-                        _条件根据图片委托1 ??= 踩去后摇;
-                        _条件根据图片委托2 ??= 踩去后摇;
-                        _条件根据图片委托3 ??= 雾霭去后摇;
-                        _条件根据图片委托4 ??= 跳刀接踩;
-                        // _切假腿配置.修改配置(Keys.E, false);
-                        await 状态初始化().ConfigureAwait(false);
+                        if (!_总循环条件)
+                        {
+                            _总循环条件 = true;
+                            _条件根据图片委托1 ??= 踩去后摇;
+                            _条件根据图片委托2 ??= 踩去后摇;
+                            _条件根据图片委托3 ??= 雾霭去后摇;
+                            _条件根据图片委托4 ??= 跳刀接踩;
+                            // _切假腿配置.修改配置(Keys.E, false);
+                            await 状态初始化().ConfigureAwait(false);
+                        }
+
+                        await 根据按键判断技能释放前通用逻辑(e).ConfigureAwait(true);
+
+                        switch (e.KeyCode)
+                        {
+                            case Keys.Q:
+                                _条件1 = true;
+                                break;
+                            case Keys.W:
+                                _条件2 = true;
+                                break;
+                            case Keys.R:
+                                _条件3 = true;
+                                break;
+                            case Keys.E:
+                                _条件4 = true;
+                                break;
+                        }
+
+                        break;
                     }
-
-                    await 根据按键判断技能释放前通用逻辑(e).ConfigureAwait(true);
-
-                    switch (e.KeyCode)
-                    {
-                        case Keys.Q:
-                            _条件1 = true;
-                            break;
-                        case Keys.W:
-                            _条件2 = true;
-                            break;
-                        case Keys.R:
-                            _条件3 = true;
-                            break;
-                        case Keys.E:
-                            _条件4 = true;
-                            break;
-                    }
-
-                    break;
-                }
 
                 #endregion
 
                 #region 斯温
 
                 case "斯温":
-                {
-                    if (!_总循环条件)
                     {
-                        _总循环条件 = true;
-                        _条件根据图片委托1 ??= 风暴之拳去后摇;
-                        _条件根据图片委托2 ??= 战吼去后摇;
-                        _条件根据图片委托3 ??= 神之力量去后摇;
-                        await 状态初始化().ConfigureAwait(false);
-                        _切假腿配置.修改配置(Keys.W, false);
+                        if (!_总循环条件)
+                        {
+                            _总循环条件 = true;
+                            _条件根据图片委托1 ??= 风暴之拳去后摇;
+                            _条件根据图片委托2 ??= 战吼去后摇;
+                            _条件根据图片委托3 ??= 神之力量去后摇;
+                            await 状态初始化().ConfigureAwait(false);
+                            _切假腿配置.修改配置(Keys.W, false);
+                        }
+
+                        await 根据按键判断技能释放前通用逻辑(e).ConfigureAwait(true);
+
+                        switch (e.KeyCode)
+                        {
+                            case Keys.Q:
+                                _条件1 = true;
+                                break;
+                            case Keys.E:
+                                _条件2 = true;
+                                break;
+                            case Keys.R:
+                                _条件3 = true;
+                                break;
+                        }
+
+                        break;
                     }
-
-                    await 根据按键判断技能释放前通用逻辑(e).ConfigureAwait(true);
-
-                    switch (e.KeyCode)
-                    {
-                        case Keys.Q:
-                            _条件1 = true;
-                            break;
-                        case Keys.E:
-                            _条件2 = true;
-                            break;
-                        case Keys.R:
-                            _条件3 = true;
-                            break;
-                    }
-
-                    break;
-                }
 
                 #endregion
 
                 #region 船长
 
                 case "船长":
-                {
-                    if (!_总循环条件)
                     {
-                        _条件根据图片委托1 ??= 洪流接x回;
-                        _条件根据图片委托2 ??= x释放后相关逻辑;
-                        _条件根据图片委托3 ??= x2次释放后;
-                        _条件根据图片委托4 ??= 立即释放洪流;
-                        _总循环条件 = true;
-                        await 状态初始化().ConfigureAwait(false);
-                    }
+                        if (!_总循环条件)
+                        {
+                            _条件根据图片委托1 ??= 洪流接x回;
+                            _条件根据图片委托2 ??= x释放后相关逻辑;
+                            _条件根据图片委托3 ??= x2次释放后;
+                            _条件根据图片委托4 ??= 立即释放洪流;
+                            _总循环条件 = true;
+                            await 状态初始化().ConfigureAwait(false);
+                        }
 
-                    await 根据按键判断技能释放前通用逻辑(e).ConfigureAwait(true);
+                        await 根据按键判断技能释放前通用逻辑(e).ConfigureAwait(true);
 
-                    switch (e.KeyCode)
-                    {
-                        case Keys.Q:
-                            _条件1 = true;
-                            break;
-                        case Keys.E:
-                            if (_全局步骤e == 1)
+                        switch (e.KeyCode)
+                        {
+                            case Keys.Q:
+                                _条件1 = true;
+                                break;
+                            case Keys.E:
+                                if (_全局步骤e == 1)
                                 {
                                     return;
                                 }
 
                                 _条件2 = true;
-                            break;
-                        case Keys.D2:
-                            设置全局步骤r(1);
-                            SimKeyBoard.KeyPress(Keys.E);
-                            break;
-                    }
+                                break;
+                            case Keys.D2:
+                                设置全局步骤r(1);
+                                SimKeyBoard.KeyPress(Keys.E);
+                                break;
+                        }
 
-                    break;
-                }
+                        break;
+                    }
 
                 #endregion
 
                 #region 夜魔
 
                 case "夜魔":
-                {
-                    if (!_总循环条件)
                     {
-                        _总循环条件 = true;
-                        _条件根据图片委托1 ??= 虚空去后摇;
-                        _条件根据图片委托2 ??= 伤残恐惧去后摇;
-                        _条件根据图片委托3 ??= 黑暗飞升去后摇;
-                        _条件根据图片委托4 ??= 暗夜猎影去后摇;
-                        _切假腿配置.修改配置(Keys.E, false);
-                        await 状态初始化().ConfigureAwait(false);
-                    }
+                        if (!_总循环条件)
+                        {
+                            _总循环条件 = true;
+                            _条件根据图片委托1 ??= 虚空去后摇;
+                            _条件根据图片委托2 ??= 伤残恐惧去后摇;
+                            _条件根据图片委托3 ??= 黑暗飞升去后摇;
+                            _条件根据图片委托4 ??= 暗夜猎影去后摇;
+                            _切假腿配置.修改配置(Keys.E, false);
+                            await 状态初始化().ConfigureAwait(false);
+                        }
 
-                    await 根据按键判断技能释放前通用逻辑(e).ConfigureAwait(true);
+                        await 根据按键判断技能释放前通用逻辑(e).ConfigureAwait(true);
 
-                    switch (e.KeyCode)
-                    {
-                        case Keys.F1:
-                            if (_是否魔晶)
+                        switch (e.KeyCode)
+                        {
+                            case Keys.F1:
+                                if (_是否魔晶)
                                 {
                                     _切假腿配置.修改配置(Keys.E, true);
                                 }
 
                                 break;
-                        case Keys.Q:
-                            _条件1 = true;
-                            break;
-                        case Keys.W:
-                            _条件2 = true;
-                            break;
-                        case Keys.E:
-                            if (_是否魔晶)
+                            case Keys.Q:
+                                _条件1 = true;
+                                break;
+                            case Keys.W:
+                                _条件2 = true;
+                                break;
+                            case Keys.E:
+                                if (_是否魔晶)
                                 {
                                     _条件4 = true;
                                 }
 
                                 break;
-                        case Keys.R:
-                            _条件3 = true;
-                            break;
-                    }
+                            case Keys.R:
+                                _条件3 = true;
+                                break;
+                        }
 
-                    break;
-                }
+                        break;
+                    }
 
                 #endregion
 
                 #region 树精
 
                 case "树精":
-                {
-                    if (!_总循环条件)
                     {
-                        _总循环条件 = true;
-                        _条件根据图片委托1 ??= 自然卷握去后摇;
-                        _条件根据图片委托2 ??= 寄生种子去后摇;
-                        _条件根据图片委托3 ??= 活体护甲去后摇;
-                        _条件根据图片委托4 ??= 丛林之眼去后摇;
-                        _条件根据图片委托5 ??= 疯狂生长去后摇;
-                        await 状态初始化().ConfigureAwait(false);
+                        if (!_总循环条件)
+                        {
+                            _总循环条件 = true;
+                            _条件根据图片委托1 ??= 自然卷握去后摇;
+                            _条件根据图片委托2 ??= 寄生种子去后摇;
+                            _条件根据图片委托3 ??= 活体护甲去后摇;
+                            _条件根据图片委托4 ??= 丛林之眼去后摇;
+                            _条件根据图片委托5 ??= 疯狂生长去后摇;
+                            await 状态初始化().ConfigureAwait(false);
+                        }
+
+                        await 根据按键判断技能释放前通用逻辑(e).ConfigureAwait(true);
+
+                        switch (e.KeyCode)
+                        {
+                            case Keys.Q:
+                                _条件1 = true;
+                                break;
+                            case Keys.W:
+                                _条件2 = true;
+                                break;
+                            case Keys.E:
+                                _条件3 = true;
+                                break;
+                            case Keys.D:
+                                if (_是否神杖)
+                                {
+                                    _切假腿配置.修改配置(Keys.D, true);
+                                    _条件4 = true;
+                                }
+
+                                break;
+                            case Keys.R:
+                                _条件5 = true;
+                                break;
+                        }
+
+                        break;
                     }
-
-                    await 根据按键判断技能释放前通用逻辑(e).ConfigureAwait(true);
-
-                    switch (e.KeyCode)
-                    {
-                        case Keys.Q:
-                            _条件1 = true;
-                            break;
-                        case Keys.W:
-                            _条件2 = true;
-                            break;
-                        case Keys.E:
-                            _条件3 = true;
-                            break;
-                        case Keys.D:
-                            if (_是否神杖)
-                            {
-                                _切假腿配置.修改配置(Keys.D, true);
-                                _条件4 = true;
-                            }
-
-                            break;
-                        case Keys.R:
-                            _条件5 = true;
-                            break;
-                    }
-
-                    break;
-                }
 
                 #endregion
 
                 #region 混沌
 
                 case "混沌":
-                {
-                    if (!_总循环条件)
                     {
-                        _总循环条件 = true;
-                        _条件根据图片委托1 ??= 混乱之箭去后摇;
-                        _条件根据图片委托2 ??= 实相裂隙去后摇;
-                        _条件根据图片委托3 ??= 混沌之军去后摇;
-                        _切假腿配置.修改配置(Keys.E, false);
-                        await 状态初始化().ConfigureAwait(false);
+                        if (!_总循环条件)
+                        {
+                            _总循环条件 = true;
+                            _条件根据图片委托1 ??= 混乱之箭去后摇;
+                            _条件根据图片委托2 ??= 实相裂隙去后摇;
+                            _条件根据图片委托3 ??= 混沌之军去后摇;
+                            _切假腿配置.修改配置(Keys.E, false);
+                            await 状态初始化().ConfigureAwait(false);
+                        }
+
+                        await 根据按键判断技能释放前通用逻辑(e).ConfigureAwait(true);
+
+                        switch (e.KeyCode)
+                        {
+                            case Keys.Q:
+                                根据图片使用物品(物品_紫苑_数组);
+                                根据图片使用物品(物品_血棘_数组);
+                                _条件1 = true;
+                                break;
+                            case Keys.W:
+                                _条件2 = true;
+                                break;
+                            case Keys.R:
+                                _条件3 = true;
+                                break;
+                            case Keys.D2:
+                                _全局模式q = 1 - _全局模式q;
+                                Tts.Speak(_全局模式q == 1 ? "混乱之箭接拉" : "混乱之箭接A");
+                                break;
+                            case Keys.D3:
+                                await 切臂章().ConfigureAwait(true);
+                                break;
+                        }
+
+                        break;
                     }
-
-                    await 根据按键判断技能释放前通用逻辑(e).ConfigureAwait(true);
-
-                    switch (e.KeyCode)
-                    {
-                        case Keys.Q:
-                            根据图片使用物品(物品_紫苑_数组);
-                            根据图片使用物品(物品_血棘_数组);
-                            _条件1 = true;
-                            break;
-                        case Keys.W:
-                            _条件2 = true;
-                            break;
-                        case Keys.R:
-                            _条件3 = true;
-                            break;
-                        case Keys.D2:
-                            _全局模式q = 1 - _全局模式q;
-                            Tts.Speak(_全局模式q == 1 ? "混乱之箭接拉" : "混乱之箭接A");
-                            break;
-                        case Keys.D3:
-                            await 切臂章().ConfigureAwait(true);
-                            break;
-                    }
-
-                    break;
-                }
 
                 #endregion
 
                 #region 马尔斯
 
                 case "马尔斯":
-                {
-                    if (!_总循环条件)
                     {
-                        _总循环条件 = true;
-                        _条件根据图片委托1 ??= 战神迅矛去后摇;
-                        _条件根据图片委托2 ??= 神之谴击去后摇;
-                        _条件根据图片委托3 ??= 热血竞技场去后摇;
-                        await 状态初始化().ConfigureAwait(false);
+                        if (!_总循环条件)
+                        {
+                            _总循环条件 = true;
+                            _条件根据图片委托1 ??= 战神迅矛去后摇;
+                            _条件根据图片委托2 ??= 神之谴击去后摇;
+                            _条件根据图片委托3 ??= 热血竞技场去后摇;
+                            await 状态初始化().ConfigureAwait(false);
+                        }
+
+                        await 根据按键判断技能释放前通用逻辑(e).ConfigureAwait(true);
+
+                        switch (e.KeyCode)
+                        {
+                            case Keys.Q:
+                                _条件1 = true;
+                                break;
+                            case Keys.W:
+                                _条件2 = true;
+                                break;
+                            case Keys.R:
+                                _条件3 = true;
+                                break;
+                            case Keys.D2:
+                                _全局模式q = 1 - _全局模式q;
+                                Tts.Speak(_全局模式q == 1 ? "矛接大招" : "矛不接大招");
+                                break;
+                        }
+
+                        break;
                     }
-
-                    await 根据按键判断技能释放前通用逻辑(e).ConfigureAwait(true);
-
-                    switch (e.KeyCode)
-                    {
-                        case Keys.Q:
-                            _条件1 = true;
-                            break;
-                        case Keys.W:
-                            _条件2 = true;
-                            break;
-                        case Keys.R:
-                            _条件3 = true;
-                            break;
-                        case Keys.D2:
-                            _全局模式q = 1 - _全局模式q;
-                            Tts.Speak(_全局模式q == 1 ? "矛接大招" : "矛不接大招");
-                            break;
-                    }
-
-                    break;
-                }
 
                 #endregion
 
                 #region 破晓晨星
 
                 case "破晓晨星":
-                {
-                    if (!_总循环条件)
                     {
-                        _总循环条件 = true;
-                        _条件根据图片委托2 ??= 上界重锤去后摇;
-                        await 状态初始化().ConfigureAwait(false);
+                        if (!_总循环条件)
+                        {
+                            _总循环条件 = true;
+                            _条件根据图片委托2 ??= 上界重锤去后摇;
+                            await 状态初始化().ConfigureAwait(false);
+                        }
+
+                        await 根据按键判断技能释放前通用逻辑(e).ConfigureAwait(true);
+
+                        switch (e.KeyCode)
+                        {
+                            case Keys.W:
+                                _条件2 = true;
+                                break;
+                        }
+
+                        break;
                     }
-
-                    await 根据按键判断技能释放前通用逻辑(e).ConfigureAwait(true);
-
-                    switch (e.KeyCode)
-                    {
-                        case Keys.W:
-                            _条件2 = true;
-                            break;
-                    }
-
-                    break;
-                }
 
                 #endregion
 
                 #region 钢背
 
                 case "钢背":
-                {
-                    if (!_总循环条件)
                     {
-                        _总循环条件 = true;
-                        _条件根据图片委托1 ??= 鼻涕去后摇;
-                        _条件根据图片委托2 ??= 针刺循环;
-                        _条件根据图片委托3 ??= 毛团去后摇;
-                        _条件根据图片委托4 ??= 钢毛后背去后摇;
-                        _条件根据图片委托5 ??= 扫射切回假腿;
-                        _切假腿配置.修改配置(Keys.E, false);
-                        await 状态初始化().ConfigureAwait(false);
-                    }
+                        if (!_总循环条件)
+                        {
+                            _总循环条件 = true;
+                            _条件根据图片委托1 ??= 鼻涕去后摇;
+                            _条件根据图片委托2 ??= 针刺循环;
+                            _条件根据图片委托3 ??= 毛团去后摇;
+                            _条件根据图片委托4 ??= 钢毛后背去后摇;
+                            _条件根据图片委托5 ??= 扫射切回假腿;
+                            _切假腿配置.修改配置(Keys.E, false);
+                            await 状态初始化().ConfigureAwait(false);
+                        }
 
-                    await 根据按键判断技能释放前通用逻辑(e).ConfigureAwait(true);
+                        await 根据按键判断技能释放前通用逻辑(e).ConfigureAwait(true);
 
-                    switch (e.KeyCode)
-                    {
-                        case Keys.F1:
-                            if (_是否魔晶)
+                        switch (e.KeyCode)
+                        {
+                            case Keys.F1:
+                                if (_是否魔晶)
                                 {
                                     _切假腿配置.修改配置(Keys.D, true);
                                 }
@@ -999,102 +999,102 @@ namespace Dota2Simulator
                                 }
 
                                 break;
-                        case Keys.Q:
-                            _条件1 = true;
-                            break;
-                        case Keys.D:
-                            if (_是否魔晶)
+                            case Keys.Q:
+                                _条件1 = true;
+                                break;
+                            case Keys.D:
+                                if (_是否魔晶)
                                 {
                                     _条件3 = true;
                                 }
 
                                 break;
-                        case Keys.E:
-                            if (_是否神杖)
+                            case Keys.E:
+                                if (_是否神杖)
                                 {
                                     _条件4 = true;
                                 }
 
                                 break;
-                        case Keys.W:
-                            _条件5 = true;
-                            break;
-                        case Keys.D2:
-                            if (!_条件2)
+                            case Keys.W:
+                                _条件5 = true;
+                                break;
+                            case Keys.D2:
+                                if (!_条件2)
                                 {
                                     _条件2 = true;
                                 }
 
                                 _循环条件1 = !_循环条件1;
-                            if (_循环条件1)
+                                if (_循环条件1)
                                 {
                                     Tts.Speak("循环扫射");
                                 }
 
                                 break;
-                    }
+                        }
 
-                    break;
-                }
+                        break;
+                    }
 
                 #endregion
 
                 #region 龙骑
 
                 case "龙骑":
-                {
-                    if (!_总循环条件)
                     {
-                        _总循环条件 = true;
-                        _条件根据图片委托1 ??= 喷火去后摇;
-                        _条件根据图片委托2 ??= 神龙摆尾去后摇;
-                        _条件根据图片委托3 ??= 变龙去后摇;
-                        _条件根据图片委托4 ??= 火球去后摇;
-                        _切假腿配置.修改配置(Keys.E, false);
-                        _基础攻击前摇 = 0.5;
-                        _基础攻击间隔 = 1.6;
-                        await 状态初始化().ConfigureAwait(false);
-                    }
+                        if (!_总循环条件)
+                        {
+                            _总循环条件 = true;
+                            _条件根据图片委托1 ??= 喷火去后摇;
+                            _条件根据图片委托2 ??= 神龙摆尾去后摇;
+                            _条件根据图片委托3 ??= 变龙去后摇;
+                            _条件根据图片委托4 ??= 火球去后摇;
+                            _切假腿配置.修改配置(Keys.E, false);
+                            _基础攻击前摇 = 0.5;
+                            _基础攻击间隔 = 1.6;
+                            await 状态初始化().ConfigureAwait(false);
+                        }
 
-                    await 根据按键判断技能释放前通用逻辑(e).ConfigureAwait(true);
+                        await 根据按键判断技能释放前通用逻辑(e).ConfigureAwait(true);
 
-                    switch (e.KeyCode)
-                    {
-                        case Keys.F1:
-                            if (_是否魔晶)
+                        switch (e.KeyCode)
+                        {
+                            case Keys.F1:
+                                if (_是否魔晶)
                                 {
                                     _切假腿配置.修改配置(Keys.D, true);
                                 }
 
                                 break;
-                        case Keys.Q:
-                            _条件1 = true;
-                            break;
-                        case Keys.W:
-                            _条件2 = true;
-                            break;
-                        case Keys.R:
-                            _条件3 = true;
-                            break;
-                        case Keys.D:
-                            if (_是否魔晶)
+                            case Keys.Q:
+                                _条件1 = true;
+                                break;
+                            case Keys.W:
+                                _条件2 = true;
+                                break;
+                            case Keys.R:
+                                _条件3 = true;
+                                break;
+                            case Keys.D:
+                                if (_是否魔晶)
                                 {
                                     _条件4 = true;
                                 }
 
                                 break;
-                        case Keys.D2:
-                            _全局模式w = 1 - _全局模式w;
-                            Tts.Speak("W接" + (_全局模式w == 1 ? "火球" : "喷火"));
-                            break;
-                        case Keys.D3:
-                            _全局模式d = 1 - _全局模式d;
-                            Tts.Speak("火球" + (_全局模式d == 1 ? "接" : "不接") + "喷火");
-                            break;
-                    }
+                            case Keys.D2:
+                                _全局模式w = 1 - _全局模式w;
+                                Tts.Speak("W接" + (_全局模式w == 1 ? "火球" : "喷火"));
+                                break;
+                            case Keys.D3:
+                                _全局模式d = 1 - _全局模式d;
+                                Tts.Speak("火球" + (_全局模式d == 1 ? "接" : "不接") + "喷火");
+                                break;
+                        }
 
-                    break;
-                }
+                        break;
+                    }
 
                 #endregion
 
@@ -1105,27 +1105,27 @@ namespace Dota2Simulator
                 #region 小骷髅
 
                 case "小骷髅":
-                {
-                    if (!_总循环条件)
                     {
-                        _总循环条件 = true;
-                        _条件根据图片委托1 ??= 扫射去后摇;
-                        _条件根据图片委托2 ??= 焦油去后摇;
-                        _条件根据图片委托3 ??= 死亡契约去后摇;
-                        _条件根据图片委托4 ??= 骨隐步去后摇;
-                        _条件根据图片委托5 ??= 炽烈火雨去后摇;
-                        _条件根据图片委托6 ??= 骷髅之军去后摇;
-                        _基础攻击前摇 = 0.4;
-                        _基础攻击间隔 = 1.7;
-                        await 状态初始化().ConfigureAwait(false);
-                    }
+                        if (!_总循环条件)
+                        {
+                            _总循环条件 = true;
+                            _条件根据图片委托1 ??= 扫射去后摇;
+                            _条件根据图片委托2 ??= 焦油去后摇;
+                            _条件根据图片委托3 ??= 死亡契约去后摇;
+                            _条件根据图片委托4 ??= 骨隐步去后摇;
+                            _条件根据图片委托5 ??= 炽烈火雨去后摇;
+                            _条件根据图片委托6 ??= 骷髅之军去后摇;
+                            _基础攻击前摇 = 0.4;
+                            _基础攻击间隔 = 1.7;
+                            await 状态初始化().ConfigureAwait(false);
+                        }
 
-                    await 根据按键判断技能释放前通用逻辑(e).ConfigureAwait(true);
+                        await 根据按键判断技能释放前通用逻辑(e).ConfigureAwait(true);
 
-                    switch (e.KeyCode)
-                    {
-                        case Keys.F1:
-                            if (_是否魔晶)
+                        switch (e.KeyCode)
+                        {
+                            case Keys.F1:
+                                if (_是否魔晶)
                                 {
                                     _切假腿配置.修改配置(Keys.D, true, "敏捷");
                                 }
@@ -1136,150 +1136,150 @@ namespace Dota2Simulator
                                 }
 
                                 break;
-                        case Keys.Q:
-                            _条件1 = true;
-                            break;
-                        case Keys.W:
-                            _条件2 = true;
-                            break;
-                        case Keys.E:
-                            _条件3 = true;
-                            break;
-                        case Keys.R:
-                            _条件4 = true;
-                            break;
-                        case Keys.D:
-                            if (_是否魔晶)
+                            case Keys.Q:
+                                _条件1 = true;
+                                break;
+                            case Keys.W:
+                                _条件2 = true;
+                                break;
+                            case Keys.E:
+                                _条件3 = true;
+                                break;
+                            case Keys.R:
+                                _条件4 = true;
+                                break;
+                            case Keys.D:
+                                if (_是否魔晶)
                                 {
                                     _条件5 = true;
                                 }
 
                                 break;
-                        case Keys.F:
-                            if (_是否神杖)
+                            case Keys.F:
+                                if (_是否神杖)
                                 {
                                     _条件6 = true;
                                 }
 
                                 break;
-                        case Keys.D2:
-                            _全局模式q = 1 - _全局模式q;
-                            Tts.Speak(_全局模式q == 1 ? "无脑接道具" : "手动道具");
-                            break;
-                        case Keys.D3:
-                            if (_是否魔晶)
-                            {
-                                _全局模式f = 1 - _全局模式f;
-                                Tts.Speak(_全局模式f == 1 ? "炽烈火雨隐身" : "炽烈火雨不隐身");
-                            }
+                            case Keys.D2:
+                                _全局模式q = 1 - _全局模式q;
+                                Tts.Speak(_全局模式q == 1 ? "无脑接道具" : "手动道具");
+                                break;
+                            case Keys.D3:
+                                if (_是否魔晶)
+                                {
+                                    _全局模式f = 1 - _全局模式f;
+                                    Tts.Speak(_全局模式f == 1 ? "炽烈火雨隐身" : "炽烈火雨不隐身");
+                                }
 
-                            break;
+                                break;
+                        }
+
+                        break;
                     }
-
-                    break;
-                }
 
                 #endregion
 
                 #region 小黑
 
                 case "小黑":
-                {
-                    if (!_总循环条件)
                     {
-                        _总循环条件 = true;
-                        _条件根据图片委托1 ??= 狂风去后摇;
-                        _条件根据图片委托2 ??= 数箭齐发去后摇;
-                        _条件根据图片委托3 ??= 冰川去后摇;
-                        await 状态初始化().ConfigureAwait(false);
-                    }
+                        if (!_总循环条件)
+                        {
+                            _总循环条件 = true;
+                            _条件根据图片委托1 ??= 狂风去后摇;
+                            _条件根据图片委托2 ??= 数箭齐发去后摇;
+                            _条件根据图片委托3 ??= 冰川去后摇;
+                            await 状态初始化().ConfigureAwait(false);
+                        }
 
-                    await 根据按键判断技能释放前通用逻辑(e).ConfigureAwait(true);
+                        await 根据按键判断技能释放前通用逻辑(e).ConfigureAwait(true);
 
-                    switch (e.KeyCode)
-                    {
-                        case Keys.F1:
-                            _全局模式e = ColorAEqualColorB(获取指定位置颜色(738, 957, in _全局数组),
-                                Color.FromArgb(246, 178, 60), 0) || ColorAEqualColorB(
-                                获取指定位置颜色(722, 957, in _全局数组),
-                                Color.FromArgb(246, 178, 60), 0)
-                                ? 1
-                                : 0;
-                            if (_是否魔晶)
+                        switch (e.KeyCode)
+                        {
+                            case Keys.F1:
+                                _全局模式e = ColorAEqualColorB(获取指定位置颜色(738, 957, in _全局数组),
+                                    Color.FromArgb(246, 178, 60), 0) || ColorAEqualColorB(
+                                    获取指定位置颜色(722, 957, in _全局数组),
+                                    Color.FromArgb(246, 178, 60), 0)
+                                    ? 1
+                                    : 0;
+                                if (_是否魔晶)
                                 {
                                     _切假腿配置.修改配置(Keys.F, true);
                                 }
 
                                 break;
-                        case Keys.D:
-                            if (_条件开启切假腿)
-                            {
-                                _全局模式 = 1 - _全局模式;
-                                switch (_全局模式)
+                            case Keys.D:
+                                if (_条件开启切假腿)
                                 {
-                                    case 0:
-                                        await 技能释放前切假腿("智力").ConfigureAwait(true);
-                                        Tts.Speak("开启冰箭");
-                                        break;
-                                    default:
-                                        要求保持假腿();
-                                        Tts.Speak("关闭冰箭");
-                                        break;
+                                    _全局模式 = 1 - _全局模式;
+                                    switch (_全局模式)
+                                    {
+                                        case 0:
+                                            await 技能释放前切假腿("智力").ConfigureAwait(true);
+                                            Tts.Speak("开启冰箭");
+                                            break;
+                                        default:
+                                            要求保持假腿();
+                                            Tts.Speak("关闭冰箭");
+                                            break;
+                                    }
                                 }
-                            }
 
-                            break;
-                        case Keys.W:
-                            _条件1 = true;
-                            break;
-                        case Keys.E:
-                            _条件2 = true;
-                            break;
-                        case Keys.F:
-                            if (_是否魔晶)
+                                break;
+                            case Keys.W:
+                                _条件1 = true;
+                                break;
+                            case Keys.E:
+                                _条件2 = true;
+                                break;
+                            case Keys.F:
+                                if (_是否魔晶)
                                 {
                                     _条件3 = true;
                                 }
 
                                 break;
-                    }
+                        }
 
-                    break;
-                }
+                        break;
+                    }
 
                 #endregion
 
                 #region 巨魔
 
                 case "巨魔":
-                {
-                    if (!_总循环条件)
                     {
-                        _总循环条件 = true;
-                        _条件根据图片委托1 ??= 旋风飞斧远去后摇;
-                        _条件根据图片委托2 ??= 旋风飞斧近去后摇;
-                        _条件根据图片委托3 ??= 战斗专注去后摇;
-                        _切假腿配置.修改配置(Keys.Q, false);
-                        await 状态初始化().ConfigureAwait(false);
+                        if (!_总循环条件)
+                        {
+                            _总循环条件 = true;
+                            _条件根据图片委托1 ??= 旋风飞斧远去后摇;
+                            _条件根据图片委托2 ??= 旋风飞斧近去后摇;
+                            _条件根据图片委托3 ??= 战斗专注去后摇;
+                            _切假腿配置.修改配置(Keys.Q, false);
+                            await 状态初始化().ConfigureAwait(false);
+                        }
+
+                        await 根据按键判断技能释放前通用逻辑(e).ConfigureAwait(true);
+
+                        switch (e.KeyCode)
+                        {
+                            case Keys.W:
+                                _条件1 = true;
+                                break;
+                            case Keys.E:
+                                _条件2 = true;
+                                break;
+                            case Keys.R:
+                                _条件3 = true;
+                                break;
+                        }
+
+                        break;
                     }
-
-                    await 根据按键判断技能释放前通用逻辑(e).ConfigureAwait(true);
-
-                    switch (e.KeyCode)
-                    {
-                        case Keys.W:
-                            _条件1 = true;
-                            break;
-                        case Keys.E:
-                            _条件2 = true;
-                            break;
-                        case Keys.R:
-                            _条件3 = true;
-                            break;
-                    }
-
-                    break;
-                }
 
                 #endregion
 
@@ -1287,149 +1287,149 @@ namespace Dota2Simulator
 
                 // todo 幻刺可以通过命石判断..但另一边基本没人选
                 case "幻刺":
-                {
-                    if (!_总循环条件)
                     {
-                        _总循环条件 = true;
-                        _条件根据图片委托1 ??= 窒息短匕敏捷;
-                        _条件根据图片委托2 ??= 幻影突袭敏捷;
-                        _条件根据图片委托3 ??= 魅影无形敏捷;
-                        _条件根据图片委托4 ??= 刀阵旋风敏捷;
-                        await 状态初始化().ConfigureAwait(false);
-                    }
+                        if (!_总循环条件)
+                        {
+                            _总循环条件 = true;
+                            _条件根据图片委托1 ??= 窒息短匕敏捷;
+                            _条件根据图片委托2 ??= 幻影突袭敏捷;
+                            _条件根据图片委托3 ??= 魅影无形敏捷;
+                            _条件根据图片委托4 ??= 刀阵旋风敏捷;
+                            await 状态初始化().ConfigureAwait(false);
+                        }
 
-                    await 根据按键判断技能释放前通用逻辑(e).ConfigureAwait(true);
+                        await 根据按键判断技能释放前通用逻辑(e).ConfigureAwait(true);
 
-                    switch (e.KeyCode)
-                    {
-                        case Keys.F1:
-                            if (_是否魔晶)
+                        switch (e.KeyCode)
+                        {
+                            case Keys.F1:
+                                if (_是否魔晶)
                                 {
                                     _切假腿配置.修改配置(Keys.D, true);
                                 }
 
                                 break;
-                        case Keys.Q:
-                            _条件1 = true;
-                            break;
-                        case Keys.W:
-                            // 触发激怒机制，2.3秒内不吸引仇恨
-                            SimKeyBoard.KeyPress(Keys.A);
-                            _条件2 = true;
-                            break;
-                        case Keys.E:
-                            _条件3 = true;
-                            break;
-                        case Keys.D:
-                            if (_是否魔晶)
+                            case Keys.Q:
+                                _条件1 = true;
+                                break;
+                            case Keys.W:
+                                // 触发激怒机制，2.3秒内不吸引仇恨
+                                SimKeyBoard.KeyPress(Keys.A);
+                                _条件2 = true;
+                                break;
+                            case Keys.E:
+                                _条件3 = true;
+                                break;
+                            case Keys.D:
+                                if (_是否魔晶)
                                 {
                                     _条件4 = true;
                                 }
 
                                 break;
-                    }
+                        }
 
-                    break;
-                }
+                        break;
+                    }
 
                 #endregion
 
                 #region 猴子
 
                 case "猴子":
-                {
-                    if (!_总循环条件)
                     {
-                        _总循环条件 = true;
-                        _条件根据图片委托1 ??= 灵魂之矛敏捷;
-                        _条件根据图片委托2 ??= 神行百变选择幻象;
-                        _切假腿配置.修改配置(Keys.W, true, "力量");
-                        _切假腿配置.修改配置(Keys.E, false);
-                        _切假腿配置.修改配置(Keys.R, false);
-                        await 状态初始化().ConfigureAwait(false);
-                    }
+                        if (!_总循环条件)
+                        {
+                            _总循环条件 = true;
+                            _条件根据图片委托1 ??= 灵魂之矛敏捷;
+                            _条件根据图片委托2 ??= 神行百变选择幻象;
+                            _切假腿配置.修改配置(Keys.W, true, "力量");
+                            _切假腿配置.修改配置(Keys.E, false);
+                            _切假腿配置.修改配置(Keys.R, false);
+                            await 状态初始化().ConfigureAwait(false);
+                        }
 
-                    await 根据按键判断技能释放前通用逻辑(e).ConfigureAwait(true);
+                        await 根据按键判断技能释放前通用逻辑(e).ConfigureAwait(true);
 
-                    switch (e.KeyCode)
-                    {
-                        case Keys.Q:
-                            if (!DOTA2判断状态技能是否启动(Keys.E, in _全局数组))
+                        switch (e.KeyCode)
+                        {
+                            case Keys.Q:
+                                if (!DOTA2判断状态技能是否启动(Keys.E, in _全局数组))
                                 {
                                     SimKeyBoard.KeyPress(Keys.E);
                                 }
 
                                 _条件1 = true;
-                            break;
-                        case Keys.W:
-                            if (!DOTA2判断状态技能是否启动(Keys.E, in _全局数组))
+                                break;
+                            case Keys.W:
+                                if (!DOTA2判断状态技能是否启动(Keys.E, in _全局数组))
                                 {
                                     SimKeyBoard.KeyPress(Keys.E);
                                 }
 
                                 _条件2 = true;
-                            break;
-                        case Keys.R:
-                            if (!DOTA2判断状态技能是否启动(Keys.E, in _全局数组))
+                                break;
+                            case Keys.R:
+                                if (!DOTA2判断状态技能是否启动(Keys.E, in _全局数组))
                                 {
                                     SimKeyBoard.KeyPress(Keys.E);
                                 }
 
                                 break;
-                    }
+                        }
 
-                    break;
-                }
+                        break;
+                    }
 
                 #endregion
 
                 #region 幽鬼
 
                 case "幽鬼":
-                {
-                    if (!_总循环条件)
                     {
-                        _总循环条件 = true;
-                        _条件根据图片委托1 ??= 幽鬼之刃去后摇;
-                        _条件根据图片委托2 ??= 如影随形去后摇;
-                        _条件根据图片委托3 ??= 空降去后摇;
-                        _条件根据图片委托4 ??= 折射去后摇;
-                        _切假腿配置.修改配置(Keys.W, false);
-                        _切假腿配置.修改配置(Keys.E, false);
-                        await 状态初始化().ConfigureAwait(false);
-                    }
+                        if (!_总循环条件)
+                        {
+                            _总循环条件 = true;
+                            _条件根据图片委托1 ??= 幽鬼之刃去后摇;
+                            _条件根据图片委托2 ??= 如影随形去后摇;
+                            _条件根据图片委托3 ??= 空降去后摇;
+                            _条件根据图片委托4 ??= 折射去后摇;
+                            _切假腿配置.修改配置(Keys.W, false);
+                            _切假腿配置.修改配置(Keys.E, false);
+                            await 状态初始化().ConfigureAwait(false);
+                        }
 
-                    await 根据按键判断技能释放前通用逻辑(e).ConfigureAwait(true);
+                        await 根据按键判断技能释放前通用逻辑(e).ConfigureAwait(true);
 
-                    switch (e.KeyCode)
-                    {
-                        case Keys.F1:
-                            if (_是否魔晶)
+                        switch (e.KeyCode)
+                        {
+                            case Keys.F1:
+                                if (_是否魔晶)
                                 {
                                     _切假腿配置.修改配置(Keys.E, true);
                                 }
 
                                 break;
-                        case Keys.Q:
-                            _条件1 = true;
-                            break;
-                        case Keys.R:
-                            _条件2 = true;
-                            break;
-                        case Keys.D:
-                            _条件3 = true;
-                            break;
-                        case Keys.E:
-                            _条件4 = true;
-                            break;
-                        case Keys.D2:
-                            _全局模式f = 1 - _全局模式f;
-                            Tts.Speak(_全局模式f == 1 ? "如影随形分身" : "关闭随形分身");
-                            break;
-                    }
+                            case Keys.Q:
+                                _条件1 = true;
+                                break;
+                            case Keys.R:
+                                _条件2 = true;
+                                break;
+                            case Keys.D:
+                                _条件3 = true;
+                                break;
+                            case Keys.E:
+                                _条件4 = true;
+                                break;
+                            case Keys.D2:
+                                _全局模式f = 1 - _全局模式f;
+                                Tts.Speak(_全局模式f == 1 ? "如影随形分身" : "关闭随形分身");
+                                break;
+                        }
 
-                    break;
-                }
+                        break;
+                    }
 
                 #endregion
 
@@ -1457,649 +1457,649 @@ namespace Dota2Simulator
                 #region TB
 
                 case "TB":
-                {
-                    if (!_总循环条件)
                     {
-                        _总循环条件 = true;
-                        _条件根据图片委托1 ??= 倒影敏捷;
-                        _条件根据图片委托2 ??= 幻惑敏捷;
-                        _条件根据图片委托3 ??= 魔化敏捷;
-                        _条件根据图片委托4 ??= 恶魔狂热去后摇;
-                        _条件根据图片委托5 ??= 恐怖心潮敏捷;
-                        _条件根据图片委托6 ??= 断魂敏捷;
-                        _切假腿配置.修改配置(Keys.W, false);
-                        await 状态初始化().ConfigureAwait(false);
-                    }
+                        if (!_总循环条件)
+                        {
+                            _总循环条件 = true;
+                            _条件根据图片委托1 ??= 倒影敏捷;
+                            _条件根据图片委托2 ??= 幻惑敏捷;
+                            _条件根据图片委托3 ??= 魔化敏捷;
+                            _条件根据图片委托4 ??= 恶魔狂热去后摇;
+                            _条件根据图片委托5 ??= 恐怖心潮敏捷;
+                            _条件根据图片委托6 ??= 断魂敏捷;
+                            _切假腿配置.修改配置(Keys.W, false);
+                            await 状态初始化().ConfigureAwait(false);
+                        }
 
-                    await 根据按键判断技能释放前通用逻辑(e).ConfigureAwait(true);
+                        await 根据按键判断技能释放前通用逻辑(e).ConfigureAwait(true);
 
-                    switch (e.KeyCode)
-                    {
-                        case Keys.F1:
-                            if (_是否神杖)
+                        switch (e.KeyCode)
+                        {
+                            case Keys.F1:
+                                if (_是否神杖)
                                 {
                                     _切假腿配置.修改配置(Keys.F, true);
                                 }
 
                                 break;
-                        case Keys.Q:
-                            _条件1 = true;
-                            break;
-                        case Keys.W:
-                            _条件2 = true;
-                            break;
-                        case Keys.E:
-                            _条件3 = true;
-                            break;
-                        case Keys.D:
-                            if (_是否魔晶)
+                            case Keys.Q:
+                                _条件1 = true;
+                                break;
+                            case Keys.W:
+                                _条件2 = true;
+                                break;
+                            case Keys.E:
+                                _条件3 = true;
+                                break;
+                            case Keys.D:
+                                if (_是否魔晶)
                                 {
                                     _条件4 = true;
                                 }
 
                                 break;
-                        case Keys.F:
-                            if (_是否神杖)
+                            case Keys.F:
+                                if (_是否神杖)
                                 {
                                     _条件5 = true;
                                 }
 
                                 break;
-                        case Keys.R:
-                            _条件6 = true;
-                            break;
-                    }
+                            case Keys.R:
+                                _条件6 = true;
+                                break;
+                        }
 
-                    break;
-                }
+                        break;
+                    }
 
                 #endregion
 
                 #region 敌法
 
                 case "敌法":
-                {
-                    if (!_总循环条件)
                     {
-                        _总循环条件 = true;
-                        _条件根据图片委托1 ??= 闪烁敏捷;
-                        _条件根据图片委托2 ??= 法术反制敏捷;
-                        _条件根据图片委托3 ??= 法力虚空取消后摇;
-                        _条件根据图片委托4 ??= 友军法术反制敏捷;
-                        _切假腿配置.修改配置(Keys.Q, false);
-                        await 状态初始化().ConfigureAwait(false);
-                    }
+                        if (!_总循环条件)
+                        {
+                            _总循环条件 = true;
+                            _条件根据图片委托1 ??= 闪烁敏捷;
+                            _条件根据图片委托2 ??= 法术反制敏捷;
+                            _条件根据图片委托3 ??= 法力虚空取消后摇;
+                            _条件根据图片委托4 ??= 友军法术反制敏捷;
+                            _切假腿配置.修改配置(Keys.Q, false);
+                            await 状态初始化().ConfigureAwait(false);
+                        }
 
-                    await 根据按键判断技能释放前通用逻辑(e).ConfigureAwait(true);
+                        await 根据按键判断技能释放前通用逻辑(e).ConfigureAwait(true);
 
-                    switch (e.KeyCode)
-                    {
-                        case Keys.F1:
-                            if (_是否魔晶)
+                        switch (e.KeyCode)
+                        {
+                            case Keys.F1:
+                                if (_是否魔晶)
                                 {
                                     _切假腿配置.修改配置(Keys.D, true);
                                 }
 
                                 break;
-                        case Keys.W:
-                            _条件1 = true;
-                            break;
-                        case Keys.E:
-                            _条件2 = true;
-                            break;
-                        case Keys.R:
-                            _条件3 = true;
-                            break;
-                        case Keys.D:
-                            if (_是否魔晶)
+                            case Keys.W:
+                                _条件1 = true;
+                                break;
+                            case Keys.E:
+                                _条件2 = true;
+                                break;
+                            case Keys.R:
+                                _条件3 = true;
+                                break;
+                            case Keys.D:
+                                if (_是否魔晶)
                                 {
                                     _条件4 = true;
                                 }
 
                                 break;
-                        case Keys.D2:
-                            _全局模式w = 1;
-                            Tts.Speak("闪烁分身晕锤一次");
-                            break;
-                    }
+                            case Keys.D2:
+                                _全局模式w = 1;
+                                Tts.Speak("闪烁分身晕锤一次");
+                                break;
+                        }
 
-                    break;
-                }
+                        break;
+                    }
 
                 #endregion
 
                 #region 小鱼人
 
                 case "小鱼人":
-                {
-                    if (!_总循环条件)
                     {
-                        _总循环条件 = true;
-                        _条件根据图片委托1 ??= 黑暗契约去后摇;
-                        _条件根据图片委托2 ??= 跳水去后摇;
-                        _条件根据图片委托3 ??= 深海护罩去后摇;
-                        _条件根据图片委托4 ??= 暗影之舞去后摇;
-                        能量转移被动计数 = 0;
-                        _基础攻击间隔 = 1.7;
-                        _基础攻击前摇 = 0.5;
-                        lb_状态抗性.Text = "转移层数";
-                        _切假腿配置.修改配置(Keys.E, false);
-                        await 状态初始化().ConfigureAwait(false);
-                    }
+                        if (!_总循环条件)
+                        {
+                            _总循环条件 = true;
+                            _条件根据图片委托1 ??= 黑暗契约去后摇;
+                            _条件根据图片委托2 ??= 跳水去后摇;
+                            _条件根据图片委托3 ??= 深海护罩去后摇;
+                            _条件根据图片委托4 ??= 暗影之舞去后摇;
+                            能量转移被动计数 = 0;
+                            _基础攻击间隔 = 1.7;
+                            _基础攻击前摇 = 0.5;
+                            lb_状态抗性.Text = "转移层数";
+                            _切假腿配置.修改配置(Keys.E, false);
+                            await 状态初始化().ConfigureAwait(false);
+                        }
 
-                    await 根据按键判断技能释放前通用逻辑(e).ConfigureAwait(true);
+                        await 根据按键判断技能释放前通用逻辑(e).ConfigureAwait(true);
 
-                    switch (e.KeyCode)
-                    {
-                        case Keys.F1:
-                            if (_是否魔晶)
+                        switch (e.KeyCode)
+                        {
+                            case Keys.F1:
+                                if (_是否魔晶)
                                 {
                                     _切假腿配置.修改配置(Keys.D, true);
                                 }
 
                                 break;
-                        case Keys.Q:
-                            _条件1 = true;
-                            break;
-                        case Keys.W:
-                            _条件2 = true;
-                            break;
-                        case Keys.R:
-                            _条件4 = true;
-                            break;
-                        case Keys.D:
-                            if (_是否魔晶)
+                            case Keys.Q:
+                                _条件1 = true;
+                                break;
+                            case Keys.W:
+                                _条件2 = true;
+                                break;
+                            case Keys.R:
+                                _条件4 = true;
+                                break;
+                            case Keys.D:
+                                if (_是否魔晶)
                                 {
                                     _条件3 = true;
                                 }
 
                                 break;
-                        case Keys.D2:
-                            // 径直移动键位
-                            SimKeyBoard.KeyDown(Keys.L);
-                            Delay(等待延迟);
-                            SimKeyBoard.MouseRightClick();
-                            Delay(等待延迟);
-                            SimKeyBoard.KeyUp(Keys.L);
-                            // 基本上180°310  90°170 75°135 转身定点，配合A杖效果极佳
-                            Delay(110);
-                            SimKeyBoard.KeyPress(Keys.W);
-                            break;
-                    }
+                            case Keys.D2:
+                                // 径直移动键位
+                                SimKeyBoard.KeyDown(Keys.L);
+                                Delay(等待延迟);
+                                SimKeyBoard.MouseRightClick();
+                                Delay(等待延迟);
+                                SimKeyBoard.KeyUp(Keys.L);
+                                // 基本上180°310  90°170 75°135 转身定点，配合A杖效果极佳
+                                Delay(110);
+                                SimKeyBoard.KeyPress(Keys.W);
+                                break;
+                        }
 
-                    break;
-                }
+                        break;
+                    }
 
                 #endregion
 
                 #region 小松鼠
 
                 case "小松鼠":
-                {
-                    if (!_总循环条件)
                     {
-                        _总循环条件 = true;
-                        _条件根据图片委托1 ??= 爆栗出击去后摇;
-                        _条件根据图片委托2 ??= 野地奇袭去后摇;
-                        _条件根据图片委托3 ??= 一箭穿心;
-                        _条件根据图片委托4 ??= 猎手旋标去后摇;
-                        await 状态初始化().ConfigureAwait(false);
-                    }
+                        if (!_总循环条件)
+                        {
+                            _总循环条件 = true;
+                            _条件根据图片委托1 ??= 爆栗出击去后摇;
+                            _条件根据图片委托2 ??= 野地奇袭去后摇;
+                            _条件根据图片委托3 ??= 一箭穿心;
+                            _条件根据图片委托4 ??= 猎手旋标去后摇;
+                            await 状态初始化().ConfigureAwait(false);
+                        }
 
-                    await 根据按键判断技能释放前通用逻辑(e).ConfigureAwait(true);
+                        await 根据按键判断技能释放前通用逻辑(e).ConfigureAwait(true);
 
-                    switch (e.KeyCode)
-                    {
-                        case Keys.F1:
-                            if (_是否魔晶)
+                        switch (e.KeyCode)
+                        {
+                            case Keys.F1:
+                                if (_是否魔晶)
                                 {
                                     _切假腿配置.修改配置(Keys.F, true);
                                 }
 
                                 break;
-                        case Keys.Q:
-                            _条件1 = true;
-                            break;
-                        case Keys.W:
-                            _条件2 = true;
-                            break;
-                        case Keys.R:
-                            _条件3 = true;
-                            break;
-                        case Keys.F:
-                            if (_是否魔晶)
+                            case Keys.Q:
+                                _条件1 = true;
+                                break;
+                            case Keys.W:
+                                _条件2 = true;
+                                break;
+                            case Keys.R:
+                                _条件3 = true;
+                                break;
+                            case Keys.F:
+                                if (_是否魔晶)
                                 {
                                     _条件4 = true;
                                 }
 
                                 break;
-                        case Keys.D2:
-                            _全局模式w = 1 - _全局模式w;
-                            Tts.Speak(_全局模式w == 0 ? "种树接平A" : "种树接捆");
-                            break;
-                        case Keys.D3:
-                            _全局模式e = 1 - _全局模式e;
-                            Tts.Speak(_全局模式e == 0 ? "捆接平A" : "捆接种树");
-                            break;
-                    }
+                            case Keys.D2:
+                                _全局模式w = 1 - _全局模式w;
+                                Tts.Speak(_全局模式w == 0 ? "种树接平A" : "种树接捆");
+                                break;
+                            case Keys.D3:
+                                _全局模式e = 1 - _全局模式e;
+                                Tts.Speak(_全局模式e == 0 ? "捆接平A" : "捆接种树");
+                                break;
+                        }
 
-                    break;
-                }
+                        break;
+                    }
 
                 #endregion
 
                 #region 火猫
 
                 case "火猫":
-                {
-                    if (!_总循环条件)
                     {
-                        _总循环条件 = true;
-                        _条件根据图片委托1 ??= 无影拳后续处理;
-                        _条件根据图片委托2 ??= 炎阳索去后摇;
-                        _条件根据图片委托3 ??= 烈火罩去后摇;
-                        _条件根据图片委托4 ??= 激活残焰去后摇;
-                        _切假腿配置.修改配置(Keys.D, true);
-                        _切假腿配置.修改配置(Keys.R, false);
-                        await 状态初始化().ConfigureAwait(false);
+                        if (!_总循环条件)
+                        {
+                            _总循环条件 = true;
+                            _条件根据图片委托1 ??= 无影拳后续处理;
+                            _条件根据图片委托2 ??= 炎阳索去后摇;
+                            _条件根据图片委托3 ??= 烈火罩去后摇;
+                            _条件根据图片委托4 ??= 激活残焰去后摇;
+                            _切假腿配置.修改配置(Keys.D, true);
+                            _切假腿配置.修改配置(Keys.R, false);
+                            await 状态初始化().ConfigureAwait(false);
+                        }
+
+                        await 根据按键判断技能释放前通用逻辑(e).ConfigureAwait(true);
+
+                        switch (e.KeyCode)
+                        {
+                            case Keys.W:
+                                _条件1 = true;
+                                await Run(() =>
+                                {
+                                    Delay(330);
+                                    要求保持假腿();
+                                }).ConfigureAwait(false);
+                                break;
+                            case Keys.Q:
+                                _条件2 = true;
+                                break;
+                            case Keys.E:
+                                _条件3 = true;
+                                break;
+                            case Keys.D:
+                                _条件4 = true;
+                                break;
+                            case Keys.D2:
+                                _全局模式w = 1 - _全局模式w;
+                                Tts.Speak(_全局模式w == 0 ? "不接捆" : "接捆");
+                                break;
+                        }
+
+                        break;
                     }
-
-                    await 根据按键判断技能释放前通用逻辑(e).ConfigureAwait(true);
-
-                    switch (e.KeyCode)
-                    {
-                        case Keys.W:
-                            _条件1 = true;
-                            await Run(() =>
-                            {
-                                Delay(330);
-                                要求保持假腿();
-                            }).ConfigureAwait(false);
-                            break;
-                        case Keys.Q:
-                            _条件2 = true;
-                            break;
-                        case Keys.E:
-                            _条件3 = true;
-                            break;
-                        case Keys.D:
-                            _条件4 = true;
-                            break;
-                        case Keys.D2:
-                            _全局模式w = 1 - _全局模式w;
-                            Tts.Speak(_全局模式w == 0 ? "不接捆" : "接捆");
-                            break;
-                    }
-
-                    break;
-                }
 
                 #endregion
 
                 #region 拍拍
 
                 case "拍拍":
-                {
-                    if (!_总循环条件)
                     {
-                        _总循环条件 = true;
-                        _条件根据图片委托1 ??= 震撼大地去后摇;
-                        _条件根据图片委托2 ??= 超强力量去后摇;
-                        _条件根据图片委托3 ??= 跳拍;
-                        _条件根据图片委托4 ??= 狂怒去后摇;
-                        await 状态初始化().ConfigureAwait(false);
-                        _切假腿配置.修改配置(Keys.E, false);
-                        _切假腿配置.修改配置(Keys.R, false);
+                        if (!_总循环条件)
+                        {
+                            _总循环条件 = true;
+                            _条件根据图片委托1 ??= 震撼大地去后摇;
+                            _条件根据图片委托2 ??= 超强力量去后摇;
+                            _条件根据图片委托3 ??= 跳拍;
+                            _条件根据图片委托4 ??= 狂怒去后摇;
+                            await 状态初始化().ConfigureAwait(false);
+                            _切假腿配置.修改配置(Keys.E, false);
+                            _切假腿配置.修改配置(Keys.R, false);
+                        }
+
+                        await 根据按键判断技能释放前通用逻辑(e).ConfigureAwait(true);
+
+                        switch (e.KeyCode)
+                        {
+                            case Keys.Q:
+                                _条件1 = true;
+                                break;
+                            case Keys.W:
+                                _条件2 = true;
+                                break;
+                            case Keys.E:
+                                _条件3 = true;
+                                break;
+                            case Keys.R:
+                                _条件4 = true;
+                                break;
+                        }
+
+                        break;
                     }
-
-                    await 根据按键判断技能释放前通用逻辑(e).ConfigureAwait(true);
-
-                    switch (e.KeyCode)
-                    {
-                        case Keys.Q:
-                            _条件1 = true;
-                            break;
-                        case Keys.W:
-                            _条件2 = true;
-                            break;
-                        case Keys.E:
-                            _条件3 = true;
-                            break;
-                        case Keys.R:
-                            _条件4 = true;
-                            break;
-                    }
-
-                    break;
-                }
 
                 #endregion
 
                 #region 火枪
 
                 case "火枪":
-                {
-                    if (!_总循环条件)
                     {
-                        _总循环条件 = true;
-                        _条件根据图片委托1 ??= 流霰弹去后摇;
-                        _条件根据图片委托2 ??= 瞄准去后摇;
-                        _条件根据图片委托3 ??= 震荡手雷去后摇;
-                        _条件根据图片委托4 ??= 暗杀去后摇;
-                        _切假腿配置.修改配置(Keys.W, false);
-                        await 状态初始化().ConfigureAwait(false);
+                        if (!_总循环条件)
+                        {
+                            _总循环条件 = true;
+                            _条件根据图片委托1 ??= 流霰弹去后摇;
+                            _条件根据图片委托2 ??= 瞄准去后摇;
+                            _条件根据图片委托3 ??= 震荡手雷去后摇;
+                            _条件根据图片委托4 ??= 暗杀去后摇;
+                            _切假腿配置.修改配置(Keys.W, false);
+                            await 状态初始化().ConfigureAwait(false);
+                        }
+
+                        _切假腿配置.修改配置(Keys.D, _是否魔晶);
+                        await 根据按键判断技能释放前通用逻辑(e).ConfigureAwait(true);
+
+                        switch (e.KeyCode)
+                        {
+                            case Keys.Q:
+                                _条件1 = true;
+                                break;
+                            case Keys.E:
+                                _条件2 = true;
+                                break;
+                            case Keys.D:
+                                _条件3 = true;
+                                break;
+                            case Keys.R:
+                                _条件4 = true;
+                                break;
+                        }
+
+                        break;
                     }
-
-                    _切假腿配置.修改配置(Keys.D, _是否魔晶);
-                    await 根据按键判断技能释放前通用逻辑(e).ConfigureAwait(true);
-
-                    switch (e.KeyCode)
-                    {
-                        case Keys.Q:
-                            _条件1 = true;
-                            break;
-                        case Keys.E:
-                            _条件2 = true;
-                            break;
-                        case Keys.D:
-                            _条件3 = true;
-                            break;
-                        case Keys.R:
-                            _条件4 = true;
-                            break;
-                    }
-
-                    break;
-                }
 
                 #endregion
 
                 #region 飞机
 
                 case "飞机":
-                {
-                    if (!_总循环条件)
                     {
-                        _总循环条件 = true;
-                        _条件根据图片委托1 ??= 火箭弹幕敏捷;
-                        _条件根据图片委托2 ??= 追踪导弹敏捷;
-                        _条件根据图片委托3 ??= 高射火炮敏捷;
-                        _条件根据图片委托4 ??= 召唤飞弹敏捷;
-                        await 状态初始化().ConfigureAwait(false);
+                        if (!_总循环条件)
+                        {
+                            _总循环条件 = true;
+                            _条件根据图片委托1 ??= 火箭弹幕敏捷;
+                            _条件根据图片委托2 ??= 追踪导弹敏捷;
+                            _条件根据图片委托3 ??= 高射火炮敏捷;
+                            _条件根据图片委托4 ??= 召唤飞弹敏捷;
+                            await 状态初始化().ConfigureAwait(false);
+                        }
+
+                        await 根据按键判断技能释放前通用逻辑(e).ConfigureAwait(true);
+
+                        switch (e.KeyCode)
+                        {
+                            case Keys.Q:
+                                _条件1 = true;
+                                break;
+                            case Keys.W:
+                                _条件2 = true;
+                                break;
+                            case Keys.E:
+                                _条件3 = true;
+                                break;
+                            case Keys.R:
+                                _条件4 = true;
+                                break;
+                        }
+
+                        break;
                     }
-
-                    await 根据按键判断技能释放前通用逻辑(e).ConfigureAwait(true);
-
-                    switch (e.KeyCode)
-                    {
-                        case Keys.Q:
-                            _条件1 = true;
-                            break;
-                        case Keys.W:
-                            _条件2 = true;
-                            break;
-                        case Keys.E:
-                            _条件3 = true;
-                            break;
-                        case Keys.R:
-                            _条件4 = true;
-                            break;
-                    }
-
-                    break;
-                }
 
                 #endregion
 
                 #region 美杜莎
 
                 case "美杜莎":
-                {
-                    if (!_总循环条件)
                     {
-                        _总循环条件 = true;
-                        _条件根据图片委托1 ??= 秘术异蛇去后摇;
-                        _条件根据图片委托2 ??= 罗网剑阵去后摇;
-                        _条件根据图片委托3 ??= 石化凝视去后摇;
-                        _切假腿配置.修改配置(Keys.Q, false);
-                        await 状态初始化().ConfigureAwait(false);
+                        if (!_总循环条件)
+                        {
+                            _总循环条件 = true;
+                            _条件根据图片委托1 ??= 秘术异蛇去后摇;
+                            _条件根据图片委托2 ??= 罗网剑阵去后摇;
+                            _条件根据图片委托3 ??= 石化凝视去后摇;
+                            _切假腿配置.修改配置(Keys.Q, false);
+                            await 状态初始化().ConfigureAwait(false);
+                        }
+
+                        await 根据按键判断技能释放前通用逻辑(e).ConfigureAwait(true);
+
+                        switch (e.KeyCode)
+                        {
+                            case Keys.W:
+                                _条件1 = true;
+                                break;
+                            case Keys.E:
+                                _条件2 = true;
+                                break;
+                            case Keys.R:
+                                _条件3 = true;
+                                break;
+                        }
+
+                        break;
                     }
-
-                    await 根据按键判断技能释放前通用逻辑(e).ConfigureAwait(true);
-
-                    switch (e.KeyCode)
-                    {
-                        case Keys.W:
-                            _条件1 = true;
-                            break;
-                        case Keys.E:
-                            _条件2 = true;
-                            break;
-                        case Keys.R:
-                            _条件3 = true;
-                            break;
-                    }
-
-                    break;
-                }
 
                 #endregion
 
                 #region 虚空
 
                 case "虚空":
-                {
-                    if (!_总循环条件)
                     {
-                        _总循环条件 = true;
-                        _条件根据图片委托1 ??= 时间漫游敏捷;
-                        _条件根据图片委托2 ??= 时间膨胀敏捷;
-                        _条件根据图片委托3 ??= 时间结界敏捷;
-                        _切假腿配置.修改配置(Keys.E, false);
-                        await 状态初始化().ConfigureAwait(false);
+                        if (!_总循环条件)
+                        {
+                            _总循环条件 = true;
+                            _条件根据图片委托1 ??= 时间漫游敏捷;
+                            _条件根据图片委托2 ??= 时间膨胀敏捷;
+                            _条件根据图片委托3 ??= 时间结界敏捷;
+                            _切假腿配置.修改配置(Keys.E, false);
+                            await 状态初始化().ConfigureAwait(false);
+                        }
+
+                        await 根据按键判断技能释放前通用逻辑(e).ConfigureAwait(true);
+
+                        switch (e.KeyCode)
+                        {
+                            case Keys.Q:
+                                _条件1 = true;
+                                break;
+                            case Keys.W:
+                                _条件2 = true;
+                                break;
+                            case Keys.R:
+                                _条件3 = true;
+                                break;
+                        }
+
+                        break;
                     }
-
-                    await 根据按键判断技能释放前通用逻辑(e).ConfigureAwait(true);
-
-                    switch (e.KeyCode)
-                    {
-                        case Keys.Q:
-                            _条件1 = true;
-                            break;
-                        case Keys.W:
-                            _条件2 = true;
-                            break;
-                        case Keys.R:
-                            _条件3 = true;
-                            break;
-                    }
-
-                    break;
-                }
 
                 #endregion
 
                 #region 血魔
 
                 case "血魔":
-                {
-                    if (!_总循环条件)
                     {
-                        _总循环条件 = true;
-                        _条件根据图片委托1 ??= 血祭去后摇;
-                        _条件根据图片委托2 ??= 割裂去后摇;
-                        _条件根据图片委托3 ??= 血怒去后摇;
-                        _切假腿配置.修改配置(Keys.E, false);
-                        await 状态初始化().ConfigureAwait(false);
-                    }
+                        if (!_总循环条件)
+                        {
+                            _总循环条件 = true;
+                            _条件根据图片委托1 ??= 血祭去后摇;
+                            _条件根据图片委托2 ??= 割裂去后摇;
+                            _条件根据图片委托3 ??= 血怒去后摇;
+                            _切假腿配置.修改配置(Keys.E, false);
+                            await 状态初始化().ConfigureAwait(false);
+                        }
 
-                    await 根据按键判断技能释放前通用逻辑(e).ConfigureAwait(true);
+                        await 根据按键判断技能释放前通用逻辑(e).ConfigureAwait(true);
 
-                    if (e.KeyValue == (int)Keys.Q && (int)e.Modifiers == (int)Keys.Alt)
+                        if (e.KeyValue == (int)Keys.Q && (int)e.Modifiers == (int)Keys.Alt)
                         {
                             _条件3 = true;
                         }
 
                         switch (e.KeyCode)
-                    {
-                        case Keys.W:
-                            _条件1 = true;
-                            break;
-                        case Keys.R:
-                            _条件2 = true;
-                            break;
-                        case Keys.Q:
-                            _条件3 = true;
-                            break;
-                    }
+                        {
+                            case Keys.W:
+                                _条件1 = true;
+                                break;
+                            case Keys.R:
+                                _条件2 = true;
+                                break;
+                            case Keys.Q:
+                                _条件3 = true;
+                                break;
+                        }
 
-                    break;
-                }
+                        break;
+                    }
 
                 #endregion
 
                 #region 赏金
 
                 case "赏金":
-                {
-                    if (!_总循环条件)
                     {
-                        _总循环条件 = true;
-                        _条件根据图片委托1 ??= 飞镖接平a;
-                        _条件根据图片委托2 ??= 标记去后摇;
-                        _条件根据图片委托3 ??= 循环标记;
-                        _切假腿配置.修改配置(Keys.W, false);
-                        await 状态初始化().ConfigureAwait(false);
+                        if (!_总循环条件)
+                        {
+                            _总循环条件 = true;
+                            _条件根据图片委托1 ??= 飞镖接平a;
+                            _条件根据图片委托2 ??= 标记去后摇;
+                            _条件根据图片委托3 ??= 循环标记;
+                            _切假腿配置.修改配置(Keys.W, false);
+                            await 状态初始化().ConfigureAwait(false);
+                        }
+
+                        await 根据按键判断技能释放前通用逻辑(e).ConfigureAwait(true);
+
+                        switch (e.KeyCode)
+                        {
+                            case Keys.Q:
+                                _条件1 = true;
+                                break;
+                            case Keys.R:
+                                _条件2 = true;
+                                break;
+                            case Keys.D2:
+                                _条件3 = !_条件3;
+                                _循环条件1 = _条件3;
+                                Tts.Speak(_循环条件1 ? "循环标记" : "不循环标记");
+                                break;
+                        }
+
+                        break;
                     }
-
-                    await 根据按键判断技能释放前通用逻辑(e).ConfigureAwait(true);
-
-                    switch (e.KeyCode)
-                    {
-                        case Keys.Q:
-                            _条件1 = true;
-                            break;
-                        case Keys.R:
-                            _条件2 = true;
-                            break;
-                        case Keys.D2:
-                            _条件3 = !_条件3;
-                            _循环条件1 = _条件3;
-                            Tts.Speak(_循环条件1 ? "循环标记" : "不循环标记");
-                            break;
-                    }
-
-                    break;
-                }
 
                 #endregion
 
                 #region 电棍
 
                 case "电棍":
-                {
-                    if (!_总循环条件)
                     {
-                        _总循环条件 = true;
-                        _条件根据图片委托1 ??= 等离子场去后摇;
-                        _条件根据图片委托2 ??= 静电连接去后摇;
-                        _条件根据图片委托3 ??= 风暴之眼去后摇;
-                        _切假腿配置.修改配置(Keys.E, false);
-                        await 状态初始化().ConfigureAwait(false);
+                        if (!_总循环条件)
+                        {
+                            _总循环条件 = true;
+                            _条件根据图片委托1 ??= 等离子场去后摇;
+                            _条件根据图片委托2 ??= 静电连接去后摇;
+                            _条件根据图片委托3 ??= 风暴之眼去后摇;
+                            _切假腿配置.修改配置(Keys.E, false);
+                            await 状态初始化().ConfigureAwait(false);
+                        }
+
+                        await 根据按键判断技能释放前通用逻辑(e).ConfigureAwait(true);
+
+                        switch (e.KeyCode)
+                        {
+                            case Keys.Q:
+                                _条件1 = true;
+                                break;
+                            case Keys.W:
+                                _条件2 = true;
+                                break;
+                            case Keys.R:
+                                _条件3 = true;
+                                break;
+                        }
+
+                        break;
                     }
-
-                    await 根据按键判断技能释放前通用逻辑(e).ConfigureAwait(true);
-
-                    switch (e.KeyCode)
-                    {
-                        case Keys.Q:
-                            _条件1 = true;
-                            break;
-                        case Keys.W:
-                            _条件2 = true;
-                            break;
-                        case Keys.R:
-                            _条件3 = true;
-                            break;
-                    }
-
-                    break;
-                }
 
                 #endregion
 
                 #region 露娜
 
                 case "露娜":
-                {
-                    if (!_总循环条件)
                     {
-                        _总循环条件 = true;
-                        _条件根据图片委托1 ??= 月光后敏捷平a;
-                        _条件根据图片委托2 ??= 月刃后敏捷平a;
-                        _条件根据图片委托3 ??= 月蚀后敏捷平a;
-                        _切假腿配置.修改配置(Keys.E, false);
-                        await 状态初始化().ConfigureAwait(false);
+                        if (!_总循环条件)
+                        {
+                            _总循环条件 = true;
+                            _条件根据图片委托1 ??= 月光后敏捷平a;
+                            _条件根据图片委托2 ??= 月刃后敏捷平a;
+                            _条件根据图片委托3 ??= 月蚀后敏捷平a;
+                            _切假腿配置.修改配置(Keys.E, false);
+                            await 状态初始化().ConfigureAwait(false);
+                        }
+
+                        await 根据按键判断技能释放前通用逻辑(e).ConfigureAwait(true);
+
+                        switch (e.KeyCode)
+                        {
+                            case Keys.Q:
+                                _条件1 = true;
+                                break;
+                            case Keys.W:
+                                _条件2 = true;
+                                break;
+                            case Keys.R:
+                                _条件3 = true;
+                                break;
+                        }
+
+                        break;
                     }
-
-                    await 根据按键判断技能释放前通用逻辑(e).ConfigureAwait(true);
-
-                    switch (e.KeyCode)
-                    {
-                        case Keys.Q:
-                            _条件1 = true;
-                            break;
-                        case Keys.W:
-                            _条件2 = true;
-                            break;
-                        case Keys.R:
-                            _条件3 = true;
-                            break;
-                    }
-
-                    break;
-                }
 
                 #endregion
 
                 #region 大圣
 
                 case "大圣":
-                {
-                    if (!_总循环条件)
                     {
-                        _总循环条件 = true;
-                        _条件根据图片委托1 ??= 棒击大地去后摇;
-                        _条件根据图片委托2 ??= 乾坤之跃敏捷;
-                        _条件根据图片委托3 ??= 猴子猴孙敏捷;
-                        _条件根据图片委托4 ??= 大圣无限跳跃;
-                        _切假腿配置.修改配置(Keys.Q, false);
-                        _切假腿配置.修改配置(Keys.W, false);
-                        await 状态初始化().ConfigureAwait(false);
+                        if (!_总循环条件)
+                        {
+                            _总循环条件 = true;
+                            _条件根据图片委托1 ??= 棒击大地去后摇;
+                            _条件根据图片委托2 ??= 乾坤之跃敏捷;
+                            _条件根据图片委托3 ??= 猴子猴孙敏捷;
+                            _条件根据图片委托4 ??= 大圣无限跳跃;
+                            _切假腿配置.修改配置(Keys.Q, false);
+                            _切假腿配置.修改配置(Keys.W, false);
+                            await 状态初始化().ConfigureAwait(false);
+                        }
+
+                        await 根据按键判断技能释放前通用逻辑(e).ConfigureAwait(true);
+
+                        switch (e.KeyCode)
+                        {
+                            case Keys.Q:
+                                _条件1 = true;
+                                break;
+                            case Keys.E:
+                                _条件2 = true;
+                                break;
+                            case Keys.R:
+                                _条件3 = true;
+                                break;
+                            case Keys.D2:
+                                _条件4 = !_条件4;
+                                _循环条件1 = _条件4;
+                                Tts.Speak(_循环条件1 ? "开启无限跳跃" : "关闭无限跳跃");
+                                break;
+                        }
+
+                        break;
                     }
-
-                    await 根据按键判断技能释放前通用逻辑(e).ConfigureAwait(true);
-
-                    switch (e.KeyCode)
-                    {
-                        case Keys.Q:
-                            _条件1 = true;
-                            break;
-                        case Keys.E:
-                            _条件2 = true;
-                            break;
-                        case Keys.R:
-                            _条件3 = true;
-                            break;
-                        case Keys.D2:
-                            _条件4 = !_条件4;
-                            _循环条件1 = _条件4;
-                            Tts.Speak(_循环条件1 ? "开启无限跳跃" : "关闭无限跳跃");
-                            break;
-                    }
-
-                    break;
-                }
 
                 #endregion
 
@@ -2110,709 +2110,709 @@ namespace Dota2Simulator
                 #region 修补匠
 
                 case "修补匠":
-                {
-                    if (!_总循环条件)
                     {
-                        _总循环条件 = true;
-                        await 状态初始化().ConfigureAwait(false);
+                        if (!_总循环条件)
+                        {
+                            _总循环条件 = true;
+                            await 状态初始化().ConfigureAwait(false);
+                        }
+
+                        await 根据按键判断技能释放前通用逻辑(e).ConfigureAwait(true);
+
+                        switch (e.KeyCode)
+                        {
+                            case Keys.Q:
+                                _条件1 = true;
+                                break;
+                            case Keys.E:
+                                _条件2 = true;
+                                break;
+                            case Keys.R:
+                                _条件3 = true;
+                                break;
+                        }
+
+                        break;
                     }
-
-                    await 根据按键判断技能释放前通用逻辑(e).ConfigureAwait(true);
-
-                    switch (e.KeyCode)
-                    {
-                        case Keys.Q:
-                            _条件1 = true;
-                            break;
-                        case Keys.E:
-                            _条件2 = true;
-                            break;
-                        case Keys.R:
-                            _条件3 = true;
-                            break;
-                    }
-
-                    break;
-                }
 
                 #endregion
 
                 #region 光法
 
                 case "光法":
-                {
-                    if (!_总循环条件)
                     {
-                        _总循环条件 = true;
-                        _条件根据图片委托1 ??= 减少300毫秒蓄力;
-                        _条件根据图片委托2 ??= 炎阳之缚去后摇;
-                        _条件根据图片委托3 ??= 查克拉魔法去后摇;
-                        _条件根据图片委托4 ??= 循环查克拉;
-                        _条件根据图片委托5 ??= 致盲之光去后摇;
-                        _条件根据图片委托6 ??= 灵光去后摇接炎阳;
-                        await 状态初始化().ConfigureAwait(false);
-                    }
+                        if (!_总循环条件)
+                        {
+                            _总循环条件 = true;
+                            _条件根据图片委托1 ??= 减少300毫秒蓄力;
+                            _条件根据图片委托2 ??= 炎阳之缚去后摇;
+                            _条件根据图片委托3 ??= 查克拉魔法去后摇;
+                            _条件根据图片委托4 ??= 循环查克拉;
+                            _条件根据图片委托5 ??= 致盲之光去后摇;
+                            _条件根据图片委托6 ??= 灵光去后摇接炎阳;
+                            await 状态初始化().ConfigureAwait(false);
+                        }
 
-                    await 根据按键判断技能释放前通用逻辑(e).ConfigureAwait(true);
+                        await 根据按键判断技能释放前通用逻辑(e).ConfigureAwait(true);
 
-                    if (e.KeyValue == (int)Keys.E && (int)e.Modifiers == (int)Keys.Alt)
+                        if (e.KeyValue == (int)Keys.E && (int)e.Modifiers == (int)Keys.Alt)
                         {
                             _条件4 = true;
                         }
 
                         switch (e.KeyCode)
-                    {
-                        case Keys.Q:
-                            _条件1 = true;
-                            break;
-                        case Keys.W:
-                            _条件2 = true;
-                            break;
-                        case Keys.E:
-                            _条件3 = true;
-                            break;
-                        case Keys.D:
-                            _条件5 = true;
-                            break;
-                        case Keys.F:
-                            _条件6 = true;
-                            break;
-                        case Keys.D2:
-                            _条件4 = !_条件4;
-                            _循环条件1 = _条件4;
-                            Tts.Speak(_循环条件1 ? "+开启循环查克拉" : "关闭循环查克拉");
-                            break;
-                    }
+                        {
+                            case Keys.Q:
+                                _条件1 = true;
+                                break;
+                            case Keys.W:
+                                _条件2 = true;
+                                break;
+                            case Keys.E:
+                                _条件3 = true;
+                                break;
+                            case Keys.D:
+                                _条件5 = true;
+                                break;
+                            case Keys.F:
+                                _条件6 = true;
+                                break;
+                            case Keys.D2:
+                                _条件4 = !_条件4;
+                                _循环条件1 = _条件4;
+                                Tts.Speak(_循环条件1 ? "+开启循环查克拉" : "关闭循环查克拉");
+                                break;
+                        }
 
-                    break;
-                }
+                        break;
+                    }
 
                 #endregion
 
                 #region 天怒
 
                 case "天怒":
-                {
-                    if (!_总循环条件)
                     {
-                        _总循环条件 = true;
-                        _条件根据图片委托1 ??= 循环奥数鹰隼;
-                        _条件根据图片委托2 ??= 天怒秒人连招;
-                        _条件根据图片委托3 ??= 奥数鹰隼去后摇;
-                        _条件根据图片委托4 ??= 上古封印去后摇;
-                        _条件根据图片委托5 ??= 神秘之耀去后摇;
-                        _条件根据图片委托6 ??= 震荡光弹去后摇;
-                        await 状态初始化().ConfigureAwait(false);
+                        if (!_总循环条件)
+                        {
+                            _总循环条件 = true;
+                            _条件根据图片委托1 ??= 循环奥数鹰隼;
+                            _条件根据图片委托2 ??= 天怒秒人连招;
+                            _条件根据图片委托3 ??= 奥数鹰隼去后摇;
+                            _条件根据图片委托4 ??= 上古封印去后摇;
+                            _条件根据图片委托5 ??= 神秘之耀去后摇;
+                            _条件根据图片委托6 ??= 震荡光弹去后摇;
+                            await 状态初始化().ConfigureAwait(false);
+                        }
+
+                        await 根据按键判断技能释放前通用逻辑(e).ConfigureAwait(true);
+
+                        switch (e.KeyCode)
+                        {
+                            case Keys.Q:
+                                _条件3 = true;
+                                break;
+                            case Keys.W:
+                                _条件6 = true;
+                                break;
+                            case Keys.E:
+                                _条件4 = true;
+                                break;
+                            case Keys.R:
+                                _条件5 = true;
+                                break;
+                            case Keys.D2:
+                                _条件1 = !_条件1;
+                                _循环条件1 = _条件1;
+                                Tts.Speak(_循环条件1 ? "循环鹰隼" : "不循环鹰隼");
+                                break;
+                            case Keys.D3:
+                                _全局步骤 = 1;
+                                _条件2 = true;
+                                break;
+                        }
+
+                        break;
                     }
-
-                    await 根据按键判断技能释放前通用逻辑(e).ConfigureAwait(true);
-
-                    switch (e.KeyCode)
-                    {
-                        case Keys.Q:
-                            _条件3 = true;
-                            break;
-                        case Keys.W:
-                            _条件6 = true;
-                            break;
-                        case Keys.E:
-                            _条件4 = true;
-                            break;
-                        case Keys.R:
-                            _条件5 = true;
-                            break;
-                        case Keys.D2:
-                            _条件1 = !_条件1;
-                            _循环条件1 = _条件1;
-                            Tts.Speak(_循环条件1 ? "循环鹰隼" : "不循环鹰隼");
-                            break;
-                        case Keys.D3:
-                            _全局步骤 = 1;
-                            _条件2 = true;
-                            break;
-                    }
-
-                    break;
-                }
 
                 #endregion
 
                 #region 墨客
 
                 case "墨客":
-                {
-                    if (!_总循环条件)
                     {
-                        _总循环条件 = true;
-                        _条件根据图片委托1 ??= 命运之笔去后摇;
-                        _条件根据图片委托2 ??= 幻影之拥去后摇;
-                        _条件根据图片委托3 ??= 墨泳去后摇;
-                        _条件根据图片委托4 ??= 缚魂去后摇;
-                        _条件根据图片委托5 ??= 暗绘去后摇;
-                        await 状态初始化().ConfigureAwait(false);
-                    }
+                        if (!_总循环条件)
+                        {
+                            _总循环条件 = true;
+                            _条件根据图片委托1 ??= 命运之笔去后摇;
+                            _条件根据图片委托2 ??= 幻影之拥去后摇;
+                            _条件根据图片委托3 ??= 墨泳去后摇;
+                            _条件根据图片委托4 ??= 缚魂去后摇;
+                            _条件根据图片委托5 ??= 暗绘去后摇;
+                            await 状态初始化().ConfigureAwait(false);
+                        }
 
-                    await 根据按键判断技能释放前通用逻辑(e).ConfigureAwait(true);
+                        await 根据按键判断技能释放前通用逻辑(e).ConfigureAwait(true);
 
-                    if (e.KeyValue == (int)Keys.E && (int)e.Modifiers == (int)Keys.Alt)
+                        if (e.KeyValue == (int)Keys.E && (int)e.Modifiers == (int)Keys.Alt)
                         {
                             _条件3 = true;
                         }
 
                         switch (e.KeyCode)
-                    {
-                        case Keys.Q:
-                            _条件1 = true;
-                            break;
-                        case Keys.W:
-                            _条件2 = true;
-                            break;
-                        case Keys.E:
-                            _条件3 = true;
-                            break;
-                        case Keys.R:
-                            _条件4 = true;
-                            break;
-                        case Keys.D:
-                            _条件5 = true;
-                            break;
-                    }
+                        {
+                            case Keys.Q:
+                                _条件1 = true;
+                                break;
+                            case Keys.W:
+                                _条件2 = true;
+                                break;
+                            case Keys.E:
+                                _条件3 = true;
+                                break;
+                            case Keys.R:
+                                _条件4 = true;
+                                break;
+                            case Keys.D:
+                                _条件5 = true;
+                                break;
+                        }
 
-                    break;
-                }
+                        break;
+                    }
 
                 #endregion
 
                 #region 宙斯
 
                 case "宙斯":
-                {
-                    if (!_总循环条件)
                     {
-                        _总循环条件 = true;
-                        _条件根据图片委托1 ??= 弧形闪电去后摇;
-                        _条件根据图片委托2 ??= 雷击去后摇;
-                        _条件根据图片委托3 ??= 神圣一跳去后摇;
-                        _条件根据图片委托4 ??= 雷神之怒去后摇;
-                        _条件根据图片委托5 ??= 雷云去后摇;
-                        await 状态初始化().ConfigureAwait(false);
+                        if (!_总循环条件)
+                        {
+                            _总循环条件 = true;
+                            _条件根据图片委托1 ??= 弧形闪电去后摇;
+                            _条件根据图片委托2 ??= 雷击去后摇;
+                            _条件根据图片委托3 ??= 神圣一跳去后摇;
+                            _条件根据图片委托4 ??= 雷神之怒去后摇;
+                            _条件根据图片委托5 ??= 雷云去后摇;
+                            await 状态初始化().ConfigureAwait(false);
+                        }
+
+                        await 根据按键判断技能释放前通用逻辑(e).ConfigureAwait(true);
+
+                        switch (e.KeyCode)
+                        {
+                            case Keys.Q:
+                                _条件1 = true;
+                                break;
+                            case Keys.W:
+                                _条件2 = true;
+                                break;
+                            case Keys.E:
+                                _条件3 = true;
+                                break;
+                            case Keys.R:
+                                _条件4 = true;
+                                break;
+                            case Keys.D:
+                                _条件5 = true;
+                                break;
+                        }
+
+                        break;
                     }
-
-                    await 根据按键判断技能释放前通用逻辑(e).ConfigureAwait(true);
-
-                    switch (e.KeyCode)
-                    {
-                        case Keys.Q:
-                            _条件1 = true;
-                            break;
-                        case Keys.W:
-                            _条件2 = true;
-                            break;
-                        case Keys.E:
-                            _条件3 = true;
-                            break;
-                        case Keys.R:
-                            _条件4 = true;
-                            break;
-                        case Keys.D:
-                            _条件5 = true;
-                            break;
-                    }
-
-                    break;
-                }
 
                 #endregion
 
                 #region 巫医
 
                 case "巫医":
-                {
-                    if (!_总循环条件)
                     {
-                        _总循环条件 = true;
-                        _条件根据图片委托1 ??= 麻痹药剂去后摇;
-                        _条件根据图片委托2 ??= 巫蛊咒术去后摇;
-                        _条件根据图片委托3 ??= 死亡守卫隐身;
-                        await 状态初始化().ConfigureAwait(false);
+                        if (!_总循环条件)
+                        {
+                            _总循环条件 = true;
+                            _条件根据图片委托1 ??= 麻痹药剂去后摇;
+                            _条件根据图片委托2 ??= 巫蛊咒术去后摇;
+                            _条件根据图片委托3 ??= 死亡守卫隐身;
+                            await 状态初始化().ConfigureAwait(false);
+                        }
+
+                        await 根据按键判断技能释放前通用逻辑(e).ConfigureAwait(true);
+
+                        switch (e.KeyCode)
+                        {
+                            case Keys.Q:
+                                _条件1 = true;
+                                break;
+                            case Keys.E:
+                                _条件2 = true;
+                                break;
+                            case Keys.R:
+                                _条件3 = true;
+                                break;
+                        }
+
+                        break;
                     }
-
-                    await 根据按键判断技能释放前通用逻辑(e).ConfigureAwait(true);
-
-                    switch (e.KeyCode)
-                    {
-                        case Keys.Q:
-                            _条件1 = true;
-                            break;
-                        case Keys.E:
-                            _条件2 = true;
-                            break;
-                        case Keys.R:
-                            _条件3 = true;
-                            break;
-                    }
-
-                    break;
-                }
 
                 #endregion
 
                 #region 巫妖
 
                 case "巫妖":
-                {
-                    if (!_总循环条件)
                     {
-                        _总循环条件 = true;
-                        _条件根据图片委托1 ??= 寒霜爆发去后摇;
-                        _条件根据图片委托2 ??= 冰霜魔盾去后摇;
-                        _条件根据图片委托3 ??= 阴邪凝视去后摇;
-                        _条件根据图片委托4 ??= 连环霜冻去后摇;
-                        _条件根据图片委托5 ??= 寒冰尖柱去后摇;
-                        await 状态初始化().ConfigureAwait(false);
-                    }
+                        if (!_总循环条件)
+                        {
+                            _总循环条件 = true;
+                            _条件根据图片委托1 ??= 寒霜爆发去后摇;
+                            _条件根据图片委托2 ??= 冰霜魔盾去后摇;
+                            _条件根据图片委托3 ??= 阴邪凝视去后摇;
+                            _条件根据图片委托4 ??= 连环霜冻去后摇;
+                            _条件根据图片委托5 ??= 寒冰尖柱去后摇;
+                            await 状态初始化().ConfigureAwait(false);
+                        }
 
-                    await 根据按键判断技能释放前通用逻辑(e).ConfigureAwait(true);
+                        await 根据按键判断技能释放前通用逻辑(e).ConfigureAwait(true);
 
-                    if (e.KeyValue == (int)Keys.W && (int)e.Modifiers == (int)Keys.Alt)
+                        if (e.KeyValue == (int)Keys.W && (int)e.Modifiers == (int)Keys.Alt)
                         {
                             _条件2 = true;
                         }
 
                         switch (e.KeyCode)
-                    {
-                        case Keys.Q:
-                            _条件1 = true;
-                            break;
-                        case Keys.W:
-                            _条件2 = true;
-                            break;
-                        case Keys.E:
-                            _条件3 = true;
-                            break;
-                        case Keys.R:
-                            _条件4 = true;
-                            break;
-                        case Keys.D:
-                            _条件5 = true;
-                            break;
-                    }
+                        {
+                            case Keys.Q:
+                                _条件1 = true;
+                                break;
+                            case Keys.W:
+                                _条件2 = true;
+                                break;
+                            case Keys.E:
+                                _条件3 = true;
+                                break;
+                            case Keys.R:
+                                _条件4 = true;
+                                break;
+                            case Keys.D:
+                                _条件5 = true;
+                                break;
+                        }
 
-                    break;
-                }
+                        break;
+                    }
 
                 #endregion
 
                 #region 帕克
 
                 case "帕克":
-                {
-                    if (!_总循环条件)
                     {
-                        _总循环条件 = true;
-                        _条件根据图片委托1 ??= 幻象法球去后摇;
-                        _条件根据图片委托2 ??= 新月之痕去后摇;
-                        _条件根据图片委托4 ??= 梦境缠绕去后摇;
-                        _条件根据图片委托5 ??= 灵动之翼定位;
-                        await 状态初始化().ConfigureAwait(false);
-                    }
+                        if (!_总循环条件)
+                        {
+                            _总循环条件 = true;
+                            _条件根据图片委托1 ??= 幻象法球去后摇;
+                            _条件根据图片委托2 ??= 新月之痕去后摇;
+                            _条件根据图片委托4 ??= 梦境缠绕去后摇;
+                            _条件根据图片委托5 ??= 灵动之翼定位;
+                            await 状态初始化().ConfigureAwait(false);
+                        }
 
-                    await 根据按键判断技能释放前通用逻辑(e).ConfigureAwait(true);
+                        await 根据按键判断技能释放前通用逻辑(e).ConfigureAwait(true);
 
-                    if (e.KeyValue == (int)Keys.W && (int)e.Modifiers == (int)Keys.Control)
+                        if (e.KeyValue == (int)Keys.W && (int)e.Modifiers == (int)Keys.Control)
                         {
                             _条件2 = true;
                         }
 
                         switch (e.KeyCode)
-                    {
-                        case Keys.Q:
-                            _条件1 = true;
-                            break;
-                        case Keys.W:
-                            _条件2 = true;
-                            break;
-                        case Keys.R:
-                            _条件4 = true;
-                            break;
-                        case Keys.D:
-                            _条件5 = true;
-                            break;
-                        case Keys.D2:
-                            _全局模式d = 1 - _全局模式d;
-                            Tts.Speak(_全局模式d == 1 ? "传" : "不传");
-                            break;
-                    }
+                        {
+                            case Keys.Q:
+                                _条件1 = true;
+                                break;
+                            case Keys.W:
+                                _条件2 = true;
+                                break;
+                            case Keys.R:
+                                _条件4 = true;
+                                break;
+                            case Keys.D:
+                                _条件5 = true;
+                                break;
+                            case Keys.D2:
+                                _全局模式d = 1 - _全局模式d;
+                                Tts.Speak(_全局模式d == 1 ? "传" : "不传");
+                                break;
+                        }
 
-                    break;
-                }
+                        break;
+                    }
 
                 #endregion
 
                 #region 骨法
 
                 case "骨法":
-                {
-                    if (!_总循环条件)
                     {
-                        _总循环条件 = true;
-                        _条件根据图片委托1 ??= 幽冥轰爆去后摇;
-                        _条件根据图片委托2 ??= 衰老去后摇;
-                        _条件根据图片委托3 ??= 幽冥守卫去后摇;
-                        _条件根据图片委托4 ??= 生命吸取去后摇;
-                        await 状态初始化().ConfigureAwait(false);
+                        if (!_总循环条件)
+                        {
+                            _总循环条件 = true;
+                            _条件根据图片委托1 ??= 幽冥轰爆去后摇;
+                            _条件根据图片委托2 ??= 衰老去后摇;
+                            _条件根据图片委托3 ??= 幽冥守卫去后摇;
+                            _条件根据图片委托4 ??= 生命吸取去后摇;
+                            await 状态初始化().ConfigureAwait(false);
+                        }
+
+                        await 根据按键判断技能释放前通用逻辑(e).ConfigureAwait(true);
+
+                        switch (e.KeyCode)
+                        {
+                            case Keys.Q:
+                                _条件1 = true;
+                                break;
+                            case Keys.W:
+                                _条件2 = true;
+                                break;
+                            case Keys.E:
+                                _条件3 = true;
+                                break;
+                            case Keys.R:
+                                根据图片使用物品(物品_希瓦_数组);
+                                根据图片使用物品(物品_纷争_数组);
+                                _条件4 = true;
+                                break;
+                            case Keys.D2:
+                                _全局模式r = 1 - _全局模式r;
+                                Tts.Speak(_全局模式r == 1 ? "吸取接衰老" : "吸取不接衰老");
+                                break;
+                        }
+
+                        break;
                     }
-
-                    await 根据按键判断技能释放前通用逻辑(e).ConfigureAwait(true);
-
-                    switch (e.KeyCode)
-                    {
-                        case Keys.Q:
-                            _条件1 = true;
-                            break;
-                        case Keys.W:
-                            _条件2 = true;
-                            break;
-                        case Keys.E:
-                            _条件3 = true;
-                            break;
-                        case Keys.R:
-                            根据图片使用物品(物品_希瓦_数组);
-                            根据图片使用物品(物品_纷争_数组);
-                            _条件4 = true;
-                            break;
-                        case Keys.D2:
-                            _全局模式r = 1 - _全局模式r;
-                            Tts.Speak(_全局模式r == 1 ? "吸取接衰老" : "吸取不接衰老");
-                            break;
-                    }
-
-                    break;
-                }
 
                 #endregion
 
                 #region 干扰者
 
                 case "干扰者":
-                {
-                    if (!_总循环条件)
                     {
-                        _总循环条件 = true;
-                        _条件根据图片委托1 ??= 风雷之击去后摇;
-                        _条件根据图片委托2 ??= 恶念瞥视去后摇;
-                        _条件根据图片委托3 ??= 动能力场去后摇;
-                        _条件根据图片委托4 ??= 静态风暴去后摇;
-                        _条件根据图片委托5 ??= 静态风暴动能立场风雷之击;
-                        await 状态初始化().ConfigureAwait(false);
+                        if (!_总循环条件)
+                        {
+                            _总循环条件 = true;
+                            _条件根据图片委托1 ??= 风雷之击去后摇;
+                            _条件根据图片委托2 ??= 恶念瞥视去后摇;
+                            _条件根据图片委托3 ??= 动能力场去后摇;
+                            _条件根据图片委托4 ??= 静态风暴去后摇;
+                            _条件根据图片委托5 ??= 静态风暴动能立场风雷之击;
+                            await 状态初始化().ConfigureAwait(false);
+                        }
+
+                        await 根据按键判断技能释放前通用逻辑(e).ConfigureAwait(true);
+
+                        switch (e.KeyCode)
+                        {
+                            case Keys.Q:
+                                _条件1 = true;
+                                break;
+                            case Keys.W:
+                                _条件2 = true;
+                                break;
+                            case Keys.E:
+                                _条件3 = true;
+                                break;
+                            case Keys.R:
+                                _条件4 = true;
+                                break;
+                            case Keys.D2:
+                                设置全局步骤w(0);
+                                _条件5 = true;
+                                break;
+                        }
+
+                        break;
                     }
-
-                    await 根据按键判断技能释放前通用逻辑(e).ConfigureAwait(true);
-
-                    switch (e.KeyCode)
-                    {
-                        case Keys.Q:
-                            _条件1 = true;
-                            break;
-                        case Keys.W:
-                            _条件2 = true;
-                            break;
-                        case Keys.E:
-                            _条件3 = true;
-                            break;
-                        case Keys.R:
-                            _条件4 = true;
-                            break;
-                        case Keys.D2:
-                            设置全局步骤w(0);
-                            _条件5 = true;
-                            break;
-                    }
-
-                    break;
-                }
 
                 #endregion
 
                 #region 黑鸟
 
                 case "黑鸟":
-                {
-                    if (!_总循环条件)
                     {
-                        _总循环条件 = true;
-                        _条件根据图片委托1 ??= 神智之蚀去后摇;
-                        _条件根据图片委托2 ??= 关接跳;
-                        await 状态初始化().ConfigureAwait(false);
-                    }
+                        if (!_总循环条件)
+                        {
+                            _总循环条件 = true;
+                            _条件根据图片委托1 ??= 神智之蚀去后摇;
+                            _条件根据图片委托2 ??= 关接跳;
+                            await 状态初始化().ConfigureAwait(false);
+                        }
 
-                    switch (e.KeyCode)
-                    {
-                        case Keys.D:
-                            SimKeyBoard.KeyPress(Keys.W);
-                            _条件1 = true;
-                            break;
-                        case Keys.W:
-                            根据图片使用物品(物品_纷争_数组);
-                            break;
-                        case Keys.E:
-                            _条件3 = true;
-                            break;
-                        case Keys.R:
-                            _条件2 = true;
-                            break;
-                    }
+                        switch (e.KeyCode)
+                        {
+                            case Keys.D:
+                                SimKeyBoard.KeyPress(Keys.W);
+                                _条件1 = true;
+                                break;
+                            case Keys.W:
+                                根据图片使用物品(物品_纷争_数组);
+                                break;
+                            case Keys.E:
+                                _条件3 = true;
+                                break;
+                            case Keys.R:
+                                _条件2 = true;
+                                break;
+                        }
 
-                    break;
-                }
+                        break;
+                    }
 
                 #endregion
 
                 #region 谜团
 
                 case "谜团":
-                {
-                    if (e.KeyCode == Keys.F)
                     {
-                        label1.Text = "F";
-                        await Run(刷新接凋零黑洞).ConfigureAwait(true);
-                    }
+                        if (e.KeyCode == Keys.F)
+                        {
+                            label1.Text = "F";
+                            await Run(刷新接凋零黑洞).ConfigureAwait(true);
+                        }
 
-                    break;
-                }
+                        break;
+                    }
 
                 #endregion
 
                 #region 冰女
 
                 case "冰女":
-                {
-                    break;
-                }
+                    {
+                        break;
+                    }
 
                 #endregion
 
                 #region 火女
 
                 case "火女":
-                {
-                    if (!_总循环条件)
                     {
-                        _总循环条件 = true;
-                        _条件根据图片委托1 ??= 龙破斩去后摇;
-                        _条件根据图片委托2 ??= 光击阵去后摇;
-                        _条件根据图片委托3 ??= 神灭斩去后摇;
-                        await 状态初始化().ConfigureAwait(false);
+                        if (!_总循环条件)
+                        {
+                            _总循环条件 = true;
+                            _条件根据图片委托1 ??= 龙破斩去后摇;
+                            _条件根据图片委托2 ??= 光击阵去后摇;
+                            _条件根据图片委托3 ??= 神灭斩去后摇;
+                            await 状态初始化().ConfigureAwait(false);
+                        }
+
+
+                        switch (e.KeyCode)
+                        {
+                            case Keys.Q:
+                                _条件1 = true;
+                                break;
+                            case Keys.W:
+                                _条件2 = true;
+                                break;
+                            case Keys.R:
+                                _条件3 = true;
+                                break;
+                        }
+
+                        break;
                     }
-
-
-                    switch (e.KeyCode)
-                    {
-                        case Keys.Q:
-                            _条件1 = true;
-                            break;
-                        case Keys.W:
-                            _条件2 = true;
-                            break;
-                        case Keys.R:
-                            _条件3 = true;
-                            break;
-                    }
-
-                    break;
-                }
 
                 #endregion
 
                 #region 蓝猫
 
                 case "蓝猫":
-                {
-                    if (!_总循环条件)
                     {
-                        _总循环条件 = true;
-                        _条件根据图片委托1 ??= 拉接平A;
-                        _条件根据图片委托2 ??= 滚接平A;
-                        await 状态初始化().ConfigureAwait(false);
+                        if (!_总循环条件)
+                        {
+                            _总循环条件 = true;
+                            _条件根据图片委托1 ??= 拉接平A;
+                            _条件根据图片委托2 ??= 滚接平A;
+                            await 状态初始化().ConfigureAwait(false);
+                        }
+
+
+                        switch (e.KeyCode)
+                        {
+                            case Keys.Q:
+                                await Run(残影接平A).ConfigureAwait(true);
+                                break;
+                            case Keys.W:
+                                _条件1 = true;
+                                break;
+                            case Keys.R:
+                                _条件2 = true;
+                                break;
+                            case Keys.D4:
+                                _条件3 = true;
+                                break;
+                        }
+
+                        break;
                     }
-
-
-                    switch (e.KeyCode)
-                    {
-                        case Keys.Q:
-                            await Run(残影接平A).ConfigureAwait(true);
-                            break;
-                        case Keys.W:
-                            _条件1 = true;
-                            break;
-                        case Keys.R:
-                            _条件2 = true;
-                            break;
-                        case Keys.D4:
-                            _条件3 = true;
-                            break;
-                    }
-
-                    break;
-                }
 
                 #endregion
 
                 #region 卡尔
 
                 case "卡尔":
-                {
-                    if (!_总循环条件)
                     {
-                        _总循环条件 = true;
-                        _条件根据图片委托1 ??= 三冰对线;
-                        _条件根据图片委托2 ??= 三雷对线;
-                        _条件根据图片委托3 ??= 三雷幽灵;
-                        _条件根据图片委托4 ??= 极冷吹风陨星锤雷暴;
-                        await 状态初始化().ConfigureAwait(false);
+                        if (!_总循环条件)
+                        {
+                            _总循环条件 = true;
+                            _条件根据图片委托1 ??= 三冰对线;
+                            _条件根据图片委托2 ??= 三雷对线;
+                            _条件根据图片委托3 ??= 三雷幽灵;
+                            _条件根据图片委托4 ??= 极冷吹风陨星锤雷暴;
+                            await 状态初始化().ConfigureAwait(false);
+                        }
+
+                        await 根据按键判断技能释放前通用逻辑(e).ConfigureAwait(true);
+
+                        switch (e.KeyCode)
+                        {
+                            case Keys.D1:
+                                _条件1 = true;
+                                break;
+                            case Keys.D2:
+                                _条件2 = true;
+                                break;
+                            case Keys.D3:
+                                _条件3 = true;
+                                break;
+                            case Keys.D4:
+                                _条件4 = true;
+                                break;
+                        }
+
+                        break;
                     }
-
-                    await 根据按键判断技能释放前通用逻辑(e).ConfigureAwait(true);
-
-                    switch (e.KeyCode)
-                    {
-                        case Keys.D1:
-                            _条件1 = true;
-                            break;
-                        case Keys.D2:
-                            _条件2 = true;
-                            break;
-                        case Keys.D3:
-                            _条件3 = true;
-                            break;
-                        case Keys.D4:
-                            _条件4 = true;
-                            break;
-                    }
-
-                    break;
-                }
 
                 #endregion
 
                 #region 拉席克
 
                 case "拉席克":
-                {
-                    if (!_总循环条件)
                     {
-                        _总循环条件 = true;
-                        _条件根据图片委托1 ??= 撕裂大地去后摇;
-                        _条件根据图片委托2 ??= 恶魔敕令去后摇;
-                        _条件根据图片委托3 ??= 闪电风暴去后摇;
-                        _条件根据图片委托4 ??= 脉冲新星去后摇;
-                        _条件根据图片委托5 ??= 虚无主义去后摇;
-                        _条件根据图片委托6 ??= 循环检测脉冲新星;
-                        await 状态初始化().ConfigureAwait(false);
+                        if (!_总循环条件)
+                        {
+                            _总循环条件 = true;
+                            _条件根据图片委托1 ??= 撕裂大地去后摇;
+                            _条件根据图片委托2 ??= 恶魔敕令去后摇;
+                            _条件根据图片委托3 ??= 闪电风暴去后摇;
+                            _条件根据图片委托4 ??= 脉冲新星去后摇;
+                            _条件根据图片委托5 ??= 虚无主义去后摇;
+                            _条件根据图片委托6 ??= 循环检测脉冲新星;
+                            await 状态初始化().ConfigureAwait(false);
+                        }
+
+                        await 根据按键判断技能释放前通用逻辑(e).ConfigureAwait(true);
+
+                        switch (e.KeyCode)
+                        {
+                            case Keys.Q:
+                                _条件1 = true;
+                                break;
+                            case Keys.W:
+                                _条件2 = true;
+                                break;
+                            case Keys.E:
+                                _条件3 = true;
+                                break;
+                            case Keys.D:
+                                _条件5 = true;
+                                break;
+                            case Keys.R:
+                                _条件4 = true;
+                                break;
+                            case Keys.D2:
+                                if (_全局模式r == 1)
+                                {
+                                    _全局模式r = 0;
+                                    _条件6 = false;
+                                    SimKeyBoard.KeyPress(Keys.R);
+                                    Tts.Speak("关闭脉冲新星");
+                                }
+                                else
+                                {
+                                    _全局模式r = 1;
+                                    _条件6 = true;
+                                    Tts.Speak("开启脉冲新星");
+                                }
+
+                                break;
+                        }
+
+                        break;
                     }
-
-                    await 根据按键判断技能释放前通用逻辑(e).ConfigureAwait(true);
-
-                    switch (e.KeyCode)
-                    {
-                        case Keys.Q:
-                            _条件1 = true;
-                            break;
-                        case Keys.W:
-                            _条件2 = true;
-                            break;
-                        case Keys.E:
-                            _条件3 = true;
-                            break;
-                        case Keys.D:
-                            _条件5 = true;
-                            break;
-                        case Keys.R:
-                            _条件4 = true;
-                            break;
-                        case Keys.D2:
-                            if (_全局模式r == 1)
-                            {
-                                _全局模式r = 0;
-                                _条件6 = false;
-                                SimKeyBoard.KeyPress(Keys.R);
-                                Tts.Speak("关闭脉冲新星");
-                            }
-                            else
-                            {
-                                _全局模式r = 1;
-                                _条件6 = true;
-                                Tts.Speak("开启脉冲新星");
-                            }
-
-                            break;
-                    }
-
-                    break;
-                }
 
                 #endregion
 
                 #region 术士
 
                 case "术士":
-                {
-                    if (!_总循环条件)
                     {
-                        _总循环条件 = true;
-                        _条件根据图片委托1 ??= 致命链接去后摇;
-                        _条件根据图片委托2 ??= 暗言术去后摇;
-                        _条件根据图片委托3 ??= 混乱之祭去后摇;
-                        await 状态初始化().ConfigureAwait(false);
+                        if (!_总循环条件)
+                        {
+                            _总循环条件 = true;
+                            _条件根据图片委托1 ??= 致命链接去后摇;
+                            _条件根据图片委托2 ??= 暗言术去后摇;
+                            _条件根据图片委托3 ??= 混乱之祭去后摇;
+                            await 状态初始化().ConfigureAwait(false);
+                        }
+
+
+                        switch (e.KeyCode)
+                        {
+                            case Keys.Q:
+                                根据图片使用物品(物品_纷争_数组);
+                                _条件1 = true;
+                                break;
+                            case Keys.W:
+                                _条件2 = true;
+                                break;
+                            case Keys.E:
+                                初始化全局时间(ref _全局时间e);
+                                break;
+                            case Keys.R:
+                                初始化全局时间(ref _全局时间r);
+                                _条件3 = true;
+                                break;
+                        }
+
+                        break;
                     }
-
-
-                    switch (e.KeyCode)
-                    {
-                        case Keys.Q:
-                            根据图片使用物品(物品_纷争_数组);
-                            _条件1 = true;
-                            break;
-                        case Keys.W:
-                            _条件2 = true;
-                            break;
-                        case Keys.E:
-                            初始化全局时间(ref _全局时间e);
-                            break;
-                        case Keys.R:
-                            初始化全局时间(ref _全局时间r);
-                            _条件3 = true;
-                            break;
-                    }
-
-                    break;
-                }
 
                 #endregion
 
                 #region 暗影萨满
 
                 case "暗影萨满":
-                {
-                    if (!_总循环条件)
                     {
-                        _总循环条件 = true;
-                        _条件根据图片委托1 ??= 苍穹振击取消后摇;
-                        _条件根据图片委托2 ??= 变羊取消后摇;
-                        _条件根据图片委托3 ??= 释放群蛇守卫取消后摇;
-                        _条件根据图片委托4 ??= 推推破林肯秒羊;
-                        _条件根据图片委托5 ??= 枷锁持续施法隐身;
-                        await 状态初始化().ConfigureAwait(false);
-                    }
+                        if (!_总循环条件)
+                        {
+                            _总循环条件 = true;
+                            _条件根据图片委托1 ??= 苍穹振击取消后摇;
+                            _条件根据图片委托2 ??= 变羊取消后摇;
+                            _条件根据图片委托3 ??= 释放群蛇守卫取消后摇;
+                            _条件根据图片委托4 ??= 推推破林肯秒羊;
+                            _条件根据图片委托5 ??= 枷锁持续施法隐身;
+                            await 状态初始化().ConfigureAwait(false);
+                        }
 
 
-                    switch (e.KeyCode)
-                    {
-                        case Keys.Q:
-                            _条件1 = true;
-                            break;
-                        case Keys.W:
-                            if (RegPicture(物品_祭礼长袍_数组, _全局数组))
+                        switch (e.KeyCode)
+                        {
+                            case Keys.Q:
+                                _条件1 = true;
+                                break;
+                            case Keys.W:
+                                if (RegPicture(物品_祭礼长袍_数组, _全局数组))
                                 {
                                     _状态抗性倍数 *= 1.1;
                                 }
@@ -2823,459 +2823,459 @@ namespace Dota2Simulator
                                 }
 
                                 _条件2 = true;
-                            break;
-                        case Keys.E:
-                            _条件5 = true;
-                            break;
-                        case Keys.R:
-                            _条件3 = true;
-                            break;
-                        case Keys.D1:
-                            switch (_全局模式w)
-                            {
-                                case 0:
-                                    _全局模式w = 1;
-                                    Tts.Speak("羊拉");
-                                    break;
-                                case 1:
-                                    _全局模式w = 2;
-                                    Tts.Speak("羊电");
-                                    break;
-                                case 2:
-                                    _全局模式w = 3;
-                                    Tts.Speak("羊电拉");
-                                    break;
-                                case 3:
-                                    _全局模式w = 4;
-                                    Tts.Speak("羊电大拉");
-                                    break;
-                                case 4:
-                                    _全局模式w = 0;
-                                    Tts.Speak("羊接平A");
-                                    break;
-                            }
+                                break;
+                            case Keys.E:
+                                _条件5 = true;
+                                break;
+                            case Keys.R:
+                                _条件3 = true;
+                                break;
+                            case Keys.D1:
+                                switch (_全局模式w)
+                                {
+                                    case 0:
+                                        _全局模式w = 1;
+                                        Tts.Speak("羊拉");
+                                        break;
+                                    case 1:
+                                        _全局模式w = 2;
+                                        Tts.Speak("羊电");
+                                        break;
+                                    case 2:
+                                        _全局模式w = 3;
+                                        Tts.Speak("羊电拉");
+                                        break;
+                                    case 3:
+                                        _全局模式w = 4;
+                                        Tts.Speak("羊电大拉");
+                                        break;
+                                    case 4:
+                                        _全局模式w = 0;
+                                        Tts.Speak("羊接平A");
+                                        break;
+                                }
 
-                            break;
-                        case Keys.D2:
-                            _条件4 = true;
-                            break;
-                        case Keys.D3:
-                            _全局模式q = 1 - _全局模式q;
-                            Tts.Speak(_全局模式q == 0 ? "羊" : "电羊");
-                            break;
+                                break;
+                            case Keys.D2:
+                                _条件4 = true;
+                                break;
+                            case Keys.D3:
+                                _全局模式q = 1 - _全局模式q;
+                                Tts.Speak(_全局模式q == 0 ? "羊" : "电羊");
+                                break;
+                        }
+
+                        break;
                     }
-
-                    break;
-                }
 
                 #endregion
 
                 #region 小仙女
 
                 case "小仙女":
-                {
-                    break;
-                }
+                    {
+                        break;
+                    }
 
                 #endregion
 
                 #region 炸弹人
 
                 case "炸弹人":
-                {
-                    if (!_总循环条件)
                     {
-                        _总循环条件 = true;
-                        _条件根据图片委托1 ??= 粘性炸弹去后摇;
-                        _条件根据图片委托2 ??= 活性电击去后摇;
-                        _条件根据图片委托3 ??= 爆破起飞去后摇;
-                        _条件根据图片委托4 ??= 爆破后接3雷粘性炸弹;
-                        await 状态初始化().ConfigureAwait(false);
+                        if (!_总循环条件)
+                        {
+                            _总循环条件 = true;
+                            _条件根据图片委托1 ??= 粘性炸弹去后摇;
+                            _条件根据图片委托2 ??= 活性电击去后摇;
+                            _条件根据图片委托3 ??= 爆破起飞去后摇;
+                            _条件根据图片委托4 ??= 爆破后接3雷粘性炸弹;
+                            await 状态初始化().ConfigureAwait(false);
+                        }
+
+
+                        switch (e.KeyCode)
+                        {
+                            case Keys.Q:
+                                _条件1 = true;
+                                break;
+                            case Keys.W:
+                                _条件2 = true;
+                                break;
+                            case Keys.E:
+                                根据图片使用物品(物品_纷争_数组);
+                                _条件3 = true;
+                                break;
+                            case Keys.D2:
+                                _全局模式e = 1 - _全局模式e;
+                                Tts.Speak(_全局模式e == 0 ? "起飞后不接3连炸弹" : "起飞后接3连炸弹");
+                                break;
+                        }
+
+                        break;
                     }
-
-
-                    switch (e.KeyCode)
-                    {
-                        case Keys.Q:
-                            _条件1 = true;
-                            break;
-                        case Keys.W:
-                            _条件2 = true;
-                            break;
-                        case Keys.E:
-                            根据图片使用物品(物品_纷争_数组);
-                            _条件3 = true;
-                            break;
-                        case Keys.D2:
-                            _全局模式e = 1 - _全局模式e;
-                            Tts.Speak(_全局模式e == 0 ? "起飞后不接3连炸弹" : "起飞后接3连炸弹");
-                            break;
-                    }
-
-                    break;
-                }
 
                 #endregion
 
                 #region 神域
 
                 case "神域":
-                {
-                    if (!_总循环条件)
                     {
-                        _总循环条件 = true;
-                        _条件根据图片委托1 ??= 命运敕令去后摇;
-                        _条件根据图片委托2 ??= 涤罪之焰去后摇;
-                        _条件根据图片委托3 ??= 虚妄之诺去后摇;
-                        _条件根据图片委托5 ??= 天命之雨去后摇;
-                        await 状态初始化().ConfigureAwait(false);
+                        if (!_总循环条件)
+                        {
+                            _总循环条件 = true;
+                            _条件根据图片委托1 ??= 命运敕令去后摇;
+                            _条件根据图片委托2 ??= 涤罪之焰去后摇;
+                            _条件根据图片委托3 ??= 虚妄之诺去后摇;
+                            _条件根据图片委托5 ??= 天命之雨去后摇;
+                            await 状态初始化().ConfigureAwait(false);
+                        }
+
+                        await 根据按键判断技能释放前通用逻辑(e).ConfigureAwait(true);
+
+                        switch (e.KeyCode)
+                        {
+                            case Keys.W:
+                                _条件1 = true;
+                                break;
+                            case Keys.E:
+                                _条件2 = true;
+                                break;
+                            case Keys.D:
+                                _条件5 = true;
+                                break;
+                            case Keys.R:
+                                _条件3 = true;
+                                break;
+                        }
+
+                        break;
                     }
-
-                    await 根据按键判断技能释放前通用逻辑(e).ConfigureAwait(true);
-
-                    switch (e.KeyCode)
-                    {
-                        case Keys.W:
-                            _条件1 = true;
-                            break;
-                        case Keys.E:
-                            _条件2 = true;
-                            break;
-                        case Keys.D:
-                            _条件5 = true;
-                            break;
-                        case Keys.R:
-                            _条件3 = true;
-                            break;
-                    }
-
-                    break;
-                }
 
                 #endregion
 
                 #region 莱恩
 
                 case "莱恩":
-                {
-                    if (!_总循环条件)
                     {
-                        _总循环条件 = true;
-                        _条件根据图片委托1 ??= 莱恩羊接技能;
-                        _条件根据图片委托2 ??= 死亡一指去后摇;
-                        _条件根据图片委托3 ??= 推推破林肯秒羊;
-                        _条件根据图片委托4 ??= 羊刺刷新秒人;
+                        if (!_总循环条件)
+                        {
+                            _总循环条件 = true;
+                            _条件根据图片委托1 ??= 莱恩羊接技能;
+                            _条件根据图片委托2 ??= 死亡一指去后摇;
+                            _条件根据图片委托3 ??= 推推破林肯秒羊;
+                            _条件根据图片委托4 ??= 羊刺刷新秒人;
 
-                        await 状态初始化().ConfigureAwait(false);
+                            await 状态初始化().ConfigureAwait(false);
+                        }
+
+
+                        switch (e.KeyCode)
+                        {
+                            case Keys.W:
+                                _条件1 = true;
+                                break;
+                            case Keys.R:
+                                await 大招前纷争(_全局数组).ConfigureAwait(true);
+                                _条件2 = true;
+                                break;
+                            case Keys.E:
+                                break;
+                            case Keys.D2:
+                                _条件3 = true;
+                                break;
+                            case Keys.S:
+                                _中断条件 = true;
+                                break;
+                            case Keys.D3:
+                                _条件4 = true;
+                                break;
+                            case Keys.D4 when !_条件5:
+                                _条件5 = true;
+                                Tts.Speak("开启刷新秒人");
+                                break;
+                            case Keys.D4:
+                                _条件5 = false;
+                                Tts.Speak("关闭刷新秒人");
+                                break;
+                            case Keys.D5 when !_条件6:
+                                _条件6 = true;
+                                Tts.Speak("开启羊接吸");
+                                break;
+                            case Keys.D5:
+                                _条件6 = false;
+                                Tts.Speak("开启羊接A");
+                                break;
+                        }
+
+                        break;
                     }
-
-
-                    switch (e.KeyCode)
-                    {
-                        case Keys.W:
-                            _条件1 = true;
-                            break;
-                        case Keys.R:
-                            await 大招前纷争(_全局数组).ConfigureAwait(true);
-                            _条件2 = true;
-                            break;
-                        case Keys.E:
-                            break;
-                        case Keys.D2:
-                            _条件3 = true;
-                            break;
-                        case Keys.S:
-                            _中断条件 = true;
-                            break;
-                        case Keys.D3:
-                            _条件4 = true;
-                            break;
-                        case Keys.D4 when !_条件5:
-                            _条件5 = true;
-                            Tts.Speak("开启刷新秒人");
-                            break;
-                        case Keys.D4:
-                            _条件5 = false;
-                            Tts.Speak("关闭刷新秒人");
-                            break;
-                        case Keys.D5 when !_条件6:
-                            _条件6 = true;
-                            Tts.Speak("开启羊接吸");
-                            break;
-                        case Keys.D5:
-                            _条件6 = false;
-                            Tts.Speak("开启羊接A");
-                            break;
-                    }
-
-                    break;
-                }
 
                 #endregion
 
                 #region 沉默
 
                 case "沉默":
-                {
-                    if (!_总循环条件)
                     {
-                        _总循环条件 = true;
-                        _条件根据图片委托1 ??= 奥数诅咒去后摇;
-                        _条件根据图片委托2 ??= 全领域沉默去后摇;
-                        await 状态初始化().ConfigureAwait(false);
+                        if (!_总循环条件)
+                        {
+                            _总循环条件 = true;
+                            _条件根据图片委托1 ??= 奥数诅咒去后摇;
+                            _条件根据图片委托2 ??= 全领域沉默去后摇;
+                            await 状态初始化().ConfigureAwait(false);
+                        }
+
+
+                        switch (e.KeyCode)
+                        {
+                            case Keys.Q:
+                                _条件1 = true;
+                                break;
+                            case Keys.R:
+                                _条件2 = true;
+                                break;
+                        }
+
+                        break;
                     }
-
-
-                    switch (e.KeyCode)
-                    {
-                        case Keys.Q:
-                            _条件1 = true;
-                            break;
-                        case Keys.R:
-                            _条件2 = true;
-                            break;
-                    }
-
-                    break;
-                }
 
                 #endregion
 
                 #region 戴泽
 
                 case "戴泽":
-                {
-                    if (!_总循环条件)
                     {
-                        _总循环条件 = true;
-                        _条件根据图片委托1 ??= 剧毒之触去后摇;
-                        _条件根据图片委托2 ??= 薄葬去后摇;
-                        _条件根据图片委托3 ??= 暗影波去后摇;
-                        _条件根据图片委托4 ??= 邪能去后摇;
-                        _基础攻击前摇 = 0.3;
-                        _基础攻击间隔 = 1.7;
-                        await 状态初始化().ConfigureAwait(false);
+                        if (!_总循环条件)
+                        {
+                            _总循环条件 = true;
+                            _条件根据图片委托1 ??= 剧毒之触去后摇;
+                            _条件根据图片委托2 ??= 薄葬去后摇;
+                            _条件根据图片委托3 ??= 暗影波去后摇;
+                            _条件根据图片委托4 ??= 邪能去后摇;
+                            _基础攻击前摇 = 0.3;
+                            _基础攻击间隔 = 1.7;
+                            await 状态初始化().ConfigureAwait(false);
+                        }
+
+
+                        switch (e.KeyCode)
+                        {
+                            case Keys.Q:
+                                初始化全局时间(ref _全局时间q);
+                                _条件1 = true;
+                                break;
+                            case Keys.W:
+                                初始化全局时间(ref _全局时间w);
+                                _条件2 = true;
+                                break;
+                            case Keys.E:
+                                初始化全局时间(ref _全局时间e);
+                                _条件3 = true;
+                                break;
+                            case Keys.R:
+                                初始化全局时间(ref _全局时间r);
+                                _条件4 = true;
+                                break;
+                        }
+
+                        break;
                     }
-
-
-                    switch (e.KeyCode)
-                    {
-                        case Keys.Q:
-                            初始化全局时间(ref _全局时间q);
-                            _条件1 = true;
-                            break;
-                        case Keys.W:
-                            初始化全局时间(ref _全局时间w);
-                            _条件2 = true;
-                            break;
-                        case Keys.E:
-                            初始化全局时间(ref _全局时间e);
-                            _条件3 = true;
-                            break;
-                        case Keys.R:
-                            初始化全局时间(ref _全局时间r);
-                            _条件4 = true;
-                            break;
-                    }
-
-                    break;
-                }
 
                 #endregion
 
                 #region 双头龙
 
                 case "双头龙":
-                {
-                    if (!_总循环条件)
                     {
-                        _总循环条件 = true;
-                        _条件根据图片委托1 ??= 冰火交加去后摇;
-                        _条件根据图片委托2 ??= 冰封路径去后摇;
-                        _条件根据图片委托3 ??= 烈焰焚身去后摇;
-                        _条件根据图片委托4 ??= 吹风接冰封路径;
-                        await 状态初始化().ConfigureAwait(false);
+                        if (!_总循环条件)
+                        {
+                            _总循环条件 = true;
+                            _条件根据图片委托1 ??= 冰火交加去后摇;
+                            _条件根据图片委托2 ??= 冰封路径去后摇;
+                            _条件根据图片委托3 ??= 烈焰焚身去后摇;
+                            _条件根据图片委托4 ??= 吹风接冰封路径;
+                            await 状态初始化().ConfigureAwait(false);
+                        }
+
+                        await 根据按键判断技能释放前通用逻辑(e).ConfigureAwait(true);
+
+                        switch (e.KeyCode)
+                        {
+                            case Keys.Q:
+                                _条件1 = true;
+                                break;
+                            case Keys.W:
+                                _条件2 = true;
+                                break;
+                            case Keys.R:
+                                _条件3 = true;
+                                break;
+                            case Keys.D3:
+                                _条件4 = true;
+                                break;
+                        }
+
+                        break;
                     }
-
-                    await 根据按键判断技能释放前通用逻辑(e).ConfigureAwait(true);
-
-                    switch (e.KeyCode)
-                    {
-                        case Keys.Q:
-                            _条件1 = true;
-                            break;
-                        case Keys.W:
-                            _条件2 = true;
-                            break;
-                        case Keys.R:
-                            _条件3 = true;
-                            break;
-                        case Keys.D3:
-                            _条件4 = true;
-                            break;
-                    }
-
-                    break;
-                }
 
                 #endregion
 
                 #region 奶绿
 
                 case "奶绿":
-                {
-                    if (!_总循环条件)
                     {
-                        _总循环条件 = true;
-                        _条件根据图片委托1 ??= 弹无虚发去后摇;
-                        _条件根据图片委托2 ??= 唤魂去后摇;
-                        _条件根据图片委托3 ??= 越界去后摇;
-                        _条件根据图片委托4 ??= 临别一枪去后摇;
-                        _条件根据图片委托5 ??= 祭台去后摇;
-                        _切假腿配置.修改配置(Keys.E, false);
-                        _切假腿配置.修改配置(Keys.F, true);
-                        await 状态初始化().ConfigureAwait(false);
-                    }
+                        if (!_总循环条件)
+                        {
+                            _总循环条件 = true;
+                            _条件根据图片委托1 ??= 弹无虚发去后摇;
+                            _条件根据图片委托2 ??= 唤魂去后摇;
+                            _条件根据图片委托3 ??= 越界去后摇;
+                            _条件根据图片委托4 ??= 临别一枪去后摇;
+                            _条件根据图片委托5 ??= 祭台去后摇;
+                            _切假腿配置.修改配置(Keys.E, false);
+                            _切假腿配置.修改配置(Keys.F, true);
+                            await 状态初始化().ConfigureAwait(false);
+                        }
 
-                    await 根据按键判断技能释放前通用逻辑(e).ConfigureAwait(true);
+                        await 根据按键判断技能释放前通用逻辑(e).ConfigureAwait(true);
 
-                    switch (e.KeyCode)
-                    {
-                        case Keys.F1:
-                            if (_是否神杖)
+                        switch (e.KeyCode)
+                        {
+                            case Keys.F1:
+                                if (_是否神杖)
                                 {
                                     _切假腿配置.修改配置(Keys.D, true);
                                 }
 
                                 break;
-                        case Keys.Q:
-                            _条件1 = true;
-                            break;
-                        case Keys.W:
-                            _条件2 = true;
-                            break;
-                        case Keys.R:
-                            _条件3 = true;
-                            break;
-                        case Keys.D:
-                            _条件4 = true;
-                            break;
-                        case Keys.F:
-                            _条件5 = true;
-                            break;
-                    }
+                            case Keys.Q:
+                                _条件1 = true;
+                                break;
+                            case Keys.W:
+                                _条件2 = true;
+                                break;
+                            case Keys.R:
+                                _条件3 = true;
+                                break;
+                            case Keys.D:
+                                _条件4 = true;
+                                break;
+                            case Keys.F:
+                                _条件5 = true;
+                                break;
+                        }
 
-                    break;
-                }
+                        break;
+                    }
 
                 #endregion
 
                 #region 女王
 
                 case "女王":
-                {
-                    if (!_总循环条件)
                     {
-                        _总循环条件 = true;
-                        _条件根据图片委托1 ??= 暗影突袭去后摇;
-                        _条件根据图片委托2 ??= 闪烁去后摇;
-                        _条件根据图片委托3 ??= 痛苦尖叫去后摇;
-                        _条件根据图片委托4 ??= 冲击波去后摇;
-                        await 状态初始化().ConfigureAwait(false);
+                        if (!_总循环条件)
+                        {
+                            _总循环条件 = true;
+                            _条件根据图片委托1 ??= 暗影突袭去后摇;
+                            _条件根据图片委托2 ??= 闪烁去后摇;
+                            _条件根据图片委托3 ??= 痛苦尖叫去后摇;
+                            _条件根据图片委托4 ??= 冲击波去后摇;
+                            await 状态初始化().ConfigureAwait(false);
+                        }
+
+
+                        switch (e.KeyCode)
+                        {
+                            case Keys.Q:
+                                _条件1 = true;
+                                break;
+                            case Keys.W:
+                                _条件2 = true;
+                                break;
+                            case Keys.E:
+                                _条件3 = true;
+                                break;
+                            case Keys.R:
+                                _条件4 = true;
+                                break;
+                            case Keys.S:
+                                _中断条件 = true;
+                                break;
+                        }
+
+                        break;
                     }
-
-
-                    switch (e.KeyCode)
-                    {
-                        case Keys.Q:
-                            _条件1 = true;
-                            break;
-                        case Keys.W:
-                            _条件2 = true;
-                            break;
-                        case Keys.E:
-                            _条件3 = true;
-                            break;
-                        case Keys.R:
-                            _条件4 = true;
-                            break;
-                        case Keys.S:
-                            _中断条件 = true;
-                            break;
-                    }
-
-                    break;
-                }
 
                 #endregion
 
                 #region 蓝胖
 
                 case "蓝胖":
-                {
-                    if (!_总循环条件)
                     {
-                        _总循环条件 = true;
-                        _条件根据图片委托1 ??= 火焰轰爆去后摇;
-                        _条件根据图片委托2 ??= 引燃去后摇;
-                        _条件根据图片委托3 ??= 嗜血术去后摇;
-                        _条件根据图片委托4 ??= 烈火护盾去后摇;
-                        _条件根据图片委托5 ??= 未精通火焰轰爆去后摇;
-                        await 状态初始化().ConfigureAwait(false);
+                        if (!_总循环条件)
+                        {
+                            _总循环条件 = true;
+                            _条件根据图片委托1 ??= 火焰轰爆去后摇;
+                            _条件根据图片委托2 ??= 引燃去后摇;
+                            _条件根据图片委托3 ??= 嗜血术去后摇;
+                            _条件根据图片委托4 ??= 烈火护盾去后摇;
+                            _条件根据图片委托5 ??= 未精通火焰轰爆去后摇;
+                            await 状态初始化().ConfigureAwait(false);
+                        }
+
+
+                        switch (e.KeyCode)
+                        {
+                            case Keys.Q:
+                                _条件1 = true;
+                                break;
+                            case Keys.W:
+                                _条件2 = true;
+                                break;
+                            case Keys.F:
+                                _条件4 = true;
+                                break;
+                            case Keys.D:
+                                _条件5 = true;
+                                break;
+                            case Keys.D2:
+                                _全局模式w = 1 - _全局模式w;
+                                Tts.Speak(_全局模式w == 0 ? "引燃接轰爆" : "引燃不接轰爆");
+                                break;
+                        }
+
+                        break;
                     }
-
-
-                    switch (e.KeyCode)
-                    {
-                        case Keys.Q:
-                            _条件1 = true;
-                            break;
-                        case Keys.W:
-                            _条件2 = true;
-                            break;
-                        case Keys.F:
-                            _条件4 = true;
-                            break;
-                        case Keys.D:
-                            _条件5 = true;
-                            break;
-                        case Keys.D2:
-                            _全局模式w = 1 - _全局模式w;
-                            Tts.Speak(_全局模式w == 0 ? "引燃接轰爆" : "引燃不接轰爆");
-                            break;
-                    }
-
-                    break;
-                }
 
                 #endregion
 
                 #region 祸乱之源
 
                 case "祸乱之源":
-                {
-                    if (!_总循环条件)
                     {
-                        _总循环条件 = true;
-                        _条件根据图片委托1 ??= 虚弱去后摇;
-                        _条件根据图片委托2 ??= 噬脑去后摇;
-                        _条件根据图片委托3 ??= 噩梦接平A锤;
-                        await 状态初始化().ConfigureAwait(false);
-                    }
+                        if (!_总循环条件)
+                        {
+                            _总循环条件 = true;
+                            _条件根据图片委托1 ??= 虚弱去后摇;
+                            _条件根据图片委托2 ??= 噬脑去后摇;
+                            _条件根据图片委托3 ??= 噩梦接平A锤;
+                            await 状态初始化().ConfigureAwait(false);
+                        }
 
 
-                    switch (e.KeyCode)
-                    {
-                        case Keys.Q:
-                            _条件1 = true;
-                            break;
-                        case Keys.W:
-                            _条件2 = true;
-                            break;
-                        case Keys.E:
-                            Color 技能点颜色 = Color.FromArgb(203, 183, 124);
-                            _全局时间 = 0;
-                            if (ColorAEqualColorB(获取指定位置颜色(971, 1008, in _全局数组), 技能点颜色, 0))
+                        switch (e.KeyCode)
+                        {
+                            case Keys.Q:
+                                _条件1 = true;
+                                break;
+                            case Keys.W:
+                                _条件2 = true;
+                                break;
+                            case Keys.E:
+                                Color 技能点颜色 = Color.FromArgb(203, 183, 124);
+                                _全局时间 = 0;
+                                if (ColorAEqualColorB(获取指定位置颜色(971, 1008, in _全局数组), 技能点颜色, 0))
                                 {
                                     _全局时间 = 7000;
                                 }
@@ -3293,15 +3293,15 @@ namespace Dota2Simulator
                                 }
 
                                 _条件3 = true;
-                            break;
-                        case Keys.D2:
-                            _全局模式e = 1 - _全局模式e;
-                            Tts.Speak(_全局模式e == 0 ? "睡不接陨星锤" : "睡接陨星锤");
-                            break;
-                    }
+                                break;
+                            case Keys.D2:
+                                _全局模式e = 1 - _全局模式e;
+                                Tts.Speak(_全局模式e == 0 ? "睡不接陨星锤" : "睡接陨星锤");
+                                break;
+                        }
 
-                    break;
-                }
+                        break;
+                    }
 
                 #endregion
 
@@ -3312,265 +3312,265 @@ namespace Dota2Simulator
                 #region 剧毒
 
                 case "剧毒":
-                {
-                    if (!_总循环条件)
                     {
-                        _总循环条件 = true;
-                        //_条件根据图片委托1 ??= 瘴气去后摇;
-                        //_条件根据图片委托2 ??= 蛇棒去后摇;
-                        //_条件根据图片委托3 ??= 剧毒新星去后摇;
-                        //_条件根据图片委托4 ??= 循环蛇棒;
-                        //_条件根据图片委托5 ??= 蛰毒去后摇;
-                        await 状态初始化().ConfigureAwait(false);
-                    }
+                        if (!_总循环条件)
+                        {
+                            _总循环条件 = true;
+                            //_条件根据图片委托1 ??= 瘴气去后摇;
+                            //_条件根据图片委托2 ??= 蛇棒去后摇;
+                            //_条件根据图片委托3 ??= 剧毒新星去后摇;
+                            //_条件根据图片委托4 ??= 循环蛇棒;
+                            //_条件根据图片委托5 ??= 蛰毒去后摇;
+                            await 状态初始化().ConfigureAwait(false);
+                        }
 
 
-                    switch (e.KeyCode)
-                    {
-                        case Keys.Q:
-                            _条件1 = true;
-                            break;
-                        case Keys.E:
-                            _条件2 = true;
-                            break;
-                        case Keys.D:
-                            if (!_是否魔晶)
+                        switch (e.KeyCode)
+                        {
+                            case Keys.Q:
+                                _条件1 = true;
+                                break;
+                            case Keys.E:
+                                _条件2 = true;
+                                break;
+                            case Keys.D:
+                                if (!_是否魔晶)
                                 {
                                     break;
                                 }
 
                                 _条件5 = true;
-                            break;
-                        case Keys.R:
-                            _条件3 = true;
-                            break;
-                        case Keys.D3:
-                        {
-                            if (!_条件4)
-                            {
-                                _循环条件1 = true;
-                                _条件4 = true;
-                            }
-                            else
-                            {
-                                _循环条件1 = false;
+                                break;
+                            case Keys.R:
+                                _条件3 = true;
+                                break;
+                            case Keys.D3:
+                                {
+                                    if (!_条件4)
+                                    {
+                                        _循环条件1 = true;
+                                        _条件4 = true;
+                                    }
+                                    else
+                                    {
+                                        _循环条件1 = false;
+                                        _条件4 = false;
+                                    }
+
+                                    break;
+                                }
+                            case Keys.S:
+                                _中断条件 = true;
+                                _条件1 = false;
+                                _条件2 = false;
+                                _条件3 = false;
                                 _条件4 = false;
-                            }
-
-                            break;
+                                _条件5 = false;
+                                break;
                         }
-                        case Keys.S:
-                            _中断条件 = true;
-                            _条件1 = false;
-                            _条件2 = false;
-                            _条件3 = false;
-                            _条件4 = false;
-                            _条件5 = false;
-                            break;
-                    }
 
-                    break;
-                }
+                        break;
+                    }
 
                 #endregion
 
                 #region 猛犸
 
                 case "猛犸":
-                {
-                    if (!_总循环条件)
                     {
-                        _总循环条件 = true;
-                        _条件根据图片委托1 = 震荡波去后摇;
-                        _条件根据图片委托2 = 授予力量去后摇;
-                        _条件根据图片委托3 = 巨角冲撞去后摇;
-                        _条件根据图片委托4 = 两级反转去后摇;
-                        _条件根据图片委托5 = 长角抛物去后摇;
-                        await 状态初始化().ConfigureAwait(false);
+                        if (!_总循环条件)
+                        {
+                            _总循环条件 = true;
+                            _条件根据图片委托1 = 震荡波去后摇;
+                            _条件根据图片委托2 = 授予力量去后摇;
+                            _条件根据图片委托3 = 巨角冲撞去后摇;
+                            _条件根据图片委托4 = 两级反转去后摇;
+                            _条件根据图片委托5 = 长角抛物去后摇;
+                            await 状态初始化().ConfigureAwait(false);
+                        }
+
+                        await 根据按键判断技能释放前通用逻辑(e).ConfigureAwait(true);
+
+                        switch (e.KeyCode)
+                        {
+                            case Keys.Q:
+                                _条件1 = true;
+                                break;
+                            case Keys.W:
+                                _条件2 = true;
+                                break;
+                            case Keys.E:
+                                _条件3 = true;
+                                break;
+                            case Keys.R:
+                                _条件4 = true;
+                                break;
+                            case Keys.D:
+                                _条件5 = true;
+                                break;
+                            case Keys.F:
+                                await Run(跳拱指定地点).ConfigureAwait(false);
+                                break;
+                            case Keys.D2:
+                                await Run(指定地点).ConfigureAwait(false);
+                                break;
+                        }
+
+                        break;
                     }
-
-                    await 根据按键判断技能释放前通用逻辑(e).ConfigureAwait(true);
-
-                    switch (e.KeyCode)
-                    {
-                        case Keys.Q:
-                            _条件1 = true;
-                            break;
-                        case Keys.W:
-                            _条件2 = true;
-                            break;
-                        case Keys.E:
-                            _条件3 = true;
-                            break;
-                        case Keys.R:
-                            _条件4 = true;
-                            break;
-                        case Keys.D:
-                            _条件5 = true;
-                            break;
-                        case Keys.F:
-                            await Run(跳拱指定地点).ConfigureAwait(false);
-                            break;
-                        case Keys.D2:
-                            await Run(指定地点).ConfigureAwait(false);
-                            break;
-                    }
-
-                    break;
-                }
 
                 #endregion
 
                 #region 狼人
 
                 case "狼人":
-                {
-                    if (!_总循环条件)
                     {
-                        _总循环条件 = true;
-                        _条件根据图片委托1 ??= 招狼去后摇;
-                        _条件根据图片委托2 ??= 嚎叫去后摇;
-                        _条件根据图片委托3 ??= 撕咬去后摇;
-                        _条件根据图片委托4 ??= 变狼去后摇;
-                        await 状态初始化().ConfigureAwait(false);
+                        if (!_总循环条件)
+                        {
+                            _总循环条件 = true;
+                            _条件根据图片委托1 ??= 招狼去后摇;
+                            _条件根据图片委托2 ??= 嚎叫去后摇;
+                            _条件根据图片委托3 ??= 撕咬去后摇;
+                            _条件根据图片委托4 ??= 变狼去后摇;
+                            await 状态初始化().ConfigureAwait(false);
+                        }
+
+                        await 根据按键判断技能释放前通用逻辑(e).ConfigureAwait(true);
+
+                        switch (e.KeyCode)
+                        {
+                            case Keys.Q:
+                                _条件1 = true;
+                                break;
+                            case Keys.W:
+                                _条件2 = true;
+                                break;
+                            case Keys.D:
+                                _条件3 = true;
+                                break;
+                            case Keys.R:
+                                _条件4 = true;
+                                break;
+                        }
+
+                        break;
                     }
-
-                    await 根据按键判断技能释放前通用逻辑(e).ConfigureAwait(true);
-
-                    switch (e.KeyCode)
-                    {
-                        case Keys.Q:
-                            _条件1 = true;
-                            break;
-                        case Keys.W:
-                            _条件2 = true;
-                            break;
-                        case Keys.D:
-                            _条件3 = true;
-                            break;
-                        case Keys.R:
-                            _条件4 = true;
-                            break;
-                    }
-
-                    break;
-                }
 
                 #endregion
 
                 #region 紫猫
 
                 case "紫猫":
-                {
-                    if (!_总循环条件)
                     {
-                        _总循环条件 = true;
-                        //_条件根据图片委托1 ??= 共鸣脉冲去后摇;
-                        await 状态初始化().ConfigureAwait(false);
+                        if (!_总循环条件)
+                        {
+                            _总循环条件 = true;
+                            //_条件根据图片委托1 ??= 共鸣脉冲去后摇;
+                            await 状态初始化().ConfigureAwait(false);
+                        }
+
+                        await 根据按键判断技能释放前通用逻辑(e).ConfigureAwait(true);
+
+                        switch (e.KeyCode)
+                        {
+                            case Keys.Q:
+                                _条件1 = true;
+                                break;
+                            case Keys.W:
+                                _条件2 = true;
+                                break;
+                            case Keys.D:
+                                _条件3 = true;
+                                break;
+                            case Keys.R:
+                                _条件4 = true;
+                                break;
+                        }
+
+                        break;
                     }
-
-                    await 根据按键判断技能释放前通用逻辑(e).ConfigureAwait(true);
-
-                    switch (e.KeyCode)
-                    {
-                        case Keys.Q:
-                            _条件1 = true;
-                            break;
-                        case Keys.W:
-                            _条件2 = true;
-                            break;
-                        case Keys.D:
-                            _条件3 = true;
-                            break;
-                        case Keys.R:
-                            _条件4 = true;
-                            break;
-                    }
-
-                    break;
-                }
 
                 #endregion
 
                 #region VS
 
                 case "VS":
-                {
-                    if (!_总循环条件)
                     {
-                        _条件根据图片委托1 ??= 魔法箭去后摇;
-                        _条件根据图片委托2 ??= 恐怖波动去后摇;
-                        _条件根据图片委托3 ??= 移形换位去后摇;
-                        _总循环条件 = true;
-                        await 状态初始化().ConfigureAwait(false);
+                        if (!_总循环条件)
+                        {
+                            _条件根据图片委托1 ??= 魔法箭去后摇;
+                            _条件根据图片委托2 ??= 恐怖波动去后摇;
+                            _条件根据图片委托3 ??= 移形换位去后摇;
+                            _总循环条件 = true;
+                            await 状态初始化().ConfigureAwait(false);
+                        }
+
+                        await 根据按键判断技能释放前通用逻辑(e).ConfigureAwait(true);
+
+                        switch (e.KeyCode)
+                        {
+                            case Keys.Q:
+                                _条件1 = true;
+                                break;
+                            case Keys.W:
+                                _条件3 = true;
+                                break;
+                            case Keys.R:
+                                _条件3 = true;
+                                break;
+                        }
+
+                        break;
                     }
-
-                    await 根据按键判断技能释放前通用逻辑(e).ConfigureAwait(true);
-
-                    switch (e.KeyCode)
-                    {
-                        case Keys.Q:
-                            _条件1 = true;
-                            break;
-                        case Keys.W:
-                            _条件3 = true;
-                            break;
-                        case Keys.R:
-                            _条件3 = true;
-                            break;
-                    }
-
-                    break;
-                }
 
                 #endregion
 
                 #region 小精灵
 
                 case "小精灵":
-                {
-                    if (!_总循环条件)
                     {
-                        _总循环条件 = true;
-                        _条件根据图片委托1 ??= 循环续勋章;
-                        _条件根据图片委托2 ??= 幽魂检测;
-                        await 状态初始化().ConfigureAwait(false);
-                    }
-
-                    await 根据按键判断技能释放前通用逻辑(e).ConfigureAwait(true);
-
-                    switch (e.KeyCode)
-                    {
-                        case Keys.W:
+                        if (!_总循环条件)
                         {
-                            if (_是否神杖)
+                            _总循环条件 = true;
+                            _条件根据图片委托1 ??= 循环续勋章;
+                            _条件根据图片委托2 ??= 幽魂检测;
+                            await 状态初始化().ConfigureAwait(false);
+                        }
+
+                        await 根据按键判断技能释放前通用逻辑(e).ConfigureAwait(true);
+
+                        switch (e.KeyCode)
+                        {
+                            case Keys.W:
+                                {
+                                    if (_是否神杖)
                                     {
                                         break;
                                     }
 
                                     _条件2 = true;
-                            break;
-                        }
-                        case Keys.D2:
-                        {
-                            if (_循环条件1)
-                            {
-                                _条件1 = false;
-                                _循环条件1 = false;
-                                Tts.Speak("关闭续勋章");
-                            }
-                            else
-                            {
-                                _条件1 = true;
-                                _循环条件1 = true;
-                                Tts.Speak("开启续勋章");
-                            }
+                                    break;
+                                }
+                            case Keys.D2:
+                                {
+                                    if (_循环条件1)
+                                    {
+                                        _条件1 = false;
+                                        _循环条件1 = false;
+                                        Tts.Speak("关闭续勋章");
+                                    }
+                                    else
+                                    {
+                                        _条件1 = true;
+                                        _循环条件1 = true;
+                                        Tts.Speak("开启续勋章");
+                                    }
 
-                            break;
-                        }
-                        case Keys.D3:
-                        {
-                            if (_选择队友头像 < 9)
+                                    break;
+                                }
+                            case Keys.D3:
+                                {
+                                    if (_选择队友头像 < 9)
                                     {
                                         _选择队友头像 += 1;
                                     }
@@ -3580,61 +3580,61 @@ namespace Dota2Simulator
                                     }
 
                                     Tts.Speak(string.Concat("选择第", _选择队友头像 + 1, "个人"));
-                            break;
+                                    break;
+                                }
                         }
-                    }
 
-                    break;
-                }
+                        break;
+                    }
 
                 #endregion
 
                 #region 马西
 
                 case "马西":
-                {
-                    if (!_总循环条件)
                     {
-                        _总循环条件 = true;
-                        _条件根据图片委托1 ??= 循环续勋章;
-                        _条件根据图片委托2 ??= 幽魂检测;
-                        await 状态初始化().ConfigureAwait(false);
-                    }
-
-                    await 根据按键判断技能释放前通用逻辑(e).ConfigureAwait(true);
-
-                    switch (e.KeyCode)
-                    {
-                        case Keys.W:
+                        if (!_总循环条件)
                         {
-                            if (_是否神杖)
+                            _总循环条件 = true;
+                            _条件根据图片委托1 ??= 循环续勋章;
+                            _条件根据图片委托2 ??= 幽魂检测;
+                            await 状态初始化().ConfigureAwait(false);
+                        }
+
+                        await 根据按键判断技能释放前通用逻辑(e).ConfigureAwait(true);
+
+                        switch (e.KeyCode)
+                        {
+                            case Keys.W:
+                                {
+                                    if (_是否神杖)
                                     {
                                         break;
                                     }
 
                                     _条件2 = true;
-                            break;
-                        }
-                        case Keys.D2:
-                        {
-                            if (_循环条件1)
-                            {
-                                _条件1 = false;
-                                _循环条件1 = false;
-                                Tts.Speak("关闭续勋章");
-                            }
-                            else
-                            {
-                                _条件1 = true;
-                                _循环条件1 = true;
-                                Tts.Speak("开启续勋章");
-                            }
+                                    break;
+                                }
+                            case Keys.D2:
+                                {
+                                    if (_循环条件1)
+                                    {
+                                        _条件1 = false;
+                                        _循环条件1 = false;
+                                        Tts.Speak("关闭续勋章");
+                                    }
+                                    else
+                                    {
+                                        _条件1 = true;
+                                        _循环条件1 = true;
+                                        Tts.Speak("开启续勋章");
+                                    }
 
-                            break;
-                        }
-                        case Keys.D3:
-                        {
-                            if (_选择队友头像 < 9)
+                                    break;
+                                }
+                            case Keys.D3:
+                                {
+                                    if (_选择队友头像 < 9)
                                     {
                                         _选择队友头像 += 1;
                                     }
@@ -3644,56 +3644,56 @@ namespace Dota2Simulator
                                     }
 
                                     Tts.Speak(string.Concat("选择第", _选择队友头像 + 1, "个人"));
-                            break;
+                                    break;
+                                }
                         }
-                    }
 
-                    break;
-                }
+                        break;
+                    }
 
                 #endregion
 
                 #region 小强
 
                 case "小强":
-                {
-                    if (!_总循环条件)
                     {
-                        _总循环条件 = true;
-                        _条件根据图片委托1 ??= 穿刺去后摇;
-                        _条件根据图片委托2 ??= 神智爆裂去后摇;
-                        _条件根据图片委托3 ??= 尖刺外壳去后摇;
-                        _条件根据图片委托4 ??= 复仇接穿刺;
-                        await 状态初始化().ConfigureAwait(false);
+                        if (!_总循环条件)
+                        {
+                            _总循环条件 = true;
+                            _条件根据图片委托1 ??= 穿刺去后摇;
+                            _条件根据图片委托2 ??= 神智爆裂去后摇;
+                            _条件根据图片委托3 ??= 尖刺外壳去后摇;
+                            _条件根据图片委托4 ??= 复仇接穿刺;
+                            await 状态初始化().ConfigureAwait(false);
+                        }
+
+                        await 根据按键判断技能释放前通用逻辑(e).ConfigureAwait(true);
+
+                        switch (e.KeyCode)
+                        {
+                            case Keys.Q:
+                                _条件1 = true;
+                                break;
+                            case Keys.W:
+                                Delay(33 * 根据图片使用物品(物品_虚灵之刃_数组));
+                                Delay(33 * (根据图片使用物品(物品_红杖_数组) +
+                                            根据图片使用物品(物品_红杖2_数组) +
+                                            根据图片使用物品(物品_红杖3_数组) +
+                                            根据图片使用物品(物品_红杖4_数组) +
+                                            根据图片使用物品(物品_红杖5_数组)));
+                                _条件2 = true;
+                                break;
+                            case Keys.E:
+                                _条件3 = true;
+                                break;
+                            case Keys.R:
+                                设置全局步骤r(0);
+                                // _条件4 = true;
+                                break;
+                        }
+
+                        break;
                     }
-
-                    await 根据按键判断技能释放前通用逻辑(e).ConfigureAwait(true);
-
-                    switch (e.KeyCode)
-                    {
-                        case Keys.Q:
-                            _条件1 = true;
-                            break;
-                        case Keys.W:
-                            Delay(33 * 根据图片使用物品(物品_虚灵之刃_数组));
-                            Delay(33 * (根据图片使用物品(物品_红杖_数组) +
-                                        根据图片使用物品(物品_红杖2_数组) +
-                                        根据图片使用物品(物品_红杖3_数组) +
-                                        根据图片使用物品(物品_红杖4_数组) +
-                                        根据图片使用物品(物品_红杖5_数组)));
-                            _条件2 = true;
-                            break;
-                        case Keys.E:
-                            _条件3 = true;
-                            break;
-                        case Keys.R:
-                            设置全局步骤r(0);
-                            // _条件4 = true;
-                            break;
-                    }
-
-                    break;
-                }
 
                 #endregion
 
@@ -3816,16 +3816,16 @@ namespace Dota2Simulator
                 #region 其他
 
                 case "测试":
-                {
-                    switch (e.KeyCode)
                     {
-                        case Keys.D1:
-                            _ = Run(测试其他功能).ConfigureAwait(true);
-                            break;
-                        case Keys.D2:
-                            _ = Run(() => { 捕捉颜色().Start(); }).ConfigureAwait(false);
-                            Delay(100);
-                            Dictionary<char, Keys> keyMapping = new()
+                        switch (e.KeyCode)
+                        {
+                            case Keys.D1:
+                                _ = Run(测试其他功能).ConfigureAwait(true);
+                                break;
+                            case Keys.D2:
+                                _ = Run(() => { 捕捉颜色().Start(); }).ConfigureAwait(false);
+                                Delay(100);
+                                Dictionary<char, Keys> keyMapping = new()
                             {
                                 { 'q', Keys.Q },
                                 { 'w', Keys.W },
@@ -3835,34 +3835,34 @@ namespace Dota2Simulator
                                 { 'f', Keys.F }
                             };
 
-                            string text = tb_阵营.Text.ToLower(CultureInfo.CurrentCulture); // 转换为小写，确保匹配时忽略大小写
+                                string text = tb_阵营.Text.ToLower(CultureInfo.CurrentCulture); // 转换为小写，确保匹配时忽略大小写
 
-                            foreach (KeyValuePair<char, Keys> kvp in keyMapping)
+                                foreach (KeyValuePair<char, Keys> kvp in keyMapping)
                                 {
                                     if (text.Contains(kvp.Key))
-                                {
-                                    SimKeyBoard.KeyPress(kvp.Value);
-                                    break; // 如果找到匹配项，退出循环
-                                }
+                                    {
+                                        SimKeyBoard.KeyPress(kvp.Value);
+                                        break; // 如果找到匹配项，退出循环
+                                    }
                                 }
 
                                 break;
-                        case Keys.D3:
-                            await Run(() => 测试方法(953, 764)).ConfigureAwait(false);
-                            break;
-                        case Keys.D4:
-                            await Run(async () =>
-                            {
-                                await 获取图片_1().ConfigureAwait(true);
-                                Tts.Speak($"技能数：{获取当前技能数量(in _全局数组)}");
-                            }).ConfigureAwait(false);
-                            break;
+                            case Keys.D3:
+                                await Run(() => 测试方法(953, 764)).ConfigureAwait(false);
+                                break;
+                            case Keys.D4:
+                                await Run(async () =>
+                                {
+                                    await 获取图片_1().ConfigureAwait(true);
+                                    Tts.Speak($"技能数：{获取当前技能数量(in _全局数组)}");
+                                }).ConfigureAwait(false);
+                                break;
+                        }
+
+                        break;
                     }
 
-                    break;
-                }
-
-                #endregion
+                    #endregion
             }
         }
 
@@ -5208,64 +5208,64 @@ namespace Dota2Simulator
                 switch (步骤)
                 {
                     case < 1:
-                    {
-                        Delay(33 * 根据图片使用物品(物品_臂章_数组));
-                        Delay(33 * 根据图片使用物品(物品_魂戒_数组));
-                        Delay(33 * 根据图片使用物品(物品_相位鞋_数组));
-
-                        if (DOTA2判断技能是否CD(Keys.W, in 数组))
                         {
-                            SimKeyBoard.KeyPressAlt(Keys.W);
+                            Delay(33 * 根据图片使用物品(物品_臂章_数组));
+                            Delay(33 * 根据图片使用物品(物品_魂戒_数组));
+                            Delay(33 * 根据图片使用物品(物品_相位鞋_数组));
+
+                            if (DOTA2判断技能是否CD(Keys.W, in 数组))
+                            {
+                                SimKeyBoard.KeyPressAlt(Keys.W);
+                                return await FromResult(true).ConfigureAwait(true);
+                            }
+
+                            Delay(33 * 根据图片使用物品(物品_刃甲_数组));
+
+                            设置全局步骤(1);
                             return await FromResult(true).ConfigureAwait(true);
                         }
-
-                        Delay(33 * 根据图片使用物品(物品_刃甲_数组));
-
-                        设置全局步骤(1);
-                        return await FromResult(true).ConfigureAwait(true);
-                    }
                     case < 2 when 步骤 == 1:
-                    {
-                        Delay(33 *
-                              (
-                                  根据图片使用物品(物品_跳刀_数组)
-                                  + 根据图片使用物品(物品_跳刀_力量跳刀_数组)
-                                  + 根据图片使用物品(物品_跳刀_智力跳刀_数组)
-                                  + 根据图片使用物品(物品_跳刀_敏捷跳刀_数组)
-                              ));
+                        {
+                            Delay(33 *
+                                  (
+                                      根据图片使用物品(物品_跳刀_数组)
+                                      + 根据图片使用物品(物品_跳刀_力量跳刀_数组)
+                                      + 根据图片使用物品(物品_跳刀_智力跳刀_数组)
+                                      + 根据图片使用物品(物品_跳刀_敏捷跳刀_数组)
+                                  ));
 
-                        设置全局步骤(2);
+                            设置全局步骤(2);
 
-                        return await FromResult(true).ConfigureAwait(true);
-                    }
+                            return await FromResult(true).ConfigureAwait(true);
+                        }
                     case < 3:
-                    {
-                        Delay(33 * 根据图片使用物品(物品_紫苑_数组));
-                        Delay(33 * 根据图片使用物品(物品_血棘_数组));
-                        Delay(33 * 根据图片使用物品(物品_否决_数组));
-                        Delay(33 * 根据图片使用物品(物品_散失_数组));
-                        Delay(33 * 根据图片使用物品(物品_散魂_数组));
-                        Delay(33 * 根据图片使用物品(物品_深渊之刃_数组));
+                        {
+                            Delay(33 * 根据图片使用物品(物品_紫苑_数组));
+                            Delay(33 * 根据图片使用物品(物品_血棘_数组));
+                            Delay(33 * 根据图片使用物品(物品_否决_数组));
+                            Delay(33 * 根据图片使用物品(物品_散失_数组));
+                            Delay(33 * 根据图片使用物品(物品_散魂_数组));
+                            Delay(33 * 根据图片使用物品(物品_深渊之刃_数组));
 
-                        设置全局步骤(3);
+                            设置全局步骤(3);
 
-                        return await FromResult(true).ConfigureAwait(true);
-                    }
+                            return await FromResult(true).ConfigureAwait(true);
+                        }
 
                     case < 4:
-                    {
-                        // 触发激怒，让周围的小兵都攻击你
-                        SimKeyBoard.KeyPress(Keys.A);
-
-                        if (DOTA2释放CD就绪技能(Keys.R, in 数组))
                         {
-                            Delay(60);
-                            return await FromResult(true).ConfigureAwait(true);
-                        }
+                            // 触发激怒，让周围的小兵都攻击你
+                            SimKeyBoard.KeyPress(Keys.A);
 
-                        设置全局步骤(-1);
-                        return await FromResult(false).ConfigureAwait(true);
-                    }
+                            if (DOTA2释放CD就绪技能(Keys.R, in 数组))
+                            {
+                                Delay(60);
+                                return await FromResult(true).ConfigureAwait(true);
+                            }
+
+                            设置全局步骤(-1);
+                            return await FromResult(false).ConfigureAwait(true);
+                        }
                 }
 
                 return await FromResult(false).ConfigureAwait(true);
@@ -6810,18 +6810,18 @@ namespace Dota2Simulator
 
                     return await FromResult(true).ConfigureAwait(true);
                 case < 3:
-                {
-                    if (DOTA2释放CD就绪技能(Keys.R, in 数组))
+                    {
+                        if (DOTA2释放CD就绪技能(Keys.R, in 数组))
                         {
                             return await FromResult(true).ConfigureAwait(true);
                         }
 
                         _条件1 = true;
-                    _循环条件1 = true;
-                    设置全局步骤(3);
+                        _循环条件1 = true;
+                        设置全局步骤(3);
 
-                    return await FromResult(false).ConfigureAwait(true);
-                }
+                        return await FromResult(false).ConfigureAwait(true);
+                    }
             }
 
             return await FromResult(true).ConfigureAwait(true);
