@@ -83,7 +83,7 @@ public unsafe class OptimizedGraphics : IDisposable
                 }
 
                 // 准备 BITMAPINFO 结构
-                BITMAPINFO bmi = new BITMAPINFO();
+                BITMAPINFO bmi = new();
                 bmi.biSize = Marshal.SizeOf(typeof(BITMAPINFO));
                 bmi.biWidth = bitmap.Width;
                 bmi.biHeight = -bitmap.Height;  // 负值表示自顶向下的位图
@@ -144,7 +144,7 @@ public unsafe class OptimizedGraphics : IDisposable
                 }
 
                 // 准备 BITMAPINFO 结构
-                BITMAPINFO bmi = new BITMAPINFO();
+                BITMAPINFO bmi = new();
                 bmi.biSize = Marshal.SizeOf(typeof(BITMAPINFO));
                 bmi.biWidth = width;
                 bmi.biHeight = -height;  // 负值表示自顶向下的位图
@@ -182,7 +182,7 @@ public unsafe class OptimizedGraphics : IDisposable
         }
     }
 
-    public unsafe bool CaptureScreenToBytes(int sourceX, int sourceY, int width, int height,ref byte[] bts)
+    public unsafe bool CaptureScreenToBytes(int sourceX, int sourceY, int width, int height, ref byte[] bts)
     {
         if (bts.Length != width * height * 4) return false;
         if (_disposed) throw new ObjectDisposedException(nameof(OptimizedGraphics));
@@ -202,7 +202,7 @@ public unsafe class OptimizedGraphics : IDisposable
             }
 
             // 准备 BITMAPINFO 结构
-            BITMAPINFO bmi = new BITMAPINFO();
+            BITMAPINFO bmi = new();
             bmi.biSize = Marshal.SizeOf(typeof(BITMAPINFO));
             bmi.biWidth = width;
             bmi.biHeight = -height; // 负值表示自顶向下的位图
@@ -257,7 +257,7 @@ public unsafe class OptimizedGraphics : IDisposable
                     int rowOffset = y * stride;
                     for (int x = 0; x < stride; x++)
                     {
-                        result[rowOffset + x] = ptr[y * bmpData.Stride + x];
+                        result[rowOffset + x] = ptr[(y * bmpData.Stride) + x];
                     }
                 });
             }
@@ -268,7 +268,7 @@ public unsafe class OptimizedGraphics : IDisposable
                     int rowOffset = y * stride;
                     for (int x = 0; x < stride; x++)
                     {
-                        result[rowOffset + x] = ptr[y * bmpData.Stride + x];
+                        result[rowOffset + x] = ptr[(y * bmpData.Stride) + x];
                     }
                 }
             }

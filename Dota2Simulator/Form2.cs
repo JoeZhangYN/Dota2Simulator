@@ -1019,6 +1019,17 @@ namespace Dota2Simulator
                             case Keys.W:
                                 _条件5 = true;
                                 break;
+                            case Keys.D1:
+                                bool b1 = ColorAEqualColorB(Color.FromArgb(1, 1, 1), Color.FromArgb(100, 100, 100), 5);
+                                if (b1)
+                                {
+                                    Tts.Speak("真");
+                                }
+                                else
+                                {
+                                    Tts.Speak("假");
+                                }
+                                break;
                             case Keys.D2:
                                 if (!_条件2)
                                 {
@@ -3316,14 +3327,15 @@ namespace Dota2Simulator
                         if (!_总循环条件)
                         {
                             _总循环条件 = true;
-                            //_条件根据图片委托1 ??= 瘴气去后摇;
-                            //_条件根据图片委托2 ??= 蛇棒去后摇;
-                            //_条件根据图片委托3 ??= 剧毒新星去后摇;
-                            //_条件根据图片委托4 ??= 循环蛇棒;
-                            //_条件根据图片委托5 ??= 蛰毒去后摇;
+                            _条件根据图片委托1 ??= 瘴气去后摇;
+                            _条件根据图片委托2 ??= 蛇棒去后摇;
+                            _条件根据图片委托3 ??= 恶性瘟疫去后摇;
+                            _条件根据图片委托4 ??= 循环蛇棒;
                             await 状态初始化().ConfigureAwait(false);
+                            _切假腿配置.修改配置(Keys.W, false);
                         }
 
+                        await 根据按键判断技能释放前通用逻辑(e).ConfigureAwait(true);
 
                         switch (e.KeyCode)
                         {
@@ -3332,14 +3344,6 @@ namespace Dota2Simulator
                                 break;
                             case Keys.E:
                                 _条件2 = true;
-                                break;
-                            case Keys.D:
-                                if (!_是否魔晶)
-                                {
-                                    break;
-                                }
-
-                                _条件5 = true;
                                 break;
                             case Keys.R:
                                 _条件3 = true;
@@ -3853,7 +3857,7 @@ namespace Dota2Simulator
                             case Keys.D4:
                                 await Run(async () =>
                                 {
-                                    await 获取图片_1().ConfigureAwait(true);
+                                    _ = await 获取图片_1().ConfigureAwait(true);
                                     Tts.Speak($"技能数：{获取当前技能数量(in _全局数组)}");
                                 }).ConfigureAwait(false);
                                 break;
@@ -4194,7 +4198,7 @@ namespace Dota2Simulator
 
             try
             {
-                using PooledList<string> list = new(tb_delay.Text.Split(','));
+                using PooledList<string> list = [.. tb_delay.Text.Split(',')];
                 pictureBox1.BackColor = Color.FromArgb(255, int.Parse(list[0]), int.Parse(list[1]), int.Parse(list[2]));
             }
             catch
@@ -4812,7 +4816,7 @@ namespace Dota2Simulator
         /// <returns>技能未释放、释放中返回真，释放完毕执行逻辑返回假</returns>
         private static async Task<bool> 主动技能释放后续(Keys skill, Action afterAction)
         {
-            if (DOTA2对比释放技能前后颜色(skill, _全局数组))
+            if (DOTA2对比释放技能前后颜色(skill, in _全局数组))
             {
                 return await FromResult(true).ConfigureAwait(true);
             }
@@ -4832,7 +4836,7 @@ namespace Dota2Simulator
         /// <returns>主动技能CD就绪返回真，进入CD执行逻辑后返回假</returns>
         private static async Task<bool> 主动技能进入CD后续(Keys skill, Action afterAction)
         {
-            if (DOTA2判断技能是否CD(skill, _全局数组))
+            if (DOTA2判断技能是否CD(skill, in _全局数组))
             {
                 return await FromResult(true).ConfigureAwait(true);
             }
@@ -4852,7 +4856,7 @@ namespace Dota2Simulator
         /// <returns>主动技能CD未就绪返回真，CD就绪执行逻辑后返回假</returns>
         private static async Task<bool> 主动技能已就绪后续(Keys skill, Action afterAction)
         {
-            if (!DOTA2判断技能是否CD(skill, _全局数组))
+            if (!DOTA2判断技能是否CD(skill, in _全局数组))
             {
                 return await FromResult(true).ConfigureAwait(true);
             }
@@ -5469,7 +5473,7 @@ namespace Dota2Simulator
                 for (int i = 0; i < 2; i++)
                 {
                     Delay(33);
-                    SimKeyBoard.MouseMove(p.X, p.Y - 60 * i);
+                    SimKeyBoard.MouseMove(p.X, p.Y - (60 * i));
                     SimKeyBoard.KeyPress(Keys.W);
                 }
 
@@ -6630,53 +6634,53 @@ namespace Dota2Simulator
 
         private static void 推推接刷新()
         {
-            long time = 获取当前时间毫秒();
-            int x_down = 0;
-            while (x_down == 1)
-            {
-                //if (RegPicture(物品_推推BUFF_数组, 400, 865, 1000, 60))
-                //{
-                //    KeyPress( Keys.R);
-                //    x_down = 1;
-                //}
-                if (获取当前时间毫秒() - time > 500)
-                {
-                    break;
-                }
-            }
+            //long time = 获取当前时间毫秒();
+            //int x_down = 0;
+            //while (x_down == 1)
+            //{
+            //    //if (RegPicture(物品_推推BUFF_数组, 400, 865, 1000, 60))
+            //    //{
+            //    //    KeyPress( Keys.R);
+            //    //    x_down = 1;
+            //    //}
+            //    if (获取当前时间毫秒() - time > 500)
+            //    {
+            //        break;
+            //    }
+            //}
         }
 
 
         private static void 刷新完跳()
         {
-            int all_down = 0;
-            long time = 获取当前时间毫秒();
-            while (all_down == 1)
-            {
-                //var r_down = 0;
-                //if (RegPicture(修补匠_再填装施法, 773, 727, 75, 77, 0.7))
-                //{
-                //    if (_条件3)
-                //        await 检测希瓦();
-                //    while (r_down == 0)
-                //        if (!RegPicture(修补匠_再填装施法, 773, 727, 75, 77, 0.7))
-                //        {
-                //            r_down = 1;
-                //            all_down = 1;
-                //            if (_条件1)
-                //                await 检测敌方英雄自动导弹();
-                //            if (_条件2)
-                //            {
-                //                Delay(60);
-                //                KeyPress(Keys.Space);
-                //            }
-                //        }
-                //}
-                if (获取当前时间毫秒() - time > 700)
-                {
-                    break;
-                }
-            }
+            //int all_down = 0;
+            //long time = 获取当前时间毫秒();
+            //while (all_down == 1)
+            //{
+            //    //var r_down = 0;
+            //    //if (RegPicture(修补匠_再填装施法, 773, 727, 75, 77, 0.7))
+            //    //{
+            //    //    if (_条件3)
+            //    //        await 检测希瓦();
+            //    //    while (r_down == 0)
+            //    //        if (!RegPicture(修补匠_再填装施法, 773, 727, 75, 77, 0.7))
+            //    //        {
+            //    //            r_down = 1;
+            //    //            all_down = 1;
+            //    //            if (_条件1)
+            //    //                await 检测敌方英雄自动导弹();
+            //    //            if (_条件2)
+            //    //            {
+            //    //                Delay(60);
+            //    //                KeyPress(Keys.Space);
+            //    //            }
+            //    //        }
+            //    //}
+            //    if (获取当前时间毫秒() - time > 700)
+            //    {
+            //        break;
+            //    }
+            //}
         }
 
         #endregion
@@ -7655,13 +7659,13 @@ namespace Dota2Simulator
 
             int w_down = 0;
 
-            while (w_down == 1)
-            {
-                if (获取当前时间毫秒() - 总开始时间 > 2000)
-                {
-                    return;
-                }
-            }
+            //while (w_down == 1)
+            //{
+            //    if (获取当前时间毫秒() - 总开始时间 > 2000)
+            //    {
+            //        return;
+            //    }
+            //}
         }
 
         private static void 诅咒皇冠吹风()
@@ -8538,6 +8542,30 @@ namespace Dota2Simulator
 
         #region 全才
 
+        #region 剧毒
+        private static async Task<bool> 瘴气去后摇(字节数组包含长宽 数组)
+        {
+            return await 使用技能后通用后续(Keys.Q, 1).ConfigureAwait(true);
+        }
+
+        private static async Task<bool> 蛇棒去后摇(字节数组包含长宽 数组)
+        {
+            SimEnigo.MouseRightClick();
+            return await Task.FromResult(false).ConfigureAwait(true);
+        }
+
+        private static async Task<bool> 恶性瘟疫去后摇(字节数组包含长宽 数组)
+        {
+            return await 使用技能后通用后续(Keys.R, 1).ConfigureAwait(true);
+        }
+
+        private static async Task<bool> 循环蛇棒(字节数组包含长宽 数组)
+        {
+            return await 使用技能后通用后续(Keys.R, 1).ConfigureAwait(true);
+        }
+
+        #endregion
+
         #region 猛犸
 
         private static async Task<bool> 震荡波去后摇(字节数组包含长宽 数组)
@@ -8719,7 +8747,7 @@ namespace Dota2Simulator
         private static async Task<bool> 循环续勋章(字节数组包含长宽 数组)
         {
             Point p = MousePosition;
-            SimKeyBoard.MouseMove(574 + _选择队友头像 * 61 + (_选择队友头像 >= 5 ? 216 : 0), 23);
+            SimKeyBoard.MouseMove(574 + (_选择队友头像 * 61) + (_选择队友头像 >= 5 ? 216 : 0), 23);
             Delay(15);
             SimKeyBoard.MouseMove(p);
             Delay(15);
@@ -8827,7 +8855,7 @@ namespace Dota2Simulator
 
             for (int i = 0; i < 5; i++)
             {
-                SimKeyBoard.MouseMove(575 + _阵营_int * 515 + 61 * i, 20);
+                SimKeyBoard.MouseMove(575 + (_阵营_int * 515) + (61 * i), 20);
                 SimKeyBoard.KeyPress(Keys.A);
                 Delay(2);
             }
@@ -9022,7 +9050,7 @@ namespace Dota2Simulator
             Delay(40);
             SimKeyBoard.KeyPress(Keys.F1);
 
-            using PooledList<string> list1 = new(tb_阵营.Text.Split(','));
+            using PooledList<string> list1 = [.. tb_阵营.Text.Split(',')];
 
             try
             {
@@ -9702,8 +9730,8 @@ namespace Dota2Simulator
             }
             else
             {
-                x = p.X - width / 2 < 0 ? 0 : p.X - width / 2;
-                y = p.Y - height / 2 < 0 ? 0 : p.Y - height / 2;
+                x = p.X - (width / 2) < 0 ? 0 : p.X - (width / 2);
+                y = p.Y - (height / 2) < 0 ? 0 : p.Y - (height / 2);
             }
 
             if (type1 == 1)
@@ -10318,7 +10346,7 @@ namespace Dota2Simulator
 
             //tb_x.Text = ($"1{a1}\r\n2{a2}\r\n3{a3}\r\n4{a4}\r\n5{a5}\r\n6{a6}\r\n");
 
-            //Tts.Speak(PaddleOcr.获取图片文字(@"J:\Desktop\1.bmp"));
+            //Tts.Speak(PaddleOcr.获取图片文字(@":\Desktop\1.bmp"));
 
             //Tts.Speak(PaddleOcr.获取图片文字(647, 963, 28, 25));
 
@@ -10330,7 +10358,7 @@ namespace Dota2Simulator
             //DOTA2获取所有释放技能前颜色(in _全局数组);
             Invoke(() => { tb_y.Text = (获取当前时间毫秒() - _全局时间).ToString(); });
 
-            _全局数组.数组保存为图片("J:\\Desktop\\1.jpg");
+            // _ = _全局数组.数组保存为图片("J:\\Desktop\\1.jpg");
         }
 
         #region 捕捉颜色
@@ -10352,7 +10380,7 @@ namespace Dota2Simulator
             while (true)
             {
                 bitmap = await CaptureScreenAsync(截图模式1X, 截图模式1Y, size).ConfigureAwait(true);
-                数组.新赋值数组(await GetBitmapByteAsync(bitmap).ConfigureAwait(true));
+                _ = 数组.新赋值数组(await GetBitmapByteAsync(bitmap).ConfigureAwait(true));
 
                 Color p = 获取指定位置颜色(x, y, in 数组);
 
@@ -10405,13 +10433,13 @@ namespace Dota2Simulator
             Size size = new(截图模式1W, 截图模式1H);
 
             Bitmap bitmap = await CaptureScreenAsync(截图模式1X, 截图模式1Y, size).ConfigureAwait(true);
-            bitmap.Save("J:\\Desktop\\新建 BMP 图像.bmp");
             字节数组包含长宽 数组 = new(await GetBitmapByteAsync(bitmap).ConfigureAwait(true), size);
+            //bitmap.Save("J:\\Desktop\\新建 BMP 图像.bmp");
 
             while (true)
             {
                 bitmap = await CaptureScreenAsync(截图模式1X, 截图模式1Y, size).ConfigureAwait(true);
-                数组.新赋值数组(await GetBitmapByteAsync(bitmap).ConfigureAwait(true));
+                _ = 数组.新赋值数组(await GetBitmapByteAsync(bitmap).ConfigureAwait(true));
 
                 Color q4 = 获取技能释放判断颜色(Keys.Q, in 数组, 4);
                 Color q5 = 获取技能释放判断颜色(Keys.Q, in 数组, 5);
@@ -10636,11 +10664,14 @@ namespace Dota2Simulator
             820, 998, 65, 17, -52, 25, -49
             , 2, -2, -4, 3, 50, -45
             , Color.FromArgb(194, 198, 202), 61
-            , Color.FromArgb(67, 76, 84), 1, Color.FromArgb(54, 62, 70), 1
+            , Color.FromArgb(67, 76, 84), 1
+            , Color.FromArgb(54, 62, 70), 1
             , Color.FromArgb(0, 129, 0), 0
             , Color.FromArgb(34, 40, 39), 1
-            , Color.FromArgb(72, 77, 81), 2, Color.FromArgb(25, 30, 34), 2
-            , Color.FromArgb(49, 51, 46), 2, Color.FromArgb(33, 36, 36), 2
+            , Color.FromArgb(72, 77, 81), 2
+            , Color.FromArgb(25, 30, 34), 2
+            , Color.FromArgb(49, 51, 46), 2
+            , Color.FromArgb(33, 36, 36), 2
             , Color.FromArgb(255, 144, 0), 8
             , [Keys.Q, Keys.W, Keys.E, Keys.R]);
 
@@ -10651,8 +10682,10 @@ namespace Dota2Simulator
             , Color.FromArgb(55, 62, 70), 1, Color.FromArgb(54, 61, 69), 1
             , Color.FromArgb(0, 129, 0), 0
             , Color.FromArgb(34, 40, 39), 1
-            , Color.FromArgb(75, 80, 84), 2, Color.FromArgb(25, 29, 34), 2
-            , Color.FromArgb(49, 51, 48), 2, Color.FromArgb(32, 35, 37), 2
+            , Color.FromArgb(75, 80, 84), 2
+            , Color.FromArgb(25, 29, 34), 2
+            , Color.FromArgb(49, 51, 48), 2
+            , Color.FromArgb(32, 35, 37), 2
             , Color.FromArgb(255, 144, 0), 8
             , [Keys.Q, Keys.W, Keys.E, Keys.D, Keys.R]);
 
@@ -10660,11 +10693,14 @@ namespace Dota2Simulator
             774, 995, 58, 17, -49, 24, -47
             , 3, -3, -1, 1, 49, -41
             , Color.FromArgb(196, 200, 203), 60
-            , Color.FromArgb(55, 62, 70), 1, Color.FromArgb(54, 61, 69), 1
+            , Color.FromArgb(55, 62, 70), 1
+            , Color.FromArgb(54, 61, 69), 1
             , Color.FromArgb(0, 129, 0), 0
             , Color.FromArgb(34, 40, 39), 1
-            , Color.FromArgb(75, 80, 84), 2, Color.FromArgb(25, 29, 34), 2
-            , Color.FromArgb(49, 51, 48), 2, Color.FromArgb(32, 35, 37), 2
+            , Color.FromArgb(75, 80, 84), 2
+            , Color.FromArgb(25, 29, 34), 2
+            , Color.FromArgb(49, 51, 48), 2
+            , Color.FromArgb(32, 35, 37), 2
             , Color.FromArgb(255, 144, 0), 8
             , [Keys.Q, Keys.W, Keys.E, Keys.D, Keys.F, Keys.R]);
 
@@ -10704,8 +10740,8 @@ namespace Dota2Simulator
             byte 推荐学习技能颜色容差,
             Keys[] 技能位置)
         {
-            public int 技能CD图标右侧x { get; } = 左下角x + 技能CD位置偏移x;
-            public int 技能CD图标右侧y { get; } = 左下角y + 技能CD位置偏移y;
+            public int 技能CD图标x { get; } = 左下角x + 技能CD位置偏移x;
+            public int 技能CD图标y { get; } = 左下角y + 技能CD位置偏移y;
             public int 技能间隔 { get; } = 技能间隔;
             public int 释放变色位置x { get; } = 左下角x + 释放位置偏移x - 2; // 向左偏移2个单位，变化更明显
             public int 释放变色位置y { get; } = 左下角y + 释放位置偏移y;
@@ -10745,7 +10781,7 @@ namespace Dota2Simulator
         /// </summary>
         private enum 技能类型
         {
-            图标右侧CD,
+            图标CD,
             法球,
             状态,
             释放变色,
@@ -10788,9 +10824,9 @@ namespace Dota2Simulator
 
             switch (类型)
             {
-                case 技能类型.图标右侧CD:
-                    x = 技能信息.技能CD图标右侧x + offsetX - 坐标偏移x;
-                    y = 技能信息.技能CD图标右侧y - 坐标偏移y;
+                case 技能类型.图标CD:
+                    x = 技能信息.技能CD图标x + offsetX - 坐标偏移x;
+                    y = 技能信息.技能CD图标y - 坐标偏移y;
                     颜色 = 技能信息.技能CD颜色;
                     颜色容差 = 技能信息.技能CD颜色容差;
                     break;
@@ -10831,8 +10867,8 @@ namespace Dota2Simulator
                     颜色容差 = 技能信息.破坏被动技能颜色容差;
                     break;
                 case 技能类型.未学主动技能:
-                    x = 技能信息.技能CD图标右侧x + offsetX - 坐标偏移x;
-                    y = 技能信息.技能CD图标右侧y - 坐标偏移y;
+                    x = 技能信息.技能CD图标x + offsetX - 坐标偏移x;
+                    y = 技能信息.技能CD图标y - 坐标偏移y;
                     颜色 = 技能信息.未学主动技能CD颜色;
                     颜色容差 = 技能信息.未学主动技能CD颜色容差;
                     break;
@@ -10884,7 +10920,7 @@ namespace Dota2Simulator
                 int 偏移 = 技能.技能间隔 * i;
 
                 Point p_QWERDF = new(技能.QWERDF位置x + 偏移 - 坐标偏移x, 技能.QWERDF位置y - 坐标偏移y);
-                Point p_主动 = new(技能.技能CD图标右侧x + 偏移 - 坐标偏移x, 技能.技能CD图标右侧y - 坐标偏移y);
+                Point p_主动 = new(技能.技能CD图标x + 偏移 - 坐标偏移x, 技能.技能CD图标y - 坐标偏移y);
                 Point p_法球 = new(技能.法球技能CD位置x + 偏移 - 坐标偏移x, 技能.法球技能CD位置y - 坐标偏移y);
                 Point p_被动 = new(技能.被动位置x + 偏移 - 坐标偏移x, 技能.被动位置y - 坐标偏移y);
                 Point p_推荐 = new(技能.状态技能位置x + 偏移 - 坐标偏移x, 技能.状态技能位置y - 坐标偏移y);
@@ -10913,27 +10949,29 @@ namespace Dota2Simulator
 
                 #region 输出判断调试用
 
-                //var 不同色 = "";
+                //string 不同色 = "";
                 //if (!colorMatch_QWERDF)
                 //{
-                //    不同色 += $"{i+1} QWERDF图标 :位置X:{p_QWERDF.X + 坐标偏移x},位置Y:{p_QWERDF.Y + 坐标偏移y}，RGB:{获取的颜色_QWERDF.R}, {获取的颜色_QWERDF.G}, {获取的颜色_QWERDF.B}\r\n";
+                //    不同色 += $"{i + 1} QWERDF图标 :位置X:{p_QWERDF.X + 坐标偏移x},位置Y:{p_QWERDF.Y + 坐标偏移y}，RGB:{获取的颜色_QWERDF.R}, {获取的颜色_QWERDF.G}, {获取的颜色_QWERDF.B}\r\n";
                 //}
                 //if (!colorMatch_已学主动 && !colorMatch_未学主动)
                 //{
-                //    不同色 += $"{i+1} 主动 :位置X:{p_主动.X + 坐标偏移x},位置Y:{p_主动.Y + 坐标偏移y}，RGB:{获取的颜色_主动.R}, {获取的颜色_主动.G}, {获取的颜色_主动.B}。\r\n";
+                //    不同色 += $"{i + 1} 主动 :位置X:{p_主动.X + 坐标偏移x},位置Y:{p_主动.Y + 坐标偏移y}，RGB:{获取的颜色_主动.R}, {获取的颜色_主动.G}, {获取的颜色_主动.B}。\r\n";
                 //}
                 //if (!colorMatch_已学法球 && !colorMatch_未学法球)
                 //{
-                //    不同色 += $"{i+1} 技能 :位置X:{p_法球.X + 坐标偏移x},位置Y:{p_法球.Y + 坐标偏移y}，RGB:{获取的颜色_法球.R}, {获取的颜色_法球.G}, {获取的颜色_法球.B}。\r\n";
+                //    不同色 += $"{i + 1} 技能 :位置X:{p_法球.X + 坐标偏移x},位置Y:{p_法球.Y + 坐标偏移y}，RGB:{获取的颜色_法球.R}, {获取的颜色_法球.G}, {获取的颜色_法球.B}。\r\n";
                 //}
                 //if (!colorMatch_被动 && !colorMatch_破坏被动)
                 //{
-                //    不同色 += $"{i+1} 被动技能 :位置X:{p_被动.X + 坐标偏移x},位置Y:{p_被动.Y + 坐标偏移y}，RGB:{获取的颜色_被动.R}, {获取的颜色_被动.G}, {获取的颜色_被动.B}。\r\n";
+                //    不同色 += $"{i + 1} 被动技能 :位置X:{p_被动.X + 坐标偏移x},位置Y:{p_被动.Y + 坐标偏移y}，RGB:{获取的颜色_被动.R}, {获取的颜色_被动.G}, {获取的颜色_被动.B}。\r\n";
                 //}
                 //if (!colorMatch_推荐)
                 //{
-                //    不同色 += $"{i+1} 推荐技能 :位置X:{p_推荐.X + 坐标偏移x},位置Y:{p_推荐.Y + 坐标偏移y}，RGB:{获取的颜色_被动.R}, {获取的颜色_被动.G}, {获取的颜色_被动.B}。\r\n";
+                //    不同色 += $"{i + 1} 推荐技能 :位置X:{p_推荐.X + 坐标偏移x},位置Y:{p_推荐.Y + 坐标偏移y}，RGB:{获取的颜色_被动.R}, {获取的颜色_被动.G}, {获取的颜色_被动.B}。\r\n";
                 //}
+
+                //Logger.Error(不同色);
 
                 #endregion
             }
@@ -10993,7 +11031,7 @@ namespace Dota2Simulator
         /// <param name="技能数量">技能数量，默认值为4</param>
         /// <param name="类型">技能类型</param>
         /// <returns>如果技能在CD状态返回真，否则返回假</returns>
-        private static bool 判断技能状态(Keys 技能位置, in 字节数组包含长宽 数组, 技能类型 类型 = 技能类型.图标右侧CD)
+        private static bool 判断技能状态(Keys 技能位置, in 字节数组包含长宽 数组, 技能类型 类型 = 技能类型.图标CD)
         {
             if (_技能数量 == 4 && (技能位置 == Keys.D || 技能位置 == Keys.F))
             {
@@ -11037,7 +11075,7 @@ namespace Dota2Simulator
         /// <returns>的像素颜色</returns>
         private static Color 获取技能进入CD判断颜色(Keys 技能位置, in 字节数组包含长宽 数组, int 技能数量 = 4)
         {
-            return 获取技能判断颜色(技能位置, in 数组, 技能数量, 技能类型.图标右侧CD);
+            return 获取技能判断颜色(技能位置, in 数组, 技能数量, 技能类型.图标CD);
         }
 
         /// <summary>
@@ -11074,12 +11112,12 @@ namespace Dota2Simulator
         /// <returns>如果技能CD好了返回真，否则返回假</returns>
         private static bool DOTA2判断技能是否CD(Keys 技能位置, in 字节数组包含长宽 数组)
         {
-            return 判断技能状态(技能位置, in 数组, 技能类型.图标右侧CD);
+            return 判断技能状态(技能位置, in 数组, 技能类型.图标CD);
         }
 
         private static bool DOTA2释放CD就绪技能(Keys 技能位置, in 字节数组包含长宽 数组)
         {
-            if (判断技能状态(技能位置, in 数组, 技能类型.图标右侧CD))
+            if (判断技能状态(技能位置, in 数组, 技能类型.图标CD))
             {
                 SimKeyBoard.KeyPress(技能位置);
                 return true;
@@ -11211,7 +11249,7 @@ namespace Dota2Simulator
         {
             int 偏移 = 获取技能位置偏移(技能位置, 技能信息);
 
-            Point p_主动 = new(技能信息.技能CD图标右侧x + 偏移 - 坐标偏移x, 技能信息.技能CD图标右侧y - 坐标偏移y);
+            Point p_主动 = new(技能信息.技能CD图标x + 偏移 - 坐标偏移x, 技能信息.技能CD图标y - 坐标偏移y);
 
             Color 获取的颜色_主动 = GetSPixelBytes(in 数组, p_主动);
 
@@ -11385,9 +11423,9 @@ namespace Dota2Simulator
         {
             if (!Avx2.IsSupported)
             {
-                return Math.Abs(beforColor.R * beforColor.R * 0.0001 + beforColor.R * 0.7656 - afterColor.R) <= 3
-                       && Math.Abs(beforColor.G * beforColor.G * 0.0014 + beforColor.G * 0.0251 + 147 - afterColor.G) <= 3
-                       && Math.Abs(beforColor.B * beforColor.B * 0.0002 + beforColor.B * 0.751 - afterColor.B) <= 3;
+                return Math.Abs((beforColor.R * beforColor.R * 0.0001) + (beforColor.R * 0.7656) - afterColor.R) <= 3
+                       && Math.Abs((beforColor.G * beforColor.G * 0.0014) + (beforColor.G * 0.0251) + 147 - afterColor.G) <= 3
+                       && Math.Abs((beforColor.B * beforColor.B * 0.0002) + (beforColor.B * 0.751) - afterColor.B) <= 3;
             }
 
             // 修改2处，上面数值
@@ -11901,13 +11939,10 @@ namespace Dota2Simulator
         /// <returns>是否匹配</returns>
         private static bool 检查技能颜色(in 字节数组包含长宽 数组, int[] xCoords, int yCoord, Color 技能点颜色)
         {
-            Rgba 技能点颜色rgba = rgba_new(技能点颜色.R, 技能点颜色.G, 技能点颜色.B, 技能点颜色.A);
-
             foreach (int xCoord in xCoords)
             {
                 Color color = GetPixelBytes(in 数组, xCoord - 坐标偏移x, yCoord - 坐标偏移y);
-                Rgba colora = rgba_new(color.R, color.G, color.B, color.A);
-                if (color_a_equal_color_b(colora, 技能点颜色rgba, 1))
+                if (ColorAEqualColorB(color, 技能点颜色, 1))
                 {
                     return true;
                 }
@@ -11926,7 +11961,7 @@ namespace Dota2Simulator
             Bitmap bitmap = await CaptureScreenAsync(截图模式1X, 截图模式1Y, size).ConfigureAwait(true);
             字节数组包含长宽 数组 = new(await GetBitmapByteAsync(bitmap).ConfigureAwait(true), size);
             bitmap = await CaptureScreenAsync(截图模式1X, 截图模式1Y, size).ConfigureAwait(true);
-            数组.新赋值数组(await GetBitmapByteAsync(bitmap).ConfigureAwait(true));
+            _ = 数组.新赋值数组(await GetBitmapByteAsync(bitmap).ConfigureAwait(true));
             return GetPixelBytes(in 数组, x - 坐标偏移x, y - 坐标偏移y);
         }
 
@@ -12202,7 +12237,6 @@ namespace Dota2Simulator
         {
             tb_攻速.Text = _攻击速度.ToString();
         }
-
 
         private void tb_状态抗性_TextChanged(object sender, EventArgs e)
         {

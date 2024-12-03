@@ -1,14 +1,15 @@
 ﻿using System.Runtime.InteropServices;
 
-namespace Dota2Simulator.KeyboardMouse;
-
-internal class kmclassAPI
+namespace Dota2Simulator.KeyboardMouse
 {
-    private const string DriverFileName = "kmclassdll.dll";
+    internal class kmclassAPI
+    {
+        private const string DriverFileName = "kmclassdll.dll";
 
-    [DllImport(DriverFileName)]
-    public static extern void KeyDown(uint key);
+        [DllImport(DriverFileName)]
+        public static extern void KeyDown(uint key);
 
-    [DllImport(DriverFileName)]
-    public static extern void KeyUp(uint key);
+        [DllImport(DriverFileName)]
+        public static extern void KeyUp(uint key);
+    }
 }

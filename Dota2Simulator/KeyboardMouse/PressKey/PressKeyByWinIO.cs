@@ -2,73 +2,74 @@
 using System.Windows.Forms;
 using TestKeyboard.DriverStageHelper;
 
-namespace TestKeyboard.PressKey;
-
-internal class PressKeyByWinIO : IPressKey
+namespace TestKeyboard.PressKey
 {
-    private EnumWindowsType mWinType;
-
-    public bool Initialize(EnumWindowsType winType)
+    internal class PressKeyByWinIO : IPressKey
     {
-        mWinType = winType;
-        switch (mWinType)
+        private EnumWindowsType mWinType;
+
+        public bool Initialize(EnumWindowsType winType)
         {
-            case EnumWindowsType.Win64:
-                WinIO64.Initialize();
-                break;
-            case EnumWindowsType.Win32:
-                WinIO32.Initialize();
-                break;
-            default:
-                return false;
+            mWinType = winType;
+            switch (mWinType)
+            {
+                case EnumWindowsType.Win64:
+                    WinIO64.Initialize();
+                    break;
+                case EnumWindowsType.Win32:
+                    WinIO32.Initialize();
+                    break;
+                default:
+                    return false;
+            }
+
+            return true;
         }
 
-        return true;
-    }
-
-    public void KeyDown(char key)
-    {
-        switch (mWinType)
+        public void KeyDown(char key)
         {
-            case EnumWindowsType.Win64:
-                WinIO64.KeyDown((Keys)key); //按下
-                break;
-            case EnumWindowsType.Win32:
-                WinIO32.KeyDown((Keys)key); //按下
-                break;
+            switch (mWinType)
+            {
+                case EnumWindowsType.Win64:
+                    WinIO64.KeyDown((Keys)key); //按下
+                    break;
+                case EnumWindowsType.Win32:
+                    WinIO32.KeyDown((Keys)key); //按下
+                    break;
+            }
         }
-    }
 
-    public void KeyPress(char key)
-    {
-        Delay(100);
-        KeyDown(key);
-        Delay(300);
-        KeyUp(key);
-        Delay(100);
-    }
-
-    public void KeyUp(char key)
-    {
-        switch (mWinType)
+        public void KeyPress(char key)
         {
-            case EnumWindowsType.Win64:
-                WinIO64.KeyUp((Keys)key); //按下
-                break;
-            case EnumWindowsType.Win32:
-                WinIO32.KeyUp((Keys)key); //按下
-                break;
+            Delay(100);
+            KeyDown(key);
+            Delay(300);
+            KeyUp(key);
+            Delay(100);
         }
-    }
 
-
-    private static void Delay(int nMilliSeconds)
-    {
-        DateTime dt = DateTime.Now;
-        dt = dt.AddMilliseconds(nMilliSeconds);
-        while (DateTime.Now < dt)
+        public void KeyUp(char key)
         {
-            Application.DoEvents(); //转让控制权            
+            switch (mWinType)
+            {
+                case EnumWindowsType.Win64:
+                    WinIO64.KeyUp((Keys)key); //按下
+                    break;
+                case EnumWindowsType.Win32:
+                    WinIO32.KeyUp((Keys)key); //按下
+                    break;
+            }
+        }
+
+
+        private static void Delay(int nMilliSeconds)
+        {
+            DateTime dt = DateTime.Now;
+            dt = dt.AddMilliseconds(nMilliSeconds);
+            while (DateTime.Now < dt)
+            {
+                Application.DoEvents(); //转让控制权            
+            }
         }
     }
 }

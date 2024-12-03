@@ -1,19 +1,20 @@
 using System;
 using System.Windows.Forms;
 
-namespace Dota2Simulator;
-
-internal static class Program
+namespace Dota2Simulator
 {
-    /// <summary>
-    ///     The main entry point for the application.
-    /// </summary>
-    [STAThread]
-    private static void Main()
+    internal static class Program
     {
-        _ = Application.SetHighDpiMode(HighDpiMode.SystemAware);
-        Application.EnableVisualStyles();
-        Application.SetCompatibleTextRenderingDefault(false);
-        Application.Run(new Form2());
+        /// <summary>
+        ///     The main entry point for the application.
+        /// </summary>
+        [STAThread]
+        private static void Main()
+        {
+            _ = Application.SetHighDpiMode(HighDpiMode.SystemAware);
+            Application.EnableVisualStyles();
+            Application.SetCompatibleTextRenderingDefault(false);
+            Application.Run(new Form2());
+        }
     }
 }
