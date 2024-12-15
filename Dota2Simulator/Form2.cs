@@ -1019,17 +1019,6 @@ namespace Dota2Simulator
                             case Keys.W:
                                 _条件5 = true;
                                 break;
-                            case Keys.D1:
-                                bool b1 = ColorAEqualColorB(Color.FromArgb(1, 1, 1), Color.FromArgb(100, 100, 100), 5);
-                                if (b1)
-                                {
-                                    Tts.Speak("真");
-                                }
-                                else
-                                {
-                                    Tts.Speak("假");
-                                }
-                                break;
                             case Keys.D2:
                                 if (!_条件2)
                                 {
@@ -3878,7 +3867,7 @@ namespace Dota2Simulator
         /// <returns></returns>
         public static async Task<bool> 设置当前技能数量()
         {
-            int i = 获取当前技能数量(in _全局数组);
+            int i = 4; // = 获取当前技能数量(in _全局数组);
             if (i != 0)
             {
                 // 技能数量改变后，技能判断色全部重置
@@ -8308,7 +8297,7 @@ namespace Dota2Simulator
 
         private static async Task<bool> 弹无虚发去后摇(字节数组包含长宽 数组)
         {
-            return await 使用技能后通用后续(Keys.Q, 1).ConfigureAwait(true);
+            return await 使用技能后通用后续(Keys.Q, 0).ConfigureAwait(true);
         }
 
         private static async Task<bool> 唤魂去后摇(字节数组包含长宽 数组)
@@ -11291,10 +11280,16 @@ namespace Dota2Simulator
 
         private static bool DOTA2对比释放技能前后颜色(Keys 技能位置, in 字节数组包含长宽 数组)
         {
-            // 获取当前技能颜色
-            Color 当前释放颜色 = 获取技能释放判断颜色(技能位置, in 数组, _技能数量);
+            // 指向性技能CD栏基本全白
+            Color 技能CD颜色 = 获取技能进入CD判断颜色(技能位置, in 数组, _技能数量);
+            if (!ColorAEqualColorB(技能CD颜色, Color.FromArgb(255, 255, 255), 10))
+            {
+                // 获取当前技能颜色
+                Color 当前释放颜色 = 获取技能释放判断颜色(技能位置, in 数组, _技能数量);
 
-            return 处理技能释放(技能位置, 当前释放颜色);
+                return 处理技能释放(技能位置, 当前释放颜色);
+            }
+            return true;
         }
 
         private static readonly Dictionary<Keys, object> 锁字典 = new()
