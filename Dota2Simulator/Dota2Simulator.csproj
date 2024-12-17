@@ -38,6 +38,7 @@
     <None Remove="Picture_Dota2\Buff_大牛_回魂.bmp" />
     <None Remove="Picture_Dota2\Buff_小强_大招.bmp" />
     <None Remove="Picture_Dota2\Buff_小精灵_幽魂.bmp" />
+    <None Remove="Picture_Dota2\Buff_小精灵_过载.bmp" />
     <None Remove="Picture_Dota2\Buff_火猫_无影拳.bmp" />
     <None Remove="Picture_Dota2\Buff_物品_TP.bmp" />
     <None Remove="Picture_Dota2\命石_伐木机_碎木击.bmp" />
@@ -121,6 +122,9 @@
   <ItemGroup>
     <EmbeddedResource Include="Picture_Dota2\Buff_光法_大招.bmp" />
     <EmbeddedResource Include="Picture_Dota2\Buff_小强_大招.bmp" />
+    <EmbeddedResource Include="Picture_Dota2\Buff_小精灵_过载.bmp">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </EmbeddedResource>
     <EmbeddedResource Include="Picture_Dota2\Buff_火猫_无影拳.bmp" />
     <EmbeddedResource Include="Picture_Dota2\命石_伐木机_碎木击.bmp" />
     <EmbeddedResource Include="Picture_Dota2\命石_伐木机_锯齿轮旋.bmp" />

@@ -3581,6 +3581,7 @@ namespace Dota2Simulator
                             _总循环条件 = true;
                             _条件根据图片委托1 ??= 循环续勋章;
                             _条件根据图片委托2 ??= 幽魂检测;
+                            _条件根据图片委托3 ??= 循环续过载;
                             await 状态初始化().ConfigureAwait(false);
                         }
 
@@ -3627,6 +3628,23 @@ namespace Dota2Simulator
                                     }
 
                                     Tts.Speak(string.Concat("选择第", _选择队友头像 + 1, "个人"));
+                                    break;
+                                }
+                            case Keys.D4:
+                                {
+                                    if (_循环条件2)
+                                    {
+                                        _条件3 = false;
+                                        _循环条件2 = false;
+                                        Tts.Speak("关闭续过载");
+                                    }
+                                    else
+                                    {
+                                        _条件3 = true;
+                                        _循环条件2 = true;
+                                        Tts.Speak("开启续过载");
+                                    }
+
                                     break;
                                 }
                         }
@@ -8633,7 +8651,12 @@ namespace Dota2Simulator
 
         private static async Task<bool> 循环蛇棒(字节数组包含长宽 数组)
         {
-            return await 使用技能后通用后续(Keys.R, 1).ConfigureAwait(true);
+            _ = await 主动技能已就绪后续(Keys.E, () =>
+            {
+                SimKeyBoard.KeyPress(Keys.E);
+                Delay(50);
+            }).ConfigureAwait(true);
+            return await FromResult(_循环条件1).ConfigureAwait(true);
         }
 
         #endregion
@@ -8832,6 +8855,22 @@ namespace Dota2Simulator
             return RegPicture(Buff_小精灵_幽魂_数组, in 数组)
                 ? await FromResult(true).ConfigureAwait(true)
                 : await FromResult(false).ConfigureAwait(true);
+        }
+
+        private static async Task<bool> 循环续过载(字节数组包含长宽 数组)
+        {
+            bool guozai = RegPicture(Buff_小精灵_过载_数组, in 数组);
+            if (guozai)
+            {
+                return await FromResult(_循环条件2).ConfigureAwait(true);
+            }
+
+            _ = await 主动技能已就绪后续(Keys.E, () =>
+            {
+                SimKeyBoard.KeyPress(Keys.E);
+                Delay(50);
+            }).ConfigureAwait(true);
+            return await FromResult(_循环条件2).ConfigureAwait(true);
         }
 
         #endregion
@@ -9341,6 +9380,7 @@ namespace Dota2Simulator
         private static 字节数组包含长宽 Buff_大牛_回魂_数组 = new();
         private static 字节数组包含长宽 Buff_光法_大招_数组 = new();
         private static 字节数组包含长宽 Buff_小精灵_幽魂_数组 = new();
+        private static 字节数组包含长宽 Buff_小精灵_过载_数组 = new();
         private static 字节数组包含长宽 Buff_物品_TP_数组 = new();
         private static 字节数组包含长宽 Buff_火猫_无影拳_数组 = new();
         private static 字节数组包含长宽 Buff_小强_大招_数组 = new();
@@ -9451,6 +9491,7 @@ namespace Dota2Simulator
             获取嵌入的图片("Buff_大牛_回魂", ref Buff_大牛_回魂_数组);
             获取嵌入的图片("Buff_光法_大招", ref Buff_光法_大招_数组);
             获取嵌入的图片("Buff_小精灵_幽魂", ref Buff_小精灵_幽魂_数组);
+            获取嵌入的图片("Buff_小精灵_过载", ref Buff_小精灵_过载_数组);
             获取嵌入的图片("Buff_物品_TP", ref Buff_物品_TP_数组);
             获取嵌入的图片("Buff_火猫_无影拳", ref Buff_火猫_无影拳_数组);
             获取嵌入的图片("Buff_小强_大招", ref Buff_小强_大招_数组);
