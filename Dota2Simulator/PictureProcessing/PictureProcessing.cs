@@ -1461,14 +1461,14 @@ namespace Dota2Simulator.PictureProcessing
         }
 
         [DllImport("findpoints.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern bool color_a_equal_color_b(
+        private static extern bool color_a_equal_color_b(
             ref Rgba colorA,  // 改用 ref
             ref Rgba colorB,  // 改用 ref
             byte errorRange
         );
 
         [DllImport("findpoints.dll", CallingConvention = CallingConvention.Cdecl)]
-        public static extern bool color_a_equal_color_b_rgb(
+        private static extern bool color_a_equal_color_b_rgb(
             ref Rgba colorA,  // 改用 ref
             ref Rgba colorB,  // 改用 ref
             byte error_r,

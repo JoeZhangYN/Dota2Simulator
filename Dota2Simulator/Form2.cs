@@ -31,6 +31,7 @@ using KeyEventArgs = System.Windows.Forms.KeyEventArgs;
 using Keys = System.Windows.Forms.Keys;
 using Point = System.Drawing.Point;
 using Size = System.Drawing.Size;
+using System.Xml.Schema;
 
 namespace Dota2Simulator
 {
@@ -1018,17 +1019,6 @@ namespace Dota2Simulator
                                 break;
                             case Keys.W:
                                 _条件5 = true;
-                                break;
-                            case Keys.D1:
-                                bool b1 = ColorAEqualColorB(Color.FromArgb(1, 1, 1), Color.FromArgb(100, 100, 100), 5);
-                                if (b1)
-                                {
-                                    Tts.Speak("真");
-                                }
-                                else
-                                {
-                                    Tts.Speak("假");
-                                }
                                 break;
                             case Keys.D2:
                                 if (!_条件2)
@@ -3308,6 +3298,59 @@ namespace Dota2Simulator
                             case Keys.D2:
                                 _全局模式e = 1 - _全局模式e;
                                 Tts.Speak(_全局模式e == 0 ? "睡不接陨星锤" : "睡接陨星锤");
+                                break;
+                        }
+
+                        break;
+                    }
+
+                #endregion
+
+                #region 瘟疫法师
+
+                case "瘟疫法师":
+                    {
+                        if (!_总循环条件)
+                        {
+                            _总循环条件 = true;
+                            _条件根据图片委托1 ??= 死亡脉冲去后摇;
+                            _条件根据图片委托2 ??= 幽魂护罩去后摇;
+                            _条件根据图片委托3 ??= 死神镰刀去后摇;
+                            _条件根据图片委托5 ??= 无限死亡脉冲;
+                            _切假腿配置.修改配置(Keys.E, false);
+                            await 状态初始化().ConfigureAwait(false);
+                        }
+
+                        await 根据按键判断技能释放前通用逻辑(e).ConfigureAwait(true);
+
+                        switch (e.KeyCode)
+                        {
+                            case Keys.F1:
+                                if (_是否魔晶)
+                                {
+                                    _切假腿配置.修改配置(Keys.F, true);
+                                }
+
+                                break;
+                            case Keys.Q:
+                                _条件1 = true;
+                                break;
+                            case Keys.W:
+                                _条件2 = true;
+                                break;
+                            case Keys.R:
+                                _条件3 = true;
+                                break;
+                            case Keys.F:
+                                if (_是否魔晶)
+                                {
+                                    _条件4 = true;
+                                }
+                                break;
+                            case Keys.D4:
+                                _循环条件1 = !_循环条件1;
+                                _条件5 = true;
+                                Tts.Speak(_循环条件1 ? "续脉冲" : "不续脉冲");
                                 break;
                         }
 
@@ -8308,7 +8351,7 @@ namespace Dota2Simulator
 
         private static async Task<bool> 弹无虚发去后摇(字节数组包含长宽 数组)
         {
-            return await 使用技能后通用后续(Keys.Q, 1).ConfigureAwait(true);
+            return await 使用技能后通用后续(Keys.Q, 0).ConfigureAwait(true);
         }
 
         private static async Task<bool> 唤魂去后摇(字节数组包含长宽 数组)
@@ -8534,6 +8577,35 @@ namespace Dota2Simulator
         private static async Task<bool> 噩梦接平A锤(字节数组包含长宽 数组)
         {
             return await FromResult(false).ConfigureAwait(true);
+        }
+
+        #endregion
+
+        #region 瘟疫法师
+
+        private static async Task<bool> 死亡脉冲去后摇(字节数组包含长宽 数组)
+        {
+            return await 使用技能后通用后续(Keys.Q, 0, 是否接按键: false).ConfigureAwait(true);
+        }
+
+        private static async Task<bool> 幽魂护罩去后摇(字节数组包含长宽 数组)
+        {
+            return await 使用技能后通用后续(Keys.W, 0, 是否接按键:false).ConfigureAwait(true);
+        }
+
+        private static async Task<bool> 死神镰刀去后摇(字节数组包含长宽 数组)
+        {
+            return await 使用技能后通用后续(Keys.R, 0).ConfigureAwait(true);
+        }
+
+        private static async Task<bool> 无限死亡脉冲(字节数组包含长宽 数组)
+        {
+            _ = await 主动技能已就绪后续(Keys.Q, () =>
+            {
+                SimKeyBoard.KeyPress(Keys.Q);
+                Delay(50);
+            }).ConfigureAwait(true);
+            return await FromResult(_循环条件1).ConfigureAwait(true);
         }
 
         #endregion
@@ -11291,10 +11363,16 @@ namespace Dota2Simulator
 
         private static bool DOTA2对比释放技能前后颜色(Keys 技能位置, in 字节数组包含长宽 数组)
         {
-            // 获取当前技能颜色
-            Color 当前释放颜色 = 获取技能释放判断颜色(技能位置, in 数组, _技能数量);
+            // 指向性技能CD栏基本全白
+            Color 技能CD颜色 = 获取技能进入CD判断颜色(技能位置, in 数组, _技能数量);
+            if (!ColorAEqualColorB(技能CD颜色, Color.FromArgb(255, 255, 255), 10))
+            {
+                // 获取当前技能颜色
+                Color 当前释放颜色 = 获取技能释放判断颜色(技能位置, in 数组, _技能数量);
 
-            return 处理技能释放(技能位置, 当前释放颜色);
+                return 处理技能释放(技能位置, 当前释放颜色);
+            }
+            return true;
         }
 
         private static readonly Dictionary<Keys, object> 锁字典 = new()
