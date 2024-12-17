@@ -3921,7 +3921,7 @@ namespace Dota2Simulator
         /// <returns></returns>
         public static async Task<bool> 设置当前技能数量()
         {
-            int i = 获取当前技能数量(in _全局数组);
+            int i = 4; // = 获取当前技能数量(in _全局数组);
             if (i != 0)
             {
                 // 技能数量改变后，技能判断色全部重置
