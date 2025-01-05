@@ -31,7 +31,6 @@ using KeyEventArgs = System.Windows.Forms.KeyEventArgs;
 using Keys = System.Windows.Forms.Keys;
 using Point = System.Drawing.Point;
 using Size = System.Drawing.Size;
-using System.Xml.Schema;
 
 namespace Dota2Simulator
 {
@@ -2708,7 +2707,6 @@ namespace Dota2Simulator
                             _条件根据图片委托3 ??= 闪电风暴去后摇;
                             _条件根据图片委托4 ??= 脉冲新星去后摇;
                             _条件根据图片委托5 ??= 虚无主义去后摇;
-                            _条件根据图片委托6 ??= 循环检测脉冲新星;
                             await 状态初始化().ConfigureAwait(false);
                         }
 
@@ -2730,22 +2728,6 @@ namespace Dota2Simulator
                                 break;
                             case Keys.R:
                                 _条件4 = true;
-                                break;
-                            case Keys.D2:
-                                if (_全局模式r == 1)
-                                {
-                                    _全局模式r = 0;
-                                    _条件6 = false;
-                                    SimKeyBoard.KeyPress(Keys.R);
-                                    Tts.Speak("关闭脉冲新星");
-                                }
-                                else
-                                {
-                                    _全局模式r = 1;
-                                    _条件6 = true;
-                                    Tts.Speak("开启脉冲新星");
-                                }
-
                                 break;
                         }
 
@@ -3371,7 +3353,7 @@ namespace Dota2Simulator
                                     _条件4 = true;
                                 }
                                 break;
-                            case Keys.D4:
+                            case Keys.D6:
                                 _循环条件1 = !_循环条件1;
                                 _条件5 = true;
                                 Tts.Speak(_循环条件1 ? "续脉冲" : "不续脉冲");
@@ -3603,7 +3585,6 @@ namespace Dota2Simulator
                         if (!_总循环条件)
                         {
                             _总循环条件 = true;
-                            _条件根据图片委托1 ??= 循环续勋章;
                             _条件根据图片委托2 ??= 幽魂检测;
                             _条件根据图片委托3 ??= 循环续过载;
                             await 状态初始化().ConfigureAwait(false);
@@ -3685,7 +3666,6 @@ namespace Dota2Simulator
                         if (!_总循环条件)
                         {
                             _总循环条件 = true;
-                            _条件根据图片委托1 ??= 循环续勋章;
                             _条件根据图片委托2 ??= 幽魂检测;
                             await 状态初始化().ConfigureAwait(false);
                         }
@@ -6991,7 +6971,7 @@ namespace Dota2Simulator
 
         private static async Task<bool> 雷云去后摇(字节数组包含长宽 数组)
         {
-            return await 使用技能后通用后续(Keys.D, 1).ConfigureAwait(true);
+            return await 使用技能后通用后续(Keys.D, 0).ConfigureAwait(true);
         }
 
         #endregion
@@ -7404,96 +7384,27 @@ namespace Dota2Simulator
 
         private static async Task<bool> 撕裂大地去后摇(字节数组包含长宽 数组)
         {
-            static void 撕裂大地后()
-            {
-                通用技能后续动作(false);
-            }
-
-            if (DOTA2判断技能是否CD(Keys.Q, in 数组))
-            {
-                return await FromResult(true).ConfigureAwait(true);
-            }
-
-            撕裂大地后();
-            return await FromResult(false).ConfigureAwait(true);
+            return await 使用技能后通用后续(Keys.Q, 0).ConfigureAwait(true);
         }
 
         private static async Task<bool> 恶魔敕令去后摇(字节数组包含长宽 数组)
         {
-            static void 恶魔敕令后()
-            {
-                通用技能后续动作(false);
-            }
-
-            if (DOTA2判断技能是否CD(Keys.W, in 数组))
-            {
-                return await FromResult(true).ConfigureAwait(true);
-            }
-
-            恶魔敕令后();
-            return await FromResult(false).ConfigureAwait(true);
+            return await 使用技能后通用后续(Keys.W, 0).ConfigureAwait(true);
         }
 
         private static async Task<bool> 闪电风暴去后摇(字节数组包含长宽 数组)
         {
-            static void 闪电风暴后()
-            {
-                通用技能后续动作(false);
-            }
-
-            if (DOTA2判断技能是否CD(Keys.E, in 数组))
-            {
-                return await FromResult(true).ConfigureAwait(true);
-            }
-
-            闪电风暴后();
-            return await FromResult(false).ConfigureAwait(true);
+            return await 使用技能后通用后续(Keys.E, 0).ConfigureAwait(true);
         }
 
         private static async Task<bool> 脉冲新星去后摇(字节数组包含长宽 数组)
         {
-            static void 脉冲新星后()
-            {
-                通用技能后续动作(false);
-            }
-
-            if (DOTA2判断技能是否CD(Keys.R, in 数组))
-            {
-                return await FromResult(true).ConfigureAwait(true);
-            }
-
-            脉冲新星后();
-            return await FromResult(false).ConfigureAwait(true);
+            return await 使用技能后通用后续(Keys.R, 0).ConfigureAwait(true);
         }
 
         private static async Task<bool> 虚无主义去后摇(字节数组包含长宽 数组)
         {
-            static void 虚无主义后()
-            {
-                SimKeyBoard.MouseRightClick();
-            }
-
-            if (DOTA2判断技能是否CD(Keys.D, in 数组))
-            {
-                return await FromResult(true).ConfigureAwait(true);
-            }
-
-            虚无主义后();
-            return await FromResult(false).ConfigureAwait(true);
-        }
-
-        private static async Task<bool> 循环检测脉冲新星(字节数组包含长宽 数组)
-        {
-            if (_全局模式r == 1)
-            {
-                if (DOTA2判断技能是否CD(Keys.R, in 数组))
-                {
-                    SimKeyBoard.KeyPress(Keys.R);
-                    return await FromResult(false).ConfigureAwait(true);
-                }
-            }
-
-            return await FromResult(true).ConfigureAwait(true);
+            return await 使用技能后通用后续(Keys.D, 0).ConfigureAwait(true);
         }
 
         #endregion
@@ -8592,6 +8503,7 @@ namespace Dota2Simulator
         #region 全才
 
         #region 剧毒
+
         private static async Task<bool> 瘴气去后摇(字节数组包含长宽 数组)
         {
             return await 使用技能后通用后续(Keys.Q, 1).ConfigureAwait(true);
@@ -8797,18 +8709,6 @@ namespace Dota2Simulator
 
         #region 小精灵
 
-        // todo 逻辑修改
-        private static async Task<bool> 循环续勋章(字节数组包含长宽 数组)
-        {
-            Point p = MousePosition;
-            SimKeyBoard.MouseMove(574 + (_选择队友头像 * 61) + (_选择队友头像 >= 5 ? 216 : 0), 23);
-            Delay(15);
-            SimKeyBoard.MouseMove(p);
-            Delay(15);
-            SimKeyBoard.MouseRightClick();
-            return _循环条件1 ? await FromResult(true).ConfigureAwait(true) : await FromResult(false).ConfigureAwait(true);
-        }
-
         private static async Task<bool> 幽魂检测(字节数组包含长宽 数组)
         {
             return RegPicture(Buff_小精灵_幽魂_数组, in 数组)
@@ -8821,13 +8721,18 @@ namespace Dota2Simulator
             bool guozai = RegPicture(Buff_小精灵_过载_数组, in 数组);
             if (guozai)
             {
+                _全局步骤e = 0;
                 return await FromResult(_循环条件2).ConfigureAwait(true);
             }
 
             _ = await 主动技能已就绪后续(Keys.E, () =>
             {
+                if (_全局步骤e == 1)
+                {
+                    Delay(200);
+                }
                 SimKeyBoard.KeyPress(Keys.E);
-                Delay(50);
+                _全局步骤e = 1;
             }).ConfigureAwait(true);
             return await FromResult(_循环条件2).ConfigureAwait(true);
         }
@@ -11445,7 +11350,6 @@ namespace Dota2Simulator
                 Logger.Info("字典读取失败");
                 return false;
             }
-
             if (释放中判断)
             {
                 // 技能释放中
@@ -11457,6 +11361,12 @@ namespace Dota2Simulator
                         更新释放判断和颜色(技能位置, true, false, 释放前Color, 释放后Color);
                         return true;
                     }
+                    else if (ColorAEqualColorB(释放前Color, 当前释放颜色, 0))  // 新增：判断是否回到初始颜色
+                    {
+                        更新释放判断和颜色(技能位置, false, true, 释放前Color, 释放后Color);
+                        // 记录技能释放信息(技能位置, "已释放完毕", false, true, 释放前Color, 释放后Color, 当前释放颜色);
+                        return false;
+                    }
                     else
                     {
                         更新释放判断和颜色(技能位置, false, true, 释放前Color, 释放后Color);
@@ -11464,7 +11374,6 @@ namespace Dota2Simulator
                         return false;
                     }
                 }
-
                 return false;
             }
             else
@@ -11482,7 +11391,6 @@ namespace Dota2Simulator
                         更新释放判断和颜色(技能位置, true, false, 释放前Color, 当前释放颜色);
                         // 记录技能释放信息(技能位置, "释放中", true, false, 释放前Color, 当前释放颜色, 当前释放颜色);
                     }
-
                     return true;
                 }
             }
