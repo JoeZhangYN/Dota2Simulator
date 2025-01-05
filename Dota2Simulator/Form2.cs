@@ -2875,6 +2875,30 @@ namespace Dota2Simulator
 
                 case "小仙女":
                     {
+                        if (!_总循环条件)
+                        {
+                            _总循环条件 = true;
+                            _条件根据图片委托5 ??= 无限暗影之境;
+                            await 状态初始化().ConfigureAwait(false);
+                        }
+
+                        await 根据按键判断技能释放前通用逻辑(e).ConfigureAwait(true);
+
+                        switch (e.KeyCode)
+                        {
+                            case Keys.F:
+                                if (_是否魔晶)
+                                {
+                                    _条件4 = true;
+                                }
+                                break;
+                            case Keys.D4:
+                                _循环条件1 = !_循环条件1;
+                                _条件5 = true;
+                                Tts.Speak(_循环条件1 ? "续暗影" : "不续暗影");
+                                break;
+                        }
+
                         break;
                     }
 
@@ -7714,79 +7738,14 @@ namespace Dota2Simulator
 
         #region 小仙女
 
-        private static void 皇冠延时计时()
+        private static async Task<bool> 无限暗影之境(字节数组包含长宽 数组)
         {
-            long 总开始时间 = 获取当前时间毫秒();
-
-            int w_down = 0;
-
-            //while (w_down == 1)
-            //{
-            //    if (获取当前时间毫秒() - 总开始时间 > 2000)
-            //    {
-            //        return;
-            //    }
-            //}
-        }
-
-        private static void 诅咒皇冠吹风()
-        {
-            //var 总开始时间 = 获取当前时间毫秒();
-
-            //KeyPress(Keys.E);
-
-            //var w_down = 0;
-
-            //while (w_down == 0)
-            //{
-            //    if (获取当前时间毫秒() - 总开始时间 > 2000) return;
-
-            //    if (RegPicture(小仙女_释放诅咒皇冠_不朽, "E", 7))
-            //    {
-            //        // Delay(阿哈利姆魔晶() ? 410 : 1410);  // 大部分技能抬手都是0.2-0.3之间
-            //        if (!_循环条件2) return;
-
-            //        if (RegPicture(物品_吹风_数组, "SPACE", 7))
-            //        {
-            //            KeyPress(Keys.Space);
-            //            KeyPress(Keys.M);
-
-            //            Delay(2500);
-            //            if (!_循环条件2) return;
-            //            作祟暗影之境最大化伤害();
-            //        }
-
-            //        w_down = 1;
-            //    }
-            //}
-        }
-
-        private static void 作祟暗影之境最大化伤害()
-        {
-            // 释放纷争，增加大量伤害
-            //if (RegPicture(物品_纷争_数组, "C", 7)) KeyPress( Keys.C);
-
-            SimKeyBoard.KeyPress(Keys.M);
-            Delay(等待延迟);
-            SimKeyBoard.KeyPress(Keys.D);
-            Delay(等待延迟);
-            SimKeyBoard.KeyPress(Keys.W);
-            Delay(等待延迟);
-            SimKeyBoard.KeyPress(Keys.W);
-
-            //var 暗影之境_开始时间 = 获取当前时间毫秒();
-
-            //if (阿哈利姆神杖())
-            //{
-            //    Delay(400);
-            //    KeyPress(Keys.A);
-            //}
-            //else
-            //{
-            //    while (获取当前时间毫秒() - 暗影之境_开始时间 < 4500 || !loop_bool_2) { }
-            //    if (!loop_bool_2) return;
-            //    KeyPress(Keys.A);
-            //}
+            _ = await 主动技能已就绪后续(Keys.W, () =>
+            {
+                SimKeyBoard.KeyPress(Keys.W);
+                Delay(50);
+            }).ConfigureAwait(true);
+            return await FromResult(_循环条件1).ConfigureAwait(true);
         }
 
         #endregion
