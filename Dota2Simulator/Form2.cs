@@ -10637,48 +10637,41 @@ namespace Dota2Simulator
         #region 模块化技能
 
         // 模块化之后，都不用注释也能看得懂了。。
+        // 技能CD为x为指定 y为灰白色最上方像素 |涉及的颜色| 技能CD颜色 未学习技能CD颜色
+        // 法球位置为灰白色左下角图标 |涉及的颜色| 法球颜色 未学习法球颜色
+        // 推荐学习和状态技能取同一个位置 开启技能后 y最底下绿色像素 金黄色下往上数2  5,6技能 为暗黄色最底下 |涉及的颜色| 推荐学习颜色 状态激活颜色
+        // QWERDF框x为左下角x向右偏移一个像素 y为特定的y 被动位置x为图标右侧边框左边第一个像素,有的技能亮色影响内侧颜色 y为qwerdf 的某个高度 |涉及的颜色| qwerdf颜色 被动颜色 未学习被动技能颜色 破坏被动颜色
         private static readonly 技能信息 技能4 = new(
-            820, 998, 65, 17, -52, 25, -49
-            , 2, -2, -4, 3, 50, -45
-            , Color.FromArgb(194, 198, 202), 61
-            , Color.FromArgb(67, 76, 84), 1
-            , Color.FromArgb(54, 62, 70), 1
-            , Color.FromArgb(0, 129, 0), 0
-            , Color.FromArgb(34, 40, 39), 1
-            , Color.FromArgb(72, 77, 81), 2
-            , Color.FromArgb(25, 30, 34), 2
-            , Color.FromArgb(49, 51, 46), 2
-            , Color.FromArgb(33, 36, 36), 2
-            , Color.FromArgb(255, 144, 0), 8
+            820, 998, 65
+            , 17, -52, Color.FromArgb(135, 143, 150), 3, Color.FromArgb(25, 30, 34), 2
+            , -45, Color.FromArgb(34, 40, 39), 2
+            , 2, -2, Color.FromArgb(54, 62, 70), 2, Color.FromArgb(72, 77, 81), 2
+            , 25, -56, Color.FromArgb(0, 129, 0), 0, Color.FromArgb(211, 181, 79), 8
+            , 50, -45, Color.FromArgb(49, 51, 47), 3, Color.FromArgb(33, 36, 37), 3
+            , 25, -49
+            , Color.FromArgb(67, 76, 84), 1 // 没用到
             , [Keys.Q, Keys.W, Keys.E, Keys.R]);
 
         private static readonly 技能信息 技能5 = new(
-            802, 995, 58, 17, -49, 24, -47
-            , 3, -3, -1, 1, 49, -41
-            , Color.FromArgb(196, 200, 203), 60
-            , Color.FromArgb(55, 62, 70), 1, Color.FromArgb(54, 61, 69), 1
-            , Color.FromArgb(0, 129, 0), 0
-            , Color.FromArgb(34, 40, 39), 1
-            , Color.FromArgb(75, 80, 84), 2
-            , Color.FromArgb(25, 29, 34), 2
-            , Color.FromArgb(49, 51, 48), 2
-            , Color.FromArgb(32, 35, 37), 2
-            , Color.FromArgb(255, 144, 0), 8
+            802, 995, 58
+            , 17, -49, Color.FromArgb(127, 134, 140), 3, Color.FromArgb(25, 29, 34), 2
+            , -41, Color.FromArgb(34, 40, 39), 1
+            , 5, -3, Color.FromArgb(54, 61, 69), 2, Color.FromArgb(75, 80, 84), 2
+            , 25, -50, Color.FromArgb(0, 129, 0), 0, Color.FromArgb(118, 100, 41), 8
+            , 51, -41, Color.FromArgb(49, 51, 47), 3, Color.FromArgb(33, 36, 37), 3
+            , 24, -47
+            , Color.FromArgb(55, 62, 70), 1  // 没用到
             , [Keys.Q, Keys.W, Keys.E, Keys.D, Keys.R]);
 
         private static readonly 技能信息 技能6 = new(
-            774, 995, 58, 17, -49, 24, -47
-            , 3, -3, -1, 1, 49, -41
-            , Color.FromArgb(196, 200, 203), 60
-            , Color.FromArgb(55, 62, 70), 1
-            , Color.FromArgb(54, 61, 69), 1
-            , Color.FromArgb(0, 129, 0), 0
-            , Color.FromArgb(34, 40, 39), 1
-            , Color.FromArgb(75, 80, 84), 2
-            , Color.FromArgb(25, 29, 34), 2
-            , Color.FromArgb(49, 51, 48), 2
-            , Color.FromArgb(32, 35, 37), 2
-            , Color.FromArgb(255, 144, 0), 8
+            774, 995, 58
+            , 17, -49, Color.FromArgb(139, 147, 154), 3, Color.FromArgb(25, 29, 34), 2
+            , -41, Color.FromArgb(34, 40, 39), 1
+            , 3, -3, Color.FromArgb(54, 61, 69), 2, Color.FromArgb(75, 80, 84), 2
+            , 25, -50, Color.FromArgb(0, 129, 0), 0, Color.FromArgb(119, 101, 39), 8
+            , 49, -41, Color.FromArgb(49, 51, 47), 3, Color.FromArgb(33, 36, 37), 3
+            , 24, -47
+            , Color.FromArgb(55, 62, 70), 1  // 没用到
             , [Keys.Q, Keys.W, Keys.E, Keys.D, Keys.F, Keys.R]);
 
         private class 技能信息(
@@ -10687,34 +10680,35 @@ namespace Dota2Simulator
             int 技能间隔,
             int 技能CD位置偏移x,
             int 技能CD位置偏移y,
-            int 释放位置偏移x,
-            int 释放位置偏移y,
-            int 法球技能CD位置变化x,
-            int 法球技能CD位置变化y,
-            int 状态技能位置变化x,
-            int 状态技能位置变化y,
-            int 被动位置变化x,
-            int QWERDF和被动位置变化y,
             Color 技能CD颜色,
             byte 技能CD颜色容差,
-            Color 技能CD左下颜色,
-            byte 技能CD左下颜色容差,
-            Color 法球技能CD颜色,
-            byte 法球技能颜色容差,
-            Color 技能状态激活颜色,
-            byte 技能状态激活颜色容差,
-            Color QWERDF框颜色,
-            byte QWERDF框颜色容差,
             Color 未学主动技能CD颜色,
             byte 未学主动技能CD颜色容差,
+            int QWERDFy,
+            Color QWERDF框颜色,
+            byte QWERDF框颜色容差,
+            int 法球技能CD位置变化x,
+            int 法球技能CD位置变化y,
+            Color 法球技能CD颜色,
+            byte 法球技能颜色容差,
             Color 未学法球技能CD颜色,
             byte 未学法球技能CD颜色容差,
+            int 状态技能位置变化x,
+            int 状态技能位置变化y,
+            Color 技能状态激活颜色,
+            byte 技能状态激活颜色容差,
+            Color 推荐学习技能颜色,
+            byte 推荐学习技能颜色容差,
+            int 被动位置变化x,
+            int 被动位置变化y,
             Color 未学被动技能颜色,
             byte 未学被动技能颜色容差,
             Color 破坏被动技能颜色,
             byte 破坏被动技能颜色容差,
-            Color 推荐学习技能颜色,
-            byte 推荐学习技能颜色容差,
+            int 释放位置偏移x,
+            int 释放位置偏移y,
+            Color 技能CD左下颜色,
+            byte 技能CD左下颜色容差,
             Keys[] 技能位置)
         {
             public int 技能CD图标x { get; } = 左下角x + 技能CD位置偏移x;
@@ -10727,9 +10721,9 @@ namespace Dota2Simulator
             public int 状态技能位置x { get; } = 左下角x + 状态技能位置变化x;
             public int 状态技能位置y { get; } = 左下角y + 状态技能位置变化y;
             public int 被动位置x { get; } = 左下角x + 被动位置变化x;
-            public int 被动位置y { get; } = 左下角y + QWERDF和被动位置变化y;
-            public int QWERDF位置x { get; } = 左下角x - 1; // 向左偏移1个单位，基本颜色一致
-            public int QWERDF位置y { get; } = 左下角y + QWERDF和被动位置变化y;
+            public int 被动位置y { get; } = 左下角y + 被动位置变化y;
+            public int QWERDF位置x { get; } = 左下角x + 1; // 向右偏移1个单位，基本颜色一致
+            public int QWERDF位置y { get; } = 左下角y + QWERDFy;
             public Color 技能CD颜色 { get; } = 技能CD颜色;
             public byte 技能CD颜色容差 { get; } = 技能CD颜色容差;
             public Color 技能CD左下颜色 { get; } = 技能CD左下颜色;
@@ -10892,7 +10886,7 @@ namespace Dota2Simulator
             List<技能信息> 技能列表 = [技能4, 技能5, 技能6];
             List<int> 技能数量 = [4, 5, 6];
 
-            static void 根据数量判断是否存在技能(in 字节数组包含长宽 数组, 技能信息 技能, int i, ref int count_技能)
+            static void 根据数量判断是否存在技能(in 字节数组包含长宽 数组, 技能信息 技能, int i, ref int count_技能,ref string 输出文字)
             {
                 int 偏移 = 技能.技能间隔 * i;
 
@@ -10921,54 +10915,72 @@ namespace Dota2Simulator
                     colorMatch_被动 || colorMatch_推荐 || colorMatch_破坏被动)
                 {
                     count_技能++;
+
+                    输出文字 += $"{i + 1} QWERDF图标 :位置X:{p_QWERDF.X + 坐标偏移x},位置Y:{p_QWERDF.Y + 坐标偏移y}，RGB:{获取的颜色_QWERDF.R}, {获取的颜色_QWERDF.G}, {获取的颜色_QWERDF.B}\r\n";
+                    输出文字 += $"{i + 1} 技能CD图标 :位置X:{p_主动.X + 坐标偏移x},位置Y:{p_主动.Y + 坐标偏移y}，RGB:{获取的颜色_主动.R}, {获取的颜色_主动.G}, {获取的颜色_主动.B}。\r\n";
+                    输出文字 += $"{i + 1} 技能法球 :位置X:{p_法球.X + 坐标偏移x},位置Y:{p_法球.Y + 坐标偏移y}，RGB:{获取的颜色_法球.R}, {获取的颜色_法球.G}, {获取的颜色_法球.B}。\r\n";
+                    输出文字 += $"{i + 1} 被动技能 :位置X:{p_被动.X + 坐标偏移x},位置Y:{p_被动.Y + 坐标偏移y}，RGB:{获取的颜色_被动.R}, {获取的颜色_被动.G}, {获取的颜色_被动.B}。\r\n";
+                    输出文字 += $"{i + 1} 推荐技能 :位置X:{p_推荐.X + 坐标偏移x},位置Y:{p_推荐.Y + 坐标偏移y}，RGB:{获取的颜色_推荐.R}, {获取的颜色_推荐.G}, {获取的颜色_推荐.B}。\r\n\r\n";
+
                     return;
                 }
 
                 #region 输出判断调试用
 
-                //string 不同色 = "";
-                //if (!colorMatch_QWERDF)
-                //{
-                //    不同色 += $"{i + 1} QWERDF图标 :位置X:{p_QWERDF.X + 坐标偏移x},位置Y:{p_QWERDF.Y + 坐标偏移y}，RGB:{获取的颜色_QWERDF.R}, {获取的颜色_QWERDF.G}, {获取的颜色_QWERDF.B}\r\n";
-                //}
-                //if (!colorMatch_已学主动 && !colorMatch_未学主动)
-                //{
-                //    不同色 += $"{i + 1} 主动 :位置X:{p_主动.X + 坐标偏移x},位置Y:{p_主动.Y + 坐标偏移y}，RGB:{获取的颜色_主动.R}, {获取的颜色_主动.G}, {获取的颜色_主动.B}。\r\n";
-                //}
-                //if (!colorMatch_已学法球 && !colorMatch_未学法球)
-                //{
-                //    不同色 += $"{i + 1} 技能 :位置X:{p_法球.X + 坐标偏移x},位置Y:{p_法球.Y + 坐标偏移y}，RGB:{获取的颜色_法球.R}, {获取的颜色_法球.G}, {获取的颜色_法球.B}。\r\n";
-                //}
-                //if (!colorMatch_被动 && !colorMatch_破坏被动)
-                //{
-                //    不同色 += $"{i + 1} 被动技能 :位置X:{p_被动.X + 坐标偏移x},位置Y:{p_被动.Y + 坐标偏移y}，RGB:{获取的颜色_被动.R}, {获取的颜色_被动.G}, {获取的颜色_被动.B}。\r\n";
-                //}
-                //if (!colorMatch_推荐)
-                //{
-                //    不同色 += $"{i + 1} 推荐技能 :位置X:{p_推荐.X + 坐标偏移x},位置Y:{p_推荐.Y + 坐标偏移y}，RGB:{获取的颜色_被动.R}, {获取的颜色_被动.G}, {获取的颜色_被动.B}。\r\n";
-                //}
-
-                //Logger.Error(不同色);
+                if (!colorMatch_QWERDF)
+                {
+                    输出文字 += $"{i + 1} QWERDF图标 :位置X:{p_QWERDF.X + 坐标偏移x},位置Y:{p_QWERDF.Y + 坐标偏移y}，RGB:{获取的颜色_QWERDF.R}, {获取的颜色_QWERDF.G}, {获取的颜色_QWERDF.B}\r\n";
+                }
+                if (!colorMatch_已学主动 && !colorMatch_未学主动)
+                {
+                    输出文字 += $"{i + 1} 技能CD图标 :位置X:{p_主动.X + 坐标偏移x},位置Y:{p_主动.Y + 坐标偏移y}，RGB:{获取的颜色_主动.R}, {获取的颜色_主动.G}, {获取的颜色_主动.B}。\r\n";
+                }
+                if (!colorMatch_已学法球 && !colorMatch_未学法球)
+                {
+                    输出文字 += $"{i + 1} 技能法球 :位置X:{p_法球.X + 坐标偏移x},位置Y:{p_法球.Y + 坐标偏移y}，RGB:{获取的颜色_法球.R}, {获取的颜色_法球.G}, {获取的颜色_法球.B}。\r\n";
+                }
+                if (!colorMatch_被动 && !colorMatch_破坏被动)
+                {
+                    输出文字 += $"{i + 1} 被动技能 :位置X:{p_被动.X + 坐标偏移x},位置Y:{p_被动.Y + 坐标偏移y}，RGB:{获取的颜色_被动.R}, {获取的颜色_被动.G}, {获取的颜色_被动.B}。\r\n";
+                }
+                if (!colorMatch_推荐)
+                {
+                    输出文字 += $"{i + 1} 推荐技能 :位置X:{p_推荐.X + 坐标偏移x},位置Y:{p_推荐.Y + 坐标偏移y}，RGB:{获取的颜色_推荐.R}, {获取的颜色_推荐.G}, {获取的颜色_推荐.B}。\r\n\r\n";
+                }                
 
                 #endregion
             }
 
+            string 输出文字 = "";
+            string 全部文字 = "";
+            
+
             for (int j = 0; j < 技能列表.Count; j++)
             {
                 技能信息 当前技能 = 技能列表[j];
+
+                输出文字 = $"\r\n当前技能数量{技能数量[j]}\r\n";
                 count_技能 = 0;
 
                 for (int i = 0; i < 技能数量[j] - 1; i++)
                 {
-                    根据数量判断是否存在技能(in 数组, 当前技能, i, ref count_技能);
+                    根据数量判断是否存在技能(in 数组, 当前技能, i, ref count_技能, ref 输出文字);
                 }
 
                 if (count_技能 == 技能数量[j] - 1)
                 {
-                    return count_技能 + 1;
+                    Logger.Error(输出文字);
+                    return 技能数量[j];
                 }
+
+                全部文字 += 输出文字;
+
+                // 结束循环依旧没匹配到
+                if (j == 2) Logger.Error(全部文字);
             }
 
+            输出文字 = "";
+            全部文字 = "";
             Tts.Speak("技能数量异常");
             return 0;
         }

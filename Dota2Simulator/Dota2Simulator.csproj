@@ -212,12 +212,12 @@
     <PackageReference Include="Collections.Pooled" Version="2.0.0-preview.27" />
     <PackageReference Include="Microsoft.IO.RecyclableMemoryStream" Version="3.0.1" />
     <PackageReference Include="NAudio" Version="2.2.1" />
-    <PackageReference Include="NeoSmart.AsyncLock" Version="3.2.1" />
-    <PackageReference Include="NLog" Version="5.3.4" />
-    <PackageReference Include="OpenCvSharp4" Version="4.10.0.20241108" />
-    <PackageReference Include="OpenCvSharp4.Extensions" Version="4.10.0.20241108" />
-    <PackageReference Include="OpenCvSharp4.runtime.win" Version="4.10.0.20241108" />
-    <PackageReference Include="PaddleOCRSharp" Version="4.4.0.2" />
+    <PackageReference Include="NeoSmart.AsyncLock" Version="3.3.0-preview1" />
+    <PackageReference Include="NLog" Version="6.0.0-preview1" />
+    <PackageReference Include="OpenCvSharp4" Version="4.11.0.20250507" />
+    <PackageReference Include="OpenCvSharp4.Extensions" Version="4.11.0.20250507" />
+    <PackageReference Include="OpenCvSharp4.runtime.win" Version="4.11.0.20250507" />
+    <PackageReference Include="PaddleOCRSharp" Version="4.5.0.1" />
     <PackageReference Include="Sdcb.PaddleInference" Version="2.5.0.1" />
     <PackageReference Include="Sdcb.PaddleInference.runtime.win64.mkl" Version="2.6.1" />
     <PackageReference Include="Sdcb.PaddleOCR" Version="2.7.0.3" />
@@ -227,7 +227,7 @@
     <PackageReference Include="SharpDX.Direct3D11" Version="4.2.0" />
     <PackageReference Include="SharpDX.DXGI" Version="4.2.0" />
     <PackageReference Include="System.Net.Http" Version="4.3.4" />
-    <PackageReference Include="System.Speech" Version="9.0.0" />
+    <PackageReference Include="System.Speech" Version="10.0.0-preview.4.25258.110" />
     <PackageReference Include="System.Text.RegularExpressions" Version="4.3.1" />
     <PackageReference Include="WindowsHook" Version="1.0.1" />
     <PackageReference Include="Xamarin.Essentials" Version="1.8.1" />
@@ -297,6 +297,10 @@
     <None Update="simengio.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Update="Paddle.Runtime.win_x64" Version="3.0.0" />
   </ItemGroup>
 
 </Project>
