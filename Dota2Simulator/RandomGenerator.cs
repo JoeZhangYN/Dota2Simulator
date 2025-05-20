@@ -36,7 +36,7 @@ namespace Dota2Simulator
                 _ = builder.Append(@char);
             }
 
-            return lowerCase ? builder.ToString().ToLower() : builder.ToString();
+            return lowerCase ? builder.ToString().ToLower(System.Globalization.CultureInfo.CurrentCulture) : builder.ToString();
         }
 
         // Generates a random password.  

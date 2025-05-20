@@ -437,7 +437,7 @@ namespace Dota2Simulator.KeyboardMouse
         /// <param name="lpClassName"></param>
         /// <param name="lpWindowName"></param>
         /// <returns></returns>
-        [DllImport("User32.dll", EntryPoint = "FindWindow")]
+        [DllImport("User32.dll", EntryPoint = "FindWindow", CharSet = CharSet.Unicode)]
         private static extern IntPtr FindWindow(string lpClassName, string lpWindowName);
 
         #endregion
@@ -894,7 +894,7 @@ namespace Dota2Simulator.KeyboardMouse
                 handling = KeyboardEventHandling(nCode, wParam, lParam);
             }
 
-            if (HookScope == HookScopeType.Application && Process.GetCurrentProcess().Id == GetForegroundWindowProcessID())
+            if (HookScope == HookScopeType.Application && Environment.ProcessId == GetForegroundWindowProcessID())
             {
                 handling = KeyboardEventHandling(nCode, wParam, lParam);
             }
@@ -952,8 +952,8 @@ namespace Dota2Simulator.KeyboardMouse
                 // raise KeyPress
                 if (KeyPress != null && wParam == WM_KEYDOWN)
                 {
-                    bool isDownShift = (vShift & 0x80) == 0x80 ? true : false;
-                    bool isDownCapslock = vCapital != 0 ? true : false;
+                    bool isDownShift = (vShift & 0x80) == 0x80;
+                    bool isDownCapslock = vCapital != 0;
 
                     byte[] keyState = new byte[256];
                     _ = GetKeyboardState(keyState);

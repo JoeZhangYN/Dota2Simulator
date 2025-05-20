@@ -2,6 +2,8 @@
 // #define DEBUG
 
 #define DOTA2
+// DOTA2 调试用 输出技能点信息
+// #define 输出技能点信息
 // #define HF2
 // #define LOL
 
@@ -755,7 +757,6 @@ namespace Dota2Simulator
                                 {
                                     return;
                                 }
-
                                 _条件2 = true;
                                 break;
                             case Keys.D2:
@@ -1581,7 +1582,7 @@ namespace Dota2Simulator
                             _条件根据图片委托2 ??= 跳水去后摇;
                             _条件根据图片委托3 ??= 深海护罩去后摇;
                             _条件根据图片委托4 ??= 暗影之舞去后摇;
-                            能量转移被动计数 = 0;
+                            // 能量转移被动计数 = 0;
                             _基础攻击间隔 = 1.7;
                             _基础攻击前摇 = 0.5;
                             lb_状态抗性.Text = "转移层数";
@@ -3155,7 +3156,6 @@ namespace Dota2Simulator
                                 {
                                     _切假腿配置.修改配置(Keys.D, true);
                                 }
-
                                 break;
                             case Keys.Q:
                                 _条件1 = true;
@@ -3895,6 +3895,9 @@ namespace Dota2Simulator
                                 break;
                             case Keys.D2:
                                 _ = Run(() => { 捕捉颜色().Start(); }).ConfigureAwait(false);
+                                break;
+                            case Keys.D3:
+                                _ = Run(() => { 捕捉颜色().Start(); }).ConfigureAwait(false);
                                 Delay(100);
                                 Dictionary<char, Keys> keyMapping = new()
                             {
@@ -3918,15 +3921,8 @@ namespace Dota2Simulator
                                 }
 
                                 break;
-                            case Keys.D3:
-                                await Run(() => 测试方法(953, 764)).ConfigureAwait(false);
-                                break;
                             case Keys.D4:
-                                await Run(async () =>
-                                {
-                                    _ = await 获取图片_1().ConfigureAwait(true);
-                                    Tts.Speak($"技能数：{获取当前技能数量(in _全局数组)}");
-                                }).ConfigureAwait(false);
+                                await Run(() => 测试方法(802, 946)).ConfigureAwait(false);
                                 break;
                         }
 
@@ -4221,7 +4217,7 @@ namespace Dota2Simulator
         {
             try
             {
-                _阵营_int = Convert.ToInt16(tb_阵营.Text.Trim());
+                _阵营_int = Convert.ToInt16(tb_阵营.Text.Trim(), CultureInfo.InvariantCulture);
             }
             catch
             {
@@ -4266,7 +4262,7 @@ namespace Dota2Simulator
             try
             {
                 using PooledList<string> list = [.. tb_delay.Text.Split(',')];
-                pictureBox1.BackColor = Color.FromArgb(255, int.Parse(list[0]), int.Parse(list[1]), int.Parse(list[2]));
+                pictureBox1.BackColor = Color.FromArgb(255, int.Parse(list[0], CultureInfo.InvariantCulture), int.Parse(list[1], CultureInfo.InvariantCulture), int.Parse(list[2], CultureInfo.InvariantCulture));
             }
             catch
             {
@@ -4578,7 +4574,7 @@ namespace Dota2Simulator
         /// <summary>
         ///     能量转移
         /// </summary>
-        private static int 能量转移被动计数;
+        // private static int 能量转移被动计数;
 
         /// <summary>
         ///     状态抗性
@@ -4617,7 +4613,7 @@ namespace Dota2Simulator
         /// <summary>
         ///     丢装备条件布尔
         /// </summary>
-        private static bool _丢装备条件;
+        // private static bool _丢装备条件;
 
         /// <summary>
         ///     全局是否魔晶
@@ -4671,7 +4667,7 @@ namespace Dota2Simulator
         /// <summary>
         ///     全局时间
         /// </summary>
-        private static long _全局时间f;
+        // private static long _全局时间f;
 
         /// <summary>
         ///     用于跳拱地点
@@ -5732,10 +5728,8 @@ namespace Dota2Simulator
                 _条件4 = false;
                 初始化全局时间(ref _全局时间q);
 
-                int 步骤e = 获取全局步骤e();
-
                 // 如果E已经释放
-                if (!_中断条件 && 步骤e == 1)
+                if (!_中断条件 && 获取全局步骤e() == 1)
                 {
                     // 1600 延迟 返回200施法时间
                     Delay(1350, _全局时间q);
@@ -5752,16 +5746,11 @@ namespace Dota2Simulator
             {
                 int 步骤e = 获取全局步骤e();
 
-                if (步骤e == 1)
-                {
-                    return;
-                }
+                if (步骤e == 1) return;
 
                 初始化全局时间(ref _全局时间e);
 
-                int 步骤r = 获取全局步骤r();
-
-                if (步骤r == 1)
+                if (获取全局步骤r() == 1)
                 {
                     SimKeyBoard.KeyPress(Keys.R);
                     设置全局步骤r(0);
@@ -8236,7 +8225,7 @@ namespace Dota2Simulator
 
         private static async Task<bool> 弹无虚发去后摇(字节数组包含长宽 数组)
         {
-            return await 使用技能后通用后续(Keys.Q, 0).ConfigureAwait(true);
+            return await 使用技能后通用后续(Keys.Q, 1).ConfigureAwait(true);
         }
 
         private static async Task<bool> 唤魂去后摇(字节数组包含长宽 数组)
@@ -8475,7 +8464,7 @@ namespace Dota2Simulator
 
         private static async Task<bool> 幽魂护罩去后摇(字节数组包含长宽 数组)
         {
-            return await 使用技能后通用后续(Keys.W, 0, 是否接按键:false).ConfigureAwait(true);
+            return await 使用技能后通用后续(Keys.W, 0, 是否接按键: false).ConfigureAwait(true);
         }
 
         private static async Task<bool> 死神镰刀去后摇(字节数组包含长宽 数组)
@@ -9349,95 +9338,95 @@ namespace Dota2Simulator
 
         private static void 初始化DOTA2用到的图片()
         {
-            获取嵌入的图片("Buff_大牛_回魂", ref Buff_大牛_回魂_数组);
-            获取嵌入的图片("Buff_光法_大招", ref Buff_光法_大招_数组);
-            获取嵌入的图片("Buff_小精灵_幽魂", ref Buff_小精灵_幽魂_数组);
-            获取嵌入的图片("Buff_小精灵_过载", ref Buff_小精灵_过载_数组);
-            获取嵌入的图片("Buff_物品_TP", ref Buff_物品_TP_数组);
-            获取嵌入的图片("Buff_火猫_无影拳", ref Buff_火猫_无影拳_数组);
-            获取嵌入的图片("Buff_小强_大招", ref Buff_小强_大招_数组);
+            获取嵌入的图片("Buff_大牛_回魂", Buff_大牛_回魂_数组);
+            获取嵌入的图片("Buff_光法_大招", Buff_光法_大招_数组);
+            获取嵌入的图片("Buff_小精灵_幽魂", Buff_小精灵_幽魂_数组);
+            获取嵌入的图片("Buff_小精灵_过载", Buff_小精灵_过载_数组);
+            获取嵌入的图片("Buff_物品_TP", Buff_物品_TP_数组);
+            获取嵌入的图片("Buff_火猫_无影拳", Buff_火猫_无影拳_数组);
+            获取嵌入的图片("Buff_小强_大招", Buff_小强_大招_数组);
 
-            获取嵌入的图片("命石_伐木机_碎木击", ref 命石_伐木机_碎木击_数组);
-            获取嵌入的图片("命石_伐木机_锯齿轮旋", ref 命石_伐木机_锯齿轮旋_数组);
-            获取嵌入的图片("命石_海民_酒友", ref 命石_海民_酒友_数组);
-            获取嵌入的图片("命石_骷髅王_白骨守卫", ref 命石_骷髅王_白骨守卫_数组);
+            获取嵌入的图片("命石_伐木机_碎木击", 命石_伐木机_碎木击_数组);
+            获取嵌入的图片("命石_伐木机_锯齿轮旋", 命石_伐木机_锯齿轮旋_数组);
+            获取嵌入的图片("命石_海民_酒友", 命石_海民_酒友_数组);
+            获取嵌入的图片("命石_骷髅王_白骨守卫", 命石_骷髅王_白骨守卫_数组);
 
-            获取嵌入的图片("技能_卡尔_幽灵漫步", ref 技能_卡尔_幽灵漫步_数组);
-            获取嵌入的图片("技能_卡尔_强袭飓风", ref 技能_卡尔_强袭飓风_数组);
-            获取嵌入的图片("技能_卡尔_极速冷却", ref 技能_卡尔_极速冷却_数组);
-            获取嵌入的图片("技能_卡尔_电磁脉冲", ref 技能_卡尔_电磁脉冲_数组);
+            获取嵌入的图片("技能_卡尔_幽灵漫步", 技能_卡尔_幽灵漫步_数组);
+            获取嵌入的图片("技能_卡尔_强袭飓风", 技能_卡尔_强袭飓风_数组);
+            获取嵌入的图片("技能_卡尔_极速冷却", 技能_卡尔_极速冷却_数组);
+            获取嵌入的图片("技能_卡尔_电磁脉冲", 技能_卡尔_电磁脉冲_数组);
 
-            获取嵌入的图片("播报_买活", ref 播报_买活_数组);
-            获取嵌入的图片("播报_塔防标志", ref 播报_塔防标志_数组);
-            获取嵌入的图片("播报_盾标志", ref 播报_盾标志_数组);
+            获取嵌入的图片("播报_买活", 播报_买活_数组);
+            获取嵌入的图片("播报_塔防标志", 播报_塔防标志_数组);
+            获取嵌入的图片("播报_盾标志", 播报_盾标志_数组);
 
-            获取嵌入的图片("物品_以太", ref 物品_以太_数组);
-            获取嵌入的图片("物品_假腿_力量腿", ref 物品_假腿_力量腿_数组);
-            获取嵌入的图片("物品_假腿_敏捷腿", ref 物品_假腿_敏捷腿_数组);
-            获取嵌入的图片("物品_假腿_智力腿", ref 物品_假腿_智力腿_数组);
-            获取嵌入的图片("物品_刃甲", ref 物品_刃甲_数组);
-            获取嵌入的图片("物品_刷新球", ref 物品_刷新球_数组);
-            获取嵌入的图片("物品_否决", ref 物品_否决_数组);
-            获取嵌入的图片("物品_吹风", ref 物品_吹风_数组);
-            获取嵌入的图片("物品_天堂", ref 物品_天堂_数组);
-            获取嵌入的图片("物品_奥术鞋", ref 物品_奥术鞋_数组);
-            获取嵌入的图片("物品_希瓦", ref 物品_希瓦_数组);
-            获取嵌入的图片("物品_青莲宝珠", ref 物品_青莲宝珠_数组);
-            获取嵌入的图片("物品_飓风长戟", ref 物品_飓风长戟_数组);
-            获取嵌入的图片("物品_幻影斧", ref 物品_幻影斧_数组);
-            获取嵌入的图片("物品_影之灵龛", ref 物品_影之灵龛_数组);
-            获取嵌入的图片("物品_推推棒", ref 物品_推推棒_数组);
-            获取嵌入的图片("物品_微光披风", ref 物品_微光披风_数组);
-            获取嵌入的图片("物品_隐刀", ref 物品_隐刀_数组);
-            获取嵌入的图片("物品_大隐刀", ref 物品_大隐刀_数组);
-            获取嵌入的图片("物品_散失", ref 物品_散失_数组);
-            获取嵌入的图片("物品_散魂", ref 物品_散魂_数组);
-            获取嵌入的图片("物品_暗影护符", ref 物品_暗影护符_数组);
-            获取嵌入的图片("物品_暗影护符buff", ref 物品_暗影护符buff_数组);
-            获取嵌入的图片("物品_永世法衣", ref 物品_永世法衣_数组);
-            获取嵌入的图片("物品_永恒遗物", ref 物品_永恒遗物_数组);
-            获取嵌入的图片("物品_深渊之刃", ref 物品_深渊之刃_数组);
-            获取嵌入的图片("物品_雷神之锤", ref 物品_雷神之锤_数组);
-            获取嵌入的图片("物品_雷神之锤_虚空至宝", ref 物品_雷神之锤_虚空至宝_数组);
-            获取嵌入的图片("物品_炎阳勋章", ref 物品_炎阳勋章_数组);
-            获取嵌入的图片("物品_玲珑心", ref 物品_玲珑心_数组);
-            获取嵌入的图片("物品_魔棒", ref 物品_魔棒_数组);
-            获取嵌入的图片("物品_吊坠", ref 物品_吊坠_数组);
-            获取嵌入的图片("物品_仙草", ref 物品_仙草_数组);
-            获取嵌入的图片("物品_疯狂面具", ref 物品_疯狂面具_数组);
-            获取嵌入的图片("物品_疯狂面具_虚空至宝", ref 物品_疯狂面具_虚空至宝_数组);
-            获取嵌入的图片("物品_相位鞋", ref 物品_相位鞋_数组);
-            获取嵌入的图片("物品_祭礼长袍", ref 物品_祭礼长袍_数组);
-            获取嵌入的图片("物品_紫苑", ref 物品_紫苑_数组);
-            获取嵌入的图片("物品_红杖", ref 物品_红杖_数组);
-            获取嵌入的图片("物品_红杖2", ref 物品_红杖2_数组);
-            获取嵌入的图片("物品_红杖3", ref 物品_红杖3_数组);
-            获取嵌入的图片("物品_红杖4", ref 物品_红杖4_数组);
-            获取嵌入的图片("物品_红杖5", ref 物品_红杖5_数组);
-            获取嵌入的图片("物品_纷争", ref 物品_纷争_数组);
-            获取嵌入的图片("物品_纷争_被控", ref 物品_纷争_被控_数组);
-            获取嵌入的图片("物品_缚灵锁", ref 物品_缚灵锁_数组);
-            获取嵌入的图片("物品_羊刀", ref 物品_羊刀_数组);
-            获取嵌入的图片("物品_臂章", ref 物品_臂章_数组);
-            获取嵌入的图片("物品_臂章_开启", ref 物品_臂章_开启_数组);
-            获取嵌入的图片("物品_虚灵_被控", ref 物品_虚灵_被控_数组);
-            获取嵌入的图片("物品_虚灵之刃", ref 物品_虚灵之刃_数组);
-            获取嵌入的图片("物品_血棘", ref 物品_血棘_数组);
-            获取嵌入的图片("物品_血精石", ref 物品_血精石_数组);
-            获取嵌入的图片("物品_跳刀", ref 物品_跳刀_数组);
-            获取嵌入的图片("物品_跳刀_力量跳刀", ref 物品_跳刀_力量跳刀_数组);
-            获取嵌入的图片("物品_跳刀_敏捷跳刀", ref 物品_跳刀_敏捷跳刀_数组);
-            获取嵌入的图片("物品_跳刀_智力跳刀", ref 物品_跳刀_智力跳刀_数组);
-            获取嵌入的图片("物品_释放天堂", ref 物品_释放天堂_数组);
-            获取嵌入的图片("物品_阿托斯之棍", ref 物品_阿托斯之棍_数组);
-            获取嵌入的图片("物品_陨星锤", ref 物品_陨星锤_数组);
-            获取嵌入的图片("物品_魂之灵龛", ref 物品_魂之灵龛_数组);
-            获取嵌入的图片("物品_魂戒", ref 物品_魂戒_数组);
-            获取嵌入的图片("物品_鱼叉", ref 物品_鱼叉_数组);
-            获取嵌入的图片("物品_黑黄杖", ref 物品_黑黄杖_数组);
+            获取嵌入的图片("物品_以太", 物品_以太_数组);
+            获取嵌入的图片("物品_假腿_力量腿", 物品_假腿_力量腿_数组);
+            获取嵌入的图片("物品_假腿_敏捷腿", 物品_假腿_敏捷腿_数组);
+            获取嵌入的图片("物品_假腿_智力腿", 物品_假腿_智力腿_数组);
+            获取嵌入的图片("物品_刃甲", 物品_刃甲_数组);
+            获取嵌入的图片("物品_刷新球", 物品_刷新球_数组);
+            获取嵌入的图片("物品_否决", 物品_否决_数组);
+            获取嵌入的图片("物品_吹风", 物品_吹风_数组);
+            获取嵌入的图片("物品_天堂", 物品_天堂_数组);
+            获取嵌入的图片("物品_奥术鞋", 物品_奥术鞋_数组);
+            获取嵌入的图片("物品_希瓦", 物品_希瓦_数组);
+            获取嵌入的图片("物品_青莲宝珠", 物品_青莲宝珠_数组);
+            获取嵌入的图片("物品_飓风长戟", 物品_飓风长戟_数组);
+            获取嵌入的图片("物品_幻影斧", 物品_幻影斧_数组);
+            获取嵌入的图片("物品_影之灵龛", 物品_影之灵龛_数组);
+            获取嵌入的图片("物品_推推棒", 物品_推推棒_数组);
+            获取嵌入的图片("物品_微光披风", 物品_微光披风_数组);
+            获取嵌入的图片("物品_隐刀", 物品_隐刀_数组);
+            获取嵌入的图片("物品_大隐刀", 物品_大隐刀_数组);
+            获取嵌入的图片("物品_散失", 物品_散失_数组);
+            获取嵌入的图片("物品_散魂", 物品_散魂_数组);
+            获取嵌入的图片("物品_暗影护符", 物品_暗影护符_数组);
+            获取嵌入的图片("物品_暗影护符buff", 物品_暗影护符buff_数组);
+            获取嵌入的图片("物品_永世法衣", 物品_永世法衣_数组);
+            获取嵌入的图片("物品_永恒遗物", 物品_永恒遗物_数组);
+            获取嵌入的图片("物品_深渊之刃", 物品_深渊之刃_数组);
+            获取嵌入的图片("物品_雷神之锤", 物品_雷神之锤_数组);
+            获取嵌入的图片("物品_雷神之锤_虚空至宝", 物品_雷神之锤_虚空至宝_数组);
+            获取嵌入的图片("物品_炎阳勋章", 物品_炎阳勋章_数组);
+            获取嵌入的图片("物品_玲珑心", 物品_玲珑心_数组);
+            获取嵌入的图片("物品_魔棒", 物品_魔棒_数组);
+            获取嵌入的图片("物品_吊坠", 物品_吊坠_数组);
+            获取嵌入的图片("物品_仙草", 物品_仙草_数组);
+            获取嵌入的图片("物品_疯狂面具", 物品_疯狂面具_数组);
+            获取嵌入的图片("物品_疯狂面具_虚空至宝", 物品_疯狂面具_虚空至宝_数组);
+            获取嵌入的图片("物品_相位鞋", 物品_相位鞋_数组);
+            获取嵌入的图片("物品_祭礼长袍", 物品_祭礼长袍_数组);
+            获取嵌入的图片("物品_紫苑", 物品_紫苑_数组);
+            获取嵌入的图片("物品_红杖", 物品_红杖_数组);
+            获取嵌入的图片("物品_红杖2", 物品_红杖2_数组);
+            获取嵌入的图片("物品_红杖3", 物品_红杖3_数组);
+            获取嵌入的图片("物品_红杖4", 物品_红杖4_数组);
+            获取嵌入的图片("物品_红杖5", 物品_红杖5_数组);
+            获取嵌入的图片("物品_纷争", 物品_纷争_数组);
+            获取嵌入的图片("物品_纷争_被控", 物品_纷争_被控_数组);
+            获取嵌入的图片("物品_缚灵锁", 物品_缚灵锁_数组);
+            获取嵌入的图片("物品_羊刀", 物品_羊刀_数组);
+            获取嵌入的图片("物品_臂章", 物品_臂章_数组);
+            获取嵌入的图片("物品_臂章_开启", 物品_臂章_开启_数组);
+            获取嵌入的图片("物品_虚灵_被控", 物品_虚灵_被控_数组);
+            获取嵌入的图片("物品_虚灵之刃", 物品_虚灵之刃_数组);
+            获取嵌入的图片("物品_血棘", 物品_血棘_数组);
+            获取嵌入的图片("物品_血精石", 物品_血精石_数组);
+            获取嵌入的图片("物品_跳刀", 物品_跳刀_数组);
+            获取嵌入的图片("物品_跳刀_力量跳刀", 物品_跳刀_力量跳刀_数组);
+            获取嵌入的图片("物品_跳刀_敏捷跳刀", 物品_跳刀_敏捷跳刀_数组);
+            获取嵌入的图片("物品_跳刀_智力跳刀", 物品_跳刀_智力跳刀_数组);
+            获取嵌入的图片("物品_释放天堂", 物品_释放天堂_数组);
+            获取嵌入的图片("物品_阿托斯之棍", 物品_阿托斯之棍_数组);
+            获取嵌入的图片("物品_陨星锤", 物品_陨星锤_数组);
+            获取嵌入的图片("物品_魂之灵龛", 物品_魂之灵龛_数组);
+            获取嵌入的图片("物品_魂戒", 物品_魂戒_数组);
+            获取嵌入的图片("物品_鱼叉", 物品_鱼叉_数组);
+            获取嵌入的图片("物品_黑黄杖", 物品_黑黄杖_数组);
         }
 
-        private static void 获取嵌入的图片(string bpName, ref 字节数组包含长宽 具体数组)
+        private static void 获取嵌入的图片(string bpName, 字节数组包含长宽 具体数组)
         {
             // 获取当前程序集
             Assembly assembly = Assembly.GetExecutingAssembly();
@@ -9713,11 +9702,9 @@ namespace Dota2Simulator
                 Delay(330); // 基本延迟用于迷雾显示
             }
 
-            Size size = new(width, height);
-            using Bitmap bp = await CaptureScreenAsync(x, y, size).ConfigureAwait(true);
-            byte[] bytes = await GetBitmapByteAsync(bp).ConfigureAwait(true);
-
-            PooledList<Point> list = 获取敌方坐标(size, bytes);
+            using var 数组 = new 字节数组包含长宽(new byte[width * height * 4], new Size(width, height));
+            CaptureScreen_固定数组(数组, x, y);
+            PooledList<Point> list = 获取敌方坐标(数组);
 
             int 偏移x = 1920;
             int 偏移y = 1080;
@@ -9760,7 +9747,7 @@ namespace Dota2Simulator
 
         #region 获取敌方坐标
 
-        private static PooledList<Point> 获取敌方坐标(Size size, in byte[] bytes)
+        private static PooledList<Point> 获取敌方坐标(字节数组包含长宽 数组)
         {
             PooledList<Color> colors = [];
             PooledList<Point> points = [];
@@ -9804,7 +9791,7 @@ namespace Dota2Simulator
                 初始化全局时间(ref _全局时间);
 #endif
 
-            PooledList<Point> list1 = FindColors(colors, points, bytes, size, 1);
+            PooledList<Point> list1 = FindColors(colors, points, 数组.字节数组, 数组.图片尺寸, 1);
 #if DEBUG
                 检测时间播报(_全局时间, 0);
                 //Tts.Speak(string.Concat("1找到",list1.Count));
@@ -9819,17 +9806,16 @@ namespace Dota2Simulator
 
         private static async Task<Point> 快速获取自身坐标(int width = 1920, int height = 1080)
         {
-            Size size = new(width, height);
-            Bitmap bp = await CaptureScreenAsync(0, 0, size).ConfigureAwait(true);
-            byte[] bytes = await GetBitmapByteAsync(bp).ConfigureAwait(true);
-            return await FromResult(获取自身坐标(size, bytes)).ConfigureAwait(true);
+            using var 数组 = new 字节数组包含长宽(new byte[width * height * 4], new Size(width, height));
+            CaptureScreen_固定数组(数组, 0, 0);
+            return await FromResult(获取自身坐标(数组)).ConfigureAwait(true);
         }
 
         #endregion
 
         #region 获取自身坐标
 
-        private static Point 获取自身坐标(Size size, in byte[] bytes)
+        private static Point 获取自身坐标(字节数组包含长宽 数组)
         {
             PooledList<Color> colors = [];
             PooledList<Point> points = [];
@@ -9860,7 +9846,7 @@ namespace Dota2Simulator
 #if DEBUG
                 初始化全局时间(ref _全局时间);
 #endif
-            PooledList<Point> list1 = FindColors(colors, points, bytes, size, 1);
+            PooledList<Point> list1 = FindColors(colors, points, 数组.字节数组, 数组.图片尺寸, 1);
 #if DEBUG
                 检测时间播报(_全局时间, 0);
                 //Tts.Speak(string.Concat("1找到",list1.Count));
@@ -9884,187 +9870,176 @@ namespace Dota2Simulator
 
         private static async Task 一般程序循环()
         {
-            async Task 更新条件(bool[] 条件数组, ConditionDelegateBitmap[] 委托数组)
+            // 条件配置
+            var 条件配置 = new[]
             {
-                // 创建任务数组
-                Task<bool>[] tasks = 条件数组.Select((条件, index) => 检查条件并执行委托(条件, 委托数组[index])).ToArray();
+        new 条件配置项(0, "条件1", () => _条件1, val => _条件1 = val, _条件根据图片委托1),
+        new 条件配置项(1, "条件2", () => _条件2, val => _条件2 = val, _条件根据图片委托2),
+        new 条件配置项(2, "条件3", () => _条件3, val => _条件3 = val, _条件根据图片委托3),
+        new 条件配置项(3, "条件4", () => _条件4, val => _条件4 = val, _条件根据图片委托4),
+        new 条件配置项(4, "条件5", () => _条件5, val => _条件5 = val, _条件根据图片委托5),
+        new 条件配置项(5, "条件6", () => _条件6, val => _条件6 = val, _条件根据图片委托6),
+        new 条件配置项(6, "条件7", () => _条件7, val => _条件7 = val, _条件根据图片委托7),
+        new 条件配置项(7, "条件8", () => _条件8, val => _条件8 = val, _条件根据图片委托8),
+        new 条件配置项(8, "条件9", () => _条件9, val => _条件9 = val, _条件根据图片委托9),
+        new 条件配置项(9, "条件z", () => _条件z, val => _条件z = val, _条件根据图片委托z),
+        new 条件配置项(10, "条件x", () => _条件x, val => _条件x = val, _条件根据图片委托x),
+        new 条件配置项(11, "条件c", () => _条件c, val => _条件c = val, _条件根据图片委托c),
+        new 条件配置项(12, "条件v", () => _条件v, val => _条件v = val, _条件根据图片委托v),
+        new 条件配置项(13, "条件b", () => _条件b, val => _条件b = val, _条件根据图片委托b),
+        new 条件配置项(14, "条件space", () => _条件space, val => _条件space = val, _条件根据图片委托space)
+    };
 
-                // 等待所有任务完成
-                bool[] results = await WhenAll(tasks).ConfigureAwait(false);
-
-                for (int i = 0; i < 条件数组.Length; i++)
-                {
-                    条件数组[i] = results[i];
-                }
-            }
-
-            ConditionDelegateBitmap[] 创建委托数组()
-            {
-                return
-                [
-                    _条件根据图片委托1, _条件根据图片委托2, _条件根据图片委托3, _条件根据图片委托4, _条件根据图片委托5,
-                    _条件根据图片委托6, _条件根据图片委托7, _条件根据图片委托8, _条件根据图片委托9, _条件根据图片委托z,
-                    _条件根据图片委托x, _条件根据图片委托c, _条件根据图片委托v, _条件根据图片委托b, _条件根据图片委托space
-                ];
-            }
-
-            void 更新条件数组(bool[] 条件数组)
-            {
-                条件数组[0] = _条件1;
-                条件数组[1] = _条件2;
-                条件数组[2] = _条件3;
-                条件数组[3] = _条件4;
-                条件数组[4] = _条件5;
-                条件数组[5] = _条件6;
-                条件数组[6] = _条件7;
-                条件数组[7] = _条件8;
-                条件数组[8] = _条件9;
-                条件数组[9] = _条件z;
-                条件数组[10] = _条件x;
-                条件数组[11] = _条件c;
-                条件数组[12] = _条件v;
-                条件数组[13] = _条件b;
-                条件数组[14] = _条件space;
-            }
-
-            bool[] 条件数组 =
-            [
-                _条件1, _条件2, _条件3, _条件4, _条件5, _条件6, _条件7, _条件8, _条件9,
-                _条件z, _条件x, _条件c, _条件v, _条件b, _条件space
-            ];
+            const int 主循环间隔 = 1; // 保持原有的1ms间隔
+            const int 中断检查间隔 = 1;
 
             while (_总循环条件)
             {
-                if (_循环内获取图片 is not null)
+                try
                 {
                     if (_中断条件)
                     {
-                        await Task.Delay(1).ConfigureAwait(true);
+                        await Task.Delay(中断检查间隔).ConfigureAwait(true);
                         continue;
                     }
 
-                    await _循环内获取图片().ConfigureAwait(true); // 更新全局Bitmap
+                    if (_循环内获取图片 is null)
+                    {
+                        await Task.Delay(主循环间隔).ConfigureAwait(true);
+                        continue;
+                    }
 
-                    // 如果有获取命石的委托
-                    if (_命石根据图片委托 != null)
+                    // 获取图片数据
+                    await _循环内获取图片().ConfigureAwait(true);
+
+                    // 处理命石相关逻辑
+                    if (_命石根据图片委托 is not null)
                     {
                         await _命石根据图片委托(_全局数组).ConfigureAwait(true);
                     }
 
+                    // 获取技能颜色信息
                     DOTA2获取所有释放技能前颜色(in _全局数组);
 
-                    // 更新条件数组
-                    更新条件数组(条件数组);
-
-                    bool[] 原始数组 = (bool[])条件数组.Clone();
-
-                    // 委托数组不会根据修改后更新，是静态的
-                    ConditionDelegateBitmap[] 委托数组 = 创建委托数组();
-
-                    Task 更新任务 = 更新条件(条件数组, 委托数组);
-
-                    while (!更新任务.IsCompleted)
-                    {
-                        // 在Task.WhenAll没有完成之前，持续更新条件数组
-                        // 因为后续代码更改为纯异步，无需等待完成，即一开始更新任务就已经完成了。
-                        // 根本不会更新
-                        更新条件数组(条件数组);
-                        await Task.Delay(1).ConfigureAwait(true); // 避免CPU占用过高
-                    }
-
-                    await 更新任务.ConfigureAwait(true); // 确保任务完成
-
-                    if (原始数组[0])
-                    {
-                        _条件1 = 条件数组[0];
-                    }
-
-                    if (原始数组[1])
-                    {
-                        _条件2 = 条件数组[1];
-                    }
-
-                    if (原始数组[2])
-                    {
-                        _条件3 = 条件数组[2];
-                    }
-
-                    if (原始数组[3])
-                    {
-                        _条件4 = 条件数组[3];
-                    }
-
-                    if (原始数组[4])
-                    {
-                        _条件5 = 条件数组[4];
-                    }
-
-                    if (原始数组[5])
-                    {
-                        _条件6 = 条件数组[5];
-                    }
-
-                    if (原始数组[6])
-                    {
-                        _条件7 = 条件数组[6];
-                    }
-
-                    if (原始数组[7])
-                    {
-                        _条件8 = 条件数组[7];
-                    }
-
-                    if (原始数组[8])
-                    {
-                        _条件9 = 条件数组[8];
-                    }
-
-                    if (原始数组[9])
-                    {
-                        _条件z = 条件数组[9];
-                    }
-
-                    if (原始数组[10])
-                    {
-                        _条件x = 条件数组[10];
-                    }
-
-                    if (原始数组[11])
-                    {
-                        _条件c = 条件数组[11];
-                    }
-
-                    if (原始数组[12])
-                    {
-                        _条件v = 条件数组[12];
-                    }
-
-                    if (原始数组[13])
-                    {
-                        _条件b = 条件数组[13];
-                    }
-
-                    if (原始数组[14])
-                    {
-                        _条件space = 条件数组[14];
-                    }
+                    // 核心逻辑：处理条件更新，包括运行期外部修改
+                    await 处理条件更新_带外部变化检测(条件配置).ConfigureAwait(true);
 
 #if DOTA2
-                    if (_条件保持假腿 && _条件开启切假腿 && _需要切假腿)
-                    {
-                        await 切假腿处理(_条件假腿敏捷 ? "敏捷" : "力量").ConfigureAwait(true);
-                    }
+                    // 处理假腿切换逻辑
+                    await 处理假腿切换().ConfigureAwait(true);
 #endif
                 }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"主循环异常: {ex.Message}");
+                }
 
-                await Task.Delay(1).ConfigureAwait(true);
+                await Task.Delay(主循环间隔).ConfigureAwait(true);
             }
         }
 
+        // 重新设计的条件更新处理 - 支持运行期外部修改检测
+        private static async Task 处理条件更新_带外部变化检测(条件配置项[] 条件配置)
+        {
+            // 1. 获取初始条件状态
+            bool[] 条件数组 = [.. 条件配置.Select(配置 => 配置.获取条件())];
+            bool[] 原始数组 = (bool[])条件数组.Clone();
+
+            // 2. 启动初始的并行委托执行
+            var 更新任务 = 更新条件数组(条件数组, 条件配置);
+
+            // 3. 关键逻辑：在委托执行期间，持续检查外部条件变化
+            var 已处理的新条件 = new HashSet<int>(); // 记录已处理的新true条件
+
+            while (!更新任务.IsCompleted)
+            {
+                // 检查是否有新的条件被外部设置为true
+                for (int i = 0; i < 条件配置.Length; i++)
+                {
+                    bool 当前条件 = 条件配置[i].获取条件();
+
+                    // 如果这个条件现在是true，且原始状态是false，且还没有处理过
+                    if (当前条件 && !原始数组[i] && !已处理的新条件.Contains(i))
+                    {
+                        // 标记为已处理
+                        已处理的新条件.Add(i);
+
+                        // 为这个新的true条件启动委托执行
+                        _ = Task.Run(async () =>
+                        {
+                            try
+                            {
+                                bool 结果 = await 检查条件并执行委托(true, 条件配置[i].委托).ConfigureAwait(false);
+                                if (当前条件) // 再次检查条件是否仍为true（可能被其他委托修改）
+                                {
+                                    条件配置[i].设置条件(结果);
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+                                Console.WriteLine($"新条件委托执行失败 [{条件配置[i].名称}]: {ex.Message}");
+                            }
+                        });
+                    }
+                }
+
+                await Task.Delay(1).ConfigureAwait(true); // 避免CPU占用过高
+            }
+
+            // 4. 等待初始任务完成
+            await 更新任务.ConfigureAwait(true);
+
+            // 5. 应用初始条件的检测结果
+            for (int i = 0; i < 原始数组.Length; i++)
+            {
+                if (原始数组[i])  // 只有原始条件为true时才更新
+                {
+                    条件配置[i].设置条件(条件数组[i]);
+                }
+            }
+        }
+
+        // 并行执行初始条件的委托检测
+        private static async Task 更新条件数组(bool[] 条件数组, 条件配置项[] 条件配置)
+        {
+            var 检测任务 = 条件配置.Select(async (配置, index) =>
+            {
+                try
+                {
+                    bool 新条件 = await 检查条件并执行委托(条件数组[index], 配置.委托).ConfigureAwait(false);
+                    条件数组[index] = 新条件;
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"条件检测失败 [{配置.名称}]: {ex.Message}");
+                }
+            });
+
+            await Task.WhenAll(检测任务).ConfigureAwait(false);
+        }
+
+        // 保持原有的检查条件并执行委托逻辑
         private static async Task<bool> 检查条件并执行委托(bool 条件, ConditionDelegateBitmap 委托)
         {
             return 条件 && 委托 is not null ? await 委托(_全局数组).ConfigureAwait(true) : 条件;
         }
+
+#if DOTA2
+        private static async Task 处理假腿切换()
+        {
+            if (_条件保持假腿 && _条件开启切假腿 && _需要切假腿)
+            {
+                await 切假腿处理(_条件假腿敏捷 ? "敏捷" : "力量").ConfigureAwait(true);
+            }
+        }
+#endif
+
+        private readonly record struct 条件配置项(
+            int 索引,
+            string 名称,
+            Func<bool> 获取条件,
+            Action<bool> 设置条件,
+            ConditionDelegateBitmap 委托);
 
 #if DOTA2
         private static async Task 切假腿处理(string 假腿类型)
@@ -10117,7 +10092,7 @@ namespace Dota2Simulator
             _循环条件1 = false;
             _循环条件2 = false;
 
-            _丢装备条件 = false;
+            // _丢装备条件 = false;
 
             _条件1 = false;
             _条件2 = false;
@@ -10174,7 +10149,7 @@ namespace Dota2Simulator
             _全局时间e = -1;
             _全局时间r = -1;
             _全局时间d = -1;
-            _全局时间f = -1;
+            // _全局时间f = -1;
 
             _攻击速度 = 100;
             _基础攻击前摇 = 0.3;
@@ -10244,7 +10219,7 @@ namespace Dota2Simulator
             }
 
             // 更新字节数组
-            CaptureScreen_固定数组(ref _全局数组, 截图模式1X, 截图模式1Y);
+            CaptureScreen_固定数组(_全局数组, 截图模式1X, 截图模式1Y);
 
             //// 捕获屏幕
             //CaptureScreen_固定大小(ref _全局图像, 截图模式1X, 截图模式1Y);
@@ -10267,7 +10242,7 @@ namespace Dota2Simulator
             }
 
             // 更新字节数组
-            CaptureScreen_固定数组(ref _全局数组, 0, 0);
+            CaptureScreen_固定数组(_全局数组, 0, 0);
 
             //// 捕获屏幕
             //CaptureScreen_固定大小(ref _全局图像, 0, 0);
@@ -10330,7 +10305,7 @@ namespace Dota2Simulator
             }
             //根据图片使用物品(物品_臂章_开启_数组);
             //DOTA2获取所有释放技能前颜色(in _全局数组);
-            Invoke(() => { tb_y.Text = (获取当前时间毫秒() - _全局时间).ToString(); });
+            Invoke(() => { tb_y.Text = (获取当前时间毫秒() - _全局时间).ToString(CultureInfo.InvariantCulture); });
 
             // _ = _全局数组.数组保存为图片("J:\\Desktop\\1.jpg");
         }
@@ -10339,58 +10314,51 @@ namespace Dota2Simulator
 
         #region 定制测试方法（按需求更改）
 
-        private async Task 测试方法(int x, int y)
+        private Task 测试方法(int x, int y)
         {
             long time = 获取当前时间毫秒();
 
-            PooledList<Color> colors = [];
-            PooledList<long> longs = [];
+            // 使用值元组记录颜色变化，减少GC压力
+            using var colors = new PooledList<Color>();
+            using var longs = new PooledList<long>();
 
-            Size size = new(截图模式1W, 截图模式1H);
+            // 使用取消令牌控制循环寿命
+            using var cts = new CancellationTokenSource();
+            cts.CancelAfter(int.Parse(tb_状态抗性.Text.Trim(), CultureInfo.InvariantCulture));
 
-            Bitmap bitmap = await CaptureScreenAsync(截图模式1X, 截图模式1Y, size).ConfigureAwait(true);
-            字节数组包含长宽 数组 = new(await GetBitmapByteAsync(bitmap).ConfigureAwait(true), size);
-
-            while (true)
+            try
             {
-                bitmap = await CaptureScreenAsync(截图模式1X, 截图模式1Y, size).ConfigureAwait(true);
-                _ = 数组.新赋值数组(await GetBitmapByteAsync(bitmap).ConfigureAwait(true));
-
-                Color p = 获取指定位置颜色(x, y, in 数组);
-
-                if (colors.Count == 0 || !colors[^1].Equals(p))
+                // 主循环：定期发送时间戳触发屏幕捕获
+                while (!cts.IsCancellationRequested)
                 {
-                    colors.Add(p);
-                    longs.Add(获取当前时间毫秒() - time);
-                }
+                    var color = CaptureColor(x, y);
 
-                if (获取当前时间毫秒() - time <= int.Parse(tb_状态抗性.Text.Trim()))
-                {
-                    continue;
-                }
-
-                break;
-            }
-
-            tb_x.Text = colors.Aggregate("",
-                (current, color) => string.Concat(current, color.R.ToString(), ",", color.G.ToString(), ",",
-                    color.B.ToString(), "|"));
-
-            string str = "";
-            if (longs.Count > 1)
-            {
-                for (int i = 1; i < longs.Count; i++) // 丢弃第一个颜色获取时间
-                {
-                    str = string.Concat(str, i > 0 ? (longs[i] - longs[i - 1]).ToString() : longs[0].ToString(), "|");
+                    if (colors.Count == 0)
+                    {
+                        colors.Add(color);
+                        longs.Add(0);
+                    }
+                    else
+                    {
+                        if (!colors[^1].Equals(color))
+                        {
+                            colors.Add(color);
+                            longs.Add(获取当前时间毫秒() - time);
+                        }
+                    }
                 }
             }
+            catch (OperationCanceledException)
+            {
+                // 预期的取消，静默处理
+            }
 
-            tb_y.Text = str;
-
-            colors.Dispose();
-            longs.Dispose();
+            // 将结果转换为所需格式
+            tb_x.Text = string.Join("|", colors.Select(c => $"{c.R},{c.G},{c.B}"));
+            tb_y.Text = string.Join("|", longs.Select(c => c));
 
             Tts.Speak("完成");
+            return CompletedTask;
         }
 
         #endregion
@@ -10399,166 +10367,162 @@ namespace Dota2Simulator
 
         private async Task 捕捉颜色()
         {
-            long time = 获取当前时间毫秒();
+            long startTime = 获取当前时间毫秒();
 
-            PooledList<Color> colors = [];
-            PooledList<long> longs = [];
+            // 使用值元组记录颜色变化，减少GC压力
+            using var colors = new PooledList<Color>();
+            using var timestamps = new PooledList<long>();
 
-            Size size = new(截图模式1W, 截图模式1H);
+            // 预先定义所有要采集的技能位置和类型配置
+            var colorConfigs = GetColorConfigurations();
 
-            Bitmap bitmap = await CaptureScreenAsync(截图模式1X, 截图模式1Y, size).ConfigureAwait(true);
-            字节数组包含长宽 数组 = new(await GetBitmapByteAsync(bitmap).ConfigureAwait(true), size);
-            //bitmap.Save("J:\\Desktop\\新建 BMP 图像.bmp");
+            // 使用取消令牌控制循环寿命
+            var timeout = int.Parse(tb_状态抗性.Text.Trim(), CultureInfo.InvariantCulture);
+            using var cts = new CancellationTokenSource(timeout);
 
-            while (true)
+            // 缓存当前选中的颜色键
+            var selectedKey = tb_阵营.Text.Trim();
+
+            // 固定一个数组
+            using var 数组 = new 字节数组包含长宽(new byte[截图模式1W * 截图模式1H * 4], new Size(截图模式1W, 截图模式1H));
+
+            try
             {
-                bitmap = await CaptureScreenAsync(截图模式1X, 截图模式1Y, size).ConfigureAwait(true);
-                _ = 数组.新赋值数组(await GetBitmapByteAsync(bitmap).ConfigureAwait(true));
+                // 缓存最近的颜色结果避免频繁的重复计算
+                var colorCache = new Dictionary<string, Color>(colorConfigs.Count);
 
-                Color q4 = 获取技能释放判断颜色(Keys.Q, in 数组, 4);
-                Color q5 = 获取技能释放判断颜色(Keys.Q, in 数组, 5);
-                Color q6 = 获取技能释放判断颜色(Keys.Q, in 数组, 6);
-                Color q41 = 获取技能进入CD判断颜色(Keys.Q, in 数组, 4);
-                Color q51 = 获取技能进入CD判断颜色(Keys.Q, in 数组, 5);
-                Color q61 = 获取技能进入CD判断颜色(Keys.Q, in 数组, 6);
-                Color q45 = 获取推荐技能学习颜色(Keys.Q, in 数组, 4);
-                Color q55 = 获取推荐技能学习颜色(Keys.Q, in 数组, 5);
-                Color q65 = 获取推荐技能学习颜色(Keys.Q, in 数组, 6);
-
-                Color w4 = 获取技能释放判断颜色(Keys.W, in 数组, 4);
-                Color w5 = 获取技能释放判断颜色(Keys.W, in 数组, 5);
-                Color w6 = 获取技能释放判断颜色(Keys.W, in 数组, 6);
-                Color w41 = 获取技能进入CD判断颜色(Keys.W, in 数组, 4);
-                Color w51 = 获取技能进入CD判断颜色(Keys.W, in 数组, 5);
-                Color w61 = 获取技能进入CD判断颜色(Keys.W, in 数组, 6);
-                Color w45 = 获取推荐技能学习颜色(Keys.W, in 数组, 4);
-                Color w55 = 获取推荐技能学习颜色(Keys.W, in 数组, 5);
-                Color w65 = 获取推荐技能学习颜色(Keys.W, in 数组, 6);
-
-                Color e4 = 获取技能释放判断颜色(Keys.E, in 数组, 4);
-                Color e5 = 获取技能释放判断颜色(Keys.E, in 数组, 5);
-                Color e6 = 获取技能释放判断颜色(Keys.E, in 数组, 6);
-                Color e41 = 获取技能进入CD判断颜色(Keys.E, in 数组, 4);
-                Color e51 = 获取技能进入CD判断颜色(Keys.E, in 数组, 5);
-                Color e61 = 获取技能进入CD判断颜色(Keys.E, in 数组, 6);
-                Color e45 = 获取推荐技能学习颜色(Keys.E, in 数组, 4);
-                Color e55 = 获取推荐技能学习颜色(Keys.E, in 数组, 5);
-                Color e65 = 获取推荐技能学习颜色(Keys.E, in 数组, 6);
-
-                Color r4 = 获取技能释放判断颜色(Keys.R, in 数组, 4);
-                Color r5 = 获取技能释放判断颜色(Keys.R, in 数组, 5);
-                Color r6 = 获取技能释放判断颜色(Keys.R, in 数组, 6);
-                Color r41 = 获取技能进入CD判断颜色(Keys.R, in 数组, 4);
-                Color r51 = 获取技能进入CD判断颜色(Keys.R, in 数组, 5);
-                Color r61 = 获取技能进入CD判断颜色(Keys.R, in 数组, 6);
-                Color r45 = 获取推荐技能学习颜色(Keys.R, in 数组, 4);
-                Color r55 = 获取推荐技能学习颜色(Keys.R, in 数组, 5);
-                Color r65 = 获取推荐技能学习颜色(Keys.R, in 数组, 6);
-
-                Color d5 = 获取技能释放判断颜色(Keys.D, in 数组, 5);
-                Color d6 = 获取技能释放判断颜色(Keys.D, in 数组, 6);
-                Color d51 = 获取技能进入CD判断颜色(Keys.D, in 数组, 5);
-                Color d61 = 获取技能进入CD判断颜色(Keys.D, in 数组, 6);
-                Color d55 = 获取推荐技能学习颜色(Keys.D, in 数组, 5);
-                Color d65 = 获取推荐技能学习颜色(Keys.D, in 数组, 6);
-
-                Color f6 = 获取技能释放判断颜色(Keys.F, in 数组, 6);
-                Color f61 = 获取技能进入CD判断颜色(Keys.F, in 数组, 6);
-                Color f65 = 获取推荐技能学习颜色(Keys.F, in 数组, 6);
-
-
-                Color p = tb_阵营.Text.Trim() switch
+                while (!cts.IsCancellationRequested)
                 {
-                    "q4" => q4,
-                    "q5" => q5,
-                    "q6" => q6,
-                    "q41" => q41,
-                    "q51" => q51,
-                    "q61" => q61,
-                    "q45" => q45,
-                    "q55" => q55,
-                    "q65" => q65,
+                    // 截图并赋值数组
+                    CaptureScreen_固定数组(数组, 截图模式1X, 截图模式1Y);
 
-                    "w4" => w4,
-                    "w5" => w5,
-                    "w6" => w6,
-                    "w41" => w41,
-                    "w51" => w51,
-                    "w61" => w61,
-                    "w45" => w45,
-                    "w55" => w55,
-                    "w65" => w65,
+                    // 并行获取所有颜色并缓存结果
+                    await Task.Run(() =>
+                    {
+                        Parallel.ForEach(
+                            colorConfigs,
+                            new ParallelOptions { MaxDegreeOfParallelism = Environment.ProcessorCount },
+                            config =>
+                            {
+                                var color = 获取技能颜色(config.SkillKey, in 数组, config.SkillCount, config.ColorType);
+                                lock (colorCache)
+                                {
+                                    colorCache[config.Key] = color;
+                                }
+                            });
+                    });
 
-                    "e4" => e4,
-                    "e5" => e5,
-                    "e6" => e6,
-                    "e41" => e41,
-                    "e51" => e51,
-                    "e61" => e61,
-                    "e45" => e45,
-                    "e55" => e55,
-                    "e65" => e65,
+                    // 获取当前选择的颜色
+                    Color currentColor;
+                    if (colorCache.TryGetValue(selectedKey, out var cachedColor))
+                    {
+                        currentColor = cachedColor;
+                    }
+                    else
+                    {
+                        // 默认返回q4
+                        currentColor = colorCache.TryGetValue("q4", out var defaultColor) ? defaultColor : Color.Empty;
+                    }
 
-                    "r4" => r4,
-                    "r5" => r5,
-                    "r6" => r6,
-                    "r41" => r41,
-                    "r51" => r51,
-                    "r61" => r61,
-                    "r45" => r45,
-                    "r55" => r55,
-                    "r65" => r65,
+                    // 记录颜色变化
+                    if (colors.Count == 0)
+                    {
+                        colors.Add(currentColor);
+                        timestamps.Add(0);
+                    }
+                    else if (!colors[^1].Equals(currentColor))
+                    {
+                        colors.Add(currentColor);
+                        timestamps.Add(获取当前时间毫秒() - startTime);
+                    }
 
-                    "d5" => d5,
-                    "d6" => d6,
-                    "d51" => d51,
-                    "d61" => d61,
-                    "d55" => d55,
-                    "d65" => d65,
-
-                    "f6" => f6,
-                    "f61" => f61,
-                    "f65" => f65,
-                    _ => q4
-                };
-
-                if (colors.Count == 0 || !colors[^1].Equals(p))
-                {
-                    colors.Add(p);
-                    longs.Add(获取当前时间毫秒() - time);
+                    // 添加短暂休眠，减轻CPU负担
+                    // Task.Delay(1, cts.Token);
                 }
-
-                // 用于排除一些颜色，但实际后续不用，会干扰颜色变化
-                //if (!ColorAEqualColorB(p, Color.FromArgb(9, 10, 16), 5, 6, 12))
-                //    {
-                //        colors.Add(p);
-                //        longs.Add(获取当前时间毫秒() - time);
-                //    }
-
-                if (获取当前时间毫秒() - time <= int.Parse(tb_状态抗性.Text.Trim()))
-                {
-                    continue;
-                }
-
-                break;
+            }
+            catch (OperationCanceledException)
+            {
+                // 预期的取消，静默处理
             }
 
-            tb_x.Text = colors.Aggregate("",
-                (current, color) => string.Concat(current, color.R.ToString(), ",", color.G.ToString(), ",",
-                    color.B.ToString(), "|"));
-
-            string str = "";
-            for (int i = 1; i < longs.Count; i++) // 丢弃第一个颜色获取时间
-            {
-                str = string.Concat(str, i > 0 ? (longs[i] - longs[i - 1]).ToString() : longs[0].ToString(), "|");
-            }
-
-            tb_y.Text = str;
-
-            colors.Dispose();
-            longs.Dispose();
+            // 将结果转换为所需格式
+            tb_x.Text = string.Join("|", colors.Select(c => $"{c.R},{c.G},{c.B}"));
+            tb_y.Text = string.Join("|", timestamps.Select(t => t.ToString(CultureInfo.InvariantCulture)));
 
             Tts.Speak("完成");
+        }
+
+        // 辅助方法：获取颜色配置
+        private static List<ColorConfig> GetColorConfigurations()
+        {
+            // 预定义所有需要捕获的颜色配置
+            var configs = new List<ColorConfig>(150);
+            foreach (var key in new[] { Keys.Q, Keys.W, Keys.E, Keys.R })
+            {
+                foreach (var count in new[] { 4, 5, 6 })
+                {
+                    // 添加所有颜色类型
+                    configs.Add(new ColorConfig($"{key.ToString().ToLower(CultureInfo.CurrentCulture)}{count}", key, count, 技能类型.释放变色));
+                    configs.Add(new ColorConfig($"{key.ToString().ToLower(CultureInfo.CurrentCulture)}{count}1", key, count, 技能类型.图标CD));
+                    configs.Add(new ColorConfig($"{key.ToString().ToLower(CultureInfo.CurrentCulture)}{count}2", key, count, 技能类型.QWERDF图标));
+                    configs.Add(new ColorConfig($"{key.ToString().ToLower(CultureInfo.CurrentCulture)}{count}3", key, count, 技能类型.法球));
+                    configs.Add(new ColorConfig($"{key.ToString().ToLower(CultureInfo.CurrentCulture)}{count}4", key, count, 技能类型.状态));
+                    configs.Add(new ColorConfig($"{key.ToString().ToLower(CultureInfo.CurrentCulture)}{count}5", key, count, 技能类型.被动技能存在));
+                }
+            }
+
+            // D键只有5和6
+            foreach (var count in new[] { 5, 6 })
+            {
+                configs.Add(new ColorConfig($"d{count}", Keys.D, count, 技能类型.释放变色));
+                configs.Add(new ColorConfig($"d{count}1", Keys.D, count, 技能类型.图标CD));
+                configs.Add(new ColorConfig($"d{count}2", Keys.D, count, 技能类型.QWERDF图标));
+                configs.Add(new ColorConfig($"d{count}3", Keys.D, count, 技能类型.法球));
+                configs.Add(new ColorConfig($"d{count}4", Keys.D, count, 技能类型.状态));
+                configs.Add(new ColorConfig($"d{count}5", Keys.D, count, 技能类型.被动技能存在));
+            }
+
+            // F键只有6
+            configs.Add(new ColorConfig("f6", Keys.F, 6, 技能类型.释放变色));
+            configs.Add(new ColorConfig("f61", Keys.F, 6, 技能类型.图标CD));
+            configs.Add(new ColorConfig("f62", Keys.F, 6, 技能类型.QWERDF图标));
+            configs.Add(new ColorConfig("f63", Keys.F, 6, 技能类型.法球));
+            configs.Add(new ColorConfig("f64", Keys.F, 6, 技能类型.状态));
+            configs.Add(new ColorConfig("f65", Keys.F, 6, 技能类型.被动技能存在));
+
+            return configs;
+        }
+
+        // 统一获取技能颜色的方法
+        private static Color 获取技能颜色(Keys skillKey, in 字节数组包含长宽 数组, int skillCount, 技能类型 colorType)
+        {
+            return colorType switch
+            {
+                技能类型.释放变色 => 获取技能释放判断颜色(skillKey, in 数组, skillCount),
+                技能类型.图标CD => 获取技能进入CD判断颜色(skillKey, in 数组, skillCount),
+                技能类型.QWERDF图标 => 获取QWERDF颜色(skillKey, in 数组, skillCount),
+                技能类型.法球 => 获取法球颜色(skillKey, in 数组, skillCount),
+                技能类型.状态 => 获取状态颜色(skillKey, in 数组, skillCount),
+                技能类型.被动技能存在 => 获取被动颜色(skillKey, in 数组, skillCount),
+                _ => Color.Empty,
+            };
+        }
+
+        // 颜色配置记录类
+        private readonly struct ColorConfig
+        {
+            public string Key { get; }
+            public Keys SkillKey { get; }
+            public int SkillCount { get; }
+            public 技能类型 ColorType { get; }
+
+            public ColorConfig(string key, Keys skillKey, int skillCount, 技能类型 colorType)
+            {
+                Key = key;
+                SkillKey = skillKey;
+                SkillCount = skillCount;
+                ColorType = colorType;
+            }
         }
 
         #endregion
@@ -10634,15 +10598,16 @@ namespace Dota2Simulator
         #region 模块化技能
 
         // 模块化之后，都不用注释也能看得懂了。。
-        // 技能CD为x为指定 y为灰白色最上方像素 |涉及的颜色| 技能CD颜色 未学习技能CD颜色
+        // 技能CD为x为指定 y为灰白色最上方像素 |涉及的颜色| 技能CD颜色实际上是释放技能时变换的颜色 所以容差大 未学习技能CD颜色 
+        // 5 6 进入CD颜色渐变 122,129,136 94,100,106 16,19,18 8,11,10 非指向性施法颜色不变
         // 法球位置为灰白色左下角图标 |涉及的颜色| 法球颜色 未学习法球颜色
         // 推荐学习和状态技能取同一个位置 开启技能后 y最底下绿色像素 金黄色下往上数2  5,6技能 为暗黄色最底下 |涉及的颜色| 推荐学习颜色 状态激活颜色
         // QWERDF框x为左下角x向右偏移一个像素 y为特定的y 被动位置x为图标右侧边框左边第一个像素,有的技能亮色影响内侧颜色 y为qwerdf 的某个高度 |涉及的颜色| qwerdf颜色 被动颜色 未学习被动技能颜色 破坏被动颜色
         private static readonly 技能信息 技能4 = new(
             820, 998, 65
-            , 17, -52, Color.FromArgb(135, 143, 150), 3, Color.FromArgb(25, 30, 34), 2
-            , -45, Color.FromArgb(34, 40, 39), 2
-            , 2, -2, Color.FromArgb(54, 62, 70), 2, Color.FromArgb(72, 77, 81), 2
+            , 27, -52, Color.FromArgb(133, 141, 148), 5, Color.FromArgb(72, 76, 80), 2
+            , -3, -45, Color.FromArgb(34, 40, 39), 2
+            , 2, -2, Color.FromArgb(54, 62, 70), 2, Color.FromArgb(25, 30, 34), 2
             , 25, -56, Color.FromArgb(0, 129, 0), 0, Color.FromArgb(211, 181, 79), 8
             , 50, -45, Color.FromArgb(49, 51, 47), 3, Color.FromArgb(33, 36, 37), 3
             , 25, -49
@@ -10651,9 +10616,9 @@ namespace Dota2Simulator
 
         private static readonly 技能信息 技能5 = new(
             802, 995, 58
-            , 17, -49, Color.FromArgb(127, 134, 140), 3, Color.FromArgb(25, 29, 34), 2
-            , -41, Color.FromArgb(34, 40, 39), 1
-            , 5, -3, Color.FromArgb(54, 61, 69), 2, Color.FromArgb(75, 80, 84), 2
+            , 30, -49, Color.FromArgb(134, 142, 149), 5, Color.FromArgb(72, 76, 80), 2
+            , 1, -41, Color.FromArgb(34, 40, 39), 1
+            , 3, -3, Color.FromArgb(54, 61, 69), 2, Color.FromArgb(25, 29, 34), 2
             , 25, -50, Color.FromArgb(0, 129, 0), 0, Color.FromArgb(118, 100, 41), 8
             , 51, -41, Color.FromArgb(49, 51, 47), 3, Color.FromArgb(33, 36, 37), 3
             , 24, -47
@@ -10661,12 +10626,12 @@ namespace Dota2Simulator
             , [Keys.Q, Keys.W, Keys.E, Keys.D, Keys.R]);
 
         private static readonly 技能信息 技能6 = new(
-            774, 995, 58
-            , 17, -49, Color.FromArgb(139, 147, 154), 3, Color.FromArgb(25, 29, 34), 2
-            , -41, Color.FromArgb(34, 40, 39), 1
-            , 3, -3, Color.FromArgb(54, 61, 69), 2, Color.FromArgb(75, 80, 84), 2
-            , 25, -50, Color.FromArgb(0, 129, 0), 0, Color.FromArgb(119, 101, 39), 8
-            , 49, -41, Color.FromArgb(49, 51, 47), 3, Color.FromArgb(33, 36, 37), 3
+            772, 995, 58
+            , 30, -49, Color.FromArgb(134, 142, 149), 5, Color.FromArgb(72, 76, 80), 2
+            ,1, -41, Color.FromArgb(34, 40, 39), 1
+            , 3, -3, Color.FromArgb(54, 61, 69), 2, Color.FromArgb(25, 29, 34), 2
+            , 25, -50, Color.FromArgb(0, 129, 0), 0, Color.FromArgb(118, 100, 41), 8
+            , 51, -41, Color.FromArgb(49, 51, 47), 3, Color.FromArgb(33, 36, 37), 3
             , 24, -47
             , Color.FromArgb(55, 62, 70), 1  // 没用到
             , [Keys.Q, Keys.W, Keys.E, Keys.D, Keys.F, Keys.R]);
@@ -10681,6 +10646,7 @@ namespace Dota2Simulator
             byte 技能CD颜色容差,
             Color 未学主动技能CD颜色,
             byte 未学主动技能CD颜色容差,
+            int QWERDFx,
             int QWERDFy,
             Color QWERDF框颜色,
             byte QWERDF框颜色容差,
@@ -10719,7 +10685,7 @@ namespace Dota2Simulator
             public int 状态技能位置y { get; } = 左下角y + 状态技能位置变化y;
             public int 被动位置x { get; } = 左下角x + 被动位置变化x;
             public int 被动位置y { get; } = 左下角y + 被动位置变化y;
-            public int QWERDF位置x { get; } = 左下角x + 1; // 向右偏移1个单位，基本颜色一致
+            public int QWERDF位置x { get; } = 左下角x + QWERDFx;
             public int QWERDF位置y { get; } = 左下角y + QWERDFy;
             public Color 技能CD颜色 { get; } = 技能CD颜色;
             public byte 技能CD颜色容差 { get; } = 技能CD颜色容差;
@@ -10893,9 +10859,9 @@ namespace Dota2Simulator
 
         // 使用缓存的检测配置
         private static readonly ConcurrentDictionary<(技能信息, int), 检测点[]> _检测点缓存 = new();
-
+#if 输出技能点信息
         // 静态StringBuilder池
-        private static class StringBuilderPool
+        private static class StringBuilderPool_输出点信息
         {
             private static readonly ThreadLocal<StringBuilder> _pool = new ThreadLocal<StringBuilder>(() => new StringBuilder());
 
@@ -10906,33 +10872,50 @@ namespace Dota2Simulator
                 return sb;
             }
         }
+#endif
+        private static class StringBuilderPool1
+        {
+            private static readonly ThreadLocal<StringBuilder> _pool = new(() => new StringBuilder());
+
+            public static StringBuilder Get()
+            {
+                var sb = _pool.Value;
+                sb.Clear();
+                return sb;
+            }
+        }
+
         public static int 获取当前技能数量(in 字节数组包含长宽 数组)
         {
             List<技能信息> 技能列表 = [技能4, 技能5, 技能6];
             List<int> 技能数量 = [4, 5, 6];
-
-            var 全部文字 = StringBuilderPool.Get();
-
+#if 输出技能点信息
+            var 全部文字 = StringBuilderPool_输出点信息.Get();
+#endif
             for (int j = 0; j < 技能列表.Count; j++)
             {
                 技能信息 当前技能 = 技能列表[j];
                 int 期望数量 = 技能数量[j];
 
-                var 输出文字 = StringBuilderPool.Get();
+                var 输出文字 = StringBuilderPool1.Get();
+#if 输出技能点信息
                 输出文字.AppendLine($"\r\n当前技能数量{期望数量}");
-
+#endif
                 var 检测到的数量 = 快速检测技能数量(in 数组, 当前技能, 期望数量 - 1, 输出文字);
 
                 if (检测到的数量 == 期望数量 - 1)
                 {
+#if 输出技能点信息
                     Logger.Info(输出文字.ToString());
+#endif
                     return 期望数量;
                 }
-
+#if 输出技能点信息
                 全部文字.Append(输出文字.ToString());
 
                 // 结束循环依旧没匹配到
                 if (j == 2) Logger.Error(全部文字.ToString());
+#endif
             }
 
             Tts.Speak("技能数量异常");
@@ -10946,7 +10929,9 @@ namespace Dota2Simulator
             for (int i = 0; i < 最大检测数量; i++)
             {
                 var (成功, 单个调试信息) = 快速检测单个技能(in 数组, 技能, i);
+#if 输出技能点信息
                 调试信息.Append(单个调试信息);
+#endif
 
                 if (成功)
                 {
@@ -10974,15 +10959,15 @@ namespace Dota2Simulator
 
                 for (int colorIdx = 0; colorIdx < 点.颜色检查.Length; colorIdx++)
                 {
-                    var 颜色检查 = 点.颜色检查.Span[colorIdx];
-                    匹配结果[colorIdx] = ColorAEqualColorB(实际颜色, 颜色检查.期望颜色, (byte)颜色检查.容差);
+                    var (期望颜色, 容差) = 点.颜色检查.Span[colorIdx];
+                    匹配结果[colorIdx] = ColorAEqualColorB(实际颜色, 期望颜色, (byte)容差);
                 }
 
                 bool 当前点有匹配 = 匹配结果.Any(match => match);
                 检测结果[idx] = (点.名称, 点.位置, 实际颜色, 匹配结果);
                 整体有匹配 |= 当前点有匹配;
             }
-
+#if 输出技能点信息
             // 根据原逻辑构建调试信息
             if (整体有匹配)
             {
@@ -11002,24 +10987,24 @@ namespace Dota2Simulator
             {
                 调试信息.AppendLine($"{i + 1} QWERDF图标 :位置X:{检测结果[0].位置.X + 坐标偏移x},位置Y:{检测结果[0].位置.Y + 坐标偏移y}，RGB:{检测结果[0].颜色.R}, {检测结果[0].颜色.G}, {检测结果[0].颜色.B}");
             }
-            else if (!检测结果[1].匹配结果.Any(match => match)) // 主动技能
+            if (!检测结果[1].匹配结果.Any(match => match)) // 主动技能
             {
                 调试信息.AppendLine($"{i + 1} 技能CD图标 :位置X:{检测结果[1].位置.X + 坐标偏移x},位置Y:{检测结果[1].位置.Y + 坐标偏移y}，RGB:{检测结果[1].颜色.R}, {检测结果[1].颜色.G}, {检测结果[1].颜色.B}。");
             }
-            else if (!检测结果[2].匹配结果.Any(match => match)) // 法球技能
+            if (!检测结果[2].匹配结果.Any(match => match)) // 法球技能
             {
                 调试信息.AppendLine($"{i + 1} 技能法球 :位置X:{检测结果[2].位置.X + 坐标偏移x},位置Y:{检测结果[2].位置.Y + 坐标偏移y}，RGB:{检测结果[2].颜色.R}, {检测结果[2].颜色.G}, {检测结果[2].颜色.B}。");
             }
-            else if (!检测结果[3].匹配结果.Any(match => match)) // 被动技能
+            if (!检测结果[3].匹配结果.Any(match => match)) // 被动技能
             {
                 调试信息.AppendLine($"{i + 1} 被动技能 :位置X:{检测结果[3].位置.X + 坐标偏移x},位置Y:{检测结果[3].位置.Y + 坐标偏移y}，RGB:{检测结果[3].颜色.R}, {检测结果[3].颜色.G}, {检测结果[3].颜色.B}。");
             }
-            else if (!检测结果[4].匹配结果.Any(match => match)) // 推荐技能
+            if (!检测结果[4].匹配结果.Any(match => match)) // 推荐技能
             {
                 调试信息.AppendLine($"{i + 1} 推荐技能 :位置X:{检测结果[4].位置.X + 坐标偏移x},位置Y:{检测结果[4].位置.Y + 坐标偏移y}，RGB:{检测结果[4].颜色.R}, {检测结果[4].颜色.G}, {检测结果[4].颜色.B}。");
                 调试信息.AppendLine();
             }
-
+#endif
             return (false, 调试信息.ToString());
         }
 
@@ -11038,41 +11023,41 @@ namespace Dota2Simulator
             Point p_被动 = new(技能.被动位置x + 偏移 - 坐标偏移x, 技能.被动位置y - 坐标偏移y);
             Point p_推荐 = new(技能.状态技能位置x + 偏移 - 坐标偏移x, 技能.状态技能位置y - 坐标偏移y);
 
-            return new 检测点[]
-            {
+            return
+            [
         // QWERDF图标检测点
-        new 检测点(p_QWERDF, new (Color, int)[]
+        new(p_QWERDF, new (Color, int)[]
         {
             (技能.QWERDF框颜色, 技能.QWERDF框颜色容差)
         }, "QWERDF图标"),
         
         // 主动技能检测点
-        new 检测点(p_主动, new (Color, int)[]
+        new(p_主动, new (Color, int)[]
         {
             (技能.技能CD颜色, 技能.技能CD颜色容差),
             (技能.未学主动技能CD颜色, 技能.未学主动技能CD颜色容差)
         }, "主动"),
         
         // 法球技能检测点
-        new 检测点(p_法球, new (Color, int)[]
+        new(p_法球, new (Color, int)[]
         {
             (技能.未学法球技能CD颜色, 技能.未学法球技能CD颜色容差),
             (技能.未学法球技能CD颜色, 技能.未学法球技能CD颜色容差) // 注意：原代码中已学和未学法球用的是同一个颜色和容差
         }, "技能"),
         
         // 被动技能检测点
-        new 检测点(p_被动, new (Color, int)[]
+        new(p_被动, new (Color, int)[]
         {
             (技能.未学被动技能颜色, 技能.未学被动技能颜色容差),
             (技能.破坏被动技能颜色, 技能.破坏被动技能颜色容差)
         }, "被动技能"),
         
         // 推荐技能检测点
-        new 检测点(p_推荐, new (Color, int)[]
+        new(p_推荐, new (Color, int)[]
         {
             (技能.推荐学习技能颜色, 技能.推荐学习技能颜色容差)
         }, "推荐技能")
-            };
+            ];
         }
 
         /// <summary>
@@ -11086,7 +11071,7 @@ namespace Dota2Simulator
             {
                 if (_form.Controls["tb_状态抗性"] is TextBox tb)
                 {
-                    double i = Convert.ToDouble(tb.Text.Trim());
+                    double i = Convert.ToDouble(tb.Text.Trim(), CultureInfo.InvariantCulture);
                     _状态抗性倍数 = (100 - (i > 100 ? 0 : i)) / 100;
                 }
             }
@@ -11146,18 +11131,6 @@ namespace Dota2Simulator
         }
 
         /// <summary>
-        ///     获取用于判断技能进入CD的像素的颜色
-        /// </summary>
-        /// <param name="技能位置">技能位置</param>
-        /// <param name="数组">包含长宽的字节数组</param>
-        /// <param name="技能数量">技能数量，默认值为4</param>
-        /// <returns>的像素颜色</returns>
-        private static Color 获取技能进入CD判断颜色(Keys 技能位置, in 字节数组包含长宽 数组, int 技能数量 = 4)
-        {
-            return 获取技能判断颜色(技能位置, in 数组, 技能数量, 技能类型.图标CD);
-        }
-
-        /// <summary>
         ///     获取用于判断技能释放的颜色
         /// </summary>
         /// <param name="技能位置">技能位置</param>
@@ -11170,15 +11143,63 @@ namespace Dota2Simulator
         }
 
         /// <summary>
-        ///     获取用于判断技能释放的颜色
+        ///     获取用于判断技能进入CD的像素的颜色
+        /// </summary>
+        /// <param name="技能位置">技能位置</param>
+        /// <param name="数组">包含长宽的字节数组</param>
+        /// <param name="技能数量">技能数量，默认值为4</param>
+        /// <returns>的像素颜色</returns>
+        private static Color 获取技能进入CD判断颜色(Keys 技能位置, in 字节数组包含长宽 数组, int 技能数量 = 4)
+        {
+            return 获取技能判断颜色(技能位置, in 数组, 技能数量, 技能类型.图标CD);
+        }
+
+        /// <summary>
+        ///     获取qwerdf的颜色
         /// </summary>
         /// <param name="技能位置">技能位置</param>
         /// <param name="数组">包含长宽的字节数组</param>
         /// <param name="技能数量">技能数量，默认值为4</param>
         /// <returns>技能释放判断的像素颜色</returns>
-        private static Color 获取推荐技能学习颜色(Keys 技能位置, in 字节数组包含长宽 数组, int 技能数量 = 4)
+        private static Color 获取QWERDF颜色(Keys 技能位置, in 字节数组包含长宽 数组, int 技能数量 = 4)
         {
-            return 获取技能判断颜色(技能位置, in 数组, 技能数量, 技能类型.推荐学习技能);
+            return 获取技能判断颜色(技能位置, in 数组, 技能数量, 技能类型.QWERDF图标);
+        }
+
+        /// <summary>
+        ///     获取法球的颜色
+        /// </summary>
+        /// <param name="技能位置">技能位置</param>
+        /// <param name="数组">包含长宽的字节数组</param>
+        /// <param name="技能数量">技能数量，默认值为4</param>
+        /// <returns>技能释放判断的像素颜色</returns>
+        private static Color 获取法球颜色(Keys 技能位置, in 字节数组包含长宽 数组, int 技能数量 = 4)
+        {
+            return 获取技能判断颜色(技能位置, in 数组, 技能数量, 技能类型.法球);
+        }
+
+        /// <summary>
+        ///     获取用于判断技能释放学习的颜色
+        /// </summary>
+        /// <param name="技能位置">技能位置</param>
+        /// <param name="数组">包含长宽的字节数组</param>
+        /// <param name="技能数量">技能数量，默认值为4</param>
+        /// <returns>技能释放判断的像素颜色</returns>
+        private static Color 获取状态颜色(Keys 技能位置, in 字节数组包含长宽 数组, int 技能数量 = 4)
+        {
+            return 获取技能判断颜色(技能位置, in 数组, 技能数量, 技能类型.状态);
+        }
+
+        /// <summary>
+        ///     获取被动的颜色
+        /// </summary>
+        /// <param name="技能位置">技能位置</param>
+        /// <param name="数组">包含长宽的字节数组</param>
+        /// <param name="技能数量">技能数量，默认值为4</param>
+        /// <returns>技能释放判断的像素颜色</returns>
+        private static Color 获取被动颜色(Keys 技能位置, in 字节数组包含长宽 数组, int 技能数量 = 4)
+        {
+            return 获取技能判断颜色(技能位置, in 数组, 技能数量, 技能类型.被动技能存在);
         }
 
         /// <summary>
@@ -11480,13 +11501,16 @@ namespace Dota2Simulator
             }
             else
             {
+                // 未释放中 颜色相同时
                 if (ColorAEqualColorB(释放前Color, 当前释放颜色, 0))
                 {
                     更新释放判断和颜色(技能位置, false, false, 释放前Color, 释放后Color);
                     return true;
                 }
+                // 未释放中 颜色不同时
                 else
                 {
+                    // 释放后不为空 且颜色相同 说明正在释放 或者释放前颜色变绿 说明正在释放
                     if ((释放后Color != Color.Empty && ColorAEqualColorB(释放后Color, 当前释放颜色, 0))
                         || DOTA2释放颜色前后对比(释放前Color, 当前释放颜色))
                     {
@@ -11561,7 +11585,7 @@ namespace Dota2Simulator
             return rResult && gResult && bResult;
         }
 
-        #endregion
+#endregion
 
         #region 使用物品
 
@@ -12043,14 +12067,9 @@ namespace Dota2Simulator
 
         #region 获取指定位置颜色
 
-        private static async Task<Color> 获取指定位置颜色(int x, int y)
+        private static Task<Color> 获取指定位置颜色(int x, int y)
         {
-            Size size = new(截图模式1W, 截图模式1H);
-            Bitmap bitmap = await CaptureScreenAsync(截图模式1X, 截图模式1Y, size).ConfigureAwait(true);
-            字节数组包含长宽 数组 = new(await GetBitmapByteAsync(bitmap).ConfigureAwait(true), size);
-            bitmap = await CaptureScreenAsync(截图模式1X, 截图模式1Y, size).ConfigureAwait(true);
-            _ = 数组.新赋值数组(await GetBitmapByteAsync(bitmap).ConfigureAwait(true));
-            return GetPixelBytes(in 数组, x - 坐标偏移x, y - 坐标偏移y);
+            return FromResult(CaptureColor(x, y));
         }
 
         private static Color 获取指定位置颜色(int x, int y, in 字节数组包含长宽 数组)
@@ -12060,9 +12079,9 @@ namespace Dota2Simulator
 
         #endregion
 
-        #endregion
+#endregion
 
-        #endregion
+#endregion
 
         #region 绝地潜兵2具体实现（虽然没用）
 
@@ -12313,7 +12332,7 @@ namespace Dota2Simulator
 
             try
             {
-                _攻击速度 = Convert.ToDouble(tb_攻速.Text);
+                _攻击速度 = Convert.ToDouble(tb_攻速.Text, CultureInfo.InvariantCulture);
             }
             catch
             {
@@ -12323,7 +12342,7 @@ namespace Dota2Simulator
 
         private void 设置当前攻速()
         {
-            tb_攻速.Text = _攻击速度.ToString();
+            tb_攻速.Text = _攻击速度.ToString(CultureInfo.InvariantCulture);
         }
 
         private void tb_状态抗性_TextChanged(object sender, EventArgs e)

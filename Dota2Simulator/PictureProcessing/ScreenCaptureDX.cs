@@ -75,13 +75,12 @@ namespace Dota2Simulator.PictureProcessing
 
         public Bitmap CaptureScreen(Rectangle captureRegion)
         {
-            OutputDuplicateFrameInformation duplicateFrameInformation;
 
             Resource screenResource;
             try
             {
                 Result result =
-                    duplicatedOutput.TryAcquireNextFrame(1000, out duplicateFrameInformation, out screenResource);
+                    duplicatedOutput.TryAcquireNextFrame(1000, out OutputDuplicateFrameInformation duplicateFrameInformation, out screenResource);
                 if (result.Failure)
                 {
                     Console.WriteLine($"Failed to acquire next frame: {result}");

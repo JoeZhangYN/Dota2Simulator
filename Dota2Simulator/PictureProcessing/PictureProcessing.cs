@@ -1,13 +1,14 @@
-﻿using System;
+﻿using Collections.Pooled;
+using OpenCvSharp;
+using OpenCvSharp.Extensions;
+using System;
+using System.Buffers;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
-using Collections.Pooled;
-using OpenCvSharp;
-using OpenCvSharp.Extensions;
 using Point = System.Drawing.Point;
 using Size = System.Drawing.Size;
 
@@ -175,15 +176,15 @@ namespace Dota2Simulator.PictureProcessing
 
         #region 屏幕截图
 
-        internal struct Bgr8
-        {
-            public uint B;
-            public uint G;
-            public uint R;
-        }
+        //internal struct Bgr8
+        //{
+        //    public uint B;
+        //    public uint G;
+        //    public uint R;
+        //}
 
-        [DllImport("rscaptrs.dll")]
-        public static extern IEnumerable<Bgr8> GetColor(uint i);
+        //[DllImport("rscaptrs.dll")]
+        //public static extern IEnumerable<Bgr8> GetColor(uint i);
 
         public static Bitmap CaptureScreen(int x, int y, int width, int height)
         {
@@ -221,7 +222,7 @@ namespace Dota2Simulator.PictureProcessing
                 .ConfigureAwait(true);
         }
 
-        public static void CaptureScreen_固定数组(ref 字节数组包含长宽 数组, int x, int y)
+        public static void CaptureScreen_固定数组(字节数组包含长宽 数组, int x, int y)
         {
             using OptimizedGraphics graphics = OptimizedGraphics.CreateGraphics();
             _ = graphics.CaptureScreenToBytes(x, y, 数组.图片尺寸.Width, 数组.图片尺寸.Height, ref 数组.字节数组);
@@ -1347,7 +1348,7 @@ namespace Dota2Simulator.PictureProcessing
             }
         }
 
-        public static unsafe void GetBitmapByte_固定数组(in Bitmap subBitmap, ref 字节数组包含长宽 bts)
+        public static unsafe void GetBitmapByte_固定数组(in Bitmap subBitmap, 字节数组包含长宽 bts)
         {
             if (subBitmap == null || bts?.字节数组 == null)
             {
@@ -1372,34 +1373,97 @@ namespace Dota2Simulator.PictureProcessing
             }
         }
 
-        internal class 字节数组包含长宽
+        internal class 字节数组包含长宽 : IDisposable
         {
             private byte[] _字节数组;
+            private bool _isPooled;
+            private bool _disposed;
 
+            // 原始构造函数保持不变，确保兼容性
             public 字节数组包含长宽(byte[] bpByts, Size bpSize)
             {
                 _字节数组 = bpByts;
                 图片尺寸 = bpSize;
+                _isPooled = false;
             }
 
+            // 新增构造函数，支持使用池化数组
+            public static 字节数组包含长宽 CreatePooled(int length, Size bpSize)
+            {
+                var instance = new 字节数组包含长宽(ArrayPool<byte>.Shared.Rent(length), bpSize)
+                {
+                    _isPooled = true
+                };
+                return instance;
+            }
+
+            // 原构造函数保持不变
             public 字节数组包含长宽()
             {
                 _字节数组 = [0];
                 图片尺寸 = new Size();
+                _isPooled = false;
             }
 
-            public ref byte[] 字节数组 => ref _字节数组;
+            // 提供兼容的属性访问，但增加检查
+            public ref byte[] 字节数组
+            {
+                get
+                {
+                    ThrowIfDisposed();
+                    return ref _字节数组;
+                }
+            }
+
+            // 安全的只读访问方法
+            public ReadOnlySpan<byte> AsSpan() => _disposed ? ReadOnlySpan<byte>.Empty : _字节数组;
+
             public Size 图片尺寸 { get; set; }
 
+            // 重新实现，增加清理逻辑
             public bool 新赋值数组(byte[] bpByts)
             {
+                ThrowIfDisposed();
+
+                // 如果当前有池化数组，返回到池中
+                if (_isPooled && _字节数组 != null && _字节数组.Length > 0)
+                {
+                    ArrayPool<byte>.Shared.Return(_字节数组);
+                    _isPooled = false;
+                }
+
                 _字节数组 = bpByts;
+                return true;
+            }
+
+            // 新增方法：池化方式更新数组
+            public bool 新赋值池化数组(byte[] sourceArray)
+            {
+                ThrowIfDisposed();
+
+                int requiredLength = sourceArray.Length;
+
+                // 如果当前数组不存在或大小不合适，从池中租用新数组
+                if (_字节数组 == null || _字节数组.Length < requiredLength)
+                {
+                    // 如果有旧的池化数组，返回到池中
+                    if (_isPooled && _字节数组 != null)
+                        ArrayPool<byte>.Shared.Return(_字节数组);
+
+                    _字节数组 = ArrayPool<byte>.Shared.Rent(requiredLength);
+                    _isPooled = true;
+                }
+
+                // 复制数据到当前数组
+                Array.Copy(sourceArray, _字节数组, requiredLength);
                 return true;
             }
 
             public bool 数组保存为图片(string 文件路径, ImageFormat 图片格式 = null)
             {
-                if (this == null || _字节数组 == null || _字节数组.Length == 0)
+                ThrowIfDisposed();
+
+                if (_字节数组 == null || _字节数组.Length == 0)
                 {
                     throw new ArgumentException("数组不能为空");
                 }
@@ -1416,7 +1480,7 @@ namespace Dota2Simulator.PictureProcessing
                 try
                 {
                     // 复制字节数组到位图
-                    Marshal.Copy(_字节数组, 0, 位图数据.Scan0, _字节数组.Length);
+                    Marshal.Copy(_字节数组, 0, 位图数据.Scan0, Math.Min(_字节数组.Length, 位图数据.Stride * 高度));
                 }
                 finally
                 {
@@ -1425,6 +1489,25 @@ namespace Dota2Simulator.PictureProcessing
                 // 保存位图到文件
                 位图.Save(文件路径, 图片格式);
                 return true;
+            }
+
+            // 实现IDisposable接口
+            public void Dispose()
+            {
+                if (!_disposed)
+                {
+                    if (_isPooled && _字节数组 != null)
+                    {
+                        ArrayPool<byte>.Shared.Return(_字节数组);
+                        _字节数组 = null;
+                    }
+                    _disposed = true;
+                }
+            }
+
+            private void ThrowIfDisposed()
+            {
+                ObjectDisposedException.ThrowIf(_disposed, this);
             }
         }
 

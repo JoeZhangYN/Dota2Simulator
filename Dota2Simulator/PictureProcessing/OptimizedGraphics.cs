@@ -83,14 +83,16 @@ public unsafe class OptimizedGraphics : IDisposable
                 }
 
                 // 准备 BITMAPINFO 结构
-                BITMAPINFO bmi = new();
-                bmi.biSize = Marshal.SizeOf(typeof(BITMAPINFO));
-                bmi.biWidth = bitmap.Width;
-                bmi.biHeight = -bitmap.Height;  // 负值表示自顶向下的位图
-                bmi.biPlanes = 1;
-                bmi.biBitCount = 32;
-                bmi.biCompression = 0;  // BI_RGB
-                bmi.biSizeImage = bitmap.Width * bitmap.Height * 4;
+                BITMAPINFO bmi = new()
+                {
+                    biSize = Marshal.SizeOf(typeof(BITMAPINFO)),
+                    biWidth = bitmap.Width,
+                    biHeight = -bitmap.Height,  // 负值表示自顶向下的位图
+                    biPlanes = 1,
+                    biBitCount = 32,
+                    biCompression = 0,  // BI_RGB
+                    biSizeImage = bitmap.Width * bitmap.Height * 4
+                };
 
                 // 创建一个字节数组来存储位图数据
                 int bytes = bitmap.Width * bitmap.Height * 4;
@@ -144,14 +146,16 @@ public unsafe class OptimizedGraphics : IDisposable
                 }
 
                 // 准备 BITMAPINFO 结构
-                BITMAPINFO bmi = new();
-                bmi.biSize = Marshal.SizeOf(typeof(BITMAPINFO));
-                bmi.biWidth = width;
-                bmi.biHeight = -height;  // 负值表示自顶向下的位图
-                bmi.biPlanes = 1;
-                bmi.biBitCount = 32;
-                bmi.biCompression = 0;  // BI_RGB
-                bmi.biSizeImage = width * height * 4;
+                BITMAPINFO bmi = new()
+                {
+                    biSize = Marshal.SizeOf(typeof(BITMAPINFO)),
+                    biWidth = width,
+                    biHeight = -height,  // 负值表示自顶向下的位图
+                    biPlanes = 1,
+                    biBitCount = 32,
+                    biCompression = 0,  // BI_RGB
+                    biSizeImage = width * height * 4
+                };
 
                 // 创建一个字节数组来存储位图数据
                 int bytes = bitmapData.Stride * height;
@@ -202,14 +206,16 @@ public unsafe class OptimizedGraphics : IDisposable
             }
 
             // 准备 BITMAPINFO 结构
-            BITMAPINFO bmi = new();
-            bmi.biSize = Marshal.SizeOf(typeof(BITMAPINFO));
-            bmi.biWidth = width;
-            bmi.biHeight = -height; // 负值表示自顶向下的位图
-            bmi.biPlanes = 1;
-            bmi.biBitCount = 32;
-            bmi.biCompression = 0; // BI_RGB
-            bmi.biSizeImage = width * height * 4;
+            BITMAPINFO bmi = new()
+            {
+                biSize = Marshal.SizeOf(typeof(BITMAPINFO)),
+                biWidth = width,
+                biHeight = -height, // 负值表示自顶向下的位图
+                biPlanes = 1,
+                biBitCount = 32,
+                biCompression = 0, // BI_RGB
+                biSizeImage = width * height * 4
+            };
 
             // 使用 GetDIBits 将位图数据复制到 bts 数组
             if (GetDIBits(hMemDC, hBitmap, 0, (uint)height, bts, ref bmi, 0) == 0)

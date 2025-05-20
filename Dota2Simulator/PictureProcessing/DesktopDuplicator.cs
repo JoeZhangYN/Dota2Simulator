@@ -49,14 +49,13 @@ namespace Dota2Simulator.PictureProcessing
 
         public Bitmap Capture(Rectangle captureArea)
         {
-            OutputDuplicateFrameInformation frameInfo;
             Resource desktopResource = null;
             SharpDX.DXGI.Resource tempResource = null;
 
             try
             {
                 // 捕捉屏幕
-                _ = outputDuplication.TryAcquireNextFrame(500, out frameInfo, out tempResource);
+                _ = outputDuplication.TryAcquireNextFrame(500, out OutputDuplicateFrameInformation frameInfo, out tempResource);
                 desktopResource = tempResource.QueryInterface<Resource>();
 
                 using Texture2D desktopTexture = desktopResource.QueryInterface<Texture2D>();
@@ -116,15 +115,9 @@ namespace Dota2Simulator.PictureProcessing
             }
             finally
             {
-                if (desktopResource != null)
-                {
-                    desktopResource.Dispose();
-                }
+                desktopResource?.Dispose();
 
-                if (tempResource != null)
-                {
-                    tempResource.Dispose();
-                }
+                tempResource?.Dispose();
 
                 outputDuplication.ReleaseFrame();
             }
