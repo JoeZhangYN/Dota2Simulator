@@ -5,7 +5,13 @@
 // #define HF2
 // #define LOL
 
+using Collections.Pooled;
+using Dota2Simulator.KeyboardMouse;
+using Dota2Simulator.PictureProcessing;
+using Dota2Simulator.TTS;
+using NLog;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
@@ -15,14 +21,10 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.Intrinsics;
 using System.Runtime.Intrinsics.X86;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using Collections.Pooled;
-using Dota2Simulator.KeyboardMouse;
-using Dota2Simulator.PictureProcessing;
-using Dota2Simulator.TTS;
-using NLog;
 using static Dota2Simulator.PictureProcessing.PictureProcessing;
 using static Dota2Simulator.SetWindowTop;
 using static System.Threading.Tasks.Task;
@@ -4302,11 +4304,6 @@ namespace Dota2Simulator
         ///     循环计数2
         /// </summary>
         private static bool _循环条件2;
-
-        /// <summary>
-        ///     全局图像
-        /// </summary>
-        private static Bitmap _全局图像;
 
         /// <summary>
         ///     _全局数组
@@ -10879,110 +10876,203 @@ namespace Dota2Simulator
         /// </summary>
         /// <param name="数组"></param>
         /// <returns></returns>
+        // 预先计算的检测点结构
+        private readonly struct 检测点
+        {
+            public readonly Point 位置;
+            public readonly ReadOnlyMemory<(Color 期望颜色, int 容差)> 颜色检查;
+            public readonly string 名称;
+
+            public 检测点(Point 位置, ReadOnlyMemory<(Color, int)> 颜色检查, string 名称)
+            {
+                this.位置 = 位置;
+                this.颜色检查 = 颜色检查;
+                this.名称 = 名称;
+            }
+        }
+
+        // 使用缓存的检测配置
+        private static readonly ConcurrentDictionary<(技能信息, int), 检测点[]> _检测点缓存 = new();
+
+        // 静态StringBuilder池
+        private static class StringBuilderPool
+        {
+            private static readonly ThreadLocal<StringBuilder> _pool = new ThreadLocal<StringBuilder>(() => new StringBuilder());
+
+            public static StringBuilder Get()
+            {
+                var sb = _pool.Value;
+                sb.Clear();
+                return sb;
+            }
+        }
         public static int 获取当前技能数量(in 字节数组包含长宽 数组)
         {
-            int count_技能 = 0;
-
             List<技能信息> 技能列表 = [技能4, 技能5, 技能6];
             List<int> 技能数量 = [4, 5, 6];
 
-            static void 根据数量判断是否存在技能(in 字节数组包含长宽 数组, 技能信息 技能, int i, ref int count_技能,ref string 输出文字)
-            {
-                int 偏移 = 技能.技能间隔 * i;
-
-                Point p_QWERDF = new(技能.QWERDF位置x + 偏移 - 坐标偏移x, 技能.QWERDF位置y - 坐标偏移y);
-                Point p_主动 = new(技能.技能CD图标x + 偏移 - 坐标偏移x, 技能.技能CD图标y - 坐标偏移y);
-                Point p_法球 = new(技能.法球技能CD位置x + 偏移 - 坐标偏移x, 技能.法球技能CD位置y - 坐标偏移y);
-                Point p_被动 = new(技能.被动位置x + 偏移 - 坐标偏移x, 技能.被动位置y - 坐标偏移y);
-                Point p_推荐 = new(技能.状态技能位置x + 偏移 - 坐标偏移x, 技能.状态技能位置y - 坐标偏移y);
-
-                Color 获取的颜色_QWERDF = GetSPixelBytes(in 数组, p_QWERDF);
-                Color 获取的颜色_主动 = GetSPixelBytes(in 数组, p_主动);
-                Color 获取的颜色_法球 = GetSPixelBytes(in 数组, p_法球);
-                Color 获取的颜色_被动 = GetSPixelBytes(in 数组, p_被动);
-                Color 获取的颜色_推荐 = GetSPixelBytes(in 数组, p_推荐);
-
-                bool colorMatch_QWERDF = ColorAEqualColorB(获取的颜色_QWERDF, 技能.QWERDF框颜色, 技能.QWERDF框颜色容差);
-                bool colorMatch_已学主动 = ColorAEqualColorB(获取的颜色_主动, 技能.技能CD颜色, 技能.技能CD颜色容差);
-                bool colorMatch_未学主动 = ColorAEqualColorB(获取的颜色_主动, 技能.未学主动技能CD颜色, 技能.未学主动技能CD颜色容差);
-                bool colorMatch_已学法球 = ColorAEqualColorB(获取的颜色_法球, 技能.未学法球技能CD颜色, 技能.未学法球技能CD颜色容差);
-                bool colorMatch_未学法球 = ColorAEqualColorB(获取的颜色_法球, 技能.未学法球技能CD颜色, 技能.未学法球技能CD颜色容差);
-                bool colorMatch_被动 = ColorAEqualColorB(获取的颜色_被动, 技能.未学被动技能颜色, 技能.未学被动技能颜色容差);
-                bool colorMatch_破坏被动 = ColorAEqualColorB(获取的颜色_被动, 技能.破坏被动技能颜色, 技能.破坏被动技能颜色容差);
-                bool colorMatch_推荐 = ColorAEqualColorB(获取的颜色_推荐, 技能.推荐学习技能颜色, 技能.推荐学习技能颜色容差);
-
-                if (colorMatch_QWERDF || colorMatch_已学主动 || colorMatch_未学主动 || colorMatch_已学法球 || colorMatch_未学法球 ||
-                    colorMatch_被动 || colorMatch_推荐 || colorMatch_破坏被动)
-                {
-                    count_技能++;
-
-                    输出文字 += $"{i + 1} QWERDF图标 :位置X:{p_QWERDF.X + 坐标偏移x},位置Y:{p_QWERDF.Y + 坐标偏移y}，RGB:{获取的颜色_QWERDF.R}, {获取的颜色_QWERDF.G}, {获取的颜色_QWERDF.B}\r\n";
-                    输出文字 += $"{i + 1} 技能CD图标 :位置X:{p_主动.X + 坐标偏移x},位置Y:{p_主动.Y + 坐标偏移y}，RGB:{获取的颜色_主动.R}, {获取的颜色_主动.G}, {获取的颜色_主动.B}。\r\n";
-                    输出文字 += $"{i + 1} 技能法球 :位置X:{p_法球.X + 坐标偏移x},位置Y:{p_法球.Y + 坐标偏移y}，RGB:{获取的颜色_法球.R}, {获取的颜色_法球.G}, {获取的颜色_法球.B}。\r\n";
-                    输出文字 += $"{i + 1} 被动技能 :位置X:{p_被动.X + 坐标偏移x},位置Y:{p_被动.Y + 坐标偏移y}，RGB:{获取的颜色_被动.R}, {获取的颜色_被动.G}, {获取的颜色_被动.B}。\r\n";
-                    输出文字 += $"{i + 1} 推荐技能 :位置X:{p_推荐.X + 坐标偏移x},位置Y:{p_推荐.Y + 坐标偏移y}，RGB:{获取的颜色_推荐.R}, {获取的颜色_推荐.G}, {获取的颜色_推荐.B}。\r\n\r\n";
-
-                    return;
-                }
-
-                #region 输出判断调试用
-
-                if (!colorMatch_QWERDF)
-                {
-                    输出文字 += $"{i + 1} QWERDF图标 :位置X:{p_QWERDF.X + 坐标偏移x},位置Y:{p_QWERDF.Y + 坐标偏移y}，RGB:{获取的颜色_QWERDF.R}, {获取的颜色_QWERDF.G}, {获取的颜色_QWERDF.B}\r\n";
-                }
-                if (!colorMatch_已学主动 && !colorMatch_未学主动)
-                {
-                    输出文字 += $"{i + 1} 技能CD图标 :位置X:{p_主动.X + 坐标偏移x},位置Y:{p_主动.Y + 坐标偏移y}，RGB:{获取的颜色_主动.R}, {获取的颜色_主动.G}, {获取的颜色_主动.B}。\r\n";
-                }
-                if (!colorMatch_已学法球 && !colorMatch_未学法球)
-                {
-                    输出文字 += $"{i + 1} 技能法球 :位置X:{p_法球.X + 坐标偏移x},位置Y:{p_法球.Y + 坐标偏移y}，RGB:{获取的颜色_法球.R}, {获取的颜色_法球.G}, {获取的颜色_法球.B}。\r\n";
-                }
-                if (!colorMatch_被动 && !colorMatch_破坏被动)
-                {
-                    输出文字 += $"{i + 1} 被动技能 :位置X:{p_被动.X + 坐标偏移x},位置Y:{p_被动.Y + 坐标偏移y}，RGB:{获取的颜色_被动.R}, {获取的颜色_被动.G}, {获取的颜色_被动.B}。\r\n";
-                }
-                if (!colorMatch_推荐)
-                {
-                    输出文字 += $"{i + 1} 推荐技能 :位置X:{p_推荐.X + 坐标偏移x},位置Y:{p_推荐.Y + 坐标偏移y}，RGB:{获取的颜色_推荐.R}, {获取的颜色_推荐.G}, {获取的颜色_推荐.B}。\r\n\r\n";
-                }                
-
-                #endregion
-            }
-
-            string 输出文字 = "";
-            string 全部文字 = "";
-            
+            var 全部文字 = StringBuilderPool.Get();
 
             for (int j = 0; j < 技能列表.Count; j++)
             {
                 技能信息 当前技能 = 技能列表[j];
+                int 期望数量 = 技能数量[j];
 
-                输出文字 = $"\r\n当前技能数量{技能数量[j]}\r\n";
-                count_技能 = 0;
+                var 输出文字 = StringBuilderPool.Get();
+                输出文字.AppendLine($"\r\n当前技能数量{期望数量}");
 
-                for (int i = 0; i < 技能数量[j] - 1; i++)
+                var 检测到的数量 = 快速检测技能数量(in 数组, 当前技能, 期望数量 - 1, 输出文字);
+
+                if (检测到的数量 == 期望数量 - 1)
                 {
-                    根据数量判断是否存在技能(in 数组, 当前技能, i, ref count_技能, ref 输出文字);
+                    Logger.Info(输出文字.ToString());
+                    return 期望数量;
                 }
 
-                if (count_技能 == 技能数量[j] - 1)
-                {
-                    Logger.Error(输出文字);
-                    return 技能数量[j];
-                }
-
-                全部文字 += 输出文字;
+                全部文字.Append(输出文字.ToString());
 
                 // 结束循环依旧没匹配到
-                if (j == 2) Logger.Error(全部文字);
+                if (j == 2) Logger.Error(全部文字.ToString());
             }
 
-            输出文字 = "";
-            全部文字 = "";
             Tts.Speak("技能数量异常");
             return 0;
+        }
+
+        private static int 快速检测技能数量(in 字节数组包含长宽 数组, 技能信息 技能, int 最大检测数量, StringBuilder 调试信息)
+        {
+            int count_技能 = 0;
+
+            for (int i = 0; i < 最大检测数量; i++)
+            {
+                var (成功, 单个调试信息) = 快速检测单个技能(in 数组, 技能, i);
+                调试信息.Append(单个调试信息);
+
+                if (成功)
+                {
+                    count_技能++;
+                }
+            }
+
+            return count_技能;
+        }
+
+        private static (bool 成功, string 调试信息) 快速检测单个技能(in 字节数组包含长宽 数组, 技能信息 技能, int i)
+        {
+            var 检测点数组 = 获取检测点配置(技能, i);
+            var 调试信息 = new StringBuilder();
+
+            // 获取所有颜色和检测结果
+            var 检测结果 = new (string 名称, Point 位置, Color 颜色, bool[] 匹配结果)[检测点数组.Length];
+            bool 整体有匹配 = false;
+
+            for (int idx = 0; idx < 检测点数组.Length; idx++)
+            {
+                var 点 = 检测点数组[idx];
+                var 实际颜色 = GetSPixelBytes(in 数组, 点.位置);
+                var 匹配结果 = new bool[点.颜色检查.Length];
+
+                for (int colorIdx = 0; colorIdx < 点.颜色检查.Length; colorIdx++)
+                {
+                    var 颜色检查 = 点.颜色检查.Span[colorIdx];
+                    匹配结果[colorIdx] = ColorAEqualColorB(实际颜色, 颜色检查.期望颜色, (byte)颜色检查.容差);
+                }
+
+                bool 当前点有匹配 = 匹配结果.Any(match => match);
+                检测结果[idx] = (点.名称, 点.位置, 实际颜色, 匹配结果);
+                整体有匹配 |= 当前点有匹配;
+            }
+
+            // 根据原逻辑构建调试信息
+            if (整体有匹配)
+            {
+                // 如果有匹配，输出所有检测点的信息
+                调试信息.AppendLine($"{i + 1} QWERDF图标 :位置X:{检测结果[0].位置.X + 坐标偏移x},位置Y:{检测结果[0].位置.Y + 坐标偏移y}，RGB:{检测结果[0].颜色.R}, {检测结果[0].颜色.G}, {检测结果[0].颜色.B}");
+                调试信息.AppendLine($"{i + 1} 技能CD图标 :位置X:{检测结果[1].位置.X + 坐标偏移x},位置Y:{检测结果[1].位置.Y + 坐标偏移y}，RGB:{检测结果[1].颜色.R}, {检测结果[1].颜色.G}, {检测结果[1].颜色.B}。");
+                调试信息.AppendLine($"{i + 1} 技能法球 :位置X:{检测结果[2].位置.X + 坐标偏移x},位置Y:{检测结果[2].位置.Y + 坐标偏移y}，RGB:{检测结果[2].颜色.R}, {检测结果[2].颜色.G}, {检测结果[2].颜色.B}。");
+                调试信息.AppendLine($"{i + 1} 被动技能 :位置X:{检测结果[3].位置.X + 坐标偏移x},位置Y:{检测结果[3].位置.Y + 坐标偏移y}，RGB:{检测结果[3].颜色.R}, {检测结果[3].颜色.G}, {检测结果[3].颜色.B}。");
+                调试信息.AppendLine($"{i + 1} 推荐技能 :位置X:{检测结果[4].位置.X + 坐标偏移x},位置Y:{检测结果[4].位置.Y + 坐标偏移y}，RGB:{检测结果[4].颜色.R}, {检测结果[4].颜色.G}, {检测结果[4].颜色.B}。");
+                调试信息.AppendLine();
+                return (true, 调试信息.ToString());
+            }
+
+            // 如果没有匹配，按原逻辑输出不匹配的项
+            // QWERDF图标
+            if (!检测结果[0].匹配结果.Any(match => match))
+            {
+                调试信息.AppendLine($"{i + 1} QWERDF图标 :位置X:{检测结果[0].位置.X + 坐标偏移x},位置Y:{检测结果[0].位置.Y + 坐标偏移y}，RGB:{检测结果[0].颜色.R}, {检测结果[0].颜色.G}, {检测结果[0].颜色.B}");
+            }
+            else if (!检测结果[1].匹配结果.Any(match => match)) // 主动技能
+            {
+                调试信息.AppendLine($"{i + 1} 技能CD图标 :位置X:{检测结果[1].位置.X + 坐标偏移x},位置Y:{检测结果[1].位置.Y + 坐标偏移y}，RGB:{检测结果[1].颜色.R}, {检测结果[1].颜色.G}, {检测结果[1].颜色.B}。");
+            }
+            else if (!检测结果[2].匹配结果.Any(match => match)) // 法球技能
+            {
+                调试信息.AppendLine($"{i + 1} 技能法球 :位置X:{检测结果[2].位置.X + 坐标偏移x},位置Y:{检测结果[2].位置.Y + 坐标偏移y}，RGB:{检测结果[2].颜色.R}, {检测结果[2].颜色.G}, {检测结果[2].颜色.B}。");
+            }
+            else if (!检测结果[3].匹配结果.Any(match => match)) // 被动技能
+            {
+                调试信息.AppendLine($"{i + 1} 被动技能 :位置X:{检测结果[3].位置.X + 坐标偏移x},位置Y:{检测结果[3].位置.Y + 坐标偏移y}，RGB:{检测结果[3].颜色.R}, {检测结果[3].颜色.G}, {检测结果[3].颜色.B}。");
+            }
+            else if (!检测结果[4].匹配结果.Any(match => match)) // 推荐技能
+            {
+                调试信息.AppendLine($"{i + 1} 推荐技能 :位置X:{检测结果[4].位置.X + 坐标偏移x},位置Y:{检测结果[4].位置.Y + 坐标偏移y}，RGB:{检测结果[4].颜色.R}, {检测结果[4].颜色.G}, {检测结果[4].颜色.B}。");
+                调试信息.AppendLine();
+            }
+
+            return (false, 调试信息.ToString());
+        }
+
+        private static 检测点[] 获取检测点配置(技能信息 技能, int i)
+        {
+            return _检测点缓存.GetOrAdd((技能, i), key => 创建检测点配置_缓存(key.Item1, key.Item2));
+        }
+
+        private static 检测点[] 创建检测点配置_缓存(技能信息 技能, int i)
+        {
+            int 偏移 = 技能.技能间隔 * i;
+
+            Point p_QWERDF = new(技能.QWERDF位置x + 偏移 - 坐标偏移x, 技能.QWERDF位置y - 坐标偏移y);
+            Point p_主动 = new(技能.技能CD图标x + 偏移 - 坐标偏移x, 技能.技能CD图标y - 坐标偏移y);
+            Point p_法球 = new(技能.法球技能CD位置x + 偏移 - 坐标偏移x, 技能.法球技能CD位置y - 坐标偏移y);
+            Point p_被动 = new(技能.被动位置x + 偏移 - 坐标偏移x, 技能.被动位置y - 坐标偏移y);
+            Point p_推荐 = new(技能.状态技能位置x + 偏移 - 坐标偏移x, 技能.状态技能位置y - 坐标偏移y);
+
+            return new 检测点[]
+            {
+        // QWERDF图标检测点
+        new 检测点(p_QWERDF, new (Color, int)[]
+        {
+            (技能.QWERDF框颜色, 技能.QWERDF框颜色容差)
+        }, "QWERDF图标"),
+        
+        // 主动技能检测点
+        new 检测点(p_主动, new (Color, int)[]
+        {
+            (技能.技能CD颜色, 技能.技能CD颜色容差),
+            (技能.未学主动技能CD颜色, 技能.未学主动技能CD颜色容差)
+        }, "主动"),
+        
+        // 法球技能检测点
+        new 检测点(p_法球, new (Color, int)[]
+        {
+            (技能.未学法球技能CD颜色, 技能.未学法球技能CD颜色容差),
+            (技能.未学法球技能CD颜色, 技能.未学法球技能CD颜色容差) // 注意：原代码中已学和未学法球用的是同一个颜色和容差
+        }, "技能"),
+        
+        // 被动技能检测点
+        new 检测点(p_被动, new (Color, int)[]
+        {
+            (技能.未学被动技能颜色, 技能.未学被动技能颜色容差),
+            (技能.破坏被动技能颜色, 技能.破坏被动技能颜色容差)
+        }, "被动技能"),
+        
+        // 推荐技能检测点
+        new 检测点(p_推荐, new (Color, int)[]
+        {
+            (技能.推荐学习技能颜色, 技能.推荐学习技能颜色容差)
+        }, "推荐技能")
+            };
         }
 
         /// <summary>

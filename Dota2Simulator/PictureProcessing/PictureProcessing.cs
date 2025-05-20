@@ -1479,17 +1479,11 @@ namespace Dota2Simulator.PictureProcessing
         public static bool ColorAEqualColorB(in Color colorA, in Color colorB, byte errorRange = 10)
         {
             return ColorExtensions.EqualsWithError(colorA, colorB, errorRange);
-            Rgba a = new Rgba(colorA);  // 直接转换
-            Rgba b = new Rgba(colorB);  // 直接转换
-            return color_a_equal_color_b(ref a, ref b, errorRange);
         }
 
         public static bool ColorAEqualColorB(in Color colorA, in Color colorB, byte errorR, byte errorG, byte errorB)
         {
             return ColorExtensions.EqualsRGBWithError(colorA, colorB, errorR, errorG, errorB);
-            Rgba a = new Rgba(colorA);  // 直接转换
-            Rgba b = new Rgba(colorB);  // 直接转换
-            return color_a_equal_color_b_rgb(ref a, ref b, errorR, errorG, errorB);
         }
 
         #endregion
