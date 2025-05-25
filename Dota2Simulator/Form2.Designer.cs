@@ -175,20 +175,20 @@ namespace Dota2Simulator
         #endregion
         private System.Windows.Forms.PictureBox pictureBox1;
         private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.TextBox tb_name;
-        private System.Windows.Forms.TextBox tb_阵营;
         private System.Windows.Forms.Label lb_name;
         private System.Windows.Forms.Label lb_阵营;
         private System.Windows.Forms.Label label4;
-        private System.Windows.Forms.TextBox tb_x;
         private System.Windows.Forms.Label label5;
-        private System.Windows.Forms.TextBox tb_y;
         private System.Windows.Forms.Label label6;
-        private System.Windows.Forms.TextBox tb_delay;
         private System.Windows.Forms.Label lb_状态抗性;
-        private System.Windows.Forms.TextBox tb_状态抗性;
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.Label lb_攻速;
-        private System.Windows.Forms.TextBox tb_攻速;
+        public System.Windows.Forms.TextBox tb_阵营;
+        public System.Windows.Forms.TextBox tb_name;
+        public System.Windows.Forms.TextBox tb_x;
+        public System.Windows.Forms.TextBox tb_y;
+        public System.Windows.Forms.TextBox tb_delay;
+        public System.Windows.Forms.TextBox tb_状态抗性;
+        public System.Windows.Forms.TextBox tb_攻速;
     }
 }

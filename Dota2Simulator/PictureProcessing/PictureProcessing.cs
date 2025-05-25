@@ -1,9 +1,9 @@
 ﻿using Collections.Pooled;
+using ImageProcessingSystem;
 using OpenCvSharp;
 using OpenCvSharp.Extensions;
 using System;
 using System.Buffers;
-using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Linq;
@@ -19,402 +19,791 @@ namespace Dota2Simulator.PictureProcessing
     /// </summary>
     internal class PictureProcessing
     {
+        #region 检测位置是否有效 只剩这个
+
+        private static readonly Point 无效坐标 = new(245760, 143640);
+
+        public static bool 是否无效位置(Point? 位置)
+        {
+            return 位置 == null ||
+           位置 == 无效坐标 ||
+           位置.Value.X <= 0 ||
+           位置.Value.Y <= 0;
+        }
+
+        #endregion
+
         #region 屏幕取色
 
-        public static Color CaptureColor(int x, int y)
-        {
-            using OptimizedGraphics graphics = OptimizedGraphics.CreateGraphics();
-            byte[] bytes = [4];
-            _ = graphics.CaptureScreenToBytes(x, y, 1, 1, ref bytes);
-            return Color.FromArgb(bytes[3], bytes[0], bytes[1], bytes[2]);
-        }
+        //public static Color CaptureColor(int x, int y)
+        //{
+        //    byte[] bytes = OptimizedGraphics.CaptureScreenToBytes(x, y, 1, 1);
+        //    return Color.FromArgb(bytes[3], bytes[0], bytes[1], bytes[2]);
+        //}
 
         #endregion
 
         #region 增加对比度
 
-        public static Bitmap MethodBaseOnMemory(Bitmap bitmap, int degree = 15)
-        {
-            if (bitmap == null)
-            {
-                return null;
-            }
+        //public static Bitmap MethodBaseOnMemory(Bitmap bitmap, int degree = 15)
+        //{
+        //    if (bitmap == null)
+        //    {
+        //        return null;
+        //    }
 
-            double deg = (100.0 + degree) / 100.0;
+        //    double deg = (100.0 + degree) / 100.0;
 
-            int width = bitmap.Width;
-            int height = bitmap.Height;
+        //    int width = bitmap.Width;
+        //    int height = bitmap.Height;
 
-            int length = height * 3 * width;
-            byte[] rgb = new byte[length];
+        //    int length = height * 3 * width;
+        //    byte[] rgb = new byte[length];
 
-            BitmapData data = bitmap.LockBits(new Rectangle(0, 0, width, height), ImageLockMode.ReadWrite,
-                PixelFormat.Format32bppArgb);
+        //    BitmapData data = bitmap.LockBits(new Rectangle(0, 0, width, height), ImageLockMode.ReadWrite,
+        //        PixelFormat.Format32bppArgb);
 
-            nint scan0 = data.Scan0;
-            Marshal.Copy(scan0, rgb, 0, length);
+        //    nint scan0 = data.Scan0;
+        //    Marshal.Copy(scan0, rgb, 0, length);
 
-            double gray;
-            for (int i = 0; i < rgb.Length; i += 3)
-            {
-                for (int j = 0; j < 3; j++)
-                {
-                    gray = ((((rgb[i + j] / 255.0) - 0.5) * deg) + 0.5) * 255.0;
-                    if (gray > 255)
-                    {
-                        gray = 255;
-                    }
+        //    double gray;
+        //    for (int i = 0; i < rgb.Length; i += 3)
+        //    {
+        //        for (int j = 0; j < 3; j++)
+        //        {
+        //            gray = ((((rgb[i + j] / 255.0) - 0.5) * deg) + 0.5) * 255.0;
+        //            if (gray > 255)
+        //            {
+        //                gray = 255;
+        //            }
 
-                    if (gray < 0)
-                    {
-                        gray = 0;
-                    }
+        //            if (gray < 0)
+        //            {
+        //                gray = 0;
+        //            }
 
-                    rgb[i + j] = (byte)gray;
-                }
-            }
+        //            rgb[i + j] = (byte)gray;
+        //        }
+        //    }
 
-            Marshal.Copy(rgb, 0, scan0, length);
-            bitmap.UnlockBits(data);
-            return bitmap;
-        }
+        //    Marshal.Copy(rgb, 0, scan0, length);
+        //    bitmap.UnlockBits(data);
+        //    return bitmap;
+        //}
 
         #endregion
 
         #region 转化为灰度图
 
-        public static Bitmap ToGray(Bitmap bmp, int mode = 0)
-        {
-            if (bmp == null)
-            {
-                return null;
-            }
+        //public static Bitmap ToGray(Bitmap bmp, int mode = 0)
+        //{
+        //    if (bmp == null)
+        //    {
+        //        return null;
+        //    }
 
-            int w = bmp.Width;
-            int h = bmp.Height;
-            try
-            {
-                BitmapData srcData = bmp.LockBits(new Rectangle(0, 0, w, h), ImageLockMode.ReadWrite,
-                    PixelFormat.Format32bppArgb);
-                unsafe
-                {
-                    byte* p = (byte*)srcData.Scan0.ToPointer();
-                    for (int y = 0; y < h; y++)
-                    {
-                        for (int x = 0; x < w; x++)
-                        {
-                            byte newColor = mode == 0
-                                ? (byte)((p[0] * 0.114f) + (p[1] * 0.587f) + (p[2] * 0.299f))
-                                : (byte)((p[0] + p[1] + p[2]) / 3.0f);
-                            p[0] = newColor;
-                            p[1] = newColor;
-                            p[2] = newColor;
+        //    int w = bmp.Width;
+        //    int h = bmp.Height;
+        //    try
+        //    {
+        //        BitmapData srcData = bmp.LockBits(new Rectangle(0, 0, w, h), ImageLockMode.ReadWrite,
+        //            PixelFormat.Format32bppArgb);
+        //        unsafe
+        //        {
+        //            byte* p = (byte*)srcData.Scan0.ToPointer();
+        //            for (int y = 0; y < h; y++)
+        //            {
+        //                for (int x = 0; x < w; x++)
+        //                {
+        //                    byte newColor = mode == 0
+        //                        ? (byte)((p[0] * 0.114f) + (p[1] * 0.587f) + (p[2] * 0.299f))
+        //                        : (byte)((p[0] + p[1] + p[2]) / 3.0f);
+        //                    p[0] = newColor;
+        //                    p[1] = newColor;
+        //                    p[2] = newColor;
 
-                            p += 3;
-                        }
+        //                    p += 3;
+        //                }
 
-                        p += srcData.Stride - (w * 3);
-                    }
+        //                p += srcData.Stride - (w * 3);
+        //            }
 
-                    bmp.UnlockBits(srcData);
-                    return bmp;
-                }
-            }
-            catch
-            {
-                return null;
-            }
-        }
+        //            bmp.UnlockBits(srcData);
+        //            return bmp;
+        //        }
+        //    }
+        //    catch
+        //    {
+        //        return null;
+        //    }
+        //}
 
         #endregion
 
         #region 多图片合并相同部分
 
-        public static void PictureCombine(Bitmap[] images, string outputname)
-        {
-            if (images == null || images.Length < 2)
-            {
-                Console.WriteLine(@"需要至少两张图片进行比较。");
-                return;
-            }
+        //public static void PictureCombine(Bitmap[] images, string outputname)
+        //{
+        //    if (images == null || images.Length < 2)
+        //    {
+        //        Console.WriteLine(@"需要至少两张图片进行比较。");
+        //        return;
+        //    }
 
-            for (int i = 1; i < images.Length; i++)
-            {
-                if (images[0].Size != images[i].Size)
-                {
-                    Console.WriteLine(@"图像大小不同，无法进行合并。");
-                    return;
-                }
-            }
+        //    for (int i = 1; i < images.Length; i++)
+        //    {
+        //        if (images[0].Size != images[i].Size)
+        //        {
+        //            Console.WriteLine(@"图像大小不同，无法进行合并。");
+        //            return;
+        //        }
+        //    }
 
-            using Bitmap resultImage = new(images[0].Width, images[0].Height);
+        //    using Bitmap resultImage = new(images[0].Width, images[0].Height);
 
-            for (int x = 0; x < images[0].Width; x++)
-            {
-                for (int y = 0; y < images[0].Height; y++)
-                {
-                    bool identical = true;
-                    Color firstPixelColor = images[0].GetPixel(x, y);
+        //    for (int x = 0; x < images[0].Width; x++)
+        //    {
+        //        for (int y = 0; y < images[0].Height; y++)
+        //        {
+        //            bool identical = true;
+        //            Color firstPixelColor = images[0].GetPixel(x, y);
 
-                    for (int n = 1; n < images.Length; n++)
-                    {
-                        if (firstPixelColor.ToArgb() != images[n].GetPixel(x, y).ToArgb())
-                        {
-                            identical = false;
-                            break;
-                        }
-                    }
+        //            for (int n = 1; n < images.Length; n++)
+        //            {
+        //                if (firstPixelColor.ToArgb() != images[n].GetPixel(x, y).ToArgb())
+        //                {
+        //                    identical = false;
+        //                    break;
+        //                }
+        //            }
 
-                    resultImage.SetPixel(x, y, identical ? firstPixelColor : Color.FromArgb(255, 20, 147));
-                }
-            }
+        //            resultImage.SetPixel(x, y, identical ? firstPixelColor : Color.FromArgb(255, 20, 147));
+        //        }
+        //    }
 
-            resultImage.Save(outputname + ".bmp", ImageFormat.Bmp);
-        }
+        //    resultImage.Save(outputname + ".bmp", ImageFormat.Bmp);
+        //}
 
         #endregion
 
         #region 屏幕截图
 
-        //internal struct Bgr8
+        //public static Bitmap CaptureScreen(int x, int y, int width, int height) =>
+        //    OptimizedGraphics.CaptureScreen(x, y, width, height);
+
+
+        //public static byte[] CaptureScreenAllByte(int x, int y, int width, int height) =>
+        //    OptimizedGraphics.CaptureScreenToBytes(x, y, width, height);
+
+        //public static async Task<Bitmap> CaptureScreenAsync(int x, int y, Size size) =>
+        //    await OptimizedGraphics.CaptureScreenAsync(x, y, size.Width, size.Height);
+
+        //public static void CaptureScreen_固定数组(字节数组包含长宽 数组, int x, int y) =>
+        //    OptimizedGraphics.CaptureScreenToBytes(x, y, 数组.图片尺寸.Width, 数组.图片尺寸.Height, 数组.字节数组);
+
+        //public static 字节数组包含长宽 CaptureScreen_固定大小(int x, int y, int width, int height)
         //{
-        //    public uint B;
-        //    public uint G;
-        //    public uint R;
+        //    byte[] bytes = new byte[width * height * 4];
+        //    OptimizedGraphics.CaptureScreenToBytes(x, y, width, height, bytes);
+
+        //    return new 字节数组包含长宽
+        //    {
+        //        图片尺寸 = new Size(width, height),
+        //        字节数组 = bytes,
+        //    };
         //}
-
-        //[DllImport("rscaptrs.dll")]
-        //public static extern IEnumerable<Bgr8> GetColor(uint i);
-
-        public static Bitmap CaptureScreen(int x, int y, int width, int height)
-        {
-            if (width + height == 0)
-            {
-                return new Bitmap(0, 0);
-            }
-
-            using OptimizedGraphics graphics = OptimizedGraphics.CreateGraphics();
-            return graphics.CaptureScreenToBitmap(x, y, width, height);
-        }
-
-        public static byte[] CaptureScreenAllByte(int x, int y, int width, int height)
-        {
-            if (width + height == 0)
-            {
-                return [];
-            }
-
-            using OptimizedGraphics graphics = OptimizedGraphics.CreateGraphics();
-            byte[] data = new byte[width * height * 4];
-            _ = graphics.CaptureScreenToBytes(x, y, width, height, ref data);
-            return data;
-        }
-
-        public static async Task<Bitmap> CaptureScreenAsync(int x, int y, Size size)
-        {
-            if (size.Height + size.Width == 0)
-            {
-                return await Task.FromResult(new Bitmap(0, 0)).ConfigureAwait(true);
-            }
-
-            using OptimizedGraphics graphics = OptimizedGraphics.CreateGraphics();
-            return await Task.FromResult(graphics.CaptureScreenToBitmap(x, y, size.Width, size.Height))
-                .ConfigureAwait(true);
-        }
-
-        public static void CaptureScreen_固定数组(字节数组包含长宽 数组, int x, int y)
-        {
-            using OptimizedGraphics graphics = OptimizedGraphics.CreateGraphics();
-            _ = graphics.CaptureScreenToBytes(x, y, 数组.图片尺寸.Width, 数组.图片尺寸.Height, ref 数组.字节数组);
-        }
-
-        public static 字节数组包含长宽 CaptureScreen_固定大小(int x, int y, int width, int height)
-        {
-            using OptimizedGraphics graphics = OptimizedGraphics.CreateGraphics();
-            byte[] bytes = new byte[width * height * 4];
-            _ = graphics.CaptureScreenToBytes(x, y, width, height, ref bytes);
-
-            return new 字节数组包含长宽
-            {
-                图片尺寸 = new Size(width, height),
-                字节数组 = bytes,
-            };
-        }
-
-        public static void CaptureScreen_固定大小(ref Bitmap bitmap, int x, int y)
-        {
-            using OptimizedGraphics graphics = OptimizedGraphics.CreateGraphics();
-            graphics.CaptureScreenToExistingBitmap(ref bitmap, x, y);
-        }
 
         #endregion
 
         #region 找色
 
-        public static PooledList<Point> FindColor(Color color, byte[] byteArraryPar, Size parSize,
-            byte errorRange = 0)
-        {
-            PooledList<Point> listPoint = [];
-            int parWidth = parSize.Width;
-            Rectangle searchRect = new(0, 0, parSize.Width, parSize.Height);
+        //public static PooledList<Point> FindColor(Color color, byte[] byteArraryPar, Size parSize,
+        //    byte errorRange = 0)
+        //{
+        //    PooledList<Point> listPoint = [];
+        //    int parWidth = parSize.Width;
+        //    Rectangle searchRect = new(0, 0, parSize.Width, parSize.Height);
 
-            Point searchLeftTop = searchRect.Location;
-            Size searchSize = searchRect.Size;
+        //    Point searchLeftTop = searchRect.Location;
+        //    Size searchSize = searchRect.Size;
 
-            int iMax = searchLeftTop.Y + searchSize.Height;
-            int jMax = searchLeftTop.X + searchSize.Width;
+        //    int iMax = searchLeftTop.Y + searchSize.Height;
+        //    int jMax = searchLeftTop.X + searchSize.Width;
 
-            object balanceLock = new();
+        //    object balanceLock = new();
 
-            _ = Parallel.For(searchLeftTop.X, jMax, () => new Point(), (j, _, _) =>
-                {
-                    for (int i = searchLeftTop.Y; i < iMax; i++)
-                    {
-                        int parIndex = (i * parWidth * 3) + (j * 3);
-                        Color colorBig = Color.FromArgb(byteArraryPar[parIndex + 2],
-                            byteArraryPar[parIndex + 1], byteArraryPar[parIndex]);
+        //    _ = Parallel.For(searchLeftTop.X, jMax, () => new Point(), (j, _, _) =>
+        //        {
+        //            for (int i = searchLeftTop.Y; i < iMax; i++)
+        //            {
+        //                int parIndex = (i * parWidth * 3) + (j * 3);
+        //                Color colorBig = Color.FromArgb(byteArraryPar[parIndex + 2],
+        //                    byteArraryPar[parIndex + 1], byteArraryPar[parIndex]);
 
-                        if (!ColorAEqualColorB(colorBig, color, errorRange))
-                        {
-                            continue;
-                        }
+        //                if (!ColorAEqualColorB(colorBig, color, errorRange))
+        //                {
+        //                    continue;
+        //                }
 
-                        return new Point(j, i);
-                    }
+        //                return new Point(j, i);
+        //            }
 
-                    return default;
-                },
-                x =>
-                {
-                    lock (balanceLock)
-                    {
-                        if (x.X != 0)
-                        {
-                            listPoint.Add(x);
-                        }
-                    }
-                }
-            );
+        //            return default;
+        //        },
+        //        x =>
+        //        {
+        //            lock (balanceLock)
+        //            {
+        //                if (x.X != 0)
+        //                {
+        //                    listPoint.Add(x);
+        //                }
+        //            }
+        //        }
+        //    );
 
-            return listPoint;
-        }
+        //    return listPoint;
+        //}
 
-        public static PooledList<Point> FindColors(PooledList<Color> colors, PooledList<Point> points,
-            byte[] byteArraryPar, Size parSize, byte errorRange = 0, double matchRate = 0.9)
-        {
-            PooledList<Point> listPoint = [];
-            int subWidth = points.Max(p => p.X);
-            int subHeight = points.Max(p => p.Y);
+        //public static PooledList<Point> FindColors(PooledList<Color> colors, PooledList<Point> points,
+        //    byte[] byteArraryPar, Size parSize, byte errorRange = 0, double matchRate = 0.9)
+        //{
+        //    PooledList<Point> listPoint = [];
+        //    int subWidth = points.Max(p => p.X);
+        //    int subHeight = points.Max(p => p.Y);
 
-            int parWidth = parSize.Width;
-            Rectangle searchRect = new(0, 0, parSize.Width, parSize.Height);
+        //    int parWidth = parSize.Width;
+        //    Rectangle searchRect = new(0, 0, parSize.Width, parSize.Height);
 
-            Point searchLeftTop = searchRect.Location;
-            Size searchSize = searchRect.Size;
-            Color startPixelColor = colors[0];
+        //    Point searchLeftTop = searchRect.Location;
+        //    Size searchSize = searchRect.Size;
+        //    Color startPixelColor = colors[0];
 
-            int iMax = searchLeftTop.Y + searchSize.Height - subHeight;
-            int jMax = searchLeftTop.X + searchSize.Width - subWidth;
+        //    int iMax = searchLeftTop.Y + searchSize.Height - subHeight;
+        //    int jMax = searchLeftTop.X + searchSize.Width - subWidth;
 
-            for (int j = searchLeftTop.X; j < jMax; j++)
-            {
-                for (int i = searchLeftTop.Y; i < iMax; i++)
-                {
-                    int parIndex = ((i + points[0].Y) * parWidth * 3) + ((j + points[0].X) * 3);
-                    Color colorBig = Color.FromArgb(byteArraryPar[parIndex + 2],
-                        byteArraryPar[parIndex + 1], byteArraryPar[parIndex]);
-                    if (!ColorAEqualColorB(colorBig, startPixelColor, errorRange))
-                    {
-                        continue;
-                    }
+        //    for (int j = searchLeftTop.X; j < jMax; j++)
+        //    {
+        //        for (int i = searchLeftTop.Y; i < iMax; i++)
+        //        {
+        //            int parIndex = ((i + points[0].Y) * parWidth * 3) + ((j + points[0].X) * 3);
+        //            Color colorBig = Color.FromArgb(byteArraryPar[parIndex + 2],
+        //                byteArraryPar[parIndex + 1], byteArraryPar[parIndex]);
+        //            if (!ColorExtensions.ColorAEqualColorB(colorBig, startPixelColor, errorRange))
+        //            {
+        //                continue;
+        //            }
 
-                    int smallStartX = j;
-                    int smallStartY = i;
-                    int sum = 0;
-                    int matchNum = 0;
-                    for (int m = 1; m < points.Count; m++)
-                    {
-                        int x2 = smallStartX + points[m].X;
-                        int y2 = smallStartY + points[m].Y;
-                        int parReleativeIndex = (y2 * parWidth * 3) + (x2 * 3);
-                        Color colorPixel = Color.FromArgb(
-                            byteArraryPar[parReleativeIndex + 2], byteArraryPar[parReleativeIndex + 1],
-                            byteArraryPar[parReleativeIndex]);
-                        if (ColorAEqualColorB(colorPixel, colors[m], errorRange))
-                        {
-                            matchNum++;
-                        }
+        //            int smallStartX = j;
+        //            int smallStartY = i;
+        //            int sum = 0;
+        //            int matchNum = 0;
+        //            for (int m = 1; m < points.Count; m++)
+        //            {
+        //                int x2 = smallStartX + points[m].X;
+        //                int y2 = smallStartY + points[m].Y;
+        //                int parReleativeIndex = (y2 * parWidth * 3) + (x2 * 3);
+        //                Color colorPixel = Color.FromArgb(
+        //                    byteArraryPar[parReleativeIndex + 2], byteArraryPar[parReleativeIndex + 1],
+        //                    byteArraryPar[parReleativeIndex]);
+        //                if (ColorExtensions.ColorAEqualColorB(colorPixel, colors[m], errorRange))
+        //                {
+        //                    matchNum++;
+        //                }
 
-                        sum++;
-                    }
+        //                sum++;
+        //            }
 
-                    if ((double)matchNum / sum >= matchRate)
-                    {
-                        Point point = new(smallStartX, smallStartY);
-                        if (!listPoint.Contains(point))
-                        {
-                            listPoint.Add(point);
-                        }
-                    }
-                }
-            }
+        //            if ((double)matchNum / sum >= matchRate)
+        //            {
+        //                Point point = new(smallStartX, smallStartY);
+        //                if (!listPoint.Contains(point))
+        //                {
+        //                    listPoint.Add(point);
+        //                }
+        //            }
+        //        }
+        //    }
 
-            return listPoint;
-        }
+        //    return listPoint;
+        //}
 
         #endregion
 
+        #region 图片识别
+
+        #region 初版找图 未使用
+
+        ///// <summary>
+        /////     用于特定位置找图，实际不太行，主要延迟集中在截图方面
+        ///// </summary>
+        ///// <param name="bp">图片</param>
+        ///// <param name="position">位置</param>
+        ///// <param name="ablityCount">拥有技能数 4（基本技能） 5（魔晶加技能 单A杖） 6（6技能基本形态） 7 其中7是6技能先出A杖没出魔晶 8 超长6技能</param>
+        ///// <param name="matchRate">匹配率</param>
+        ///// <returns></returns>
+        //private static bool RegPicture(Bitmap bp, string position, int ablityCount = 4, double matchRate = 0.9)
+        //{
+        //    int x = 0;
+        //    int y = 0;
+        //    int width = 0;
+        //    int height = 0;
+
+        //    switch (ablityCount)
+        //    {
+        //        case 4:
+        //            switch (position)
+        //            {
+        //                case "Q":
+        //                    x = 798;
+        //                    y = 943;
+        //                    width = 58;
+        //                    height = 64;
+        //                    break;
+        //                case "W":
+        //                    x = 864;
+        //                    y = 943;
+        //                    width = 58;
+        //                    height = 64;
+        //                    break;
+        //                case "E":
+        //                    x = 930;
+        //                    y = 943;
+        //                    width = 58;
+        //                    height = 64;
+        //                    break;
+        //                case "R":
+        //                    x = 994;
+        //                    y = 943;
+        //                    width = 58;
+        //                    height = 64;
+        //                    break;
+        //                case "Z":
+        //                    x = 1117;
+        //                    y = 941;
+        //                    width = 58;
+        //                    height = 64;
+        //                    break;
+        //                case "X":
+        //                    x = 1185;
+        //                    y = 941;
+        //                    width = 61;
+        //                    height = 47;
+        //                    break;
+        //                case "C":
+        //                    x = 1250;
+        //                    y = 941;
+        //                    width = 61;
+        //                    height = 47;
+        //                    break;
+        //                case "V":
+        //                    x = 1117;
+        //                    y = 990;
+        //                    width = 61;
+        //                    height = 47;
+        //                    break;
+        //                case "B":
+        //                    x = 1185;
+        //                    y = 990;
+        //                    width = 61;
+        //                    height = 47;
+        //                    break;
+        //                case "G":
+        //                    x = 1313;
+        //                    y = 968;
+        //                    width = 47;
+        //                    height = 47;
+        //                    break;
+        //                case "SPACE":
+        //                    x = 1250;
+        //                    y = 990;
+        //                    width = 61;
+        //                    height = 47;
+        //                    break;
+        //            }
+
+        //            break;
+        //        case 5:
+        //            switch (position)
+        //            {
+        //                case "Q":
+        //                    x = 766;
+        //                    y = 945;
+        //                    width = 58;
+        //                    height = 64;
+        //                    break;
+        //                case "W":
+        //                    x = 831;
+        //                    y = 945;
+        //                    width = 58;
+        //                    height = 64;
+        //                    break;
+        //                case "E":
+        //                    x = 898;
+        //                    y = 945;
+        //                    width = 58;
+        //                    height = 64;
+        //                    break;
+        //                case "D":
+        //                    x = 962;
+        //                    y = 945;
+        //                    width = 58;
+        //                    height = 64;
+        //                    break;
+        //                case "R":
+        //                    x = 1026;
+        //                    y = 945;
+        //                    width = 58;
+        //                    height = 64;
+        //                    break;
+        //                case "Z":
+        //                    x = 1151;
+        //                    y = 942;
+        //                    width = 58;
+        //                    height = 64;
+        //                    break;
+        //                case "X":
+        //                    x = 1217;
+        //                    y = 942;
+        //                    width = 61;
+        //                    height = 47;
+        //                    break;
+        //                case "C":
+        //                    x = 1283;
+        //                    y = 942;
+        //                    width = 61;
+        //                    height = 47;
+        //                    break;
+        //                case "V":
+        //                    x = 1151;
+        //                    y = 991;
+        //                    width = 61;
+        //                    height = 47;
+        //                    break;
+        //                case "B":
+        //                    x = 1217;
+        //                    y = 991;
+        //                    width = 61;
+        //                    height = 47;
+        //                    break;
+        //                case "G":
+        //                    x = 1350;
+        //                    y = 970;
+        //                    width = 47;
+        //                    height = 47;
+        //                    break;
+        //                case "SPACE":
+        //                    x = 1283;
+        //                    y = 991;
+        //                    width = 61;
+        //                    height = 47;
+        //                    break;
+        //            }
+
+        //            break;
+        //        case 6:
+        //            switch (position)
+        //            {
+        //                case "Q":
+        //                    x = 753;
+        //                    y = 940;
+        //                    width = 56;
+        //                    height = 56;
+        //                    break;
+        //                case "W":
+        //                    x = 811;
+        //                    y = 940;
+        //                    width = 56;
+        //                    height = 56;
+        //                    break;
+        //                case "E":
+        //                    x = 870;
+        //                    y = 940;
+        //                    width = 56;
+        //                    height = 56;
+        //                    break;
+        //                case "D":
+        //                    x = 927;
+        //                    y = 940;
+        //                    width = 56;
+        //                    height = 56;
+        //                    break;
+        //                case "F":
+        //                    x = 985;
+        //                    y = 940;
+        //                    width = 56;
+        //                    height = 56;
+        //                    break;
+        //                case "R":
+        //                    x = 1043;
+        //                    y = 940;
+        //                    width = 56;
+        //                    height = 56;
+        //                    break;
+        //                case "Z":
+        //                    x = 1162;
+        //                    y = 940;
+        //                    width = 60;
+        //                    height = 46;
+        //                    break;
+        //                case "X":
+        //                    x = 1228;
+        //                    y = 940;
+        //                    width = 60;
+        //                    height = 46;
+        //                    break;
+        //                case "C":
+        //                    x = 1294;
+        //                    y = 940;
+        //                    width = 60;
+        //                    height = 46;
+        //                    break;
+        //                case "V":
+        //                    x = 1162;
+        //                    y = 991;
+        //                    width = 61;
+        //                    height = 47;
+        //                    break;
+        //                case "B":
+        //                    x = 1228;
+        //                    y = 991;
+        //                    width = 61;
+        //                    height = 47;
+        //                    break;
+        //                case "G":
+        //                    x = 1360;
+        //                    y = 968;
+        //                    width = 47;
+        //                    height = 47;
+        //                    break;
+        //                case "SPACE":
+        //                    x = 1294;
+        //                    y = 991;
+        //                    width = 61;
+        //                    height = 47;
+        //                    break;
+        //            }
+
+        //            break;
+        //        case 7:
+        //            switch (position)
+        //            {
+        //                case "Q":
+        //                    x = 785;
+        //                    y = 940;
+        //                    width = 57;
+        //                    height = 57;
+        //                    break;
+        //                case "W":
+        //                    x = 842;
+        //                    y = 940;
+        //                    width = 57;
+        //                    height = 57;
+        //                    break;
+        //                case "E":
+        //                    x = 898;
+        //                    y = 940;
+        //                    width = 57;
+        //                    height = 57;
+        //                    break;
+        //                case "F":
+        //                    x = 957;
+        //                    y = 940;
+        //                    width = 57;
+        //                    height = 57;
+        //                    break;
+        //                case "R":
+        //                    x = 1015;
+        //                    y = 940;
+        //                    width = 57;
+        //                    height = 57;
+        //                    break;
+        //                case "Z":
+        //                    x = 1133;
+        //                    y = 942;
+        //                    width = 61;
+        //                    height = 47;
+        //                    break;
+        //                case "X":
+        //                    x = 1199;
+        //                    y = 941;
+        //                    width = 61;
+        //                    height = 47;
+        //                    break;
+        //                case "C":
+        //                    x = 1265;
+        //                    y = 942;
+        //                    width = 61;
+        //                    height = 47;
+        //                    break;
+        //                case "V":
+        //                    x = 1133;
+        //                    y = 991;
+        //                    width = 60;
+        //                    height = 47;
+        //                    break;
+        //                case "B":
+        //                    x = 1199;
+        //                    y = 991;
+        //                    width = 60;
+        //                    height = 47;
+        //                    break;
+        //                case "G":
+        //                    x = 1331;
+        //                    y = 968;
+        //                    width = 47;
+        //                    height = 47;
+        //                    break;
+        //                case "SPACE":
+        //                    x = 1265;
+        //                    y = 991;
+        //                    width = 60;
+        //                    height = 47;
+        //                    break;
+        //            }
+
+        //            break;
+        //        case 8:
+        //            switch (position)
+        //            {
+        //                case "Q":
+        //                    x = 738;
+        //                    y = 940;
+        //                    width = 57;
+        //                    height = 57;
+        //                    break;
+        //                case "W":
+        //                    x = 803;
+        //                    y = 940;
+        //                    width = 57;
+        //                    height = 57;
+        //                    break;
+        //                case "E":
+        //                    x = 868;
+        //                    y = 940;
+        //                    width = 57;
+        //                    height = 57;
+        //                    break;
+        //                case "F":
+        //                    x = 997;
+        //                    y = 940;
+        //                    width = 57;
+        //                    height = 57;
+        //                    break;
+        //                case "R":
+        //                    x = 1061;
+        //                    y = 940;
+        //                    width = 57;
+        //                    height = 57;
+        //                    break;
+        //                case "Z":
+        //                    x = 1083;
+        //                    y = 942;
+        //                    width = 61;
+        //                    height = 47;
+        //                    break;
+        //                case "X":
+        //                    x = 1250;
+        //                    y = 941;
+        //                    width = 61;
+        //                    height = 47;
+        //                    break;
+        //                case "C":
+        //                    x = 1316;
+        //                    y = 942;
+        //                    width = 61;
+        //                    height = 47;
+        //                    break;
+        //                case "V":
+        //                    x = 1083;
+        //                    y = 991;
+        //                    width = 60;
+        //                    height = 47;
+        //                    break;
+        //                case "B":
+        //                    x = 1250;
+        //                    y = 991;
+        //                    width = 60;
+        //                    height = 47;
+        //                    break;
+        //                case "G":
+        //                    x = 1385;
+        //                    y = 972;
+        //                    width = 47;
+        //                    height = 47;
+        //                    break;
+        //                case "SPACE":
+        //                    x = 1316;
+        //                    y = 991;
+        //                    width = 60;
+        //                    height = 47;
+        //                    break;
+        //            }
+
+        //            break;
+        //    }
+
+        //    using Bitmap bp1 = CaptureScreen(x, y, width, height);
+        //    return FindPictureParallel(bp, parBitmap: bp1, matchRate: matchRate).Count > 0;
+        //}
+
+        #endregion
+
+        #region 新版找图
+
+        #region 是否存在图片
+
+        ///// <summary>
+        /////     需要1-9ms不等的延迟
+        ///// </summary>
+        ///// <param name="bp">原始图片</param>
+        ///// <param name="bp1">对比图片</param>
+        ///// <param name="matchRate">匹配率</param>
+        ///// <returns></returns>
+        //public static bool RegPicture(Bitmap bp, Bitmap bp1, double matchRate = 0.8)
+        //{
+        //    using Bitmap bp2 = new(bp1);
+        //    return FindPictureParallel(bp, bp2, matchRate: matchRate).Count > 0;
+        //}
+
+        ///// <summary>
+        /////     基本上只需要1ms左右的延迟
+        ///// </summary>
+        ///// <param name="bp"></param>
+        ///// <param name="bts"></param>
+        ///// <param name="size"></param>
+        ///// <param name="matchRate"></param>
+        ///// <returns></returns>
+        //public static bool RegPicture(Bitmap bp, in 字节数组包含长宽 数组1, double matchRate = 0.8)
+        //{
+        //    Point p = RegPicturePointR(bp, in 数组1, matchRate);
+        //    return p.X + p.Y >= 0 && p.X != 245760 && p.X != 143640;
+        //    //return FindBytesParallel(GetBitmapByte(bp), bp.Size, in 数组, matchRate: matchRate).Count > 0;
+        //}
+
+        //public static bool RegPicture(in 字节数组包含长宽 数组1, in 字节数组包含长宽 数组2, double matchRate = 0.8)
+        //{
+        //    Point p = RegPicturePointR(in 数组1, in 数组2, matchRate);
+        //    return p.X + p.Y >= 0 && p.X != 245760 && p.X != 143640;
+        //    //return FindBytesParallel(GetBitmapByte(bp), bp.Size, in 数组, matchRate: matchRate).Count > 0;
+        //}
+
+        //public static bool RegPicture(in 字节数组包含长宽 数组1, in 字节数组包含长宽 数组2, byte tolerance, double matchRate = 0.8)
+        //{
+        //    Point p = RegPicturePointR(in 数组1, in 数组2, tolerance, matchRate);
+        //    return p.X + p.Y >= 0 && p.X != 245760 && p.X != 143640;
+        //    //return FindBytesParallel(GetBitmapByte(bp), bp.Size, in 数组, matchRate: matchRate).Count > 0;
+        //}
+
+        //private static bool RegPicture(Bitmap bp, int x, int y, int width, int height, double matchRate = 0.8)
+        //{
+        //    return FindPictureParallel(bp, CaptureScreen(x, y, width, height), matchRate: matchRate).Count > 0;
+        //}
+
         #region 找图
 
-        [StructLayout(LayoutKind.Sequential)]
-        internal struct Tuple
-        {
-            public uint x;
-            public uint y;
-        }
-
-        [DllImport("findpoints.dll")]
-        private static extern Tuple FindBytesRust(
-            [In] byte[] n1,
-            UIntPtr len1,
-            Tuple t1,
-            [In] byte[] n2,
-            UIntPtr len2,
-            Tuple t2,
-            double matchRate,
-            byte ignore_r,
-            byte ignore_g,
-            byte ignore_b
-        );
-
-        [DllImport("findpoints.dll")]
-        private static extern Tuple FindBytesTolerance(
-            [In] byte[] n1,
-            UIntPtr len1,
-            Tuple t1,
-            [In] byte[] n2,
-            UIntPtr len2,
-            Tuple t2,
-            double matchRate,
-            byte ignore_r,
-            byte ignore_g,
-            byte ignore_b,
-            byte tolerance
-        );
-
-        public static Tuple FindBytesR(byte[] n1, UIntPtr len1, Tuple t1, byte[] n2,
-            UIntPtr len2, Tuple t2, double matchRate, byte ignore_r, byte ignore_g, byte ignore_b)
-        {
-            return FindBytesRust(n1, len1, t1, n2, len2, t2, matchRate, ignore_r, ignore_g, ignore_b);
-        }
-
-        public static Tuple FindBytesRTolerance(byte[] n1, UIntPtr len1, Tuple t1, byte[] n2,
-            UIntPtr len2, Tuple t2, double matchRate, byte ignore_r, byte ignore_g, byte ignore_b, byte tolerance)
-        {
-            return FindBytesTolerance(n1, len1, t1, n2, len2, t2, matchRate, ignore_r, ignore_g, ignore_b, tolerance);
-        }
-
-        public static Point FindBitmaPoint(in Bitmap bp1, in Bitmap bp2)
+        /*
+        public static Point FindBitmapPoint(in Bitmap bp1, in Bitmap bp2)
         {
             Mat image = BitmapConverter.ToMat(bp1);
             Mat template = BitmapConverter.ToMat(bp2);
@@ -453,51 +842,51 @@ namespace Dota2Simulator.PictureProcessing
             object balanceLock = new();
 
             _ = Parallel.For(searchLeftTop.X, jMax, () => new Point(), (j, _, subPoint) =>
+            {
+                for (int i = searchLeftTop.Y; i < iMax; i++)
                 {
-                    for (int i = searchLeftTop.Y; i < iMax; i++)
+                    int x = j, y = i;
+                    int parIndex = (i * parWidth * 4) + (j * 4);
+                    Color colorBig = Color.FromArgb(byteArrayPar[parIndex + 2],
+                        byteArrayPar[parIndex + 1], byteArrayPar[parIndex]);
+                    if (!ColorExtensions.ColorAEqualColorB(colorBig, startPixelColor, errorRange))
                     {
-                        int x = j, y = i;
-                        int parIndex = (i * parWidth * 4) + (j * 4);
-                        Color colorBig = Color.FromArgb(byteArrayPar[parIndex + 2],
-                            byteArrayPar[parIndex + 1], byteArrayPar[parIndex]);
-                        if (!ColorAEqualColorB(colorBig, startPixelColor, errorRange))
-                        {
-                            continue;
-                        }
+                        continue;
+                    }
 
-                        int smallStartX = x;
-                        int smallStartY = y;
-                        int sum = 0;
-                        int matchNum = 0;
-                        for (int m = 0; m < subHeight; m++)
+                    int smallStartX = x;
+                    int smallStartY = y;
+                    int sum = 0;
+                    int matchNum = 0;
+                    for (int m = 0; m < subHeight; m++)
+                    {
+                        for (int n = 0; n < subWidth; n++)
                         {
-                            for (int n = 0; n < subWidth; n++)
+                            int subIndex = (m * subWidth * 4) + (n * 4);
+                            Color color = Color.FromArgb(byteArraySub[subIndex + 2],
+                                byteArraySub[subIndex + 1], byteArraySub[subIndex]);
+
+                            sum++;
+                            int x2 = smallStartX + n, y2 = smallStartY + m;
+                            int parReleativeIndex = (y2 * parWidth * 4) + (x2 * 4);
+                            Color colorPixel = Color.FromArgb(byteArrayPar[parReleativeIndex + 2],
+                                byteArrayPar[parReleativeIndex + 1],
+                                byteArrayPar[parReleativeIndex]);
+                            if (ColorExtensions.ColorAEqualColorB(colorPixel, color, errorRange))
                             {
-                                int subIndex = (m * subWidth * 4) + (n * 4);
-                                Color color = Color.FromArgb(byteArraySub[subIndex + 2],
-                                    byteArraySub[subIndex + 1], byteArraySub[subIndex]);
-
-                                sum++;
-                                int x2 = smallStartX + n, y2 = smallStartY + m;
-                                int parReleativeIndex = (y2 * parWidth * 4) + (x2 * 4);
-                                Color colorPixel = Color.FromArgb(byteArrayPar[parReleativeIndex + 2],
-                                    byteArrayPar[parReleativeIndex + 1],
-                                    byteArrayPar[parReleativeIndex]);
-                                if (ColorAEqualColorB(colorPixel, color, errorRange))
-                                {
-                                    matchNum++;
-                                }
+                                matchNum++;
                             }
-                        }
-
-                        if ((double)matchNum / sum >= matchRate)
-                        {
-                            return new Point(smallStartX, smallStartY);
                         }
                     }
 
-                    return subPoint;
-                },
+                    if ((double)matchNum / sum >= matchRate)
+                    {
+                        return new Point(smallStartX, smallStartY);
+                    }
+                }
+
+                return subPoint;
+            },
                 x =>
                 {
                     lock (balanceLock)
@@ -543,51 +932,51 @@ namespace Dota2Simulator.PictureProcessing
             object balanceLock = new();
 
             _ = Parallel.For(searchLeftTop.X, jMax, () => new Point(), (j, _, subPoint) =>
+            {
+                for (int i = searchLeftTop.Y; i < iMax; i++)
                 {
-                    for (int i = searchLeftTop.Y; i < iMax; i++)
+                    int x = j, y = i;
+                    int parIndex = (i * parWidth * 4) + (j * 4);
+                    Color colorBig = Color.FromArgb(byteArraryPar[parIndex + 2],
+                        byteArraryPar[parIndex + 1], byteArraryPar[parIndex]);
+                    if (!ColorExtensions.ColorAEqualColorB(colorBig, startPixelColor, errorRange))
                     {
-                        int x = j, y = i;
-                        int parIndex = (i * parWidth * 4) + (j * 4);
-                        Color colorBig = Color.FromArgb(byteArraryPar[parIndex + 2],
-                            byteArraryPar[parIndex + 1], byteArraryPar[parIndex]);
-                        if (!ColorAEqualColorB(colorBig, startPixelColor, errorRange))
-                        {
-                            continue;
-                        }
+                        continue;
+                    }
 
-                        int smallStartX = x;
-                        int smallStartY = y;
-                        int sum = 0;
-                        int matchNum = 0;
-                        for (int m = 0; m < subHeight; m++)
+                    int smallStartX = x;
+                    int smallStartY = y;
+                    int sum = 0;
+                    int matchNum = 0;
+                    for (int m = 0; m < subHeight; m++)
+                    {
+                        for (int n = 0; n < subWidth; n++)
                         {
-                            for (int n = 0; n < subWidth; n++)
+                            int subIndex = (m * subWidth * 4) + (n * 4);
+                            Color color = Color.FromArgb(byteArrarySub[subIndex + 2],
+                                byteArrarySub[subIndex + 1], byteArrarySub[subIndex]);
+
+                            sum++;
+                            int x2 = smallStartX + n, y2 = smallStartY + m;
+                            int parReleativeIndex = (y2 * parWidth * 4) + (x2 * 4);
+                            Color colorPixel = Color.FromArgb(
+                                byteArraryPar[parReleativeIndex + 2], byteArraryPar[parReleativeIndex + 1],
+                                byteArraryPar[parReleativeIndex]);
+                            if (ColorExtensions.ColorAEqualColorB(colorPixel, color, errorRange))
                             {
-                                int subIndex = (m * subWidth * 4) + (n * 4);
-                                Color color = Color.FromArgb(byteArrarySub[subIndex + 2],
-                                    byteArrarySub[subIndex + 1], byteArrarySub[subIndex]);
-
-                                sum++;
-                                int x2 = smallStartX + n, y2 = smallStartY + m;
-                                int parReleativeIndex = (y2 * parWidth * 4) + (x2 * 4);
-                                Color colorPixel = Color.FromArgb(
-                                    byteArraryPar[parReleativeIndex + 2], byteArraryPar[parReleativeIndex + 1],
-                                    byteArraryPar[parReleativeIndex]);
-                                if (ColorAEqualColorB(colorPixel, color, errorRange))
-                                {
-                                    matchNum++;
-                                }
+                                matchNum++;
                             }
-                        }
-
-                        if ((double)matchNum / sum >= matchRate)
-                        {
-                            return new Point(smallStartX, smallStartY);
                         }
                     }
 
-                    return subPoint;
-                },
+                    if ((double)matchNum / sum >= matchRate)
+                    {
+                        return new Point(smallStartX, smallStartY);
+                    }
+                }
+
+                return subPoint;
+            },
                 x =>
                 {
                     lock (balanceLock)
@@ -640,7 +1029,7 @@ namespace Dota2Simulator.PictureProcessing
                     int parIndex = (i * parWidth * 4) + (j * 4);
                     Color colorBig = Color.FromArgb(byteArraryPar[parIndex + 2],
                         byteArraryPar[parIndex + 1], byteArraryPar[parIndex]);
-                    if (!ColorAEqualColorB(colorBig, startPixelColor, errorRange))
+                    if (!ColorExtensions.ColorAEqualColorB(colorBig, startPixelColor, errorRange))
                     {
                         continue;
                     }
@@ -663,7 +1052,7 @@ namespace Dota2Simulator.PictureProcessing
                             Color colorPixel = Color.FromArgb(
                                 byteArraryPar[parReleativeIndex + 2], byteArraryPar[parReleativeIndex + 1],
                                 byteArraryPar[parReleativeIndex]);
-                            if (ColorAEqualColorB(colorPixel, color, errorRange))
+                            if (ColorExtensions.ColorAEqualColorB(colorPixel, color, errorRange))
                             {
                                 matchNum++;
                             }
@@ -692,495 +1081,13 @@ namespace Dota2Simulator.PictureProcessing
             return listPoint;
         }
 
-        #endregion
-
-        #region 图片识别
-
-        #region 初版找图
-
-        /// <summary>
-        ///     用于特定位置找图，实际不太行，主要延迟集中在截图方面
-        /// </summary>
-        /// <param name="bp">图片</param>
-        /// <param name="position">位置</param>
-        /// <param name="ablityCount">拥有技能数 4（基本技能） 5（魔晶加技能 单A杖） 6（6技能基本形态） 7 其中7是6技能先出A杖没出魔晶 8 超长6技能</param>
-        /// <param name="matchRate">匹配率</param>
-        /// <returns></returns>
-        private static bool RegPicture(Bitmap bp, string position, int ablityCount = 4, double matchRate = 0.9)
-        {
-            int x = 0;
-            int y = 0;
-            int width = 0;
-            int height = 0;
-
-            switch (ablityCount)
-            {
-                case 4:
-                    switch (position)
-                    {
-                        case "Q":
-                            x = 798;
-                            y = 943;
-                            width = 58;
-                            height = 64;
-                            break;
-                        case "W":
-                            x = 864;
-                            y = 943;
-                            width = 58;
-                            height = 64;
-                            break;
-                        case "E":
-                            x = 930;
-                            y = 943;
-                            width = 58;
-                            height = 64;
-                            break;
-                        case "R":
-                            x = 994;
-                            y = 943;
-                            width = 58;
-                            height = 64;
-                            break;
-                        case "Z":
-                            x = 1117;
-                            y = 941;
-                            width = 58;
-                            height = 64;
-                            break;
-                        case "X":
-                            x = 1185;
-                            y = 941;
-                            width = 61;
-                            height = 47;
-                            break;
-                        case "C":
-                            x = 1250;
-                            y = 941;
-                            width = 61;
-                            height = 47;
-                            break;
-                        case "V":
-                            x = 1117;
-                            y = 990;
-                            width = 61;
-                            height = 47;
-                            break;
-                        case "B":
-                            x = 1185;
-                            y = 990;
-                            width = 61;
-                            height = 47;
-                            break;
-                        case "G":
-                            x = 1313;
-                            y = 968;
-                            width = 47;
-                            height = 47;
-                            break;
-                        case "SPACE":
-                            x = 1250;
-                            y = 990;
-                            width = 61;
-                            height = 47;
-                            break;
-                    }
-
-                    break;
-                case 5:
-                    switch (position)
-                    {
-                        case "Q":
-                            x = 766;
-                            y = 945;
-                            width = 58;
-                            height = 64;
-                            break;
-                        case "W":
-                            x = 831;
-                            y = 945;
-                            width = 58;
-                            height = 64;
-                            break;
-                        case "E":
-                            x = 898;
-                            y = 945;
-                            width = 58;
-                            height = 64;
-                            break;
-                        case "D":
-                            x = 962;
-                            y = 945;
-                            width = 58;
-                            height = 64;
-                            break;
-                        case "R":
-                            x = 1026;
-                            y = 945;
-                            width = 58;
-                            height = 64;
-                            break;
-                        case "Z":
-                            x = 1151;
-                            y = 942;
-                            width = 58;
-                            height = 64;
-                            break;
-                        case "X":
-                            x = 1217;
-                            y = 942;
-                            width = 61;
-                            height = 47;
-                            break;
-                        case "C":
-                            x = 1283;
-                            y = 942;
-                            width = 61;
-                            height = 47;
-                            break;
-                        case "V":
-                            x = 1151;
-                            y = 991;
-                            width = 61;
-                            height = 47;
-                            break;
-                        case "B":
-                            x = 1217;
-                            y = 991;
-                            width = 61;
-                            height = 47;
-                            break;
-                        case "G":
-                            x = 1350;
-                            y = 970;
-                            width = 47;
-                            height = 47;
-                            break;
-                        case "SPACE":
-                            x = 1283;
-                            y = 991;
-                            width = 61;
-                            height = 47;
-                            break;
-                    }
-
-                    break;
-                case 6:
-                    switch (position)
-                    {
-                        case "Q":
-                            x = 753;
-                            y = 940;
-                            width = 56;
-                            height = 56;
-                            break;
-                        case "W":
-                            x = 811;
-                            y = 940;
-                            width = 56;
-                            height = 56;
-                            break;
-                        case "E":
-                            x = 870;
-                            y = 940;
-                            width = 56;
-                            height = 56;
-                            break;
-                        case "D":
-                            x = 927;
-                            y = 940;
-                            width = 56;
-                            height = 56;
-                            break;
-                        case "F":
-                            x = 985;
-                            y = 940;
-                            width = 56;
-                            height = 56;
-                            break;
-                        case "R":
-                            x = 1043;
-                            y = 940;
-                            width = 56;
-                            height = 56;
-                            break;
-                        case "Z":
-                            x = 1162;
-                            y = 940;
-                            width = 60;
-                            height = 46;
-                            break;
-                        case "X":
-                            x = 1228;
-                            y = 940;
-                            width = 60;
-                            height = 46;
-                            break;
-                        case "C":
-                            x = 1294;
-                            y = 940;
-                            width = 60;
-                            height = 46;
-                            break;
-                        case "V":
-                            x = 1162;
-                            y = 991;
-                            width = 61;
-                            height = 47;
-                            break;
-                        case "B":
-                            x = 1228;
-                            y = 991;
-                            width = 61;
-                            height = 47;
-                            break;
-                        case "G":
-                            x = 1360;
-                            y = 968;
-                            width = 47;
-                            height = 47;
-                            break;
-                        case "SPACE":
-                            x = 1294;
-                            y = 991;
-                            width = 61;
-                            height = 47;
-                            break;
-                    }
-
-                    break;
-                case 7:
-                    switch (position)
-                    {
-                        case "Q":
-                            x = 785;
-                            y = 940;
-                            width = 57;
-                            height = 57;
-                            break;
-                        case "W":
-                            x = 842;
-                            y = 940;
-                            width = 57;
-                            height = 57;
-                            break;
-                        case "E":
-                            x = 898;
-                            y = 940;
-                            width = 57;
-                            height = 57;
-                            break;
-                        case "F":
-                            x = 957;
-                            y = 940;
-                            width = 57;
-                            height = 57;
-                            break;
-                        case "R":
-                            x = 1015;
-                            y = 940;
-                            width = 57;
-                            height = 57;
-                            break;
-                        case "Z":
-                            x = 1133;
-                            y = 942;
-                            width = 61;
-                            height = 47;
-                            break;
-                        case "X":
-                            x = 1199;
-                            y = 941;
-                            width = 61;
-                            height = 47;
-                            break;
-                        case "C":
-                            x = 1265;
-                            y = 942;
-                            width = 61;
-                            height = 47;
-                            break;
-                        case "V":
-                            x = 1133;
-                            y = 991;
-                            width = 60;
-                            height = 47;
-                            break;
-                        case "B":
-                            x = 1199;
-                            y = 991;
-                            width = 60;
-                            height = 47;
-                            break;
-                        case "G":
-                            x = 1331;
-                            y = 968;
-                            width = 47;
-                            height = 47;
-                            break;
-                        case "SPACE":
-                            x = 1265;
-                            y = 991;
-                            width = 60;
-                            height = 47;
-                            break;
-                    }
-
-                    break;
-                case 8:
-                    switch (position)
-                    {
-                        case "Q":
-                            x = 738;
-                            y = 940;
-                            width = 57;
-                            height = 57;
-                            break;
-                        case "W":
-                            x = 803;
-                            y = 940;
-                            width = 57;
-                            height = 57;
-                            break;
-                        case "E":
-                            x = 868;
-                            y = 940;
-                            width = 57;
-                            height = 57;
-                            break;
-                        case "F":
-                            x = 997;
-                            y = 940;
-                            width = 57;
-                            height = 57;
-                            break;
-                        case "R":
-                            x = 1061;
-                            y = 940;
-                            width = 57;
-                            height = 57;
-                            break;
-                        case "Z":
-                            x = 1083;
-                            y = 942;
-                            width = 61;
-                            height = 47;
-                            break;
-                        case "X":
-                            x = 1250;
-                            y = 941;
-                            width = 61;
-                            height = 47;
-                            break;
-                        case "C":
-                            x = 1316;
-                            y = 942;
-                            width = 61;
-                            height = 47;
-                            break;
-                        case "V":
-                            x = 1083;
-                            y = 991;
-                            width = 60;
-                            height = 47;
-                            break;
-                        case "B":
-                            x = 1250;
-                            y = 991;
-                            width = 60;
-                            height = 47;
-                            break;
-                        case "G":
-                            x = 1385;
-                            y = 972;
-                            width = 47;
-                            height = 47;
-                            break;
-                        case "SPACE":
-                            x = 1316;
-                            y = 991;
-                            width = 60;
-                            height = 47;
-                            break;
-                    }
-
-                    break;
-            }
-
-            using Bitmap bp1 = CaptureScreen(x, y, width, height);
-            return FindPictureParallel(bp, parBitmap: bp1, matchRate: matchRate).Count > 0;
-        }
+        */
 
         #endregion
-
-        #region 新版找图
-
-        #region 是否存在图片
-
-        /// <summary>
-        ///     基本上只需要1-9ms不等的延迟
-        /// </summary>
-        /// <param name="bp">原始图片</param>
-        /// <param name="bp1">对比图片</param>
-        /// <param name="matchRate">匹配率</param>
-        /// <returns></returns>
-        public static bool RegPicture(Bitmap bp, Bitmap bp1, double matchRate = 0.8)
-        {
-            using Bitmap bp2 = new(bp1);
-            return FindPictureParallel(bp, bp2, matchRate: matchRate).Count > 0;
-        }
-
-        /// <summary>
-        ///     基本上只需要1ms左右的延迟
-        /// </summary>
-        /// <param name="bp"></param>
-        /// <param name="bts"></param>
-        /// <param name="size"></param>
-        /// <param name="matchRate"></param>
-        /// <returns></returns>
-        public static bool RegPicture(Bitmap bp, in 字节数组包含长宽 数组1, double matchRate = 0.8)
-        {
-            Point p = RegPicturePointR(bp, in 数组1, matchRate);
-            return p.X + p.Y >= 0 && p.X != 245760 && p.X != 143640;
-            //return FindBytesParallel(GetBitmapByte(bp), bp.Size, in 数组, matchRate: matchRate).Count > 0;
-        }
-
-        public static bool RegPicture(in 字节数组包含长宽 数组1, in 字节数组包含长宽 数组2, double matchRate = 0.8)
-        {
-            Point p = RegPicturePointR(in 数组1, in 数组2, matchRate);
-            return p.X + p.Y >= 0 && p.X != 245760 && p.X != 143640;
-            //return FindBytesParallel(GetBitmapByte(bp), bp.Size, in 数组, matchRate: matchRate).Count > 0;
-        }
-
-        public static bool RegPicture(in 字节数组包含长宽 数组1, in 字节数组包含长宽 数组2, byte tolerance, double matchRate = 0.8)
-        {
-            Point p = RegPicturePointR(in 数组1, in 数组2, tolerance, matchRate);
-            return p.X + p.Y >= 0 && p.X != 245760 && p.X != 143640;
-            //return FindBytesParallel(GetBitmapByte(bp), bp.Size, in 数组, matchRate: matchRate).Count > 0;
-        }
-
-        /// <summary>
-        ///     需要图片完全相似
-        /// </summary>
-        /// <param name="bp"></param>
-        /// <param name="bp1"></param>
-        /// <param name="matchRate"></param>
-        /// <returns></returns>
-        public static bool RegPicture_small(Bitmap bp, Bitmap bp1, double matchRate = 0.7)
-        {
-            using Bitmap bp2 = new(bp1);
-            return RegPictrueSmall(bp, bp2, matchRate);
-        }
-
-        //private static bool RegPicture(Bitmap bp, int x, int y, int width, int height, double matchRate = 0.8)
-        //{
-        //    return FindPictureParallel(bp, CaptureScreen(x, y, width, height), matchRate: matchRate).Count > 0;
-        //}
 
         #region 返回图片实际坐标
 
-        private static readonly Point 无效坐标 = new(245760, 143640);
-
+        /*
         public static Point RegPicturePoint(Bitmap bp, int x, int y, int width, int height, double matchRate = 0.8)
         {
             try
@@ -1210,7 +1117,10 @@ namespace Dota2Simulator.PictureProcessing
 
             return [];
         }
+        */
 
+        #region 依赖字节数组包含长宽查找
+        /*
         /// <summary>
         ///     稳定后延迟在0-1ms左右，相当的快了，而且不存在并行的各种毛病，默认忽略色深粉色（255,20,147）
         /// </summary>
@@ -1224,7 +1134,7 @@ namespace Dota2Simulator.PictureProcessing
             try
             {
                 // 转化为 RGBA数组
-                byte[] bts1 = GetBitmapByte(bp);
+                byte[] bts1 = OptimizedGraphics.BitmapToByteArray(bp);
                 UIntPtr binr = (nuint)数组.字节数组.Length;
                 UIntPtr binr1 = (nuint)bts1.Length;
                 Tuple t = FindBytesR(数组.字节数组, binr, new Tuple { x = (uint)数组.图片尺寸.Width, y = (uint)数组.图片尺寸.Height }, bts1,
@@ -1278,6 +1188,8 @@ namespace Dota2Simulator.PictureProcessing
 
             return 无效坐标;
         }
+        */
+        #endregion
 
         #endregion
 
@@ -1285,6 +1197,7 @@ namespace Dota2Simulator.PictureProcessing
 
         #region 返回数组对应颜色
 
+        /*
         public static Color GetPixelBytes(in 字节数组包含长宽 数组, int x, int y)
         {
             int subIndex = (y * 数组.图片尺寸.Width * 4) + (x * 4);
@@ -1298,348 +1211,303 @@ namespace Dota2Simulator.PictureProcessing
             return Color.FromArgb(数组.字节数组[subIndex + 2],
                 数组.字节数组[subIndex + 1], 数组.字节数组[subIndex]);
         }
-
-        #endregion
-
-        public static bool 是否无效位置(Point 位置)
-        {
-            return 位置.X + 位置.Y <= 0 || 位置 == 无效坐标;
-        }
+        */
 
         #endregion
 
         #endregion
 
-        #region 返回图片颜色数组
+        #endregion
 
-        public static async ValueTask<byte[]> GetBitmapByteAsync(Bitmap subBitmap)
-        {
-            if (subBitmap == null)
-            {
-                return await ValueTask.FromResult(Array.Empty<byte>()).ConfigureAwait(true);
-            }
+        #region 新类
 
-            byte[] bytes = OptimizedGraphics.BitmapToByteArray(subBitmap);
+        //internal class 字节数组包含长宽 : IDisposable
+        //{
+        //    private byte[] _字节数组;
+        //    private bool _isPooled;
+        //    private bool _disposed;
 
-            return await ValueTask.FromResult(bytes).ConfigureAwait(true);
-        }
+        //    // 原始构造函数保持不变，确保兼容性
+        //    public 字节数组包含长宽(byte[] bpByts, Size bpSize)
+        //    {
+        //        _字节数组 = bpByts;
+        //        图片尺寸 = bpSize;
+        //        _isPooled = false;
+        //    }
 
-        public static unsafe void GetBitmapByte_固定数组(in Bitmap subBitmap, ref byte[] bts)
-        {
-            if (subBitmap == null || bts == null)
-            {
-                return;
-            }
+        //    // 新增构造函数，支持使用池化数组
+        //    public static 字节数组包含长宽 CreatePooled(int length, Size bpSize)
+        //    {
+        //        var instance = new 字节数组包含长宽(ArrayPool<byte>.Shared.Rent(length), bpSize)
+        //        {
+        //            _isPooled = true
+        //        };
+        //        return instance;
+        //    }
 
-            Rectangle rect = new(0, 0, subBitmap.Width, subBitmap.Height);
-            BitmapData bitmapData = subBitmap.LockBits(rect, ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
+        //    // 原构造函数保持不变
+        //    public 字节数组包含长宽()
+        //    {
+        //        _字节数组 = [0];
+        //        图片尺寸 = new Size();
+        //        _isPooled = false;
+        //    }
 
-            try
-            {
-                int bytesCount = Math.Min(bts.Length, bitmapData.Stride * bitmapData.Height);
-                fixed (byte* destPtr = bts)
-                {
-                    Buffer.MemoryCopy((void*)bitmapData.Scan0, destPtr, bytesCount, bytesCount);
-                }
-            }
-            finally
-            {
-                subBitmap.UnlockBits(bitmapData);
-            }
-        }
+        //    // 提供兼容的属性访问，但增加检查
+        //    public ref byte[] 字节数组
+        //    {
+        //        get
+        //        {
+        //            ThrowIfDisposed();
+        //            return ref _字节数组;
+        //        }
+        //    }
 
-        public static unsafe void GetBitmapByte_固定数组(in Bitmap subBitmap, 字节数组包含长宽 bts)
-        {
-            if (subBitmap == null || bts?.字节数组 == null)
-            {
-                return;
-            }
+        //    // 安全的只读访问方法
+        //    public ReadOnlySpan<byte> AsSpan() => _disposed ? ReadOnlySpan<byte>.Empty : _字节数组;
 
-            bts.图片尺寸 = subBitmap.Size;
-            Rectangle rect = new(0, 0, subBitmap.Width, subBitmap.Height);
-            BitmapData bitmapData = subBitmap.LockBits(rect, ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
+        //    public Size 图片尺寸 { get; set; }
 
-            try
-            {
-                int bytesCount = Math.Min(bts.字节数组.Length, bitmapData.Stride * bitmapData.Height);
-                fixed (byte* destPtr = bts.字节数组)
-                {
-                    Buffer.MemoryCopy((void*)bitmapData.Scan0, destPtr, bytesCount, bytesCount);
-                }
-            }
-            finally
-            {
-                subBitmap.UnlockBits(bitmapData);
-            }
-        }
+        //    // 重新实现，增加清理逻辑
+        //    public bool 新赋值数组(byte[] bpByts)
+        //    {
+        //        ThrowIfDisposed();
 
-        internal class 字节数组包含长宽 : IDisposable
-        {
-            private byte[] _字节数组;
-            private bool _isPooled;
-            private bool _disposed;
+        //        // 如果当前有池化数组，返回到池中
+        //        if (_isPooled && _字节数组 != null && _字节数组.Length > 0)
+        //        {
+        //            ArrayPool<byte>.Shared.Return(_字节数组);
+        //            _isPooled = false;
+        //        }
 
-            // 原始构造函数保持不变，确保兼容性
-            public 字节数组包含长宽(byte[] bpByts, Size bpSize)
-            {
-                _字节数组 = bpByts;
-                图片尺寸 = bpSize;
-                _isPooled = false;
-            }
+        //        _字节数组 = bpByts;
+        //        return true;
+        //    }
 
-            // 新增构造函数，支持使用池化数组
-            public static 字节数组包含长宽 CreatePooled(int length, Size bpSize)
-            {
-                var instance = new 字节数组包含长宽(ArrayPool<byte>.Shared.Rent(length), bpSize)
-                {
-                    _isPooled = true
-                };
-                return instance;
-            }
+        //    // 新增方法：池化方式更新数组
+        //    public bool 新赋值池化数组(byte[] sourceArray)
+        //    {
+        //        ThrowIfDisposed();
 
-            // 原构造函数保持不变
-            public 字节数组包含长宽()
-            {
-                _字节数组 = [0];
-                图片尺寸 = new Size();
-                _isPooled = false;
-            }
+        //        int requiredLength = sourceArray.Length;
 
-            // 提供兼容的属性访问，但增加检查
-            public ref byte[] 字节数组
-            {
-                get
-                {
-                    ThrowIfDisposed();
-                    return ref _字节数组;
-                }
-            }
+        //        // 如果当前数组不存在或大小不合适，从池中租用新数组
+        //        if (_字节数组 == null || _字节数组.Length < requiredLength)
+        //        {
+        //            // 如果有旧的池化数组，返回到池中
+        //            if (_isPooled && _字节数组 != null)
+        //                ArrayPool<byte>.Shared.Return(_字节数组);
 
-            // 安全的只读访问方法
-            public ReadOnlySpan<byte> AsSpan() => _disposed ? ReadOnlySpan<byte>.Empty : _字节数组;
+        //            _字节数组 = ArrayPool<byte>.Shared.Rent(requiredLength);
+        //            _isPooled = true;
+        //        }
 
-            public Size 图片尺寸 { get; set; }
+        //        // 复制数据到当前数组
+        //        Array.Copy(sourceArray, _字节数组, requiredLength);
+        //        return true;
+        //    }
 
-            // 重新实现，增加清理逻辑
-            public bool 新赋值数组(byte[] bpByts)
-            {
-                ThrowIfDisposed();
+        //    public bool 数组保存为图片(string 文件路径, ImageFormat 图片格式 = null)
+        //    {
+        //        ThrowIfDisposed();
 
-                // 如果当前有池化数组，返回到池中
-                if (_isPooled && _字节数组 != null && _字节数组.Length > 0)
-                {
-                    ArrayPool<byte>.Shared.Return(_字节数组);
-                    _isPooled = false;
-                }
+        //        if (_字节数组 == null || _字节数组.Length == 0)
+        //        {
+        //            throw new ArgumentException("数组不能为空");
+        //        }
+        //        if (string.IsNullOrWhiteSpace(文件路径))
+        //        {
+        //            throw new ArgumentException("文件路径不能为空");
+        //        }
+        //        图片格式 ??= ImageFormat.Jpeg; // 默认使用JPEG格式
+        //        int 宽度 = 图片尺寸.Width;
+        //        int 高度 = 图片尺寸.Height;
+        //        using Bitmap 位图 = new(宽度, 高度, PixelFormat.Format32bppArgb);
+        //        BitmapData 位图数据 = 位图.LockBits(new Rectangle(0, 0, 宽度, 高度),
+        //            ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
+        //        try
+        //        {
+        //            // 复制字节数组到位图
+        //            Marshal.Copy(_字节数组, 0, 位图数据.Scan0, Math.Min(_字节数组.Length, 位图数据.Stride * 高度));
+        //        }
+        //        finally
+        //        {
+        //            位图.UnlockBits(位图数据);
+        //        }
+        //        // 保存位图到文件
+        //        位图.Save(文件路径, 图片格式);
+        //        return true;
+        //    }
 
-                _字节数组 = bpByts;
-                return true;
-            }
+        //    // 实现IDisposable接口
+        //    public void Dispose()
+        //    {
+        //        if (!_disposed)
+        //        {
+        //            if (_isPooled && _字节数组 != null)
+        //            {
+        //                ArrayPool<byte>.Shared.Return(_字节数组);
+        //                _字节数组 = null;
+        //            }
+        //            _disposed = true;
+        //        }
+        //    }
 
-            // 新增方法：池化方式更新数组
-            public bool 新赋值池化数组(byte[] sourceArray)
-            {
-                ThrowIfDisposed();
-
-                int requiredLength = sourceArray.Length;
-
-                // 如果当前数组不存在或大小不合适，从池中租用新数组
-                if (_字节数组 == null || _字节数组.Length < requiredLength)
-                {
-                    // 如果有旧的池化数组，返回到池中
-                    if (_isPooled && _字节数组 != null)
-                        ArrayPool<byte>.Shared.Return(_字节数组);
-
-                    _字节数组 = ArrayPool<byte>.Shared.Rent(requiredLength);
-                    _isPooled = true;
-                }
-
-                // 复制数据到当前数组
-                Array.Copy(sourceArray, _字节数组, requiredLength);
-                return true;
-            }
-
-            public bool 数组保存为图片(string 文件路径, ImageFormat 图片格式 = null)
-            {
-                ThrowIfDisposed();
-
-                if (_字节数组 == null || _字节数组.Length == 0)
-                {
-                    throw new ArgumentException("数组不能为空");
-                }
-                if (string.IsNullOrWhiteSpace(文件路径))
-                {
-                    throw new ArgumentException("文件路径不能为空");
-                }
-                图片格式 ??= ImageFormat.Jpeg; // 默认使用JPEG格式
-                int 宽度 = 图片尺寸.Width;
-                int 高度 = 图片尺寸.Height;
-                using Bitmap 位图 = new(宽度, 高度, PixelFormat.Format32bppArgb);
-                BitmapData 位图数据 = 位图.LockBits(new Rectangle(0, 0, 宽度, 高度),
-                    ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
-                try
-                {
-                    // 复制字节数组到位图
-                    Marshal.Copy(_字节数组, 0, 位图数据.Scan0, Math.Min(_字节数组.Length, 位图数据.Stride * 高度));
-                }
-                finally
-                {
-                    位图.UnlockBits(位图数据);
-                }
-                // 保存位图到文件
-                位图.Save(文件路径, 图片格式);
-                return true;
-            }
-
-            // 实现IDisposable接口
-            public void Dispose()
-            {
-                if (!_disposed)
-                {
-                    if (_isPooled && _字节数组 != null)
-                    {
-                        ArrayPool<byte>.Shared.Return(_字节数组);
-                        _字节数组 = null;
-                    }
-                    _disposed = true;
-                }
-            }
-
-            private void ThrowIfDisposed()
-            {
-                ObjectDisposedException.ThrowIf(_disposed, this);
-            }
-        }
-
-        public static byte[] GetBitmapByte(Bitmap subBitmap)
-        {
-            BitmapData subData = subBitmap.LockBits(new Rectangle(0, 0, subBitmap.Width, subBitmap.Height),
-                ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
-            byte[] bts = new byte[subData.Stride * subData.Height];
-            Marshal.Copy(subData.Scan0, bts, 0, subData.Stride * subData.Height);
-            subBitmap.UnlockBits(subData);
-            return bts;
-        }
+        //    private void ThrowIfDisposed()
+        //    {
+        //        ObjectDisposedException.ThrowIf(_disposed, this);
+        //    }
+        //}
 
         #endregion
 
-        #region 颜色对比
+        #region 返回图片颜色数组 未使用代码
 
-        [StructLayout(LayoutKind.Sequential)]
-        internal struct Rgba
-        {
-            public byte R;
-            public byte G;
-            public byte B;
-            public byte A;
+        //public static async ValueTask<byte[]> GetBitmapByteAsync(Bitmap subBitmap)
+        //{
+        //    if (subBitmap == null)
+        //    {
+        //        return await ValueTask.FromResult(Array.Empty<byte>()).ConfigureAwait(true);
+        //    }
 
-            // 添加从 Color 的构造函数
-            public Rgba(Color color)
-            {
-                R = color.R;
-                G = color.G;
-                B = color.B;
-                A = color.A;
-            }
-        }
+        //    byte[] bytes = OptimizedGraphics.BitmapToByteArray(subBitmap);
 
-        [DllImport("findpoints.dll", CallingConvention = CallingConvention.Cdecl)]
-        private static extern bool color_a_equal_color_b(
-            ref Rgba colorA,  // 改用 ref
-            ref Rgba colorB,  // 改用 ref
-            byte errorRange
-        );
+        //    return await ValueTask.FromResult(bytes).ConfigureAwait(true);
+        //}
 
-        [DllImport("findpoints.dll", CallingConvention = CallingConvention.Cdecl)]
-        private static extern bool color_a_equal_color_b_rgb(
-            ref Rgba colorA,  // 改用 ref
-            ref Rgba colorB,  // 改用 ref
-            byte error_r,
-            byte error_g,
-            byte error_b
-        );
+        //public static unsafe void GetBitmapByte_固定数组(in Bitmap subBitmap, ref byte[] bts)
+        //{
+        //    if (subBitmap == null || bts == null)
+        //    {
+        //        return;
+        //    }
 
-        public static bool ColorAEqualColorB(in Color colorA, in Color colorB, byte errorRange = 10)
-        {
-            return ColorExtensions.EqualsWithError(colorA, colorB, errorRange);
-        }
+        //    Rectangle rect = new(0, 0, subBitmap.Width, subBitmap.Height);
+        //    BitmapData bitmapData = subBitmap.LockBits(rect, ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
 
-        public static bool ColorAEqualColorB(in Color colorA, in Color colorB, byte errorR, byte errorG, byte errorB)
-        {
-            return ColorExtensions.EqualsRGBWithError(colorA, colorB, errorR, errorG, errorB);
-        }
+        //    try
+        //    {
+        //        int bytesCount = Math.Min(bts.Length, bitmapData.Stride * bitmapData.Height);
+        //        fixed (byte* destPtr = bts)
+        //        {
+        //            Buffer.MemoryCopy((void*)bitmapData.Scan0, destPtr, bytesCount, bytesCount);
+        //        }
+        //    }
+        //    finally
+        //    {
+        //        subBitmap.UnlockBits(bitmapData);
+        //    }
+        //}
+
+        //public static unsafe void GetBitmapByte_固定数组(in Bitmap subBitmap, 字节数组包含长宽 bts)
+        //{
+        //    if (subBitmap == null || bts?.字节数组 == null)
+        //    {
+        //        return;
+        //    }
+
+        //    bts.图片尺寸 = subBitmap.Size;
+        //    Rectangle rect = new(0, 0, subBitmap.Width, subBitmap.Height);
+        //    BitmapData bitmapData = subBitmap.LockBits(rect, ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
+
+        //    try
+        //    {
+        //        int bytesCount = Math.Min(bts.字节数组.Length, bitmapData.Stride * bitmapData.Height);
+        //        fixed (byte* destPtr = bts.字节数组)
+        //        {
+        //            Buffer.MemoryCopy((void*)bitmapData.Scan0, destPtr, bytesCount, bytesCount);
+        //        }
+        //    }
+        //    finally
+        //    {
+        //        subBitmap.UnlockBits(bitmapData);
+        //    }
+        //}
 
         #endregion
 
-        #region 减少图片大小对比
+        #region 减少图片大小对比 未使用
 
-        public static bool RegPictrueSmall(Bitmap a, Bitmap b, double matchrate = 0.7)
-        {
-            return CalcSimilarDegree(GetHash(a), GetHash(b), matchrate);
-        }
+        ///// <summary>
+        /////     需要图片完全相似
+        ///// </summary>
+        ///// <param name="bp"></param>
+        ///// <param name="bp1"></param>
+        ///// <param name="matchRate"></param>
+        ///// <returns></returns>
+        //public static bool RegPicture_small(Bitmap bp, Bitmap bp1, double matchRate = 0.7)
+        //{
+        //    using Bitmap bp2 = new(bp1);
+        //    return RegPictrueSmall(bp, bp2, matchRate);
+        //}
 
-        private static string GetHash(Bitmap bitmap)
-        {
-            byte[] grayValues = ReduceColor(ReduceSize(bitmap));
-            byte average = CalcAverage(grayValues);
-            string reslut = ComputeBits(grayValues, average);
-            return reslut;
-        }
+        //public static bool RegPictrueSmall(Bitmap a, Bitmap b, double matchrate = 0.7)
+        //{
+        //    return CalcSimilarDegree(GetHash(a), GetHash(b), matchrate);
+        //}
 
-        private static Bitmap ReduceSize(Bitmap bitMap, int width = 8, int height = 8)
-        {
-            Image img = bitMap;
-            return (Bitmap)img.GetThumbnailImage(width, height, () => false, IntPtr.Zero);
-        }
+        //private static string GetHash(Bitmap bitmap)
+        //{
+        //    byte[] grayValues = ReduceColor(ReduceSize(bitmap));
+        //    byte average = CalcAverage(grayValues);
+        //    string reslut = ComputeBits(grayValues, average);
+        //    return reslut;
+        //}
 
-        private static byte[] ReduceColor(Bitmap bitMap)
-        {
-            byte[] grayValues = new byte[bitMap.Width * bitMap.Height];
-            for (int x = 0; x < bitMap.Width; x++)
-            {
-                for (int y = 0; y < bitMap.Height; y++)
-                {
-                    Color color = bitMap.GetPixel(x, y);
-                    byte grayValue = (byte)(((color.R * 30) + (color.G * 59) + (color.B * 11)) / 100);
-                    grayValues[(x * bitMap.Width) + y] = grayValue;
-                }
-            }
+        //private static Bitmap ReduceSize(Bitmap bitMap, int width = 8, int height = 8)
+        //{
+        //    Image img = bitMap;
+        //    return (Bitmap)img.GetThumbnailImage(width, height, () => false, IntPtr.Zero);
+        //}
 
-            return grayValues;
-        }
+        //private static byte[] ReduceColor(Bitmap bitMap)
+        //{
+        //    byte[] grayValues = new byte[bitMap.Width * bitMap.Height];
+        //    for (int x = 0; x < bitMap.Width; x++)
+        //    {
+        //        for (int y = 0; y < bitMap.Height; y++)
+        //        {
+        //            Color color = bitMap.GetPixel(x, y);
+        //            byte grayValue = (byte)(((color.R * 30) + (color.G * 59) + (color.B * 11)) / 100);
+        //            grayValues[(x * bitMap.Width) + y] = grayValue;
+        //        }
+        //    }
 
-        private static byte CalcAverage(byte[] values)
-        {
-            int sum = 0;
-            for (int i = 0; i < values.Length; i++)
-            {
-                sum += values[i];
-            }
+        //    return grayValues;
+        //}
 
-            return Convert.ToByte(sum / values.Length);
-        }
+        //private static byte CalcAverage(byte[] values)
+        //{
+        //    int sum = 0;
+        //    for (int i = 0; i < values.Length; i++)
+        //    {
+        //        sum += values[i];
+        //    }
 
-        private static string ComputeBits(byte[] values, byte averageValue)
-        {
-            char[] result = new char[values.Length];
-            for (int i = 0; i < values.Length; i++)
-            {
-                result[i] = values[i] < averageValue ? '0' : '1';
-            }
+        //    return Convert.ToByte(sum / values.Length);
+        //}
 
-            return new string(result);
-        }
+        //private static string ComputeBits(byte[] values, byte averageValue)
+        //{
+        //    char[] result = new char[values.Length];
+        //    for (int i = 0; i < values.Length; i++)
+        //    {
+        //        result[i] = values[i] < averageValue ? '0' : '1';
+        //    }
 
-        private static bool CalcSimilarDegree(string a, string b, double matchRate = 0.7)
-        {
-            if (a.Length != b.Length)
-            {
-                return false;
-            }
+        //    return new string(result);
+        //}
 
-            int count = a.Where((t, i) => t == b[i]).Count();
-            return count / (double)a.Length >= matchRate;
-        }
+        //private static bool CalcSimilarDegree(string a, string b, double matchRate = 0.7)
+        //{
+        //    if (a.Length != b.Length)
+        //    {
+        //        return false;
+        //    }
+
+        //    int count = a.Where((t, i) => t == b[i]).Count();
+        //    return count / (double)a.Length >= matchRate;
+        //}
 
         #endregion
     }

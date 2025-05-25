@@ -129,9 +129,18 @@ namespace Dota2Simulator.PictureProcessing
             return result.Text;
         }
 
+        /// <summary>
+        ///     TODO: 适配
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <param name="width"></param>
+        /// <param name="height"></param>
+        /// <returns></returns>
         public static string 获取图片文字(int x, int y, int width, int height)
         {
-            return 获取图片文字(PictureProcessing.CaptureScreenAllByte(x, y, width, height), width, height);
+            return "";
+            //return 获取图片文字(PictureProcessing.CaptureScreenAllByte(x, y, width, height), width, height);
         }
 
         #endregion

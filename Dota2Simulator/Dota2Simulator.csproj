@@ -15,7 +15,7 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <FileAlignment>4096</FileAlignment>
     <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
-    <DefineConstants>$(DefineConstants);TRACE</DefineConstants>
+    <DefineConstants>$(DefineConstants);TRACE;DOTA2</DefineConstants>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
@@ -24,7 +24,7 @@
 	<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 	<FileAlignment>4096</FileAlignment>
 	<CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
-	<DefineConstants>$(DefineConstants);TRACE</DefineConstants>
+	<DefineConstants>$(DefineConstants);TRACE;DOTA2</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>
