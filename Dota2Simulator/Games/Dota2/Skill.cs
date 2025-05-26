@@ -24,15 +24,89 @@ namespace Dota2Simulator.Games.Dota2
     {
         #region 模块化技能
 
+        // 释放CD颜色变换
+        /*
+         * 
+4释放前中技能上边框CD颜色
+
+133,141,148
+134,142,150
+141,149,157
+151,160,168
+164,174,183
+183,194,204
+193,204,214
+207,219,230
+221,234,246
+234,248,255
+250,255,255
+255,255,255
+245,255,255
+235,249,255
+219,232,244
+212,224,235
+199,210,221
+185,196,206
+172,182,191
+155,164,173
+148,157,165
+139,147,155
+134,142,149
+133,141,148
+
+5释放前中技能上边框CD颜色
+134,142,149
+136,144,151
+142,151,158
+167,176,185
+187,198,208
+196,207,218
+210,222,233
+237,250,255
+255,255,255
+231,244,255
+217,229,241
+202,213,224
+187,198,207
+160,169,177
+148,156,164
+139,147,154
+134,142,149
+
+6释放前中技能上边框CD颜色
+134,142,149
+136,144,151
+143,151,159
+153,162,170
+167,176,185
+187,198,207
+196,208,218
+211,223,234
+225,237,249
+238,251,255
+255,255,255
+252,255,255
+239,252,255
+226,238,250
+211,223,234
+189,200,210
+180,190,200
+163,173,181
+152,161,169
+139,147,154
+135,143,150
+134,142,149
+         */
+
         // 模块化之后，都不用注释也能看得懂了。。
-        // 技能CD为x为指定 y为灰白色最上方像素 |涉及的颜色| 技能CD颜色实际上是释放技能时变换的颜色 所以容差大 未学习技能CD颜色 
+        // 技能CD为x为指定 y为灰白色最上方像素 |涉及的颜色| 技能CD颜色实际上是释放技能时变换的颜色 所以容差大 456基本通用 4颜色少1rgb 未学习技能CD颜色 
         // 5 6 进入CD颜色渐变 122,129,136 94,100,106 16,19,18 8,11,10 非指向性施法颜色不变
         // 法球位置为灰白色左下角图标 |涉及的颜色| 法球颜色 未学习法球颜色
         // 推荐学习和状态技能取同一个位置 开启技能后 y最底下绿色像素 金黄色下往上数2  5,6技能 为暗黄色最底下 |涉及的颜色| 推荐学习颜色 状态激活颜色
         // QWERDF框x为左下角x向右偏移一个像素 y为特定的y 被动位置x为图标右侧边框左边第一个像素,有的技能亮色影响内侧颜色 y为qwerdf 的某个高度 |涉及的颜色| qwerdf颜色 被动颜色 未学习被动技能颜色 破坏被动颜色
         private static readonly 技能信息 技能4 = new(
             820, 998, 65
-            , 27, -52, Color.FromArgb(133, 141, 148), 5, Color.FromArgb(72, 76, 80), 2
+            , 27, -52, Color.FromArgb(194, 198, 202), 62, Color.FromArgb(72, 76, 80), 2
             , -1, -45, Color.FromArgb(34, 40, 39), 2
             , 2, -2, Color.FromArgb(54, 62, 70), 2, Color.FromArgb(25, 30, 34), 2
             , 25, -56, Color.FromArgb(0, 129, 0), 0, Color.FromArgb(211, 181, 79), 8
@@ -43,7 +117,7 @@ namespace Dota2Simulator.Games.Dota2
 
         private static readonly 技能信息 技能5 = new(
             802, 995, 58
-            , 30, -49, Color.FromArgb(134, 142, 149), 5, Color.FromArgb(72, 76, 80), 2
+            , 30, -49, Color.FromArgb(194, 198, 202), 62, Color.FromArgb(72, 76, 80), 2
             , 1, -41, Color.FromArgb(34, 40, 39), 1
             , 3, -3, Color.FromArgb(54, 61, 69), 2, Color.FromArgb(25, 29, 34), 2
             , 25, -50, Color.FromArgb(0, 129, 0), 0, Color.FromArgb(118, 100, 41), 8
@@ -54,7 +128,7 @@ namespace Dota2Simulator.Games.Dota2
 
         private static readonly 技能信息 技能6 = new(
             772, 995, 58
-            , 30, -49, Color.FromArgb(134, 142, 149), 5, Color.FromArgb(72, 76, 80), 2
+            , 30, -49, Color.FromArgb(194, 198, 202), 62, Color.FromArgb(72, 76, 80), 2
             , 1, -41, Color.FromArgb(34, 40, 39), 1
             , 3, -3, Color.FromArgb(54, 61, 69), 2, Color.FromArgb(25, 29, 34), 2
             , 25, -50, Color.FromArgb(0, 129, 0), 0, Color.FromArgb(118, 100, 41), 8
@@ -185,6 +259,12 @@ namespace Dota2Simulator.Games.Dota2
 
             switch (类型)
             {
+                case 技能类型.释放变色:
+                    x = 技能信息.释放变色位置x + offsetX - 坐标偏移x;
+                    y = 技能信息.释放变色位置y - 坐标偏移y;
+                    颜色 = default;
+                    颜色容差 = 0;
+                    break;
                 case 技能类型.图标CD:
                     x = 技能信息.技能CD图标x + offsetX - 坐标偏移x;
                     y = 技能信息.技能CD图标y - 坐标偏移y;
@@ -202,12 +282,6 @@ namespace Dota2Simulator.Games.Dota2
                     y = 技能信息.状态技能位置y - 坐标偏移y;
                     颜色 = 技能信息.技能状态激活颜色;
                     颜色容差 = 技能信息.技能状态激活颜色容差;
-                    break;
-                case 技能类型.释放变色:
-                    x = 技能信息.释放变色位置x + offsetX - 坐标偏移x;
-                    y = 技能信息.释放变色位置y - 坐标偏移y;
-                    颜色 = default;
-                    颜色容差 = 0;
                     break;
                 case 技能类型.QWERDF图标:
                     x = 技能信息.QWERDF位置x + offsetX - 坐标偏移x;
@@ -891,6 +965,82 @@ namespace Dota2Simulator.Games.Dota2
                 技能状态.释放后Color = Color.Empty;
             }
         }
+        // 存储每个技能的释放开始时间
+        private static readonly Dictionary<Keys, DateTime> _技能释放开始时间 = new Dictionary<Keys, DateTime>();
+        private static readonly Lock _时间锁 = new();
+
+        /// <summary>
+        /// 获取或设置技能释放开始时间
+        /// </summary>
+        /// <param name="技能位置">技能按键位置</param>
+        /// <param name="当前释放中">当前是否处于释放中状态</param>
+        /// <returns>释放开始时间</returns>
+        private static DateTime 获取或设置释放开始时间(Keys 技能位置, bool 当前释放中)
+        {
+            lock (_时间锁)
+            {
+                if (_技能释放开始时间.TryGetValue(技能位置, out DateTime value))
+                {
+                    // 如果已存在记录，直接返回
+                    return value;
+                }
+                else
+                {
+                    // 如果不存在记录，说明是新的释放周期，设置当前时间
+                    DateTime 开始时间 = DateTime.Now;
+                    _技能释放开始时间[技能位置] = 开始时间;
+                    //Logger.Debug($"技能{技能位置}记录释放开始时间: {开始时间:HH:mm:ss.fff}");
+                    return 开始时间;
+                }
+            }
+        }
+
+        /// <summary>
+        /// 设置技能释放开始时间
+        /// </summary>
+        /// <param name="技能位置">技能按键位置</param>
+        /// <param name="开始时间">释放开始时间</param>
+        private static void 设置释放开始时间(Keys 技能位置, DateTime 开始时间)
+        {
+            lock (_时间锁)
+            {
+                _技能释放开始时间[技能位置] = 开始时间;
+                //Logger.Debug($"技能{技能位置}设置释放开始时间: {开始时间:HH:mm:ss.fff}");
+            }
+        }
+
+        /// <summary>
+        /// 清除技能释放开始时间记录（在释放结束时调用）
+        /// </summary>
+        /// <param name="技能位置">技能按键位置</param>
+        private static void 清除释放开始时间(Keys 技能位置)
+        {
+            lock (_时间锁)
+            {
+                if (_技能释放开始时间.ContainsKey(技能位置))
+                {
+                    _技能释放开始时间.Remove(技能位置);
+                    //Logger.Debug($"技能{技能位置}清除释放开始时间记录");
+                }
+            }
+        }
+
+        /// <summary>
+        /// 获取技能释放持续时间（毫秒）
+        /// </summary>
+        /// <param name="技能位置">技能按键位置</param>
+        /// <returns>持续时间（毫秒），如果未找到记录返回0</returns>
+        private static double 获取释放持续时间(Keys 技能位置)
+        {
+            lock (_时间锁)
+            {
+                if (_技能释放开始时间.TryGetValue(技能位置, out DateTime value))
+                {
+                    return (DateTime.Now - value).TotalMilliseconds;
+                }
+                return 0;
+            }
+        }
 
         private static bool 处理技能释放(Keys 技能位置, Color 当前释放颜色)
         {
@@ -899,53 +1049,187 @@ namespace Dota2Simulator.Games.Dota2
                 Logger.Info("字典读取失败");
                 return false;
             }
+
+            const int COLOR_TOLERANCE = 8;
+            const int MIN_RELEASE_DURATION_MS = 100; // 最短释放时间
+
+            // 获取释放开始时间
+            DateTime 释放开始时间 = 获取或设置释放开始时间(技能位置, 释放中判断);
+
+            //Logger.Debug($"技能{技能位置}: 当前RGB({当前释放颜色.R},{当前释放颜色.G},{当前释放颜色.B}) " +
+            //            $"释放前RGB({释放前Color.R},{释放前Color.G},{释放前Color.B}) " +
+            //            $"释放后RGB({释放后Color.R},{释放后Color.G},{释放后Color.B}) " +
+            //            $"状态: 释放中={释放中判断}, 已释放={已释放变色判断}");
+
             if (释放中判断)
             {
-                // 技能释放中
                 if (!已释放变色判断)
                 {
-                    // 技能未释放完毕
-                    if (ColorExtensions.ColorAEqualColorB(释放后Color, 当前释放颜色, 0))
+                    double 与释放前距离 = CalculateColorDistance(当前释放颜色, 释放前Color);
+                    double 与释放后距离 = CalculateColorDistance(当前释放颜色, 释放后Color);
+                    double 释放已持续时间 = (DateTime.Now - 释放开始时间).TotalMilliseconds;
+
+                    //Logger.Debug($"技能{技能位置}释放中: 与释放前距离={与释放前距离:F2}, 与释放后距离={与释放后距离:F2}, 持续时间={释放已持续时间:F0}ms");
+
+                    // 智能判断：优先考虑距离比较，然后考虑时间
+                    if (与释放前距离 <= COLOR_TOLERANCE)
                     {
-                        更新释放判断和颜色(技能位置, true, false, 释放前Color, 释放后Color);
+                        // 回到释放前颜色
+                        if (释放已持续时间 >= MIN_RELEASE_DURATION_MS)
+                        {
+                            更新释放判断和颜色(技能位置, false, true, 释放前Color, 释放后Color);
+                            //Logger.Info($"技能{技能位置}释放完毕 - 颜色回到初始状态 (距离={与释放前距离:F2}, 持续={释放已持续时间:F0}ms)");
+                            return false;
+                        }
+                        else
+                        {
+                            //Logger.Debug($"技能{技能位置}颜色回到初始，但时间太短，继续等待");
+                            return true;
+                        }
+                    }
+                    else if (与释放后距离 <= Math.Max(20, 与释放前距离 * 0.7)) // 动态阈值：更接近释放后颜色
+                    {
+                        //Logger.Debug($"技能{技能位置}仍接近释放后颜色，继续释放状态");
                         return true;
                     }
-                    else if (ColorExtensions.ColorAEqualColorB(释放前Color, 当前释放颜色, 0))  // 新增：判断是否回到初始颜色
+                    else if (IsColorInTransition(当前释放颜色, 释放前Color, 释放后Color, 与释放前距离, 与释放后距离))
                     {
-                        更新释放判断和颜色(技能位置, false, true, 释放前Color, 释放后Color);
-                        // 记录技能释放信息(技能位置, "已释放完毕", false, true, 释放前Color, 释放后Color, 当前释放颜色);
-                        return false;
+                        //Logger.Debug($"技能{技能位置}检测到渐变色，继续释放状态");
+                        return true;
                     }
                     else
                     {
-                        更新释放判断和颜色(技能位置, false, true, 释放前Color, 释放后Color);
-                        // 记录技能释放信息(技能位置, "已释放完毕", false, true, 释放前Color, 释放后Color, 当前释放颜色);
-                        return false;
+                        // 智能判断是否应该结束
+                        bool 应该结束释放 = ShouldEndRelease(与释放前距离, 与释放后距离, 释放已持续时间);
+
+                        if (应该结束释放)
+                        {
+                            更新释放判断和颜色(技能位置, false, true, 释放前Color, 释放后Color);
+                            //Logger.Info($"技能{技能位置}释放结束 - 智能判断 (前距离={与释放前距离:F2}, 后距离={与释放后距离:F2}, 持续={释放已持续时间:F0}ms)");
+                            return false;
+                        }
+                        else
+                        {
+                            //Logger.Debug($"技能{技能位置}颜色异常但继续等待");
+                            return true;
+                        }
                     }
                 }
-                return false;
+                else
+                {
+                    // 已释放完毕状态处理...
+                    if (ColorExtensions.ColorAEqualColorB(释放前Color, 当前释放颜色, COLOR_TOLERANCE))
+                    {
+                        更新释放判断和颜色(技能位置, false, false, 释放前Color, 释放后Color);
+                        //Logger.Info($"技能{技能位置}重置为可用状态");
+                        return true;
+                    }
+                    return false;
+                }
             }
             else
             {
-                // 未释放中 颜色相同时
-                if (ColorExtensions.ColorAEqualColorB(释放前Color, 当前释放颜色, 0))
+                // 未释放状态逻辑...
+                if (已释放变色判断)
                 {
-                    更新释放判断和颜色(技能位置, false, false, 释放前Color, 释放后Color);
-                    return true;
+                    if (ColorExtensions.ColorAEqualColorB(释放前Color, 当前释放颜色, COLOR_TOLERANCE))
+                    {
+                        更新释放判断和颜色(技能位置, false, false, 释放前Color, 释放后Color);
+                        //Logger.Info($"技能{技能位置}从已释放状态重置为可用");
+                        return true;
+                    }
+                    return false;
                 }
-                // 未释放中 颜色不同时
                 else
                 {
-                    // 释放后不为空 且颜色相同 说明正在释放 或者释放前颜色变绿 说明正在释放
-                    if (释放后Color != Color.Empty && ColorExtensions.ColorAEqualColorB(释放后Color, 当前释放颜色, 0)
-                        || DOTA2释放颜色前后对比(释放前Color, 当前释放颜色))
+                    if (ColorExtensions.ColorAEqualColorB(释放前Color, 当前释放颜色, COLOR_TOLERANCE))
                     {
-                        更新释放判断和颜色(技能位置, true, false, 释放前Color, 当前释放颜色);
-                        // 记录技能释放信息(技能位置, "释放中", true, false, 释放前Color, 当前释放颜色, 当前释放颜色);
+                        return true;
                     }
-                    return true;
+                    else
+                    {
+                        // 统一的释放检测逻辑
+                        bool 开始释放 = IsSkillReleasing(当前释放颜色, 释放前Color, 释放后Color);
+
+                        if (开始释放)
+                        {
+                            更新释放判断和颜色(技能位置, true, false, 释放前Color, 当前释放颜色);
+                            设置释放开始时间(技能位置, DateTime.Now);
+                            //Logger.Info($"技能{技能位置}开始释放 - 统一检测逻辑");
+                        }
+
+                        return true;
+                    }
                 }
             }
+        }
+
+        // 智能判断是否应该结束释放
+        private static bool ShouldEndRelease(double 前距离, double 后距离, double 持续时间)
+        {
+            //// 如果持续时间太短，不要轻易结束
+            //if (持续时间 < MIN_RELEASE_DURATION_MS)
+            //    return false;
+
+            // 如果两个距离都很大，且持续时间够长，可以结束
+            if (前距离 > 50 && 后距离 > 50 && 持续时间 > 500)
+                return true;
+
+            // 如果距离差异很大（明显偏离两种预期颜色），结束
+            if (Math.Min(前距离, 后距离) > 100)
+                return true;
+
+            return false;
+        }
+
+        // 改进的渐变色检测
+        private static bool IsColorInTransition(Color current, Color start, Color end, double 前距离, double 后距离)
+        {
+            // 如果当前颜色在起始和结束颜色的"中间位置"
+            double 总距离 = CalculateColorDistance(start, end);
+            double 距离比例 = Math.Min(前距离, 后距离) / 总距离;
+
+            return 距离比例 < 0.8; // 在合理范围内
+        }
+
+        // 统一的释放检测逻辑
+        private static bool IsSkillReleasing(Color current, Color before, Color after)
+        {
+            // 方法1：直接匹配释放后颜色
+            if (after != Color.Empty && ColorExtensions.ColorAEqualColorB(after, current, 15))
+            {
+                return true;
+            }
+
+            // 方法2：使用颜色变换公式
+            if (DOTA2释放颜色前后对比(before, current))
+            {
+                return true;
+            }
+
+            // 方法3：颜色距离判断（作为补充）
+            double 与前距离 = CalculateColorDistance(current, before);
+            double 与后距离 = CalculateColorDistance(current, after);
+
+            // 如果明显更接近释放后颜色
+            return 与后距离 < 与前距离 * 0.6 && 与后距离 < 30;
+        }
+
+        // 辅助方法：计算颜色距离
+        private static double CalculateColorDistance(Color c1, Color c2)
+        {
+            return Math.Sqrt(Math.Pow(c1.R - c2.R, 2) + Math.Pow(c1.G - c2.G, 2) + Math.Pow(c1.B - c2.B, 2));
+        }
+
+        // 辅助方法：检查颜色是否在渐变过程中
+        private static bool IsColorInTransition(Color current, Color start, Color end)
+        {
+            // 检查当前颜色是否在起始色和结束色之间的合理范围内
+            bool rInRange = (current.R >= Math.Min(start.R, end.R) - 10) && (current.R <= Math.Max(start.R, end.R) + 10);
+            bool gInRange = (current.G >= Math.Min(start.G, end.G) - 10) && (current.G <= Math.Max(start.G, end.G) + 10);
+            bool bInRange = (current.B >= Math.Min(start.B, end.B) - 10) && (current.B <= Math.Max(start.B, end.B) + 10);
+
+            return rInRange && gInRange && bInRange;
         }
 
         /// <summary>
@@ -961,54 +1245,30 @@ namespace Dota2Simulator.Games.Dota2
         {
             if (!Avx2.IsSupported)
             {
-                return Math.Abs(beforColor.R * beforColor.R * 0.0001 + beforColor.R * 0.7656 - afterColor.R) <= 3
-                       && Math.Abs(beforColor.G * beforColor.G * 0.0014 + beforColor.G * 0.0251 + 147 - afterColor.G) <= 3
-                       && Math.Abs(beforColor.B * beforColor.B * 0.0002 + beforColor.B * 0.751 - afterColor.B) <= 3;
+                return Math.Abs(beforColor.R * beforColor.R * 0.0001 + beforColor.R * 0.7629 - afterColor.R) <= 4
+                       && Math.Abs(beforColor.G * beforColor.G * 0.0014 + beforColor.G * 0.0219 + 147 - afterColor.G) <= 4
+                       && Math.Abs(beforColor.B * beforColor.B * 0.0002 + beforColor.B * 0.7586 - afterColor.B) <= 4;
             }
 
-            // 修改2处，上面数值
+            // 一次性加载所有数据
+            Vector256<float> beforeVec = Vector256.Create(beforColor.R, beforColor.G, beforColor.B, 0f, 0f, 0f, 0f, 0f);
+            Vector256<float> afterVec = Vector256.Create(afterColor.R, afterColor.G, afterColor.B, 0f, 0f, 0f, 0f, 0f);
+            Vector256<float> squareCoeff = Vector256.Create(0.0001f, 0.0014f, 0.0002f, 0f, 0f, 0f, 0f, 0f);
+            Vector256<float> linearCoeff = Vector256.Create(0.7629f, 0.0219f, 0.7586f, 0f, 0f, 0f, 0f, 0f);
+            Vector256<float> constant = Vector256.Create(0f, 147f, 0f, 0f, 0f, 0f, 0f, 0f);
 
-            // Load color components into Vector256<float>
-            Vector256<float> beforColorVec = Vector256.Create(
-                beforColor.R, beforColor.G, beforColor.B, 0f,
-                beforColor.R, beforColor.G, beforColor.B, 0f
-            );
+            // 计算 ax² + bx + c
+            Vector256<float> squared = Avx.Multiply(beforeVec, beforeVec);
+            Vector256<float> result = Avx.Add(
+                Avx.Add(Avx.Multiply(squared, squareCoeff), Avx.Multiply(beforeVec, linearCoeff)),
+                constant);
 
-            // 这里的数值之一
+            // 计算差值的绝对值
+            Vector256<float> diff = Avx.Subtract(result, afterVec);
+            Vector256<float> absDiff = Avx.And(diff, Vector256.Create(0x7FFFFFFF).AsSingle());
 
-            // Compute R channel comparison
-            Vector256<float> squaredBeforColorVecR = Avx.Multiply(beforColorVec, beforColorVec);
-            Vector256<float> tempR = Avx.Add(Avx.Multiply(squaredBeforColorVecR, Vector256.Create(0.0001f)),
-                Avx.Multiply(beforColorVec, Vector256.Create(0.7656f)));
-            Vector256<float> diffR = Avx.Subtract(tempR, Vector256.Create((float)afterColor.R));
-            Vector256<float> absDiffR = Avx.And(diffR, Vector256.Create(0x7FFFFFFF).AsSingle());
-            float rResultValue = absDiffR.GetElement(0);
-            bool rResult = rResultValue <= 3f;
-
-            // 这里的数值之一
-
-            // Compute G channel comparison
-            Vector256<float> squaredBeforColorVecG = Avx.Multiply(beforColorVec, beforColorVec);
-            Vector256<float> tempG = Avx.Add(Avx.Multiply(squaredBeforColorVecG, Vector256.Create(0.0014f)),
-                Avx.Multiply(beforColorVec, Vector256.Create(0.0251f)));
-            tempG = Avx.Add(tempG, Vector256.Create(147f));
-            Vector256<float> diffG = Avx.Subtract(tempG, Vector256.Create((float)afterColor.G));
-            Vector256<float> absDiffG = Avx.And(diffG, Vector256.Create(0x7FFFFFFF).AsSingle());
-            float gResultValue = absDiffG.GetElement(1);
-            bool gResult = gResultValue <= 3f;
-
-            // 这里的数值之一
-
-            // Compute B channel comparison
-            Vector256<float> squaredBeforColorVecB = Avx.Multiply(beforColorVec, beforColorVec);
-            Vector256<float> tempB = Avx.Add(Avx.Multiply(squaredBeforColorVecB, Vector256.Create(0.0002f)),
-                Avx.Multiply(beforColorVec, Vector256.Create(0.751f)));
-            Vector256<float> diffB = Avx.Subtract(tempB, Vector256.Create((float)afterColor.B));
-            Vector256<float> absDiffB = Avx.And(diffB, Vector256.Create(0x7FFFFFFF).AsSingle());
-            float bResultValue = absDiffB.GetElement(2);
-            bool bResult = bResultValue <= 3f;
-
-            return rResult && gResult && bResult;
+            // 检查阈值
+            return absDiff.GetElement(0) <= 4f && absDiff.GetElement(1) <= 4f && absDiff.GetElement(2) <= 4f;
         }
 
         #endregion

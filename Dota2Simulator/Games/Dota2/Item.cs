@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using static Dota2Simulator.Games.Dota2.MainClass;
 using static Dota2Simulator.Games.Dota2.Skill;
+using static OpenCvSharp.Stitcher;
 
 namespace Dota2Simulator.Games.Dota2
 {
@@ -242,28 +243,28 @@ namespace Dota2Simulator.Games.Dota2
         // 最上侧 最右侧 用于判断物品是否可用
         // 1195 943
 
-        private static readonly 物品信息 物品4 = new(1136,
+        public static readonly 物品信息 物品4 = new(1136,
             [
                 Color.FromArgb(35, 36, 37), Color.FromArgb(34, 35, 35), Color.FromArgb(32, 32, 32),
                 Color.FromArgb(35, 35, 35), Color.FromArgb(34, 33, 33), Color.FromArgb(31, 31, 32)
             ]
         );
 
-        private static readonly 物品信息 物品5 = new(1150,
+        public static readonly 物品信息 物品5 = new(1150,
             [
                 Color.FromArgb(35, 36, 37), Color.FromArgb(34, 35, 35), Color.FromArgb(32, 32, 32),
                 Color.FromArgb(35, 35, 35), Color.FromArgb(34, 33, 33), Color.FromArgb(31, 31, 32)
             ]
         );
 
-        private static readonly 物品信息 物品6 = new(1180,
+        public static readonly 物品信息 物品6 = new(1180,
             [
                 Color.FromArgb(35, 36, 37), Color.FromArgb(34, 35, 35), Color.FromArgb(32, 32, 32),
                 Color.FromArgb(35, 35, 35), Color.FromArgb(34, 33, 33), Color.FromArgb(31, 31, 32)
             ]
         );
 
-        private class 物品信息(int 最左侧x, Color[] 物品锁闭颜色)
+        public class 物品信息(int 最左侧x, Color[] 物品锁闭颜色)
         {
             public int 物品最左侧x { get; } = 最左侧x;
             public int 物品最上侧y { get; } = 943; // 为灰色那条线的高度
@@ -282,6 +283,8 @@ namespace Dota2Simulator.Games.Dota2
             public Color[] 物品锁闭颜色 { get; } = 物品锁闭颜色; // 因为无物品时，无锁闭情况，但其他物品锁闭
             public byte 物品锁闭颜色容差 { get; }
             public Keys[] 物品位置 { get; } = [Keys.Z, Keys.X, Keys.C, Keys.V, Keys.B, Keys.Space];
+            public Rectangle 物品范围 { get; } = new Rectangle(最左侧x, 943, 65 * 3, 48 * 2);
+            public Rectangle 中立TP范围 { get; }= new Rectangle(最左侧x + 197, 968, 47, 101); // 6技能 1377,968,47,101 1180  197
         }
 
         private static bool 判断物品状态(物品信息 物品, int 序号, in ImageHandle 句柄, Point 初始位置, Color 目标颜色, byte 颜色容差)
@@ -348,13 +351,35 @@ namespace Dota2Simulator.Games.Dota2
             return false;
         }
 
-        private static 物品信息 根据技能数量获取物品信息(int mode = 4)
+        public static 物品信息 根据技能数量获取物品信息(int mode = 4)
         {
             return mode switch
             {
                 4 => 物品4,
                 5 => 物品5,
                 6 => 物品6,
+                _ => throw new ArgumentException("Invalid Item number")
+            };
+        }
+
+        public static Rectangle 获取物品范围(int mode = 4)
+        {
+            return mode switch
+            {
+                4 => 物品4.物品范围,
+                5 => 物品5.物品范围,
+                6 => 物品6.物品范围,
+                _ => throw new ArgumentException("Invalid Item number")
+            };
+        }
+
+        public static Rectangle 获取中立TP范围(int mode = 4)
+        {
+            return mode switch
+            {
+                4 => 物品4.中立TP范围,
+                5 => 物品5.中立TP范围,
+                6 => 物品6.中立TP范围,
                 _ => throw new ArgumentException("Invalid Item number")
             };
         }
@@ -380,14 +405,14 @@ namespace Dota2Simulator.Games.Dota2
         {
             ImageHandle[] 需切假腿物品句柄 =
             [
-                物品_黑黄杖_handle,
+                物品_黑皇杖_handle,
                 物品_疯狂面具_handle,
-                物品_疯狂面具_虚空至宝_handle,
+                物品_虚空至宝_疯狂面具_handle,
                 物品_紫苑_handle,
                 物品_血棘_handle,
                 物品_深渊之刃_handle,
                 物品_雷神之锤_handle,
-                物品_雷神之锤_虚空至宝_handle,
+                物品_虚空至宝_雷神之锤_handle,
                 物品_魂戒_handle,
                 物品_鱼叉_handle,
                 物品_散失_handle,
@@ -435,59 +460,61 @@ namespace Dota2Simulator.Games.Dota2
             return true;
         }
 
-        // 定义一个结构体来表示颜色检查项
-        private struct ColorCheck
-        {
-            public int Num;
-            public Rectangle OcrArea; // OCR 的区域
-        }
+        /*
+        //// 定义一个结构体来表示颜色检查项
+        //private struct ColorCheck
+        //{
+        //    public int Num;
+        //    public Rectangle OcrArea; // OCR 的区域
+        //}
 
-        private static double 获取当前攻击速度()
-        {
-            // 定义颜色检查项的列表
-            List<ColorCheck> colorChecks =
-            [
-                new()
-                {
-                    Num = 4,
-                    OcrArea = new Rectangle(663, 959, 28, 30)
-                },
-                new()
-                {
-                    Num = 5,
-                    OcrArea = new Rectangle(647, 959, 28, 30)
-                },
-                new()
-                {
-                    Num = 6,
-                    OcrArea = new Rectangle(619, 959, 28, 30)
-                }
-            ];
+        //private static double 获取当前攻击速度()
+        //{
+        //    // 定义颜色检查项的列表
+        //    List<ColorCheck> colorChecks =
+        //    [
+        //        new()
+        //        {
+        //            Num = 4,
+        //            OcrArea = new Rectangle(663, 959, 28, 30)
+        //        },
+        //        new()
+        //        {
+        //            Num = 5,
+        //            OcrArea = new Rectangle(647, 959, 28, 30)
+        //        },
+        //        new()
+        //        {
+        //            Num = 6,
+        //            OcrArea = new Rectangle(619, 959, 28, 30)
+        //        }
+        //    ];
 
-            foreach (ColorCheck check in colorChecks)
-            {
-                if (check.Num != _技能数量)
-                {
-                    continue;
-                }
+        //    foreach (ColorCheck check in colorChecks)
+        //    {
+        //        if (check.Num != _技能数量)
+        //        {
+        //            continue;
+        //        }
 
-                string ocrResult = PaddleOcr.获取图片文字(check.OcrArea.X, check.OcrArea.Y, check.OcrArea.Width,
-                    check.OcrArea.Height);
-                if (double.TryParse(ocrResult, out double result))
-                {
-                    return result;
-                }
-                else
-                {
-                    return 100.0;
-                    // throw new InvalidOperationException("OCR 结果无法转换为双精度浮点数。");
-                }
-            }
+        //        string ocrResult = PaddleOcr.获取图片文字(check.OcrArea.X, check.OcrArea.Y, check.OcrArea.Width,
+        //            check.OcrArea.Height);
+        //        if (double.TryParse(ocrResult, out double result))
+        //        {
+        //            return result;
+        //        }
+        //        else
+        //        {
+        //            return 100.0;
+        //            // throw new InvalidOperationException("OCR 结果无法转换为双精度浮点数。");
+        //        }
+        //    }
 
-            return 100.0;
-            // 如果没有匹配的颜色，抛出异常或返回默认值
-            // throw new InvalidOperationException("未找到匹配的颜色。");
-        }
+        //    return 100.0;
+        //    // 如果没有匹配的颜色，抛出异常或返回默认值
+        //    // throw new InvalidOperationException("未找到匹配的颜色。");
+        //}
+        */
 
         private static bool 获取当前假腿按键()
         {
@@ -528,7 +555,7 @@ namespace Dota2Simulator.Games.Dota2
 
         public static Keys 根据图片获取物品按键(in ImageHandle 句柄)
         {
-            var 位置 = ImageFinder.FindImage(in 句柄, in _全局图像句柄);
+            var 位置 = ImageFinder.FindImageInRegion(in 句柄, in _全局图像句柄, 获取物品范围(_技能数量));
             return 根据位置获取按键(位置);
         }
 
@@ -564,7 +591,7 @@ namespace Dota2Simulator.Games.Dota2
 
         private static int 执行物品操作(in ImageHandle 句柄, Action<Keys> 按键操作)
         {
-            Point? 位置 = ImageFinder.FindImage(in 句柄, in _全局图像句柄);
+            Point? 位置 = ImageFinder.FindImageInRegion(in 句柄, in _全局图像句柄, 获取物品范围(_技能数量));
             if (PictureProcessing.PictureProcessing.是否无效位置(位置))
             {
                 return 0;

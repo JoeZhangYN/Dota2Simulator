@@ -73,16 +73,11 @@
     <None Remove="Picture_Dota2\物品_散失.bmp" />
     <None Remove="Picture_Dota2\物品_散魂.bmp" />
     <None Remove="Picture_Dota2\物品_暗影护符.bmp" />
-    <None Remove="Picture_Dota2\物品_暗影护符buff.bmp" />
     <None Remove="Picture_Dota2\物品_永世法衣.bmp" />
-    <None Remove="Picture_Dota2\物品_永恒遗物.bmp" />
     <None Remove="Picture_Dota2\物品_深渊之刃.bmp" />
-    <None Remove="Picture_Dota2\物品_炎阳勋章.bmp" />
     <None Remove="Picture_Dota2\物品_玲珑心.bmp" />
     <None Remove="Picture_Dota2\物品_疯狂面具.bmp" />
-    <None Remove="Picture_Dota2\物品_疯狂面具_虚空至宝.bmp" />
     <None Remove="Picture_Dota2\物品_相位鞋.bmp" />
-    <None Remove="Picture_Dota2\物品_祭礼长袍.bmp" />
     <None Remove="Picture_Dota2\物品_紫苑.bmp" />
     <None Remove="Picture_Dota2\物品_红杖.bmp" />
     <None Remove="Picture_Dota2\物品_红杖2.bmp" />
@@ -99,24 +94,24 @@
     <None Remove="Picture_Dota2\物品_虚灵之刃.bmp" />
     <None Remove="Picture_Dota2\物品_血棘.bmp" />
     <None Remove="Picture_Dota2\物品_血精石.bmp" />
+    <None Remove="Picture_Dota2\物品_赤红甲.bmp" />
     <None Remove="Picture_Dota2\物品_跳刀.bmp" />
     <None Remove="Picture_Dota2\物品_跳刀_力量跳刀.bmp" />
     <None Remove="Picture_Dota2\物品_跳刀_敏捷跳刀.bmp" />
     <None Remove="Picture_Dota2\物品_跳刀_智力跳刀.bmp" />
-    <None Remove="Picture_Dota2\物品_释放天堂.bmp" />
+    <None Remove="Picture_Dota2\物品_长盾.bmp" />
     <None Remove="Picture_Dota2\物品_阿托斯之棍.bmp" />
     <None Remove="Picture_Dota2\物品_阿托斯之棍_进入CD.bmp" />
     <None Remove="Picture_Dota2\物品_陨星锤.bmp" />
     <None Remove="Picture_Dota2\物品_隐刀.bmp" />
     <None Remove="Picture_Dota2\物品_雷神之锤.bmp" />
-    <None Remove="Picture_Dota2\物品_雷神之锤_虚空至宝.bmp" />
     <None Remove="Picture_Dota2\物品_青莲宝珠.bmp" />
     <None Remove="Picture_Dota2\物品_飓风长戟.bmp" />
     <None Remove="Picture_Dota2\物品_魂之灵龛.bmp" />
     <None Remove="Picture_Dota2\物品_魂戒.bmp" />
     <None Remove="Picture_Dota2\物品_魔棒.bmp" />
     <None Remove="Picture_Dota2\物品_鱼叉.bmp" />
-    <None Remove="Picture_Dota2\物品_黑黄杖.bmp" />
+    <None Remove="Picture_Dota2\物品_黑皇杖.bmp" />
   </ItemGroup>
 
   <ItemGroup>
@@ -160,16 +155,16 @@
     <EmbeddedResource Include="Picture_Dota2\物品_散失.bmp" />
     <EmbeddedResource Include="Picture_Dota2\物品_散魂.bmp" />
     <EmbeddedResource Include="Picture_Dota2\物品_暗影护符.bmp" />
-    <EmbeddedResource Include="Picture_Dota2\物品_暗影护符buff.bmp" />
+    <EmbeddedResource Include="Picture_Dota2\Buff_暗影护符.bmp" />
     <EmbeddedResource Include="Picture_Dota2\物品_永世法衣.bmp" />
-    <EmbeddedResource Include="Picture_Dota2\物品_永恒遗物.bmp" />
+    <EmbeddedResource Include="Picture_Dota2\中立_永恒遗物.bmp" />
     <EmbeddedResource Include="Picture_Dota2\物品_深渊之刃.bmp" />
-    <EmbeddedResource Include="Picture_Dota2\物品_炎阳勋章.bmp" />
+    <EmbeddedResource Include="Picture_Dota2\物品_炎阳纹章.bmp" />
     <EmbeddedResource Include="Picture_Dota2\物品_玲珑心.bmp" />
     <EmbeddedResource Include="Picture_Dota2\物品_疯狂面具.bmp" />
-    <EmbeddedResource Include="Picture_Dota2\物品_疯狂面具_虚空至宝.bmp" />
+    <EmbeddedResource Include="Picture_Dota2\物品_虚空至宝_疯狂面具.bmp" />
     <EmbeddedResource Include="Picture_Dota2\物品_相位鞋.bmp" />
-    <EmbeddedResource Include="Picture_Dota2\物品_祭礼长袍.bmp" />
+    <EmbeddedResource Include="Picture_Dota2\中立_祭礼长袍.bmp" />
     <EmbeddedResource Include="Picture_Dota2\物品_紫苑.bmp" />
     <EmbeddedResource Include="Picture_Dota2\物品_红杖.bmp" />
     <EmbeddedResource Include="Picture_Dota2\物品_红杖2.bmp" />
@@ -186,26 +181,27 @@
     <EmbeddedResource Include="Picture_Dota2\物品_虚灵之刃.bmp" />
     <EmbeddedResource Include="Picture_Dota2\物品_血棘.bmp" />
     <EmbeddedResource Include="Picture_Dota2\物品_血精石.bmp" />
+    <EmbeddedResource Include="Picture_Dota2\物品_赤红甲.bmp" />
     <EmbeddedResource Include="Picture_Dota2\物品_跳刀.bmp" />
     <EmbeddedResource Include="Picture_Dota2\物品_跳刀_力量跳刀.bmp" />
     <EmbeddedResource Include="Picture_Dota2\物品_跳刀_敏捷跳刀.bmp" />
     <EmbeddedResource Include="Picture_Dota2\物品_跳刀_智力跳刀.bmp" />
-    <EmbeddedResource Include="Picture_Dota2\物品_释放天堂.bmp" />
+    <EmbeddedResource Include="Picture_Dota2\物品_长盾.bmp" />
     <EmbeddedResource Include="Picture_Dota2\物品_阿托斯之棍.bmp" />
     <EmbeddedResource Include="Picture_Dota2\物品_陨星锤.bmp" />
     <EmbeddedResource Include="Picture_Dota2\物品_隐刀.bmp" />
     <EmbeddedResource Include="Picture_Dota2\物品_雷神之锤.bmp">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="Picture_Dota2\物品_雷神之锤_虚空至宝.bmp" />
+    <EmbeddedResource Include="Picture_Dota2\物品_虚空至宝_雷神之锤.bmp" />
     <EmbeddedResource Include="Picture_Dota2\物品_青莲宝珠.bmp" />
     <EmbeddedResource Include="Picture_Dota2\物品_飓风长戟.bmp" />
     <EmbeddedResource Include="Picture_Dota2\物品_魂之灵龛.bmp" />
     <EmbeddedResource Include="Picture_Dota2\物品_魂戒.bmp" />
     <EmbeddedResource Include="Picture_Dota2\物品_魔棒.bmp" />
     <EmbeddedResource Include="Picture_Dota2\物品_鱼叉.bmp" />
-    <EmbeddedResource Include="Picture_Dota2\物品_黑黄杖.bmp" />
     <EmbeddedResource Include="Picture_Dota2\命石_骷髅王_白骨守卫.bmp" />
+    <EmbeddedResource Include="Picture_Dota2\物品_黑皇杖.bmp" />
   </ItemGroup>
 
   <ItemGroup>

@@ -16,6 +16,7 @@ namespace Dota2Simulator
 {
     internal partial class Form2 : Form
     {
+        // 单例模式 传递Form,调用UI线程更新
         private static Form2? _instance;
         public static Form2 Instance => _instance ?? throw new InvalidOperationException("Form2未初始化");
 
@@ -242,7 +243,7 @@ namespace Dota2Simulator
                 lb_阵营.Text = "模式例:q4";
                 lb_状态抗性.Text = "超时时间";
                 lb_攻速.Text = "位置12|13";
-                tb_阵营.Text = "q4";
+                tb_阵营.Text = "q41";
                 tb_状态抗性.Text = "2000";
                 label6.Text = "颜色";
                 tb_delay.Text = "";
@@ -252,6 +253,10 @@ namespace Dota2Simulator
                 lb_攻速.Text = "攻速";
                 tb_状态抗性.Text = "25";
             }
+
+#if DOTA2
+            Games.Dota2.MainClass.获取图片_2(); // 初始化获取截图 避免一开始的黑色
+#endif
         }
 
         /// <summary>

@@ -851,7 +851,7 @@ namespace ImageProcessingSystem
         /// <summary>
         /// 优化的保存图像方法
         /// </summary>
-        public static unsafe bool SaveImage(in ImageHandle handle, string filePath)
+        public static unsafe bool SaveImage(in ImageHandle handle, string filePath, Rectangle? region = null)
         {
             if (!_images.TryGetValue(handle.Id, out var metadata))
                 return false;
@@ -861,46 +861,71 @@ namespace ImageProcessingSystem
                 // 直接使用 GetImageData 方法获取所有需要的信息
                 var (ptr, length, size) = GetImageData(in handle);
 
-                using (var bitmap = new Bitmap((int)size.x, (int)size.y, PixelFormat.Format32bppArgb))
+                // 确定保存区域
+                Rectangle saveRegion;
+                if (region.HasValue)
                 {
-                    var rect = new Rectangle(0, 0, (int)size.x, (int)size.y);
-                    var bitmapData = bitmap.LockBits(rect, ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
+                    // 验证并调整区域边界
+                    var rect = region.Value;
+                    int maxWidth = (int)size.x;
+                    int maxHeight = (int)size.y;
 
+                    saveRegion = new Rectangle(
+                        Math.Max(0, Math.Min(rect.X, maxWidth)),
+                        Math.Max(0, Math.Min(rect.Y, maxHeight)),
+                        Math.Max(1, Math.Min(rect.Width, maxWidth - Math.Max(0, rect.X))),
+                        Math.Max(1, Math.Min(rect.Height, maxHeight - Math.Max(0, rect.Y)))
+                    );
+
+                    // 如果调整后的区域无效，返回false
+                    if (saveRegion.Width <= 0 || saveRegion.Height <= 0)
+                    {
+                        _logger.LogError($"无效的保存区域: {rect}，图像尺寸: {size.x}x{size.y}");
+                        return false;
+                    }
+                }
+                else
+                {
+                    // 保存整个图像
+                    saveRegion = new Rectangle(0, 0, (int)size.x, (int)size.y);
+                }
+
+                using (var bitmap = new Bitmap(saveRegion.Width, saveRegion.Height, PixelFormat.Format32bppArgb))
+                {
+                    var rect = new Rectangle(0, 0, saveRegion.Width, saveRegion.Height);
+                    var bitmapData = bitmap.LockBits(rect, ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
                     try
                     {
                         byte* src = (byte*)ptr;
                         byte* dst = (byte*)bitmapData.Scan0;
-                        int width = (int)size.x;
-                        int height = (int)size.y;
+                        int srcWidth = (int)size.x;
+                        int dstWidth = saveRegion.Width;
+                        int dstHeight = saveRegion.Height;
+                        int bytesPerPixel = 4; // ARGB
 
-                        // 使用并行复制提高大图像的保存速度
-                        if (height > 100 && bitmapData.Stride == width * 4)
+                        // 计算源图像中区域起始位置
+                        int srcStartX = saveRegion.X;
+                        int srcStartY = saveRegion.Y;
+
+                        // 使用并行复制提高大图像区域的保存速度
+                        if (dstHeight > 100)
                         {
-                            // 大图像且内存连续，使用并行复制
-                            Parallel.For(0, height, y =>
+                            // 大区域使用并行复制
+                            Parallel.For(0, dstHeight, y =>
                             {
-                                Buffer.MemoryCopy(
-                                    src + y * width * 4,
-                                    dst + y * width * 4,
-                                    width * 4,
-                                    width * 4);
+                                byte* srcRow = src + ((srcStartY + y) * srcWidth + srcStartX) * bytesPerPixel;
+                                byte* dstRow = dst + y * bitmapData.Stride;
+                                Buffer.MemoryCopy(srcRow, dstRow, dstWidth * bytesPerPixel, dstWidth * bytesPerPixel);
                             });
-                        }
-                        else if (bitmapData.Stride == width * 4)
-                        {
-                            // 内存连续，一次性复制
-                            Buffer.MemoryCopy(src, dst, length, length);
                         }
                         else
                         {
-                            // 逐行复制
-                            for (int y = 0; y < height; y++)
+                            // 小区域使用顺序复制
+                            for (int y = 0; y < dstHeight; y++)
                             {
-                                Buffer.MemoryCopy(
-                                    src + y * width * 4,
-                                    dst + y * bitmapData.Stride,
-                                    width * 4,
-                                    width * 4);
+                                byte* srcRow = src + ((srcStartY + y) * srcWidth + srcStartX) * bytesPerPixel;
+                                byte* dstRow = dst + y * bitmapData.Stride;
+                                Buffer.MemoryCopy(srcRow, dstRow, dstWidth * bytesPerPixel, dstWidth * bytesPerPixel);
                             }
                         }
                     }
@@ -910,7 +935,7 @@ namespace ImageProcessingSystem
                     }
 
                     // 根据扩展名保存
-                    var extension = Path.GetExtension(filePath).ToLower();
+                    var extension = Path.GetExtension(filePath).ToLower(System.Globalization.CultureInfo.CurrentCulture);
                     var format = extension switch
                     {
                         ".bmp" => ImageFormat.Bmp,
@@ -926,10 +951,16 @@ namespace ImageProcessingSystem
                     if (format == ImageFormat.Jpeg)
                     {
                         var jpegEncoder = GetEncoder(ImageFormat.Jpeg);
-                        if (jpegEncoder == null) bitmap.Save(filePath, format);
-                        var encoderParams = new EncoderParameters(1);
-                        encoderParams.Param[0] = new EncoderParameter(Encoder.Quality, 90L); // 90% 质量
-                        bitmap.Save(filePath, jpegEncoder, encoderParams);
+                        if (jpegEncoder == null)
+                        {
+                            bitmap.Save(filePath, format);
+                        }
+                        else
+                        {
+                            var encoderParams = new EncoderParameters(1);
+                            encoderParams.Param[0] = new EncoderParameter(Encoder.Quality, 90L); // 90% 质量
+                            bitmap.Save(filePath, jpegEncoder, encoderParams);
+                        }
                     }
                     else
                     {
@@ -941,7 +972,8 @@ namespace ImageProcessingSystem
                 metadata.LastAccessTime = DateTime.Now;
                 _images[handle.Id] = metadata;
 
-                _logger.LogInfo($"图像已保存: {filePath} (类型: {handle.Type}, 大小: {size.x}x{size.y})");
+                string regionInfo = region.HasValue ? $"区域: {saveRegion}" : "完整图像";
+                _logger.LogInfo($"图像已保存: {filePath} (类型: {handle.Type}, {regionInfo}, 保存尺寸: {saveRegion.Width}x{saveRegion.Height})");
                 return true;
             }
             catch (Exception ex)
@@ -1487,6 +1519,164 @@ namespace ImageProcessingSystem
 
         // 查找失败时的返回值
         private static readonly Tuple NotFound = new() { x = 245760, y = 143640 };
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct Region
+        {
+            public uint x;
+            public uint y;
+            public uint width;
+            public uint height;
+        }
+
+        [DllImport("findpoints.dll", CallingConvention = CallingConvention.Cdecl)]
+        private static extern Tuple FindBytesInRegion(
+            IntPtr n1, UIntPtr len1, Tuple t1,
+            IntPtr n2, UIntPtr len2, Tuple t2,
+            Region region,
+            double matchRate,
+            byte ignore_r, byte ignore_g, byte ignore_b
+        );
+
+        /// <summary>
+        ///     指定区域大图小图对比
+        /// </summary>
+        /// <param name="subImage"></param>
+        /// <param name="mainImage"></param>
+        /// <param name="region"></param>
+        /// <param name="matchRate"></param>
+        /// <param name="ignoreColor"></param>
+        /// <returns></returns>
+        public static Point? FindImageInRegion(
+            in ImageHandle subImage,
+            in ImageHandle mainImage,
+            Rectangle region,
+            double matchRate = 0.9,
+            Color? ignoreColor = null)
+        {
+            // 调用新的 Rust 函数
+            var regionStruct = new Region
+            {
+                x = (uint)region.X,
+                y = (uint)region.Y,
+                width = (uint)region.Width,
+                height = (uint)region.Height
+            };
+
+
+            // 获取图像数据，增加异常处理
+            IntPtr mainPtr, subPtr;
+            int mainLen, subLen;
+            Tuple mainSize, subSize;
+
+            try
+            {
+                var mainData = ImageManager.GetImageData(in mainImage);
+                mainPtr = mainData.ptr;
+                mainLen = mainData.length;
+                mainSize = mainData.size;
+
+                var subData = ImageManager.GetImageData(in subImage);
+                subPtr = subData.ptr;
+                subLen = subData.length;
+                subSize = subData.size;
+            }
+            catch (Exception ex)
+            {
+                _logger?.Error($"获取图像数据失败: {ex.Message}");
+                return null;
+            }
+
+            // 处理忽略色
+            byte ignoreR = 255, ignoreG = 20, ignoreB = 147;
+            if (ignoreColor.HasValue)
+            {
+                ignoreR = ignoreColor.Value.R;
+                ignoreG = ignoreColor.Value.G;
+                ignoreB = ignoreColor.Value.B;
+            }
+
+            var result = FindBytesInRegion(
+                mainPtr, (UIntPtr)mainLen, mainSize,
+                subPtr, (UIntPtr)subLen, subSize,
+                regionStruct,
+                matchRate,
+                ignoreR, ignoreG, ignoreB
+            );
+
+            // 结果已经是相对于原始大图的坐标
+            return result.x == NotFound.x ? null : new Point((int)result.x, (int)result.y);
+        }
+
+        /// <summary>
+        ///     指定区域大图存在小图
+        /// </summary>
+        /// <param name="subImage"></param>
+        /// <param name="mainImage"></param>
+        /// <param name="region"></param>
+        /// <param name="matchRate"></param>
+        /// <param name="ignoreColor"></param>
+        /// <returns></returns>
+        public static bool FindImageInRegionBool(
+            in ImageHandle subImage,
+            in ImageHandle mainImage,
+            Rectangle region,
+            double matchRate = 0.9,
+            Color? ignoreColor = null)
+        {
+            // 调用新的 Rust 函数
+            var regionStruct = new Region
+            {
+                x = (uint)region.X,
+                y = (uint)region.Y,
+                width = (uint)region.Width,
+                height = (uint)region.Height
+            };
+
+
+            // 获取图像数据，增加异常处理
+            IntPtr mainPtr, subPtr;
+            int mainLen, subLen;
+            Tuple mainSize, subSize;
+
+            try
+            {
+                var mainData = ImageManager.GetImageData(in mainImage);
+                mainPtr = mainData.ptr;
+                mainLen = mainData.length;
+                mainSize = mainData.size;
+
+                var subData = ImageManager.GetImageData(in subImage);
+                subPtr = subData.ptr;
+                subLen = subData.length;
+                subSize = subData.size;
+            }
+            catch (Exception ex)
+            {
+                _logger?.Error($"获取图像数据失败: {ex.Message}");
+                return false;
+            }
+
+            // 处理忽略色
+            byte ignoreR = 255, ignoreG = 20, ignoreB = 147;
+            if (ignoreColor.HasValue)
+            {
+                ignoreR = ignoreColor.Value.R;
+                ignoreG = ignoreColor.Value.G;
+                ignoreB = ignoreColor.Value.B;
+            }
+
+            var result = FindBytesInRegion(
+                mainPtr, (UIntPtr)mainLen, mainSize,
+                subPtr, (UIntPtr)subLen, subSize,
+                regionStruct,
+                matchRate,
+                ignoreR, ignoreG, ignoreB
+            );
+
+            // 结果已经是相对于原始大图的坐标
+            return result.x == NotFound.x ? false : true;
+        }
 
         // 在大图中查找小图（精确匹配）
         /// <summary>
