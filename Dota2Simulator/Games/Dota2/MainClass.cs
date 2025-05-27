@@ -4229,13 +4229,13 @@ namespace Dota2Simulator.Games.Dota2
                                     {
                                         _条件1 = false;
                                         _循环条件1 = false;
-                                        Tts.Speak("关闭续勋章");
+                                        Tts.Speak("关闭续纹章");
                                     }
                                     else
                                     {
                                         _条件1 = true;
                                         _循环条件1 = true;
-                                        Tts.Speak("开启续勋章");
+                                        Tts.Speak("开启续纹章");
                                     }
 
                                     break;
@@ -4309,13 +4309,13 @@ namespace Dota2Simulator.Games.Dota2
                                     {
                                         _条件1 = false;
                                         _循环条件1 = false;
-                                        Tts.Speak("关闭续勋章");
+                                        Tts.Speak("关闭续纹章");
                                     }
                                     else
                                     {
                                         _条件1 = true;
                                         _循环条件1 = true;
-                                        Tts.Speak("开启续勋章");
+                                        Tts.Speak("开启续纹章");
                                     }
 
                                     break;
@@ -8720,7 +8720,7 @@ namespace Dota2Simulator.Games.Dota2
             缓存嵌入的图片("物品_深渊之刃");
             缓存嵌入的图片("物品_雷神之锤");
             缓存嵌入的图片("物品_雷神之锤_虚空至宝");
-            缓存嵌入的图片("物品_炎阳勋章");
+            缓存嵌入的图片("物品_炎阳纹章");
             缓存嵌入的图片("物品_玲珑心");
             缓存嵌入的图片("物品_魔棒");
             缓存嵌入的图片("物品_吊坠");
