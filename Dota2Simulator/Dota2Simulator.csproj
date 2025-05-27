@@ -134,6 +134,7 @@
     <EmbeddedResource Include="Picture_Dota2\播报_塔防标志.bmp" />
     <EmbeddedResource Include="Picture_Dota2\播报_盾标志.bmp" />
     <EmbeddedResource Include="Picture_Dota2\Buff_物品_TP.bmp" />
+    <EmbeddedResource Include="Picture_Dota2\物品_书.bmp" />
     <EmbeddedResource Include="Picture_Dota2\物品_仙草.bmp" />
     <EmbeddedResource Include="Picture_Dota2\物品_以太.bmp" />
     <EmbeddedResource Include="Picture_Dota2\物品_假腿_力量腿.bmp" />

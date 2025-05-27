@@ -272,8 +272,8 @@ namespace Dota2Simulator.Games.Dota2
             private int 物品宽度 { get; } = 44;
             private int 物品左右间隔 { get; } = 5;
             private int 物品上下间隔 { get; } = 4;
-            public int 物品间隔x { get; } = 60 + 5;
-            public int 物品间隔y { get; } = 44 + 4;
+            public int 物品间隔x { get; } = 62 + 5; // 图片宽度 + 中间间隔
+            public int 物品间隔y { get; } = 45 + 3; // 图片长度 + 中间间隔
             public int 物品CD右上角x { get; } = 最左侧x + 60 - 1; // CD好的时候物品框的右上方
             public int 物品CD右上角y { get; } = 943; // 为灰色那条线的高度
             public Color 物品CD颜色 { get; } = Color.FromArgb(104, 104, 104);
@@ -283,7 +283,7 @@ namespace Dota2Simulator.Games.Dota2
             public Color[] 物品锁闭颜色 { get; } = 物品锁闭颜色; // 因为无物品时，无锁闭情况，但其他物品锁闭
             public byte 物品锁闭颜色容差 { get; }
             public Keys[] 物品位置 { get; } = [Keys.Z, Keys.X, Keys.C, Keys.V, Keys.B, Keys.Space];
-            public Rectangle 物品范围 { get; } = new Rectangle(最左侧x, 943, 65 * 3, 48 * 2);
+            public Rectangle 物品范围 { get; } = new Rectangle(最左侧x, 943, 67 * 3, 48 * 2);
             public Rectangle 中立TP范围 { get; }= new Rectangle(最左侧x + 197, 968, 47, 101); // 6技能 1377,968,47,101 1180  197
         }
 

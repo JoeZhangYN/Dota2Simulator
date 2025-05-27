@@ -706,6 +706,44 @@ namespace Dota2Simulator.Games.Dota2
 
                 #endregion
 
+                #region 发条
+
+                case "发条":
+                    {
+                        if (!_总循环条件)
+                        {
+                            //_条件根据图片委托1 ??= 回音践踏去后摇;
+                            //_条件根据图片委托2 ??= 灵体游魂去后摇;
+                            //_条件根据图片委托3 ??= 裂地沟壑去后摇;
+                            _条件根据图片委托8 ??= 有书吃书;
+                            _条件8 = true;
+                            _总循环条件 = true;
+                            await 状态初始化().ConfigureAwait(false);
+                            //_切假腿配置.修改配置(Keys.E, false);
+                        }
+
+                        await 根据按键判断技能释放前通用逻辑(e).ConfigureAwait(true);
+
+                        switch (e.KeyCode)
+                        {
+                            case Keys.Q:
+                                _条件1 = true;
+                                break;
+                            case Keys.W:
+                                // 用于回收时按W
+                                SimKeyBoard.KeyPress(Keys.A);
+                                _条件2 = true;
+                                break;
+                            case Keys.R:
+                                _条件3 = true;
+                                break;
+                        }
+
+                        break;
+                    }
+
+                #endregion
+
                 #region 尸王
 
                 case "尸王":
@@ -1871,11 +1909,10 @@ namespace Dota2Simulator.Games.Dota2
                         switch (e.KeyCode)
                         {
                             case Keys.F1:
-                                if (_是否魔晶)
+                                if (_是否神杖)
                                 {
                                     _切假腿配置.修改配置(Keys.D, true);
                                 }
-
                                 break;
                             case Keys.Q:
                                 _条件1 = true;
@@ -1889,11 +1926,10 @@ namespace Dota2Simulator.Games.Dota2
                                 _条件3 = true;
                                 break;
                             case Keys.D:
-                                if (_是否魔晶)
+                                if (_是否神杖)
                                 {
                                     _条件4 = true;
                                 }
-
                                 break;
                         }
 
@@ -2003,22 +2039,45 @@ namespace Dota2Simulator.Games.Dota2
 
                 #region 影魔
 
-                // todo 待修改
                 case "影魔":
-                    //if (e.KeyValue == Keys.Num)
-                    //{
-                    //    label1.Text = "Space";
+                    {
+                        if (!_总循环条件)
+                        {
+                            _总循环条件 = true;
+                            _条件根据图片委托1 ??= z炮去后摇;
+                            _条件根据图片委托2 ??= x炮去后摇;
+                            _条件根据图片委托3 ??= c炮去后摇;
+                            _条件根据图片委托4 ??= 灵魂盛宴去后摇;
+                            //_条件根据图片委托5 ??= 如影随形去后摇;
+                            _条件根据图片委托8 ??= 有书吃书;
+                            _条件8 = true;
+                            _切假腿配置.修改配置(Keys.F, false);
+                            await 状态初始化().ConfigureAwait(false);
+                        }
 
-                    //    _tasks.Append() = new Task(吹风摇大);
-                    //    _taskDelay = new Task(() => delay(1000));
+                        await 根据按键判断技能释放前通用逻辑(e).ConfigureAwait(true);
 
-                    //    _taskDelay.Start();
-                    //    _taskTrigger.Start();
+                        switch (e.KeyCode)
+                        {
+                            case Keys.Q:
+                                _条件1 = true;
+                                break;
+                            case Keys.W:
+                                _条件2 = true;
+                                break;
+                            case Keys.E:
+                                _条件3 = true;
+                                break;
+                            case Keys.D:
+                                _条件4 = true;
+                                break;
+                            case Keys.R:
+                                _条件5 = true;
+                                break;
+                        }
 
-                    //    Task task = new Task(() => { Task.WaitAny(_taskTrigger, _taskDelay); });
-                    //    task.Start();
-                    //}
-                    break;
+                        break;
+                    }
 
                 #endregion
 
@@ -2862,6 +2921,8 @@ namespace Dota2Simulator.Games.Dota2
                             _条件根据图片委托3 ??= 神圣一跳去后摇;
                             _条件根据图片委托4 ??= 雷神之怒去后摇;
                             _条件根据图片委托5 ??= 雷云去后摇;
+                            _条件根据图片委托8 ??= 有书吃书;
+                            _条件8 = true;
                             await 状态初始化().ConfigureAwait(false);
                         }
 
@@ -3273,6 +3334,8 @@ namespace Dota2Simulator.Games.Dota2
                             _条件根据图片委托3 ??= 闪电风暴去后摇;
                             _条件根据图片委托4 ??= 脉冲新星去后摇;
                             _条件根据图片委托5 ??= 虚无主义去后摇;
+                            _条件根据图片委托8 ??= 有书吃书;
+                            _条件8 = true;
                             await 状态初始化().ConfigureAwait(false);
                         }
 
@@ -3705,6 +3768,8 @@ namespace Dota2Simulator.Games.Dota2
                             _条件根据图片委托3 ??= 越界去后摇;
                             _条件根据图片委托4 ??= 临别一枪去后摇;
                             _条件根据图片委托5 ??= 祭台去后摇;
+                            _条件根据图片委托8 ??= 有书吃书;
+                            _条件8 = true;
                             _切假腿配置.修改配置(Keys.E, false);
                             await 状态初始化().ConfigureAwait(false);
                         }
@@ -3875,6 +3940,8 @@ namespace Dota2Simulator.Games.Dota2
                             _条件根据图片委托2 ??= 幽魂护罩去后摇;
                             _条件根据图片委托3 ??= 死神镰刀去后摇;
                             _条件根据图片委托5 ??= 无限死亡脉冲;
+                            _条件根据图片委托8 ??= 有书吃书;
+                            _条件8 = true;
                             _切假腿配置.修改配置(Keys.E, false);
                             await 状态初始化().ConfigureAwait(false);
                         }
@@ -4326,9 +4393,9 @@ namespace Dota2Simulator.Games.Dota2
                     {
                         switch (e.KeyCode)
                         {
-                            //case Keys.D1:
-                            //    _ = Task.Run(测试其他功能).ConfigureAwait(true);
-                            //    break;
+                            case Keys.D1:
+                                _ = Task.Run(测试其他功能).ConfigureAwait(true);
+                                break;
                             case Keys.D2:
                                 _ = Task.Run(() => { 捕捉颜色().Start(); }).ConfigureAwait(false);
                                 break;
@@ -5438,6 +5505,24 @@ namespace Dota2Simulator.Games.Dota2
         #endregion
 
         #region 影魔
+        private static async Task<bool> z炮去后摇(ImageHandle 句柄)
+        {
+            return await 使用技能后通用后续(Keys.Q, 1, false).ConfigureAwait(true);
+        }
+
+        private static async Task<bool> x炮去后摇(ImageHandle 句柄)
+        {
+            return await 使用技能后通用后续(Keys.W, 1, false).ConfigureAwait(true);
+        }
+
+        private static async Task<bool> c炮去后摇(ImageHandle 句柄)
+        {
+            return await 使用技能后通用后续(Keys.E, 1, false).ConfigureAwait(true);
+        }
+        private static async Task<bool> 灵魂盛宴去后摇(ImageHandle 句柄)
+        {
+            return await 使用技能后通用后续(Keys.D, 1, false).ConfigureAwait(true);
+        }
 
         //private static void 吹风摇大()
         //{
@@ -8572,6 +8657,8 @@ namespace Dota2Simulator.Games.Dota2
         public static readonly ImageHandle 物品_虚空至宝_雷神之锤_handle = 缓存嵌入的图片("物品_虚空至宝_雷神之锤");
         public static readonly ImageHandle 物品_虚空至宝_疯狂面具_handle = 缓存嵌入的图片("物品_虚空至宝_疯狂面具");
 
+        public static readonly ImageHandle 物品_书_handle = 缓存嵌入的图片("物品_书");
+
         public static readonly ImageHandle 中立_永恒遗物_handle = 缓存嵌入的图片("中立_永恒遗物");
         public static readonly ImageHandle 中立_祭礼长袍_handle = 缓存嵌入的图片("中立_祭礼长袍");
         #endregion
@@ -9140,6 +9227,16 @@ namespace Dota2Simulator.Games.Dota2
 
         #endregion
 
+        #region RPG
+
+        private static async Task<bool> 有书吃书(ImageHandle 句柄)
+        {
+            根据图片使用物品(物品_书_handle);
+            return await Task.FromResult(true).ConfigureAwait(true);
+        }
+
+        #endregion
+
         #endregion
 
         #region 测试_捕捉颜色
@@ -9166,7 +9263,7 @@ namespace Dota2Simulator.Games.Dota2
 
             Form?.Invoke(() =>
             {
-                var 物品 = Form.tb_阵营.Text switch
+                物品 = Form.tb_阵营.Text switch
                 {
                     "4" => 物品4,
                     "5" => 物品5,
