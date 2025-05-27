@@ -95,15 +95,17 @@ namespace Dota2Simulator.Games.Dota2
 
         /// <summary>
         ///     1080p 增益状态栏 
-        ///     <para>12个buff最多 单buff36像素 间隔9像素</para>
+        ///     <para>12个buff最多 单buff36像素 间隔9像素</para> 962, 857, 526, 80
+        ///     <para>升级框会改变buff位置</para>
         /// </summary>
-        private static Rectangle buff状态技能栏 = new Rectangle(962, 857, 526, 40);
+        private static Rectangle buff状态技能栏 = new Rectangle(962, 826, 526, 80);
 
         /// <summary>
         ///     1080p 增益状态栏 
-        ///     <para>12个buff最多 单buff36像素 间隔9像素</para> =962-
+        ///     <para>12个buff最多 单buff36像素 间隔9像素</para> 962, 857, 526, 80
+        ///     <para>升级框会改变buff位置</para>
         /// </summary>
-        private static Rectangle debuff状态技能栏 = new Rectangle(435, 857, 526, 40);
+        private static Rectangle debuff状态技能栏 = new Rectangle(435, 826, 526, 80);
 
         /// <summary>
         ///     1080p 命石范围 6技能最左738 4技能最右807 单个25*25大小
@@ -4206,6 +4208,8 @@ namespace Dota2Simulator.Games.Dota2
                             _总循环条件 = true;
                             _条件根据图片委托2 ??= 幽魂检测;
                             _条件根据图片委托3 ??= 循环续过载;
+                            _条件根据图片委托8 ??= 有书吃书;
+                            _条件8 = true;
                             await 状态初始化().ConfigureAwait(false);
                         }
 
@@ -8033,19 +8037,27 @@ namespace Dota2Simulator.Games.Dota2
             bool guozai = ImageFinder.FindImageInRegionBool(Buff_小精灵_过载_handle, in 句柄, buff状态技能栏);
             if (guozai)
             {
-                _全局步骤e = 0;
+                _全局步骤e = 3;
                 return await Task.FromResult(_循环条件2).ConfigureAwait(true);
             }
-
-            _ = await 主动技能已就绪后续(Keys.E, () =>
+            else
             {
-                if (_全局步骤e == 1)
+                _ = await 主动技能已就绪后续(Keys.E, () =>
                 {
-                    Delay(200);
-                }
-                SimKeyBoard.KeyPress(Keys.E);
-                _全局步骤e = 1;
-            }).ConfigureAwait(true);
+                    if (_全局步骤e < 2)
+                    {
+                        SimKeyBoard.KeyPress(Keys.E);
+                        _全局步骤e = 2;
+                        初始化全局时间(ref _全局时间e);
+                    }
+                    else
+                    {
+                        if (获取当前时间毫秒() - _全局时间e < 150) return;
+                        _全局步骤e = 1;
+                    }
+                }).ConfigureAwait(true);
+            }
+
             return await Task.FromResult(_循环条件2).ConfigureAwait(true);
         }
 
