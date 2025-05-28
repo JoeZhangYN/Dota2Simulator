@@ -1903,6 +1903,8 @@ namespace Dota2Simulator.Games.Dota2
                             _条件根据图片委托2 ??= 幻影突袭敏捷;
                             _条件根据图片委托3 ??= 魅影无形敏捷;
                             _条件根据图片委托4 ??= 刀阵旋风敏捷;
+                            _条件根据图片委托8 ??= 有书吃书;
+                            _条件8 = true;
                             await 状态初始化().ConfigureAwait(false);
                         }
 
@@ -2375,6 +2377,8 @@ namespace Dota2Simulator.Games.Dota2
                             _条件根据图片委托2 ??= 超强力量去后摇;
                             _条件根据图片委托3 ??= 跳拍;
                             _条件根据图片委托4 ??= 狂怒去后摇;
+                            _条件根据图片委托8 ??= 有书吃书;
+                            _条件8 = true;
                             await 状态初始化().ConfigureAwait(false);
                             _切假腿配置.修改配置(Keys.E, false);
                             _切假腿配置.修改配置(Keys.R, false);
