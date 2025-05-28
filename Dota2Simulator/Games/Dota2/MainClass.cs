@@ -8056,7 +8056,7 @@ namespace Dota2Simulator.Games.Dota2
                     }
                     else
                     {
-                        if (获取当前时间毫秒() - _全局时间e < 150) return;
+                        if (获取当前时间毫秒() - _全局时间e < 300) return;
                         _全局步骤e = 1;
                     }
                 }).ConfigureAwait(true);
