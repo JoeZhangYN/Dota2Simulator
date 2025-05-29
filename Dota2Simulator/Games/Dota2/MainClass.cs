@@ -1,4 +1,5 @@
 ﻿#if DOTA2
+# define RPG
 
 using Collections.Pooled;
 using Dota2Simulator.KeyboardMouse;
@@ -22,6 +23,7 @@ namespace Dota2Simulator.Games.Dota2
 {
     internal class MainClass
     {
+        #region 全局变量
         // 创建一个静态的 Logger 实例
         public static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
@@ -31,15 +33,26 @@ namespace Dota2Simulator.Games.Dota2
         private static Form2? Form = Form2.Instance;
 
         /// dota 2 适配7.36 1920 * 1080 动态肖像 法线贴图 地面视差 主界面高画质 计算器渲染器 纹理、特效、阴影 中 渲染 70% 高级水面效果
+        /// 最主要就是主界面高画质,其他没事
         private const int 截图模式1X = 671;
         private const int 截图模式1Y = 727;
         private const int 截图模式1W = 760;
         private const int 截图模式1H = 346;
+        private static Rectangle 截图模式1Reg = new(截图模式1X, 截图模式1Y, 截图模式1W, 截图模式1H);
+
+        private const int 截图模式2X = 0;
+        private const int 截图模式2Y = 0;
+        private const int 截图模式2W = 1920;
+        private const int 截图模式2H = 1080;
+        private static Rectangle 截图模式2Reg = new(截图模式2X, 截图模式2Y, 截图模式2W, 截图模式2H);
+
         private const int 等待延迟 = 33;
 
+
+
         // 根据截图模式不同，用于判断技能 和 物品的具体x, y值随之变化 涉及到 全局假腿，技能位置，使用物品位置，判断神杖、魔晶 中立道具
-        public const int 坐标偏移x = 0;
-        public const int 坐标偏移y = 0;
+        public static int 坐标偏移x;
+        public static int 坐标偏移y;
 
 
 
@@ -98,19 +111,19 @@ namespace Dota2Simulator.Games.Dota2
         ///     <para>12个buff最多 单buff36像素 间隔9像素</para> 962, 857, 526, 80
         ///     <para>升级框会改变buff位置</para>
         /// </summary>
-        private static Rectangle buff状态技能栏 = new Rectangle(962, 826, 526, 80);
+        private static Rectangle buff状态技能栏 = new(962, 826, 526, 80);
 
         /// <summary>
         ///     1080p 增益状态栏 
         ///     <para>12个buff最多 单buff36像素 间隔9像素</para> 962, 857, 526, 80
         ///     <para>升级框会改变buff位置</para>
         /// </summary>
-        private static Rectangle debuff状态技能栏 = new Rectangle(435, 826, 526, 80);
+        private static Rectangle debuff状态技能栏 = new(435, 826, 526, 80);
 
         /// <summary>
         ///     1080p 命石范围 6技能最左738 4技能最右807 单个25*25大小
         /// </summary>
-        private static Rectangle 命石区域 = new Rectangle(738, 945, 70, 26);
+        private static Rectangle 命石区域 = new(738, 945, 70, 26);
 
 
         /// <summary>
@@ -406,7 +419,8 @@ namespace Dota2Simulator.Games.Dota2
         /// <summary>
         ///     仅用于快速吸引仇恨
         /// </summary>
-        private static int _阵营_int;
+        private static int _阵营_int; 
+        #endregion
 
         #region 模式
 
@@ -439,6 +453,11 @@ namespace Dota2Simulator.Games.Dota2
         ///     全局时间
         /// </summary>
         private static long _全局时间d;
+
+        /// <summary>
+        ///     全局时间
+        /// </summary>
+        private static long _全局时间f;
 
         /// <summary>
         ///     全局时间
@@ -637,35 +656,7 @@ namespace Dota2Simulator.Games.Dota2
 
         #endregion
 
-        /// <summary>
-        ///     100次运行，6ms...
-        ///     还要什么自行车，全部添加判断
-        /// </summary>
-        /// <param name="数组"></param>
-        /// <returns></returns>
-        public static async Task<bool> 设置当前技能数量()
-        {
-            int i = 获取当前技能数量(in _全局图像句柄);
-            if (i != 0)
-            {
-                // 技能数量改变后，技能判断色全部重置
-                // 只有两种情况需要重置，一种是还没学，到学习了
-                // 另一种是技能改变了
-                if (_技能数量 != i)
-                {
-                    _技能数量 = i;
-
-                    // 重置所有技能判断
-                    重置所有技能判断();
-
-                    // 获取当前技能颜色
-                    _ = DOTA2获取所有释放技能前颜色(in _全局图像句柄);
-                }
-            }
-
-            return await Task.FromResult(i != 0).ConfigureAwait(true);
-        }
-
+        #region 根据名称修改对应按键
         public static async Task 根据当前英雄增强(string name, KeyEventArgs e)
         {
             switch (name)
@@ -717,8 +708,6 @@ namespace Dota2Simulator.Games.Dota2
                             //_条件根据图片委托1 ??= 回音践踏去后摇;
                             //_条件根据图片委托2 ??= 灵体游魂去后摇;
                             //_条件根据图片委托3 ??= 裂地沟壑去后摇;
-                            _条件根据图片委托8 ??= 有书吃书;
-                            _条件8 = true;
                             _总循环条件 = true;
                             await 状态初始化().ConfigureAwait(false);
                             //_切假腿配置.修改配置(Keys.E, false);
@@ -1893,7 +1882,6 @@ namespace Dota2Simulator.Games.Dota2
 
                 #region 幻刺
 
-                // todo 幻刺可以通过命石判断..但另一边基本没人选
                 case "幻刺":
                     {
                         if (!_总循环条件)
@@ -1903,8 +1891,6 @@ namespace Dota2Simulator.Games.Dota2
                             _条件根据图片委托2 ??= 幻影突袭敏捷;
                             _条件根据图片委托3 ??= 魅影无形敏捷;
                             _条件根据图片委托4 ??= 刀阵旋风敏捷;
-                            _条件根据图片委托8 ??= 有书吃书;
-                            _条件8 = true;
                             await 状态初始化().ConfigureAwait(false);
                         }
 
@@ -2053,8 +2039,6 @@ namespace Dota2Simulator.Games.Dota2
                             _条件根据图片委托3 ??= c炮去后摇;
                             _条件根据图片委托4 ??= 灵魂盛宴去后摇;
                             //_条件根据图片委托5 ??= 如影随形去后摇;
-                            _条件根据图片委托8 ??= 有书吃书;
-                            _条件8 = true;
                             _切假腿配置.修改配置(Keys.F, false);
                             await 状态初始化().ConfigureAwait(false);
                         }
@@ -2377,8 +2361,6 @@ namespace Dota2Simulator.Games.Dota2
                             _条件根据图片委托2 ??= 超强力量去后摇;
                             _条件根据图片委托3 ??= 跳拍;
                             _条件根据图片委托4 ??= 狂怒去后摇;
-                            _条件根据图片委托8 ??= 有书吃书;
-                            _条件8 = true;
                             await 状态初始化().ConfigureAwait(false);
                             _切假腿配置.修改配置(Keys.E, false);
                             _切假腿配置.修改配置(Keys.R, false);
@@ -2927,8 +2909,6 @@ namespace Dota2Simulator.Games.Dota2
                             _条件根据图片委托3 ??= 神圣一跳去后摇;
                             _条件根据图片委托4 ??= 雷神之怒去后摇;
                             _条件根据图片委托5 ??= 雷云去后摇;
-                            _条件根据图片委托8 ??= 有书吃书;
-                            _条件8 = true;
                             await 状态初始化().ConfigureAwait(false);
                         }
 
@@ -3340,8 +3320,6 @@ namespace Dota2Simulator.Games.Dota2
                             _条件根据图片委托3 ??= 闪电风暴去后摇;
                             _条件根据图片委托4 ??= 脉冲新星去后摇;
                             _条件根据图片委托5 ??= 虚无主义去后摇;
-                            _条件根据图片委托8 ??= 有书吃书;
-                            _条件8 = true;
                             await 状态初始化().ConfigureAwait(false);
                         }
 
@@ -3774,8 +3752,6 @@ namespace Dota2Simulator.Games.Dota2
                             _条件根据图片委托3 ??= 越界去后摇;
                             _条件根据图片委托4 ??= 临别一枪去后摇;
                             _条件根据图片委托5 ??= 祭台去后摇;
-                            _条件根据图片委托8 ??= 有书吃书;
-                            _条件8 = true;
                             _切假腿配置.修改配置(Keys.E, false);
                             await 状态初始化().ConfigureAwait(false);
                         }
@@ -3946,8 +3922,6 @@ namespace Dota2Simulator.Games.Dota2
                             _条件根据图片委托2 ??= 幽魂护罩去后摇;
                             _条件根据图片委托3 ??= 死神镰刀去后摇;
                             _条件根据图片委托5 ??= 无限死亡脉冲;
-                            _条件根据图片委托8 ??= 有书吃书;
-                            _条件8 = true;
                             _切假腿配置.修改配置(Keys.E, false);
                             await 状态初始化().ConfigureAwait(false);
                         }
@@ -4212,8 +4186,6 @@ namespace Dota2Simulator.Games.Dota2
                             _总循环条件 = true;
                             _条件根据图片委托2 ??= 幽魂检测;
                             _条件根据图片委托3 ??= 循环续过载;
-                            _条件根据图片委托8 ??= 有书吃书;
-                            _条件8 = true;
                             await 状态初始化().ConfigureAwait(false);
                         }
 
@@ -4421,7 +4393,8 @@ namespace Dota2Simulator.Games.Dota2
                             };
 
                                 string text = "";
-                                Form.Invoke(() => {
+                                Form.Invoke(() =>
+                                {
                                     text = Form.tb_阵营.Text.ToLower(CultureInfo.CurrentCulture); // 转换为小写，确保匹配时忽略大小写
                                 });
 
@@ -4446,6 +4419,7 @@ namespace Dota2Simulator.Games.Dota2
                     #endregion
             }
         }
+        #endregion
 
         #region 获取指定位置颜色
 
@@ -4461,6 +4435,37 @@ namespace Dota2Simulator.Games.Dota2
             return ImageManager.GetColor(in 句柄, x - 坐标偏移x, y - 坐标偏移y);
         }
 
+        #endregion
+
+        #region 获取当前技能数量
+        /// <summary>
+        ///     100次运行，6ms...
+        ///     还要什么自行车，全部添加判断
+        /// </summary>
+        /// <param name="数组"></param>
+        /// <returns></returns>
+        public static async Task<bool> 设置当前技能数量()
+        {
+            int i = 获取当前技能数量(in _全局图像句柄);
+            if (i != 0)
+            {
+                // 技能数量改变后，技能判断色全部重置
+                // 只有两种情况需要重置，一种是还没学，到学习了
+                // 另一种是技能改变了
+                if (_技能数量 != i)
+                {
+                    _技能数量 = i;
+
+                    // 重置所有技能判断
+                    重置所有技能判断();
+
+                    // 获取当前技能颜色
+                    _ = DOTA2获取所有释放技能前颜色(in _全局图像句柄);
+                }
+            }
+
+            return await Task.FromResult(i != 0).ConfigureAwait(true);
+        }
         #endregion
 
         #region Dota2具体实现
@@ -9241,16 +9246,16 @@ namespace Dota2Simulator.Games.Dota2
 
         #endregion
 
-        #endregion
+#endregion
 
         #region RPG
-
+#if RPG
         private static async Task<bool> 有书吃书(ImageHandle 句柄)
         {
             根据图片使用物品(物品_书_handle);
             return await Task.FromResult(true).ConfigureAwait(true);
         }
-
+#endif
         #endregion
 
         #endregion
@@ -9622,6 +9627,13 @@ namespace Dota2Simulator.Games.Dota2
 
         #region 循环
 
+        private readonly record struct 条件配置项(
+            int 索引,
+            string 名称,
+            Func<bool> 获取条件,
+            Action<bool> 设置条件,
+            ConditionDelegateBitmap 委托);
+
         private static async Task 一般程序循环()
         {
             // 条件配置
@@ -9784,13 +9796,6 @@ namespace Dota2Simulator.Games.Dota2
             }
         }
 
-        private readonly record struct 条件配置项(
-            int 索引,
-            string 名称,
-            Func<bool> 获取条件,
-            Action<bool> 设置条件,
-            ConditionDelegateBitmap 委托);
-
         private static async Task 切假腿处理(string 假腿类型)
         {
             if (_切假腿中)
@@ -9825,6 +9830,10 @@ namespace Dota2Simulator.Games.Dota2
 
         private static async Task 状态初始化()
         {
+#if RPG
+            _条件根据图片委托8 ??= 有书吃书;
+            _条件8 = true;
+#endif
             _循环内获取图片 ??= 获取图片_2;
             await 一般程序循环().ConfigureAwait(true);
         }
@@ -9897,7 +9906,7 @@ namespace Dota2Simulator.Games.Dota2
             _全局时间e = -1;
             _全局时间r = -1;
             _全局时间d = -1;
-            // _全局时间f = -1;
+            _全局时间f = -1;
 
             _攻击速度 = 100;
             _基础攻击前摇 = 0.3;
@@ -9933,12 +9942,13 @@ namespace Dota2Simulator.Games.Dota2
         /// <returns></returns>
         private static bool 获取图片_1()
         {
+            // 最新通过DesktopDuplicator 实现更快速的全屏捕获
             // 671 856 760 217 基本所有技能状态物品 .net9 6-7ms 延迟。
             // 671 727 760 346 所有技能状态物品加上施法状态 .net9 6-7ms fps142+
             // 初始化全局图像和数组
             //_全局图像 ??= new Bitmap(截图模式1W, 截图模式1H);
 
-            /*
+            /* 
             if (_全局图像句柄 == null || _全局图像句柄.图片尺寸.Width + _全局图像句柄.图片尺寸.Height == 0)
             {
                 _全局图像句柄 = new ImageHandle(new byte[截图模式1W * 截图模式1H * 4], new Size(截图模式1W, 截图模式1H));
@@ -9957,40 +9967,41 @@ namespace Dota2Simulator.Games.Dota2
             return await Task.FromResult(true).ConfigureAwait(true);
             */
 
-            // 如果全局图像句柄无效，创建一个
-            if (!_全局图像句柄.IsValid)
-            {
-                // 创建全局截图缓冲区
-                var initialData = new byte[截图模式1W * 截图模式1H * 4];
-                _全局图像句柄 = ImageManager.CreateDynamicImage(
-                    initialData,
-                    new Size(截图模式1W, 截图模式1H),
-                    "GlobalScreen"
-                );
-            }
-
-            // 更新截图数据到全局缓冲区
-            OptimizedGraphics.CaptureScreenToHandle(_全局图像句柄, 截图模式1X, 截图模式1Y);
+            执行屏幕捕捉捕捉(截图模式1Reg);
 
             return true;
         }
 
-        public static bool 获取图片_2()
+        /// <summary>
+        ///     初始化全屏捕捉
+        ///     <para>图像信息赋值给_全局图像句柄</para>
+        /// </summary>
+        /// <param name="rectangle">截图区域,自动调整偏移量</param>
+        private static void 执行屏幕捕捉捕捉(in Rectangle rectangle)
         {
             // 如果全局图像句柄无效，创建一个
             if (!_全局图像句柄.IsValid)
             {
                 // 创建全局截图缓冲区
-                var initialData = new byte[1920 * 1080 * 4];
+                var initialData = new byte[rectangle.Width * rectangle.Height * 4];
                 _全局图像句柄 = ImageManager.CreateDynamicImage(
                     initialData,
-                    new Size(1920, 1080),
+                    new Size(rectangle.Width, rectangle.Height),
                     "GlobalScreen"
                 );
+
+                // 调整坐标偏移
+                坐标偏移x = rectangle.X;
+                坐标偏移y = rectangle.Y;
             }
 
             // 更新截图数据到全局缓冲区
-            OptimizedGraphics.CaptureScreenToHandle(_全局图像句柄, 0, 0);
+            OptimizedGraphics.CaptureScreenToHandle(_全局图像句柄, rectangle.X, rectangle.Y);
+        }
+
+        public static bool 获取图片_2()
+        {
+            执行屏幕捕捉捕捉(截图模式2Reg);
 
             return true;
 
@@ -10039,9 +10050,9 @@ namespace Dota2Simulator.Games.Dota2
 
         #endregion
 
-        #endregion
+#endregion
 
-        #endregion
+#endregion
 
         #region 延时
 

@@ -16,9 +16,11 @@ namespace Dota2Simulator
 {
     internal partial class Form2 : Form
     {
+        #region 页面单例调用UI线程
         // 单例模式 传递Form,调用UI线程更新
         private static Form2? _instance;
-        public static Form2 Instance => _instance ?? throw new InvalidOperationException("Form2未初始化");
+        public static Form2 Instance => _instance ?? throw new InvalidOperationException("Form2未初始化"); 
+        #endregion
 
         #region 触发重载
 

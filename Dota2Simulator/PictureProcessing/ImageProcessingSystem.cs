@@ -596,14 +596,21 @@ namespace ImageProcessingSystem
             public bool IsPersistent;
         }
 
+
         /// <summary>
-        /// 创建动态图像（截图等）
+        ///     创建动态图像（截图等）
         /// </summary>
+        /// <param name="data">具体的数据</param>
+        /// <param name="size">数据对应图片的大小</param>
+        /// <param name="name">主要就是看看..</param>
+        /// <returns>实例化结构</returns>
+        /// <exception cref="ArgumentException"></exception>
         public static ImageHandle CreateDynamicImage(byte[] data, in Size size, string? name = null)
         {
             if (data.Length != size.Width * size.Height * 4)
                 throw new ArgumentException("数据大小与图像尺寸不匹配");
 
+            // 单例递增
             int id = Interlocked.Increment(ref _nextId);
             // 初始化检测
             if (!DynamicImageBuffer.IsInitialized) DynamicImageBuffer.Initialize();
@@ -627,8 +634,13 @@ namespace ImageProcessingSystem
         }
 
         /// <summary>
-        /// 创建静态图像（特征图片）
+        ///     创建静态图像（特征图片）
         /// </summary>
+        /// <param name="data">具体的数据</param>
+        /// <param name="size">数据对应图片的大小</param>
+        /// <param name="name">主要就是看看..</param>
+        /// <returns>实例化结构</returns>
+        /// <exception cref="ArgumentException"></exception>
         public static ImageHandle CreateStaticImage(byte[] data, in Size size, string? name = null)
         {
             if (data.Length != size.Width * size.Height * 4)

@@ -18,6 +18,7 @@ namespace Dota2Simulator.Games.Dota2
 {
     internal class Item
     {
+        #region 全局变量
         internal class 技能切假腿配置
         {
             public 技能切假腿配置()
@@ -56,7 +57,10 @@ namespace Dota2Simulator.Games.Dota2
 
         public static 技能切假腿配置 _切假腿配置 = new();
 
-        public static Keys _假腿按键 = Keys.Escape;
+        public static Keys _假腿按键 = Keys.Escape; 
+        #endregion
+
+        #region 主要逻辑
 
         public static async Task 根据按键判断技能释放前通用逻辑(KeyEventArgs e)
         {
@@ -101,7 +105,7 @@ namespace Dota2Simulator.Games.Dota2
 
                     break;
             }
-            /*
+            /* 走A实际不行
             //else if (e.KeyCode == Keys.NumPad6)
             //{
             //    _开启走A = !_开启走A;
@@ -169,7 +173,7 @@ namespace Dota2Simulator.Games.Dota2
             Tts.Speak(_条件保持假腿 ? "保持假腿" : "不保持假腿");
         }
 
-
+        #endregion
 
         #region 使用物品
 
@@ -732,6 +736,7 @@ namespace Dota2Simulator.Games.Dota2
 
         #endregion
 
+        #region 所有物品可使用后续
         /// <summary>
         ///     所有物品可使用后续
         ///     <para>字节数组为副本</para>
@@ -754,7 +759,8 @@ namespace Dota2Simulator.Games.Dota2
 
             _ = Task.Run(afterAction).ConfigureAwait(false);
             return await Task.FromResult(false).ConfigureAwait(true);
-        }
+        } 
+        #endregion
     }
 }
 
