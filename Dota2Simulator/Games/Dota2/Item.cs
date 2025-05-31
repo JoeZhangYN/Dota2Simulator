@@ -91,6 +91,22 @@ namespace Dota2Simulator.Games.Dota2
                     break;
                 case var _ when e.KeyCode == _假腿按键:
                     return;
+#if RPG
+                case Keys.NumPad1:
+                    跳过循环获取金碎片(in _全局图像句柄);
+                    break;
+                case Keys.NumPad2:
+                    自动屏蔽3个选项(in _全局图像句柄);
+                    break;
+                case Keys.NumPad3:
+                    break;
+                case Keys.NumPad4:
+                    点击暴击(in _全局图像句柄);
+                    break;
+                case Keys.NumPad5:
+                    点击黑皇(in _全局图像句柄);
+                    break;
+#endif
                 default:
                     if (!_存在假腿)
                     {
@@ -173,7 +189,7 @@ namespace Dota2Simulator.Games.Dota2
             Tts.Speak(_条件保持假腿 ? "保持假腿" : "不保持假腿");
         }
 
-        #endregion
+#endregion
 
         #region 使用物品
 

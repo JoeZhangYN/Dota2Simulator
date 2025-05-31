@@ -1,5 +1,4 @@
 ﻿#if DOTA2
-# define RPG
 
 using Collections.Pooled;
 using Dota2Simulator.KeyboardMouse;
@@ -72,27 +71,6 @@ namespace Dota2Simulator.Games.Dota2
         ///     循环条件
         /// </summary>
         private static bool _总循环条件;
-
-        /// <summary>
-        ///     循环计数1
-        /// </summary>
-        private static bool _循环条件1;
-
-        private static bool 获取循环条件1()
-        {
-            return _循环条件1;
-        }
-
-        private static bool 设置循环条件1(bool 条件)
-        {
-            return _循环条件1 = 条件;
-        }
-
-        /// <summary>
-        ///     循环计数2
-        /// </summary>
-        private static bool _循环条件2;
-
 
         // 创建全局截图缓冲区
         private static byte[] _initialData = new byte[1920 * 1080 * 4];
@@ -197,7 +175,7 @@ namespace Dota2Simulator.Games.Dota2
         /// <summary>
         ///     条件9委托
         /// </summary>
-        private static ConditionDelegateBitmap _条件根据图片委托9;
+        public static ConditionDelegateBitmap _条件根据图片委托9;
 
         /// <summary>
         ///     命石委托
@@ -282,7 +260,7 @@ namespace Dota2Simulator.Games.Dota2
         /// <summary>
         ///     条件布尔
         /// </summary>
-        private static bool _条件9;
+        public static bool _条件9;
 
         /// <summary>
         ///     条件布尔
@@ -770,7 +748,7 @@ namespace Dota2Simulator.Games.Dota2
                         break;
                     }
 
-                #endregion
+                # endregion
 
                 #region 伐木机
 
@@ -1239,7 +1217,7 @@ namespace Dota2Simulator.Games.Dota2
                                 根据图片使用物品(物品_魂戒_handle);
                                 _条件3 = true;
                                 break;
-                            case Keys.D2:
+                            case Keys.D4:
                                 _全局模式q = 1 - _全局模式q;
                                 Tts.Speak(_全局模式q == 1 ? "吼接刃甲" : "吼不接刃甲");
                                 break;
@@ -1572,7 +1550,7 @@ namespace Dota2Simulator.Games.Dota2
                         {
                             _总循环条件 = true;
                             _条件根据图片委托1 ??= 鼻涕去后摇;
-                            _条件根据图片委托2 ??= 针刺循环;
+                            // _条件根据图片委托2 ??= 针刺循环; 已优化不需要
                             _条件根据图片委托3 ??= 毛团去后摇;
                             _条件根据图片委托4 ??= 钢毛后背去后摇;
                             _条件根据图片委托5 ??= 扫射切回假腿;
@@ -1615,19 +1593,6 @@ namespace Dota2Simulator.Games.Dota2
                                 break;
                             case Keys.W:
                                 _条件5 = true;
-                                break;
-                            case Keys.D2:
-                                if (!_条件2)
-                                {
-                                    _条件2 = true;
-                                }
-
-                                _循环条件1 = !_循环条件1;
-                                if (_循环条件1)
-                                {
-                                    Tts.Speak("循环扫射");
-                                }
-
                                 break;
                         }
 
@@ -2435,28 +2400,33 @@ namespace Dota2Simulator.Games.Dota2
                         if (!_总循环条件)
                         {
                             _总循环条件 = true;
-                            _条件根据图片委托1 ??= 火箭弹幕敏捷;
-                            _条件根据图片委托2 ??= 追踪导弹敏捷;
-                            _条件根据图片委托3 ??= 高射火炮敏捷;
-                            _条件根据图片委托4 ??= 召唤飞弹敏捷;
+                            //_条件根据图片委托1 ??= 火箭弹幕敏捷;
+                            //_条件根据图片委托2 ??= 追踪导弹敏捷;
+                            //_条件根据图片委托3 ??= 高射火炮敏捷;
+                            //_条件根据图片委托4 ??= 召唤飞弹敏捷;
+                            _条件根据图片委托5 ??= 循环火箭弹幕;
                             await 状态初始化().ConfigureAwait(false);
                         }
 
                         await 根据按键判断技能释放前通用逻辑(e).ConfigureAwait(true);
 
                         switch (e.KeyCode)
-                        {
-                            case Keys.Q:
-                                _条件1 = true;
-                                break;
-                            case Keys.W:
-                                _条件2 = true;
-                                break;
-                            case Keys.E:
-                                _条件3 = true;
-                                break;
-                            case Keys.R:
-                                _条件4 = true;
+                        {                            
+                            //case Keys.Q:
+                            //    _条件1 = true;
+                            //    break;
+                            //case Keys.W:
+                            //    _条件2 = true;
+                            //    break;
+                            //case Keys.E:
+                            //    _条件3 = true;
+                            //    break;
+                            //case Keys.R:
+                            //    _条件4 = true;
+                            //    break;
+                            case Keys.D3:
+                                _条件5 = !_条件5;
+                                Tts.Speak(_条件5 ? "循环弹幕" : "关闭弹幕");
                                 break;
                         }
 
@@ -2598,8 +2568,7 @@ namespace Dota2Simulator.Games.Dota2
                                 break;
                             case Keys.D2:
                                 _条件3 = !_条件3;
-                                _循环条件1 = _条件3;
-                                Tts.Speak(_循环条件1 ? "循环标记" : "不循环标记");
+                                Tts.Speak(_条件3 ? "循环标记" : "不循环标记");
                                 break;
                         }
 
@@ -2689,6 +2658,7 @@ namespace Dota2Simulator.Games.Dota2
                             _条件根据图片委托4 ??= 大圣无限跳跃;
                             _切假腿配置.修改配置(Keys.Q, false);
                             _切假腿配置.修改配置(Keys.W, false);
+                            重复按键执行间隔阈值 = 100;
                             await 状态初始化().ConfigureAwait(false);
                         }
 
@@ -2705,10 +2675,45 @@ namespace Dota2Simulator.Games.Dota2
                             case Keys.R:
                                 _条件3 = true;
                                 break;
-                            case Keys.D2:
+                            case Keys.D3:
                                 _条件4 = !_条件4;
-                                _循环条件1 = _条件4;
-                                Tts.Speak(_循环条件1 ? "开启无限跳跃" : "关闭无限跳跃");
+                                Tts.Speak(_条件4 ? "开启无限跳跃" : "关闭无限跳跃");
+                                break;
+                        }
+
+                        break;
+                    }
+
+                #endregion
+
+                #region 剃刀
+
+                case "剃刀":
+                    {
+                        if (!_总循环条件)
+                        {
+                            _总循环条件 = true;
+                            //_条件根据图片委托1 ??= 棒击大地去后摇;
+                            //_条件根据图片委托2 ??= 乾坤之跃敏捷;
+                            //_条件根据图片委托3 ??= 猴子猴孙敏捷;
+                            //_条件根据图片委托4 ??= 大圣无限跳跃;
+                            //_切假腿配置.修改配置(Keys.Q, false);
+                            //_切假腿配置.修改配置(Keys.W, false);
+                            await 状态初始化().ConfigureAwait(false);
+                        }
+
+                        await 根据按键判断技能释放前通用逻辑(e).ConfigureAwait(true);
+
+                        switch (e.KeyCode)
+                        {
+                            case Keys.Q:
+                                _条件1 = true;
+                                break;
+                            case Keys.E:
+                                _条件2 = true;
+                                break;
+                            case Keys.R:
+                                _条件3 = true;
                                 break;
                         }
 
@@ -2764,6 +2769,7 @@ namespace Dota2Simulator.Games.Dota2
                             _条件根据图片委托4 ??= 循环查克拉;
                             _条件根据图片委托5 ??= 致盲之光去后摇;
                             _条件根据图片委托6 ??= 灵光去后摇接炎阳;
+                            重复按键执行间隔阈值 = 100;
                             await 状态初始化().ConfigureAwait(false);
                         }
 
@@ -2793,8 +2799,7 @@ namespace Dota2Simulator.Games.Dota2
                                 break;
                             case Keys.D2:
                                 _条件4 = !_条件4;
-                                _循环条件1 = _条件4;
-                                Tts.Speak(_循环条件1 ? "+开启循环查克拉" : "关闭循环查克拉");
+                                Tts.Speak(_条件4 ? "开启循环查克拉" : "关闭循环查克拉");
                                 break;
                         }
 
@@ -2816,6 +2821,7 @@ namespace Dota2Simulator.Games.Dota2
                             _条件根据图片委托4 ??= 上古封印去后摇;
                             _条件根据图片委托5 ??= 神秘之耀去后摇;
                             _条件根据图片委托6 ??= 震荡光弹去后摇;
+                            重复按键执行间隔阈值 = 100;
                             await 状态初始化().ConfigureAwait(false);
                         }
 
@@ -2837,8 +2843,7 @@ namespace Dota2Simulator.Games.Dota2
                                 break;
                             case Keys.D2:
                                 _条件1 = !_条件1;
-                                _循环条件1 = _条件1;
-                                Tts.Speak(_循环条件1 ? "循环鹰隼" : "不循环鹰隼");
+                                Tts.Speak(_条件1 ? "循环鹰隼" : "不循环鹰隼");
                                 break;
                             case Keys.D3:
                                 _全局步骤 = 1;
@@ -3487,10 +3492,9 @@ namespace Dota2Simulator.Games.Dota2
                                     _条件4 = true;
                                 }
                                 break;
-                            case Keys.D4:
-                                _循环条件1 = !_循环条件1;
-                                _条件5 = true;
-                                Tts.Speak(_循环条件1 ? "续暗影" : "不续暗影");
+                            case Keys.D3:
+                                _条件5 = !_条件5;
+                                Tts.Speak(_条件5 ? "续暗影" : "不续暗影");
                                 break;
                         }
 
@@ -3921,7 +3925,8 @@ namespace Dota2Simulator.Games.Dota2
                             _条件根据图片委托1 ??= 死亡脉冲去后摇;
                             _条件根据图片委托2 ??= 幽魂护罩去后摇;
                             _条件根据图片委托3 ??= 死神镰刀去后摇;
-                            _条件根据图片委托5 ??= 无限死亡脉冲;
+                            _条件根据图片委托5 ??= 循环死亡脉冲;
+                            重复按键执行间隔阈值 = 100;
                             _切假腿配置.修改配置(Keys.E, false);
                             await 状态初始化().ConfigureAwait(false);
                         }
@@ -3952,10 +3957,9 @@ namespace Dota2Simulator.Games.Dota2
                                     _条件4 = true;
                                 }
                                 break;
-                            case Keys.D6:
-                                _循环条件1 = !_循环条件1;
-                                _条件5 = true;
-                                Tts.Speak(_循环条件1 ? "续脉冲" : "不续脉冲");
+                            case Keys.D3:
+                                _条件5 = !_条件5;
+                                Tts.Speak(_条件5 ? "循环脉冲" : "终止循环");
                                 break;
                         }
 
@@ -3979,6 +3983,7 @@ namespace Dota2Simulator.Games.Dota2
                             _条件根据图片委托2 ??= 蛇棒去后摇;
                             _条件根据图片委托3 ??= 恶性瘟疫去后摇;
                             _条件根据图片委托4 ??= 循环蛇棒;
+                            重复按键执行间隔阈值 = 100;
                             await 状态初始化().ConfigureAwait(false);
                             _切假腿配置.修改配置(Keys.W, false);
                         }
@@ -3998,17 +4003,8 @@ namespace Dota2Simulator.Games.Dota2
                                 break;
                             case Keys.D3:
                                 {
-                                    if (!_条件4)
-                                    {
-                                        _循环条件1 = true;
-                                        _条件4 = true;
-                                    }
-                                    else
-                                    {
-                                        _循环条件1 = false;
-                                        _条件4 = false;
-                                    }
-
+                                    _条件4 = !_条件4;
+                                    Tts.Speak(_条件4 ? "循环蛇棒" : "终止循环");
                                     break;
                                 }
                             case Keys.S:
@@ -4186,6 +4182,7 @@ namespace Dota2Simulator.Games.Dota2
                             _总循环条件 = true;
                             _条件根据图片委托2 ??= 幽魂检测;
                             _条件根据图片委托3 ??= 循环续过载;
+                            重复按键执行间隔阈值 = 100;
                             await 状态初始化().ConfigureAwait(false);
                         }
 
@@ -4203,52 +4200,10 @@ namespace Dota2Simulator.Games.Dota2
                                     _条件2 = true;
                                     break;
                                 }
-                            case Keys.D2:
-                                {
-                                    if (_循环条件1)
-                                    {
-                                        _条件1 = false;
-                                        _循环条件1 = false;
-                                        Tts.Speak("关闭续纹章");
-                                    }
-                                    else
-                                    {
-                                        _条件1 = true;
-                                        _循环条件1 = true;
-                                        Tts.Speak("开启续纹章");
-                                    }
-
-                                    break;
-                                }
                             case Keys.D3:
                                 {
-                                    if (_选择队友头像 < 9)
-                                    {
-                                        _选择队友头像 += 1;
-                                    }
-                                    else
-                                    {
-                                        _选择队友头像 = 0;
-                                    }
-
-                                    Tts.Speak(string.Concat("选择第", _选择队友头像 + 1, "个人"));
-                                    break;
-                                }
-                            case Keys.D4:
-                                {
-                                    if (_循环条件2)
-                                    {
-                                        _条件3 = false;
-                                        _循环条件2 = false;
-                                        Tts.Speak("关闭续过载");
-                                    }
-                                    else
-                                    {
-                                        _条件3 = true;
-                                        _循环条件2 = true;
-                                        Tts.Speak("开启续过载");
-                                    }
-
+                                    _条件3 = !_条件3;
+                                    Tts.Speak(_条件3 ? "关闭续过载" : "开启续过载");
                                     break;
                                 }
                         }
@@ -4283,37 +4238,6 @@ namespace Dota2Simulator.Games.Dota2
                                     _条件2 = true;
                                     break;
                                 }
-                            case Keys.D2:
-                                {
-                                    if (_循环条件1)
-                                    {
-                                        _条件1 = false;
-                                        _循环条件1 = false;
-                                        Tts.Speak("关闭续纹章");
-                                    }
-                                    else
-                                    {
-                                        _条件1 = true;
-                                        _循环条件1 = true;
-                                        Tts.Speak("开启续纹章");
-                                    }
-
-                                    break;
-                                }
-                            case Keys.D3:
-                                {
-                                    if (_选择队友头像 < 9)
-                                    {
-                                        _选择队友头像 += 1;
-                                    }
-                                    else
-                                    {
-                                        _选择队友头像 = 0;
-                                    }
-
-                                    Tts.Speak(string.Concat("选择第", _选择队友头像 + 1, "个人"));
-                                    break;
-                                }
                         }
 
                         break;
@@ -4328,10 +4252,12 @@ namespace Dota2Simulator.Games.Dota2
                         if (!_总循环条件)
                         {
                             _总循环条件 = true;
-                            _条件根据图片委托1 ??= 穿刺去后摇;
-                            _条件根据图片委托2 ??= 神智爆裂去后摇;
-                            _条件根据图片委托3 ??= 尖刺外壳去后摇;
-                            _条件根据图片委托4 ??= 复仇接穿刺;
+                            //_条件根据图片委托1 ??= 穿刺去后摇;
+                            //_条件根据图片委托2 ??= 神智爆裂去后摇;
+                            //_条件根据图片委托3 ??= 尖刺外壳去后摇;
+                            //_条件根据图片委托4 ??= 复仇接穿刺;
+                            _条件根据图片委托5 ??= 循环接爆裂;
+                            重复按键执行间隔阈值 = 150;
                             await 状态初始化().ConfigureAwait(false);
                         }
 
@@ -4339,24 +4265,28 @@ namespace Dota2Simulator.Games.Dota2
 
                         switch (e.KeyCode)
                         {
-                            case Keys.Q:
-                                _条件1 = true;
-                                break;
-                            case Keys.W:
-                                Delay(33 * 根据图片使用物品(物品_虚灵之刃_handle));
-                                Delay(33 * (根据图片使用物品(物品_红杖_handle) +
-                                            根据图片使用物品(物品_红杖2_handle) +
-                                            根据图片使用物品(物品_红杖3_handle) +
-                                            根据图片使用物品(物品_红杖4_handle) +
-                                            根据图片使用物品(物品_红杖5_handle)));
-                                _条件2 = true;
-                                break;
-                            case Keys.E:
-                                _条件3 = true;
-                                break;
-                            case Keys.R:
-                                设置全局步骤r(0);
-                                // _条件4 = true;
+                            //case Keys.Q:
+                            //    _条件1 = true;
+                            //    break;
+                            //case Keys.W:
+                            //    Delay(33 * 根据图片使用物品(物品_虚灵之刃_handle));
+                            //    Delay(33 * (根据图片使用物品(物品_红杖_handle) +
+                            //                根据图片使用物品(物品_红杖2_handle) +
+                            //                根据图片使用物品(物品_红杖3_handle) +
+                            //                根据图片使用物品(物品_红杖4_handle) +
+                            //                根据图片使用物品(物品_红杖5_handle)));
+                            //    _条件2 = true;
+                            //    break;
+                            //case Keys.E:
+                            //    _条件3 = true;
+                            //    break;
+                            //case Keys.R:
+                            //    设置全局步骤r(0);
+                            //    // _条件4 = true;
+                            //    break;
+                            case Keys.D3:
+                                _条件5 = !_条件5;
+                                Tts.Speak(_条件5 ? "循环爆裂" : "终止循环");
                                 break;
                         }
 
@@ -4476,7 +4406,7 @@ namespace Dota2Simulator.Games.Dota2
 
         private static async Task<bool> 回音践踏去后摇(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.Q, 1, 判断成功后延时: 1300).ConfigureAwait(true);
+            return await 技能通用判断(Keys.Q, 1, 判断成功后延时: 1300).ConfigureAwait(true);
         }
 
         private static async Task<bool> 灵体游魂去后摇(ImageHandle 句柄)
@@ -4486,7 +4416,7 @@ namespace Dota2Simulator.Games.Dota2
 
         private static async Task<bool> 裂地沟壑去后摇(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.R, 1).ConfigureAwait(true);
+            return await 技能通用判断(Keys.R, 1).ConfigureAwait(true);
         }
 
         #endregion
@@ -4495,22 +4425,22 @@ namespace Dota2Simulator.Games.Dota2
 
         private static async Task<bool> 腐朽去后摇(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.Q, 1).ConfigureAwait(true);
+            return await 技能通用判断(Keys.Q, 1).ConfigureAwait(true);
         }
 
         private static async Task<bool> 噬魂去后摇(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.W, 1).ConfigureAwait(true);
+            return await 技能通用判断(Keys.W, 1).ConfigureAwait(true);
         }
 
         private static async Task<bool> 墓碑去后摇(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.R, 1).ConfigureAwait(true);
+            return await 技能通用判断(Keys.R, 1).ConfigureAwait(true);
         }
 
         private static async Task<bool> 血肉傀儡去后摇(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.R, 0).ConfigureAwait(true);
+            return await 技能通用判断(Keys.R, 0).ConfigureAwait(true);
         }
 
         #endregion
@@ -4538,17 +4468,17 @@ namespace Dota2Simulator.Games.Dota2
 
         private static async Task<bool> 死亡旋风去后摇(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.Q, 0).ConfigureAwait(true);
+            return await 技能通用判断(Keys.Q, 0).ConfigureAwait(true);
         }
 
         private static async Task<bool> 伐木聚链去后摇(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.W, 1).ConfigureAwait(true);
+            return await 技能通用判断(Keys.W, 1).ConfigureAwait(true);
         }
 
         private static async Task<bool> 锯齿轮旋去后摇(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.D, 1).ConfigureAwait(true);
+            return await 技能通用判断(Keys.D, 1).ConfigureAwait(true);
         }
 
         private static async Task<bool> 锯齿飞轮去后摇(ImageHandle 句柄)
@@ -4558,7 +4488,7 @@ namespace Dota2Simulator.Games.Dota2
 
         private static async Task<bool> 喷火装置去后摇(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.F, 0).ConfigureAwait(true);
+            return await 技能通用判断(Keys.F, 0).ConfigureAwait(true);
         }
 
         #endregion
@@ -4567,17 +4497,17 @@ namespace Dota2Simulator.Games.Dota2
 
         private static async Task<bool> 洗礼去后摇(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.Q, 1).ConfigureAwait(true);
+            return await 技能通用判断(Keys.Q, 1).ConfigureAwait(true);
         }
 
         private static async Task<bool> 驱逐去后摇(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.W, 1).ConfigureAwait(true);
+            return await 技能通用判断(Keys.W, 1).ConfigureAwait(true);
         }
 
         private static async Task<bool> 守护天使去后摇(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.R, 1).ConfigureAwait(true);
+            return await 技能通用判断(Keys.R, 1).ConfigureAwait(true);
         }
 
         #endregion
@@ -4659,17 +4589,17 @@ namespace Dota2Simulator.Games.Dota2
 
         private static async Task<bool> 压倒性优势去后摇(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.Q, 0).ConfigureAwait(true);
+            return await 技能通用判断(Keys.Q, 0).ConfigureAwait(true);
         }
 
         private static async Task<bool> 强攻去后摇(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.W, 1).ConfigureAwait(true);
+            return await 技能通用判断(Keys.W, 1).ConfigureAwait(true);
         }
 
         private static async Task<bool> 决斗去后摇(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.R, 1, 要接的按键: Keys.Q).ConfigureAwait(true);
+            return await 技能通用判断(Keys.R, 1, 要接的按键: Keys.Q).ConfigureAwait(true);
         }
 
         #endregion
@@ -4689,12 +4619,12 @@ namespace Dota2Simulator.Games.Dota2
 
         private static async Task<bool> 冥火爆击去后摇(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.Q, 1).ConfigureAwait(true);
+            return await 技能通用判断(Keys.Q, 1).ConfigureAwait(true);
         }
 
         private static async Task<bool> 白骨守卫去后摇(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.W, 1).ConfigureAwait(true);
+            return await 技能通用判断(Keys.W, 1).ConfigureAwait(true);
         }
 
         #endregion
@@ -4703,12 +4633,12 @@ namespace Dota2Simulator.Games.Dota2
 
         private static async Task<bool> 马蹄践踏接平A(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.Q, 0).ConfigureAwait(true);
+            return await 技能通用判断(Keys.Q, 0).ConfigureAwait(true);
         }
 
         private static async Task<bool> 双刃剑去后摇(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.W, 1).ConfigureAwait(true);
+            return await 技能通用判断(Keys.W, 1).ConfigureAwait(true);
         }
 
         #endregion
@@ -4717,7 +4647,7 @@ namespace Dota2Simulator.Games.Dota2
 
         private static async Task<bool> 心炎去后摇(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.W, 1).ConfigureAwait(true);
+            return await 技能通用判断(Keys.W, 1).ConfigureAwait(true);
         }
 
         private static async Task<bool> 牺牲去后摇(ImageHandle 句柄)
@@ -4741,12 +4671,12 @@ namespace Dota2Simulator.Games.Dota2
 
         private static async Task<bool> 狂暴去后摇(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.Q, 0).ConfigureAwait(true);
+            return await 技能通用判断(Keys.Q, 0).ConfigureAwait(true);
         }
 
         private static async Task<bool> 撕裂伤口去后摇(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.W, 1).ConfigureAwait(true);
+            return await 技能通用判断(Keys.W, 1).ConfigureAwait(true);
         }
 
         #endregion
@@ -4755,17 +4685,17 @@ namespace Dota2Simulator.Games.Dota2
 
         private static async Task<bool> 巨石冲击去后摇(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.Q, 0).ConfigureAwait(true);
+            return await 技能通用判断(Keys.Q, 0).ConfigureAwait(true);
         }
 
         private static async Task<bool> 地磁之握去后摇(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.E, 0).ConfigureAwait(true);
+            return await 技能通用判断(Keys.E, 0).ConfigureAwait(true);
         }
 
         private static async Task<bool> 磁化去后摇(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.R, 1).ConfigureAwait(true);
+            return await 技能通用判断(Keys.R, 1).ConfigureAwait(true);
         }
 
         #endregion
@@ -4774,7 +4704,7 @@ namespace Dota2Simulator.Games.Dota2
 
         private static async Task<bool> 火焰风暴去后摇(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.Q, 1).ConfigureAwait(true);
+            return await 技能通用判断(Keys.Q, 1).ConfigureAwait(true);
         }
 
         private static async Task<bool> 怨念深渊去后摇(ImageHandle 句柄)
@@ -4797,7 +4727,7 @@ namespace Dota2Simulator.Games.Dota2
 
         private static async Task<bool> 山崩去后摇(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.Q, 0).ConfigureAwait(true);
+            return await 技能通用判断(Keys.Q, 0).ConfigureAwait(true);
         }
 
         private static async Task<bool> 投掷去后摇(ImageHandle 句柄)
@@ -4831,17 +4761,17 @@ namespace Dota2Simulator.Games.Dota2
 
         private static async Task<bool> 冰片去后摇(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.Q, 1).ConfigureAwait(true);
+            return await 技能通用判断(Keys.Q, 1).ConfigureAwait(true);
         }
 
         private static async Task<bool> 摔角行家去后摇(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.E, 0).ConfigureAwait(true);
+            return await 技能通用判断(Keys.E, 0).ConfigureAwait(true);
         }
 
         private static async Task<bool> 酒友去后摇(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.E, 1).ConfigureAwait(true);
+            return await 技能通用判断(Keys.E, 1).ConfigureAwait(true);
         }
 
         // 基本完美了。。。
@@ -4957,12 +4887,12 @@ namespace Dota2Simulator.Games.Dota2
 
         private static async Task<bool> 战斗饥渴去后摇(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.W, 1).ConfigureAwait(true);
+            return await 技能通用判断(Keys.W, 1).ConfigureAwait(true);
         }
 
         private static async Task<bool> 淘汰之刃去后摇(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.R, 1).ConfigureAwait(true);
+            return await 技能通用判断(Keys.R, 1).ConfigureAwait(true);
         }
 
         private static async Task<bool> 跳吼(ImageHandle 句柄)
@@ -5007,17 +4937,17 @@ namespace Dota2Simulator.Games.Dota2
 
         private static async Task<bool> 守卫冲刺去后摇(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.Q, 0).ConfigureAwait(true);
+            return await 技能通用判断(Keys.Q, 0).ConfigureAwait(true);
         }
 
         private static async Task<bool> 踩去后摇(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.W, 1, 要接的按键: _是否魔晶 ? Keys.A : Keys.R).ConfigureAwait(true);
+            return await 技能通用判断(Keys.W, 1, 要接的按键: _是否魔晶 ? Keys.A : Keys.R).ConfigureAwait(true);
         }
 
         private static async Task<bool> 雾霭去后摇(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.R, 1).ConfigureAwait(true);
+            return await 技能通用判断(Keys.R, 1).ConfigureAwait(true);
         }
 
         #endregion
@@ -5026,17 +4956,17 @@ namespace Dota2Simulator.Games.Dota2
 
         private static async Task<bool> 风暴之拳去后摇(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.Q, 1).ConfigureAwait(true);
+            return await 技能通用判断(Keys.Q, 1).ConfigureAwait(true);
         }
 
         private static async Task<bool> 战吼去后摇(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.E, 0).ConfigureAwait(true);
+            return await 技能通用判断(Keys.E, 0).ConfigureAwait(true);
         }
 
         private static async Task<bool> 神之力量去后摇(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.R, 0).ConfigureAwait(true);
+            return await 技能通用判断(Keys.R, 0).ConfigureAwait(true);
         }
 
         #endregion
@@ -5116,22 +5046,22 @@ namespace Dota2Simulator.Games.Dota2
 
         private static async Task<bool> 虚空去后摇(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.Q, 1).ConfigureAwait(true);
+            return await 技能通用判断(Keys.Q, 1).ConfigureAwait(true);
         }
 
         private static async Task<bool> 伤残恐惧去后摇(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.W, 0).ConfigureAwait(true);
+            return await 技能通用判断(Keys.W, 0).ConfigureAwait(true);
         }
 
         private static async Task<bool> 暗夜猎影去后摇(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.E, 0).ConfigureAwait(true);
+            return await 技能通用判断(Keys.E, 0).ConfigureAwait(true);
         }
 
         private static async Task<bool> 黑暗飞升去后摇(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.R, 1).ConfigureAwait(true);
+            return await 技能通用判断(Keys.R, 1).ConfigureAwait(true);
         }
 
         #endregion
@@ -5140,27 +5070,27 @@ namespace Dota2Simulator.Games.Dota2
 
         private static async Task<bool> 自然卷握去后摇(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.Q, 1).ConfigureAwait(true);
+            return await 技能通用判断(Keys.Q, 1).ConfigureAwait(true);
         }
 
         private static async Task<bool> 寄生种子去后摇(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.W, 1).ConfigureAwait(true);
+            return await 技能通用判断(Keys.W, 1).ConfigureAwait(true);
         }
 
         private static async Task<bool> 活体护甲去后摇(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.E, 1).ConfigureAwait(true);
+            return await 技能通用判断(Keys.E, 1).ConfigureAwait(true);
         }
 
         private static async Task<bool> 丛林之眼去后摇(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.D, 1).ConfigureAwait(true);
+            return await 技能通用判断(Keys.D, 1).ConfigureAwait(true);
         }
 
         private static async Task<bool> 疯狂生长去后摇(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.R, 1).ConfigureAwait(true);
+            return await 技能通用判断(Keys.R, 1).ConfigureAwait(true);
         }
 
         #endregion
@@ -5169,17 +5099,17 @@ namespace Dota2Simulator.Games.Dota2
 
         private static async Task<bool> 混乱之箭去后摇(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.Q, 1, 要接的按键: _全局模式q == 1 ? Keys.W : Keys.A).ConfigureAwait(true);
+            return await 技能通用判断(Keys.Q, 1, 要接的按键: _全局模式q == 1 ? Keys.W : Keys.A).ConfigureAwait(true);
         }
 
         private static async Task<bool> 实相裂隙去后摇(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.W, 11).ConfigureAwait(true);
+            return await 技能通用判断(Keys.W, 11).ConfigureAwait(true);
         }
 
         private static async Task<bool> 混沌之军去后摇(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.R, 1).ConfigureAwait(true);
+            return await 技能通用判断(Keys.R, 1).ConfigureAwait(true);
         }
 
         #endregion
@@ -5203,7 +5133,7 @@ namespace Dota2Simulator.Games.Dota2
 
         private static async Task<bool> 神之谴击去后摇(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.W, 1).ConfigureAwait(true);
+            return await 技能通用判断(Keys.W, 1).ConfigureAwait(true);
         }
 
         private static async Task<bool> 热血竞技场去后摇(ImageHandle 句柄)
@@ -5225,7 +5155,7 @@ namespace Dota2Simulator.Games.Dota2
 
         private static async Task<bool> 上界重锤去后摇(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.W, 1).ConfigureAwait(true);
+            return await 技能通用判断(Keys.W, 1).ConfigureAwait(true);
         }
 
         #endregion
@@ -5234,32 +5164,32 @@ namespace Dota2Simulator.Games.Dota2
 
         private static async Task<bool> 鼻涕去后摇(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.Q, 1).ConfigureAwait(true);
+            return await 技能通用判断(Keys.Q, 1).ConfigureAwait(true);
         }
 
         private static async Task<bool> 扫射切回假腿(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.W, 10).ConfigureAwait(true);
+            return await 技能通用判断(Keys.W, 10).ConfigureAwait(true);
         }
 
-        private static async Task<bool> 针刺循环(ImageHandle 句柄)
-        {
-            _ = await 主动技能已就绪后续(Keys.W, () =>
-            {
-                SimKeyBoard.KeyPress(Keys.W);
-                Delay(等待延迟);
-            }).ConfigureAwait(true);
-            return await Task.FromResult(_循环条件1).ConfigureAwait(true);
-        }
+        //private static async Task<bool> 针刺循环(ImageHandle 句柄)
+        //{
+        //    _ = await 主动技能已就绪后续(Keys.W, () =>
+        //    {
+        //        SimKeyBoard.KeyPress(Keys.W);
+        //        Delay(等待延迟);
+        //    }).ConfigureAwait(true);
+        //    return await Task.FromResult(_循环条件1).ConfigureAwait(true);
+        //}
 
         private static async Task<bool> 毛团去后摇(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.D, 1).ConfigureAwait(true);
+            return await 技能通用判断(Keys.D, 1).ConfigureAwait(true);
         }
 
         private static async Task<bool> 钢毛后背去后摇(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.E, 0, false).ConfigureAwait(true);
+            return await 技能通用判断(Keys.E, 0, false).ConfigureAwait(true);
         }
 
         #endregion
@@ -5268,7 +5198,7 @@ namespace Dota2Simulator.Games.Dota2
 
         private static async Task<bool> 喷火去后摇(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.Q, 1).ConfigureAwait(true);
+            return await 技能通用判断(Keys.Q, 1).ConfigureAwait(true);
         }
 
         private static async Task<bool> 神龙摆尾去后摇(ImageHandle 句柄)
@@ -5284,12 +5214,12 @@ namespace Dota2Simulator.Games.Dota2
 
         private static async Task<bool> 变龙去后摇(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.R, 0).ConfigureAwait(true);
+            return await 技能通用判断(Keys.R, 0).ConfigureAwait(true);
         }
 
         private static async Task<bool> 火球去后摇(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.D, 0, 要接的按键: _全局模式d == 1 && DOTA2判断技能是否CD(Keys.Q, in 句柄) ? Keys.Q : Keys.A)
+            return await 技能通用判断(Keys.D, 0, 要接的按键: _全局模式d == 1 && DOTA2判断技能是否CD(Keys.Q, in 句柄) ? Keys.Q : Keys.A)
                 .ConfigureAwait(true);
         }
 
@@ -5355,7 +5285,7 @@ namespace Dota2Simulator.Games.Dota2
 
         private static async Task<bool> 骷髅之军去后摇(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.F, 0).ConfigureAwait(true);
+            return await 技能通用判断(Keys.F, 0).ConfigureAwait(true);
         }
 
         #endregion
@@ -5409,17 +5339,17 @@ namespace Dota2Simulator.Games.Dota2
 
         private static async Task<bool> 旋风飞斧远去后摇(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.W, 1).ConfigureAwait(true);
+            return await 技能通用判断(Keys.W, 1).ConfigureAwait(true);
         }
 
         private static async Task<bool> 旋风飞斧近去后摇(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.E, 0).ConfigureAwait(true);
+            return await 技能通用判断(Keys.E, 0).ConfigureAwait(true);
         }
 
         private static async Task<bool> 战斗专注去后摇(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.R, 0).ConfigureAwait(true);
+            return await 技能通用判断(Keys.R, 0).ConfigureAwait(true);
         }
 
         #endregion
@@ -5428,22 +5358,22 @@ namespace Dota2Simulator.Games.Dota2
 
         private static async Task<bool> 窒息短匕敏捷(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.Q, 1).ConfigureAwait(true);
+            return await 技能通用判断(Keys.Q, 1).ConfigureAwait(true);
         }
 
         private static async Task<bool> 幻影突袭敏捷(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.W, 0).ConfigureAwait(true);
+            return await 技能通用判断(Keys.W, 0).ConfigureAwait(true);
         }
 
         private static async Task<bool> 魅影无形敏捷(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.E, 0, false).ConfigureAwait(true);
+            return await 技能通用判断(Keys.E, 0, false).ConfigureAwait(true);
         }
 
         private static async Task<bool> 刀阵旋风敏捷(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.D, 0).ConfigureAwait(true);
+            return await 技能通用判断(Keys.D, 0).ConfigureAwait(true);
         }
 
         #endregion
@@ -5452,7 +5382,7 @@ namespace Dota2Simulator.Games.Dota2
 
         private static async Task<bool> 灵魂之矛敏捷(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.Q, 1).ConfigureAwait(true);
+            return await 技能通用判断(Keys.Q, 1).ConfigureAwait(true);
         }
 
         private static async Task<bool> 神行百变选择幻象(ImageHandle 句柄)
@@ -5474,7 +5404,7 @@ namespace Dota2Simulator.Games.Dota2
 
         private static async Task<bool> 幽鬼之刃去后摇(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.Q, 1, false).ConfigureAwait(true);
+            return await 技能通用判断(Keys.Q, 1, false).ConfigureAwait(true);
         }
 
         private static async Task<bool> 如影随形去后摇(ImageHandle 句柄)
@@ -5512,7 +5442,7 @@ namespace Dota2Simulator.Games.Dota2
 
         private static async Task<bool> 折射去后摇(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.E, 0).ConfigureAwait(true);
+            return await 技能通用判断(Keys.E, 0).ConfigureAwait(true);
         }
 
         #endregion
@@ -5520,21 +5450,21 @@ namespace Dota2Simulator.Games.Dota2
         #region 影魔
         private static async Task<bool> z炮去后摇(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.Q, 1, false).ConfigureAwait(true);
+            return await 技能通用判断(Keys.Q, 1, false).ConfigureAwait(true);
         }
 
         private static async Task<bool> x炮去后摇(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.W, 1, false).ConfigureAwait(true);
+            return await 技能通用判断(Keys.W, 1, false).ConfigureAwait(true);
         }
 
         private static async Task<bool> c炮去后摇(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.E, 1, false).ConfigureAwait(true);
+            return await 技能通用判断(Keys.E, 1, false).ConfigureAwait(true);
         }
         private static async Task<bool> 灵魂盛宴去后摇(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.D, 1, false).ConfigureAwait(true);
+            return await 技能通用判断(Keys.D, 1, false).ConfigureAwait(true);
         }
 
         //private static void 吹风摇大()
@@ -5559,32 +5489,32 @@ namespace Dota2Simulator.Games.Dota2
 
         private static async Task<bool> 倒影敏捷(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.Q, 1).ConfigureAwait(true);
+            return await 技能通用判断(Keys.Q, 1).ConfigureAwait(true);
         }
 
         private static async Task<bool> 幻惑敏捷(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.W, 1).ConfigureAwait(true);
+            return await 技能通用判断(Keys.W, 1).ConfigureAwait(true);
         }
 
         private static async Task<bool> 魔化敏捷(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.E, 0).ConfigureAwait(true);
+            return await 技能通用判断(Keys.E, 0).ConfigureAwait(true);
         }
 
         private static async Task<bool> 恶魔狂热去后摇(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.D, 1).ConfigureAwait(true);
+            return await 技能通用判断(Keys.D, 1).ConfigureAwait(true);
         }
 
         private static async Task<bool> 恐怖心潮敏捷(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.F, 0).ConfigureAwait(true);
+            return await 技能通用判断(Keys.F, 0).ConfigureAwait(true);
         }
 
         private static async Task<bool> 断魂敏捷(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.R, 1).ConfigureAwait(true);
+            return await 技能通用判断(Keys.R, 1).ConfigureAwait(true);
         }
 
         #endregion
@@ -5609,17 +5539,17 @@ namespace Dota2Simulator.Games.Dota2
 
         private static async Task<bool> 法力虚空取消后摇(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.R, 1).ConfigureAwait(true);
+            return await 技能通用判断(Keys.R, 1).ConfigureAwait(true);
         }
 
         private static async Task<bool> 法术反制敏捷(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.E, 10).ConfigureAwait(true);
+            return await 技能通用判断(Keys.E, 10).ConfigureAwait(true);
         }
 
         private static async Task<bool> 友军法术反制敏捷(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.D, 10).ConfigureAwait(true);
+            return await 技能通用判断(Keys.D, 10).ConfigureAwait(true);
         }
 
         #endregion
@@ -5628,7 +5558,7 @@ namespace Dota2Simulator.Games.Dota2
 
         private static async Task<bool> 黑暗契约去后摇(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.Q, 0).ConfigureAwait(true);
+            return await 技能通用判断(Keys.Q, 0).ConfigureAwait(true);
         }
 
         private static async Task<bool> 跳水去后摇(ImageHandle 句柄)
@@ -5645,12 +5575,12 @@ namespace Dota2Simulator.Games.Dota2
 
         private static async Task<bool> 深海护罩去后摇(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.D, 0).ConfigureAwait(true);
+            return await 技能通用判断(Keys.D, 0).ConfigureAwait(true);
         }
 
         private static async Task<bool> 暗影之舞去后摇(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.R, 0).ConfigureAwait(true);
+            return await 技能通用判断(Keys.R, 0).ConfigureAwait(true);
         }
 
         #endregion
@@ -5694,7 +5624,7 @@ namespace Dota2Simulator.Games.Dota2
 
         private static async Task<bool> 猎手旋标去后摇(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.F, 1).ConfigureAwait(true);
+            return await 技能通用判断(Keys.F, 1).ConfigureAwait(true);
         }
 
         #endregion
@@ -5722,17 +5652,17 @@ namespace Dota2Simulator.Games.Dota2
 
         private static async Task<bool> 炎阳索去后摇(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.Q, 0).ConfigureAwait(true);
+            return await 技能通用判断(Keys.Q, 0).ConfigureAwait(true);
         }
 
         private static async Task<bool> 烈火罩去后摇(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.E, 0).ConfigureAwait(true);
+            return await 技能通用判断(Keys.E, 0).ConfigureAwait(true);
         }
 
         private static async Task<bool> 激活残焰去后摇(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.D, 1).ConfigureAwait(true);
+            return await 技能通用判断(Keys.D, 1).ConfigureAwait(true);
         }
 
         #endregion
@@ -5741,17 +5671,17 @@ namespace Dota2Simulator.Games.Dota2
 
         private static async Task<bool> 超强力量去后摇(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.W, 1).ConfigureAwait(true);
+            return await 技能通用判断(Keys.W, 1).ConfigureAwait(true);
         }
 
         private static async Task<bool> 震撼大地去后摇(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.Q, 0).ConfigureAwait(true);
+            return await 技能通用判断(Keys.Q, 0).ConfigureAwait(true);
         }
 
         private static async Task<bool> 狂怒去后摇(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.R, 0).ConfigureAwait(true);
+            return await 技能通用判断(Keys.R, 0).ConfigureAwait(true);
         }
 
         private static async Task<bool> 跳拍(ImageHandle 句柄)
@@ -5777,7 +5707,7 @@ namespace Dota2Simulator.Games.Dota2
 
         private static async Task<bool> 流霰弹去后摇(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.Q, 1).ConfigureAwait(true);
+            return await 技能通用判断(Keys.Q, 1).ConfigureAwait(true);
         }
 
         private static async Task<bool> 瞄准去后摇(ImageHandle 句柄)
@@ -5792,12 +5722,12 @@ namespace Dota2Simulator.Games.Dota2
 
         private static async Task<bool> 暗杀去后摇(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.R, 1).ConfigureAwait(true);
+            return await 技能通用判断(Keys.R, 1).ConfigureAwait(true);
         }
 
         private static async Task<bool> 震荡手雷去后摇(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.D, 1).ConfigureAwait(true);
+            return await 技能通用判断(Keys.D, 1).ConfigureAwait(true);
         }
 
         #endregion
@@ -5806,22 +5736,34 @@ namespace Dota2Simulator.Games.Dota2
 
         private static async Task<bool> 火箭弹幕敏捷(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.Q, 0).ConfigureAwait(true);
+            return await 技能通用判断(Keys.Q, 0).ConfigureAwait(true);
         }
 
         private static async Task<bool> 追踪导弹敏捷(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.W, 0).ConfigureAwait(true);
+            return await 技能通用判断(Keys.W, 0).ConfigureAwait(true);
         }
 
         private static async Task<bool> 高射火炮敏捷(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.E, 0).ConfigureAwait(true);
+            return await 技能通用判断(Keys.E, 0).ConfigureAwait(true);
         }
 
         private static async Task<bool> 召唤飞弹敏捷(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.R, 1).ConfigureAwait(true);
+            return await 技能通用判断(Keys.R, 1).ConfigureAwait(true);
+        }
+        
+        private static async Task<bool> 循环火箭弹幕(ImageHandle 句柄)
+        {
+            if (获取当前时间毫秒()-_全局时间q > 400)
+            await 主动技能已就绪后续(Keys.Q, () =>
+            {
+                SimKeyBoard.KeyPress(Keys.Q);
+                _全局时间q = 获取当前时间毫秒();
+            }).ConfigureAwait(true);
+
+            return await Task.FromResult(_条件5);
         }
 
         #endregion
@@ -5830,17 +5772,17 @@ namespace Dota2Simulator.Games.Dota2
 
         private static async Task<bool> 秘术异蛇去后摇(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.W, 1).ConfigureAwait(true);
+            return await 技能通用判断(Keys.W, 1).ConfigureAwait(true);
         }
 
         private static async Task<bool> 罗网剑阵去后摇(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.E, 1).ConfigureAwait(true);
+            return await 技能通用判断(Keys.E, 1).ConfigureAwait(true);
         }
 
         private static async Task<bool> 石化凝视去后摇(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.R, 1).ConfigureAwait(true);
+            return await 技能通用判断(Keys.R, 1).ConfigureAwait(true);
         }
 
         #endregion
@@ -5849,17 +5791,17 @@ namespace Dota2Simulator.Games.Dota2
 
         private static async Task<bool> 时间漫游敏捷(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.Q, 1).ConfigureAwait(true);
+            return await 技能通用判断(Keys.Q, 1).ConfigureAwait(true);
         }
 
         private static async Task<bool> 时间膨胀敏捷(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.W, 0).ConfigureAwait(true);
+            return await 技能通用判断(Keys.W, 0).ConfigureAwait(true);
         }
 
         private static async Task<bool> 时间结界敏捷(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.R, 1).ConfigureAwait(true);
+            return await 技能通用判断(Keys.R, 1).ConfigureAwait(true);
         }
 
         #endregion
@@ -5887,12 +5829,12 @@ namespace Dota2Simulator.Games.Dota2
 
         private static async Task<bool> 割裂去后摇(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.R, 1).ConfigureAwait(true);
+            return await 技能通用判断(Keys.R, 1).ConfigureAwait(true);
         }
 
         private static async Task<bool> 血怒去后摇(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.Q, 0).ConfigureAwait(true);
+            return await 技能通用判断(Keys.Q, 0).ConfigureAwait(true);
         }
 
         #endregion
@@ -5901,29 +5843,18 @@ namespace Dota2Simulator.Games.Dota2
 
         private static async Task<bool> 飞镖接平a(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.Q, 1).ConfigureAwait(true);
+            return await 技能通用判断(Keys.Q, 1).ConfigureAwait(true);
         }
 
         private static async Task<bool> 标记去后摇(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.R, _循环条件1 ? 0 : 1).ConfigureAwait(true);
+            return await 技能通用判断(Keys.R, 1).ConfigureAwait(true);
         }
 
         private static async Task<bool> 循环标记(ImageHandle 句柄)
         {
-            int 步骤 = 获取全局步骤r();
-            _ = await 主动技能已就绪后续(Keys.R, () =>
-            {
-                if (步骤 == 0)
-                {
-                    设置全局步骤(1);
-                    SimKeyBoard.KeyPress(Keys.R);
-                    Delay(200);
-                    设置全局步骤(0);
-                }
-            }).ConfigureAwait(true);
-
-            return _循环条件1;
+            await 技能通用判断(Keys.R, 2).ConfigureAwait(true);
+            return await Task.FromResult(_条件3).ConfigureAwait(true);
         }
 
         #endregion
@@ -5932,17 +5863,17 @@ namespace Dota2Simulator.Games.Dota2
 
         private static async Task<bool> 等离子场去后摇(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.Q, 0).ConfigureAwait(true);
+            return await 技能通用判断(Keys.Q, 0).ConfigureAwait(true);
         }
 
         private static async Task<bool> 静电连接去后摇(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.W, 1).ConfigureAwait(true);
+            return await 技能通用判断(Keys.W, 1).ConfigureAwait(true);
         }
 
         private static async Task<bool> 风暴之眼去后摇(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.R, 0).ConfigureAwait(true);
+            return await 技能通用判断(Keys.R, 0).ConfigureAwait(true);
         }
 
         #endregion
@@ -5951,17 +5882,17 @@ namespace Dota2Simulator.Games.Dota2
 
         private static async Task<bool> 月光后敏捷平a(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.Q, 1).ConfigureAwait(true);
+            return await 技能通用判断(Keys.Q, 1).ConfigureAwait(true);
         }
 
         private static async Task<bool> 月刃后敏捷平a(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.W, 0).ConfigureAwait(true);
+            return await 技能通用判断(Keys.W, 0).ConfigureAwait(true);
         }
 
         private static async Task<bool> 月蚀后敏捷平a(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.R, 1).ConfigureAwait(true);
+            return await 技能通用判断(Keys.R, 1).ConfigureAwait(true);
         }
 
         #endregion
@@ -5970,35 +5901,23 @@ namespace Dota2Simulator.Games.Dota2
 
         private static async Task<bool> 棒击大地去后摇(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.Q, 1).ConfigureAwait(true);
+            return await 技能通用判断(Keys.Q, 1).ConfigureAwait(true);
         }
 
         private static async Task<bool> 乾坤之跃敏捷(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.E, 0).ConfigureAwait(true);
+            return await 技能通用判断(Keys.E, 0).ConfigureAwait(true);
         }
 
         private static async Task<bool> 猴子猴孙敏捷(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.R, 1).ConfigureAwait(true);
+            return await 技能通用判断(Keys.R, 1).ConfigureAwait(true);
         }
 
         private static async Task<bool> 大圣无限跳跃(ImageHandle 句柄)
         {
-            int 步骤 = 获取全局步骤w();
-
-            _ = await 主动技能已就绪后续(Keys.W, () =>
-            {
-                if (步骤 == 0)
-                {
-                    设置全局步骤w(1);
-                    SimKeyBoard.KeyPress(Keys.W);
-                    Delay(200);
-                    设置全局步骤w(0);
-                }
-            }).ConfigureAwait(true);
-
-            return await Task.FromResult(_循环条件1).ConfigureAwait(true);
+            await 技能通用判断(Keys.W, 2).ConfigureAwait(true);
+            return await Task.FromResult(_条件4).ConfigureAwait(true);
         }
 
         #endregion
@@ -6110,38 +6029,28 @@ namespace Dota2Simulator.Games.Dota2
 
         private static async Task<bool> 炎阳之缚去后摇(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.D, 1).ConfigureAwait(true);
+            return await 技能通用判断(Keys.D, 1).ConfigureAwait(true);
         }
 
         private static async Task<bool> 查克拉魔法去后摇(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.E, 1).ConfigureAwait(true);
+            return await 技能通用判断(Keys.E, 1).ConfigureAwait(true);
         }
 
         private static async Task<bool> 致盲之光去后摇(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.W, 1).ConfigureAwait(true);
+            return await 技能通用判断(Keys.W, 1).ConfigureAwait(true);
         }
 
         private static async Task<bool> 灵光去后摇接炎阳(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.F, 1).ConfigureAwait(true);
+            return await 技能通用判断(Keys.F, 1).ConfigureAwait(true);
         }
 
         private static async Task<bool> 循环查克拉(ImageHandle 句柄)
         {
-            _ = await 主动技能已就绪后续(Keys.E, () =>
-            {
-                if (_全局步骤e == 0)
-                {
-                    _全局步骤e = 1;
-                    SimKeyBoard.KeyPress(Keys.E);
-                    Delay(200);
-                    _全局步骤e = 0;
-                }
-            }).ConfigureAwait(true);
-
-            return _循环条件1;
+            await 技能通用判断(Keys.E, 2).ConfigureAwait(true);
+            return await Task.FromResult(_条件4).ConfigureAwait(true);
         }
 
         #endregion
@@ -6150,20 +6059,8 @@ namespace Dota2Simulator.Games.Dota2
 
         private static async Task<bool> 循环奥数鹰隼(ImageHandle 句柄)
         {
-            _ = await 主动技能已就绪后续(Keys.Q, () =>
-            {
-                int 步骤 = 获取全局步骤q();
-
-                if (步骤 == 0)
-                {
-                    设置全局步骤q(1);
-                    SimKeyBoard.KeyPress(Keys.Q);
-                    Delay(200);
-                    设置全局步骤q(0);
-                }
-            }).ConfigureAwait(true);
-
-            return true;
+            await 技能通用判断(Keys.Q, 2).ConfigureAwait(true);
+            return await Task.FromResult(_条件1).ConfigureAwait(true);
         }
 
         private static async Task<bool> 天怒秒人连招(ImageHandle 句柄)
@@ -6212,7 +6109,6 @@ namespace Dota2Simulator.Games.Dota2
                         }
 
                         _条件1 = true;
-                        _循环条件1 = true;
                         设置全局步骤(3);
 
                         return await Task.FromResult(false).ConfigureAwait(true);
@@ -6224,22 +6120,22 @@ namespace Dota2Simulator.Games.Dota2
 
         private static async Task<bool> 奥数鹰隼去后摇(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.Q, 0).ConfigureAwait(true);
+            return await 技能通用判断(Keys.Q, 0).ConfigureAwait(true);
         }
 
         private static async Task<bool> 上古封印去后摇(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.E, 0).ConfigureAwait(true);
+            return await 技能通用判断(Keys.E, 0).ConfigureAwait(true);
         }
 
         private static async Task<bool> 神秘之耀去后摇(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.R, 1).ConfigureAwait(true);
+            return await 技能通用判断(Keys.R, 1).ConfigureAwait(true);
         }
 
         private static async Task<bool> 震荡光弹去后摇(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.W, 0).ConfigureAwait(true);
+            return await 技能通用判断(Keys.W, 0).ConfigureAwait(true);
         }
 
         #endregion
@@ -6248,27 +6144,27 @@ namespace Dota2Simulator.Games.Dota2
 
         private static async Task<bool> 命运之笔去后摇(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.Q, 1).ConfigureAwait(true);
+            return await 技能通用判断(Keys.Q, 1).ConfigureAwait(true);
         }
 
         private static async Task<bool> 幻影之拥去后摇(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.W, 0).ConfigureAwait(true);
+            return await 技能通用判断(Keys.W, 0).ConfigureAwait(true);
         }
 
         private static async Task<bool> 墨泳去后摇(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.E, 1).ConfigureAwait(true);
+            return await 技能通用判断(Keys.E, 1).ConfigureAwait(true);
         }
 
         private static async Task<bool> 缚魂去后摇(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.R, 1).ConfigureAwait(true);
+            return await 技能通用判断(Keys.R, 1).ConfigureAwait(true);
         }
 
         private static async Task<bool> 暗绘去后摇(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.D, 0).ConfigureAwait(true);
+            return await 技能通用判断(Keys.D, 0).ConfigureAwait(true);
         }
 
         #endregion
@@ -6277,27 +6173,27 @@ namespace Dota2Simulator.Games.Dota2
 
         private static async Task<bool> 弧形闪电去后摇(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.Q, 1).ConfigureAwait(true);
+            return await 技能通用判断(Keys.Q, 1).ConfigureAwait(true);
         }
 
         private static async Task<bool> 雷击去后摇(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.W, 1).ConfigureAwait(true);
+            return await 技能通用判断(Keys.W, 1).ConfigureAwait(true);
         }
 
         private static async Task<bool> 神圣一跳去后摇(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.E, 0).ConfigureAwait(true);
+            return await 技能通用判断(Keys.E, 0).ConfigureAwait(true);
         }
 
         private static async Task<bool> 雷神之怒去后摇(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.R, 1).ConfigureAwait(true);
+            return await 技能通用判断(Keys.R, 1).ConfigureAwait(true);
         }
 
         private static async Task<bool> 雷云去后摇(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.D, 0).ConfigureAwait(true);
+            return await 技能通用判断(Keys.D, 0).ConfigureAwait(true);
         }
 
         #endregion
@@ -6306,7 +6202,7 @@ namespace Dota2Simulator.Games.Dota2
 
         private static async Task<bool> 麻痹药剂去后摇(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.Q, 1, 要接的按键: Keys.E).ConfigureAwait(true);
+            return await 技能通用判断(Keys.Q, 1, 要接的按键: Keys.E).ConfigureAwait(true);
         }
 
         private static async Task<bool> 巫蛊咒术去后摇(ImageHandle 句柄)
@@ -6335,12 +6231,12 @@ namespace Dota2Simulator.Games.Dota2
 
         private static async Task<bool> 寒霜爆发去后摇(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.Q, _全局步骤e > 0 ? 11 : 1).ConfigureAwait(true);
+            return await 技能通用判断(Keys.Q, _全局步骤e > 0 ? 11 : 1).ConfigureAwait(true);
         }
 
         private static async Task<bool> 冰霜魔盾去后摇(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.W, _全局步骤e > 0 ? 11 : 1, false).ConfigureAwait(true);
+            return await 技能通用判断(Keys.W, _全局步骤e > 0 ? 11 : 1, false).ConfigureAwait(true);
         }
 
         private static async Task<bool> 阴邪凝视去后摇(ImageHandle 句柄)
@@ -6386,12 +6282,12 @@ namespace Dota2Simulator.Games.Dota2
 
         private static async Task<bool> 连环霜冻去后摇(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.R, _全局步骤e > 0 ? 11 : 1).ConfigureAwait(true);
+            return await 技能通用判断(Keys.R, _全局步骤e > 0 ? 11 : 1).ConfigureAwait(true);
         }
 
         private static async Task<bool> 寒冰尖柱去后摇(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.D, _全局步骤e > 0 ? 10 : 0).ConfigureAwait(true);
+            return await 技能通用判断(Keys.D, _全局步骤e > 0 ? 10 : 0).ConfigureAwait(true);
         }
 
         #endregion
@@ -6415,12 +6311,12 @@ namespace Dota2Simulator.Games.Dota2
 
         private static async Task<bool> 新月之痕去后摇(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.W, 0).ConfigureAwait(true);
+            return await 技能通用判断(Keys.W, 0).ConfigureAwait(true);
         }
 
         private static async Task<bool> 梦境缠绕去后摇(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.R, 0).ConfigureAwait(true);
+            return await 技能通用判断(Keys.R, 0).ConfigureAwait(true);
         }
 
         private static async Task<bool> 灵动之翼定位(ImageHandle 句柄)
@@ -6438,7 +6334,7 @@ namespace Dota2Simulator.Games.Dota2
 
         private static async Task<bool> 幽冥轰爆去后摇(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.Q, _全局步骤r > 0 ? 10 : 0).ConfigureAwait(true);
+            return await 技能通用判断(Keys.Q, _全局步骤r > 0 ? 10 : 0).ConfigureAwait(true);
         }
 
         private static async Task<bool> 衰老去后摇(ImageHandle 句柄)
@@ -6457,7 +6353,7 @@ namespace Dota2Simulator.Games.Dota2
 
         private static async Task<bool> 幽冥守卫去后摇(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.E, _全局步骤r > 0 ? 10 : 0).ConfigureAwait(true);
+            return await 技能通用判断(Keys.E, _全局步骤r > 0 ? 10 : 0).ConfigureAwait(true);
         }
 
         private static async Task<bool> 生命吸取去后摇(ImageHandle 句柄)
@@ -6511,22 +6407,22 @@ namespace Dota2Simulator.Games.Dota2
 
         private static async Task<bool> 风雷之击去后摇(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.Q, 0).ConfigureAwait(true);
+            return await 技能通用判断(Keys.Q, 0).ConfigureAwait(true);
         }
 
         private static async Task<bool> 静态风暴去后摇(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.R, 0).ConfigureAwait(true);
+            return await 技能通用判断(Keys.R, 0).ConfigureAwait(true);
         }
 
         private static async Task<bool> 恶念瞥视去后摇(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.W, 0, false).ConfigureAwait(true);
+            return await 技能通用判断(Keys.W, 0, false).ConfigureAwait(true);
         }
 
         private static async Task<bool> 动能力场去后摇(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.E, 0, false).ConfigureAwait(true);
+            return await 技能通用判断(Keys.E, 0, false).ConfigureAwait(true);
         }
 
         private static async Task<bool> 静态风暴动能立场风雷之击(ImageHandle 句柄)
@@ -6710,27 +6606,27 @@ namespace Dota2Simulator.Games.Dota2
 
         private static async Task<bool> 撕裂大地去后摇(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.Q, 0).ConfigureAwait(true);
+            return await 技能通用判断(Keys.Q, 0).ConfigureAwait(true);
         }
 
         private static async Task<bool> 恶魔敕令去后摇(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.W, 0).ConfigureAwait(true);
+            return await 技能通用判断(Keys.W, 0).ConfigureAwait(true);
         }
 
         private static async Task<bool> 闪电风暴去后摇(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.E, 0).ConfigureAwait(true);
+            return await 技能通用判断(Keys.E, 0).ConfigureAwait(true);
         }
 
         private static async Task<bool> 脉冲新星去后摇(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.R, 0).ConfigureAwait(true);
+            return await 技能通用判断(Keys.R, 0).ConfigureAwait(true);
         }
 
         private static async Task<bool> 虚无主义去后摇(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.D, 0).ConfigureAwait(true);
+            return await 技能通用判断(Keys.D, 0).ConfigureAwait(true);
         }
 
         #endregion
@@ -6976,12 +6872,8 @@ namespace Dota2Simulator.Games.Dota2
 
         private static async Task<bool> 无限暗影之境(ImageHandle 句柄)
         {
-            _ = await 主动技能已就绪后续(Keys.W, () =>
-            {
-                SimKeyBoard.KeyPress(Keys.W);
-                Delay(50);
-            }).ConfigureAwait(true);
-            return await Task.FromResult(_循环条件1).ConfigureAwait(true);
+            await 技能通用判断(Keys.W, 2).ConfigureAwait(true);
+            return await Task.FromResult(_条件5).ConfigureAwait(true);
         }
 
         #endregion
@@ -7564,27 +7456,27 @@ namespace Dota2Simulator.Games.Dota2
 
         private static async Task<bool> 弹无虚发去后摇(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.Q, 1).ConfigureAwait(true);
+            return await 技能通用判断(Keys.Q, 1).ConfigureAwait(true);
         }
 
         private static async Task<bool> 唤魂去后摇(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.W, 0).ConfigureAwait(true);
+            return await 技能通用判断(Keys.W, 0).ConfigureAwait(true);
         }
 
         private static async Task<bool> 越界去后摇(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.R, 0, 判断成功后延时: 360).ConfigureAwait(true);
+            return await 技能通用判断(Keys.R, 0, 判断成功后延时: 360).ConfigureAwait(true);
         }
 
         private static async Task<bool> 临别一枪去后摇(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.D, 0).ConfigureAwait(true);
+            return await 技能通用判断(Keys.D, 0).ConfigureAwait(true);
         }
 
         private static async Task<bool> 祭台去后摇(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.F, 0).ConfigureAwait(true);
+            return await 技能通用判断(Keys.F, 0).ConfigureAwait(true);
         }
 
         #endregion
@@ -7798,27 +7690,23 @@ namespace Dota2Simulator.Games.Dota2
 
         private static async Task<bool> 死亡脉冲去后摇(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.Q, 0, 是否接按键: false).ConfigureAwait(true);
+            return await 技能通用判断(Keys.Q, 0, 是否接按键: false).ConfigureAwait(true);
         }
 
         private static async Task<bool> 幽魂护罩去后摇(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.W, 0, 是否接按键: false).ConfigureAwait(true);
+            return await 技能通用判断(Keys.W, 0, 是否接按键: false).ConfigureAwait(true);
         }
 
         private static async Task<bool> 死神镰刀去后摇(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.R, 0).ConfigureAwait(true);
+            return await 技能通用判断(Keys.R, 0).ConfigureAwait(true);
         }
 
-        private static async Task<bool> 无限死亡脉冲(ImageHandle 句柄)
+        private static async Task<bool> 循环死亡脉冲(ImageHandle 句柄)
         {
-            _ = await 主动技能已就绪后续(Keys.Q, () =>
-            {
-                SimKeyBoard.KeyPress(Keys.Q);
-                Delay(50);
-            }).ConfigureAwait(true);
-            return await Task.FromResult(_循环条件1).ConfigureAwait(true);
+            await 技能通用判断(Keys.Q, 2).ConfigureAwait(true);
+            return await Task.FromResult(_条件5).ConfigureAwait(true);
         }
 
         #endregion
@@ -7831,7 +7719,7 @@ namespace Dota2Simulator.Games.Dota2
 
         private static async Task<bool> 瘴气去后摇(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.Q, 1).ConfigureAwait(true);
+            return await 技能通用判断(Keys.Q, 1).ConfigureAwait(true);
         }
 
         private static async Task<bool> 蛇棒去后摇(ImageHandle 句柄)
@@ -7842,17 +7730,12 @@ namespace Dota2Simulator.Games.Dota2
 
         private static async Task<bool> 恶性瘟疫去后摇(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.R, 1).ConfigureAwait(true);
+            return await 技能通用判断(Keys.R, 1).ConfigureAwait(true);
         }
 
         private static async Task<bool> 循环蛇棒(ImageHandle 句柄)
         {
-            _ = await 主动技能已就绪后续(Keys.E, () =>
-            {
-                SimKeyBoard.KeyPress(Keys.E);
-                Delay(50);
-            }).ConfigureAwait(true);
-            return await Task.FromResult(_循环条件1).ConfigureAwait(true);
+            return await 技能通用判断(Keys.E, 2).ConfigureAwait(true);
         }
 
         #endregion
@@ -8017,17 +7900,17 @@ namespace Dota2Simulator.Games.Dota2
 
         private static async Task<bool> 魔法箭去后摇(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.Q, 1).ConfigureAwait(true);
+            return await 技能通用判断(Keys.Q, 1).ConfigureAwait(true);
         }
 
         private static async Task<bool> 恐怖波动去后摇(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.W, 1).ConfigureAwait(true);
+            return await 技能通用判断(Keys.W, 1).ConfigureAwait(true);
         }
 
         private static async Task<bool> 移形换位去后摇(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.R, 1).ConfigureAwait(true);
+            return await 技能通用判断(Keys.R, 1).ConfigureAwait(true);
         }
 
         #endregion
@@ -8047,27 +7930,13 @@ namespace Dota2Simulator.Games.Dota2
             if (guozai)
             {
                 _全局步骤e = 3;
-                return await Task.FromResult(_循环条件2).ConfigureAwait(true);
+                return await Task.FromResult(_条件3).ConfigureAwait(true);
             }
             else
             {
-                _ = await 主动技能已就绪后续(Keys.E, () =>
-                {
-                    if (_全局步骤e < 2)
-                    {
-                        SimKeyBoard.KeyPress(Keys.E);
-                        _全局步骤e = 2;
-                        初始化全局时间(ref _全局时间e);
-                    }
-                    else
-                    {
-                        if (获取当前时间毫秒() - _全局时间e < 300) return;
-                        _全局步骤e = 1;
-                    }
-                }).ConfigureAwait(true);
+                await 技能通用判断(Keys.E, 2).ConfigureAwait(true);
+                return await Task.FromResult(_条件3).ConfigureAwait(true);
             }
-
-            return await Task.FromResult(_循环条件2).ConfigureAwait(true);
         }
 
         #endregion
@@ -8076,17 +7945,17 @@ namespace Dota2Simulator.Games.Dota2
 
         private static async Task<bool> 穿刺去后摇(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.Q, 1).ConfigureAwait(true);
+            return await 技能通用判断(Keys.Q, 1).ConfigureAwait(true);
         }
 
         private static async Task<bool> 神智爆裂去后摇(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.W, 1).ConfigureAwait(true);
+            return await 技能通用判断(Keys.W, 1).ConfigureAwait(true);
         }
 
         private static async Task<bool> 尖刺外壳去后摇(ImageHandle 句柄)
         {
-            return await 使用技能后通用后续(Keys.E, 0, false).ConfigureAwait(true);
+            return await 技能通用判断(Keys.E, 0, false).ConfigureAwait(true);
         }
 
         private static async Task<bool> 复仇接穿刺(ImageHandle 句柄)
@@ -8126,6 +7995,12 @@ namespace Dota2Simulator.Games.Dota2
                 设置全局步骤r(0);
                 return await Task.FromResult(false).ConfigureAwait(true);
             }
+        }
+
+        private static async Task<bool> 循环接爆裂(ImageHandle 句柄)
+        {
+            await 技能通用判断(Keys.W, 2).ConfigureAwait(true);
+            return await Task.FromResult(_条件5).ConfigureAwait(true);
         }
 
         #endregion
@@ -8682,6 +8557,14 @@ namespace Dota2Simulator.Games.Dota2
 
         public static readonly ImageHandle 中立_永恒遗物_handle = 缓存嵌入的图片("中立_永恒遗物");
         public static readonly ImageHandle 中立_祭礼长袍_handle = 缓存嵌入的图片("中立_祭礼长袍");
+        #endregion
+
+        #region RPG
+
+        public static readonly ImageHandle RPG_选择天赋_handle = 缓存嵌入的图片("RPG_选择天赋");
+        public static readonly ImageHandle RPG_金色天赋_handle = 缓存嵌入的图片("RPG_金色天赋");
+        public static readonly ImageHandle RPG_普通天赋_handle = 缓存嵌入的图片("RPG_普通天赋");
+
         #endregion
 
         #endregion
@@ -9254,6 +9137,106 @@ namespace Dota2Simulator.Games.Dota2
         {
             根据图片使用物品(物品_书_handle);
             return await Task.FromResult(true).ConfigureAwait(true);
+        }
+
+        private readonly static Rectangle RPG选择技能范围 = new(757, 161, 384, 62);
+        private readonly static Rectangle RPG第一技能金 = new(631, 290, 60, 400);
+
+        private static int 获取碎片循环计数;
+        private static Point 之前位置;
+
+        public static void 跳过循环获取金碎片(in ImageHandle 句柄)
+        {
+            if (获取碎片循环计数 == 0) 之前位置 = Control.MousePosition;
+
+            if (获取碎片循环计数 > 12)
+            {
+                获取碎片循环计数 = 0;
+                SimKeyBoard.MouseMove(之前位置);
+                之前位置 = new();
+                Tts.Speak("12次退出");
+                var 当前英雄 = "";
+                Form?.Invoke(() =>
+                {
+                    当前英雄 = Form.tb_name.Text.Trim();
+                });
+                if (当前英雄 == "飞机")
+                {
+                    // 需要循环需加速buff
+                    SimKeyBoard.MouseMove(1332, 92);
+                    Delay(50);
+                    SimKeyBoard.MouseLeftClick();
+                }
+            }
+            else
+            {
+                if (ImageFinder.FindImageInRegionBool(in RPG_选择天赋_handle, in _全局图像句柄, RPG选择技能范围)
+                    && ImageFinder.FindImageInRegionBool(in RPG_普通天赋_handle, in _全局图像句柄, RPG第一技能金))
+                {
+                    SimKeyBoard.MouseMove(768, 674);
+                    Delay(50);
+                    SimKeyBoard.MouseLeftClick();
+                    Delay(50);
+                    SimKeyBoard.MouseLeftClick();
+                    获取碎片循环计数++;
+                    Task.Run(() =>
+                    {
+                        Delay(250);
+                        // 自我调用
+                        SimKeyBoard.KeyPress(Keys.NumPad1);
+                    }).ConfigureAwait(true);
+                }
+            }
+        }
+
+
+        public static void 自动屏蔽3个选项(in ImageHandle 句柄)
+        {
+            if (ImageFinder.FindImageInRegionBool(in RPG_选择天赋_handle, in _全局图像句柄, RPG选择技能范围))
+            {
+                var p = Control.MousePosition;
+                // 第三个技能右上角颜色金
+                if (ColorExtensions.ColorAEqualColorB(ImageManager.GetColor(_全局图像句柄, new Point(1318, 296)),
+                    Color.FromArgb(188, 134, 1), 10))
+                {
+                    SimKeyBoard.MouseMove(690, 673);
+                    Delay(100);
+                    SimKeyBoard.MouseLeftClick();
+                    Delay(100);
+                    SimKeyBoard.MouseMove(953, 673);
+                    Delay(100);
+                    SimKeyBoard.MouseLeftClick();
+                    Delay(100);
+                    SimKeyBoard.MouseMove(1205, 673);
+                    Delay(100);
+                    SimKeyBoard.MouseLeftClick();
+                    Delay(100);
+                    SimKeyBoard.MouseMove(540, 146);
+                    Delay(100);
+                    SimKeyBoard.MouseLeftClick();
+                    Delay(100);
+                }
+                SimKeyBoard.MouseMove(p);
+            }
+        }
+        public static void 点击黑皇(in ImageHandle 句柄)
+        {
+            var p = Control.MousePosition;
+            SimKeyBoard.MouseMove(40, 500);
+            Delay(50);
+            SimKeyBoard.MouseLeftClick();
+            Delay(50);
+            SimKeyBoard.MouseMove(p);
+        }
+
+        public static void 点击暴击(in ImageHandle 句柄)
+        {
+            var p = Control.MousePosition;
+            SimKeyBoard.MouseMove(40, 580);
+            Delay(50);
+            SimKeyBoard.MouseLeftClick();
+            Delay(50);
+            SimKeyBoard.MouseMove(p);
         }
 #endif
         #endregion
@@ -9845,9 +9828,6 @@ namespace Dota2Simulator.Games.Dota2
             _总循环条件 = false;
             _循环内获取图片 = null;
             _中断条件 = false;
-
-            _循环条件1 = false;
-            _循环条件2 = false;
 
             // _丢装备条件 = false;
 

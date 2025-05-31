@@ -15,7 +15,7 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <FileAlignment>4096</FileAlignment>
     <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
-    <DefineConstants>$(DefineConstants);TRACE;DOTA2</DefineConstants>
+    <DefineConstants>$(DefineConstants);DOTA2;TRACE;RPG</DefineConstants>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
@@ -24,7 +24,7 @@
 	<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 	<FileAlignment>4096</FileAlignment>
 	<CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
-	<DefineConstants>$(DefineConstants);TRACE;DOTA2</DefineConstants>
+	<DefineConstants>$(DefineConstants);DOTA2;TRACE;RPG</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>
@@ -41,6 +41,9 @@
     <None Remove="Picture_Dota2\Buff_小精灵_过载.bmp" />
     <None Remove="Picture_Dota2\Buff_火猫_无影拳.bmp" />
     <None Remove="Picture_Dota2\Buff_物品_TP.bmp" />
+    <None Remove="Picture_Dota2\RPG_普通天赋.bmp" />
+    <None Remove="Picture_Dota2\RPG_选择天赋.bmp" />
+    <None Remove="Picture_Dota2\RPG_金色天赋.bmp" />
     <None Remove="Picture_Dota2\命石_伐木机_碎木击.bmp" />
     <None Remove="Picture_Dota2\命石_伐木机_锯齿轮旋.bmp" />
     <None Remove="Picture_Dota2\命石_海民_酒友.bmp" />
@@ -121,6 +124,9 @@
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </EmbeddedResource>
     <EmbeddedResource Include="Picture_Dota2\Buff_火猫_无影拳.bmp" />
+    <EmbeddedResource Include="Picture_Dota2\RPG_普通天赋.bmp" />
+    <EmbeddedResource Include="Picture_Dota2\RPG_选择天赋.bmp" />
+    <EmbeddedResource Include="Picture_Dota2\RPG_金色天赋.bmp" />
     <EmbeddedResource Include="Picture_Dota2\命石_伐木机_碎木击.bmp" />
     <EmbeddedResource Include="Picture_Dota2\命石_伐木机_锯齿轮旋.bmp" />
     <EmbeddedResource Include="Picture_Dota2\技能_卡尔_幽灵漫步.bmp" />

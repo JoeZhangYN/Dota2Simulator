@@ -1326,11 +1326,22 @@ namespace Dota2Simulator.Games.Dota2
         /// <returns>主动技能CD未就绪返回真，CD就绪执行逻辑后返回假</returns>
         public static async Task<bool> 主动技能已就绪后续(Keys skill, Action afterAction)
         {
+            // 检查是否在时间间隔内
+            if (技能执行时间.TryGetValue(skill, out DateTime 上次执行时间))
+            {
+                if ((DateTime.Now - 上次执行时间).TotalMilliseconds < 重复按键执行间隔阈值)
+                {
+                    // 时间间隔过短，跳过执行
+                    return await Task.FromResult(true).ConfigureAwait(true);
+                }
+            }
+
             if (!DOTA2判断技能是否CD(skill, in MainClass._全局图像句柄))
             {
                 return await Task.FromResult(true).ConfigureAwait(true);
             }
 
+            技能执行时间.AddOrUpdate(skill, DateTime.Now, (k, v) => DateTime.Now);
             _ = Task.Run(afterAction).ConfigureAwait(false);
             return await Task.FromResult(false).ConfigureAwait(true);
         }
@@ -1376,8 +1387,41 @@ namespace Dota2Simulator.Games.Dota2
         }
 
         /// <summary>
+        ///     懒加载字典
+        /// </summary>
+        private static readonly Lazy<ConcurrentDictionary<Keys, DateTime>> _技能执行时间 =
+        new Lazy<ConcurrentDictionary<Keys, DateTime>>(() => new ConcurrentDictionary<Keys, DateTime>());
+
+        /// <summary>
+        ///     获取对应Key的时间
+        /// </summary>
+        private static ConcurrentDictionary<Keys, DateTime> 技能执行时间 => _技能执行时间.Value;
+
+        /// <summary>
+        ///     循环使用技能等待时间
+        /// </summary>
+        public static int 重复按键执行间隔阈值 = 100;
+
+        public static void 清除技能时间记录(Keys skill)
+        {
+            if (_技能执行时间.IsValueCreated)
+            {
+                技能执行时间.TryRemove(skill, out _);
+            }
+        }
+
+        // 可选：清除所有技能的时间记录
+        public static void 清除所有时间记录()
+        {
+            if (_技能执行时间.IsValueCreated)
+            {
+                技能执行时间.Clear();
+            }
+        }
+
+        /// <summary>
         ///     使用技能后通用后续
-        ///     <para><paramref name="判断模式" /> 0 主动技能进入CD 1 释放技能有抬手</para>
+        ///     <para><paramref name="判断模式" /> 0 主动技能进入CD 1 释放技能有抬手 2 技能准备好就释放</para>
         ///     <para> 10 进入CD仅切回假腿 11 释放技能仅切回假腿</para>
         /// </summary>
         /// <param name="技能键"></param>
@@ -1385,7 +1429,7 @@ namespace Dota2Simulator.Games.Dota2
         /// <param name="判断模式">0 无充能进入CD 1 释放技能有抬手</param>
         /// <param name="是否接A"></param>
         /// <returns></returns>
-        public static async Task<bool> 使用技能后通用后续(Keys 技能键, int 判断模式, bool 是否接按键 = true, Keys 要接的按键 = Keys.A,
+        public static async Task<bool> 技能通用判断(Keys 技能键, int 判断模式, bool 是否接按键 = true, Keys 要接的按键 = Keys.A,
             int 判断成功后延时 = 0)
         {
             void 技能后续动作()
@@ -1402,6 +1446,7 @@ namespace Dota2Simulator.Games.Dota2
             {
                 0 => () => 主动技能进入CD后续(技能键, 技能后续动作),
                 1 => () => 主动技能释放后续(技能键, 技能后续动作),
+                2 => () => 主动技能已就绪后续(技能键, () => { SimKeyBoard.KeyPress(技能键); }),
                 10 => () => 主动技能进入CD后续(技能键, 切回假腿),
                 11 => () => 主动技能释放后续(技能键, 切回假腿),
                 _ => throw new ArgumentException("无效的判断模式")
@@ -1466,7 +1511,6 @@ namespace Dota2Simulator.Games.Dota2
                 }
                 else
                 {
-                    SimKeyBoard.KeyPress(Keys.A);
                     SimKeyBoard.MouseRightClick();
                 }
             });
