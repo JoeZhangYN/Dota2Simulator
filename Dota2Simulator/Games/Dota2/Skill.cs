@@ -15,7 +15,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using static Dota2Simulator.Games.Dota2.MainClass;
+using static Dota2Simulator.Games.Dota2.Main;
 using static Dota2Simulator.Games.Dota2.Item;
 
 namespace Dota2Simulator.Games.Dota2
@@ -732,7 +732,7 @@ namespace Dota2Simulator.Games.Dota2
         {
             // 通过添加步骤来等待完全显示
             // 用于检测持续施法，施法中文字的施字颜色，10秒以内有效
-            return ColorExtensions.ColorAEqualColorB(MainClass.获取指定位置颜色(953, 764, in 句柄), Color.FromArgb(254, 254, 254), 2);
+            return ColorExtensions.ColorAEqualColorB(Main.获取指定位置颜色(953, 764, in 句柄), Color.FromArgb(254, 254, 254), 2);
         }
 
         private static void 记录技能释放信息(Keys s1, string s, bool b1, bool b2, Color c1, Color c2, Color c3)
@@ -1286,7 +1286,7 @@ namespace Dota2Simulator.Games.Dota2
         /// <returns>技能未释放、释放中返回真，释放完毕执行逻辑返回假</returns>
         public static async Task<bool> 主动技能释放后续(Keys skill, Action afterAction)
         {
-            if (DOTA2对比释放技能前后颜色(skill, in MainClass._全局图像句柄))
+            if (DOTA2对比释放技能前后颜色(skill, GlobalScreenCapture.GetCurrentHandle()))
             {
                 return await Task.FromResult(true).ConfigureAwait(true);
             }
@@ -1306,7 +1306,7 @@ namespace Dota2Simulator.Games.Dota2
         /// <returns>主动技能CD就绪返回真，进入CD执行逻辑后返回假</returns>
         public static async Task<bool> 主动技能进入CD后续(Keys skill, Action afterAction)
         {
-            if (DOTA2判断技能是否CD(skill, in MainClass._全局图像句柄))
+            if (DOTA2判断技能是否CD(skill, GlobalScreenCapture.GetCurrentHandle()))
             {
                 return await Task.FromResult(true).ConfigureAwait(true);
             }
@@ -1336,7 +1336,7 @@ namespace Dota2Simulator.Games.Dota2
                 }
             }
 
-            if (!DOTA2判断技能是否CD(skill, in MainClass._全局图像句柄))
+            if (!DOTA2判断技能是否CD(skill, GlobalScreenCapture.GetCurrentHandle()))
             {
                 return await Task.FromResult(true).ConfigureAwait(true);
             }
@@ -1357,7 +1357,7 @@ namespace Dota2Simulator.Games.Dota2
         /// <returns>法球技能CD就绪返回真，进入CD执行逻辑后返回假</returns>
         public static async Task<bool> 法球技能进入CD后续(Keys skill, Action afterAction)
         {
-            if (DOTA2判断法球技能是否CD(skill, in MainClass._全局图像句柄))
+            if (DOTA2判断法球技能是否CD(skill, GlobalScreenCapture.GetCurrentHandle()))
             {
                 return await Task.FromResult(true).ConfigureAwait(true);
             }
@@ -1377,7 +1377,7 @@ namespace Dota2Simulator.Games.Dota2
         /// <returns>状态技能未启动返回真，启动后逻辑后返回假</returns>
         public static async Task<bool> 状态技能启动后续(Keys skill, Action afterAction)
         {
-            if (!DOTA2判断状态技能是否启动(skill, MainClass._全局图像句柄))
+            if (!DOTA2判断状态技能是否启动(skill, GlobalScreenCapture.GetCurrentHandle()))
             {
                 return await Task.FromResult(true).ConfigureAwait(true);
             }
@@ -1497,7 +1497,7 @@ namespace Dota2Simulator.Games.Dota2
         {
             _ = Task.Run(() =>
             {
-                MainClass.Delay(等待的延迟);
+                Main.Delay(等待的延迟);
 
                 if (是否保持假腿)
                 {
@@ -1520,7 +1520,7 @@ namespace Dota2Simulator.Games.Dota2
         {
             _ = Task.Run(() =>
             {
-                MainClass.Delay(等待的延迟);
+                Main.Delay(等待的延迟);
                 要求保持假腿();
             });
         }

@@ -40,13 +40,14 @@ namespace Dota2Simulator
             tb_x = new System.Windows.Forms.TextBox();
             label5 = new System.Windows.Forms.Label();
             tb_y = new System.Windows.Forms.TextBox();
-            label6 = new System.Windows.Forms.Label();
-            tb_delay = new System.Windows.Forms.TextBox();
+            lb_等待延迟 = new System.Windows.Forms.Label();
+            tb_等待延迟 = new System.Windows.Forms.TextBox();
             lb_状态抗性 = new System.Windows.Forms.Label();
             tb_状态抗性 = new System.Windows.Forms.TextBox();
             button1 = new System.Windows.Forms.Button();
             lb_攻速 = new System.Windows.Forms.Label();
             tb_攻速 = new System.Windows.Forms.TextBox();
+            checkBox_showAll = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
             SuspendLayout();
             // 
@@ -103,16 +104,16 @@ namespace Dota2Simulator
             resources.ApplyResources(tb_y, "tb_y");
             tb_y.Name = "tb_y";
             // 
-            // label6
+            // lb_等待延迟
             // 
-            resources.ApplyResources(label6, "label6");
-            label6.Name = "label6";
+            resources.ApplyResources(lb_等待延迟, "lb_等待延迟");
+            lb_等待延迟.Name = "lb_等待延迟";
             // 
-            // tb_delay
+            // tb_等待延迟
             // 
-            resources.ApplyResources(tb_delay, "tb_delay");
-            tb_delay.Name = "tb_delay";
-            tb_delay.TextChanged += Tb_delay_TextChanged;
+            resources.ApplyResources(tb_等待延迟, "tb_等待延迟");
+            tb_等待延迟.Name = "tb_等待延迟";
+            tb_等待延迟.TextChanged += Tb_delay_TextChanged;
             // 
             // lb_状态抗性
             // 
@@ -143,17 +144,25 @@ namespace Dota2Simulator
             tb_攻速.Name = "tb_攻速";
             tb_攻速.TextChanged += Tb_攻速_TextChanged;
             // 
+            // checkBox_showAll
+            // 
+            resources.ApplyResources(checkBox_showAll, "checkBox_showAll");
+            checkBox_showAll.Name = "checkBox_showAll";
+            checkBox_showAll.UseVisualStyleBackColor = true;
+            checkBox_showAll.CheckedChanged += checkBox_showAll_CheckedChanged;
+            // 
             // Form2
             // 
             resources.ApplyResources(this, "$this");
             AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            Controls.Add(checkBox_showAll);
             Controls.Add(lb_攻速);
             Controls.Add(tb_攻速);
             Controls.Add(button1);
             Controls.Add(lb_状态抗性);
             Controls.Add(tb_状态抗性);
-            Controls.Add(label6);
-            Controls.Add(tb_delay);
+            Controls.Add(lb_等待延迟);
+            Controls.Add(tb_等待延迟);
             Controls.Add(label5);
             Controls.Add(tb_y);
             Controls.Add(label4);
@@ -179,7 +188,7 @@ namespace Dota2Simulator
         private System.Windows.Forms.Label lb_阵营;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Label label5;
-        private System.Windows.Forms.Label label6;
+        private System.Windows.Forms.Label lb_等待延迟;
         private System.Windows.Forms.Label lb_状态抗性;
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.Label lb_攻速;
@@ -187,8 +196,9 @@ namespace Dota2Simulator
         public System.Windows.Forms.TextBox tb_name;
         public System.Windows.Forms.TextBox tb_x;
         public System.Windows.Forms.TextBox tb_y;
-        public System.Windows.Forms.TextBox tb_delay;
+        public System.Windows.Forms.TextBox tb_等待延迟;
         public System.Windows.Forms.TextBox tb_状态抗性;
         public System.Windows.Forms.TextBox tb_攻速;
+        private System.Windows.Forms.CheckBox checkBox_showAll;
     }
 }

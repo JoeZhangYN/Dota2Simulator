@@ -1,4 +1,5 @@
-﻿using Collections.Pooled;
+﻿#if false
+using Collections.Pooled;
 using ImageProcessingSystem;
 using OpenCvSharp;
 using OpenCvSharp.Extensions;
@@ -12,27 +13,13 @@ using System.Threading.Tasks;
 using Point = System.Drawing.Point;
 using Size = System.Drawing.Size;
 
-namespace Dota2Simulator.PictureProcessing
+namespace Dota2Simulator.PictureProcessing.Old
 {
     /// <summary>
     ///     图片处理类
     /// </summary>
     internal class PictureProcessing
     {
-        #region 检测位置是否有效 只剩这个
-
-        private static readonly Point 无效坐标 = new(245760, 143640);
-
-        public static bool 是否无效位置(Point? 位置)
-        {
-            return 位置 == null ||
-           位置 == 无效坐标 ||
-           位置.Value.X <= 0 ||
-           位置.Value.Y <= 0;
-        }
-
-        #endregion
-
         #region 屏幕取色
 
         //public static Color CaptureColor(int x, int y)
@@ -1511,4 +1498,5 @@ namespace Dota2Simulator.PictureProcessing
 
         #endregion
     }
-}
+} 
+#endif

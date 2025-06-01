@@ -3,6 +3,7 @@ using NLog;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
@@ -17,6 +18,170 @@ using Timer = System.Threading.Timer;
 
 namespace ImageProcessingSystem
 {
+    #region 三缓冲设计
+
+    /* 优点         
+     * 读取缓冲、写入缓冲、就绪缓冲三个独立缓冲区
+     * 读写真正解耦,写入永不阻塞,可立即开始下一帧捕获
+     * 使用SpinLock实现超低延迟的缓冲区交换
+     * 缺点
+     * 获取的是2帧前的数据
+     * 额外8MB内存（对现代系统微不足道）
+     * 略微增加的复杂度
+     */
+    /// <summary>
+    ///     三缓冲设计   
+    /// </summary>
+    public sealed class TripleBufferSystem : IDisposable
+    {
+        private struct BufferInfo
+        {
+            public ImageHandle Handle { get; set; }
+            public long Timestamp { get; set; }
+            public int FrameId { get; set; }
+        }
+
+        /// <summary>
+        ///     读buff
+        /// </summary>
+        private BufferInfo _readBuffer;
+        /// <summary>
+        ///     写buff
+        /// </summary>
+        private BufferInfo _writeBuffer;
+        /// <summary>
+        ///     三层缓冲buff
+        /// </summary>
+        private BufferInfo _readyBuffer;
+        /// <summary>
+        ///     锁
+        /// </summary>
+        private SpinLock _spinLock;
+        /// <summary>
+        ///     帧数计数
+        ///     <para>理论上有上限,每帧增加会爆</para>
+        ///     <para>按照1秒240hz,达到上限2147483647,需要103天</para>
+        /// </summary>
+        private int _frameCounter;
+
+        /// <summary>
+        ///     初始化三重缓冲
+        /// </summary>
+        /// <param name="width">宽度 默认1920</param>
+        /// <param name="height">高度 默认1080</param>
+        public TripleBufferSystem(int width = 1920, int height = 1080)
+        {
+            var size = new Size(width, height);
+            var initialData = new byte[width * height * 4];
+
+            _readBuffer = new BufferInfo { Handle = ImageManager.CreateDynamicImage(initialData, size, "ReadBuffer"), FrameId = -1 };
+            _writeBuffer = new BufferInfo { Handle = ImageManager.CreateDynamicImage(initialData, size, "WriteBuffer"), FrameId = -1 };
+            _readyBuffer = new BufferInfo { Handle = ImageManager.CreateDynamicImage(initialData, size, "ReadyBuffer"), FrameId = -1 };
+        }
+
+        public ImageHandle GetWriteBuffer() => _writeBuffer.Handle;
+
+        /// <summary>
+        ///     获取当前时间,暂无其他功能
+        /// </summary>
+        public void BeginCapture() => _writeBuffer.Timestamp = Stopwatch.GetTimestamp();
+
+        /// <summary>
+        ///     修改确认,
+        /// </summary>
+        public void CommitCapture()
+        {
+            _writeBuffer.FrameId = Interlocked.Increment(ref _frameCounter);
+            bool lockTaken = false;
+            try
+            {
+                _spinLock.Enter(ref lockTaken);
+                (_writeBuffer, _readyBuffer) = (_readyBuffer, _writeBuffer);
+            }
+            finally
+            {
+                if (lockTaken) _spinLock.Exit();
+            }
+        }
+
+        /// <summary>
+        /// 获取读缓冲区句柄和新帧标志
+        /// </summary>
+        public (ImageHandle handle, bool isNewFrame) GetReadBuffer()
+        {
+            bool lockTaken = false;
+            bool hasNewFrame = false;
+
+            try
+            {
+                _spinLock.Enter(ref lockTaken);
+                if (_readyBuffer.FrameId > _readBuffer.FrameId)
+                {
+                    (_readBuffer, _readyBuffer) = (_readyBuffer, _readBuffer);
+                    hasNewFrame = true;
+                }
+            }
+            finally
+            {
+                if (lockTaken) _spinLock.Exit();
+            }
+
+            return (_readBuffer.Handle, hasNewFrame);
+        }
+
+        /// <summary>
+        /// 仅获取读缓冲区句柄（高性能版本）
+        /// </summary>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public ImageHandle GetReadHandle()
+        {
+            bool lockTaken = false;
+
+            try
+            {
+                _spinLock.Enter(ref lockTaken);
+                // 如果有新帧，交换缓冲区
+                if (_readyBuffer.FrameId > _readBuffer.FrameId)
+                {
+                    (_readBuffer, _readyBuffer) = (_readyBuffer, _readBuffer);
+                }
+                return _readBuffer.Handle;
+            }
+            finally
+            {
+                if (lockTaken) _spinLock.Exit();
+            }
+        }
+
+        /// <summary>
+        /// 仅获取当前读缓冲区句柄，不进行缓冲区交换（最高性能）
+        /// </summary>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public ImageHandle GetCurrentReadHandle()
+        {
+            // 直接返回当前读缓冲区，不检查是否有新帧
+            return _readBuffer.Handle;
+        }
+
+        /// <summary>
+        /// 检查是否有新帧可用
+        /// </summary>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public bool HasNewFrame()
+        {
+            return _readyBuffer.FrameId > _readBuffer.FrameId;
+        }
+
+        public void Dispose()
+        {
+            // 代码错误,并未实现dispose方法
+            //_readBuffer.Handle?.Dispose();
+            //_writeBuffer.Handle?.Dispose();
+            //_readyBuffer.Handle?.Dispose();
+        }
+    }
+    #endregion
+
     #region 日志接口
 
     // 日志接口，用于依赖注入
@@ -102,7 +267,7 @@ namespace ImageProcessingSystem
     public static class ImageProcessingSystem
     {
         private static long _totalBudget = 512 * 1024 * 1024; // 512mb 默认预算 1920*1080*4 = 6.4mb
-        private static long _currentUsage = 0;
+        private static long _currentUsage;
         private static ILogger _logger = new ConsoleLogger();
 
         public static long TotalBudget
@@ -581,6 +746,20 @@ namespace ImageProcessingSystem
     /// </summary>
     public static class ImageManager
     {
+        #region 检测位置是否有效
+
+        private static readonly Point 无效坐标 = new(245760, 143640);
+
+        public static bool 是否无效位置(Point? 位置)
+        {
+            return 位置 == null ||
+           位置 == 无效坐标 ||
+           位置.Value.X <= 0 ||
+           位置.Value.Y <= 0;
+        }
+
+        #endregion
+
         private static readonly ConcurrentDictionary<int, ImageMetadata> _images = new();
         private static int _nextId = 1;
         private static ILogger _logger = new ConsoleLogger();
@@ -594,6 +773,8 @@ namespace ImageProcessingSystem
             public DateTime LastAccessTime;
             public string Name;
             public bool IsPersistent;
+            public bool UseTripleBuffer;
+            public TripleBufferSystem TripleBuffer;
         }
 
 
@@ -692,6 +873,24 @@ namespace ImageProcessingSystem
             metadata.LastAccessTime = DateTime.Now;
             _images[handle.Id] = metadata;
 
+            // 如果使用三重缓冲
+            if (metadata.UseTripleBuffer && metadata.TripleBuffer != null)
+            {
+                var (readHandle, _) = metadata.TripleBuffer.GetReadBuffer();
+                if (readHandle.IsValid)
+                {
+                    // 从三重缓冲的读缓冲区获取像素
+                    var (ptr, _, size) = GetImageData(readHandle);
+                    unsafe
+                    {
+                        uint* pixels = (uint*)ptr;
+                        return pixels[y * (int)size.x + x];
+                    }
+                }
+                return 0;
+            }
+
+            // 原有逻辑
             return handle.Type switch
             {
                 ImageType.Static => StaticImageCache.GetPixel(handle.Id, x, y),
@@ -745,6 +944,19 @@ namespace ImageProcessingSystem
             int length = metadata.Size.Width * metadata.Size.Height * 4;
             var size = new Tuple { x = (uint)metadata.Size.Width, y = (uint)metadata.Size.Height };
 
+            // 如果使用三重缓冲
+            if (metadata.UseTripleBuffer && metadata.TripleBuffer != null)
+            {
+                var (readHandle, _) = metadata.TripleBuffer.GetReadBuffer();
+                if (readHandle.IsValid)
+                {
+                    // 递归调用获取实际的缓冲区数据
+                    return GetImageData(readHandle);
+                }
+                throw new InvalidOperationException("三重缓冲读取失败");
+            }
+
+            // 原有逻辑
             if (handle.Type == ImageType.Static)
             {
                 var cached = StaticImageCache.GetImagePointer(handle.Id);
@@ -752,30 +964,15 @@ namespace ImageProcessingSystem
                     throw new InvalidOperationException("静态图像缓存丢失");
 
                 ptr = cached.Value.ptr;
-
-                // 验证指针有效性
-                if (ptr == IntPtr.Zero)
-                    throw new InvalidOperationException("静态图像指针无效");
             }
             else
             {
                 ptr = DynamicImageBuffer.GetPointer(metadata.Offset);
-
-                // 验证指针有效性
-                if (ptr == IntPtr.Zero)
-                    throw new InvalidOperationException("动态图像指针无效");
             }
 
-            // 验证内存可访问性（可选，用于调试）
-            try
-            {
-                byte testByte = *(byte*)ptr;
-                byte testByte2 = *((byte*)ptr + length - 1);
-            }
-            catch
-            {
-                throw new InvalidOperationException($"无法访问图像内存: ptr={ptr:X}, length={length}");
-            }
+            // 验证指针有效性
+            if (ptr == IntPtr.Zero)
+                throw new InvalidOperationException($"{handle.Type}图像指针无效");
 
             metadata.LastAccessTime = DateTime.Now;
             _images[handle.Id] = metadata;
@@ -790,11 +987,15 @@ namespace ImageProcessingSystem
         {
             if (_images.TryRemove(handle.Id, out var metadata))
             {
-                if (handle.Type == ImageType.Dynamic)
+                if (metadata.UseTripleBuffer)
+                {
+                    // 三重缓冲由外部管理，这里只移除引用
+                    _logger.LogInfo($"释放三重缓冲图像引用: {metadata.Name}");
+                }
+                else if (handle.Type == ImageType.Dynamic)
                 {
                     DynamicImageBuffer.ReleaseSpace(metadata.Offset);
                 }
-                // 静态图像缓存由 StaticImageCache 自己管理
 
                 _logger.LogInfo($"释放图像: {metadata.Name}");
             }
@@ -1090,6 +1291,433 @@ namespace ImageProcessingSystem
             }
 
             return results;
+        }
+
+        /// <summary>
+        /// 创建使用三重缓冲的动态图像
+        /// </summary>
+        public static ImageHandle CreateDynamicImageWithTripleBuffer(
+            TripleBufferSystem tripleBuffer,
+            in Size size,
+            string? name = null)
+        {
+            int id = Interlocked.Increment(ref _nextId);
+
+            var metadata = new ImageMetadata
+            {
+                Size = size,
+                Offset = 0,  // 三重缓冲不使用offset
+                Type = ImageType.Dynamic,
+                CreatedTime = DateTime.Now,
+                LastAccessTime = DateTime.Now,
+                Name = name ?? $"TripleBuffer_{id}",
+                IsPersistent = false,
+                UseTripleBuffer = true,
+                TripleBuffer = tripleBuffer
+            };
+
+            _images[id] = metadata;
+            return new ImageHandle(id, in size, 0, ImageType.Dynamic);
+        }
+    }
+
+    #endregion
+
+    #region 全局截图管理器
+
+    /// <summary>
+    /// 全局截图管理器 - 直接使用三重缓冲系统
+    /// </summary>
+    public static class GlobalScreenCapture
+    {
+        private static TripleBufferSystem _tripleBuffer;
+        private static int _coordinateOffsetX;
+        private static int _coordinateOffsetY;
+        private static readonly Lock _initLock = new();
+        private static ILogger _logger = new ConsoleLogger();
+        private static Size _captureSize;
+
+        /// <summary>
+        /// 获取坐标偏移
+        /// </summary>
+        public static (int x, int y) CoordinateOffset => (_coordinateOffsetX, _coordinateOffsetY);
+
+        /// <summary>
+        /// 获取捕获区域大小
+        /// </summary>
+        public static Size CaptureSize => _captureSize;
+
+        /// <summary>
+        /// 是否已初始化
+        /// </summary>
+        public static bool IsInitialized => _tripleBuffer != null;
+
+        /// <summary>
+        /// 初始化全局截图缓冲区
+        /// </summary>
+        public static void Initialize(int width = 1920, int height = 1080, int x = 0, int y = 0)
+        {
+            lock (_initLock)
+            {
+                if (_tripleBuffer != null)
+                {
+                    _logger.LogWarning("全局截图缓冲区已初始化");
+                    return;
+                }
+
+                // 创建三重缓冲系统
+                _tripleBuffer = new TripleBufferSystem(width, height);
+                _captureSize = new Size(width, height);
+
+                // 设置坐标偏移
+                _coordinateOffsetX = x;
+                _coordinateOffsetY = y;
+
+                _logger.LogInfo($"全局截图缓冲区初始化完成: {width}x{height}, 偏移({x}, {y})");
+            }
+        }
+
+        /// <summary>
+        /// 执行屏幕捕捉
+        /// </summary>
+        public static void CaptureScreen(in Rectangle rectangle)
+        {
+            // 如果未初始化，自动初始化
+            if (_tripleBuffer == null)
+            {
+                Initialize(rectangle.Width, rectangle.Height, rectangle.X, rectangle.Y);
+            }
+
+            // 检查尺寸是否匹配
+            if (_captureSize.Width != rectangle.Width || _captureSize.Height != rectangle.Height)
+            {
+                _logger.LogWarning($"截图区域尺寸变化，重新初始化缓冲区");
+                Cleanup();
+                Initialize(rectangle.Width, rectangle.Height, rectangle.X, rectangle.Y);
+            }
+
+            // 开始捕获
+            _tripleBuffer.BeginCapture();
+
+            // 获取写缓冲区句柄并捕获屏幕
+            var writeHandle = _tripleBuffer.GetWriteBuffer();
+            bool success = OptimizedGraphics.CaptureScreenToHandle(writeHandle, rectangle.X, rectangle.Y);
+
+            if (success)
+            {
+                // 提交捕获，交换缓冲区
+                _tripleBuffer.CommitCapture();
+            }
+            else
+            {
+                _logger.LogError("屏幕捕获失败");
+            }
+        }
+
+        /// <summary>
+        /// 异步捕获屏幕
+        /// </summary>
+        public static async Task CaptureScreenAsync(Rectangle rectangle)
+        {
+            await Task.Run(() => CaptureScreen(rectangle));
+        }
+
+        /// <summary>
+        /// 获取当前可读的图像句柄（包含是否新帧信息）
+        /// </summary>
+        public static (ImageHandle handle, bool isNewFrame) GetCurrentFrame()
+        {
+            if (_tripleBuffer == null)
+            {
+                return (ImageHandle.Invalid, false);
+            }
+            return _tripleBuffer.GetReadBuffer();
+        }
+
+        /// <summary>
+        /// 获取当前可读的图像句柄（高性能版本）
+        /// </summary>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static ImageHandle GetCurrentHandle()
+        {
+            return _tripleBuffer?.GetReadHandle() ?? ImageHandle.Invalid;
+        }
+
+        /// <summary>
+        /// 获取当前读缓冲区句柄，不更新缓冲区（最高性能）
+        /// </summary>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static ImageHandle GetCurrentHandleNoSwap()
+        {
+            return _tripleBuffer?.GetCurrentReadHandle() ?? ImageHandle.Invalid;
+        }
+
+        /// <summary>
+        /// 检查是否有新帧
+        /// </summary>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool HasNewFrame()
+        {
+            return _tripleBuffer?.HasNewFrame() ?? false;
+        }
+
+        /// <summary>
+        /// 直接获取像素（包含坐标偏移处理）
+        /// </summary>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static uint GetPixel(int screenX, int screenY)
+        {
+            if (_tripleBuffer == null)
+                return 0;
+
+            // 转换为缓冲区坐标
+            int bufferX = screenX - _coordinateOffsetX;
+            int bufferY = screenY - _coordinateOffsetY;
+
+            // 边界检查
+            if (bufferX < 0 || bufferX >= _captureSize.Width ||
+                bufferY < 0 || bufferY >= _captureSize.Height)
+                return 0;
+
+            var (handle, _) = _tripleBuffer.GetReadBuffer();
+            if (!handle.IsValid)
+                return 0;
+
+            return ImageManager.GetPixel(handle, bufferX, bufferY);
+        }
+
+        /// <summary>
+        /// 获取颜色（包含坐标偏移处理）
+        /// </summary>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Color GetColor(int screenX, int screenY)
+        {
+            uint pixel = GetPixel(screenX, screenY);
+            return Color.FromArgb(
+                (int)((pixel >> 24) & 0xFF),
+                (int)((pixel >> 16) & 0xFF),
+                (int)((pixel >> 8) & 0xFF),
+                (int)(pixel & 0xFF)
+            );
+        }
+
+        /// <summary>
+        /// 在全局截图中查找图像
+        /// </summary>
+        public static Point? FindImage(in ImageHandle targetImage, double matchRate = 0.9)
+        {
+            var (currentFrame, _) = GetCurrentFrame();
+            if (!currentFrame.IsValid)
+                return null;
+
+            var result = ImageFinder.FindImage(targetImage, currentFrame, matchRate);
+
+            // 如果找到，添加坐标偏移
+            if (result.HasValue)
+            {
+                return new Point(
+                    result.Value.X + _coordinateOffsetX,
+                    result.Value.Y + _coordinateOffsetY
+                );
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// 保存当前帧
+        /// </summary>
+        public static bool SaveCurrentFrame(string filePath)
+        {
+            var (handle, _) = GetCurrentFrame();
+            if (!handle.IsValid)
+                return false;
+
+            return ImageManager.SaveImage(handle, filePath);
+        }
+
+        /// <summary>
+        /// 在全局截图中查找所有匹配的图像（使用Rust高性能实现）
+        /// </summary>
+        public static List<Point> FindAllImagesOptimized(
+            in ImageHandle targetImage,
+            double matchRate = 0.9,
+            int maxResults = 100,
+            int minDistance = 1,
+            bool earlyExit = true)
+        {
+            var handle = GlobalScreenCapture.GetCurrentHandle();
+            if (!handle.IsValid)
+                return new List<Point>();
+
+            var results = ImageFinder.FindAllImages(
+                targetImage,
+                handle,
+                matchRate,
+                maxResults,
+                minDistance,
+                earlyExit
+            );
+
+            // 添加坐标偏移
+            var (offsetX, offsetY) = GlobalScreenCapture.CoordinateOffset;
+            return results.Select(p => new Point(p.X + offsetX, p.Y + offsetY)).ToList();
+        }
+
+        /// <summary>
+        /// 实时追踪多个目标（高性能版本）
+        /// </summary>
+        public static async IAsyncEnumerable<List<Point>> TrackMultipleTargetsOptimized(
+            ImageHandle targetImage,
+            double matchRate = 0.9,
+            int maxTargets = 10,
+            int minDistance = 10,
+            [EnumeratorCancellation] CancellationToken cancellationToken = default)
+        {
+            var lastPositions = new List<Point>();
+            var frameSkip = 0;
+
+            while (!cancellationToken.IsCancellationRequested)
+            {
+                // 智能帧跳过：如果目标稳定，降低检测频率
+                if (frameSkip > 0)
+                {
+                    frameSkip--;
+                    await Task.Delay(5, cancellationToken);
+                    continue;
+                }
+
+                var currentPositions = FindAllImagesOptimized(
+                    targetImage,
+                    matchRate,
+                    maxTargets,
+                    minDistance,
+                    true // 早期退出以提高性能
+                );
+
+                // 计算位置变化
+                if (!PositionsChanged(lastPositions, currentPositions))
+                {
+                    // 目标稳定，增加帧跳过
+                    frameSkip = 5;
+                }
+                else
+                {
+                    // 目标移动，重置帧跳过
+                    frameSkip = 0;
+                    lastPositions = currentPositions;
+                    yield return currentPositions;
+                }
+
+                await Task.Delay(1, cancellationToken);
+            }
+        }
+
+        private static bool PositionsChanged(List<Point> list1, List<Point> list2, int threshold = 2)
+        {
+            if (list1.Count != list2.Count)
+                return true;
+
+            // 按坐标排序以进行比较
+            var sorted1 = list1.OrderBy(p => p.X).ThenBy(p => p.Y).ToList();
+            var sorted2 = list2.OrderBy(p => p.X).ThenBy(p => p.Y).ToList();
+
+            for (int i = 0; i < sorted1.Count; i++)
+            {
+                var dx = Math.Abs(sorted1[i].X - sorted2[i].X);
+                var dy = Math.Abs(sorted1[i].Y - sorted2[i].Y);
+                if (dx > threshold || dy > threshold)
+                    return true;
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// 清理资源
+        /// </summary>
+        public static void Cleanup()
+        {
+            _tripleBuffer?.Dispose();
+            _tripleBuffer = null;
+            _captureSize = Size.Empty;
+            _logger.LogInfo("全局截图缓冲区已清理");
+        }
+    }
+
+    #endregion
+
+    #region 高级用法示例
+
+    public static class AdvancedGlobalScreenUsage
+    {
+        /// <summary>
+        /// 等待屏幕上出现指定图像
+        /// </summary>
+        public static async Task<Point?> WaitForImage(
+            ImageHandle targetImage,
+            int timeoutMs = 5000,
+            double matchRate = 0.9)
+        {
+            var sw = Stopwatch.StartNew();
+
+            while (sw.ElapsedMilliseconds < timeoutMs)
+            {
+                var position = GlobalScreenCapture.FindImage(targetImage, matchRate);
+                if (position.HasValue)
+                    return position;
+
+                await Task.Delay(50); // 每50ms检查一次
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// 监控屏幕区域颜色变化
+        /// </summary>
+        public static async Task MonitorColorChange(
+            Point screenPoint,
+            Action<Color, Color> onColorChanged,
+            CancellationToken cancellationToken)
+        {
+            Color lastColor = Color.Empty;
+
+            while (!cancellationToken.IsCancellationRequested)
+            {
+                var currentColor = GlobalScreenCapture.GetColor(screenPoint.X, screenPoint.Y);
+
+                if (lastColor != Color.Empty && currentColor != lastColor)
+                {
+                    onColorChanged(lastColor, currentColor);
+                }
+
+                lastColor = currentColor;
+                await Task.Delay(10);
+            }
+        }
+
+        /// <summary>
+        /// 实时追踪目标图像位置
+        /// </summary>
+        public static async IAsyncEnumerable<Point> TrackImage(
+            ImageHandle targetImage,
+            [EnumeratorCancellation] CancellationToken cancellationToken = default)
+        {
+            Point? lastPosition = null;
+
+            while (!cancellationToken.IsCancellationRequested)
+            {
+                var position = GlobalScreenCapture.FindImage(targetImage, 0.9);
+
+                if (position.HasValue && position != lastPosition)
+                {
+                    lastPosition = position;
+                    yield return position.Value;
+                }
+
+                await Task.Delay(1);
+            }
         }
     }
 
@@ -2006,59 +2634,198 @@ namespace ImageProcessingSystem
             }
         }
 
-        // 批量查找（返回所有匹配位置）
-        public static List<Point> FindAllImages(
+        // 新增：批量查找配置
+        [StructLayout(LayoutKind.Sequential)]
+        public struct FindAllConfig
+        {
+            public int max_results;
+            public int min_distance;
+            [MarshalAs(UnmanagedType.I1)]
+            public bool early_exit;
+        }
+
+        // 新增：批量查找结果
+        [StructLayout(LayoutKind.Sequential)]
+        public struct MultipleResults
+        {
+            public IntPtr points;
+            public int count;
+            public int capacity;
+        }
+
+        [DllImport("findpoints.dll", CallingConvention = CallingConvention.Cdecl)]
+        private static extern MultipleResults FindAllBytesInRegion(
+            IntPtr n1, UIntPtr len1, Tuple t1,
+            IntPtr n2, UIntPtr len2, Tuple t2,
+            Region region,
+            double matchRate,
+            byte ignore_r, byte ignore_g, byte ignore_b,
+            FindAllConfig config
+        );
+
+        [DllImport("findpoints.dll", CallingConvention = CallingConvention.Cdecl)]
+        private static extern void FreeMultipleResults(MultipleResults results);
+
+        /// <summary>
+        /// 查找所有匹配的图像（高性能Rust实现）
+        /// </summary>
+        public static unsafe List<Point> FindAllImages(
             in ImageHandle subImage,
             in ImageHandle mainImage,
             double matchRate = 0.9,
-            int maxResults = 10)
+            int maxResults = 100,
+            int minDistance = 1,
+            bool earlyExit = true,
+            Color? ignoreColor = null)
         {
             var results = new List<Point>();
-            var excludeRegions = new List<Rectangle>();
 
-            while (results.Count < maxResults)
+            try
             {
-                Point? found = null;
-
-                // 创建临时工作图像，排除已找到的区域
-                if (excludeRegions.Count > 0)
+                // 验证句柄
+                if (!mainImage.IsValid || !subImage.IsValid)
                 {
-                    // TODO: 实现排除区域的逻辑
-                    found = FindImage(mainImage, subImage, matchRate);
-                }
-                else
-                {
-                    found = FindImage(mainImage, subImage, matchRate);
+                    _logger?.Error("无效的图像句柄");
+                    return results;
                 }
 
-                if (!found.HasValue)
-                    break;
+                // 获取图像数据
+                var mainData = ImageManager.GetImageData(mainImage);
+                var subData = ImageManager.GetImageData(subImage);
 
-                // 检查是否在排除区域内
-                bool inExcludeRegion = false;
-                foreach (var region in excludeRegions)
+                // 设置搜索区域为整个图像
+                var region = new Region
                 {
-                    if (region.Contains(found.Value))
+                    x = 0,
+                    y = 0,
+                    width = (uint)mainImage.Size.Width,
+                    height = (uint)mainImage.Size.Height
+                };
+
+                // 配置批量查找参数
+                var config = new FindAllConfig
+                {
+                    max_results = maxResults,
+                    min_distance = minDistance,
+                    early_exit = earlyExit
+                };
+
+                // 处理忽略色
+                byte ignoreR = 255, ignoreG = 20, ignoreB = 147;
+                if (ignoreColor.HasValue)
+                {
+                    ignoreR = ignoreColor.Value.R;
+                    ignoreG = ignoreColor.Value.G;
+                    ignoreB = ignoreColor.Value.B;
+                }
+
+                // 确保内存有效
+                GC.KeepAlive(mainImage);
+                GC.KeepAlive(subImage);
+
+                // 调用 Rust 函数
+                var multiResults = FindAllBytesInRegion(
+                    mainData.ptr, (UIntPtr)mainData.length, mainData.size,
+                    subData.ptr, (UIntPtr)subData.length, subData.size,
+                    region,
+                    matchRate,
+                    ignoreR, ignoreG, ignoreB,
+                    config
+                );
+
+                // 转换结果
+                if (multiResults.count > 0 && multiResults.points != IntPtr.Zero)
+                {
+                    Tuple* points = (Tuple*)multiResults.points;
+                    for (int i = 0; i < multiResults.count; i++)
                     {
-                        inExcludeRegion = true;
-                        break;
+                        if (points[i].x != NotFound.x)
+                        {
+                            results.Add(new Point((int)points[i].x, (int)points[i].y));
+                        }
                     }
                 }
 
-                if (!inExcludeRegion)
+                // 释放 Rust 分配的内存
+                FreeMultipleResults(multiResults);
+            }
+            catch (Exception ex)
+            {
+                _logger?.Error($"批量查找图像失败: {ex.Message}");
+            }
+
+            return results;
+        }
+
+        /// <summary>
+        /// 在指定区域查找所有匹配的图像
+        /// </summary>
+        public static unsafe List<Point> FindAllImagesInRegion(
+            in ImageHandle subImage,
+            in ImageHandle mainImage,
+            Rectangle searchRegion,
+            double matchRate = 0.9,
+            int maxResults = 100,
+            int minDistance = 1,
+            Color? ignoreColor = null)
+        {
+            var results = new List<Point>();
+
+            try
+            {
+                var mainData = ImageManager.GetImageData(mainImage);
+                var subData = ImageManager.GetImageData(subImage);
+
+                // 设置搜索区域
+                var region = new Region
                 {
-                    results.Add(found.Value);
-                    excludeRegions.Add(new Rectangle(
-                        found.Value.X,
-                        found.Value.Y,
-                        subImage.Size.Width,
-                        subImage.Size.Height
-                    ));
-                }
-                else
+                    x = (uint)searchRegion.X,
+                    y = (uint)searchRegion.Y,
+                    width = (uint)searchRegion.Width,
+                    height = (uint)searchRegion.Height
+                };
+
+                var config = new FindAllConfig
                 {
-                    break; // 避免无限循环
+                    max_results = maxResults,
+                    min_distance = minDistance,
+                    early_exit = true
+                };
+
+                byte ignoreR = 255, ignoreG = 20, ignoreB = 147;
+                if (ignoreColor.HasValue)
+                {
+                    ignoreR = ignoreColor.Value.R;
+                    ignoreG = ignoreColor.Value.G;
+                    ignoreB = ignoreColor.Value.B;
                 }
+
+                GC.KeepAlive(mainImage);
+                GC.KeepAlive(subImage);
+
+                var multiResults = FindAllBytesInRegion(
+                    mainData.ptr, (UIntPtr)mainData.length, mainData.size,
+                    subData.ptr, (UIntPtr)subData.length, subData.size,
+                    region,
+                    matchRate,
+                    ignoreR, ignoreG, ignoreB,
+                    config
+                );
+
+                if (multiResults.count > 0 && multiResults.points != IntPtr.Zero)
+                {
+                    Tuple* points = (Tuple*)multiResults.points;
+                    for (int i = 0; i < multiResults.count; i++)
+                    {
+                        results.Add(new Point((int)points[i].x, (int)points[i].y));
+                    }
+                }
+
+                FreeMultipleResults(multiResults);
+            }
+            catch (Exception ex)
+            {
+                _logger?.Error($"区域批量查找失败: {ex.Message}");
             }
 
             return results;

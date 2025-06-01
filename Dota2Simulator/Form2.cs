@@ -1,6 +1,6 @@
 ﻿using Collections.Pooled;
 using Dota2Simulator.KeyboardMouse;
-using Dota2Simulator.PictureProcessing;
+using Dota2Simulator.PictureProcessing.Ocr;
 using System;
 using System.Diagnostics;
 using System.Drawing;
@@ -19,7 +19,7 @@ namespace Dota2Simulator
         #region 页面单例调用UI线程
         // 单例模式 传递Form,调用UI线程更新
         private static Form2? _instance;
-        public static Form2 Instance => _instance ?? throw new InvalidOperationException("Form2未初始化"); 
+        public static Form2 Instance => _instance ?? throw new InvalidOperationException("Form2未初始化");
         #endregion
 
         #region 触发重载
@@ -35,7 +35,7 @@ namespace Dota2Simulator
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private async void Hook_KeyDown(object sender, KeyEventArgs e)
-        {            
+        {
             #region 使用界面 隐藏
 
             switch (e.KeyCode)
@@ -52,7 +52,7 @@ namespace Dota2Simulator
             #endregion
 
 #if DOTA2
-            await Games.Dota2.MainClass.根据当前英雄增强(tb_name.Text.Trim(), e);
+            await Games.Dota2.Main.根据当前英雄增强(tb_name.Text.Trim(), e);
 #endif
 #if LOL
             Games.LOL.MainClass.根据当前英雄增强(tb_name.Text.Trim(), e);
@@ -71,7 +71,7 @@ namespace Dota2Simulator
         private void Tb_name_TextChanged(object sender, EventArgs e)
         {
 #if DOTA2
-            Games.Dota2.MainClass.取消所有功能();
+            Games.Dota2.Main.取消所有功能();
 #endif
         }
 
@@ -150,7 +150,7 @@ namespace Dota2Simulator
 
             try
             {
-                using PooledList<string> list = [.. tb_delay.Text.Split(',')];
+                using PooledList<string> list = [.. tb_等待延迟.Text.Split(',')];
                 pictureBox1.BackColor = Color.FromArgb(255, int.Parse(list[0], CultureInfo.InvariantCulture), int.Parse(list[1], CultureInfo.InvariantCulture), int.Parse(list[2], CultureInfo.InvariantCulture));
             }
             catch
@@ -216,7 +216,7 @@ namespace Dota2Simulator
             _hookUser.Start(false, true);
 
             // 初始化Ocr
-            PaddleOcr.初始化PaddleOcr();
+            PaddleOCR.初始化PaddleOcr();
 
             //// winIo 和 WinRing0 需要额外的操作
             //WinIO32.Initialize();
@@ -232,23 +232,19 @@ namespace Dota2Simulator
 
             // 设置窗体置顶
             TopMost = true;
-
-            // 338 987 只显示四行 1047 只显示1行 900 基本显示除了颜色框的全部
-            // 设置窗口位置
-            Location = new Point(338, 987);
             Width = 136;
 
             if (tb_name.Text.Trim() == "测试")
             {
-                // 850 基本显示完全
-                Location = new Point(338, 850);
                 lb_阵营.Text = "模式例:q4";
                 lb_状态抗性.Text = "超时时间";
                 lb_攻速.Text = "位置12|13";
+                lb_等待延迟.Text = "颜色";
+                lb_攻速.Text = "攻速";
                 tb_阵营.Text = "q41";
                 tb_状态抗性.Text = "2000";
-                label6.Text = "颜色";
-                tb_delay.Text = "";
+                tb_等待延迟.Text = "";
+                tb_状态抗性.Text = "25";
             }
             else
             {
@@ -256,8 +252,10 @@ namespace Dota2Simulator
                 tb_状态抗性.Text = "25";
             }
 
+            Location = new Point(338, 1060);
+
 #if DOTA2
-            Games.Dota2.MainClass.获取图片_2(); // 初始化获取截图 避免一开始的黑色
+            Games.Dota2.Main.获取图片_2(); // 初始化获取截图 避免一开始的黑色
 #endif
         }
 
@@ -281,9 +279,26 @@ namespace Dota2Simulator
             //KeyboardMouseSimulateDriverAPI.Uninitialize();
 
             // 释放PaddleOcr
-            _ = PaddleOcr.释放PaddleOcr();
+            _ = PaddleOCR.释放PaddleOcr();
         }
 
         #endregion
+
+        private void checkBox_showAll_CheckedChanged(object sender, EventArgs e)
+        {
+
+            // 338 987 只显示四行 1060 只显示1行 900 基本显示除了颜色框的全部
+            Location = new Point(338, 987);
+
+            if (checkBox_showAll.Checked == true)
+            {
+                // 850 基本显示完全
+                Location = new Point(338, 850);
+            }
+            else
+            {
+                Location = new Point(338, 1060);
+            }
+        }
     }
 }

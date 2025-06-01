@@ -9,7 +9,7 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.Threading.Tasks;
 
-namespace Dota2Simulator.PictureProcessing
+namespace Dota2Simulator.PictureProcessing.Ocr
 {
     /*
      *
@@ -21,7 +21,7 @@ namespace Dota2Simulator.PictureProcessing
      Sdcb.PaddleInference.runtime.win64.cu20-sm86-89 选一个，Gpu用下面的，实际上完全没法用。
      OpenCvSharp4.runtime.win
      */
-    internal abstract class PaddleOcr
+    internal abstract class PaddleOCR
     {
         private static PaddleOcrAll _PaddleOcrAll;
 
@@ -98,13 +98,6 @@ namespace Dota2Simulator.PictureProcessing
             {
                 var (ptr, length, size) = ImageManager.GetImageData(in handle);
 
-                // 确保区域在图像范围内
-                var imageRect = new Rectangle(0, 0, (int)size.x, (int)size.y);
-                region.Intersect(imageRect);
-
-                if (region.IsEmpty)
-                    return string.Empty;
-
                 unsafe
                 {
                     // 创建区域的临时缓冲区
@@ -125,7 +118,7 @@ namespace Dota2Simulator.PictureProcessing
                         }
 
                         // 在 fixed 块内调用方法
-                        return 获取图片文字((IntPtr)dstPtr, region.Width, region.Height);
+                        return 获取图片文字((nint)dstPtr, region.Width, region.Height);
                     }
                 }
             }
@@ -138,14 +131,14 @@ namespace Dota2Simulator.PictureProcessing
         /// <summary>
         /// 优化的从指针直接创建 Mat 的方法
         /// </summary>
-        public static unsafe string 获取图片文字(IntPtr ptr, int width, int height)
+        public static unsafe string 获取图片文字(nint ptr, int width, int height)
         {
             if (!_isStart)
             {
                 _ = 初始化PaddleOcr();
             }
 
-            if (ptr == IntPtr.Zero)
+            if (ptr == nint.Zero)
             {
                 throw new ArgumentException("Input pointer is null.");
             }
@@ -176,7 +169,7 @@ namespace Dota2Simulator.PictureProcessing
         {
             try
             {
-                var _currentScreenHandle = Games.Dota2.MainClass._全局图像句柄;
+                var _currentScreenHandle = GlobalScreenCapture.GetCurrentHandle();
                 // 方案1: 如果有全屏截图的 ImageHandle
                 if (_currentScreenHandle.IsValid)
                 {

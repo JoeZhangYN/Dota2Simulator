@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
@@ -10,6 +11,7 @@ using System.Threading.Tasks;
 
 public static class OptimizedGraphics
 {
+    #region 全局数据
     private static readonly Lock _initLock = new();
     private static CaptureMethod _preferredMethod = CaptureMethod.Unknown;
 
@@ -32,7 +34,8 @@ public static class OptimizedGraphics
         DesktopDuplication,      // Windows 8+ (次快)
         BitBlt,                  // Windows Vista+ (较快)
         GdiPlus                  // 所有Windows版本 (最慢但最兼容)
-    }
+    } 
+    #endregion
 
     #region 公共API
 

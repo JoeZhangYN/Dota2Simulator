@@ -10,7 +10,7 @@ using System.Drawing;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using static Dota2Simulator.Games.Dota2.MainClass;
+using static Dota2Simulator.Games.Dota2.Main;
 using static Dota2Simulator.Games.Dota2.Skill;
 using static OpenCvSharp.Stitcher;
 
@@ -66,8 +66,8 @@ namespace Dota2Simulator.Games.Dota2
         {
             _ = await 设置当前技能数量().ConfigureAwait(true);
             _存在假腿 = 获取当前假腿按键();
-            _是否神杖 = 阿哈利姆神杖(in _全局图像句柄);
-            _是否魔晶 = 阿哈利姆魔晶(in _全局图像句柄);
+            _是否神杖 = 阿哈利姆神杖(GlobalScreenCapture.GetCurrentHandle());
+            _是否魔晶 = 阿哈利姆魔晶(GlobalScreenCapture.GetCurrentHandle());
 
             switch (e.KeyCode)
             {
@@ -91,22 +91,27 @@ namespace Dota2Simulator.Games.Dota2
                     break;
                 case var _ when e.KeyCode == _假腿按键:
                     return;
-#if RPG
+                #region Silt
+#if Silt
                 case Keys.NumPad1:
-                    跳过循环获取金碎片(in _全局图像句柄);
+                    Silt.Main.跳过循环获取金碎片(GlobalScreenCapture.GetCurrentHandle());
                     break;
                 case Keys.NumPad2:
-                    自动屏蔽3个选项(in _全局图像句柄);
+                    Silt.Main.自动屏蔽3个选项(GlobalScreenCapture.GetCurrentHandle());
                     break;
                 case Keys.NumPad3:
                     break;
                 case Keys.NumPad4:
-                    点击暴击(in _全局图像句柄);
+                    Silt.Main.点击暴击(GlobalScreenCapture.GetCurrentHandle());
                     break;
                 case Keys.NumPad5:
-                    点击黑皇(in _全局图像句柄);
+                    Silt.Main.点击黑皇(GlobalScreenCapture.GetCurrentHandle());
+                    break;
+                case Keys.NumPad6:
+                    Silt.Main.测试识别(GlobalScreenCapture.GetCurrentHandle());
                     break;
 #endif
+                #endregion
                 default:
                     if (!_存在假腿)
                     {
@@ -575,7 +580,7 @@ namespace Dota2Simulator.Games.Dota2
 
         public static Keys 根据图片获取物品按键(in ImageHandle 句柄)
         {
-            var 位置 = ImageFinder.FindImageInRegion(in 句柄, in _全局图像句柄, 获取物品范围(_技能数量));
+            var 位置 = ImageFinder.FindImageInRegion(in 句柄, GlobalScreenCapture.GetCurrentHandle(), 获取物品范围(_技能数量));
             return 根据位置获取按键(位置);
         }
 
@@ -611,8 +616,8 @@ namespace Dota2Simulator.Games.Dota2
 
         private static int 执行物品操作(in ImageHandle 句柄, Action<Keys> 按键操作)
         {
-            Point? 位置 = ImageFinder.FindImageInRegion(in 句柄, in _全局图像句柄, 获取物品范围(_技能数量));
-            if (PictureProcessing.PictureProcessing.是否无效位置(位置))
+            Point? 位置 = ImageFinder.FindImageInRegion(in 句柄, GlobalScreenCapture.GetCurrentHandle(), 获取物品范围(_技能数量));
+            if (ImageManager.是否无效位置(位置))
             {
                 return 0;
             }
@@ -628,7 +633,7 @@ namespace Dota2Simulator.Games.Dota2
 
         private static Keys 根据位置获取按键(Point? 位置)
         {
-            if (!位置.HasValue || PictureProcessing.PictureProcessing.是否无效位置(位置))
+            if (!位置.HasValue || ImageManager.是否无效位置(位置))
             {
                 return Keys.Escape;
             }

@@ -2,6 +2,7 @@
 
 using Collections.Pooled;
 using Dota2Simulator.KeyboardMouse;
+using Dota2Simulator.PictureProcessing;
 using Dota2Simulator.TTS;
 using ImageProcessingSystem;
 using NLog;
@@ -20,7 +21,7 @@ using static Dota2Simulator.Games.Dota2.Skill;
 
 namespace Dota2Simulator.Games.Dota2
 {
-    internal class MainClass
+    internal class Main
     {
         #region 全局变量
         // 创建一个静态的 Logger 实例
@@ -29,7 +30,7 @@ namespace Dota2Simulator.Games.Dota2
         /// <summary>
         ///     调用UI页面元素
         /// </summary>
-        private static Form2? Form = Form2.Instance;
+        public static Form2? Form = Form2.Instance;
 
         /// dota 2 适配7.36 1920 * 1080 动态肖像 法线贴图 地面视差 主界面高画质 计算器渲染器 纹理、特效、阴影 中 渲染 70% 高级水面效果
         /// 最主要就是主界面高画质,其他没事
@@ -74,15 +75,6 @@ namespace Dota2Simulator.Games.Dota2
 
         // 创建全局截图缓冲区
         private static byte[] _initialData = new byte[1920 * 1080 * 4];
-
-        /// <summary>
-        ///     全局图像句柄
-        /// </summary>
-        public static ImageHandle _全局图像句柄 = ImageManager.CreateDynamicImage(
-                    _initialData,
-                    new Size(1920, 1080),
-                    "GlobalScreen"
-                );
 
         /// <summary>
         ///     1080p 增益状态栏 
@@ -1133,7 +1125,7 @@ namespace Dota2Simulator.Games.Dota2
                             case Keys.F:
                                 if (_命石选择 == 1)
                                 {
-                                    DOTA2释放CD就绪技能(Keys.E, in _全局图像句柄);
+                                    DOTA2释放CD就绪技能(Keys.E, GlobalScreenCapture.GetCurrentHandle());
                                 }
 
                                 _条件3 = true;
@@ -1549,11 +1541,11 @@ namespace Dota2Simulator.Games.Dota2
                         if (!_总循环条件)
                         {
                             _总循环条件 = true;
-                            _条件根据图片委托1 ??= 鼻涕去后摇;
-                            // _条件根据图片委托2 ??= 针刺循环; 已优化不需要
-                            _条件根据图片委托3 ??= 毛团去后摇;
-                            _条件根据图片委托4 ??= 钢毛后背去后摇;
-                            _条件根据图片委托5 ??= 扫射切回假腿;
+                            //_条件根据图片委托1 ??= 鼻涕去后摇;
+                            //// _条件根据图片委托2 ??= 针刺循环; 已优化不需要
+                            //_条件根据图片委托3 ??= 毛团去后摇;
+                            //_条件根据图片委托4 ??= 钢毛后背去后摇;
+                            //_条件根据图片委托5 ??= 扫射切回假腿;
                             _切假腿配置.修改配置(Keys.E, false);
                             await 状态初始化().ConfigureAwait(false);
                         }
@@ -1761,9 +1753,9 @@ namespace Dota2Simulator.Games.Dota2
                         switch (e.KeyCode)
                         {
                             case Keys.F1:
-                                _全局模式e = ColorExtensions.ColorAEqualColorB(获取指定位置颜色(738, 957, in _全局图像句柄),
+                                _全局模式e = ColorExtensions.ColorAEqualColorB(获取指定位置颜色(738, 957, GlobalScreenCapture.GetCurrentHandle()),
                                     Color.FromArgb(246, 178, 60), 0) || ColorExtensions.ColorAEqualColorB(
-                                    获取指定位置颜色(722, 957, in _全局图像句柄),
+                                    获取指定位置颜色(722, 957, GlobalScreenCapture.GetCurrentHandle()),
                                     Color.FromArgb(246, 178, 60), 0)
                                     ? 1
                                     : 0;
@@ -1913,7 +1905,7 @@ namespace Dota2Simulator.Games.Dota2
                         switch (e.KeyCode)
                         {
                             case Keys.Q:
-                                if (!DOTA2判断状态技能是否启动(Keys.E, in _全局图像句柄))
+                                if (!DOTA2判断状态技能是否启动(Keys.E, GlobalScreenCapture.GetCurrentHandle()))
                                 {
                                     SimKeyBoard.KeyPress(Keys.E);
                                 }
@@ -1921,7 +1913,7 @@ namespace Dota2Simulator.Games.Dota2
                                 _条件1 = true;
                                 break;
                             case Keys.W:
-                                if (!DOTA2判断状态技能是否启动(Keys.E, in _全局图像句柄))
+                                if (!DOTA2判断状态技能是否启动(Keys.E, GlobalScreenCapture.GetCurrentHandle()))
                                 {
                                     SimKeyBoard.KeyPress(Keys.E);
                                 }
@@ -1929,7 +1921,7 @@ namespace Dota2Simulator.Games.Dota2
                                 _条件2 = true;
                                 break;
                             case Keys.R:
-                                if (!DOTA2判断状态技能是否启动(Keys.E, in _全局图像句柄))
+                                if (!DOTA2判断状态技能是否启动(Keys.E, GlobalScreenCapture.GetCurrentHandle()))
                                 {
                                     SimKeyBoard.KeyPress(Keys.E);
                                 }
@@ -3413,12 +3405,12 @@ namespace Dota2Simulator.Games.Dota2
                                 _条件1 = true;
                                 break;
                             case Keys.W:
-                                if (ImageFinder.FindImageInRegionBool(中立_祭礼长袍_handle, _全局图像句柄, 获取中立TP范围(_技能数量)))
+                                if (ImageFinder.FindImageInRegionBool(中立_祭礼长袍_handle, GlobalScreenCapture.GetCurrentHandle(), 获取中立TP范围(_技能数量)))
                                 {
                                     _状态抗性倍数 *= 1.1;
                                 }
 
-                                if (ImageFinder.FindImageInRegionBool(中立_永恒遗物_handle, _全局图像句柄, 获取中立TP范围(_技能数量)))
+                                if (ImageFinder.FindImageInRegionBool(中立_永恒遗物_handle, GlobalScreenCapture.GetCurrentHandle(), 获取中立TP范围(_技能数量)))
                                 {
                                     _状态抗性倍数 *= 1.2;
                                 }
@@ -3600,7 +3592,7 @@ namespace Dota2Simulator.Games.Dota2
                                 _条件1 = true;
                                 break;
                             case Keys.R:
-                                await 大招前纷争(_全局图像句柄).ConfigureAwait(true);
+                                await 大招前纷争(GlobalScreenCapture.GetCurrentHandle()).ConfigureAwait(true);
                                 _条件2 = true;
                                 break;
                             case Keys.E:
@@ -3885,19 +3877,19 @@ namespace Dota2Simulator.Games.Dota2
                             case Keys.E:
                                 Color 技能点颜色 = Color.FromArgb(203, 183, 124);
                                 _全局时间 = 0;
-                                if (ColorExtensions.ColorAEqualColorB(获取指定位置颜色(971, 1008, in _全局图像句柄), 技能点颜色, 0))
+                                if (ColorExtensions.ColorAEqualColorB(获取指定位置颜色(971, 1008, GlobalScreenCapture.GetCurrentHandle()), 技能点颜色, 0))
                                 {
                                     _全局时间 = 7000;
                                 }
-                                else if (ColorExtensions.ColorAEqualColorB(获取指定位置颜色(964, 1008, in _全局图像句柄), 技能点颜色, 0))
+                                else if (ColorExtensions.ColorAEqualColorB(获取指定位置颜色(964, 1008, GlobalScreenCapture.GetCurrentHandle()), 技能点颜色, 0))
                                 {
                                     _全局时间 = 6000;
                                 }
-                                else if (ColorExtensions.ColorAEqualColorB(获取指定位置颜色(947, 1008, in _全局图像句柄), 技能点颜色, 0))
+                                else if (ColorExtensions.ColorAEqualColorB(获取指定位置颜色(947, 1008, GlobalScreenCapture.GetCurrentHandle()), 技能点颜色, 0))
                                 {
                                     _全局时间 = 5000;
                                 }
-                                else if (ColorExtensions.ColorAEqualColorB(获取指定位置颜色(935, 1008, in _全局图像句柄), 技能点颜色, 0))
+                                else if (ColorExtensions.ColorAEqualColorB(获取指定位置颜色(935, 1008, GlobalScreenCapture.GetCurrentHandle()), 技能点颜色, 0))
                                 {
                                     _全局时间 = 4000;
                                 }
@@ -4357,7 +4349,7 @@ namespace Dota2Simulator.Games.Dota2
         {
             _ = 获取图片_2();
 
-            return Task.FromResult(ImageManager.GetColor(_全局图像句柄, x, y));
+            return Task.FromResult(GlobalScreenCapture.GetColor(x, y));
         }
 
         public static Color 获取指定位置颜色(int x, int y, in ImageHandle 句柄)
@@ -4376,7 +4368,7 @@ namespace Dota2Simulator.Games.Dota2
         /// <returns></returns>
         public static async Task<bool> 设置当前技能数量()
         {
-            int i = 获取当前技能数量(in _全局图像句柄);
+            int i = 获取当前技能数量(GlobalScreenCapture.GetCurrentHandle());
             if (i != 0)
             {
                 // 技能数量改变后，技能判断色全部重置
@@ -4390,7 +4382,7 @@ namespace Dota2Simulator.Games.Dota2
                     重置所有技能判断();
 
                     // 获取当前技能颜色
-                    _ = DOTA2获取所有释放技能前颜色(in _全局图像句柄);
+                    _ = DOTA2获取所有释放技能前颜色(GlobalScreenCapture.GetCurrentHandle());
                 }
             }
 
@@ -4451,11 +4443,11 @@ namespace Dota2Simulator.Games.Dota2
         {
             if (_命石选择 == 0)
             {
-                if (ImageFinder.FindImageInRegionBool(命石_伐木机_碎木击_handle, in _全局图像句柄, 命石区域))
+                if (ImageFinder.FindImageInRegionBool(命石_伐木机_碎木击_handle, GlobalScreenCapture.GetCurrentHandle(), 命石区域))
                 {
                     _命石选择 = 1;
                 }
-                else if (ImageFinder.FindImageInRegionBool(命石_伐木机_锯齿轮旋_handle, in _全局图像句柄, 命石区域))
+                else if (ImageFinder.FindImageInRegionBool(命石_伐木机_锯齿轮旋_handle, GlobalScreenCapture.GetCurrentHandle(), 命石区域))
                 {
                     _命石选择 = 2;
                     _切假腿配置.修改配置(Keys.D, true);
@@ -4610,7 +4602,7 @@ namespace Dota2Simulator.Games.Dota2
         {
             if (_命石选择 == 0)
             {
-                _命石选择 = ImageFinder.FindImageInRegionBool(命石_骷髅王_白骨守卫_handle, in _全局图像句柄, 命石区域) ? 1 : 2;
+                _命石选择 = ImageFinder.FindImageInRegionBool(命石_骷髅王_白骨守卫_handle, GlobalScreenCapture.GetCurrentHandle(), 命石区域) ? 1 : 2;
             }
 
             _命石根据图片委托 = null;
@@ -4752,7 +4744,7 @@ namespace Dota2Simulator.Games.Dota2
         {
             if (_命石选择 == 0)
             {
-                _命石选择 = ImageFinder.FindImageInRegionBool(命石_海民_酒友_handle, in _全局图像句柄, 命石区域) ? 2 : 1;
+                _命石选择 = ImageFinder.FindImageInRegionBool(命石_海民_酒友_handle, GlobalScreenCapture.GetCurrentHandle(), 命石区域) ? 2 : 1;
             }
 
             _命石根据图片委托 = null;
@@ -6011,7 +6003,7 @@ namespace Dota2Simulator.Games.Dota2
                     }).ConfigureAwait(true);
                 default:
                     设置全局步骤q(1);
-                    if (ImageFinder.FindImageInRegionBool(Buff_光法_大招_handle, _全局图像句柄, buff状态技能栏))
+                    if (ImageFinder.FindImageInRegionBool(Buff_光法_大招_handle, GlobalScreenCapture.GetCurrentHandle(), buff状态技能栏))
                     {
                         _切假腿配置.修改配置(Keys.Q, false);
                         SimKeyBoard.MouseRightClick();
@@ -6514,7 +6506,7 @@ namespace Dota2Simulator.Games.Dota2
 
             //var time = 获取当前时间毫秒();
 
-            //while (ImageFinder.FindImageBool(物品_跳刀"), "SPACE") || ImageFinder.FindImageBool(缓存嵌入的图片("物品_跳刀_智力跳刀"), "SPACE_handle)
+            //while (ImageFinder.FindImageBool(物品_跳刀"), "SPACE") || ImageFinder.FindImageBool(缓存嵌入的图片("物品.跳刀_智力跳刀"), "SPACE_handle)
             //{
             //    Delay(15);
             //    KeyPress( Keys.Space);
@@ -7943,59 +7935,59 @@ namespace Dota2Simulator.Games.Dota2
 
         #region 小强
 
-        private static async Task<bool> 穿刺去后摇(ImageHandle 句柄)
-        {
-            return await 技能通用判断(Keys.Q, 1).ConfigureAwait(true);
-        }
+        //private static async Task<bool> 穿刺去后摇(ImageHandle 句柄)
+        //{
+        //    return await 技能通用判断(Keys.Q, 1).ConfigureAwait(true);
+        //}
 
-        private static async Task<bool> 神智爆裂去后摇(ImageHandle 句柄)
-        {
-            return await 技能通用判断(Keys.W, 1).ConfigureAwait(true);
-        }
+        //private static async Task<bool> 神智爆裂去后摇(ImageHandle 句柄)
+        //{
+        //    return await 技能通用判断(Keys.W, 1).ConfigureAwait(true);
+        //}
 
-        private static async Task<bool> 尖刺外壳去后摇(ImageHandle 句柄)
-        {
-            return await 技能通用判断(Keys.E, 0, false).ConfigureAwait(true);
-        }
+        //private static async Task<bool> 尖刺外壳去后摇(ImageHandle 句柄)
+        //{
+        //    return await 技能通用判断(Keys.E, 0, false).ConfigureAwait(true);
+        //}
 
-        private static async Task<bool> 复仇接穿刺(ImageHandle 句柄)
-        {
-            if (_全局步骤r == 0)
-            {
-                bool 技能释放 = DOTA2判断技能是否CD(Keys.R, 句柄);
-                if (!技能释放)
-                {
-                    设置全局步骤r(1);
-                }
+        //private static async Task<bool> 复仇接穿刺(ImageHandle 句柄)
+        //{
+        //    if (_全局步骤r == 0)
+        //    {
+        //        bool 技能释放 = DOTA2判断技能是否CD(Keys.R, 句柄);
+        //        if (!技能释放)
+        //        {
+        //            设置全局步骤r(1);
+        //        }
 
-                return await Task.FromResult(true).ConfigureAwait(true);
-            }
-            else if (_全局步骤r == 1)
-            {
-                _ = Task.Run(() =>
-                {
-                    Delay(300);
-                    设置全局步骤r(2);
-                });
-                return await Task.FromResult(true).ConfigureAwait(true);
-            }
-            else
-            {
-                bool 大招状态 = ImageFinder.FindImageInRegionBool(Buff_小强_大招_handle, 句柄, buff状态技能栏);
-                if (大招状态)
-                {
-                    return await Task.FromResult(true).ConfigureAwait(true);
-                }
+        //        return await Task.FromResult(true).ConfigureAwait(true);
+        //    }
+        //    else if (_全局步骤r == 1)
+        //    {
+        //        _ = Task.Run(() =>
+        //        {
+        //            Delay(300);
+        //            设置全局步骤r(2);
+        //        });
+        //        return await Task.FromResult(true).ConfigureAwait(true);
+        //    }
+        //    else
+        //    {
+        //        bool 大招状态 = ImageFinder.FindImageInRegionBool(Buff_小强_大招_handle, 句柄, buff状态技能栏);
+        //        if (大招状态)
+        //        {
+        //            return await Task.FromResult(true).ConfigureAwait(true);
+        //        }
 
-                if (DOTA2释放CD就绪技能(Keys.Q, 句柄))
-                {
-                    return await Task.FromResult(true).ConfigureAwait(true);
-                }
+        //        if (DOTA2释放CD就绪技能(Keys.Q, 句柄))
+        //        {
+        //            return await Task.FromResult(true).ConfigureAwait(true);
+        //        }
 
-                设置全局步骤r(0);
-                return await Task.FromResult(false).ConfigureAwait(true);
-            }
-        }
+        //        设置全局步骤r(0);
+        //        return await Task.FromResult(false).ConfigureAwait(true);
+        //    }
+        //}
 
         private static async Task<bool> 循环接爆裂(ImageHandle 句柄)
         {
@@ -8450,217 +8442,116 @@ namespace Dota2Simulator.Games.Dota2
 
         #region 状态buff
 
-        public static readonly ImageHandle Buff_大牛_回魂_handle = 缓存嵌入的图片("Buff_大牛_回魂");
-        public static readonly ImageHandle Buff_光法_大招_handle = 缓存嵌入的图片("Buff_光法_大招");
-        public static readonly ImageHandle Buff_小精灵_幽魂_handle = 缓存嵌入的图片("Buff_小精灵_幽魂");
-        public static readonly ImageHandle Buff_小精灵_过载_handle = 缓存嵌入的图片("Buff_小精灵_过载");
-        public static readonly ImageHandle Buff_物品_TP_handle = 缓存嵌入的图片("Buff_物品_TP");
-        public static readonly ImageHandle Buff_火猫_无影拳_handle = 缓存嵌入的图片("Buff_火猫_无影拳");
-        public static readonly ImageHandle Buff_小强_大招_handle = 缓存嵌入的图片("Buff_小强_大招");
-        public static readonly ImageHandle Buff_暗影护符_handle = 缓存嵌入的图片("Buff_暗影护符");
+        public static readonly ImageHandle Buff_大牛_回魂_handle = 缓存嵌入的图片("BUFF.大牛_回魂");
+        public static readonly ImageHandle Buff_光法_大招_handle = 缓存嵌入的图片("BUFF.光法_大招");
+        public static readonly ImageHandle Buff_小精灵_幽魂_handle = 缓存嵌入的图片("BUFF.小精灵_幽魂");
+        public static readonly ImageHandle Buff_小精灵_过载_handle = 缓存嵌入的图片("BUFF.小精灵_过载");
+        public static readonly ImageHandle Buff_物品_TP_handle = 缓存嵌入的图片("BUFF.物品_TP");
+        public static readonly ImageHandle Buff_火猫_无影拳_handle = 缓存嵌入的图片("BUFF.火猫_无影拳");
+        public static readonly ImageHandle Buff_小强_大招_handle = 缓存嵌入的图片("BUFF.小强_大招");
+        public static readonly ImageHandle Buff_暗影护符_handle = 缓存嵌入的图片("BUFF.物品_暗影护符");
 
         #endregion
 
         #region 命石
 
-        public static readonly ImageHandle 命石_伐木机_碎木击_handle = 缓存嵌入的图片("命石_伐木机_碎木击");
-        public static readonly ImageHandle 命石_伐木机_锯齿轮旋_handle = 缓存嵌入的图片("命石_伐木机_锯齿轮旋");
-        public static readonly ImageHandle 命石_海民_酒友_handle = 缓存嵌入的图片("命石_海民_酒友");
-        public static readonly ImageHandle 命石_骷髅王_白骨守卫_handle = 缓存嵌入的图片("命石_骷髅王_白骨守卫");
+        public static readonly ImageHandle 命石_伐木机_碎木击_handle = 缓存嵌入的图片("命石.伐木机_碎木击");
+        public static readonly ImageHandle 命石_伐木机_锯齿轮旋_handle = 缓存嵌入的图片("命石.伐木机_锯齿轮旋");
+        public static readonly ImageHandle 命石_海民_酒友_handle = 缓存嵌入的图片("命石.海民_酒友");
+        public static readonly ImageHandle 命石_骷髅王_白骨守卫_handle = 缓存嵌入的图片("命石.骷髅王_白骨守卫");
 
         #endregion
 
         #region 英雄技能
 
-        public static readonly ImageHandle 技能_卡尔_幽灵漫步_handle = 缓存嵌入的图片("技能_卡尔_幽灵漫步");
-        public static readonly ImageHandle 技能_卡尔_强袭飓风_handle = 缓存嵌入的图片("技能_卡尔_强袭飓风");
-        public static readonly ImageHandle 技能_卡尔_极速冷却_handle = 缓存嵌入的图片("技能_卡尔_极速冷却");
-        public static readonly ImageHandle 技能_卡尔_电磁脉冲_handle = 缓存嵌入的图片("技能_卡尔_电磁脉冲");
+        public static readonly ImageHandle 技能_卡尔_幽灵漫步_handle = 缓存嵌入的图片("技能.卡尔_幽灵漫步");
+        public static readonly ImageHandle 技能_卡尔_强袭飓风_handle = 缓存嵌入的图片("技能.卡尔_强袭飓风");
+        public static readonly ImageHandle 技能_卡尔_极速冷却_handle = 缓存嵌入的图片("技能.卡尔_极速冷却");
+        public static readonly ImageHandle 技能_卡尔_电磁脉冲_handle = 缓存嵌入的图片("技能.卡尔_电磁脉冲");
 
         #endregion
 
         #region 播报信息
 
-        public static readonly ImageHandle 播报_买活_handle = 缓存嵌入的图片("播报_买活");
-        public static readonly ImageHandle 播报_塔防标志_handle = 缓存嵌入的图片("播报_塔防标志");
-        public static readonly ImageHandle 播报_盾标志_handle = 缓存嵌入的图片("播报_盾标志");
+        public static readonly ImageHandle 播报_买活_handle = 缓存嵌入的图片("播报.买活");
+        public static readonly ImageHandle 播报_塔防标志_handle = 缓存嵌入的图片("播报.塔防标志");
+        public static readonly ImageHandle 播报_盾标志_handle = 缓存嵌入的图片("播报.盾标志");
 
         #endregion
 
         #region 物品
 
-        public static readonly ImageHandle 物品_以太_handle = 缓存嵌入的图片("物品_以太");
-        public static readonly ImageHandle 物品_假腿_力量腿_handle = 缓存嵌入的图片("物品_假腿_力量腿");
-        public static readonly ImageHandle 物品_假腿_敏捷腿_handle = 缓存嵌入的图片("物品_假腿_敏捷腿");
-        public static readonly ImageHandle 物品_假腿_智力腿_handle = 缓存嵌入的图片("物品_假腿_智力腿");
-        public static readonly ImageHandle 物品_刃甲_handle = 缓存嵌入的图片("物品_刃甲");
-        public static readonly ImageHandle 物品_刷新球_handle = 缓存嵌入的图片("物品_刷新球");
-        public static readonly ImageHandle 物品_否决_handle = 缓存嵌入的图片("物品_否决");
-        public static readonly ImageHandle 物品_吹风_handle = 缓存嵌入的图片("物品_吹风");
-        public static readonly ImageHandle 物品_天堂_handle = 缓存嵌入的图片("物品_天堂");
-        public static readonly ImageHandle 物品_奥术鞋_handle = 缓存嵌入的图片("物品_奥术鞋");
-        public static readonly ImageHandle 物品_希瓦_handle = 缓存嵌入的图片("物品_希瓦");
-        public static readonly ImageHandle 物品_飓风长戟_handle = 缓存嵌入的图片("物品_飓风长戟");
-        public static readonly ImageHandle 物品_青莲宝珠_handle = 缓存嵌入的图片("物品_青莲宝珠");
-        public static readonly ImageHandle 物品_幻影斧_handle = 缓存嵌入的图片("物品_幻影斧");
-        public static readonly ImageHandle 物品_影之灵龛_handle = 缓存嵌入的图片("物品_影之灵龛");
-        public static readonly ImageHandle 物品_推推棒_handle = 缓存嵌入的图片("物品_推推棒");
-        public static readonly ImageHandle 物品_微光披风_handle = 缓存嵌入的图片("物品_微光披风");
-        public static readonly ImageHandle 物品_隐刀_handle = 缓存嵌入的图片("物品_隐刀");
-        public static readonly ImageHandle 物品_大隐刀_handle = 缓存嵌入的图片("物品_大隐刀");
-        public static readonly ImageHandle 物品_散失_handle = 缓存嵌入的图片("物品_散失");
-        public static readonly ImageHandle 物品_散魂_handle = 缓存嵌入的图片("物品_散魂");
-        public static readonly ImageHandle 物品_暗影护符_handle = 缓存嵌入的图片("物品_暗影护符");
-        public static readonly ImageHandle 物品_永世法衣_handle = 缓存嵌入的图片("物品_永世法衣");
-        public static readonly ImageHandle 物品_深渊之刃_handle = 缓存嵌入的图片("物品_深渊之刃");
-        public static readonly ImageHandle 物品_雷神之锤_handle = 缓存嵌入的图片("物品_雷神之锤");
-        public static readonly ImageHandle 物品_长盾_handle = 缓存嵌入的图片("物品_长盾");
-        public static readonly ImageHandle 物品_炎阳纹章_handle = 缓存嵌入的图片("物品_炎阳纹章");
-        public static readonly ImageHandle 物品_玲珑心_handle = 缓存嵌入的图片("物品_玲珑心");
-        public static readonly ImageHandle 物品_魔棒_handle = 缓存嵌入的图片("物品_魔棒");
-        public static readonly ImageHandle 物品_吊坠_handle = 缓存嵌入的图片("物品_吊坠");
-        public static readonly ImageHandle 物品_仙草_handle = 缓存嵌入的图片("物品_仙草");
-        public static readonly ImageHandle 物品_赤红甲_handle = 缓存嵌入的图片("物品_赤红甲");
-        public static readonly ImageHandle 物品_疯狂面具_handle = 缓存嵌入的图片("物品_疯狂面具");
-        public static readonly ImageHandle 物品_相位鞋_handle = 缓存嵌入的图片("物品_相位鞋");
-        public static readonly ImageHandle 物品_紫苑_handle = 缓存嵌入的图片("物品_紫苑");
-        public static readonly ImageHandle 物品_红杖_handle = 缓存嵌入的图片("物品_红杖");
-        public static readonly ImageHandle 物品_红杖2_handle = 缓存嵌入的图片("物品_红杖2");
-        public static readonly ImageHandle 物品_红杖3_handle = 缓存嵌入的图片("物品_红杖3");
-        public static readonly ImageHandle 物品_红杖4_handle = 缓存嵌入的图片("物品_红杖4");
-        public static readonly ImageHandle 物品_红杖5_handle = 缓存嵌入的图片("物品_红杖5");
-        public static readonly ImageHandle 物品_纷争_handle = 缓存嵌入的图片("物品_纷争");
-        public static readonly ImageHandle 物品_纷争_被控_handle = 缓存嵌入的图片("物品_纷争_被控");
-        public static readonly ImageHandle 物品_缚灵锁_handle = 缓存嵌入的图片("物品_缚灵锁");
-        public static readonly ImageHandle 物品_羊刀_handle = 缓存嵌入的图片("物品_羊刀");
-        public static readonly ImageHandle 物品_臂章_handle = 缓存嵌入的图片("物品_臂章");
-        public static readonly ImageHandle 物品_臂章_开启_handle = 缓存嵌入的图片("物品_臂章_开启");
-        public static readonly ImageHandle 物品_虚灵_被控_handle = 缓存嵌入的图片("物品_虚灵_被控");
-        public static readonly ImageHandle 物品_虚灵之刃_handle = 缓存嵌入的图片("物品_虚灵之刃");
-        public static readonly ImageHandle 物品_血棘_handle = 缓存嵌入的图片("物品_血棘");
-        public static readonly ImageHandle 物品_血精石_handle = 缓存嵌入的图片("物品_血精石");
-        public static readonly ImageHandle 物品_跳刀_handle = 缓存嵌入的图片("物品_跳刀");
-        public static readonly ImageHandle 物品_跳刀_力量跳刀_handle = 缓存嵌入的图片("物品_跳刀_力量跳刀");
-        public static readonly ImageHandle 物品_跳刀_敏捷跳刀_handle = 缓存嵌入的图片("物品_跳刀_敏捷跳刀");
-        public static readonly ImageHandle 物品_跳刀_智力跳刀_handle = 缓存嵌入的图片("物品_跳刀_智力跳刀");
-        public static readonly ImageHandle 物品_阿托斯之棍_handle = 缓存嵌入的图片("物品_阿托斯之棍");
-        public static readonly ImageHandle 物品_陨星锤_handle = 缓存嵌入的图片("物品_陨星锤");
-        public static readonly ImageHandle 物品_魂之灵龛_handle = 缓存嵌入的图片("物品_魂之灵龛");
-        public static readonly ImageHandle 物品_魂戒_handle = 缓存嵌入的图片("物品_魂戒");
-        public static readonly ImageHandle 物品_鱼叉_handle = 缓存嵌入的图片("物品_鱼叉");
-        public static readonly ImageHandle 物品_黑皇杖_handle = 缓存嵌入的图片("物品_黑皇杖");
+        public static readonly ImageHandle 物品_以太_handle = 缓存嵌入的图片("物品.以太");
+        public static readonly ImageHandle 物品_假腿_力量腿_handle = 缓存嵌入的图片("物品.假腿_力量腿");
+        public static readonly ImageHandle 物品_假腿_敏捷腿_handle = 缓存嵌入的图片("物品.假腿_敏捷腿");
+        public static readonly ImageHandle 物品_假腿_智力腿_handle = 缓存嵌入的图片("物品.假腿_智力腿");
+        public static readonly ImageHandle 物品_刃甲_handle = 缓存嵌入的图片("物品.刃甲");
+        public static readonly ImageHandle 物品_刷新球_handle = 缓存嵌入的图片("物品.刷新球");
+        public static readonly ImageHandle 物品_否决_handle = 缓存嵌入的图片("物品.否决");
+        public static readonly ImageHandle 物品_吹风_handle = 缓存嵌入的图片("物品.吹风");
+        public static readonly ImageHandle 物品_天堂_handle = 缓存嵌入的图片("物品.天堂");
+        public static readonly ImageHandle 物品_奥术鞋_handle = 缓存嵌入的图片("物品.奥术鞋");
+        public static readonly ImageHandle 物品_希瓦_handle = 缓存嵌入的图片("物品.希瓦");
+        public static readonly ImageHandle 物品_飓风长戟_handle = 缓存嵌入的图片("物品.飓风长戟");
+        public static readonly ImageHandle 物品_青莲宝珠_handle = 缓存嵌入的图片("物品.青莲宝珠");
+        public static readonly ImageHandle 物品_幻影斧_handle = 缓存嵌入的图片("物品.幻影斧");
+        public static readonly ImageHandle 物品_影之灵龛_handle = 缓存嵌入的图片("物品.影之灵龛");
+        public static readonly ImageHandle 物品_推推棒_handle = 缓存嵌入的图片("物品.推推棒");
+        public static readonly ImageHandle 物品_微光披风_handle = 缓存嵌入的图片("物品.微光披风");
+        public static readonly ImageHandle 物品_隐刀_handle = 缓存嵌入的图片("物品.隐刀");
+        public static readonly ImageHandle 物品_大隐刀_handle = 缓存嵌入的图片("物品.大隐刀");
+        public static readonly ImageHandle 物品_散失_handle = 缓存嵌入的图片("物品.散失");
+        public static readonly ImageHandle 物品_散魂_handle = 缓存嵌入的图片("物品.散魂");
+        public static readonly ImageHandle 物品_暗影护符_handle = 缓存嵌入的图片("物品.暗影护符");
+        public static readonly ImageHandle 物品_永世法衣_handle = 缓存嵌入的图片("物品.永世法衣");
+        public static readonly ImageHandle 物品_深渊之刃_handle = 缓存嵌入的图片("物品.深渊之刃");
+        public static readonly ImageHandle 物品_雷神之锤_handle = 缓存嵌入的图片("物品.雷神之锤");
+        public static readonly ImageHandle 物品_长盾_handle = 缓存嵌入的图片("物品.长盾");
+        public static readonly ImageHandle 物品_炎阳纹章_handle = 缓存嵌入的图片("物品.炎阳纹章");
+        public static readonly ImageHandle 物品_玲珑心_handle = 缓存嵌入的图片("物品.玲珑心");
+        public static readonly ImageHandle 物品_魔棒_handle = 缓存嵌入的图片("物品.魔棒");
+        public static readonly ImageHandle 物品_吊坠_handle = 缓存嵌入的图片("物品.吊坠");
+        public static readonly ImageHandle 物品_仙草_handle = 缓存嵌入的图片("物品.仙草");
+        public static readonly ImageHandle 物品_赤红甲_handle = 缓存嵌入的图片("物品.赤红甲");
+        public static readonly ImageHandle 物品_疯狂面具_handle = 缓存嵌入的图片("物品.疯狂面具");
+        public static readonly ImageHandle 物品_相位鞋_handle = 缓存嵌入的图片("物品.相位鞋");
+        public static readonly ImageHandle 物品_紫苑_handle = 缓存嵌入的图片("物品.紫苑");
+        public static readonly ImageHandle 物品_红杖_handle = 缓存嵌入的图片("物品.红杖");
+        public static readonly ImageHandle 物品_红杖2_handle = 缓存嵌入的图片("物品.红杖2");
+        public static readonly ImageHandle 物品_红杖3_handle = 缓存嵌入的图片("物品.红杖3");
+        public static readonly ImageHandle 物品_红杖4_handle = 缓存嵌入的图片("物品.红杖4");
+        public static readonly ImageHandle 物品_红杖5_handle = 缓存嵌入的图片("物品.红杖5");
+        public static readonly ImageHandle 物品_纷争_handle = 缓存嵌入的图片("物品.纷争");
+        public static readonly ImageHandle 物品_被控_纷争_handle = 缓存嵌入的图片("物品.被控_纷争");
+        public static readonly ImageHandle 物品_缚灵锁_handle = 缓存嵌入的图片("物品.缚灵锁");
+        public static readonly ImageHandle 物品_羊刀_handle = 缓存嵌入的图片("物品.羊刀");
+        public static readonly ImageHandle 物品_臂章_handle = 缓存嵌入的图片("物品.臂章");
+        public static readonly ImageHandle 物品_臂章_开启_handle = 缓存嵌入的图片("物品.臂章_开启");
+        public static readonly ImageHandle 物品_被控_虚灵_handle = 缓存嵌入的图片("物品.被控_虚灵");
+        public static readonly ImageHandle 物品_虚灵之刃_handle = 缓存嵌入的图片("物品.虚灵之刃");
+        public static readonly ImageHandle 物品_血棘_handle = 缓存嵌入的图片("物品.血棘");
+        public static readonly ImageHandle 物品_血精石_handle = 缓存嵌入的图片("物品.血精石");
+        public static readonly ImageHandle 物品_跳刀_handle = 缓存嵌入的图片("物品.跳刀");
+        public static readonly ImageHandle 物品_跳刀_力量跳刀_handle = 缓存嵌入的图片("物品.跳刀_力量跳刀");
+        public static readonly ImageHandle 物品_跳刀_敏捷跳刀_handle = 缓存嵌入的图片("物品.跳刀_敏捷跳刀");
+        public static readonly ImageHandle 物品_跳刀_智力跳刀_handle = 缓存嵌入的图片("物品.跳刀_智力跳刀");
+        public static readonly ImageHandle 物品_阿托斯之棍_handle = 缓存嵌入的图片("物品.阿托斯之棍");
+        public static readonly ImageHandle 物品_陨星锤_handle = 缓存嵌入的图片("物品.陨星锤");
+        public static readonly ImageHandle 物品_魂之灵龛_handle = 缓存嵌入的图片("物品.魂之灵龛");
+        public static readonly ImageHandle 物品_魂戒_handle = 缓存嵌入的图片("物品.魂戒");
+        public static readonly ImageHandle 物品_鱼叉_handle = 缓存嵌入的图片("物品.鱼叉");
+        public static readonly ImageHandle 物品_黑皇杖_handle = 缓存嵌入的图片("物品.黑皇杖");
 
-        public static readonly ImageHandle 物品_虚空至宝_雷神之锤_handle = 缓存嵌入的图片("物品_虚空至宝_雷神之锤");
-        public static readonly ImageHandle 物品_虚空至宝_疯狂面具_handle = 缓存嵌入的图片("物品_虚空至宝_疯狂面具");
+        public static readonly ImageHandle 物品_虚空至宝_雷神之锤_handle = 缓存嵌入的图片("物品.虚空至宝_雷神之锤");
+        public static readonly ImageHandle 物品_虚空至宝_疯狂面具_handle = 缓存嵌入的图片("物品.虚空至宝_疯狂面具");
 
-        public static readonly ImageHandle 物品_书_handle = 缓存嵌入的图片("物品_书");
+        public static readonly ImageHandle 物品_书_handle = 缓存嵌入的图片("物品.书");
 
-        public static readonly ImageHandle 中立_永恒遗物_handle = 缓存嵌入的图片("中立_永恒遗物");
-        public static readonly ImageHandle 中立_祭礼长袍_handle = 缓存嵌入的图片("中立_祭礼长袍");
-        #endregion
-
-        #region RPG
-
-        public static readonly ImageHandle RPG_选择天赋_handle = 缓存嵌入的图片("RPG_选择天赋");
-        public static readonly ImageHandle RPG_金色天赋_handle = 缓存嵌入的图片("RPG_金色天赋");
-        public static readonly ImageHandle RPG_普通天赋_handle = 缓存嵌入的图片("RPG_普通天赋");
-
+        public static readonly ImageHandle 中立_永恒遗物_handle = 缓存嵌入的图片("物品.中立_永恒遗物");
+        public static readonly ImageHandle 中立_祭礼长袍_handle = 缓存嵌入的图片("物品.中立_祭礼长袍");
         #endregion
 
         #endregion
-
-        #region 初始化DOTA2用到的图片
-
-        private static void 初始化DOTA2用到的图片()
-        {
-            /*
-            缓存嵌入的图片("Buff_大牛_回魂");
-            缓存嵌入的图片("Buff_光法_大招");
-            缓存嵌入的图片("Buff_小精灵_幽魂");
-            缓存嵌入的图片("Buff_小精灵_过载");
-            缓存嵌入的图片("Buff_物品_TP");
-            缓存嵌入的图片("Buff_火猫_无影拳");
-            缓存嵌入的图片("Buff_小强_大招");
-
-            缓存嵌入的图片("命石_伐木机_碎木击");
-            缓存嵌入的图片("命石_伐木机_锯齿轮旋");
-            缓存嵌入的图片("命石_海民_酒友");
-            缓存嵌入的图片("命石_骷髅王_白骨守卫");
-
-            缓存嵌入的图片("技能_卡尔_幽灵漫步");
-            缓存嵌入的图片("技能_卡尔_强袭飓风");
-            缓存嵌入的图片("技能_卡尔_极速冷却");
-            缓存嵌入的图片("技能_卡尔_电磁脉冲");
-
-            缓存嵌入的图片("播报_买活");
-            缓存嵌入的图片("播报_塔防标志");
-            缓存嵌入的图片("播报_盾标志");
-
-            缓存嵌入的图片("物品_以太");
-            缓存嵌入的图片("物品_假腿_力量腿");
-            缓存嵌入的图片("物品_假腿_敏捷腿");
-            缓存嵌入的图片("物品_假腿_智力腿");
-            缓存嵌入的图片("物品_刃甲");
-            缓存嵌入的图片("物品_刷新球");
-            缓存嵌入的图片("物品_否决");
-            缓存嵌入的图片("物品_吹风");
-            缓存嵌入的图片("物品_天堂");
-            缓存嵌入的图片("物品_奥术鞋");
-            缓存嵌入的图片("物品_希瓦");
-            缓存嵌入的图片("物品_青莲宝珠");
-            缓存嵌入的图片("物品_飓风长戟");
-            缓存嵌入的图片("物品_幻影斧");
-            缓存嵌入的图片("物品_影之灵龛");
-            缓存嵌入的图片("物品_推推棒");
-            缓存嵌入的图片("物品_微光披风");
-            缓存嵌入的图片("物品_隐刀");
-            缓存嵌入的图片("物品_大隐刀");
-            缓存嵌入的图片("物品_散失");
-            缓存嵌入的图片("物品_散魂");
-            缓存嵌入的图片("物品_暗影护符");
-            缓存嵌入的图片("物品_暗影护符buff");
-            缓存嵌入的图片("物品_永世法衣");
-            缓存嵌入的图片("物品_永恒遗物");
-            缓存嵌入的图片("物品_深渊之刃");
-            缓存嵌入的图片("物品_雷神之锤");
-            缓存嵌入的图片("物品_雷神之锤_虚空至宝");
-            缓存嵌入的图片("物品_炎阳纹章");
-            缓存嵌入的图片("物品_玲珑心");
-            缓存嵌入的图片("物品_魔棒");
-            缓存嵌入的图片("物品_吊坠");
-            缓存嵌入的图片("物品_仙草");
-            缓存嵌入的图片("物品_疯狂面具");
-            缓存嵌入的图片("物品_疯狂面具_虚空至宝");
-            缓存嵌入的图片("物品_相位鞋");
-            缓存嵌入的图片("物品_祭礼长袍");
-            缓存嵌入的图片("物品_紫苑");
-            缓存嵌入的图片("物品_红杖");
-            缓存嵌入的图片("物品_红杖2");
-            缓存嵌入的图片("物品_红杖3");
-            缓存嵌入的图片("物品_红杖4");
-            缓存嵌入的图片("物品_红杖5");
-            缓存嵌入的图片("物品_纷争");
-            缓存嵌入的图片("物品_纷争_被控");
-            缓存嵌入的图片("物品_缚灵锁");
-            缓存嵌入的图片("物品_羊刀");
-            缓存嵌入的图片("物品_臂章");
-            缓存嵌入的图片("物品_臂章_开启");
-            缓存嵌入的图片("物品_虚灵_被控");
-            缓存嵌入的图片("物品_虚灵之刃");
-            缓存嵌入的图片("物品_血棘");
-            缓存嵌入的图片("物品_血精石");
-            缓存嵌入的图片("物品_跳刀");
-            缓存嵌入的图片("物品_跳刀_力量跳刀");
-            缓存嵌入的图片("物品_跳刀_敏捷跳刀");
-            缓存嵌入的图片("物品_跳刀_智力跳刀");
-            缓存嵌入的图片("物品_阿托斯之棍");
-            缓存嵌入的图片("物品_陨星锤");
-            缓存嵌入的图片("物品_魂之灵龛");
-            缓存嵌入的图片("物品_魂戒");
-            缓存嵌入的图片("物品_鱼叉");
-            缓存嵌入的图片("物品_黑皇杖");
-            */
-        }
 
         /// <summary>
         /// 缓存对应的句柄
@@ -8705,6 +8596,7 @@ namespace Dota2Simulator.Games.Dota2
             else
             {
                 Tts.Speak($"{bpName}图片不存在");
+                Delay(3000);
                 return ImageHandle.Invalid;
             }
         }
@@ -8979,7 +8871,7 @@ namespace Dota2Simulator.Games.Dota2
                 Delay(330); // 基本延迟用于迷雾显示
             }
 
-            PooledList<Point> list = 获取敌方坐标(_全局图像句柄);
+            PooledList<Point> list = 获取敌方坐标(GlobalScreenCapture.GetCurrentHandle());
 
             int 偏移x = 1920;
             int 偏移y = 1080;
@@ -9079,7 +8971,7 @@ namespace Dota2Simulator.Games.Dota2
 
         private static async Task<Point> 快速获取自身坐标(int width = 1920, int height = 1080)
         {
-            return await Task.FromResult(获取自身坐标(_全局图像句柄)).ConfigureAwait(true);
+            return await Task.FromResult(获取自身坐标(GlobalScreenCapture.GetCurrentHandle())).ConfigureAwait(true);
         }
 
         #endregion
@@ -9129,118 +9021,6 @@ namespace Dota2Simulator.Games.Dota2
 
         #endregion
 
-#endregion
-
-        #region RPG
-#if RPG
-        private static async Task<bool> 有书吃书(ImageHandle 句柄)
-        {
-            根据图片使用物品(物品_书_handle);
-            return await Task.FromResult(true).ConfigureAwait(true);
-        }
-
-        private readonly static Rectangle RPG选择技能范围 = new(757, 161, 384, 62);
-        private readonly static Rectangle RPG第一技能金 = new(631, 290, 60, 400);
-
-        private static int 获取碎片循环计数;
-        private static Point 之前位置;
-
-        public static void 跳过循环获取金碎片(in ImageHandle 句柄)
-        {
-            if (获取碎片循环计数 == 0) 之前位置 = Control.MousePosition;
-
-            if (获取碎片循环计数 > 12)
-            {
-                获取碎片循环计数 = 0;
-                SimKeyBoard.MouseMove(之前位置);
-                之前位置 = new();
-                Tts.Speak("12次退出");
-                var 当前英雄 = "";
-                Form?.Invoke(() =>
-                {
-                    当前英雄 = Form.tb_name.Text.Trim();
-                });
-                if (当前英雄 == "飞机")
-                {
-                    // 需要循环需加速buff
-                    SimKeyBoard.MouseMove(1332, 92);
-                    Delay(50);
-                    SimKeyBoard.MouseLeftClick();
-                }
-            }
-            else
-            {
-                if (ImageFinder.FindImageInRegionBool(in RPG_选择天赋_handle, in _全局图像句柄, RPG选择技能范围)
-                    && ImageFinder.FindImageInRegionBool(in RPG_普通天赋_handle, in _全局图像句柄, RPG第一技能金))
-                {
-                    SimKeyBoard.MouseMove(768, 674);
-                    Delay(50);
-                    SimKeyBoard.MouseLeftClick();
-                    Delay(50);
-                    SimKeyBoard.MouseLeftClick();
-                    获取碎片循环计数++;
-                    Task.Run(() =>
-                    {
-                        Delay(250);
-                        // 自我调用
-                        SimKeyBoard.KeyPress(Keys.NumPad1);
-                    }).ConfigureAwait(true);
-                }
-            }
-        }
-
-
-        public static void 自动屏蔽3个选项(in ImageHandle 句柄)
-        {
-            if (ImageFinder.FindImageInRegionBool(in RPG_选择天赋_handle, in _全局图像句柄, RPG选择技能范围))
-            {
-                var p = Control.MousePosition;
-                // 第三个技能右上角颜色金
-                if (ColorExtensions.ColorAEqualColorB(ImageManager.GetColor(_全局图像句柄, new Point(1318, 296)),
-                    Color.FromArgb(188, 134, 1), 10))
-                {
-                    SimKeyBoard.MouseMove(690, 673);
-                    Delay(100);
-                    SimKeyBoard.MouseLeftClick();
-                    Delay(100);
-                    SimKeyBoard.MouseMove(953, 673);
-                    Delay(100);
-                    SimKeyBoard.MouseLeftClick();
-                    Delay(100);
-                    SimKeyBoard.MouseMove(1205, 673);
-                    Delay(100);
-                    SimKeyBoard.MouseLeftClick();
-                    Delay(100);
-                    SimKeyBoard.MouseMove(540, 146);
-                    Delay(100);
-                    SimKeyBoard.MouseLeftClick();
-                    Delay(100);
-                }
-                SimKeyBoard.MouseMove(p);
-            }
-        }
-        public static void 点击黑皇(in ImageHandle 句柄)
-        {
-            var p = Control.MousePosition;
-            SimKeyBoard.MouseMove(40, 500);
-            Delay(50);
-            SimKeyBoard.MouseLeftClick();
-            Delay(50);
-            SimKeyBoard.MouseMove(p);
-        }
-
-        public static void 点击暴击(in ImageHandle 句柄)
-        {
-            var p = Control.MousePosition;
-            SimKeyBoard.MouseMove(40, 580);
-            Delay(50);
-            SimKeyBoard.MouseLeftClick();
-            Delay(50);
-            SimKeyBoard.MouseMove(p);
-        }
-#endif
-        #endregion
-
         #endregion
 
         #region 测试_捕捉颜色
@@ -9265,6 +9045,7 @@ namespace Dota2Simulator.Games.Dota2
 
             物品信息 物品 = 物品4;
 
+            // 根据阵营设置456,设置物品456
             Form?.Invoke(() =>
             {
                 物品 = Form.tb_阵营.Text switch
@@ -9277,12 +9058,12 @@ namespace Dota2Simulator.Games.Dota2
             });
 
             // 默认物品4 1138,954,50,17
-            ImageManager.SaveImage(_全局图像句柄, "J:\\Desktop\\物品_1.bmp",new Rectangle(物品.物品最左侧x + 2, 物品.物品最上侧y + 11, 50,17));
-            ImageManager.SaveImage(_全局图像句柄, "J:\\Desktop\\物品_2.bmp", new Rectangle(物品.物品最左侧x + 2 + 物品.物品间隔x, 物品.物品最上侧y + 11, 50, 17));
-            ImageManager.SaveImage(_全局图像句柄, "J:\\Desktop\\物品_3.bmp", new Rectangle(物品.物品最左侧x + 2 + 物品.物品间隔x * 2, 物品.物品最上侧y + 11, 50, 17));
-            ImageManager.SaveImage(_全局图像句柄, "J:\\Desktop\\物品_4.bmp", new Rectangle(物品.物品最左侧x + 2, 物品.物品最上侧y + 11 + 物品.物品间隔y, 50, 17));
-            ImageManager.SaveImage(_全局图像句柄, "J:\\Desktop\\物品_5.bmp", new Rectangle(物品.物品最左侧x + 2 + 物品.物品间隔x, 物品.物品最上侧y + 11 + 物品.物品间隔y, 50, 17));
-            ImageManager.SaveImage(_全局图像句柄, "J:\\Desktop\\物品_6.bmp", new Rectangle(物品.物品最左侧x + 2 + 物品.物品间隔x * 2, 物品.物品最上侧y + 11 + 物品.物品间隔y, 50, 17));
+            ImageManager.SaveImage(GlobalScreenCapture.GetCurrentHandle(), "J:\\Desktop\\物品_1.bmp",new Rectangle(物品.物品最左侧x + 2, 物品.物品最上侧y + 11, 50,17));
+            ImageManager.SaveImage(GlobalScreenCapture.GetCurrentHandle(), "J:\\Desktop\\物品_2.bmp", new Rectangle(物品.物品最左侧x + 2 + 物品.物品间隔x, 物品.物品最上侧y + 11, 50, 17));
+            ImageManager.SaveImage(GlobalScreenCapture.GetCurrentHandle(), "J:\\Desktop\\物品_3.bmp", new Rectangle(物品.物品最左侧x + 2 + 物品.物品间隔x * 2, 物品.物品最上侧y + 11, 50, 17));
+            ImageManager.SaveImage(GlobalScreenCapture.GetCurrentHandle(), "J:\\Desktop\\物品_4.bmp", new Rectangle(物品.物品最左侧x + 2, 物品.物品最上侧y + 11 + 物品.物品间隔y, 50, 17));
+            ImageManager.SaveImage(GlobalScreenCapture.GetCurrentHandle(), "J:\\Desktop\\物品_5.bmp", new Rectangle(物品.物品最左侧x + 2 + 物品.物品间隔x, 物品.物品最上侧y + 11 + 物品.物品间隔y, 50, 17));
+            ImageManager.SaveImage(GlobalScreenCapture.GetCurrentHandle(), "J:\\Desktop\\物品_6.bmp", new Rectangle(物品.物品最左侧x + 2 + 物品.物品间隔x * 2, 物品.物品最上侧y + 11 + 物品.物品间隔y, 50, 17));
 
             //var a1 = 获取指定位置颜色(物品.物品锁闭x + i1, 物品.物品锁闭y).Result;
             //var a2 = 获取指定位置颜色(物品.物品锁闭x + 物品.物品间隔x + i1, 物品.物品锁闭y).Result;
@@ -9302,7 +9083,7 @@ namespace Dota2Simulator.Games.Dota2
             //    _ = 获取图片_2();
             //}
             //根据图片使用物品(物品_臂章_开启_handle);
-            //DOTA2获取所有释放技能前颜色(in _全局图像句柄);
+            //DOTA2获取所有释放技能前颜色(GlobalScreenCapture.GetCurrentHandle());
             Form?.Invoke(() => { Form.tb_y.Text = (获取当前时间毫秒() - _全局时间).ToString(CultureInfo.InvariantCulture); });
 
             Tts.Speak("完成");
@@ -9335,7 +9116,7 @@ namespace Dota2Simulator.Games.Dota2
                 {
                     _ = 获取图片_2();
 
-                    var color = ImageManager.GetColor(_全局图像句柄, x, y);
+                    var color = GlobalScreenCapture.GetColor(x, y);
 
                     if (colors.Count == 0)
                     {
@@ -9414,7 +9195,7 @@ namespace Dota2Simulator.Games.Dota2
                             new ParallelOptions { MaxDegreeOfParallelism = Environment.ProcessorCount },
                             config =>
                             {
-                                var color = 获取技能颜色(config.SkillKey, in _全局图像句柄, config.SkillCount, config.ColorType);
+                                var color = 获取技能颜色(config.SkillKey, GlobalScreenCapture.GetCurrentHandle(), config.SkillCount, config.ColorType);
                                 lock (colorCache)
                                 {
                                     colorCache[config.Key] = color;
@@ -9664,11 +9445,11 @@ namespace Dota2Simulator.Games.Dota2
                     // 处理命石相关逻辑
                     if (_命石根据图片委托 is not null)
                     {
-                        await _命石根据图片委托(_全局图像句柄).ConfigureAwait(true);
+                        await _命石根据图片委托(GlobalScreenCapture.GetCurrentHandle()).ConfigureAwait(true);
                     }
 
                     // 获取技能颜色信息
-                    DOTA2获取所有释放技能前颜色(_全局图像句柄);
+                    DOTA2获取所有释放技能前颜色(GlobalScreenCapture.GetCurrentHandle());
 
                     // 核心逻辑：处理条件更新，包括运行期外部修改
                     await 处理条件更新_带外部变化检测(条件配置).ConfigureAwait(true);
@@ -9768,7 +9549,7 @@ namespace Dota2Simulator.Games.Dota2
         // 保持原有的检查条件并执行委托逻辑
         private static async Task<bool> 检查条件并执行委托(bool 条件, ConditionDelegateBitmap 委托)
         {
-            return 条件 && 委托 is not null ? await 委托(_全局图像句柄).ConfigureAwait(true) : 条件;
+            return 条件 && 委托 is not null ? await 委托(GlobalScreenCapture.GetCurrentHandle()).ConfigureAwait(true) : 条件;
         }
 
         private static async Task 处理假腿切换()
@@ -9795,7 +9576,7 @@ namespace Dota2Simulator.Games.Dota2
                     _ => throw new NotImplementedException()
                 };
 
-                if (ImageFinder.FindImageInRegionBool(句柄, in _全局图像句柄, 获取物品范围(_技能数量)))
+                if (ImageFinder.FindImageInRegionBool(句柄, GlobalScreenCapture.GetCurrentHandle(), 获取物品范围(_技能数量)))
                 {
                     return;
                 }
@@ -9813,8 +9594,8 @@ namespace Dota2Simulator.Games.Dota2
 
         private static async Task 状态初始化()
         {
-#if RPG
-            _条件根据图片委托8 ??= 有书吃书;
+#if Silt
+            _条件根据图片委托8 ??= Silt.Main.有书吃书;
             _条件8 = true;
 #endif
             _循环内获取图片 ??= 获取图片_2;
@@ -9917,6 +9698,16 @@ namespace Dota2Simulator.Games.Dota2
         #region 获取图片
 
         /// <summary>
+        ///     初始化全屏捕捉
+        ///     <para>图像信息赋值给GlobalScreenCapture.GetCurrentHandle()</para>
+        /// </summary>
+        /// <param name="rectangle">截图区域,自动调整偏移量</param>
+        private static void 执行屏幕捕捉捕捉(in Rectangle rectangle)
+        {
+            GlobalScreenCapture.CaptureScreen(rectangle);
+        }
+
+        /// <summary>
         ///     获取时间为6.92ms，占程序的大头
         /// </summary>
         /// <returns></returns>
@@ -9929,19 +9720,19 @@ namespace Dota2Simulator.Games.Dota2
             //_全局图像 ??= new Bitmap(截图模式1W, 截图模式1H);
 
             /* 
-            if (_全局图像句柄 == null || _全局图像句柄.图片尺寸.Width + _全局图像句柄.图片尺寸.Height == 0)
+            if (GlobalScreenCapture.GetCurrentHandle() == null || GlobalScreenCapture.GetCurrentHandle().图片尺寸.Width + GlobalScreenCapture.GetCurrentHandle().图片尺寸.Height == 0)
             {
-                _全局图像句柄 = new ImageHandle(new byte[截图模式1W * 截图模式1H * 4], new Size(截图模式1W, 截图模式1H));
+                GlobalScreenCapture.GetCurrentHandle() = new ImageHandle(new byte[截图模式1W * 截图模式1H * 4], new Size(截图模式1W, 截图模式1H));
             }
 
             // 更新字节数组
-            CaptureScreen_固定数组(_全局图像句柄, 截图模式1X, 截图模式1Y);
+            CaptureScreen_固定数组(GlobalScreenCapture.GetCurrentHandle(), 截图模式1X, 截图模式1Y);
 
             //// 捕获屏幕
             //CaptureScreen_固定大小(ref _全局图像, 截图模式1X, 截图模式1Y);
 
             //// 获取位图字节数组
-            //GetBitmapByte_固定数组(in _全局图像, ref _全局图像句柄);
+            //GetBitmapByte_固定数组(in _全局图像, ref GlobalScreenCapture.GetCurrentHandle());
 
             // 直接返回已完成的任务，减少异步开销
             return await Task.FromResult(true).ConfigureAwait(true);
@@ -9950,33 +9741,6 @@ namespace Dota2Simulator.Games.Dota2
             执行屏幕捕捉捕捉(截图模式1Reg);
 
             return true;
-        }
-
-        /// <summary>
-        ///     初始化全屏捕捉
-        ///     <para>图像信息赋值给_全局图像句柄</para>
-        /// </summary>
-        /// <param name="rectangle">截图区域,自动调整偏移量</param>
-        private static void 执行屏幕捕捉捕捉(in Rectangle rectangle)
-        {
-            // 如果全局图像句柄无效，创建一个
-            if (!_全局图像句柄.IsValid)
-            {
-                // 创建全局截图缓冲区
-                var initialData = new byte[rectangle.Width * rectangle.Height * 4];
-                _全局图像句柄 = ImageManager.CreateDynamicImage(
-                    initialData,
-                    new Size(rectangle.Width, rectangle.Height),
-                    "GlobalScreen"
-                );
-
-                // 调整坐标偏移
-                坐标偏移x = rectangle.X;
-                坐标偏移y = rectangle.Y;
-            }
-
-            // 更新截图数据到全局缓冲区
-            OptimizedGraphics.CaptureScreenToHandle(_全局图像句柄, rectangle.X, rectangle.Y);
         }
 
         public static bool 获取图片_2()
@@ -9989,19 +9753,19 @@ namespace Dota2Simulator.Games.Dota2
             // 优化之后16-17ms fps 58+
             //_全局图像 ??= new Bitmap(1920, 1080);
 
-            //if (_全局图像句柄 == null || _全局图像句柄.图片尺寸.Width == 截图模式1W || _全局图像句柄.图片尺寸.Height == 截图模式1H)
+            //if (GlobalScreenCapture.GetCurrentHandle() == null || GlobalScreenCapture.GetCurrentHandle().图片尺寸.Width == 截图模式1W || GlobalScreenCapture.GetCurrentHandle().图片尺寸.Height == 截图模式1H)
             //{
-            //    _全局图像句柄 = new ImageHandle(new byte[1920 * 1080 * 4], new Size(1920, 1080));
+            //    GlobalScreenCapture.GetCurrentHandle() = new ImageHandle(new byte[1920 * 1080 * 4], new Size(1920, 1080));
             //}
 
             //// 更新字节数组
-            //CaptureScreen_固定数组(_全局图像句柄, 0, 0);
+            //CaptureScreen_固定数组(GlobalScreenCapture.GetCurrentHandle(), 0, 0);
 
             ////// 捕获屏幕
             ////CaptureScreen_固定大小(ref _全局图像, 0, 0);
 
             ////// 获取位图字节数组
-            ////GetBitmapByte_固定数组(in _全局图像, ref _全局图像句柄);
+            ////GetBitmapByte_固定数组(in _全局图像, ref GlobalScreenCapture.GetCurrentHandle());
 
             //// 直接返回已完成的任务，减少异步开销
             //return await Task.FromResult(true).ConfigureAwait(true);
@@ -10019,9 +9783,9 @@ namespace Dota2Simulator.Games.Dota2
             _缓存图像句柄.Clear();
 
             // 释放全局图像
-            if (_全局图像句柄.IsValid)
+            if (GlobalScreenCapture.GetCurrentHandle().IsValid)
             {
-                ImageManager.ReleaseImage(_全局图像句柄);
+                ImageManager.ReleaseImage(GlobalScreenCapture.GetCurrentHandle());
             }
 
             // 执行完整清理

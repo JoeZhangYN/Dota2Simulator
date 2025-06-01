@@ -1,4 +1,5 @@
-﻿using NLog;
+﻿using ImageProcessingSystem;
+using NLog;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -7,7 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using static OptimizedGraphics;
 
-namespace ImageProcessingSystem.Performance
+namespace Dota2Simulator.PictureProcessing.BenchMark
 {
     #region 测试结果
     /*
@@ -413,7 +414,7 @@ namespace ImageProcessingSystem.Performance
 
             var fullScreenResult = await fullScreenTest.RunAsync(async () =>
             {
-                var handle = OptimizedGraphics.CaptureScreen(0, 0, 1920, 1080);
+                var handle = CaptureScreen(0, 0, 1920, 1080);
 
                 // 处理各个区域
                 foreach (var region in testRegions)
@@ -446,7 +447,7 @@ namespace ImageProcessingSystem.Performance
 
                 foreach (var region in testRegions)
                 {
-                    var handle = OptimizedGraphics.CaptureScreen(
+                    var handle = CaptureScreen(
                         region.X, region.Y, region.Width, region.Height);
                     handles.Add(handle);
 
@@ -471,7 +472,7 @@ namespace ImageProcessingSystem.Performance
             comparator.AddResult(multiCaptureResult);
 
             // 测试3: 缓存策略
-            var cachedHandle = OptimizedGraphics.GetOrCreateScreenCaptureHandle(
+            var cachedHandle = GetOrCreateScreenCaptureHandle(
                 "CachedScreen", 1920, 1080);
 
             var cachedTest = new PerformanceTestRunner("缓存句柄策略")
@@ -483,7 +484,7 @@ namespace ImageProcessingSystem.Performance
             var cachedResult = await cachedTest.RunAsync(async () =>
             {
                 // 更新缓存的句柄
-                OptimizedGraphics.CaptureScreenToHandle(cachedHandle, 0, 0);
+                CaptureScreenToHandle(cachedHandle, 0, 0);
 
                 // 处理各个区域
                 foreach (var region in testRegions)
@@ -507,7 +508,7 @@ namespace ImageProcessingSystem.Performance
             _logger.Info(comparator.GetComparisonReport());
 
             // 清理
-            OptimizedGraphics.ReleaseScreenCaptureHandle("CachedScreen");
+            ReleaseScreenCaptureHandle("CachedScreen");
         }
 
         /// <summary>
@@ -518,7 +519,7 @@ namespace ImageProcessingSystem.Performance
             var comparator = new PerformanceComparator();
             var testRegion = new System.Drawing.Rectangle(0, 0, 1920, 1080);
 
-            var cachedHandle = OptimizedGraphics.GetOrCreateScreenCaptureHandle(
+            var cachedHandle = GetOrCreateScreenCaptureHandle(
                 "CachedScreen", 1920, 1080);
 
             var 使用缓存 = false;
@@ -549,7 +550,7 @@ namespace ImageProcessingSystem.Performance
                         var result = test.Run(() =>
                         {
                             // 更新缓存的句柄
-                            OptimizedGraphics.CaptureScreenToHandle(cachedHandle, 0, 0);
+                            CaptureScreenToHandle(cachedHandle, 0, 0);
                         });
 
                         comparator.AddResult(result);
@@ -558,7 +559,7 @@ namespace ImageProcessingSystem.Performance
                     {
                         var result = test.Run(() =>
                         {
-                            var handle = OptimizedGraphics.CaptureScreen(
+                            var handle = CaptureScreen(
                                 testRegion.X, testRegion.Y,
                                 testRegion.Width, testRegion.Height);
                             ImageManager.ReleaseImage(handle);
@@ -580,7 +581,7 @@ namespace ImageProcessingSystem.Performance
         public static void SetPreferredCaptureMethod(CaptureMethod method)
         {
             // 需要在OptimizedGraphics类中添加此方法
-            OptimizedGraphics.SetPreferredMethod(method);
+            SetPreferredMethod(method);
         }
     }
 }

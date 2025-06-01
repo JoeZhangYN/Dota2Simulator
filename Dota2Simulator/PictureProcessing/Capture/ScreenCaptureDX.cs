@@ -10,7 +10,7 @@ using Resource = SharpDX.DXGI.Resource;
 using ResultCode = SharpDX.DXGI.ResultCode;
 
 
-namespace Dota2Simulator.PictureProcessing
+namespace Dota2Simulator.PictureProcessing.Capture
 {
     internal class ScreenCaptureDX : IDisposable
     {
@@ -140,7 +140,7 @@ namespace Dota2Simulator.PictureProcessing
                 Rectangle boundsRect = new(0, 0, captureRegion.Width, captureRegion.Height);
 
                 BitmapData mapDest = bitmap.LockBits(boundsRect, ImageLockMode.WriteOnly, bitmap.PixelFormat);
-                nint sourcePtr = mapSource.DataPointer + (captureRegion.Y * mapSource.RowPitch) + (captureRegion.X * 4);
+                nint sourcePtr = mapSource.DataPointer + captureRegion.Y * mapSource.RowPitch + captureRegion.X * 4;
                 nint destPtr = mapDest.Scan0;
                 int sourcePitch = mapSource.RowPitch;
                 int destPitch = mapDest.Stride;
@@ -148,8 +148,8 @@ namespace Dota2Simulator.PictureProcessing
                 for (int y = 0; y < captureRegion.Height; y++)
                 {
                     Utilities.CopyMemory(destPtr, sourcePtr, captureRegion.Width * 4);
-                    sourcePtr = IntPtr.Add(sourcePtr, sourcePitch);
-                    destPtr = IntPtr.Add(destPtr, destPitch);
+                    sourcePtr = nint.Add(sourcePtr, sourcePitch);
+                    destPtr = nint.Add(destPtr, destPitch);
                 }
 
                 bitmap.UnlockBits(mapDest);

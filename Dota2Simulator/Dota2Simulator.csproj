@@ -15,7 +15,7 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <FileAlignment>4096</FileAlignment>
     <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
-    <DefineConstants>$(DefineConstants);DOTA2;TRACE;RPG</DefineConstants>
+    <DefineConstants>$(DefineConstants);DOTA2;TRACE;Silt</DefineConstants>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
@@ -24,7 +24,7 @@
 	<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 	<FileAlignment>4096</FileAlignment>
 	<CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
-	<DefineConstants>$(DefineConstants);DOTA2;TRACE;RPG</DefineConstants>
+	<DefineConstants>$(DefineConstants);DOTA2;TRACE;Silt</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>
@@ -44,6 +44,27 @@
     <None Remove="Picture_Dota2\RPG_普通天赋.bmp" />
     <None Remove="Picture_Dota2\RPG_选择天赋.bmp" />
     <None Remove="Picture_Dota2\RPG_金色天赋.bmp" />
+    <None Remove="Picture_Dota2\Silt\钢背\刺针扫射.bmp" />
+    <None Remove="Picture_Dota2\Silt\钢背\战意.bmp" />
+    <None Remove="Picture_Dota2\Silt\钢背\毛团.bmp" />
+    <None Remove="Picture_Dota2\Silt\钢背\鼻涕.bmp" />
+    <None Remove="Picture_Dota2\Silt\附魔\冒险.bmp" />
+    <None Remove="Picture_Dota2\Silt\附魔\吸血鬼.bmp" />
+    <None Remove="Picture_Dota2\Silt\附魔\坚强.bmp" />
+    <None Remove="Picture_Dota2\Silt\附魔\壮实.bmp" />
+    <None Remove="Picture_Dota2\Silt\附魔\巨神.bmp" />
+    <None Remove="Picture_Dota2\Silt\附魔\捷足.bmp" />
+    <None Remove="Picture_Dota2\Silt\附魔\无边.bmp" />
+    <None Remove="Picture_Dota2\Silt\附魔\永恒.bmp" />
+    <None Remove="Picture_Dota2\Silt\附魔\犀利.bmp" />
+    <None Remove="Picture_Dota2\Silt\附魔\狂热.bmp" />
+    <None Remove="Picture_Dota2\Silt\附魔\睿智.bmp" />
+    <None Remove="Picture_Dota2\Silt\附魔\神秘.bmp" />
+    <None Remove="Picture_Dota2\Silt\附魔\粗暴.bmp" />
+    <None Remove="Picture_Dota2\Silt\附魔\警觉.bmp" />
+    <None Remove="Picture_Dota2\Silt\附魔\贪婪.bmp" />
+    <None Remove="Picture_Dota2\Silt\附魔\迅速.bmp" />
+    <None Remove="Picture_Dota2\Silt\附魔\进化.bmp" />
     <None Remove="Picture_Dota2\命石_伐木机_碎木击.bmp" />
     <None Remove="Picture_Dota2\命石_伐木机_锯齿轮旋.bmp" />
     <None Remove="Picture_Dota2\命石_海民_酒友.bmp" />
@@ -118,97 +139,119 @@
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="Picture_Dota2\Buff_光法_大招.bmp" />
-    <EmbeddedResource Include="Picture_Dota2\Buff_小强_大招.bmp" />
-    <EmbeddedResource Include="Picture_Dota2\Buff_小精灵_过载.bmp">
+    <EmbeddedResource Include="Picture_Dota2\BUFF\光法_大招.bmp" />
+    <EmbeddedResource Include="Picture_Dota2\BUFF\小强_大招.bmp" />
+    <EmbeddedResource Include="Picture_Dota2\BUFF\小精灵_过载.bmp">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="Picture_Dota2\Buff_火猫_无影拳.bmp" />
-    <EmbeddedResource Include="Picture_Dota2\RPG_普通天赋.bmp" />
-    <EmbeddedResource Include="Picture_Dota2\RPG_选择天赋.bmp" />
-    <EmbeddedResource Include="Picture_Dota2\RPG_金色天赋.bmp" />
-    <EmbeddedResource Include="Picture_Dota2\命石_伐木机_碎木击.bmp" />
-    <EmbeddedResource Include="Picture_Dota2\命石_伐木机_锯齿轮旋.bmp" />
-    <EmbeddedResource Include="Picture_Dota2\技能_卡尔_幽灵漫步.bmp" />
-    <EmbeddedResource Include="Picture_Dota2\技能_卡尔_强袭飓风.bmp" />
-    <EmbeddedResource Include="Picture_Dota2\技能_卡尔_极速冷却.bmp" />
-    <EmbeddedResource Include="Picture_Dota2\技能_卡尔_电磁脉冲.bmp" />
-    <EmbeddedResource Include="Picture_Dota2\命石_海民_酒友.bmp" />
-    <EmbeddedResource Include="Picture_Dota2\Buff_大牛_回魂.bmp" />
-    <EmbeddedResource Include="Picture_Dota2\Buff_小精灵_幽魂.bmp" />
-    <EmbeddedResource Include="Picture_Dota2\播报_买活.bmp" />
-    <EmbeddedResource Include="Picture_Dota2\播报_塔防标志.bmp" />
-    <EmbeddedResource Include="Picture_Dota2\播报_盾标志.bmp" />
-    <EmbeddedResource Include="Picture_Dota2\Buff_物品_TP.bmp" />
-    <EmbeddedResource Include="Picture_Dota2\物品_书.bmp" />
-    <EmbeddedResource Include="Picture_Dota2\物品_仙草.bmp" />
-    <EmbeddedResource Include="Picture_Dota2\物品_以太.bmp" />
-    <EmbeddedResource Include="Picture_Dota2\物品_假腿_力量腿.bmp" />
-    <EmbeddedResource Include="Picture_Dota2\物品_假腿_敏捷腿.bmp" />
-    <EmbeddedResource Include="Picture_Dota2\物品_假腿_智力腿.bmp" />
-    <EmbeddedResource Include="Picture_Dota2\物品_刃甲.bmp" />
-    <EmbeddedResource Include="Picture_Dota2\物品_刷新球.bmp" />
-    <EmbeddedResource Include="Picture_Dota2\物品_吊坠.bmp" />
-    <EmbeddedResource Include="Picture_Dota2\物品_否决.bmp" />
-    <EmbeddedResource Include="Picture_Dota2\物品_吹风.bmp" />
-    <EmbeddedResource Include="Picture_Dota2\物品_大隐刀.bmp" />
-    <EmbeddedResource Include="Picture_Dota2\物品_天堂.bmp" />
-    <EmbeddedResource Include="Picture_Dota2\物品_奥术鞋.bmp" />
-    <EmbeddedResource Include="Picture_Dota2\物品_希瓦.bmp" />
-    <EmbeddedResource Include="Picture_Dota2\物品_幻影斧.bmp" />
-    <EmbeddedResource Include="Picture_Dota2\物品_影之灵龛.bmp" />
-    <EmbeddedResource Include="Picture_Dota2\物品_微光披风.bmp" />
-    <EmbeddedResource Include="Picture_Dota2\物品_推推棒.bmp" />
-    <EmbeddedResource Include="Picture_Dota2\物品_散失.bmp" />
-    <EmbeddedResource Include="Picture_Dota2\物品_散魂.bmp" />
-    <EmbeddedResource Include="Picture_Dota2\物品_暗影护符.bmp" />
-    <EmbeddedResource Include="Picture_Dota2\Buff_暗影护符.bmp" />
-    <EmbeddedResource Include="Picture_Dota2\物品_永世法衣.bmp" />
-    <EmbeddedResource Include="Picture_Dota2\中立_永恒遗物.bmp" />
-    <EmbeddedResource Include="Picture_Dota2\物品_深渊之刃.bmp" />
-    <EmbeddedResource Include="Picture_Dota2\物品_炎阳纹章.bmp" />
-    <EmbeddedResource Include="Picture_Dota2\物品_玲珑心.bmp" />
-    <EmbeddedResource Include="Picture_Dota2\物品_疯狂面具.bmp" />
-    <EmbeddedResource Include="Picture_Dota2\物品_虚空至宝_疯狂面具.bmp" />
-    <EmbeddedResource Include="Picture_Dota2\物品_相位鞋.bmp" />
-    <EmbeddedResource Include="Picture_Dota2\中立_祭礼长袍.bmp" />
-    <EmbeddedResource Include="Picture_Dota2\物品_紫苑.bmp" />
-    <EmbeddedResource Include="Picture_Dota2\物品_红杖.bmp" />
-    <EmbeddedResource Include="Picture_Dota2\物品_红杖2.bmp" />
-    <EmbeddedResource Include="Picture_Dota2\物品_红杖3.bmp" />
-    <EmbeddedResource Include="Picture_Dota2\物品_红杖4.bmp" />
-    <EmbeddedResource Include="Picture_Dota2\物品_红杖5.bmp" />
-    <EmbeddedResource Include="Picture_Dota2\物品_纷争.bmp" />
-    <EmbeddedResource Include="Picture_Dota2\物品_纷争_被控.bmp" />
-    <EmbeddedResource Include="Picture_Dota2\物品_缚灵锁.bmp" />
-    <EmbeddedResource Include="Picture_Dota2\物品_羊刀.bmp" />
-    <EmbeddedResource Include="Picture_Dota2\物品_臂章.bmp" />
-    <EmbeddedResource Include="Picture_Dota2\物品_臂章_开启.bmp" />
-    <EmbeddedResource Include="Picture_Dota2\物品_虚灵_被控.bmp" />
-    <EmbeddedResource Include="Picture_Dota2\物品_虚灵之刃.bmp" />
-    <EmbeddedResource Include="Picture_Dota2\物品_血棘.bmp" />
-    <EmbeddedResource Include="Picture_Dota2\物品_血精石.bmp" />
-    <EmbeddedResource Include="Picture_Dota2\物品_赤红甲.bmp" />
-    <EmbeddedResource Include="Picture_Dota2\物品_跳刀.bmp" />
-    <EmbeddedResource Include="Picture_Dota2\物品_跳刀_力量跳刀.bmp" />
-    <EmbeddedResource Include="Picture_Dota2\物品_跳刀_敏捷跳刀.bmp" />
-    <EmbeddedResource Include="Picture_Dota2\物品_跳刀_智力跳刀.bmp" />
-    <EmbeddedResource Include="Picture_Dota2\物品_长盾.bmp" />
-    <EmbeddedResource Include="Picture_Dota2\物品_阿托斯之棍.bmp" />
-    <EmbeddedResource Include="Picture_Dota2\物品_陨星锤.bmp" />
-    <EmbeddedResource Include="Picture_Dota2\物品_隐刀.bmp" />
-    <EmbeddedResource Include="Picture_Dota2\物品_雷神之锤.bmp">
+    <EmbeddedResource Include="Picture_Dota2\BUFF\火猫_无影拳.bmp" />
+    <EmbeddedResource Include="Picture_Dota2\Silt\普通天赋.bmp" />
+    <EmbeddedResource Include="Picture_Dota2\Silt\选择天赋.bmp" />
+    <EmbeddedResource Include="Picture_Dota2\Silt\金色天赋.bmp" />
+    <EmbeddedResource Include="Picture_Dota2\Silt\钢背\钢毛后背.bmp" />
+    <EmbeddedResource Include="Picture_Dota2\Silt\钢背\刺针扫射.bmp" />
+    <EmbeddedResource Include="Picture_Dota2\Silt\钢背\战意.bmp" />
+    <EmbeddedResource Include="Picture_Dota2\Silt\钢背\毛团.bmp" />
+    <EmbeddedResource Include="Picture_Dota2\Silt\钢背\鼻涕.bmp" />
+    <EmbeddedResource Include="Picture_Dota2\Silt\附魔\冒险.bmp" />
+    <EmbeddedResource Include="Picture_Dota2\Silt\附魔\吸血鬼.bmp" />
+    <EmbeddedResource Include="Picture_Dota2\Silt\附魔\坚强.bmp" />
+    <EmbeddedResource Include="Picture_Dota2\Silt\附魔\壮实.bmp" />
+    <EmbeddedResource Include="Picture_Dota2\Silt\附魔\巨神.bmp" />
+    <EmbeddedResource Include="Picture_Dota2\Silt\附魔\捷足.bmp" />
+    <EmbeddedResource Include="Picture_Dota2\Silt\附魔\无边.bmp" />
+    <EmbeddedResource Include="Picture_Dota2\Silt\附魔\永恒.bmp" />
+    <EmbeddedResource Include="Picture_Dota2\Silt\附魔\犀利.bmp" />
+    <EmbeddedResource Include="Picture_Dota2\Silt\附魔\狂热.bmp" />
+    <EmbeddedResource Include="Picture_Dota2\Silt\附魔\睿智.bmp" />
+    <EmbeddedResource Include="Picture_Dota2\Silt\附魔\神秘.bmp" />
+    <EmbeddedResource Include="Picture_Dota2\Silt\附魔\粗暴.bmp" />
+    <EmbeddedResource Include="Picture_Dota2\Silt\附魔\警觉.bmp" />
+    <EmbeddedResource Include="Picture_Dota2\Silt\附魔\贪婪.bmp" />
+    <EmbeddedResource Include="Picture_Dota2\Silt\附魔\迅速.bmp" />
+    <EmbeddedResource Include="Picture_Dota2\Silt\附魔\进化.bmp" />
+    <EmbeddedResource Include="Picture_Dota2\命石\伐木机_碎木击.bmp" />
+    <EmbeddedResource Include="Picture_Dota2\命石\伐木机_锯齿轮旋.bmp" />
+    <EmbeddedResource Include="Picture_Dota2\技能\卡尔_幽灵漫步.bmp" />
+    <EmbeddedResource Include="Picture_Dota2\技能\卡尔_强袭飓风.bmp" />
+    <EmbeddedResource Include="Picture_Dota2\技能\卡尔_极速冷却.bmp" />
+    <EmbeddedResource Include="Picture_Dota2\技能\卡尔_电磁脉冲.bmp" />
+    <EmbeddedResource Include="Picture_Dota2\命石\海民_酒友.bmp" />
+    <EmbeddedResource Include="Picture_Dota2\BUFF\大牛_回魂.bmp" />
+    <EmbeddedResource Include="Picture_Dota2\BUFF\小精灵_幽魂.bmp" />
+    <EmbeddedResource Include="Picture_Dota2\播报\买活.bmp" />
+    <EmbeddedResource Include="Picture_Dota2\播报\塔防标志.bmp" />
+    <EmbeddedResource Include="Picture_Dota2\播报\盾标志.bmp" />
+    <EmbeddedResource Include="Picture_Dota2\BUFF\物品_TP.bmp" />
+    <EmbeddedResource Include="Picture_Dota2\物品\书.bmp" />
+    <EmbeddedResource Include="Picture_Dota2\物品\仙草.bmp" />
+    <EmbeddedResource Include="Picture_Dota2\物品\以太.bmp" />
+    <EmbeddedResource Include="Picture_Dota2\物品\假腿_力量腿.bmp" />
+    <EmbeddedResource Include="Picture_Dota2\物品\假腿_敏捷腿.bmp" />
+    <EmbeddedResource Include="Picture_Dota2\物品\假腿_智力腿.bmp" />
+    <EmbeddedResource Include="Picture_Dota2\物品\刃甲.bmp" />
+    <EmbeddedResource Include="Picture_Dota2\物品\刷新球.bmp" />
+    <EmbeddedResource Include="Picture_Dota2\物品\吊坠.bmp" />
+    <EmbeddedResource Include="Picture_Dota2\物品\否决.bmp" />
+    <EmbeddedResource Include="Picture_Dota2\物品\吹风.bmp" />
+    <EmbeddedResource Include="Picture_Dota2\物品\大隐刀.bmp" />
+    <EmbeddedResource Include="Picture_Dota2\物品\天堂.bmp" />
+    <EmbeddedResource Include="Picture_Dota2\物品\奥术鞋.bmp" />
+    <EmbeddedResource Include="Picture_Dota2\物品\希瓦.bmp" />
+    <EmbeddedResource Include="Picture_Dota2\物品\幻影斧.bmp" />
+    <EmbeddedResource Include="Picture_Dota2\物品\影之灵龛.bmp" />
+    <EmbeddedResource Include="Picture_Dota2\物品\微光披风.bmp" />
+    <EmbeddedResource Include="Picture_Dota2\物品\推推棒.bmp" />
+    <EmbeddedResource Include="Picture_Dota2\物品\散失.bmp" />
+    <EmbeddedResource Include="Picture_Dota2\物品\散魂.bmp" />
+    <EmbeddedResource Include="Picture_Dota2\物品\暗影护符.bmp" />
+    <EmbeddedResource Include="Picture_Dota2\BUFF\物品_暗影护符.bmp" />
+    <EmbeddedResource Include="Picture_Dota2\物品\永世法衣.bmp" />
+    <EmbeddedResource Include="Picture_Dota2\物品\中立_永恒遗物.bmp" />
+    <EmbeddedResource Include="Picture_Dota2\物品\深渊之刃.bmp" />
+    <EmbeddedResource Include="Picture_Dota2\物品\炎阳纹章.bmp" />
+    <EmbeddedResource Include="Picture_Dota2\物品\玲珑心.bmp" />
+    <EmbeddedResource Include="Picture_Dota2\物品\疯狂面具.bmp" />
+    <EmbeddedResource Include="Picture_Dota2\物品\虚空至宝_疯狂面具.bmp" />
+    <EmbeddedResource Include="Picture_Dota2\物品\相位鞋.bmp" />
+    <EmbeddedResource Include="Picture_Dota2\物品\中立_祭礼长袍.bmp" />
+    <EmbeddedResource Include="Picture_Dota2\物品\紫苑.bmp" />
+    <EmbeddedResource Include="Picture_Dota2\物品\红杖.bmp" />
+    <EmbeddedResource Include="Picture_Dota2\物品\红杖2.bmp" />
+    <EmbeddedResource Include="Picture_Dota2\物品\红杖3.bmp" />
+    <EmbeddedResource Include="Picture_Dota2\物品\红杖4.bmp" />
+    <EmbeddedResource Include="Picture_Dota2\物品\红杖5.bmp" />
+    <EmbeddedResource Include="Picture_Dota2\物品\纷争.bmp" />
+    <EmbeddedResource Include="Picture_Dota2\物品\被控_纷争.bmp" />
+    <EmbeddedResource Include="Picture_Dota2\物品\缚灵锁.bmp" />
+    <EmbeddedResource Include="Picture_Dota2\物品\羊刀.bmp" />
+    <EmbeddedResource Include="Picture_Dota2\物品\臂章.bmp" />
+    <EmbeddedResource Include="Picture_Dota2\物品\臂章_开启.bmp" />
+    <EmbeddedResource Include="Picture_Dota2\物品\被控_虚灵.bmp" />
+    <EmbeddedResource Include="Picture_Dota2\物品\虚灵之刃.bmp" />
+    <EmbeddedResource Include="Picture_Dota2\物品\血棘.bmp" />
+    <EmbeddedResource Include="Picture_Dota2\物品\血精石.bmp" />
+    <EmbeddedResource Include="Picture_Dota2\物品\赤红甲.bmp" />
+    <EmbeddedResource Include="Picture_Dota2\物品\跳刀.bmp" />
+    <EmbeddedResource Include="Picture_Dota2\物品\跳刀_力量跳刀.bmp" />
+    <EmbeddedResource Include="Picture_Dota2\物品\跳刀_敏捷跳刀.bmp" />
+    <EmbeddedResource Include="Picture_Dota2\物品\跳刀_智力跳刀.bmp" />
+    <EmbeddedResource Include="Picture_Dota2\物品\长盾.bmp" />
+    <EmbeddedResource Include="Picture_Dota2\物品\阿托斯之棍.bmp" />
+    <EmbeddedResource Include="Picture_Dota2\物品\陨星锤.bmp" />
+    <EmbeddedResource Include="Picture_Dota2\物品\隐刀.bmp" />
+    <EmbeddedResource Include="Picture_Dota2\物品\雷神之锤.bmp">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="Picture_Dota2\物品_虚空至宝_雷神之锤.bmp" />
-    <EmbeddedResource Include="Picture_Dota2\物品_青莲宝珠.bmp" />
-    <EmbeddedResource Include="Picture_Dota2\物品_飓风长戟.bmp" />
-    <EmbeddedResource Include="Picture_Dota2\物品_魂之灵龛.bmp" />
-    <EmbeddedResource Include="Picture_Dota2\物品_魂戒.bmp" />
-    <EmbeddedResource Include="Picture_Dota2\物品_魔棒.bmp" />
-    <EmbeddedResource Include="Picture_Dota2\物品_鱼叉.bmp" />
-    <EmbeddedResource Include="Picture_Dota2\命石_骷髅王_白骨守卫.bmp" />
-    <EmbeddedResource Include="Picture_Dota2\物品_黑皇杖.bmp" />
+    <EmbeddedResource Include="Picture_Dota2\物品\虚空至宝_雷神之锤.bmp" />
+    <EmbeddedResource Include="Picture_Dota2\物品\青莲宝珠.bmp" />
+    <EmbeddedResource Include="Picture_Dota2\物品\飓风长戟.bmp" />
+    <EmbeddedResource Include="Picture_Dota2\物品\魂之灵龛.bmp" />
+    <EmbeddedResource Include="Picture_Dota2\物品\魂戒.bmp" />
+    <EmbeddedResource Include="Picture_Dota2\物品\魔棒.bmp" />
+    <EmbeddedResource Include="Picture_Dota2\物品\鱼叉.bmp" />
+    <EmbeddedResource Include="Picture_Dota2\命石\骷髅王_白骨守卫.bmp" />
+    <EmbeddedResource Include="Picture_Dota2\物品\黑皇杖.bmp" />
   </ItemGroup>
 
   <ItemGroup>
@@ -216,11 +259,11 @@
     <PackageReference Include="Microsoft.IO.RecyclableMemoryStream" Version="3.0.1" />
     <PackageReference Include="NAudio" Version="2.2.1" />
     <PackageReference Include="NeoSmart.AsyncLock" Version="3.3.0-preview1" />
-    <PackageReference Include="NLog" Version="6.0.0-preview1" />
+    <PackageReference Include="NLog" Version="6.0.0-rc1" />
     <PackageReference Include="OpenCvSharp4" Version="4.11.0.20250507" />
     <PackageReference Include="OpenCvSharp4.Extensions" Version="4.11.0.20250507" />
     <PackageReference Include="OpenCvSharp4.runtime.win" Version="4.11.0.20250507" />
-    <PackageReference Include="PaddleOCRSharp" Version="4.5.0.1" />
+    <PackageReference Include="PaddleOCRSharp" Version="5.0.0.1" />
     <PackageReference Include="Sdcb.PaddleInference" Version="2.5.0.1" />
     <PackageReference Include="Sdcb.PaddleInference.runtime.win64.mkl" Version="2.6.1" />
     <PackageReference Include="Sdcb.PaddleOCR" Version="2.7.0.3" />
