@@ -2,7 +2,6 @@
 #if DOTA2
 
 using Dota2Simulator.KeyboardMouse;
-using Dota2Simulator.TTS;
 using ImageProcessingSystem;
 using System;
 using System.Collections.Concurrent;
@@ -15,8 +14,8 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using static Dota2Simulator.Games.Dota2.Main;
 using static Dota2Simulator.Games.Dota2.Item;
+using static Dota2Simulator.Games.Dota2.Main;
 
 namespace Dota2Simulator.Games.Dota2
 {
@@ -408,7 +407,7 @@ namespace Dota2Simulator.Games.Dota2
                 {
 
 #if 输出技能信息
-                    Logger.Info(输出文字.ToString()); 
+                    Common.Main_Logger.Info(输出文字.ToString()); 
 #endif
 
                     return 期望数量;
@@ -418,12 +417,12 @@ namespace Dota2Simulator.Games.Dota2
 
 #if 输出技能信息
                 // 结束循环依旧没匹配到
-                if (j == 2) Logger.Error(全部文字.ToString()); 
+                if (j == 2) Common.Main_Logger.Error(全部文字.ToString()); 
 #endif
 
             }
 
-            Tts.Speak("技能数量异常");
+            TTS.TTS.Speak("技能数量异常");
             return 0;
         }
 
@@ -737,7 +736,7 @@ namespace Dota2Simulator.Games.Dota2
 
         private static void 记录技能释放信息(Keys s1, string s, bool b1, bool b2, Color c1, Color c2, Color c3)
         {
-            Logger.Info($"\r\n{s1}{s}\r\n"
+            Common.Main_Logger.Info($"\r\n{s1}{s}\r\n"
                                 + $"判断是否释放{b1}\r\n"
                                 + $"释放后变色{b2}\r\n"
                                 + $"释放前{c1}\r\n"
@@ -747,7 +746,7 @@ namespace Dota2Simulator.Games.Dota2
 
         private static void 记录技能释放信息(Keys s1, Keys 技能位置)
         {
-            Logger.Info(s1);
+            Common.Main_Logger.Info(s1);
 
             lock (锁字典[技能位置])
             {
@@ -757,7 +756,7 @@ namespace Dota2Simulator.Games.Dota2
                     bool 已释放变色判断 = 获取技能状态.已释放变色判断;
                     Color 释放前Color = 获取技能状态.释放前Color;
                     Color 释放后Color = 获取技能状态.释放后Color;
-                    Logger.Info($"\r\n获取到{s1}的技能状态\r\n"
+                    Common.Main_Logger.Info($"\r\n获取到{s1}的技能状态\r\n"
                                 + $"判断是否释放{释放中判断}\r\n"
                                 + $"释放后变色{已释放变色判断}\r\n"
                                 + $"释放前{释放前Color}\r\n"
@@ -765,7 +764,7 @@ namespace Dota2Simulator.Games.Dota2
                 }
                 else
                 {
-                    Logger.Info($"获取不到{技能位置}的技能状态");
+                    Common.Main_Logger.Info($"获取不到{技能位置}的技能状态");
                 }
             }
         }
@@ -989,7 +988,7 @@ namespace Dota2Simulator.Games.Dota2
                     // 如果不存在记录，说明是新的释放周期，设置当前时间
                     DateTime 开始时间 = DateTime.Now;
                     _技能释放开始时间[技能位置] = 开始时间;
-                    //Logger.Debug($"技能{技能位置}记录释放开始时间: {开始时间:HH:mm:ss.fff}");
+                    //Common.Main_Logger.Debug($"技能{技能位置}记录释放开始时间: {开始时间:HH:mm:ss.fff}");
                     return 开始时间;
                 }
             }
@@ -1005,7 +1004,7 @@ namespace Dota2Simulator.Games.Dota2
             lock (_时间锁)
             {
                 _技能释放开始时间[技能位置] = 开始时间;
-                //Logger.Debug($"技能{技能位置}设置释放开始时间: {开始时间:HH:mm:ss.fff}");
+                //Common.Main_Logger.Debug($"技能{技能位置}设置释放开始时间: {开始时间:HH:mm:ss.fff}");
             }
         }
 
@@ -1020,7 +1019,7 @@ namespace Dota2Simulator.Games.Dota2
                 if (_技能释放开始时间.ContainsKey(技能位置))
                 {
                     _技能释放开始时间.Remove(技能位置);
-                    //Logger.Debug($"技能{技能位置}清除释放开始时间记录");
+                    //Common.Main_Logger.Debug($"技能{技能位置}清除释放开始时间记录");
                 }
             }
         }
@@ -1046,7 +1045,7 @@ namespace Dota2Simulator.Games.Dota2
         {
             if (!获取技能释放状态(技能位置, out bool 释放中判断, out bool 已释放变色判断, out Color 释放前Color, out Color 释放后Color))
             {
-                Logger.Info("字典读取失败");
+                Common.Main_Logger.Info("字典读取失败");
                 return false;
             }
 
@@ -1056,7 +1055,7 @@ namespace Dota2Simulator.Games.Dota2
             // 获取释放开始时间
             DateTime 释放开始时间 = 获取或设置释放开始时间(技能位置, 释放中判断);
 
-            //Logger.Debug($"技能{技能位置}: 当前RGB({当前释放颜色.R},{当前释放颜色.G},{当前释放颜色.B}) " +
+            //Common.Main_Logger.Debug($"技能{技能位置}: 当前RGB({当前释放颜色.R},{当前释放颜色.G},{当前释放颜色.B}) " +
             //            $"释放前RGB({释放前Color.R},{释放前Color.G},{释放前Color.B}) " +
             //            $"释放后RGB({释放后Color.R},{释放后Color.G},{释放后Color.B}) " +
             //            $"状态: 释放中={释放中判断}, 已释放={已释放变色判断}");
@@ -1069,7 +1068,7 @@ namespace Dota2Simulator.Games.Dota2
                     double 与释放后距离 = CalculateColorDistance(当前释放颜色, 释放后Color);
                     double 释放已持续时间 = (DateTime.Now - 释放开始时间).TotalMilliseconds;
 
-                    //Logger.Debug($"技能{技能位置}释放中: 与释放前距离={与释放前距离:F2}, 与释放后距离={与释放后距离:F2}, 持续时间={释放已持续时间:F0}ms");
+                    //Common.Main_Logger.Debug($"技能{技能位置}释放中: 与释放前距离={与释放前距离:F2}, 与释放后距离={与释放后距离:F2}, 持续时间={释放已持续时间:F0}ms");
 
                     // 智能判断：优先考虑距离比较，然后考虑时间
                     if (与释放前距离 <= COLOR_TOLERANCE)
@@ -1078,23 +1077,23 @@ namespace Dota2Simulator.Games.Dota2
                         if (释放已持续时间 >= MIN_RELEASE_DURATION_MS)
                         {
                             更新释放判断和颜色(技能位置, false, true, 释放前Color, 释放后Color);
-                            //Logger.Info($"技能{技能位置}释放完毕 - 颜色回到初始状态 (距离={与释放前距离:F2}, 持续={释放已持续时间:F0}ms)");
+                            //Common.Main_Logger.Info($"技能{技能位置}释放完毕 - 颜色回到初始状态 (距离={与释放前距离:F2}, 持续={释放已持续时间:F0}ms)");
                             return false;
                         }
                         else
                         {
-                            //Logger.Debug($"技能{技能位置}颜色回到初始，但时间太短，继续等待");
+                            //Common.Main_Logger.Debug($"技能{技能位置}颜色回到初始，但时间太短，继续等待");
                             return true;
                         }
                     }
                     else if (与释放后距离 <= Math.Max(20, 与释放前距离 * 0.7)) // 动态阈值：更接近释放后颜色
                     {
-                        //Logger.Debug($"技能{技能位置}仍接近释放后颜色，继续释放状态");
+                        //Common.Main_Logger.Debug($"技能{技能位置}仍接近释放后颜色，继续释放状态");
                         return true;
                     }
                     else if (IsColorInTransition(当前释放颜色, 释放前Color, 释放后Color, 与释放前距离, 与释放后距离))
                     {
-                        //Logger.Debug($"技能{技能位置}检测到渐变色，继续释放状态");
+                        //Common.Main_Logger.Debug($"技能{技能位置}检测到渐变色，继续释放状态");
                         return true;
                     }
                     else
@@ -1105,12 +1104,12 @@ namespace Dota2Simulator.Games.Dota2
                         if (应该结束释放)
                         {
                             更新释放判断和颜色(技能位置, false, true, 释放前Color, 释放后Color);
-                            //Logger.Info($"技能{技能位置}释放结束 - 智能判断 (前距离={与释放前距离:F2}, 后距离={与释放后距离:F2}, 持续={释放已持续时间:F0}ms)");
+                            //Common.Main_Logger.Info($"技能{技能位置}释放结束 - 智能判断 (前距离={与释放前距离:F2}, 后距离={与释放后距离:F2}, 持续={释放已持续时间:F0}ms)");
                             return false;
                         }
                         else
                         {
-                            //Logger.Debug($"技能{技能位置}颜色异常但继续等待");
+                            //Common.Main_Logger.Debug($"技能{技能位置}颜色异常但继续等待");
                             return true;
                         }
                     }
@@ -1121,7 +1120,7 @@ namespace Dota2Simulator.Games.Dota2
                     if (ColorExtensions.ColorAEqualColorB(释放前Color, 当前释放颜色, COLOR_TOLERANCE))
                     {
                         更新释放判断和颜色(技能位置, false, false, 释放前Color, 释放后Color);
-                        //Logger.Info($"技能{技能位置}重置为可用状态");
+                        //Common.Main_Logger.Info($"技能{技能位置}重置为可用状态");
                         return true;
                     }
                     return false;
@@ -1135,7 +1134,7 @@ namespace Dota2Simulator.Games.Dota2
                     if (ColorExtensions.ColorAEqualColorB(释放前Color, 当前释放颜色, COLOR_TOLERANCE))
                     {
                         更新释放判断和颜色(技能位置, false, false, 释放前Color, 释放后Color);
-                        //Logger.Info($"技能{技能位置}从已释放状态重置为可用");
+                        //Common.Main_Logger.Info($"技能{技能位置}从已释放状态重置为可用");
                         return true;
                     }
                     return false;
@@ -1155,7 +1154,7 @@ namespace Dota2Simulator.Games.Dota2
                         {
                             更新释放判断和颜色(技能位置, true, false, 释放前Color, 当前释放颜色);
                             设置释放开始时间(技能位置, DateTime.Now);
-                            //Logger.Info($"技能{技能位置}开始释放 - 统一检测逻辑");
+                            //Common.Main_Logger.Info($"技能{技能位置}开始释放 - 统一检测逻辑");
                         }
 
                         return true;
@@ -1497,7 +1496,7 @@ namespace Dota2Simulator.Games.Dota2
         {
             _ = Task.Run(() =>
             {
-                Main.Delay(等待的延迟);
+                Common.Delay(等待的延迟);
 
                 if (是否保持假腿)
                 {
@@ -1520,7 +1519,7 @@ namespace Dota2Simulator.Games.Dota2
         {
             _ = Task.Run(() =>
             {
-                Main.Delay(等待的延迟);
+                Common.Delay(等待的延迟);
                 要求保持假腿();
             });
         }

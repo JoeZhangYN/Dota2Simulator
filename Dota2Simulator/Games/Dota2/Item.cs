@@ -1,18 +1,13 @@
 ﻿#if DOTA2
 
-using Dota2Simulator.KeyboardMouse;
-using Dota2Simulator.PictureProcessing;
-using Dota2Simulator.TTS;
 using ImageProcessingSystem;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using static Dota2Simulator.Games.Dota2.Main;
-using static Dota2Simulator.Games.Dota2.Skill;
-using static OpenCvSharp.Stitcher;
+using static Dota2Simulator.KeyboardMouse.SimKeyBoard;
 
 namespace Dota2Simulator.Games.Dota2
 {
@@ -78,7 +73,7 @@ namespace Dota2Simulator.Games.Dota2
                     break;
                 case Keys.Escape:
                     _中断条件 = !_中断条件;
-                    Tts.Speak($"{(_中断条件 ? "中断" : "继续")}运行");
+                    TTS.TTS.Speak($"{(_中断条件 ? "中断" : "继续")}运行");
                     break;
                 case Keys.NumPad7 when _存在假腿:
                     切换假腿状态();
@@ -126,26 +121,27 @@ namespace Dota2Simulator.Games.Dota2
 
                     break;
             }
-            /* 走A实际不行
-            //else if (e.KeyCode == Keys.NumPad6)
-            //{
-            //    _开启走A = !_开启走A;
-            //    Tts.Speak(_开启走A ? "开启走A" : "关闭走A");
-            //}
-            //else if (e.KeyCode == Keys.A)
-            //{
-            //    var 现在的时间 = 获取当前时间毫秒();
-            //    if (现在的时间 - _实际出手时间 >= _实际攻击间隔 - _实际攻击前摇)
-            //    {
-            //        _实际出手时间 = 现在的时间 + _实际攻击前摇;
-            //        Run(走A去等待后摇);
-            //    }
-            //}
-            //else if (e.KeyCode == Keys.S)
-            //{
-            //    _停止走A = 1;
-            //}
-            */
+            // 走A实际不行
+#if false
+                    else if (e.KeyCode == Keys.NumPad6)
+            {
+                _开启走A = !_开启走A;
+                Tts.Speak(_开启走A ? "开启走A" : "关闭走A");
+            }
+            else if (e.KeyCode == Keys.A)
+            {
+                var 现在的时间 = 获取当前时间毫秒();
+                if (现在的时间 - _实际出手时间 >= _实际攻击间隔 - _实际攻击前摇)
+                {
+                    _实际出手时间 = 现在的时间 + _实际攻击前摇;
+                    Run(走A去等待后摇);
+                }
+            }
+            else if (e.KeyCode == Keys.S)
+            {
+                _停止走A = 1;
+            } 
+#endif
         }
 
         private static async Task 技能释放前切假腿(KeyEventArgs e, 技能切假腿配置 配置)
@@ -176,7 +172,7 @@ namespace Dota2Simulator.Games.Dota2
         {
             _条件假腿敏捷 = !_条件假腿敏捷;
             要求保持假腿();
-            Tts.Speak(_条件假腿敏捷 ? "切敏捷" : "切力量");
+            TTS.TTS.Speak(_条件假腿敏捷 ? "切敏捷" : "切力量");
         }
 
         private static void 切换保持假腿状态()
@@ -191,73 +187,73 @@ namespace Dota2Simulator.Games.Dota2
                 要求保持假腿();
             }
 
-            Tts.Speak(_条件保持假腿 ? "保持假腿" : "不保持假腿");
+            TTS.TTS.Speak(_条件保持假腿 ? "保持假腿" : "不保持假腿");
         }
 
-#endregion
+        #endregion
 
         #region 使用物品
 
         #region Resource改版前
 
-        /*
-        ///// <summary>
-        /////     visual studio 改版资源浏览器，直接Bitmap没了，变成byte[]
-        ///// </summary>
-        ///// <param name="bp"></param>
-        ///// <param name="bts"></param>
-        ///// <param name="size"></param>
-        ///// <param name="mode"></param>
-        ///// <param name="matchRate"></param>
-        ///// <returns></returns>
-        //private static bool 根据图片以及类别使用物品(Bitmap bp, in ImageHandle 句柄, int mode = 4, double matchRate = 0.8)
-        //{
-        //    var p = ImageFinder.FindImageBool(bp, in 句柄, matchRate);
-        //    if ((p.X + p.Y <= 0) || (p.X == 245760) || (p.X == 143640)) return false;
-        //    根据物品位置按键(p, mode, KeyBoardSim.KeyPress);
-        //    return true;
-        //}
+#if false
+        /// <summary>
+        ///     visual studio 改版资源浏览器，直接Bitmap没了，变成byte[]
+        /// </summary>
+        /// <param name="bp"></param>
+        /// <param name="bts"></param>
+        /// <param name="size"></param>
+        /// <param name="mode"></param>
+        /// <param name="matchRate"></param>
+        /// <returns></returns>
+        private static bool 根据图片以及类别使用物品(Bitmap bp, in ImageHandle 句柄, int mode = 4, double matchRate = 0.8)
+        {
+            var p = ImageFinder.FindImageBool(bp, in 句柄, matchRate);
+            if ((p.X + p.Y <= 0) || (p.X == 245760) || (p.X == 143640)) return false;
+            根据物品位置按键(p, mode, KeyBoardSim.KeyPress);
+            return true;
+        }
 
-        ///// <summary>
-        /////     用时4-5ms左右
-        ///// </summary>
-        ///// <param name="bp"></param>
-        ///// <param name="bts"></param>
-        ///// <param name="size"></param>
-        ///// <param name="mode"></param>
-        ///// <returns></returns>
-        //private static bool 根据图片以及类别自我使用物品(Bitmap bp, in ImageHandle 句柄, int mode = 4)
-        //{
-        //    var p = ImageFinder.FindImageBool(bp, in 句柄);
-        //    if ((p.X + p.Y <= 0) || (p.X == 245760) || (p.X == 143640)) return false;
-        //    根据物品位置按键(p, mode, KeyBoardSim.KeyPressAlt);
-        //    return true;
-        //}
+        /// <summary>
+        ///     用时4-5ms左右
+        /// </summary>
+        /// <param name="bp"></param>
+        /// <param name="bts"></param>
+        /// <param name="size"></param>
+        /// <param name="mode"></param>
+        /// <returns></returns>
+        private static bool 根据图片以及类别自我使用物品(Bitmap bp, in ImageHandle 句柄, int mode = 4)
+        {
+            var p = ImageFinder.FindImageBool(bp, in 句柄);
+            if ((p.X + p.Y <= 0) || (p.X == 245760) || (p.X == 143640)) return false;
+            根据物品位置按键(p, mode, KeyBoardSim.KeyPressAlt);
+            return true;
+        }
 
-        //private static bool 根据图片以及类别队列使用物品(Bitmap bp, in ImageHandle 句柄, int mode = 4)
-        //{
-        //    var p = ImageFinder.FindImageBool(bp, in 句柄);
-        //    if ((p.X + p.Y <= 0) || (p.X == 245760) || (p.X == 143640)) return false;
-        //    根据物品位置按键(p, mode, key => KeyBoardSim.KeyPressWhile(key, Keys.Shift));
-        //    return true;
-        //}
+        private static bool 根据图片以及类别队列使用物品(Bitmap bp, in ImageHandle 句柄, int mode = 4)
+        {
+            var p = ImageFinder.FindImageBool(bp, in 句柄);
+            if ((p.X + p.Y <= 0) || (p.X == 245760) || (p.X == 143640)) return false;
+            根据物品位置按键(p, mode, key => KeyBoardSim.KeyPressWhile(key, Keys.Shift));
+            return true;
+        }
 
-        //private static bool 根据图片以及类别使用物品多次(Bitmap bp, ImageHandle 句柄, int times, int delay, int mode = 4)
-        //{
-        //    var p = ImageFinder.FindImageBool(bp, in 句柄);
-        //    if ((p.X + p.Y <= 0) || (p.X == 245760) || (p.X == 143640)) return false;
+        private static bool 根据图片以及类别使用物品多次(Bitmap bp, ImageHandle 句柄, int times, int Common.Delay, int mode = 4)
+        {
+            var p = ImageFinder.FindImageBool(bp, in 句柄);
+            if ((p.X + p.Y <= 0) || (p.X == 245760) || (p.X == 143640)) return false;
 
-        //    for (var i = 0; i < times; i++)
-        //    {
-        //        根据物品位置按键(p, mode, KeyBoardSim.KeyPress);
-        //        if (i == times - 1) break;
+            for (var i = 0; i < times; i++)
+            {
+                根据物品位置按键(p, mode, KeyBoardSim.KeyPress);
+                if (i == times - 1) break;
 
-        //        Delay(delay);
-        //    }
+                Common.Delay(Common.Delay);
+            }
 
-        //    return true;
-        //}
-        */
+            return true;
+        } 
+#endif
 
         #endregion
 
@@ -430,28 +426,28 @@ namespace Dota2Simulator.Games.Dota2
         {
             ImageHandle[] 需切假腿物品句柄 =
             [
-                物品_黑皇杖_handle,
-                物品_疯狂面具_handle,
-                物品_虚空至宝_疯狂面具_handle,
-                物品_紫苑_handle,
-                物品_血棘_handle,
-                物品_深渊之刃_handle,
-                物品_雷神之锤_handle,
-                物品_虚空至宝_雷神之锤_handle,
-                物品_魂戒_handle,
-                物品_鱼叉_handle,
-                物品_散失_handle,
-                物品_散魂_handle,
-                物品_希瓦_handle,
-                物品_青莲宝珠_handle,
-                物品_飓风长戟_handle,
-                物品_红杖_handle,
-                物品_红杖2_handle,
-                物品_红杖3_handle,
-                物品_红杖4_handle,
-                物品_红杖5_handle,
-                物品_刷新球_handle,
-                物品_虚灵之刃_handle
+                Dota2_Pictrue.物品.黑皇杖,
+                Dota2_Pictrue.物品.疯狂面具,
+                Dota2_Pictrue.物品.虚空至宝_疯狂面具,
+                Dota2_Pictrue.物品.紫苑,
+                Dota2_Pictrue.物品.血棘,
+                Dota2_Pictrue.物品.深渊之刃,
+                Dota2_Pictrue.物品.雷神之锤,
+                Dota2_Pictrue.物品.虚空至宝_雷神之锤,
+                Dota2_Pictrue.物品.魂戒,
+                Dota2_Pictrue.物品.鱼叉,
+                Dota2_Pictrue.物品.散失,
+                Dota2_Pictrue.物品.散魂,
+                Dota2_Pictrue.物品.希瓦,
+                Dota2_Pictrue.物品.青莲宝珠,
+                Dota2_Pictrue.物品.飓风长戟,
+                Dota2_Pictrue.物品.红杖,
+                Dota2_Pictrue.物品.红杖2,
+                Dota2_Pictrue.物品.红杖3,
+                Dota2_Pictrue.物品.红杖4,
+                Dota2_Pictrue.物品.红杖5,
+                Dota2_Pictrue.物品.刷新球,
+                Dota2_Pictrue.物品.虚灵之刃
             ];
 
             Dictionary<Keys, Action> 物品进入CD委托 = new()
@@ -469,7 +465,7 @@ namespace Dota2Simulator.Games.Dota2
                 Keys key = 根据图片获取物品按键(匹配句柄);
                 if (key != Keys.Escape && 物品进入CD委托.TryGetValue(key, out Action value))
                 {
-                    if (匹配句柄.Id == 物品_魂戒_handle.Id)
+                    if (匹配句柄.Id == Dota2_Pictrue.物品.魂戒.Id)
                     {
                         _切假腿配置.修改配置(key, true, "力量");
                     }
@@ -545,9 +541,9 @@ namespace Dota2Simulator.Games.Dota2
         {
             ImageHandle[] 假腿句柄集合 =
             [
-                物品_假腿_力量腿_handle,
-                物品_假腿_敏捷腿_handle,
-                物品_假腿_智力腿_handle
+                Dota2_Pictrue.物品.假腿_力量腿,
+                Dota2_Pictrue.物品.假腿_敏捷腿,
+                Dota2_Pictrue.物品.假腿_智力腿
             ];
 
             Dictionary<Keys, (Action 清空委托, Action 重置条件)> 清空物品进入CD委托和条件映射 = new()
@@ -586,29 +582,29 @@ namespace Dota2Simulator.Games.Dota2
 
         public static int 根据图片使用物品(in ImageHandle 句柄)
         {
-            return 执行物品操作(句柄, (k) => SimKeyBoard.KeyPress(k));
+            return 执行物品操作(句柄, (k) => KeyPress(k));
         }
 
         public static int 根据图片自我使用物品(in ImageHandle 句柄)
         {
-            return 执行物品操作(句柄, (k) => SimKeyBoard.KeyPressAlt(k));
+            return 执行物品操作(句柄, (k) => KeyPressAlt(k));
         }
 
         public static bool 根据图片队列使用物品(in ImageHandle 句柄)
         {
-            return 执行物品操作(句柄, (k) => SimKeyBoard.KeyPressWhile(k, Keys.Shift)) > 0;
+            return 执行物品操作(句柄, (k) => KeyPressWhile(k, Keys.Shift)) > 0;
         }
 
-        public static int 根据图片多次使用物品(in ImageHandle 句柄, int times, int delay)
+        public static int 根据图片多次使用物品(in ImageHandle 句柄, int times, int 延迟)
         {
             return 执行物品操作(句柄, (k) =>
             {
                 for (int i = 0; i < times; i++)
                 {
-                    SimKeyBoard.KeyPress(k);
+                    KeyPress(k);
                     if (i < times - 1)
                     {
-                        Delay(delay);
+                        Common.Delay(延迟);
                     }
                 }
             });
@@ -718,7 +714,7 @@ namespace Dota2Simulator.Games.Dota2
 
             _ = Task.Run(() =>
             {
-                Delay(60);
+                Common.Delay(60);
                 要求保持假腿();
             }).ConfigureAwait(false);
 

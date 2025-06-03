@@ -3,9 +3,9 @@
 namespace Dota2Simulator.TTS
 {
     /// <summary>
-    ///     <see cref="Tts" /> TTS 类
+    ///     <see cref="TTS" /> TTS 类
     /// </summary>
-    internal class Tts
+    internal class TTS
     {
         #region 语音播放
 
