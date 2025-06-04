@@ -1401,7 +1401,7 @@ namespace ImageProcessingSystem
 
             // 获取写缓冲区句柄并捕获屏幕
             var writeHandle = _tripleBuffer.GetWriteBuffer();
-            bool success = OptimizedGraphics.CaptureScreenToHandle(writeHandle, rectangle.X, rectangle.Y);
+            bool success = ModifyGraphics.CaptureScreenToHandle(writeHandle, rectangle.X, rectangle.Y);
 
             if (success)
             {
@@ -1539,7 +1539,7 @@ namespace ImageProcessingSystem
         /// <summary>
         /// 在全局截图中查找所有匹配的图像（使用Rust高性能实现）
         /// </summary>
-        public static List<Point> FindAllImagesOptimized(
+        public static List<Point> FindAllImages(
             in ImageHandle targetImage,
             double matchRate = 0.9,
             int maxResults = 100,
@@ -1567,7 +1567,7 @@ namespace ImageProcessingSystem
         /// <summary>
         /// 实时追踪多个目标（高性能版本）
         /// </summary>
-        public static async IAsyncEnumerable<List<Point>> TrackMultipleTargetsOptimized(
+        public static async IAsyncEnumerable<List<Point>> TrackMultipleTargets(
             ImageHandle targetImage,
             double matchRate = 0.9,
             int maxTargets = 10,
@@ -1587,7 +1587,7 @@ namespace ImageProcessingSystem
                     continue;
                 }
 
-                var currentPositions = FindAllImagesOptimized(
+                var currentPositions = FindAllImages(
                     targetImage,
                     matchRate,
                     maxTargets,

@@ -137,6 +137,8 @@ namespace Dota2Simulator.Games.Dota2
             public static ImageHandle 选择天赋 => LazyImageLoader.GetImage("Silt.选择天赋");
             public static ImageHandle 金色天赋 => LazyImageLoader.GetImage("Silt.金色天赋");
             public static ImageHandle 普通天赋 => LazyImageLoader.GetImage("Silt.普通天赋");
+            public static ImageHandle 先天 => LazyImageLoader.GetImage("Silt.先天");
+
 
             #region 钢背
 
@@ -145,6 +147,14 @@ namespace Dota2Simulator.Games.Dota2
             public static ImageHandle 钢毛后背 => LazyImageLoader.GetImage("Silt.钢背.钢毛后背");
             public static ImageHandle 毛团 => LazyImageLoader.GetImage("Silt.钢背.毛团");
             public static ImageHandle 战意 => LazyImageLoader.GetImage("Silt.钢背.战意");
+
+            #endregion
+
+            #region 沙王
+            public static ImageHandle 掘地穿刺 => LazyImageLoader.GetImage("Silt.沙王.掘地穿刺");
+            public static ImageHandle 沙尘暴 => LazyImageLoader.GetImage("Silt.沙王.沙尘暴");
+            public static ImageHandle 尾刺 => LazyImageLoader.GetImage("Silt.沙王.尾刺");
+            public static ImageHandle 地震 => LazyImageLoader.GetImage("Silt.沙王.地震");
 
             #endregion
 

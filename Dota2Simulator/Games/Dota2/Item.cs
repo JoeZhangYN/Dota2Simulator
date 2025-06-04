@@ -103,7 +103,7 @@ namespace Dota2Simulator.Games.Dota2
                     Silt.Main.点击黑皇(GlobalScreenCapture.GetCurrentHandle());
                     break;
                 case Keys.NumPad6:
-                    Silt.Main.测试识别(GlobalScreenCapture.GetCurrentHandle());
+                    Silt.Main.沙王自动选择(GlobalScreenCapture.GetCurrentHandle());
                     break;
 #endif
                 #endregion

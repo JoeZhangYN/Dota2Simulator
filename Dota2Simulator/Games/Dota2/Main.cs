@@ -4262,6 +4262,47 @@ namespace Dota2Simulator.Games.Dota2
 
                 #endregion
 
+                #region 沙王
+
+                case "沙王":
+                    {
+                        if (!_总循环条件)
+                        {
+                            _总循环条件 = true;
+                            重复按键执行间隔阈值 = 150;
+                            await 状态初始化().ConfigureAwait(false);
+                        }
+
+                        await 根据按键判断技能释放前通用逻辑(e).ConfigureAwait(true);
+
+                        switch (e.KeyCode)
+                        {
+                            //case Keys.Q:
+                            //    _条件1 = true;
+                            //    break;
+                            //case Keys.W:
+                            //    Common.Delay(33 * 根据图片使用物品(Dota2_Pictrue.物品.虚灵之刃));
+                            //    Common.Delay(33 * (根据图片使用物品(Dota2_Pictrue.物品.红杖) +
+                            //                根据图片使用物品(Dota2_Pictrue.物品.红杖2) +
+                            //                根据图片使用物品(Dota2_Pictrue.物品.红杖3) +
+                            //                根据图片使用物品(Dota2_Pictrue.物品.红杖4) +
+                            //                根据图片使用物品(Dota2_Pictrue.物品.红杖5)));
+                            //    _条件2 = true;
+                            //    break;
+                            //case Keys.E:
+                            //    _条件3 = true;
+                            //    break;
+                            //case Keys.R:
+                            //    设置全局步骤r(0);
+                            //    // _条件4 = true;
+                            //    break;
+                        }
+
+                        break;
+                    }
+
+                #endregion
+
                 #endregion
 
                 #region 测试
@@ -9491,6 +9532,8 @@ namespace Dota2Simulator.Games.Dota2
             // 重置切假腿配置
             _切假腿配置 = new 技能切假腿配置();
             _假腿按键 = Keys.Escape;
+
+
         }
 
         #endregion

@@ -9,7 +9,7 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 
-public static class OptimizedGraphics
+public static class ModifyGraphics
 {
     #region 全局数据
     private static readonly Lock _initLock = new();
@@ -133,7 +133,7 @@ public static class OptimizedGraphics
 
     #endregion
 
-    #region 性能优化的连续捕获API
+    #region 性能连续捕获API
 
     /// <summary>
     /// 高性能连续屏幕捕获
@@ -639,7 +639,7 @@ public static class OptimizedGraphics
 
     #region 清理资源
 
-    static OptimizedGraphics()
+    static ModifyGraphics()
     {
         AppDomain.CurrentDomain.ProcessExit += OnProcessExit;
     }

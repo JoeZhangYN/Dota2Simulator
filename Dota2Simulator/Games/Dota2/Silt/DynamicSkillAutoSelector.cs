@@ -2,33 +2,31 @@
 #if Silt
 
 using Dota2Simulator.KeyboardMouse;
-using Dota2Simulator.PictureProcessing.Ocr;
+using Dota2Simulator.PictureProcessing.OCR;
 using ImageProcessingSystem;
 using System;
+using System.Collections.Concurrent;
+using System.Collections.Frozen;
 using System.Collections.Generic;
+using System.Data;
 using System.Drawing;
 using System.Linq;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 
 namespace Dota2Simulator.Games.Dota2.Silt
 {
-    #region 枚举定义
+    #region 核心枚举和记录类型
 
     /// <summary>
     /// 选择模式
     /// </summary>
     public enum SelectionMode
     {
-        /// <summary>
-        /// 原逻辑 - 选择不刷新，跳过也不刷新
-        /// </summary>
         Sequential,
-
-        /// <summary>
-        /// 实际逻辑 - 先跳过所有其他天赋，再选择
-        /// </summary>
         SkipFirstThenSelect
     }
 
@@ -37,205 +35,275 @@ namespace Dota2Simulator.Games.Dota2.Silt
     /// </summary>
     public enum TalentValueType
     {
-        /// <summary>
-        /// 基础值 - 直接增加
-        /// </summary>
         基础值,
-
-        /// <summary>
-        /// 增量 - 每次/每层增加的值
-        /// </summary>
         增量,
-
-        /// <summary>
-        /// 倍数 - 百分比加成
-        /// </summary>
         倍数,
-
-        /// <summary>
-        /// 上限 - 最大值限制
-        /// </summary>
         上限,
-
-        /// <summary>
-        /// 触发率 - 触发概率
-        /// </summary>
         触发率,
-
-        /// <summary>
-        /// 持续时间
-        /// </summary>
         持续时间,
+        冷却时间,
+        作用范围,
+        间隔值
+    }
+
+    /// <summary>
+    /// 值限制类型
+    /// </summary>
+    public enum ValueLimitType
+    {
+        无限制,
+        伤害最大值,
+        间隔最小值,
+        叠加最大值,
+        范围最大值
+    }
+
+    /// <summary>
+    /// 优先级奖励配置
+    /// </summary>
+    public readonly record struct PriorityBonus(
+        int MinBonus,
+        int MiddleBonus,
+        int MaxBonus
+    )
+    {
+        public static readonly PriorityBonus Default = new(0, 0, 0);
 
         /// <summary>
-        /// 冷却时间
+        /// 计算值对应的奖励
         /// </summary>
-        冷却时间
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public readonly int CalculateBonus(double value, double minValue, double maxValue)
+        {
+            if (Math.Abs(value - minValue) < 0.001) return MinBonus;
+            if (Math.Abs(value - maxValue) < 0.001) return MaxBonus;
+            return MiddleBonus;
+        }
     }
 
     #endregion
 
-    #region 核心数据结构
+    #region 优化的数据结构
 
     /// <summary>
-    /// 技能基础配置
+    /// 技能配置（使用struct减少内存分配）
     /// </summary>
-    public class SkillBaseConfig
+    [StructLayout(LayoutKind.Auto)]
+    public struct SkillConfig
     {
-        public string SkillName { get; set; }
-        public double BaseValue { get; set; } = 0;      // 基础值
-        public double Increment { get; set; } = 0;       // 每次增量
-        public double Multiplier { get; set; } = 1;      // 倍数
-        public double MaxValue { get; set; } = double.MaxValue;  // 上限值
-        public double MinValue { get; set; } = 0;        // 下限值
-        public int MaxStacks { get; set; } = 1;          // 最大层数
-        public double TriggerInterval { get; set; } = 1; // 触发间隔（秒）
+        public double BaseValue;
+        public double Increment;
+        public double Multiplier;
+        public double MaxValue;
+        public double MinInterval;
+        public int MaxStacks;
+        public double MaxRange;
+        public double CurrentInterval;
+        public double CurrentRange;
+        public double StartRange;
 
-        /// <summary>
-        /// 计算当前实际值
-        /// </summary>
-        public double CalculateCurrentValue(int currentStacks = 0)
+        public SkillConfig()
+        {
+            Multiplier = 1;
+            MaxValue = double.MaxValue;
+            MinInterval = 0.1;
+            MaxStacks = 1;
+            MaxRange = double.MaxValue;
+            CurrentInterval = 1;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public readonly double GetLimitValue(ValueLimitType limitType) => limitType switch
+        {
+            ValueLimitType.伤害最大值 => MaxValue,
+            ValueLimitType.间隔最小值 => MinInterval,
+            ValueLimitType.叠加最大值 => MaxStacks,
+            ValueLimitType.范围最大值 => MaxRange,
+            _ => double.MaxValue
+        };
+
+        public readonly double CalculateCurrentValue(int currentStacks = 0)
         {
             var value = BaseValue + (Increment * currentStacks);
             value *= Multiplier;
-            return Math.Max(MinValue, Math.Min(value, MaxValue));
+            return Math.Min(value, MaxValue);
         }
 
-        /// <summary>
-        /// 计算增加某个值后的收益
-        /// </summary>
-        public double CalculateImprovement(TalentValueType type, double addValue, double duration = 10)
+        public readonly (double improvement, string details) CalculateImprovement(
+            TalentValueType type, double addValue, int count, int duration)
         {
-            switch (type)
+            // 特殊类型不计算收益
+            if (type is TalentValueType.作用范围 or TalentValueType.冷却时间 or TalentValueType.持续时间)
+                return (0, $"  {type}类型不计算预期收益");
+
+            int actualCount = count > 0 ? count : (duration > 0 ? (int)(duration / CurrentInterval) : 0);
+            if (actualCount == 0) return (Math.Abs(addValue), "  使用简单计算");
+
+            return type switch
             {
-                case TalentValueType.基础值:
-                    return addValue * Multiplier * (duration / TriggerInterval);
+                TalentValueType.基础值 => (Math.Abs(addValue) * actualCount * Multiplier,
+                    $"  |{addValue}| × {actualCount}次 × {Multiplier}倍率"),
 
-                case TalentValueType.增量:
-                    // 计算实际能达到的层数
-                    var effectiveStacks = Math.Min(MaxStacks, duration / TriggerInterval);
-                    var currentTotal = CalculateTotalDamage(duration);
+                TalentValueType.倍数 => (CalculateTotalValue(actualCount) * (Math.Abs(addValue) / 100),
+                    $"  当前总伤害 × {Math.Abs(addValue)}%"),
 
-                    // 创建临时配置计算新值
-                    var tempConfig = this.Clone();
-                    tempConfig.Increment += addValue;
-                    var newTotal = tempConfig.CalculateTotalDamage(duration);
-
-                    return newTotal - currentTotal;
-
-                case TalentValueType.倍数:
-                    var currentDamage = CalculateTotalDamage(duration);
-                    return currentDamage * (addValue / 100);
-
-                case TalentValueType.上限:
-                    // 只有当前值会达到上限时，增加上限才有意义
-                    var maxPossibleValue = BaseValue + (Increment * MaxStacks);
-                    if (maxPossibleValue > MaxValue)
-                    {
-                        var tempConfig2 = this.Clone();
-                        tempConfig2.MaxValue += addValue;
-                        return tempConfig2.CalculateTotalDamage(duration) - CalculateTotalDamage(duration);
-                    }
-                    return 0;
-
-                default:
-                    return addValue;
-            }
+                _ => (Math.Abs(addValue), "  默认计算")
+            };
         }
 
-        /// <summary>
-        /// 计算指定时间内的总伤害
-        /// </summary>
-        public double CalculateTotalDamage(double duration)
+        private readonly double CalculateTotalValue(int count)
         {
-            double totalDamage = 0;
-            double currentValue = BaseValue;
+            double total = 0;
             int stacks = 0;
 
-            for (double t = 0; t < duration; t += TriggerInterval)
+            for (int i = 0; i < count; i++)
             {
-                currentValue = BaseValue + (Increment * stacks);
-                currentValue *= Multiplier;
-                currentValue = Math.Max(MinValue, Math.Min(currentValue, MaxValue));
-
-                totalDamage += currentValue;
-
-                if (stacks < MaxStacks)
-                    stacks++;
+                var value = (BaseValue + Increment * stacks) * Multiplier;
+                value = Math.Min(value, MaxValue);
+                total += value;
+                if (stacks < MaxStacks) stacks++;
             }
 
-            return totalDamage;
-        }
-
-        public SkillBaseConfig Clone()
-        {
-            return new SkillBaseConfig
-            {
-                SkillName = this.SkillName,
-                BaseValue = this.BaseValue,
-                Increment = this.Increment,
-                Multiplier = this.Multiplier,
-                MaxValue = this.MaxValue,
-                MinValue = this.MinValue,
-                MaxStacks = this.MaxStacks,
-                TriggerInterval = this.TriggerInterval
-            };
+            return total;
         }
     }
 
     /// <summary>
-    /// 天赋规则
+    /// 天赋规则（使用class因为需要委托）
     /// </summary>
-    public class TalentRule
+    public sealed class TalentRule
     {
-        public string SkillImageHandle { get; set; }
-        public string DescriptionPattern { get; set; }
-        public TalentValueType ValueType { get; set; }
-        public double MinValue { get; set; } = double.MinValue;
-        public double MaxValue { get; set; } = double.MaxValue;
-        public int BasePriority { get; set; } = 100;
-        public int MaxSelectionCount { get; set; } = int.MaxValue;
-        public bool AutoSkip { get; set; } = false;
-        public bool IsSpecialSkill { get; set; } = false;
+        public required string SkillImageHandle { get; init; }
+        public required string DescriptionPattern { get; init; }
+        public required TalentValueType ValueType { get; init; }
+        public ValueLimitType LimitType { get; init; } = ValueLimitType.无限制;
+        public double MinValue { get; init; } = double.MinValue;
+        public double MaxValue { get; init; } = double.MaxValue;
+        public int BasePriority { get; init; } = 100;
+        public int MaxSelectionCount { get; init; } = int.MaxValue;
+        public bool AutoSkip { get; init; }
+        public bool IsSpecialSkill { get; init; }
+        public PriorityBonus PriorityBonus { get; init; } = PriorityBonus.Default;
+        public Func<SkillConfig, double, int>? CalculateDynamicPriority { get; init; }
+    }
 
-        /// <summary>
-        /// 动态计算优先级
-        /// </summary>
-        public Func<SkillBaseConfig, double, int> CalculateDynamicPriority { get; set; }
+    /// <summary>
+    /// 图片搜索结果
+    /// </summary>
+    public readonly record struct ImageSearchResult(
+        string ImageName,
+        Point Position,
+        Point PickPoint,
+        Point SkipPoint,
+        IReadOnlyList<TalentRule> MatchingRules
+    )
+    {
+        public bool HasRule => MatchingRules.Count > 0;
     }
 
     /// <summary>
     /// 天赋候选项
     /// </summary>
-    public class TalentCandidate
+    public sealed record TalentCandidate
     {
-        public Point Position { get; set; }
-        public Point PickPoint { get; set; }
-        public Point SkipPoint { get; set; }
-        public string SkillName { get; set; }           // 技能名称（从特殊区域OCR）
-        public string Description { get; set; }          // 描述
-        public string Effect { get; set; }               // 效果
-        public string MinMaxText { get; set; }           // Min/Max 文本
-        public double ExtractedValue { get; set; }       // 提取的数值
-        public double ExtractedMinValue { get; set; }    // 提取的最小值
-        public double ExtractedMaxValue { get; set; }    // 提取的最大值
-        public TalentRule MatchedRule { get; set; }      // 匹配的规则
-        public int Priority { get; set; }                // 优先级
-        public double ExpectedImprovement { get; set; }  // 预期收益
-        public bool IsSpecialSkill { get; set; }         // 是否特殊技能
+        public required ImageSearchResult SearchResult { get; init; }
+        public required string SkillName { get; init; }
+        public required string Description { get; init; }
+        public required string Effect { get; init; }
+        public string MinMaxText { get; init; } = "";
+        public double ExtractedValue { get; init; }
+        public double ExtractedMinValue { get; init; }
+        public double ExtractedMaxValue { get; init; } = double.MaxValue;
+        public TalentRule? MatchedRule { get; init; }
+        public int Priority { get; init; }
+        public double ExpectedImprovement { get; init; }
+        public string ImprovementDetails { get; init; } = "";
+        public bool IsSpecialSkill { get; init; }
+        public bool ShouldSelect { get; init; }
+        public bool ShouldSkip { get; init; }
     }
 
     /// <summary>
-    /// 天赋选择配置
+    /// 天赋队列项
     /// </summary>
-    public class TalentSelectionConfig
+    public readonly record struct TalentQueueItem(
+        string Name,
+        string Description,
+        double Value,
+        int Priority,
+        TalentCandidate Candidate
+    );
+
+    #endregion
+
+    #region 天赋队列管理器
+
+    /// <summary>
+    /// 天赋队列管理器
+    /// </summary>
+    public sealed class TalentQueueManager
     {
-        public string HeroName { get; set; }
-        public SelectionMode Mode { get; set; } = SelectionMode.SkipFirstThenSelect;
-        public Dictionary<string, SkillBaseConfig> SkillConfigs { get; set; } = new();
-        public List<TalentRule> Rules { get; set; } = new();
-        public bool SkipUnmatchedByDefault { get; set; } = true;
-        public int CalculationDuration { get; set; } = 10; // 计算收益的时长（秒）
+        private readonly List<TalentQueueItem> _queue = new();
+        private readonly Dictionary<int, List<TalentQueueItem>> _priorityGroups = new();
+
+        public IReadOnlyList<TalentQueueItem> Queue => _queue;
+
+        public void Add(TalentCandidate candidate)
+        {
+            var item = new TalentQueueItem(
+                Name: $"{candidate.SkillName}{candidate.ExtractedValue:+#;-#;0}",
+                Description: candidate.Description,
+                Value: candidate.ExtractedValue,
+                Priority: candidate.Priority,
+                Candidate: candidate
+            );
+
+            _queue.Add(item);
+
+            if (!_priorityGroups.TryGetValue(candidate.Priority, out var group))
+            {
+                group = new List<TalentQueueItem>();
+                _priorityGroups[candidate.Priority] = group;
+            }
+            group.Add(item);
+        }
+
+        public void Sort()
+        {
+            _queue.Sort((a, b) => b.Priority.CompareTo(a.Priority));
+        }
+
+        public string GetQueueDisplay()
+        {
+            var sb = new StringBuilder();
+            sb.AppendLine("=== 天赋队列 ===");
+            sb.AppendLine($"{"名称",-20} {"优先级",8} {"描述"}");
+            sb.AppendLine(new string('-', 60));
+
+            foreach (var item in _queue)
+            {
+                sb.AppendLine($"{item.Name,-20} {item.Priority,8} {item.Description}");
+            }
+
+            // 检查相同优先级
+            var duplicatePriorities = _priorityGroups.Where(g => g.Value.Count > 1).ToList();
+            if (duplicatePriorities.Any())
+            {
+                sb.AppendLine("\n⚠️ 警告：以下天赋具有相同优先级：");
+                foreach (var (priority, items) in duplicatePriorities)
+                {
+                    sb.AppendLine($"  优先级 {priority}: {string.Join(", ", items.Select(i => i.Name))}");
+                }
+            }
+
+            return sb.ToString();
+        }
+
+        public void Clear()
+        {
+            _queue.Clear();
+            _priorityGroups.Clear();
+        }
     }
 
     #endregion
@@ -243,211 +311,267 @@ namespace Dota2Simulator.Games.Dota2.Silt
     #region 天赋选择器
 
     /// <summary>
-    /// 优化的天赋选择器
+    /// 天赋选择器
     /// </summary>
-    public class OptimizedTalentSelector
+    public sealed class TalentSelector
     {
-        private static readonly Regex NumberRegex = new Regex(@"[+\-]?\d+\.?\d*", RegexOptions.Compiled);
-        private readonly Dictionary<string, int> _selectionCounts = new();
-        private readonly Dictionary<string, SkillBaseConfig> _currentConfigs = new();
+        private static readonly Regex NumberRegex = new(@"[+\-]?\d+\.?\d*", RegexOptions.Compiled);
+        private readonly ConcurrentDictionary<string, int> _selectionCounts = new();
+        private readonly Dictionary<string, SkillConfig> _currentConfigs = new();
+        private readonly StringBuilder _detailedLogs = new();
+        private readonly TalentQueueManager _queueManager = new();
 
-        public class SelectionOptions
+        public record struct SelectionOptions
         {
-            public int DelayBetweenChecks { get; set; } = 100;
-            public int DelayAfterClick { get; set; } = 300;
-            public int DelayAfterSelection { get; set; } = 500; // 选择后额外延迟，等待刷新
-            public double ImageMatchThreshold { get; set; } = 0.9;
-            public int MaxSearchResults { get; set; } = 100;
-            public int SearchStep { get; set; } = 10;
-            public bool EnableLogging { get; set; } = true;
-            public bool EnableTTS { get; set; } = true;
+            public SelectionOptions()
+            {
+            }
+
+            public int DelayBetweenChecks { get; init; } = 25;
+            public int DelayAfterClick { get; init; } = 25;
+            public int DelayAfterSelection { get; init; } = 100;
+            public double ImageMatchThreshold { get; init; } = 0.9;
+            public int MaxSearchResults { get; init; } = 100;
+            public int SearchStep { get; init; } = 10;
+            public bool EnableLogging { get; init; } = true;
+            public bool EnableTTS { get; init; } = true;
+            public bool EnableDetailedLogging { get; init; } = true;
         }
 
         private SelectionOptions _options = new();
 
-        public void SetOptions(SelectionOptions options)
-        {
-            _options = options ?? new SelectionOptions();
-        }
+        public void SetOptions(SelectionOptions options) => _options = options;
 
-        /// <summary>
-        /// 执行天赋选择
-        /// </summary>
         public SelectionReport ExecuteSelection(
             in ImageHandle gameHandle,
             TalentSelectionConfig config,
-            Dictionary<string, ImageHandle> imageHandles)
+            IReadOnlyDictionary<string, ImageHandle> imageHandles)
         {
-            var report = new SelectionReport
-            {
-                HeroName = config.HeroName,
-                StartTime = DateTime.Now
-            };
+            _detailedLogs.Clear();
+            _queueManager.Clear();
+
+            LogDetailed($"=== 开始执行 {config.HeroName} 天赋选择 ===");
+
+            var error_message = "";
 
             try
             {
-                // 初始化当前配置
                 InitializeCurrentConfigs(config);
 
-                if (config.Mode == SelectionMode.Sequential)
+                var Result = config.Mode switch
                 {
-                    // 原逻辑：顺序处理
-                    report.Results = ProcessSequential(gameHandle, config, imageHandles);
-                }
-                else
-                {
-                    // 实际逻辑：先跳过，再选择
-                    report.Results = ProcessSkipFirstThenSelect(gameHandle, config, imageHandles);
-                }
+                    SelectionMode.Sequential => ProcessSequential(gameHandle, config, imageHandles),
+                    _ => ProcessSkipFirstThenSelect(gameHandle, config, imageHandles)
+                };
 
-                report.EndTime = DateTime.Now;
-                report.Success = true;
-                report.Summary = GenerateSummary(report.Results);
+                var report = new SelectionReport
+                {
+                    HeroName = config.HeroName,
+                    StartTime = DateTime.Now,
+                    Results = Result,
+                    EndTime = DateTime.Now,
+                    Success = true,
+                    Summary = GenerateSummary(Result),
+                    DetailedLog = _detailedLogs.ToString(),
+                    QueueDisplay = _queueManager.GetQueueDisplay()
+                };
 
                 if (_options.EnableTTS)
-                {
                     TTS.TTS.Speak($"{config.HeroName}天赋选择完成");
-                }
+
+                return report;
             }
             catch (Exception ex)
             {
-                report.Success = false;
-                report.ErrorMessage = ex.Message;
-                Log($"错误: {ex.Message}");
+                LogDetailed($"错误: {ex.Message}\n{ex.StackTrace}");
+                error_message = ex.Message;
             }
 
-            return report;
+            var er_report = new SelectionReport
+            {
+                HeroName = config.HeroName,
+                StartTime = DateTime.Now,
+                Success = false,
+                ErrorMessage = error_message,
+            };
+
+            return er_report;
         }
 
-        /// <summary>
-        /// 顺序处理模式
-        /// </summary>
-        private List<SelectionResult> ProcessSequential(
+        private List<SelectionResult> ProcessSkipFirstThenSelect(
             in ImageHandle gameHandle,
             TalentSelectionConfig config,
-            Dictionary<string, ImageHandle> imageHandles)
+            IReadOnlyDictionary<string, ImageHandle> imageHandles)
         {
             var results = new List<SelectionResult>();
-            var candidates = CollectAllCandidates(in gameHandle, config, imageHandles);
+            var processedPositions = new HashSet<string>();
+            int round = 0;
 
-            if (!candidates.Any())
+            while (round++ < 10)
             {
-                Log("未找到任何候选项");
-                return results;
-            }
+                LogDetailed($"\n--- 第 {round} 轮处理 ---");
 
-            // 按优先级排序
-            var sortedCandidates = SortCandidates(candidates, config);
+                var searchResults = FindAllImages(imageHandles, config);
+                var newResults = searchResults
+                    .Where(sr => !processedPositions.Contains(GetPositionKey(sr.Position)))
+                    .ToList();
 
-            foreach (var candidate in sortedCandidates)
-            {
-                if (ShouldSelect(candidate, config))
+                if (newResults.Count == 0)
                 {
-                    PerformSelection(candidate.PickPoint);
-                    UpdateCurrentConfig(candidate);
-                    results.Add(CreateResult(candidate, true));
+                    LogDetailed("没有找到新的天赋图标，结束处理");
+                    break;
+                }
+
+                var candidates = new List<TalentCandidate>();
+                var toSkipImmediately = new List<ImageSearchResult>();
+
+                // 创建候选项
+                foreach (var searchResult in newResults)
+                {
+                    if (!searchResult.HasRule)
+                    {
+                        toSkipImmediately.Add(searchResult);
+                    }
+                    else if (CreateCandidateFromSearchWithoutDescript(searchResult, gameHandle, config))
+                    {
+                        toSkipImmediately.Add(searchResult);
+                    }
+                    else if (CreateCandidateFromSearch(searchResult, gameHandle, config) is { } candidate)
+                    {
+                        candidates.Add(candidate);
+                        _queueManager.Add(candidate);
+                    }
+                }
+
+                LogDetailed($"\n当前跳过项有{toSkipImmediately.Count}");
+                LogDetailed($"\n当前候选项有{candidates.Count}");
+
+                // 显示当前队列
+                LogDetailed("\n" + _queueManager.GetQueueDisplay());
+
+                // 处理无规则项
+                foreach (var searchResult in toSkipImmediately)
+                {
+                    PerformSkip(searchResult.SkipPoint);
+                    processedPositions.Add(GetPositionKey(searchResult.Position));
+                    results.Add(CreateSkipResult(searchResult));
+                }
+
+                // 评估并选择
+                TalentCandidate? selectedCandidate = null;
+                var toSkipCandidates = new List<TalentCandidate>();
+
+                foreach (var candidate in candidates)
+                {
+                    var candidate1 = EvaluateCandidate(candidate, config);
+
+                    if (candidate1.ShouldSkip)
+                        toSkipCandidates.Add(candidate1);
+                    else if (candidate1.ShouldSelect && (selectedCandidate == null ||
+                             candidate.Priority > selectedCandidate.Priority ||
+                             (candidate.Priority == selectedCandidate.Priority &&
+                              candidate.ExpectedImprovement > selectedCandidate.ExpectedImprovement)))
+                    {
+                        LogDetailed($"\n{candidate1.SkillName}_{candidate1.Description}设置为当前选择");
+                        selectedCandidate = candidate1;
+                    }
+                }
+
+                // 执行操作
+                if (selectedCandidate != null)
+                {
+                    LogDetailed("\n" + $"存在要选择的{selectedCandidate.SkillName}_{selectedCandidate.Description}");
+
+                    // 跳过其他候选项
+                    foreach (var candidate in toSkipCandidates)
+                    {
+                        PerformSkip(candidate.SearchResult.SkipPoint);
+                        processedPositions.Add(GetPositionKey(candidate.SearchResult.Position));
+                        results.Add(CreateResult(candidate, false));
+                    }
+
+                    // 选择最佳候选项
+                    PerformSelection(selectedCandidate.SearchResult.PickPoint);
+                    UpdateCurrentConfig(selectedCandidate);
+                    processedPositions.Add(GetPositionKey(selectedCandidate.SearchResult.Position));
+                    results.Add(CreateResult(selectedCandidate, true));
+
+                    Thread.Sleep(_options.DelayAfterSelection);
+                    PerformNewSelect();
+                    break;
+                }
+                else if (toSkipCandidates.Count > 0)
+                {
+                    foreach (var candidate in toSkipCandidates)
+                    {
+                        PerformSkip(candidate.SearchResult.SkipPoint);
+                        processedPositions.Add(GetPositionKey(candidate.SearchResult.Position));
+                        results.Add(CreateResult(candidate, false));
+                    }
                 }
                 else
                 {
-                    PerformSkip(candidate.SkipPoint);
+                    foreach (var candidate in candidates)
+                    {
+                        processedPositions.Add(GetPositionKey(candidate.SearchResult.Position));
+                        results.Add(CreateResult(candidate, false));
+                    }
+                    break;
+                }
+            }
+
+            return results;
+        }
+
+        private List<SelectionResult> ProcessSequential(
+            in ImageHandle gameHandle,
+            TalentSelectionConfig config,
+            IReadOnlyDictionary<string, ImageHandle> imageHandles)
+        {
+            var results = new List<SelectionResult>();
+            var searchResults = FindAllImages(imageHandles, config);
+
+            foreach (var searchResult in searchResults)
+            {
+                if (!searchResult.HasRule)
+                {
+                    PerformSkip(searchResult.SkipPoint);
+                    results.Add(CreateSkipResult(searchResult));
+                    continue;
+                }
+
+                if (CreateCandidateFromSearch(searchResult, gameHandle, config) is not { } candidate)
+                    continue;
+
+                _queueManager.Add(candidate);
+                candidate = EvaluateCandidate(candidate, config);
+
+                if (candidate.ShouldSelect)
+                {
+                    PerformSelection(searchResult.PickPoint);
+                    UpdateCurrentConfig(candidate);
+                    results.Add(CreateResult(candidate, true));
+                }
+                else if (candidate.ShouldSkip)
+                {
+                    PerformSkip(searchResult.SkipPoint);
                     results.Add(CreateResult(candidate, false));
                 }
             }
 
+            LogDetailed("\n" + _queueManager.GetQueueDisplay());
             return results;
         }
 
-        /// <summary>
-        /// 先跳过再选择模式
-        /// </summary>
-        private List<SelectionResult> ProcessSkipFirstThenSelect(
-            in ImageHandle gameHandle,
-            TalentSelectionConfig config,
-            Dictionary<string, ImageHandle> imageHandles)
+        private List<ImageSearchResult> FindAllImages(
+            IReadOnlyDictionary<string, ImageHandle> imageHandles,
+            TalentSelectionConfig config)
         {
-            var results = new List<SelectionResult>();
-            var processedPositions = new HashSet<string>();
-            TalentCandidate selectedCandidate = null;
+            var results = new List<ImageSearchResult>();
 
-            while (true)
+            foreach (var (name, imageHandle) in imageHandles)
             {
-                var candidates = CollectAllCandidates(in gameHandle, config, imageHandles);
-
-                // 过滤已处理的位置
-                candidates = candidates.Where(c => !processedPositions.Contains(GetPositionKey(c))).ToList();
-
-                if (!candidates.Any())
-                    break;
-
-                // 排序并找到最佳候选
-                var sortedCandidates = SortCandidates(candidates, config);
-                selectedCandidate = null;
-
-                foreach (var candidate in sortedCandidates)
-                {
-                    if (ShouldSelect(candidate, config))
-                    {
-                        selectedCandidate = candidate;
-                        break;
-                    }
-                }
-
-                if (selectedCandidate != null)
-                {
-                    // 先跳过其他所有候选项
-                    foreach (var candidate in candidates.Where(c => c != selectedCandidate))
-                    {
-                        PerformSkip(candidate.SkipPoint);
-                        processedPositions.Add(GetPositionKey(candidate));
-                        results.Add(CreateResult(candidate, false));
-                        Thread.Sleep(50); // 短暂延迟
-                    }
-
-                    // 选择最佳候选项
-                    PerformSelection(selectedCandidate.PickPoint);
-                    UpdateCurrentConfig(selectedCandidate);
-                    processedPositions.Add(GetPositionKey(selectedCandidate));
-                    results.Add(CreateResult(selectedCandidate, true));
-
-                    // 等待界面刷新
-                    Thread.Sleep(_options.DelayAfterSelection);
-                }
-                else
-                {
-                    // 没有要选择的，跳过所有
-                    foreach (var candidate in candidates)
-                    {
-                        PerformSkip(candidate.SkipPoint);
-                        processedPositions.Add(GetPositionKey(candidate));
-                        results.Add(CreateResult(candidate, false));
-                    }
-                    break;
-                }
-            }
-
-            return results;
-        }
-
-        /// <summary>
-        /// 收集所有候选项
-        /// </summary>
-        private List<TalentCandidate> CollectAllCandidates(
-            in ImageHandle gameHandle,
-            TalentSelectionConfig config,
-            Dictionary<string, ImageHandle> imageHandles)
-        {
-            var candidates = new List<TalentCandidate>();
-            var processedPositions = new HashSet<string>();
-
-            foreach (var rule in config.Rules.Where(r => !r.AutoSkip))
-            {
-                if (!imageHandles.TryGetValue(rule.SkillImageHandle, out var imageHandle))
-                {
-                    Log($"未找到图片句柄: {rule.SkillImageHandle}");
-                    continue;
-                }
-
-                var positions = GlobalScreenCapture.FindAllImagesOptimized(
+                var positions = GlobalScreenCapture.FindAllImages(
                     imageHandle,
                     _options.ImageMatchThreshold,
                     _options.MaxSearchResults,
@@ -455,300 +579,213 @@ namespace Dota2Simulator.Games.Dota2.Silt
 
                 foreach (var position in positions)
                 {
-                    var posKey = $"{position.X},{position.Y}";
-                    if (processedPositions.Contains(posKey))
-                        continue;
+                    var matchingRules = config.Rules
+                        .Where(r => r.SkillImageHandle == name && !r.AutoSkip)
+                        .ToList();
 
-                    processedPositions.Add(posKey);
-
-                    var candidate = ExtractCandidate(position, gameHandle, config, rule);
-                    if (candidate != null)
-                    {
-                        candidates.Add(candidate);
-                    }
+                    results.Add(new ImageSearchResult(
+                        ImageName: name,
+                        Position: position,
+                        PickPoint: new Point(position.X + 41, position.Y + 306),
+                        SkipPoint: new Point(position.X + 41, position.Y + 360),
+                        MatchingRules: matchingRules
+                    ));
                 }
             }
 
-            return candidates;
+            return results;
         }
 
-        /// <summary>
-        /// 提取候选项信息
-        /// </summary>
-        private TalentCandidate ExtractCandidate(
-            Point position,
+        private bool CreateCandidateFromSearchWithoutDescript(
+            ImageSearchResult searchResult,
             in ImageHandle gameHandle,
-            TalentSelectionConfig config,
-            TalentRule rule)
+            TalentSelectionConfig config)
         {
-            // 定义OCR区域
-            Rectangle descRect, effectRect, minMaxRect, skillNameRect;
+            if (!PerformOCR(searchResult, gameHandle, out var ocrData))
+                return false;
 
-            if (rule.IsSpecialSkill)
+            foreach (var rule in searchResult.MatchingRules)
             {
-                // 特殊技能区域
-                skillNameRect = new Rectangle(position.X - 66, position.Y - 55, 212, 42);
-                descRect = new Rectangle(position.X - 66, position.Y + 170, 212, 42);
-                effectRect = new Rectangle(position.X - 66, position.Y + 183, 212, 42);
-                minMaxRect = new Rectangle(position.X - 66, position.Y + 216, 212, 42);
-            }
-            else
-            {
-                // 普通技能区域
-                skillNameRect = new Rectangle(position.X - 66, position.Y - 55, 212, 42);
-                descRect = new Rectangle(position.X - 66, position.Y + 114, 212, 42);
-                effectRect = new Rectangle(position.X - 66, position.Y + 183, 212, 42);
-                minMaxRect = new Rectangle(position.X - 66, position.Y + 216, 212, 42);
+                if (MatchesDescription(ocrData.Description, rule.DescriptionPattern))
+                    return false;
             }
 
-            var pickPoint = new Point(position.X + 41, position.Y + 306);
-            var skipPoint = new Point(position.X + 41, position.Y + 360);
+            return true;
+        }
 
-            // OCR识别
-            var skillName = PaddleOCR.获取图片文字(in gameHandle, skillNameRect);
-            var description = PaddleOCR.获取图片文字(in gameHandle, descRect);
-            var effect = PaddleOCR.获取图片文字(in gameHandle, effectRect);
-            var minMaxText = PaddleOCR.获取图片文字(in gameHandle, minMaxRect);
+        private TalentCandidate? CreateCandidateFromSearch(
+            ImageSearchResult searchResult,
+            in ImageHandle gameHandle,
+            TalentSelectionConfig config)
+        {
+            if (!PerformOCR(searchResult, gameHandle, out var ocrData))
+                return null;
 
-            Log($"OCR结果 - 技能:{skillName}, 描述:{description}, 效果:{effect}, Min/Max:{minMaxText}");
-
-            // 检查是否为特殊技能（描述为空）
-            if (string.IsNullOrWhiteSpace(description) && !rule.IsSpecialSkill)
+            foreach (var rule in searchResult.MatchingRules)
             {
-                // 尝试作为特殊技能重新识别
-                var specialRule = config.Rules.FirstOrDefault(r =>
-                    r.SkillImageHandle == rule.SkillImageHandle && r.IsSpecialSkill);
+                if (!MatchesDescription(ocrData.Description, rule.DescriptionPattern))
+                    continue;
 
-                if (specialRule != null)
+                var extractedValue = ExtractValue(ocrData.Effect);
+                var skillConfig = _currentConfigs.GetValueOrDefault(ocrData.SkillName);
+
+                // 计算优先级
+                int priority = rule.BasePriority;
+
+                // 应用优先级奖励
+                var bonus = rule.PriorityBonus.CalculateBonus(extractedValue, rule.MinValue, rule.MaxValue);
+                priority += bonus;
+
+                // 动态优先级
+                if (rule.CalculateDynamicPriority != null)
                 {
-                    return ExtractCandidate(position, gameHandle, config, specialRule);
+                    priority = rule.CalculateDynamicPriority(skillConfig, extractedValue);
                 }
-            }
 
-            // 解析Min/Max值
-            var (minValue, maxValue) = ParseMinMaxValues(minMaxText);
+                // 计算收益
+                var (improvement, details) = skillConfig.CalculateImprovement(
+                    rule.ValueType,
+                    extractedValue,
+                    config.CalculationCount,
+                    config.CalculationDuration);
 
-            // 创建候选项
-            var candidate = new TalentCandidate
-            {
-                Position = position,
-                PickPoint = pickPoint,
-                SkipPoint = skipPoint,
-                SkillName = CleanText(skillName),
-                Description = CleanText(description),
-                Effect = CleanText(effect),
-                MinMaxText = minMaxText,
-                ExtractedMinValue = minValue,
-                ExtractedMaxValue = maxValue,
-                IsSpecialSkill = rule.IsSpecialSkill
-            };
-
-            // 检查是否匹配规则
-            if (MatchesRule(candidate, rule))
-            {
-                candidate.MatchedRule = rule;
-                candidate.ExtractedValue = ExtractValue(effect);
-
-                // 计算优先级和预期收益
-                CalculatePriorityAndImprovement(candidate, config);
-
-                return candidate;
+                return new TalentCandidate
+                {
+                    SearchResult = searchResult,
+                    SkillName = ocrData.SkillName,
+                    Description = ocrData.Description,
+                    Effect = ocrData.Effect,
+                    MinMaxText = ocrData.MinMaxText,
+                    ExtractedValue = extractedValue,
+                    ExtractedMinValue = ocrData.MinValue,
+                    ExtractedMaxValue = ocrData.MaxValue,
+                    MatchedRule = rule,
+                    Priority = priority,
+                    ExpectedImprovement = improvement,
+                    ImprovementDetails = details,
+                    IsSpecialSkill = rule.IsSpecialSkill
+                };
             }
 
             return null;
         }
 
-        /// <summary>
-        /// 解析Min/Max值
-        /// </summary>
-        private (double min, double max) ParseMinMaxValues(string minMaxText)
+        private readonly record struct OCRData(
+            string SkillName,
+            string Description,
+            string Effect,
+            string MinMaxText,
+            double MinValue,
+            double MaxValue
+        );
+
+        private bool PerformOCR(
+            ImageSearchResult searchResult,
+            in ImageHandle gameHandle,
+            out OCRData ocrData)
         {
-            double minValue = 0;
-            double maxValue = double.MaxValue;
+            ocrData = default;
 
-            if (!string.IsNullOrEmpty(minMaxText))
+            try
             {
-                var minMatch = Regex.Match(minMaxText, @"Min\s*Value:\s*([\d.]+)");
-                var maxMatch = Regex.Match(minMaxText, @"Max\s*Value:\s*([\d.]+)");
+                var position = searchResult.Position;
 
-                if (minMatch.Success)
-                    double.TryParse(minMatch.Groups[1].Value, out minValue);
+                // OCR区域定义
+                ReadOnlySpan<Rectangle> normalRects = [
+                    new(position.X - 66, position.Y - 48, 212, 42),  // 技能名
+                    new(position.X - 66, position.Y + 114, 212, 42), // 描述
+                    new(position.X - 66, position.Y + 183, 212, 42), // 效果
+                    new(position.X - 66, position.Y + 216, 212, 42)  // Min/Max
+                ];
 
-                if (maxMatch.Success)
-                    double.TryParse(maxMatch.Groups[1].Value, out maxValue);
+                var skillName = CleanText(PaddleOCR.获取图片文字(in gameHandle, normalRects[0]));
+                var description = CleanText(PaddleOCR.获取图片文字(in gameHandle, normalRects[1]));
+                var effect = CleanText(PaddleOCR.获取图片文字(in gameHandle, normalRects[2]));
+                var minMaxText = PaddleOCR.获取图片文字(in gameHandle, normalRects[3]);
+
+                // 特殊技能处理
+                if (string.IsNullOrWhiteSpace(description))
+                {
+                    var specialRect = new Rectangle(position.X - 66, position.Y + 170, 212, 42);
+                    description = CleanText(PaddleOCR.获取图片文字(in gameHandle, specialRect));
+                }
+
+                if (string.IsNullOrWhiteSpace(skillName))
+                    skillName = searchResult.ImageName;
+
+                var (minValue, maxValue) = ParseMinMaxValues(minMaxText);
+
+                ocrData = new OCRData(skillName, description, effect, minMaxText, minValue, maxValue);
+                return true;
             }
-
-            return (minValue, maxValue);
+            catch (Exception ex)
+            {
+                LogDetailed($"OCR异常: {ex.Message}");
+                return false;
+            }
         }
 
-        /// <summary>
-        /// 检查是否匹配规则
-        /// </summary>
-        private bool MatchesRule(TalentCandidate candidate, TalentRule rule)
+        private TalentCandidate EvaluateCandidate(TalentCandidate candidate, TalentSelectionConfig config)
         {
-            // 检查描述模式
-            if (!string.IsNullOrEmpty(rule.DescriptionPattern))
+            if (candidate.MatchedRule == null)
             {
-                if (!candidate.Description.Contains(rule.DescriptionPattern))
-                    return false;
+                candidate = candidate with { ShouldSkip = true };
+                LogDetailed($"\n{candidate.SkillName}_{candidate.Description} 不存在匹配的规则");
+                return candidate;
             }
+
+            var rule = candidate.MatchedRule;
+            var key = GetRuleKey(rule);
 
             // 检查选择次数
-            var key = GetRuleKey(rule);
-            if (_selectionCounts.TryGetValue(key, out int count))
+            if (_selectionCounts.TryGetValue(key, out int count) && count >= rule.MaxSelectionCount)
             {
-                if (count >= rule.MaxSelectionCount)
-                    return false;
+                candidate = candidate with { ShouldSkip = true };
+                LogDetailed($"\n{candidate.SkillName}_{candidate.Description} 选择次数已到");
+                return candidate;
             }
 
-            return true;
-        }
-
-        /// <summary>
-        /// 计算优先级和预期收益
-        /// </summary>
-        private void CalculatePriorityAndImprovement(TalentCandidate candidate, TalentSelectionConfig config)
-        {
-            var rule = candidate.MatchedRule;
-            candidate.Priority = rule.BasePriority;
-
-            // 获取技能配置
-            if (_currentConfigs.TryGetValue(candidate.SkillName, out var skillConfig))
+            // 检查值范围 不在不需要排除
+            if (candidate.ExtractedValue < rule.MinValue || candidate.ExtractedValue > rule.MaxValue)
             {
-                // 计算预期收益
-                candidate.ExpectedImprovement = skillConfig.CalculateImprovement(
-                    rule.ValueType,
-                    candidate.ExtractedValue,
-                    config.CalculationDuration);
-
-                // 动态优先级计算
-                if (rule.CalculateDynamicPriority != null)
-                {
-                    candidate.Priority = rule.CalculateDynamicPriority(skillConfig, candidate.ExtractedValue);
-                }
-                else
-                {
-                    // 默认动态优先级：基于收益
-                    candidate.Priority += (int)(candidate.ExpectedImprovement / 10);
-                }
-
-                // 特殊情况：接近上限时优先选择上限提升
-                if (rule.ValueType == TalentValueType.增量)
-                {
-                    var maxPossibleValue = skillConfig.BaseValue +
-                        (skillConfig.Increment * skillConfig.MaxStacks);
-
-                    if (maxPossibleValue > skillConfig.MaxValue * 0.8)
-                    {
-                        // 接近上限，降低增量优先级
-                        candidate.Priority -= 20;
-                    }
-                }
-                else if (rule.ValueType == TalentValueType.上限)
-                {
-                    var maxPossibleValue = skillConfig.BaseValue +
-                        (skillConfig.Increment * skillConfig.MaxStacks);
-
-                    if (maxPossibleValue > skillConfig.MaxValue)
-                    {
-                        // 会达到上限，提高上限优先级
-                        candidate.Priority += 30;
-                    }
-                }
-            }
-        }
-
-        /// <summary>
-        /// 候选项排序
-        /// </summary>
-        private List<TalentCandidate> SortCandidates(List<TalentCandidate> candidates, TalentSelectionConfig config)
-        {
-            return candidates
-                .OrderByDescending(c => c.Priority)
-                .ThenByDescending(c => c.ExpectedImprovement)
-                .ThenByDescending(c => Math.Abs(c.ExtractedValue))
-                .ToList();
-        }
-
-        /// <summary>
-        /// 判断是否应该选择
-        /// </summary>
-        private bool ShouldSelect(TalentCandidate candidate, TalentSelectionConfig config)
-        {
-            var rule = candidate.MatchedRule;
-
-            // 检查值范围
-            if (candidate.ExtractedValue < rule.MinValue ||
-                candidate.ExtractedValue > rule.MaxValue)
-            {
-                return false;
+                //candidate = candidate with { ShouldSkip = true };
+                LogDetailed($"\n{candidate.SkillName}_{candidate.Description} 不在选择区间");
+                return candidate;
             }
 
-            // 检查Min/Max限制
-            if (candidate.ExtractedValue < candidate.ExtractedMinValue ||
-                candidate.ExtractedValue > candidate.ExtractedMaxValue)
+            // 根据类型决定选择
+            var shouldSelect = rule.ValueType switch
             {
-                // 特殊情况：如果已经接近上限，且这是最后的选择机会
-                if (rule.ValueType == TalentValueType.增量 &&
-                    _currentConfigs.TryGetValue(candidate.SkillName, out var skillConfig))
-                {
-                    var remainingToMax = skillConfig.MaxValue -
-                        (skillConfig.BaseValue + skillConfig.Increment * skillConfig.MaxStacks);
+                TalentValueType.作用范围 or TalentValueType.冷却时间 or TalentValueType.持续时间
+                    => candidate.Priority >= 0,
+                _ => candidate.ExpectedImprovement >= 0
+            };
 
-                    if (remainingToMax > 0 && remainingToMax < candidate.ExtractedValue)
-                    {
-                        // 虽然不在范围内，但可以填补剩余空间
-                        return true;
-                    }
-                }
-                return false;
-            }
+            LogDetailed($"\n{candidate.SkillName}_{candidate.Description}" +
+                $"是{rule.ValueType}," +
+                $"优先级{candidate.Priority}," +
+                $"预计增量{candidate.ExpectedImprovement}");
 
-            // 检查预期收益
-            if (candidate.ExpectedImprovement <= 0)
+            candidate = candidate with
             {
-                return false;
-            }
+                ShouldSelect = shouldSelect,
+                ShouldSkip = !shouldSelect
+            };
 
-            return true;
+            LogDetailed($"\n{candidate.SkillName}_{candidate.Description}" +
+                $"是否选择{candidate.ShouldSelect}," +
+                $"是否跳过{candidate.ShouldSkip}");
+
+            return candidate;
         }
 
-        /// <summary>
-        /// 执行选择
-        /// </summary>
-        private void PerformSelection(Point position)
-        {
-            SimKeyBoard.MouseMove(position);
-            Thread.Sleep(_options.DelayBetweenChecks);
-            SimKeyBoard.MouseLeftClick();
-            Thread.Sleep(_options.DelayAfterClick);
-        }
-
-        /// <summary>
-        /// 执行跳过
-        /// </summary>
-        private void PerformSkip(Point position)
-        {
-            SimKeyBoard.MouseMove(position);
-            Thread.Sleep(_options.DelayBetweenChecks);
-            SimKeyBoard.MouseLeftClick();
-            Thread.Sleep(_options.DelayAfterClick);
-        }
-
-        /// <summary>
-        /// 更新当前配置
-        /// </summary>
         private void UpdateCurrentConfig(TalentCandidate candidate)
         {
-            var rule = candidate.MatchedRule;
-
-            // 更新选择计数
+            var rule = candidate.MatchedRule!;
             var key = GetRuleKey(rule);
-            if (!_selectionCounts.ContainsKey(key))
-                _selectionCounts[key] = 0;
-            _selectionCounts[key]++;
 
-            // 更新技能配置
+            _selectionCounts.AddOrUpdate(key, 1, (_, count) => count + 1);
+
             if (_currentConfigs.TryGetValue(candidate.SkillName, out var config))
             {
                 switch (rule.ValueType)
@@ -765,66 +802,114 @@ namespace Dota2Simulator.Games.Dota2.Silt
                     case TalentValueType.上限:
                         config.MaxValue += candidate.ExtractedValue;
                         break;
+                    case TalentValueType.间隔值:
+                        config.CurrentInterval = Math.Max(config.MinInterval,
+                            config.CurrentInterval - Math.Abs(candidate.ExtractedValue));
+                        break;
+                    case TalentValueType.作用范围:
+                        config.CurrentRange = Math.Min(config.MaxRange,
+                            config.CurrentRange + Math.Abs(candidate.ExtractedValue));
+                        break;
                 }
+                _currentConfigs[candidate.SkillName] = config;
             }
         }
 
-        /// <summary>
-        /// 初始化当前配置
-        /// </summary>
         private void InitializeCurrentConfigs(TalentSelectionConfig config)
         {
             _currentConfigs.Clear();
             _selectionCounts.Clear();
 
-            foreach (var kvp in config.SkillConfigs)
+            foreach (var (name, skillConfig) in config.SkillConfigs)
             {
-                _currentConfigs[kvp.Key] = kvp.Value.Clone();
+                _currentConfigs[name] = new SkillConfig
+                {
+                    BaseValue = skillConfig.BaseValue,
+                    Increment = skillConfig.Increment,
+                    Multiplier = skillConfig.Multiplier,
+                    MaxValue = skillConfig.MaxValue,
+                    MinInterval = skillConfig.MinInterval,
+                    MaxStacks = skillConfig.MaxStacks,
+                    MaxRange = skillConfig.MaxRange,
+                    CurrentInterval = skillConfig.CurrentInterval,
+                    CurrentRange = skillConfig.CurrentRange,
+                    StartRange = skillConfig.StartRange
+                };
             }
         }
 
-        /// <summary>
-        /// 辅助方法
-        /// </summary>
-        private string CleanText(string text)
-        {
-            if (string.IsNullOrEmpty(text)) return "";
-            return Regex.Replace(text, @"[^\w\u4e00-\u9fa5+\-\.\d\s]", "").Trim();
-        }
+        // 辅助方法
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static bool MatchesDescription(string description, string pattern)
+            => string.IsNullOrEmpty(pattern) || description.Contains(pattern);
 
-        private double ExtractValue(string effect)
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static string CleanText(string text)
+            => string.IsNullOrEmpty(text) ? "" : Regex.Replace(text, @"[^\w\u4e00-\u9fa5+\-\.\d\s]", "").Trim();
+
+        private static double ExtractValue(string effect)
         {
             var matches = NumberRegex.Matches(effect);
-            if (matches.Count > 0 && double.TryParse(matches[0].Value, out double value))
+            return matches.Count > 0 && double.TryParse(matches[0].Value, out double value)
+                ? Math.Abs(value) : 0;
+        }
+
+        private static (double min, double max) ParseMinMaxValues(string minMaxText)
+        {
+            if (string.IsNullOrEmpty(minMaxText))
+                return (0, double.MaxValue);
+
+            double minValue = 0;
+            double maxValue = double.MaxValue;
+
+            var minMatch = Regex.Match(minMaxText, @"Min\s*Value:\s*([\d.]+)");
+            var maxMatch = Regex.Match(minMaxText, @"Max\s*Value:\s*([\d.]+)");
+
+            if (minMatch.Success)
+                double.TryParse(minMatch.Groups[1].Value, out minValue);
+
+            if (maxMatch.Success)
+                double.TryParse(maxMatch.Groups[1].Value, out maxValue);
+
+            return (minValue, maxValue);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static string GetRuleKey(TalentRule rule)
+            => $"{rule.SkillImageHandle}_{rule.DescriptionPattern}";
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static string GetPositionKey(Point position)
+            => $"{position.X},{position.Y}";
+
+        private void PerformSelection(Point position)
+        {
+            SimKeyBoard.MouseMove(position);
+            Thread.Sleep(_options.DelayBetweenChecks);
+            SimKeyBoard.MouseLeftClick();
+            Thread.Sleep(_options.DelayAfterClick);
+        }
+
+        private void PerformSkip(Point position)
+        {
+            SimKeyBoard.MouseMove(position);
+            Thread.Sleep(_options.DelayBetweenChecks);
+            SimKeyBoard.MouseLeftClick();
+            Thread.Sleep(_options.DelayAfterClick);
+        }
+
+        private void PerformNewSelect()
+        {
+            SimKeyBoard.MouseMove(new Point(1550, 1044));
+            Thread.Sleep(_options.DelayBetweenChecks);
+            SimKeyBoard.MouseLeftClick();
+            Thread.Sleep(_options.DelayAfterClick);
+        }
+
+        private static SelectionResult CreateResult(TalentCandidate candidate, bool wasSelected)
+            => new()
             {
-                return value;
-            }
-            return 0;
-        }
-
-        private string GetRuleKey(TalentRule rule)
-        {
-            return $"{rule.SkillImageHandle}_{rule.DescriptionPattern}";
-        }
-
-        private string GetPositionKey(TalentCandidate candidate)
-        {
-            return $"{candidate.Position.X},{candidate.Position.Y}";
-        }
-
-        private void Log(string message)
-        {
-            if (_options.EnableLogging)
-            {
-                Console.WriteLine($"[天赋选择] {message}");
-            }
-        }
-
-        private SelectionResult CreateResult(TalentCandidate candidate, bool wasSelected)
-        {
-            return new SelectionResult
-            {
-                Position = candidate.Position,
+                Position = candidate.SearchResult.Position,
                 SkillName = candidate.SkillName,
                 Description = candidate.Description,
                 Effect = candidate.Effect,
@@ -833,11 +918,21 @@ namespace Dota2Simulator.Games.Dota2.Silt
                 ExtractedValue = candidate.ExtractedValue,
                 Priority = candidate.Priority,
                 ExpectedImprovement = candidate.ExpectedImprovement,
-                IsSpecialSkill = candidate.IsSpecialSkill
+                IsSpecialSkill = candidate.IsSpecialSkill,
+                RuleName = candidate.MatchedRule?.DescriptionPattern ?? "无规则"
             };
-        }
 
-        private string GenerateSummary(List<SelectionResult> results)
+        private static SelectionResult CreateSkipResult(ImageSearchResult searchResult)
+            => new()
+            {
+                Position = searchResult.Position,
+                SkillName = searchResult.ImageName,
+                Description = "未配置规则",
+                WasSelected = false,
+                RuleName = "无规则"
+            };
+
+        private static string GenerateSummary(List<SelectionResult> results)
         {
             var selected = results.Where(r => r.WasSelected).ToList();
             var skipped = results.Where(r => !r.WasSelected).ToList();
@@ -845,7 +940,7 @@ namespace Dota2Simulator.Games.Dota2.Silt
             var sb = new StringBuilder();
             sb.AppendLine($"选择了 {selected.Count} 个天赋，跳过了 {skipped.Count} 个天赋。");
 
-            if (selected.Any())
+            if (selected.Count > 0)
             {
                 sb.AppendLine("\n已选择的天赋：");
                 foreach (var result in selected)
@@ -856,41 +951,57 @@ namespace Dota2Simulator.Games.Dota2.Silt
 
             return sb.ToString();
         }
+
+        private void LogDetailed(string message)
+        {
+            if (_options.EnableDetailedLogging)
+            {
+                _detailedLogs.AppendLine($"[{DateTime.Now:HH:mm:ss.fff}] {message}");
+            }
+
+            if (_options.EnableLogging)
+            {
+                Console.WriteLine($"[天赋选择] {message}");
+            }
+        }
     }
 
     #endregion
 
-    #region 结果类
+    #region 结果和配置类
 
     /// <summary>
     /// 选择结果
     /// </summary>
-    public class SelectionResult
+    public sealed record SelectionResult
     {
-        public Point Position { get; set; }
-        public string SkillName { get; set; }
-        public string Description { get; set; }
-        public string Effect { get; set; }
-        public string MinMaxText { get; set; }
-        public bool WasSelected { get; set; }
-        public double ExtractedValue { get; set; }
-        public int Priority { get; set; }
-        public double ExpectedImprovement { get; set; }
-        public bool IsSpecialSkill { get; set; }
+        public Point Position { get; init; }
+        public string SkillName { get; init; } = "";
+        public string Description { get; init; } = "";
+        public string Effect { get; init; } = "";
+        public string MinMaxText { get; init; } = "";
+        public bool WasSelected { get; init; }
+        public double ExtractedValue { get; init; }
+        public int Priority { get; init; }
+        public double ExpectedImprovement { get; init; }
+        public bool IsSpecialSkill { get; init; }
+        public string RuleName { get; init; } = "";
     }
 
     /// <summary>
     /// 选择报告
     /// </summary>
-    public class SelectionReport
+    public sealed class SelectionReport
     {
-        public string HeroName { get; set; }
-        public DateTime StartTime { get; set; }
-        public DateTime EndTime { get; set; }
-        public bool Success { get; set; }
-        public string ErrorMessage { get; set; }
-        public List<SelectionResult> Results { get; set; } = new();
-        public string Summary { get; set; }
+        public required string HeroName { get; init; }
+        public DateTime StartTime { get; init; }
+        public DateTime EndTime { get; init; }
+        public bool Success { get; init; }
+        public string? ErrorMessage { get; init; }
+        public List<SelectionResult> Results { get; init; } = new();
+        public string Summary { get; init; } = "";
+        public string DetailedLog { get; init; } = "";
+        public string QueueDisplay { get; init; } = "";
 
         public TimeSpan Duration => EndTime - StartTime;
 
@@ -903,20 +1014,29 @@ namespace Dota2Simulator.Games.Dota2.Silt
             sb.AppendLine($"状态: {(Success ? "成功" : $"失败 - {ErrorMessage}")}");
             sb.AppendLine();
 
-            if (Results?.Any() == true)
+            if (!string.IsNullOrEmpty(QueueDisplay))
+            {
+                sb.AppendLine(QueueDisplay);
+                sb.AppendLine();
+            }
+
+            if (Results.Count > 0)
             {
                 sb.AppendLine("【选择详情】");
                 foreach (var result in Results)
                 {
-                    sb.AppendLine($"• {result.SkillName} - {result.Description}");
+                    sb.AppendLine($"• {result.SkillName} - {result.Description} [{result.RuleName}]");
                     sb.AppendLine($"  效果: {result.Effect}");
-                    sb.AppendLine($"  Min/Max: {result.MinMaxText}");
-                    sb.AppendLine($"  状态: {(result.WasSelected ? "✓ 已选择" : "✗ 已跳过")}");
-                    sb.AppendLine($"  优先级: {result.Priority}");
-                    sb.AppendLine($"  预期收益: {result.ExpectedImprovement:F0}");
-                    if (result.IsSpecialSkill)
+                    if (!string.IsNullOrEmpty(result.MinMaxText))
                     {
-                        sb.AppendLine($"  特殊技能: 是");
+                        sb.AppendLine($"  限制: {result.MinMaxText}");
+                    }
+                    sb.AppendLine($"  状态: {(result.WasSelected ? "✓ 已选择" : "✗ 已跳过")}");
+                    sb.AppendLine($"  提取值: {result.ExtractedValue}");
+                    sb.AppendLine($"  优先级: {result.Priority}");
+                    if (result.ExpectedImprovement > 0)
+                    {
+                        sb.AppendLine($"  预期收益: {result.ExpectedImprovement:F0}");
                     }
                     sb.AppendLine();
                 }
@@ -931,6 +1051,37 @@ namespace Dota2Simulator.Games.Dota2.Silt
         }
     }
 
+    /// <summary>
+    /// 天赋选择配置
+    /// </summary>
+    public sealed class TalentSelectionConfig
+    {
+        public required string HeroName { get; init; }
+        public SelectionMode Mode { get; init; } = SelectionMode.SkipFirstThenSelect;
+        public IReadOnlyDictionary<string, SkillBaseConfig> SkillConfigs { get; init; } =
+            new Dictionary<string, SkillBaseConfig>();
+        public List<TalentRule> Rules { get; init; } = new List<TalentRule>();
+        public int CalculationDuration { get; init; }
+        public int CalculationCount { get; init; }
+    }
+
+    /// <summary>
+    /// 技能基础配置（兼容旧版）
+    /// </summary>
+    public sealed class SkillBaseConfig
+    {
+        public double BaseValue { get; set; }
+        public double Increment { get; set; }
+        public double Multiplier { get; set; } = 1;
+        public double MaxValue { get; set; } = double.MaxValue;
+        public double MinInterval { get; set; } = 0.1;
+        public int MaxStacks { get; set; } = 1;
+        public double MaxRange { get; set; } = double.MaxValue;
+        public double CurrentInterval { get; set; } = 1;
+        public double CurrentRange { get; set; }
+        public double StartRange { get; set; }
+    }
+
     #endregion
 
     #region 配置构建器
@@ -938,110 +1089,132 @@ namespace Dota2Simulator.Games.Dota2.Silt
     /// <summary>
     /// 天赋配置构建器
     /// </summary>
-    public class TalentConfigBuilder
+    public sealed class TalentConfigBuilder
     {
-        private readonly TalentSelectionConfig _config;
+        private readonly string _heroName;
+        private SelectionMode _mode = SelectionMode.SkipFirstThenSelect;
+        private readonly Dictionary<string, SkillBaseConfig> _skillConfigs = new();
+        private readonly List<TalentRule> _rules = new();
         private readonly Dictionary<string, ImageHandle> _imageHandles = new();
+        private int _calculationDuration;
+        private int _calculationCount;
 
         public TalentConfigBuilder(string heroName)
         {
-            _config = new TalentSelectionConfig
-            {
-                HeroName = heroName,
-                Mode = SelectionMode.SkipFirstThenSelect,
-                SkipUnmatchedByDefault = true
-            };
+            _heroName = heroName;
         }
 
-        /// <summary>
-        /// 设置选择模式
-        /// </summary>
         public TalentConfigBuilder SetMode(SelectionMode mode)
         {
-            _config.Mode = mode;
+            _mode = mode;
             return this;
         }
 
-        /// <summary>
-        /// 设置计算时长
-        /// </summary>
-        public TalentConfigBuilder SetCalculationDuration(int seconds)
+        public TalentConfigBuilder SetCalculation(int duration = 0, int count = 0)
         {
-            _config.CalculationDuration = seconds;
+            _calculationDuration = duration;
+            _calculationCount = count;
             return this;
         }
 
-        /// <summary>
-        /// 添加技能基础配置
-        /// </summary>
         public TalentConfigBuilder AddSkillConfig(string skillName, Action<SkillBaseConfig> configure)
         {
-            var config = new SkillBaseConfig { SkillName = skillName };
+            var config = new SkillBaseConfig();
             configure(config);
-            _config.SkillConfigs[skillName] = config;
+            _skillConfigs[skillName] = config;
             return this;
         }
 
-        /// <summary>
-        /// 添加图片句柄
-        /// </summary>
         public TalentConfigBuilder AddImageHandle(string skillName, ImageHandle handle)
         {
             _imageHandles[skillName] = handle;
             return this;
         }
 
-        /// <summary>
-        /// 添加天赋规则
-        /// </summary>
         public TalentConfigBuilder AddRule(
             string skillImageHandle,
             string descriptionPattern,
             TalentValueType valueType,
+            ValueLimitType limitType = ValueLimitType.无限制,
             double minValue = double.MinValue,
             double maxValue = double.MaxValue,
             int basePriority = 100,
             int maxSelectionCount = int.MaxValue,
-            bool isSpecialSkill = false)
+            bool isSpecialSkill = false,
+            PriorityBonus? priorityBonus = null)
         {
             var rule = new TalentRule
             {
                 SkillImageHandle = skillImageHandle,
                 DescriptionPattern = descriptionPattern,
                 ValueType = valueType,
+                LimitType = limitType,
                 MinValue = minValue,
                 MaxValue = maxValue,
                 BasePriority = basePriority,
                 MaxSelectionCount = maxSelectionCount,
-                IsSpecialSkill = isSpecialSkill
+                IsSpecialSkill = isSpecialSkill,
+                PriorityBonus = priorityBonus ?? PriorityBonus.Default
             };
 
-            _config.Rules.Add(rule);
+            _rules.Add(rule);
             return this;
         }
 
-        /// <summary>
-        /// 添加自动跳过规则
-        /// </summary>
+        public TalentConfigBuilder AddRuleWithBonus(
+            string skillImageHandle,
+            string descriptionPattern,
+            TalentValueType valueType,
+            double minValue,
+            double maxValue,
+            int basePriority,
+            int minBonus,
+            int middleBonus,
+            int maxBonus,
+            ValueLimitType limitType = ValueLimitType.无限制,
+            int maxSelectionCount = int.MaxValue,
+            bool isSpecialSkill = false)
+        {
+            return AddRule(
+                skillImageHandle,
+                descriptionPattern,
+                valueType,
+                limitType,
+                minValue,
+                maxValue,
+                basePriority,
+                maxSelectionCount,
+                isSpecialSkill,
+                new PriorityBonus(minBonus, middleBonus, maxBonus));
+        }
+
         public TalentConfigBuilder AddSkipRule(string skillImageHandle, string descriptionPattern)
         {
             var rule = new TalentRule
             {
                 SkillImageHandle = skillImageHandle,
                 DescriptionPattern = descriptionPattern,
+                ValueType = TalentValueType.基础值,
                 AutoSkip = true
             };
 
-            _config.Rules.Add(rule);
+            _rules.Add(rule);
             return this;
         }
 
-        /// <summary>
-        /// 构建配置
-        /// </summary>
-        public (TalentSelectionConfig config, Dictionary<string, ImageHandle> imageHandles) Build()
+        public (TalentSelectionConfig config, FrozenDictionary<string, ImageHandle> imageHandles) Build()
         {
-            return (_config, _imageHandles);
+            var config = new TalentSelectionConfig
+            {
+                HeroName = _heroName,
+                Mode = _mode,
+                SkillConfigs = _skillConfigs.ToFrozenDictionary(),
+                Rules = _rules,
+                CalculationDuration = _calculationDuration,
+                CalculationCount = _calculationCount
+            };
+
+            return (config, _imageHandles.ToFrozenDictionary());
         }
     }
 
@@ -1050,82 +1223,137 @@ namespace Dota2Simulator.Games.Dota2.Silt
     #region 使用示例
 
     /// <summary>
+    /// 英雄配置管理器
+    /// </summary>
+    public static class HeroConfigManager
+    {
+        private static readonly ConcurrentDictionary<string, Lazy<TalentConfigBuilder>> _heroConfigs = new();
+
+        static HeroConfigManager()
+        {
+            RegisterHeroConfig("沙王", CreateSandKingConfig);
+            RegisterHeroConfig("钢背兽", CreateBristlebackConfig);
+        }
+
+        public static void RegisterHeroConfig(string heroName, Func<TalentConfigBuilder> configFactory)
+        {
+            _heroConfigs[heroName] = new Lazy<TalentConfigBuilder>(configFactory);
+        }
+
+        public static TalentConfigBuilder GetHeroConfig(string heroName)
+        {
+            if (_heroConfigs.TryGetValue(heroName, out var lazyConfig))
+            {
+                return lazyConfig.Value;
+            }
+            throw new InvalidOperationException($"未找到英雄 {heroName} 的配置");
+        }
+
+        /// <summary>
+        /// 创建沙王配置（使用优先级奖励）
+        /// </summary>
+        private static TalentConfigBuilder CreateSandKingConfig()
+        {
+            return new TalentConfigBuilder("沙王")
+                .SetMode(SelectionMode.SkipFirstThenSelect)
+                .SetCalculation(duration: 0, count: 12)
+
+                .AddSkillConfig("地震", config =>
+                {
+                    config.BaseValue = 60;
+                    config.CurrentInterval = 7;
+                    config.MinInterval = 0.1;
+                    config.MaxRange = 2700;
+                })
+                .AddSkillConfig("沙尘暴", config =>
+                {
+                    config.StartRange = 300;
+                    config.CurrentRange = 300;
+                    config.MaxRange = 1000;
+                })
+
+                .AddImageHandle("先天", Dota2_Pictrue.Silt.先天)
+                .AddImageHandle("掘地穿刺", Dota2_Pictrue.Silt.掘地穿刺)
+                .AddImageHandle("沙尘暴", Dota2_Pictrue.Silt.沙尘暴)
+                .AddImageHandle("尾刺", Dota2_Pictrue.Silt.尾刺)
+                .AddImageHandle("地震", Dota2_Pictrue.Silt.地震)
+
+                // 使用优先级奖励
+                .AddRuleWithBonus("地震", "碎片胍街間隔", TalentValueType.间隔值,
+                    minValue: 3, maxValue: 4, basePriority: 200,
+                    minBonus: -10, middleBonus: 0, maxBonus: 10,
+                    limitType: ValueLimitType.间隔最小值, maxSelectionCount: 2)
+
+                .AddRuleWithBonus("地震", "每波伤害", TalentValueType.基础值,
+                    minValue: 45, maxValue: 45, basePriority: 120,
+                    minBonus: 0, middleBonus: 0, maxBonus: 30,
+                    maxSelectionCount: 9999)
+
+                .AddRuleWithBonus("地震", "碎片凰", TalentValueType.作用范围,
+                    minValue: 475, maxValue: 500, basePriority: 90,
+                    minBonus: -10, middleBonus: 15, maxBonus: 20,
+                    limitType: ValueLimitType.范围最大值, maxSelectionCount: 6);
+        }
+
+        /// <summary>
+        /// 创建钢背兽配置
+        /// </summary>
+        private static TalentConfigBuilder CreateBristlebackConfig()
+        {
+            return new TalentConfigBuilder("钢背兽")
+                .SetMode(SelectionMode.SkipFirstThenSelect)
+                .SetCalculation(duration: 10, count: 0)
+
+                .AddSkillConfig("钢毛后背", config =>
+                {
+                    config.BaseValue = 85;
+                    config.Increment = 2;
+                    config.MaxStacks = 12;
+                    config.MaxValue = 500;
+                    config.CurrentInterval = 0.1;
+                    config.MinInterval = 0.05;
+                })
+
+                .AddImageHandle("钢毛后背", Dota2_Pictrue.Silt.钢毛后背)
+
+                .AddRuleWithBonus("钢毛后背", "每层效果", TalentValueType.增量,
+                    minValue: 1.5, maxValue: 3, basePriority: 100,
+                    minBonus: -10, middleBonus: 5, maxBonus: 15,
+                    limitType: ValueLimitType.伤害最大值, maxSelectionCount: 5)
+
+                .AddSkipRule("钢毛后背", "每层叠加攻击力加成");
+        }
+    }
+
+    /// <summary>
     /// 使用示例
     /// </summary>
     public static class TalentSelectionExamples
     {
-        private static readonly OptimizedTalentSelector Selector = new();
+        private static readonly TalentSelector Selector = new();
 
-        /// <summary>
-        /// 钢背兽配置示例
-        /// </summary>
-        public static void 钢背兽自动选择(in ImageHandle gameHandle)
+        public static void ExecuteHeroSelection(string heroName, in ImageHandle gameHandle)
         {
-            var builder = new TalentConfigBuilder("钢背兽")
-                .SetMode(SelectionMode.SkipFirstThenSelect)
-                .SetCalculationDuration(10)
-                // 添加技能配置
-                .AddSkillConfig("钢毛后背", config =>
-                {
-                    config.BaseValue = 85;      // 基础伤害
-                    config.Increment = 2;        // 每层增加
-                    config.MaxStacks = 12;       // 最大层数
-                    config.MaxValue = 500;       // 伤害上限
-                    config.TriggerInterval = 0.1; // 0.1秒触发一次
-                })
-                // 添加图片句柄
-                .AddImageHandle("钢毛后背", Dota2_Pictrue.Silt.钢毛后背)
-                // 添加规则
-                .AddRule("钢毛后背", "每层效果", TalentValueType.增量, 1.5, 3, 100, 5)
-                .AddRule("钢毛后背", "最大层数", TalentValueType.基础值, 4, 7, 100, 3)
-                .AddRule("钢毛后背", "伤害临界值", TalentValueType.上限, 50, 200, 90, 2)
-                .AddSkipRule("钢毛后背", "每层叠加攻击力加成");
-
+            var builder = HeroConfigManager.GetHeroConfig(heroName);
             var (config, handles) = builder.Build();
 
-            // 设置选项
-            Selector.SetOptions(new OptimizedTalentSelector.SelectionOptions
+            Selector.SetOptions(new TalentSelector.SelectionOptions
             {
                 EnableLogging = true,
                 EnableTTS = true,
-                DelayAfterSelection = 500
+                EnableDetailedLogging = true,
+                DelayAfterSelection = 150
             });
 
-            // 执行选择
             var report = Selector.ExecuteSelection(in gameHandle, config, handles);
-
-            // 显示结果
             ShowResults(report);
         }
-
-#if false
-
-        /// <summary>
-        /// 特殊技能示例
-        /// </summary>
-        public static void 特殊技能选择(in ImageHandle gameHandle)
-        {
-            var builder = new TalentConfigBuilder("测试英雄")
-                .SetMode(SelectionMode.Sequential) // 使用顺序模式
-                .AddSkillConfig("特殊技能", config =>
-                {
-                    config.BaseValue = 100;
-                    config.Multiplier = 1.5;
-                })
-                .AddImageHandle("特殊技能", Dota2_Pictrue.Silt.特殊技能图标)
-                .AddRule("特殊技能", "", TalentValueType.基础值, 50, 150, 120, 1, true); // 特殊技能标记
-
-            var (config, handles) = builder.Build();
-            var report = Selector.ExecuteSelection(in gameHandle, config, handles);
-            ShowResults(report);
-        } 
-#endif
 
         private static void ShowResults(SelectionReport report)
         {
             var resultText = report.ToDetailedString();
+            resultText += report.DetailedLog;
 
-            // 更新UI
             Common.Main_Form?.Invoke(() =>
             {
                 if (Common.Main_Form.tb_阵营 != null)
@@ -1140,5 +1368,6 @@ namespace Dota2Simulator.Games.Dota2.Silt
 
     #endregion
 }
+
 #endif
 #endif

@@ -2,25 +2,18 @@
 #if Silt
 
 using Dota2Simulator.KeyboardMouse;
-using Dota2Simulator.TTS;
+using Dota2Simulator.PictureProcessing.OCR;
 using ImageProcessingSystem;
 using System;
-using System.Collections.Generic;
 using System.Drawing;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using static Dota2Simulator.Games.Dota2.Main;
 using static Dota2Simulator.Games.Dota2.Item;
-using Dota2Simulator.PictureProcessing.Ocr;
 
 namespace Dota2Simulator.Games.Dota2.Silt
 {
     internal class Main
     {
-
-        #region Silt
-#if Silt
         private static bool 已吃书;
 
         public static async Task<bool> 有书吃书(ImageHandle 句柄)
@@ -45,9 +38,13 @@ namespace Dota2Simulator.Games.Dota2.Silt
         private static int 获取碎片循环计数;
         private static Point 之前位置;
 
+        private static long _循环时间;
+
         public static void 跳过循环获取金碎片(in ImageHandle 句柄)
         {
             if (获取碎片循环计数 == 0) 之前位置 = Control.MousePosition;
+
+            _循环时间 = Common.获取当前时间毫秒();
 
             if (获取碎片循环计数 > 12)
             {
@@ -74,17 +71,37 @@ namespace Dota2Simulator.Games.Dota2.Silt
                     && ImageFinder.FindImageInRegionBool(Dota2_Pictrue.Silt.普通天赋, GlobalScreenCapture.GetCurrentHandle(), RPG第一技能金))
                 {
                     SimKeyBoard.MouseMove(768, 674);
-                    Common.Delay(50);
+                    Common.Delay(10);
                     SimKeyBoard.MouseLeftClick();
-                    Common.Delay(50);
+                    Common.Delay(10);
+                    SimKeyBoard.MouseLeftClick();
+
+                    获取碎片循环计数++;
+                    Task.Run(() =>
+                    {
+                        Common.Delay(325, _循环时间);
+                        // 自我调用
+                        SimKeyBoard.KeyPress(Keys.NumPad1);
+                    }).ConfigureAwait(true);
+                }
+                else if (PaddleOCR.获取图片文字(GlobalScreenCapture.GetCurrentHandle(), new Rectangle(732, 503, 66, 35)) != "+45")
+                {
+                    SimKeyBoard.MouseMove(768, 674);
+                    Common.Delay(10);
+                    SimKeyBoard.MouseLeftClick();
+                    Common.Delay(10);
                     SimKeyBoard.MouseLeftClick();
                     获取碎片循环计数++;
                     Task.Run(() =>
                     {
-                        Common.Delay(250);
+                        Common.Delay(325, _循环时间);
                         // 自我调用
                         SimKeyBoard.KeyPress(Keys.NumPad1);
                     }).ConfigureAwait(true);
+                }
+                else
+                {
+                    获取碎片循环计数 = 0;
                 }
             }
         }
@@ -100,21 +117,21 @@ namespace Dota2Simulator.Games.Dota2.Silt
                     Color.FromArgb(188, 134, 1), 10))
                 {
                     SimKeyBoard.MouseMove(690, 673);
-                    Common.Delay(50);
+                    Common.Delay(25);
                     SimKeyBoard.MouseLeftClick();
-                    Common.Delay(50);
+                    Common.Delay(25);
                     SimKeyBoard.MouseMove(953, 673);
-                    Common.Delay(50);
+                    Common.Delay(25);
                     SimKeyBoard.MouseLeftClick();
-                    Common.Delay(50);
+                    Common.Delay(25);
                     SimKeyBoard.MouseMove(1205, 673);
-                    Common.Delay(50);
+                    Common.Delay(25);
                     SimKeyBoard.MouseLeftClick();
-                    Common.Delay(50);
+                    Common.Delay(25);
                     SimKeyBoard.MouseMove(540, 146);
-                    Common.Delay(50);
+                    Common.Delay(25);
                     SimKeyBoard.MouseLeftClick();
-                    Common.Delay(50);
+                    Common.Delay(25);
                 }
                 SimKeyBoard.MouseMove(p);
             }
@@ -141,7 +158,7 @@ namespace Dota2Simulator.Games.Dota2.Silt
 
         public static void 测试识别(in ImageHandle 句柄)
         {
-            var rustResults = GlobalScreenCapture.FindAllImagesOptimized(Dota2_Pictrue.Silt.钢毛后背, 0.9, 100, 10);
+            var rustResults = GlobalScreenCapture.FindAllImages(Dota2_Pictrue.Silt.钢毛后背, 0.9, 100, 10);
             var string1 = "";
             foreach (var point in rustResults)
             {
@@ -164,11 +181,19 @@ namespace Dota2Simulator.Games.Dota2.Silt
             TTS.TTS.Speak("完成");
             // Tts.Speak(PaddleOCR.获取图片文字(in 句柄, new Rectangle(620, 437, 120, 40)));
         }
-#endif
-        #endregion
+
+        public static void 沙王自动选择(in ImageHandle gameHandle)
+        {
+            var p = Control.MousePosition;
+            TalentSelectionExamples.ExecuteHeroSelection("沙王", gameHandle);
+            SimKeyBoard.MouseMove(p);
+        }
+
+        public static void 初始化天赋选择(in ImageHandle gameHandle)
+        {
+        }
     }
 }
 
 #endif
-
 #endif

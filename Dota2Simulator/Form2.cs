@@ -1,6 +1,6 @@
 ﻿using Collections.Pooled;
 using Dota2Simulator.KeyboardMouse;
-using Dota2Simulator.PictureProcessing.Ocr;
+using Dota2Simulator.PictureProcessing.OCR;
 using System;
 using System.Diagnostics;
 using System.Drawing;

@@ -9,7 +9,7 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.Threading.Tasks;
 
-namespace Dota2Simulator.PictureProcessing.Ocr
+namespace Dota2Simulator.PictureProcessing.OCR
 {
     /*
      *

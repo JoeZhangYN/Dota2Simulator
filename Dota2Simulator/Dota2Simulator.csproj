@@ -44,6 +44,10 @@
     <None Remove="Picture_Dota2\RPG_普通天赋.bmp" />
     <None Remove="Picture_Dota2\RPG_选择天赋.bmp" />
     <None Remove="Picture_Dota2\RPG_金色天赋.bmp" />
+    <None Remove="Picture_Dota2\Silt\先天.bmp" />
+    <None Remove="Picture_Dota2\Silt\沙王\地震.bmp" />
+    <None Remove="Picture_Dota2\Silt\沙王\尾刺.bmp" />
+    <None Remove="Picture_Dota2\Silt\沙王\沙尘暴.bmp" />
     <None Remove="Picture_Dota2\Silt\钢背\刺针扫射.bmp" />
     <None Remove="Picture_Dota2\Silt\钢背\战意.bmp" />
     <None Remove="Picture_Dota2\Silt\钢背\毛团.bmp" />
@@ -145,7 +149,12 @@
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </EmbeddedResource>
     <EmbeddedResource Include="Picture_Dota2\BUFF\火猫_无影拳.bmp" />
+    <EmbeddedResource Include="Picture_Dota2\Silt\先天.bmp" />
     <EmbeddedResource Include="Picture_Dota2\Silt\普通天赋.bmp" />
+    <EmbeddedResource Include="Picture_Dota2\Silt\沙王\地震.bmp" />
+    <EmbeddedResource Include="Picture_Dota2\Silt\沙王\尾刺.bmp" />
+    <EmbeddedResource Include="Picture_Dota2\Silt\沙王\掘地穿刺.bmp" />
+    <EmbeddedResource Include="Picture_Dota2\Silt\沙王\沙尘暴.bmp" />
     <EmbeddedResource Include="Picture_Dota2\Silt\选择天赋.bmp" />
     <EmbeddedResource Include="Picture_Dota2\Silt\金色天赋.bmp" />
     <EmbeddedResource Include="Picture_Dota2\Silt\钢背\钢毛后背.bmp" />
@@ -259,7 +268,7 @@
     <PackageReference Include="Microsoft.IO.RecyclableMemoryStream" Version="3.0.1" />
     <PackageReference Include="NAudio" Version="2.2.1" />
     <PackageReference Include="NeoSmart.AsyncLock" Version="3.3.0-preview1" />
-    <PackageReference Include="NLog" Version="6.0.0-rc1" />
+    <PackageReference Include="NLog" Version="6.0.0-rc2" />
     <PackageReference Include="OpenCvSharp4" Version="4.11.0.20250507" />
     <PackageReference Include="OpenCvSharp4.Extensions" Version="4.11.0.20250507" />
     <PackageReference Include="OpenCvSharp4.runtime.win" Version="4.11.0.20250507" />
