@@ -407,6 +407,9 @@ namespace Dota2Simulator.Games.Dota2.Silt
             var processedPositions = new HashSet<string>();
             int round = 0;
 
+            
+            var point = ImageFinder.FindImageInRegion(Dota2_Pictrue.Silt.左上角选框, GlobalScreenCapture.GetCurrentHandle(), new Rectangle(380, 150, 600, 150));
+
             while (round++ < 10)
             {
                 LogDetailed($"\n--- 第 {round} 轮处理 ---");
@@ -455,6 +458,19 @@ namespace Dota2Simulator.Games.Dota2.Silt
                     PerformSkip(searchResult.SkipPoint);
                     processedPositions.Add(GetPositionKey(searchResult.Position));
                     results.Add(CreateSkipResult(searchResult));
+                }
+
+                // 跳过所有的中立和附魔
+                if (point != null)
+                {
+                    var p = (Point)point;
+                    if (p.X < 450)
+                    {
+                        SimKeyBoard.MouseMove(new Point(1337, 673));
+                        Thread.Sleep(_options.DelayBetweenChecks);
+                        SimKeyBoard.MouseLeftClick();
+                        Thread.Sleep(_options.DelayAfterClick);
+                    }
                 }
 
                 // 评估并选择
@@ -508,6 +524,8 @@ namespace Dota2Simulator.Games.Dota2.Silt
                         processedPositions.Add(GetPositionKey(candidate.SearchResult.Position));
                         results.Add(CreateResult(candidate, false));
                     }
+
+                    ConfirmSkip(point);
                 }
                 else
                 {
@@ -516,6 +534,9 @@ namespace Dota2Simulator.Games.Dota2.Silt
                         processedPositions.Add(GetPositionKey(candidate.SearchResult.Position));
                         results.Add(CreateResult(candidate, false));
                     }
+
+                    ConfirmSkip(point);
+
                     break;
                 }
             }
@@ -898,6 +919,19 @@ namespace Dota2Simulator.Games.Dota2.Silt
             Thread.Sleep(_options.DelayAfterClick);
         }
 
+        private void ConfirmSkip(Point? position)
+        {
+            if (position != null)
+            {
+                var p = (Point)position;
+                p.Y = p.Y - 50;
+                SimKeyBoard.MouseMove(p);
+                Thread.Sleep(_options.DelayBetweenChecks);
+                SimKeyBoard.MouseLeftClick();
+                Thread.Sleep(_options.DelayAfterClick);
+            }
+        }
+
         private void PerformNewSelect()
         {
             SimKeyBoard.MouseMove(new Point(1550, 1044));
@@ -1233,6 +1267,7 @@ namespace Dota2Simulator.Games.Dota2.Silt
         {
             RegisterHeroConfig("沙王", CreateSandKingConfig);
             RegisterHeroConfig("钢背兽", CreateBristlebackConfig);
+            RegisterHeroConfig("夜魔", Create夜魔Config);
         }
 
         public static void RegisterHeroConfig(string heroName, Func<TalentConfigBuilder> configFactory)
@@ -1282,7 +1317,7 @@ namespace Dota2Simulator.Games.Dota2.Silt
                 .AddRuleWithBonus("地震", "碎片胍街間隔", TalentValueType.间隔值,
                     minValue: 3, maxValue: 4, basePriority: 200,
                     minBonus: -10, middleBonus: 0, maxBonus: 10,
-                    limitType: ValueLimitType.间隔最小值, maxSelectionCount: 2)
+                    limitType: ValueLimitType.间隔最小值, maxSelectionCount: 99999)
 
                 .AddRuleWithBonus("地震", "每波伤害", TalentValueType.基础值,
                     minValue: 45, maxValue: 45, basePriority: 120,
@@ -1292,7 +1327,54 @@ namespace Dota2Simulator.Games.Dota2.Silt
                 .AddRuleWithBonus("地震", "碎片凰", TalentValueType.作用范围,
                     minValue: 475, maxValue: 500, basePriority: 90,
                     minBonus: -10, middleBonus: 15, maxBonus: 20,
-                    limitType: ValueLimitType.范围最大值, maxSelectionCount: 6);
+                    limitType: ValueLimitType.范围最大值, maxSelectionCount: 99999);
+        }
+
+        private static TalentConfigBuilder Create夜魔Config()
+        {
+            return new TalentConfigBuilder("夜魔")
+                .SetMode(SelectionMode.SkipFirstThenSelect)
+                .SetCalculation(duration: 0, count: 0)
+
+                .AddSkillConfig("暗夜猎影", config =>
+                {
+                })
+
+                //.AddImageHandle("神秘", Dota2_Pictrue.Silt.神秘)
+                //.AddImageHandle("壮实", Dota2_Pictrue.Silt.壮实)
+                //.AddImageHandle("警觉", Dota2_Pictrue.Silt.警觉)
+                //.AddImageHandle("坚强", Dota2_Pictrue.Silt.坚强)
+                //.AddImageHandle("迅速", Dota2_Pictrue.Silt.迅速)
+                //.AddImageHandle("犀利", Dota2_Pictrue.Silt.犀利)
+                //.AddImageHandle("高远", Dota2_Pictrue.Silt.高远)
+                //.AddImageHandle("贪婪", Dota2_Pictrue.Silt.贪婪)
+                //.AddImageHandle("吸血鬼", Dota2_Pictrue.Silt.吸血鬼)
+                //.AddImageHandle("永恒", Dota2_Pictrue.Silt.永恒)
+                //.AddImageHandle("巨神", Dota2_Pictrue.Silt.巨神)
+                //.AddImageHandle("粗暴", Dota2_Pictrue.Silt.粗暴)
+
+                //.AddImageHandle("狗头人酒杯", Dota2_Pictrue.Silt.狗头人酒杯)
+                //.AddImageHandle("毁灭灵球", Dota2_Pictrue.Silt.毁灭灵球)
+                //.AddImageHandle("玄奥手镯", Dota2_Pictrue.Silt.玄奥手镯)
+                //.AddImageHandle("撕裂之鞭", Dota2_Pictrue.Silt.撕裂之鞭)
+                //.AddImageHandle("勇气之光", Dota2_Pictrue.Silt.勇气之光)
+
+                .AddImageHandle("长夜之治", Dota2_Pictrue.Silt.长夜之治)
+                .AddImageHandle("虚空", Dota2_Pictrue.Silt.虚空)
+                .AddImageHandle("伤残恐惧", Dota2_Pictrue.Silt.伤残恐惧)
+                .AddImageHandle("暗夜猎影", Dota2_Pictrue.Silt.暗夜猎影)
+                .AddImageHandle("黑暗飞升", Dota2_Pictrue.Silt.黑暗飞升)
+
+                // 使用优先级奖励
+                .AddRuleWithBonus("暗夜猎影", "移动速度提升", TalentValueType.基础值,
+                    minValue: 11, maxValue: 12, basePriority: 200,
+                    minBonus: -10, middleBonus: 0, maxBonus: 10,
+                    limitType: ValueLimitType.无限制, maxSelectionCount: 99999)
+
+                .AddRuleWithBonus("黑暗飞升", "持续时间", TalentValueType.基础值,
+                    minValue: 13, maxValue: 14, basePriority: 120,
+                    minBonus: 0, middleBonus: 0, maxBonus: 30,
+                    limitType: ValueLimitType.无限制, maxSelectionCount: 99999);
         }
 
         /// <summary>

@@ -158,6 +158,16 @@ namespace Dota2Simulator.Games.Dota2
 
             #endregion
 
+            #region 夜魔
+
+            public static ImageHandle 长夜之治 => LazyImageLoader.GetImage("Silt.夜魔.长夜之治");
+            public static ImageHandle 虚空 => LazyImageLoader.GetImage("Silt.夜魔.虚空");
+            public static ImageHandle 伤残恐惧 => LazyImageLoader.GetImage("Silt.夜魔.伤残恐惧");
+            public static ImageHandle 暗夜猎影 => LazyImageLoader.GetImage("Silt.夜魔.暗夜猎影");
+            public static ImageHandle 黑暗飞升 => LazyImageLoader.GetImage("Silt.夜魔.黑暗飞升");
+
+            #endregion
+
             #region 附魔
 
             #region 1-4
@@ -173,7 +183,9 @@ namespace Dota2Simulator.Games.Dota2
             #region 2-3
 
             public static ImageHandle 犀利 => LazyImageLoader.GetImage("Silt.附魔.犀利");
-            // 高远
+
+            public static ImageHandle 高远 => LazyImageLoader.GetImage("Silt.附魔.高远");
+            
             public static ImageHandle 贪婪 => LazyImageLoader.GetImage("Silt.附魔.贪婪");
 
             #endregion
@@ -204,6 +216,19 @@ namespace Dota2Simulator.Games.Dota2
             #endregion
 
             #endregion
+
+            #region 中立
+
+            public static ImageHandle 狗头人酒杯 => LazyImageLoader.GetImage("Silt.中立.狗头人酒杯");
+            public static ImageHandle 毁灭灵球 => LazyImageLoader.GetImage("Silt.中立.毁灭灵球");
+            public static ImageHandle 玄奥手镯 => LazyImageLoader.GetImage("Silt.中立.玄奥手镯");
+            public static ImageHandle 撕裂之鞭 => LazyImageLoader.GetImage("Silt.中立.撕裂之鞭");
+            public static ImageHandle 勇气之光 => LazyImageLoader.GetImage("Silt.中立.勇气之光");
+
+            #endregion
+
+            public static ImageHandle 左上角选框 => LazyImageLoader.GetImage("Silt.左上角选框");
+
 #endif
         }
         #endregion

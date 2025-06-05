@@ -8,6 +8,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Runtime.Intrinsics;
 using System.Runtime.Intrinsics.X86;
 using System.Text;
@@ -1232,42 +1233,161 @@ namespace Dota2Simulator.Games.Dota2
         }
 
         /// <summary>
-        ///     变色运算匹配，符合的返回真，不符合返回假
-        ///     <para>10000次 1ms..</para>
-        ///     <para><paramref name="beforColor" /> 释放前颜色</para>
-        ///     <para><paramref name="afterColor" /> 释放后颜色</para>
+        /// 高性能颜色匹配器 - 使用SIMD和Span优化
         /// </summary>
-        /// <param name="beforColor"></param>
-        /// <param name="afterColor"></param>
-        /// <returns></returns>
-        private static bool DOTA2释放颜色前后对比(Color beforColor, Color afterColor)
+        public static class ColorMatcher
         {
-            if (!Avx2.IsSupported)
+            // 预计算的颜色转换表
+            private static readonly byte[] RSquaredLookup = new byte[256];
+            private static readonly byte[] GSquaredLookup = new byte[256];
+            private static readonly byte[] BSquaredLookup = new byte[256];
+
+            // 空间换时间 预先计算所有结果,到时候直接匹配
+            static ColorMatcher()
             {
-                return Math.Abs(beforColor.R * beforColor.R * 0.0001 + beforColor.R * 0.7629 - afterColor.R) <= 4
-                       && Math.Abs(beforColor.G * beforColor.G * 0.0014 + beforColor.G * 0.0219 + 147 - afterColor.G) <= 4
-                       && Math.Abs(beforColor.B * beforColor.B * 0.0002 + beforColor.B * 0.7586 - afterColor.B) <= 4;
+                // 预计算查找表
+                for (int i = 0; i < 256; i++)
+                {
+                    RSquaredLookup[i] = (byte)(i * i * 0.0001 + 0.7629 * i);
+                    GSquaredLookup[i] = (byte)(i * i * 0.0014 + 0.0219 * i + 147);
+                    BSquaredLookup[i] = (byte)(i * i * 0.0002 + 0.7586 * i);
+                }
             }
 
-            // 一次性加载所有数据
-            Vector256<float> beforeVec = Vector256.Create(beforColor.R, beforColor.G, beforColor.B, 0f, 0f, 0f, 0f, 0f);
-            Vector256<float> afterVec = Vector256.Create(afterColor.R, afterColor.G, afterColor.B, 0f, 0f, 0f, 0f, 0f);
-            Vector256<float> squareCoeff = Vector256.Create(0.0001f, 0.0014f, 0.0002f, 0f, 0f, 0f, 0f, 0f);
-            Vector256<float> linearCoeff = Vector256.Create(0.7629f, 0.0219f, 0.7586f, 0f, 0f, 0f, 0f, 0f);
-            Vector256<float> constant = Vector256.Create(0f, 147f, 0f, 0f, 0f, 0f, 0f, 0f);
+            /// <summary>
+            /// 批量颜色匹配 - 使用SIMD加速
+            /// </summary>
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            public static bool BatchColorMatch(ReadOnlySpan<Color> colors, ReadOnlySpan<Color> targets, byte tolerance)
+            {
+                if (colors.Length != targets.Length)
+                    return false;
 
-            // 计算 ax² + bx + c
-            Vector256<float> squared = Avx.Multiply(beforeVec, beforeVec);
-            Vector256<float> result = Avx.Add(
-                Avx.Add(Avx.Multiply(squared, squareCoeff), Avx.Multiply(beforeVec, linearCoeff)),
-                constant);
+                //// 使用SIMD进行批量比较
+                //if (Avx2.IsSupported && colors.Length >= 8)
+                //{
+                //    return BatchColorMatchAvx2(colors, targets, tolerance);
+                //}
 
-            // 计算差值的绝对值
-            Vector256<float> diff = Avx.Subtract(result, afterVec);
-            Vector256<float> absDiff = Avx.And(diff, Vector256.Create(0x7FFFFFFF).AsSingle());
+                // 回退到标量实现
+                for (int i = 0; i < colors.Length; i++)
+                {
+                    if (!ColorExtensions.ColorAEqualColorB(colors[i], targets[i], tolerance))
+                        return false;
+                }
 
-            // 检查阈值
-            return absDiff.GetElement(0) <= 4f && absDiff.GetElement(1) <= 4f && absDiff.GetElement(2) <= 4f;
+                return true;
+            }
+
+            //private static unsafe bool BatchColorMatchAvx2(
+            //    ReadOnlySpan<Color> colors,
+            //    ReadOnlySpan<Color> targets,
+            //    byte tolerance)
+            //{
+            //    fixed (Color* pColors = colors)
+            //    fixed (Color* pTargets = targets)
+            //    {
+            //        var toleranceVec = Vector256.Create(tolerance);
+            //        byte* colorBytes = (byte*)pColors;
+            //        byte* targetBytes = (byte*)pTargets;
+
+            //        int vectorSize = Vector256<byte>.Count;
+            //        int iterations = (colors.Length * 4) / vectorSize;
+
+            //        for (int i = 0; i < iterations; i++)
+            //        {
+            //            var colorVec = Avx.LoadVector256(colorBytes + i * vectorSize);
+            //            var targetVec = Avx.LoadVector256(targetBytes + i * vectorSize);
+
+            //            var diff = Avx2.SubtractSaturate(
+            //                Avx2.Max(colorVec, targetVec),
+            //                Avx2.Min(colorVec, targetVec));
+
+            //            var mask = Avx2.CompareGreaterThan(diff, toleranceVec);
+
+            //            if (!Avx2.TestZ(mask, mask))
+            //                return false;
+            //        }
+
+            //        return true;
+            //    }
+            //}
+
+            ///     变色运算匹配，符合的返回真，不符合返回假
+            ///     <para>10000次 1ms..</para>
+            ///     <para><paramref name="beforColor" /> 释放前颜色</para>
+            ///     <para><paramref name="afterColor" /> 释放后颜色</para>
+            /// </summary>
+            /// <param name="befor"></param>
+            /// <param name="after"></param>
+            /// <returns></returns>
+            private static bool MatchAvx2(Color befor, Color after)
+            {
+                if (!Avx2.IsSupported)
+                {
+                    return Math.Abs(befor.R * befor.R * 0.0001 + befor.R * 0.7629 - after.R) <= 4
+                           && Math.Abs(befor.G * befor.G * 0.0014 + befor.G * 0.0219 + 147 - after.G) <= 4
+                           && Math.Abs(befor.B * befor.B * 0.0002 + befor.B * 0.7586 - after.B) <= 4;
+                }
+
+                // 一次性加载所有数据
+                Vector256<float> beforeVec = Vector256.Create(befor.R, befor.G, befor.B, 0f, 0f, 0f, 0f, 0f);
+                Vector256<float> afterVec = Vector256.Create(after.R, after.G, after.B, 0f, 0f, 0f, 0f, 0f);
+                Vector256<float> squareCoeff = Vector256.Create(0.0001f, 0.0014f, 0.0002f, 0f, 0f, 0f, 0f, 0f);
+                Vector256<float> linearCoeff = Vector256.Create(0.7629f, 0.0219f, 0.7586f, 0f, 0f, 0f, 0f, 0f);
+                Vector256<float> constant = Vector256.Create(0f, 147f, 0f, 0f, 0f, 0f, 0f, 0f);
+
+                // x²
+                Vector256<float> squared = Avx.Multiply(beforeVec, beforeVec);
+
+                Vector256<float> result = Avx.Add(
+                    Avx.Add(
+                        // +x²*a
+                        Avx.Multiply(squared, squareCoeff)
+                        // +x*b
+                        , Avx.Multiply(beforeVec, linearCoeff)
+                        )
+                    // +c
+                    , constant);
+
+                // 计算结果和原始的差值
+                Vector256<float> diff = Avx.Subtract(result, afterVec);
+                // 取绝对值
+                Vector256<float> absDiff = Avx.And(diff, Vector256.Create(0x7FFFFFFF).AsSingle());
+
+                // 检查阈值
+                return absDiff.GetElement(0) <= 4f
+                    && absDiff.GetElement(1) <= 4f
+                    && absDiff.GetElement(2) <= 4f;
+            }
+
+            /// <summary>
+            /// 使用查找表的快速颜色转换
+            /// </summary>
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            public static bool FastReleaseColorMatch(Color before, Color after)
+            {
+                var expectedR = RSquaredLookup[before.R];
+                var expectedG = GSquaredLookup[before.G];
+                var expectedB = BSquaredLookup[before.B];
+
+                return Math.Abs(expectedR - after.R) <= 4 &&
+                       Math.Abs(expectedG - after.G) <= 4 &&
+                       Math.Abs(expectedB - after.B) <= 4;
+            }
+        }
+
+        /// <summary>
+        ///     运用算发表查找匹配,减少运算量
+        ///     <para><paramref name="befor" /> 释放前颜色</para>
+        ///     <para><paramref name="after" /> 释放后颜色</para>
+        /// </summary>
+        /// <param name="befor"></param>
+        /// <param name="after"></param>
+        /// <returns></returns>
+        private static bool DOTA2释放颜色前后对比(Color befor, Color after)
+        {
+            return ColorMatcher.FastReleaseColorMatch(befor, after);
         }
 
         #endregion

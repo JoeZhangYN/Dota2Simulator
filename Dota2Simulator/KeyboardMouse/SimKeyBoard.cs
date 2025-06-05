@@ -58,6 +58,14 @@ namespace Dota2Simulator.KeyboardMouse
 
         #endregion
 
+        /// <summary>
+        ///     用于预热,基本没用.
+        /// </summary>
+        public static void InitEnigoThreadlocal()
+        {
+            SimEnigo.init_enigo_threadlocal();
+        }
+
         public static void MouseLeftClick()
         {
             SimEnigo.MouseLeftClick();

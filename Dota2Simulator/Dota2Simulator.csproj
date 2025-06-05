@@ -44,7 +44,18 @@
     <None Remove="Picture_Dota2\RPG_普通天赋.bmp" />
     <None Remove="Picture_Dota2\RPG_选择天赋.bmp" />
     <None Remove="Picture_Dota2\RPG_金色天赋.bmp" />
+    <None Remove="Picture_Dota2\Silt\中立\勇气之光.bmp" />
+    <None Remove="Picture_Dota2\Silt\中立\撕裂之鞭.bmp" />
+    <None Remove="Picture_Dota2\Silt\中立\毁灭灵球.bmp" />
+    <None Remove="Picture_Dota2\Silt\中立\狗头人酒杯.bmp" />
+    <None Remove="Picture_Dota2\Silt\中立\玄奥手镯.bmp" />
     <None Remove="Picture_Dota2\Silt\先天.bmp" />
+    <None Remove="Picture_Dota2\Silt\夜魔\伤残恐惧.bmp" />
+    <None Remove="Picture_Dota2\Silt\夜魔\暗夜猎影.bmp" />
+    <None Remove="Picture_Dota2\Silt\夜魔\虚空.bmp" />
+    <None Remove="Picture_Dota2\Silt\夜魔\长夜之治.bmp" />
+    <None Remove="Picture_Dota2\Silt\夜魔\黑暗飞升.bmp" />
+    <None Remove="Picture_Dota2\Silt\左上角选框.bmp" />
     <None Remove="Picture_Dota2\Silt\沙王\地震.bmp" />
     <None Remove="Picture_Dota2\Silt\沙王\尾刺.bmp" />
     <None Remove="Picture_Dota2\Silt\沙王\沙尘暴.bmp" />
@@ -149,7 +160,18 @@
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </EmbeddedResource>
     <EmbeddedResource Include="Picture_Dota2\BUFF\火猫_无影拳.bmp" />
+    <EmbeddedResource Include="Picture_Dota2\Silt\中立\勇气之光.bmp" />
+    <EmbeddedResource Include="Picture_Dota2\Silt\中立\撕裂之鞭.bmp" />
+    <EmbeddedResource Include="Picture_Dota2\Silt\中立\毁灭灵球.bmp" />
+    <EmbeddedResource Include="Picture_Dota2\Silt\中立\狗头人酒杯.bmp" />
+    <EmbeddedResource Include="Picture_Dota2\Silt\中立\玄奥手镯.bmp" />
     <EmbeddedResource Include="Picture_Dota2\Silt\先天.bmp" />
+    <EmbeddedResource Include="Picture_Dota2\Silt\夜魔\伤残恐惧.bmp" />
+    <EmbeddedResource Include="Picture_Dota2\Silt\夜魔\暗夜猎影.bmp" />
+    <EmbeddedResource Include="Picture_Dota2\Silt\夜魔\虚空.bmp" />
+    <EmbeddedResource Include="Picture_Dota2\Silt\夜魔\长夜之治.bmp" />
+    <EmbeddedResource Include="Picture_Dota2\Silt\夜魔\黑暗飞升.bmp" />
+    <EmbeddedResource Include="Picture_Dota2\Silt\左上角选框.bmp" />
     <EmbeddedResource Include="Picture_Dota2\Silt\普通天赋.bmp" />
     <EmbeddedResource Include="Picture_Dota2\Silt\沙王\地震.bmp" />
     <EmbeddedResource Include="Picture_Dota2\Silt\沙王\尾刺.bmp" />
@@ -167,6 +189,7 @@
     <EmbeddedResource Include="Picture_Dota2\Silt\附魔\坚强.bmp" />
     <EmbeddedResource Include="Picture_Dota2\Silt\附魔\壮实.bmp" />
     <EmbeddedResource Include="Picture_Dota2\Silt\附魔\巨神.bmp" />
+    <EmbeddedResource Include="Picture_Dota2\Silt\附魔\高远.bmp" />
     <EmbeddedResource Include="Picture_Dota2\Silt\附魔\捷足.bmp" />
     <EmbeddedResource Include="Picture_Dota2\Silt\附魔\无边.bmp" />
     <EmbeddedResource Include="Picture_Dota2\Silt\附魔\永恒.bmp" />

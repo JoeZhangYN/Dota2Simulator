@@ -43,6 +43,12 @@ namespace Dota2Simulator.KeyboardMouse
 
         [DllImport("simengio.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern void MouseRightUp();
+
+        /// <summary>
+        ///     用于预热,实际上没啥必要
+        /// </summary>
+        [DllImport("simengio.dll", CallingConvention = CallingConvention.Cdecl)]
+        public static extern void init_enigo_threadlocal();
     }
 
     internal enum KeysE : uint

@@ -67,42 +67,38 @@ namespace Dota2Simulator.Games.Dota2.Silt
             }
             else
             {
+                var 描述 = PaddleOCR.获取图片文字(GlobalScreenCapture.GetCurrentHandle(), new Rectangle(730, 503, 71, 39)).Trim();
+                // Common.Main_Form.Invoke(() => { Common.Main_Form.tb_阵营.Text = 描述; });
                 if (ImageFinder.FindImageInRegionBool(Dota2_Pictrue.Silt.选择天赋, GlobalScreenCapture.GetCurrentHandle(), RPG选择技能范围)
                     && ImageFinder.FindImageInRegionBool(Dota2_Pictrue.Silt.普通天赋, GlobalScreenCapture.GetCurrentHandle(), RPG第一技能金))
                 {
-                    SimKeyBoard.MouseMove(768, 674);
-                    Common.Delay(10);
-                    SimKeyBoard.MouseLeftClick();
-                    Common.Delay(10);
-                    SimKeyBoard.MouseLeftClick();
-
-                    获取碎片循环计数++;
-                    Task.Run(() =>
-                    {
-                        Common.Delay(325, _循环时间);
-                        // 自我调用
-                        SimKeyBoard.KeyPress(Keys.NumPad1);
-                    }).ConfigureAwait(true);
+                    跳过重新选择();
                 }
-                else if (PaddleOCR.获取图片文字(GlobalScreenCapture.GetCurrentHandle(), new Rectangle(732, 503, 66, 35)) != "+45")
+                else if (描述 != "+45")
                 {
-                    SimKeyBoard.MouseMove(768, 674);
-                    Common.Delay(10);
-                    SimKeyBoard.MouseLeftClick();
-                    Common.Delay(10);
-                    SimKeyBoard.MouseLeftClick();
-                    获取碎片循环计数++;
-                    Task.Run(() =>
-                    {
-                        Common.Delay(325, _循环时间);
-                        // 自我调用
-                        SimKeyBoard.KeyPress(Keys.NumPad1);
-                    }).ConfigureAwait(true);
+                    跳过重新选择();
                 }
                 else
                 {
                     获取碎片循环计数 = 0;
                 }
+            }
+
+            static void 跳过重新选择()
+            {
+                SimKeyBoard.MouseMove(768, 674);
+                Common.Delay(10);
+                SimKeyBoard.MouseLeftClick();
+                Common.Delay(10);
+                SimKeyBoard.MouseLeftClick();
+
+                获取碎片循环计数++;
+                Task.Run(() =>
+                {
+                    Common.Delay(350, _循环时间);
+                    // 自我调用
+                    SimKeyBoard.KeyPress(Keys.NumPad1);
+                }).ConfigureAwait(true);
             }
         }
 
@@ -185,7 +181,7 @@ namespace Dota2Simulator.Games.Dota2.Silt
         public static void 沙王自动选择(in ImageHandle gameHandle)
         {
             var p = Control.MousePosition;
-            TalentSelectionExamples.ExecuteHeroSelection("沙王", gameHandle);
+            TalentSelectionExamples.ExecuteHeroSelection("夜魔", gameHandle);
             SimKeyBoard.MouseMove(p);
         }
 
