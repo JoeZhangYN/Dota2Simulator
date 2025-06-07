@@ -1,12 +1,15 @@
-﻿//#define 输出技能信息
+﻿// Games/Dota2/Skill.cs
+//#define 输出技能信息
 #if DOTA2
 
+using Collections.Pooled;
+using Dota2Simulator.ImageProcessingSystem;
 using Dota2Simulator.KeyboardMouse;
-using ImageProcessingSystem;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Globalization;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Runtime.Intrinsics;
@@ -15,88 +18,12 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using static Dota2Simulator.Games.Dota2.Item;
-using static Dota2Simulator.Games.Dota2.Main;
 
 namespace Dota2Simulator.Games.Dota2
 {
     internal class Skill
     {
         #region 模块化技能
-
-        // 释放CD颜色变换
-        /*
-         * 
-4释放前中技能上边框CD颜色
-
-133,141,148
-134,142,150
-141,149,157
-151,160,168
-164,174,183
-183,194,204
-193,204,214
-207,219,230
-221,234,246
-234,248,255
-250,255,255
-255,255,255
-245,255,255
-235,249,255
-219,232,244
-212,224,235
-199,210,221
-185,196,206
-172,182,191
-155,164,173
-148,157,165
-139,147,155
-134,142,149
-133,141,148
-
-5释放前中技能上边框CD颜色
-134,142,149
-136,144,151
-142,151,158
-167,176,185
-187,198,208
-196,207,218
-210,222,233
-237,250,255
-255,255,255
-231,244,255
-217,229,241
-202,213,224
-187,198,207
-160,169,177
-148,156,164
-139,147,154
-134,142,149
-
-6释放前中技能上边框CD颜色
-134,142,149
-136,144,151
-143,151,159
-153,162,170
-167,176,185
-187,198,207
-196,208,218
-211,223,234
-225,237,249
-238,251,255
-255,255,255
-252,255,255
-239,252,255
-226,238,250
-211,223,234
-189,200,210
-180,190,200
-163,173,181
-152,161,169
-139,147,154
-135,143,150
-134,142,149
-         */
 
         // 模块化之后，都不用注释也能看得懂了。。
         // 技能CD为x为指定 y为灰白色最上方像素 |涉及的颜色| 技能CD颜色实际上是释放技能时变换的颜色 所以容差大 456基本通用 4颜色少1rgb 未学习技能CD颜色 
@@ -228,6 +155,8 @@ namespace Dota2Simulator.Games.Dota2
             推荐学习技能
         }
 
+        public static int _技能数量;
+
         #endregion
 
         #region 技能相关方法
@@ -260,62 +189,62 @@ namespace Dota2Simulator.Games.Dota2
             switch (类型)
             {
                 case 技能类型.释放变色:
-                    x = 技能信息.释放变色位置x + offsetX - 坐标偏移x;
-                    y = 技能信息.释放变色位置y - 坐标偏移y;
+                    x = 技能信息.释放变色位置x + offsetX - Main.坐标偏移x;
+                    y = 技能信息.释放变色位置y - Main.坐标偏移y;
                     颜色 = default;
                     颜色容差 = 0;
                     break;
                 case 技能类型.图标CD:
-                    x = 技能信息.技能CD图标x + offsetX - 坐标偏移x;
-                    y = 技能信息.技能CD图标y - 坐标偏移y;
+                    x = 技能信息.技能CD图标x + offsetX - Main.坐标偏移x;
+                    y = 技能信息.技能CD图标y - Main.坐标偏移y;
                     颜色 = 技能信息.技能CD颜色;
                     颜色容差 = 技能信息.技能CD颜色容差;
                     break;
                 case 技能类型.法球:
-                    x = 技能信息.法球技能CD位置x + offsetX - 坐标偏移x;
-                    y = 技能信息.法球技能CD位置y - 坐标偏移y;
+                    x = 技能信息.法球技能CD位置x + offsetX - Main.坐标偏移x;
+                    y = 技能信息.法球技能CD位置y - Main.坐标偏移y;
                     颜色 = 技能信息.法球技能CD颜色;
                     颜色容差 = 技能信息.法球技能颜色容差;
                     break;
                 case 技能类型.状态:
-                    x = 技能信息.状态技能位置x + offsetX - 坐标偏移x;
-                    y = 技能信息.状态技能位置y - 坐标偏移y;
+                    x = 技能信息.状态技能位置x + offsetX - Main.坐标偏移x;
+                    y = 技能信息.状态技能位置y - Main.坐标偏移y;
                     颜色 = 技能信息.技能状态激活颜色;
                     颜色容差 = 技能信息.技能状态激活颜色容差;
                     break;
                 case 技能类型.QWERDF图标:
-                    x = 技能信息.QWERDF位置x + offsetX - 坐标偏移x;
-                    y = 技能信息.QWERDF位置y - 坐标偏移y;
+                    x = 技能信息.QWERDF位置x + offsetX - Main.坐标偏移x;
+                    y = 技能信息.QWERDF位置y - Main.坐标偏移y;
                     颜色 = 技能信息.QWERDF框颜色;
                     颜色容差 = 技能信息.QWERDF框颜色容差;
                     break;
                 case 技能类型.被动技能存在:
-                    x = 技能信息.被动位置x + offsetX - 坐标偏移x;
-                    y = 技能信息.被动位置y - 坐标偏移y;
+                    x = 技能信息.被动位置x + offsetX - Main.坐标偏移x;
+                    y = 技能信息.被动位置y - Main.坐标偏移y;
                     颜色 = 技能信息.未学被动技能颜色;
                     颜色容差 = 技能信息.未学被动技能颜色容差;
                     break;
                 case 技能类型.破坏被动技能:
-                    x = 技能信息.被动位置x + offsetX - 坐标偏移x;
-                    y = 技能信息.被动位置y - 坐标偏移y;
+                    x = 技能信息.被动位置x + offsetX - Main.坐标偏移x;
+                    y = 技能信息.被动位置y - Main.坐标偏移y;
                     颜色 = 技能信息.破坏被动技能颜色;
                     颜色容差 = 技能信息.破坏被动技能颜色容差;
                     break;
                 case 技能类型.未学主动技能:
-                    x = 技能信息.技能CD图标x + offsetX - 坐标偏移x;
-                    y = 技能信息.技能CD图标y - 坐标偏移y;
+                    x = 技能信息.技能CD图标x + offsetX - Main.坐标偏移x;
+                    y = 技能信息.技能CD图标y - Main.坐标偏移y;
                     颜色 = 技能信息.未学主动技能CD颜色;
                     颜色容差 = 技能信息.未学主动技能CD颜色容差;
                     break;
                 case 技能类型.未学法球技能:
-                    x = 技能信息.法球技能CD位置x + offsetX - 坐标偏移x;
-                    y = 技能信息.法球技能CD位置y - 坐标偏移y;
+                    x = 技能信息.法球技能CD位置x + offsetX - Main.坐标偏移x;
+                    y = 技能信息.法球技能CD位置y - Main.坐标偏移y;
                     颜色 = 技能信息.未学法球技能CD颜色;
                     颜色容差 = 技能信息.未学法球技能CD颜色容差;
                     break;
                 case 技能类型.推荐学习技能:
-                    x = 技能信息.状态技能位置x + offsetX - 坐标偏移x;
-                    y = 技能信息.状态技能位置y - 坐标偏移y;
+                    x = 技能信息.状态技能位置x + offsetX - Main.坐标偏移x;
+                    y = 技能信息.状态技能位置y - Main.坐标偏移y;
                     颜色 = 技能信息.推荐学习技能颜色;
                     颜色容差 = 技能信息.推荐学习技能颜色容差;
                     break;
@@ -336,6 +265,37 @@ namespace Dota2Simulator.Games.Dota2
 
             return index == -1 ? throw new ArgumentException("Invalid skill position") : 技能信息.技能间隔 * index;
         }
+
+        #region 获取当前技能数量
+        /// <summary>
+        ///     100次运行，6ms...
+        ///     还要什么自行车，全部添加判断
+        /// </summary>
+        /// <param name="数组"></param>
+        /// <returns></returns>
+        public static async Task<bool> 设置当前技能数量()
+        {
+            int i = 获取当前技能数量(GlobalScreenCapture.GetCurrentHandle());
+            if (i != 0)
+            {
+                // 技能数量改变后，技能判断色全部重置
+                // 只有两种情况需要重置，一种是还没学，到学习了
+                // 另一种是技能改变了
+                if (_技能数量 != i)
+                {
+                    _技能数量 = i;
+
+                    // 重置所有技能判断
+                    重置所有技能判断();
+
+                    // 获取当前技能颜色
+                    _ = DOTA2获取所有释放技能前颜色(GlobalScreenCapture.GetCurrentHandle());
+                }
+            }
+
+            return await Task.FromResult(i != 0).ConfigureAwait(true);
+        }
+        #endregion
 
         /// <summary>
         ///     <para>最后一个技能为被动时，出到A杖，光会紊乱颜色</para>
@@ -477,11 +437,11 @@ namespace Dota2Simulator.Games.Dota2
             if (整体有匹配)
             {
                 // 如果有匹配，输出所有检测点的信息
-                调试信息.AppendLine($"{i + 1} QWERDF图标 :位置X:{检测结果[0].位置.X + 坐标偏移x},位置Y:{检测结果[0].位置.Y + 坐标偏移y}，RGB:{检测结果[0].颜色.R}, {检测结果[0].颜色.G}, {检测结果[0].颜色.B}");
-                调试信息.AppendLine($"{i + 1} 技能CD图标 :位置X:{检测结果[1].位置.X + 坐标偏移x},位置Y:{检测结果[1].位置.Y + 坐标偏移y}，RGB:{检测结果[1].颜色.R}, {检测结果[1].颜色.G}, {检测结果[1].颜色.B}。");
-                调试信息.AppendLine($"{i + 1} 技能法球 :位置X:{检测结果[2].位置.X + 坐标偏移x},位置Y:{检测结果[2].位置.Y + 坐标偏移y}，RGB:{检测结果[2].颜色.R}, {检测结果[2].颜色.G}, {检测结果[2].颜色.B}。");
-                调试信息.AppendLine($"{i + 1} 被动技能 :位置X:{检测结果[3].位置.X + 坐标偏移x},位置Y:{检测结果[3].位置.Y + 坐标偏移y}，RGB:{检测结果[3].颜色.R}, {检测结果[3].颜色.G}, {检测结果[3].颜色.B}。");
-                调试信息.AppendLine($"{i + 1} 推荐技能 :位置X:{检测结果[4].位置.X + 坐标偏移x},位置Y:{检测结果[4].位置.Y + 坐标偏移y}，RGB:{检测结果[4].颜色.R}, {检测结果[4].颜色.G}, {检测结果[4].颜色.B}。");
+                调试信息.AppendLine($"{i + 1} QWERDF图标 :位置X:{检测结果[0].位置.X + Main.坐标偏移x},位置Y:{检测结果[0].位置.Y + Main.坐标偏移y}，RGB:{检测结果[0].颜色.R}, {检测结果[0].颜色.G}, {检测结果[0].颜色.B}");
+                调试信息.AppendLine($"{i + 1} 技能CD图标 :位置X:{检测结果[1].位置.X + Main.坐标偏移x},位置Y:{检测结果[1].位置.Y + Main.坐标偏移y}，RGB:{检测结果[1].颜色.R}, {检测结果[1].颜色.G}, {检测结果[1].颜色.B}。");
+                调试信息.AppendLine($"{i + 1} 技能法球 :位置X:{检测结果[2].位置.X + Main.坐标偏移x},位置Y:{检测结果[2].位置.Y + Main.坐标偏移y}，RGB:{检测结果[2].颜色.R}, {检测结果[2].颜色.G}, {检测结果[2].颜色.B}。");
+                调试信息.AppendLine($"{i + 1} 被动技能 :位置X:{检测结果[3].位置.X + Main.坐标偏移x},位置Y:{检测结果[3].位置.Y + Main.坐标偏移y}，RGB:{检测结果[3].颜色.R}, {检测结果[3].颜色.G}, {检测结果[3].颜色.B}。");
+                调试信息.AppendLine($"{i + 1} 推荐技能 :位置X:{检测结果[4].位置.X + Main.坐标偏移x},位置Y:{检测结果[4].位置.Y + Main.坐标偏移y}，RGB:{检测结果[4].颜色.R}, {检测结果[4].颜色.G}, {检测结果[4].颜色.B}。");
                 调试信息.AppendLine();
                 return (true, 调试信息.ToString());
             }
@@ -490,23 +450,23 @@ namespace Dota2Simulator.Games.Dota2
             // QWERDF图标
             if (!检测结果[0].匹配结果.Any(match => match))
             {
-                调试信息.AppendLine($"{i + 1} QWERDF图标 :位置X:{检测结果[0].位置.X + 坐标偏移x},位置Y:{检测结果[0].位置.Y + 坐标偏移y}，RGB:{检测结果[0].颜色.R}, {检测结果[0].颜色.G}, {检测结果[0].颜色.B}");
+                调试信息.AppendLine($"{i + 1} QWERDF图标 :位置X:{检测结果[0].位置.X + Main.坐标偏移x},位置Y:{检测结果[0].位置.Y + Main.坐标偏移y}，RGB:{检测结果[0].颜色.R}, {检测结果[0].颜色.G}, {检测结果[0].颜色.B}");
             }
             if (!检测结果[1].匹配结果.Any(match => match)) // 主动技能
             {
-                调试信息.AppendLine($"{i + 1} 技能CD图标 :位置X:{检测结果[1].位置.X + 坐标偏移x},位置Y:{检测结果[1].位置.Y + 坐标偏移y}，RGB:{检测结果[1].颜色.R}, {检测结果[1].颜色.G}, {检测结果[1].颜色.B}。");
+                调试信息.AppendLine($"{i + 1} 技能CD图标 :位置X:{检测结果[1].位置.X + Main.坐标偏移x},位置Y:{检测结果[1].位置.Y + Main.坐标偏移y}，RGB:{检测结果[1].颜色.R}, {检测结果[1].颜色.G}, {检测结果[1].颜色.B}。");
             }
             if (!检测结果[2].匹配结果.Any(match => match)) // 法球技能
             {
-                调试信息.AppendLine($"{i + 1} 技能法球 :位置X:{检测结果[2].位置.X + 坐标偏移x},位置Y:{检测结果[2].位置.Y + 坐标偏移y}，RGB:{检测结果[2].颜色.R}, {检测结果[2].颜色.G}, {检测结果[2].颜色.B}。");
+                调试信息.AppendLine($"{i + 1} 技能法球 :位置X:{检测结果[2].位置.X + Main.坐标偏移x},位置Y:{检测结果[2].位置.Y + Main.坐标偏移y}，RGB:{检测结果[2].颜色.R}, {检测结果[2].颜色.G}, {检测结果[2].颜色.B}。");
             }
             if (!检测结果[3].匹配结果.Any(match => match)) // 被动技能
             {
-                调试信息.AppendLine($"{i + 1} 被动技能 :位置X:{检测结果[3].位置.X + 坐标偏移x},位置Y:{检测结果[3].位置.Y + 坐标偏移y}，RGB:{检测结果[3].颜色.R}, {检测结果[3].颜色.G}, {检测结果[3].颜色.B}。");
+                调试信息.AppendLine($"{i + 1} 被动技能 :位置X:{检测结果[3].位置.X + Main.坐标偏移x},位置Y:{检测结果[3].位置.Y + Main.坐标偏移y}，RGB:{检测结果[3].颜色.R}, {检测结果[3].颜色.G}, {检测结果[3].颜色.B}。");
             }
             if (!检测结果[4].匹配结果.Any(match => match)) // 推荐技能
             {
-                调试信息.AppendLine($"{i + 1} 推荐技能 :位置X:{检测结果[4].位置.X + 坐标偏移x},位置Y:{检测结果[4].位置.Y + 坐标偏移y}，RGB:{检测结果[4].颜色.R}, {检测结果[4].颜色.G}, {检测结果[4].颜色.B}。");
+                调试信息.AppendLine($"{i + 1} 推荐技能 :位置X:{检测结果[4].位置.X + Main.坐标偏移x},位置Y:{检测结果[4].位置.Y + Main.坐标偏移y}，RGB:{检测结果[4].颜色.R}, {检测结果[4].颜色.G}, {检测结果[4].颜色.B}。");
                 调试信息.AppendLine();
             }
 
@@ -522,11 +482,11 @@ namespace Dota2Simulator.Games.Dota2
         {
             int 偏移 = 技能.技能间隔 * i;
 
-            Point p_QWERDF = new(技能.QWERDF位置x + 偏移 - 坐标偏移x, 技能.QWERDF位置y - 坐标偏移y);
-            Point p_主动 = new(技能.技能CD图标x + 偏移 - 坐标偏移x, 技能.技能CD图标y - 坐标偏移y);
-            Point p_法球 = new(技能.法球技能CD位置x + 偏移 - 坐标偏移x, 技能.法球技能CD位置y - 坐标偏移y);
-            Point p_被动 = new(技能.被动位置x + 偏移 - 坐标偏移x, 技能.被动位置y - 坐标偏移y);
-            Point p_推荐 = new(技能.状态技能位置x + 偏移 - 坐标偏移x, 技能.状态技能位置y - 坐标偏移y);
+            Point p_QWERDF = new(技能.QWERDF位置x + 偏移 - Main.坐标偏移x, 技能.QWERDF位置y - Main.坐标偏移y);
+            Point p_主动 = new(技能.技能CD图标x + 偏移 - Main.坐标偏移x, 技能.技能CD图标y - Main.坐标偏移y);
+            Point p_法球 = new(技能.法球技能CD位置x + 偏移 - Main.坐标偏移x, 技能.法球技能CD位置y - Main.坐标偏移y);
+            Point p_被动 = new(技能.被动位置x + 偏移 - Main.坐标偏移x, 技能.被动位置y - Main.坐标偏移y);
+            Point p_推荐 = new(技能.状态技能位置x + 偏移 - Main.坐标偏移x, 技能.状态技能位置y - Main.坐标偏移y);
 
             return
             [
@@ -827,7 +787,7 @@ namespace Dota2Simulator.Games.Dota2
         {
             int 偏移 = 获取技能位置偏移(技能位置, 技能信息);
 
-            Point p_主动 = new(技能信息.技能CD图标x + 偏移 - 坐标偏移x, 技能信息.技能CD图标y - 坐标偏移y);
+            Point p_主动 = new(技能信息.技能CD图标x + 偏移 - Main.坐标偏移x, 技能信息.技能CD图标y - Main.坐标偏移y);
 
             Color 获取的颜色_主动 = ImageManager.GetColor(in 句柄, p_主动);
 
@@ -1279,41 +1239,7 @@ namespace Dota2Simulator.Games.Dota2
                 return true;
             }
 
-            //private static unsafe bool BatchColorMatchAvx2(
-            //    ReadOnlySpan<Color> colors,
-            //    ReadOnlySpan<Color> targets,
-            //    byte tolerance)
-            //{
-            //    fixed (Color* pColors = colors)
-            //    fixed (Color* pTargets = targets)
-            //    {
-            //        var toleranceVec = Vector256.Create(tolerance);
-            //        byte* colorBytes = (byte*)pColors;
-            //        byte* targetBytes = (byte*)pTargets;
-
-            //        int vectorSize = Vector256<byte>.Count;
-            //        int iterations = (colors.Length * 4) / vectorSize;
-
-            //        for (int i = 0; i < iterations; i++)
-            //        {
-            //            var colorVec = Avx.LoadVector256(colorBytes + i * vectorSize);
-            //            var targetVec = Avx.LoadVector256(targetBytes + i * vectorSize);
-
-            //            var diff = Avx2.SubtractSaturate(
-            //                Avx2.Max(colorVec, targetVec),
-            //                Avx2.Min(colorVec, targetVec));
-
-            //            var mask = Avx2.CompareGreaterThan(diff, toleranceVec);
-
-            //            if (!Avx2.TestZ(mask, mask))
-            //                return false;
-            //        }
-
-            //        return true;
-            //    }
-            //}
-
-            ///     变色运算匹配，符合的返回真，不符合返回假
+            ///     变色运算匹配，符合的返回真，不符合返回假  未使用
             ///     <para>10000次 1ms..</para>
             ///     <para><paramref name="beforColor" /> 释放前颜色</para>
             ///     <para><paramref name="afterColor" /> 释放后颜色</para>
@@ -1599,7 +1525,7 @@ namespace Dota2Simulator.Games.Dota2
                     {
                         设置全局步骤(1);
                         通用技能后续动作();
-                        _切假腿配置.修改配置(key, false);
+                        Item._切假腿配置.修改配置(key, false);
                     }).ConfigureAwait(true);
 
                     return await Task.FromResult(true).ConfigureAwait(true);
@@ -1620,7 +1546,7 @@ namespace Dota2Simulator.Games.Dota2
 
                 if (是否保持假腿)
                 {
-                    要求保持假腿();
+                    Item.要求保持假腿();
                 }
 
                 if (是否接按键)
@@ -1640,8 +1566,240 @@ namespace Dota2Simulator.Games.Dota2
             _ = Task.Run(() =>
             {
                 Common.Delay(等待的延迟);
-                要求保持假腿();
+                Item.要求保持假腿();
             });
+        }
+
+        #endregion
+
+        #region 捕捉颜色
+
+        #region 定制测试方法（按需求更改）
+
+        public static Task 测试方法(int x, int y)
+        {
+            if (Common.Main_Form == null) return Task.CompletedTask;
+
+            long startTime = Common.获取当前时间毫秒();
+
+            // 使用值元组记录颜色变化，减少GC压力
+            using var colors = new PooledList<Color>();
+            using var longs = new PooledList<long>();
+
+            // 使用取消令牌控制循环寿命
+            using var cts = new CancellationTokenSource();
+            int 延迟 = 0;
+            Common.Main_Form.Invoke(() => { 延迟 = int.Parse(Common.Main_Form?.tb_状态抗性.Text.Trim(), CultureInfo.InvariantCulture); });
+            cts.CancelAfter(延迟);
+
+            try
+            {
+                // 主循环：定期发送时间戳触发屏幕捕获
+                while (!cts.IsCancellationRequested)
+                {
+                    _ = Main.获取图片_2();
+
+                    var color = GlobalScreenCapture.GetColor(x, y);
+
+                    if (colors.Count == 0)
+                    {
+                        colors.Add(color);
+                        longs.Add(0);
+                    }
+                    else
+                    {
+                        if (!colors[^1].Equals(color))
+                        {
+                            colors.Add(color);
+                            longs.Add(Common.获取当前时间毫秒() - startTime);
+                        }
+                    }
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                // 预期的取消，静默处理
+            }
+            Common.Main_Form.Invoke(() =>
+            {
+                // 将结果转换为所需格式
+                Common.Main_Form.tb_x.Text = string.Join("|", colors.Select(c => $"{c.R},{c.G},{c.B}"));
+                Common.Main_Form.tb_y.Text = string.Join("|", longs.Select((c, index) => index == 0 ? c : c - longs[index - 1]));
+            });
+
+            TTS.TTS.Speak("完成");
+            return Task.CompletedTask;
+        }
+
+        #endregion
+
+        public static async Task 捕捉颜色()
+        {
+            if (Common.Main_Form == null) return;
+
+            long startTime = Common.获取当前时间毫秒();
+
+            // 使用值元组记录颜色变化，减少GC压力
+            using var colors = new PooledList<Color>();
+            using var timestamps = new PooledList<long>();
+
+            // 预先定义所有要采集的技能位置和类型配置
+            var colorConfigs = GetColorConfigurations();
+
+            // 使用取消令牌控制循环寿命
+            var timeout = 0;
+
+            // 缓存当前选中的颜色键
+            var selectedKey = "";
+
+            Common.Main_Form.Invoke(() =>
+            {
+                selectedKey = Common.Main_Form.tb_阵营.Text.Trim();
+                timeout = int.Parse(Common.Main_Form.tb_状态抗性.Text.Trim(), CultureInfo.InvariantCulture);
+            });
+
+            using var cts = new CancellationTokenSource(timeout);
+
+            try
+            {
+                // 缓存最近的颜色结果避免频繁的重复计算
+                var colorCache = new Dictionary<string, Color>(colorConfigs.Count);
+
+                while (!cts.IsCancellationRequested)
+                {
+                    // 截图并赋值数组
+                    Main.获取图片_2();
+
+                    // 并行获取所有颜色并缓存结果
+                    await Task.Run(() =>
+                    {
+                        Parallel.ForEach(
+                            colorConfigs,
+                            new ParallelOptions { MaxDegreeOfParallelism = Environment.ProcessorCount },
+                            config =>
+                            {
+                                var color = 获取技能颜色(config.SkillKey, GlobalScreenCapture.GetCurrentHandle(), config.SkillCount, config.ColorType);
+                                lock (colorCache)
+                                {
+                                    colorCache[config.Key] = color;
+                                }
+                            });
+                    });
+
+                    // 获取当前选择的颜色
+                    Color currentColor;
+                    if (colorCache.TryGetValue(selectedKey, out var cachedColor))
+                    {
+                        currentColor = cachedColor;
+                    }
+                    else
+                    {
+                        // 默认返回q4
+                        currentColor = colorCache.TryGetValue("q4", out var defaultColor) ? defaultColor : Color.Empty;
+                    }
+
+                    // 记录颜色变化
+                    if (colors.Count == 0)
+                    {
+                        colors.Add(currentColor);
+                        timestamps.Add(0);
+                    }
+                    else if (!colors[^1].Equals(currentColor))
+                    {
+                        colors.Add(currentColor);
+                        timestamps.Add(Common.获取当前时间毫秒() - startTime);
+                    }
+
+                    // 添加短暂休眠，减轻CPU负担
+                    // Task.Delay(1, cts.Token);
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                // 预期的取消，静默处理
+            }
+
+            Common.Main_Form.Invoke(() =>
+            {
+                // 将结果转换为所需格式
+                Common.Main_Form.tb_x.Text = string.Join("|", colors.Select(c => $"{c.R},{c.G},{c.B}"));
+                Common.Main_Form.tb_y.Text = string.Join("|", timestamps.Select((c, index) => index == 0 ? c : c - timestamps[index - 1]));
+            });
+
+            TTS.TTS.Speak("完成");
+        }
+
+        // 辅助方法：获取颜色配置
+        private static List<ColorConfig> GetColorConfigurations()
+        {
+            // 预定义所有需要捕获的颜色配置
+            var configs = new List<ColorConfig>(150);
+            foreach (var key in new[] { Keys.Q, Keys.W, Keys.E, Keys.R })
+            {
+                foreach (var count in new[] { 4, 5, 6 })
+                {
+                    // 添加所有颜色类型
+                    configs.Add(new ColorConfig($"{key.ToString().ToLower(CultureInfo.CurrentCulture)}{count}", key, count, 技能类型.释放变色));
+                    configs.Add(new ColorConfig($"{key.ToString().ToLower(CultureInfo.CurrentCulture)}{count}1", key, count, 技能类型.图标CD));
+                    configs.Add(new ColorConfig($"{key.ToString().ToLower(CultureInfo.CurrentCulture)}{count}2", key, count, 技能类型.QWERDF图标));
+                    configs.Add(new ColorConfig($"{key.ToString().ToLower(CultureInfo.CurrentCulture)}{count}3", key, count, 技能类型.法球));
+                    configs.Add(new ColorConfig($"{key.ToString().ToLower(CultureInfo.CurrentCulture)}{count}4", key, count, 技能类型.状态));
+                    configs.Add(new ColorConfig($"{key.ToString().ToLower(CultureInfo.CurrentCulture)}{count}5", key, count, 技能类型.被动技能存在));
+                }
+            }
+
+            // D键只有5和6
+            foreach (var count in new[] { 5, 6 })
+            {
+                configs.Add(new ColorConfig($"d{count}", Keys.D, count, 技能类型.释放变色));
+                configs.Add(new ColorConfig($"d{count}1", Keys.D, count, 技能类型.图标CD));
+                configs.Add(new ColorConfig($"d{count}2", Keys.D, count, 技能类型.QWERDF图标));
+                configs.Add(new ColorConfig($"d{count}3", Keys.D, count, 技能类型.法球));
+                configs.Add(new ColorConfig($"d{count}4", Keys.D, count, 技能类型.状态));
+                configs.Add(new ColorConfig($"d{count}5", Keys.D, count, 技能类型.被动技能存在));
+            }
+
+            // F键只有6
+            configs.Add(new ColorConfig("f6", Keys.F, 6, 技能类型.释放变色));
+            configs.Add(new ColorConfig("f61", Keys.F, 6, 技能类型.图标CD));
+            configs.Add(new ColorConfig("f62", Keys.F, 6, 技能类型.QWERDF图标));
+            configs.Add(new ColorConfig("f63", Keys.F, 6, 技能类型.法球));
+            configs.Add(new ColorConfig("f64", Keys.F, 6, 技能类型.状态));
+            configs.Add(new ColorConfig("f65", Keys.F, 6, 技能类型.被动技能存在));
+
+            return configs;
+        }
+
+        // 统一获取技能颜色的方法
+        private static Color 获取技能颜色(Keys skillKey, in ImageHandle 句柄, int skillCount, 技能类型 colorType)
+        {
+            return colorType switch
+            {
+                技能类型.释放变色 => 获取技能释放判断颜色(skillKey, in 句柄, skillCount),
+                技能类型.图标CD => 获取技能进入CD判断颜色(skillKey, in 句柄, skillCount),
+                技能类型.QWERDF图标 => 获取QWERDF颜色(skillKey, in 句柄, skillCount),
+                技能类型.法球 => 获取法球颜色(skillKey, in 句柄, skillCount),
+                技能类型.状态 => 获取状态颜色(skillKey, in 句柄, skillCount),
+                技能类型.被动技能存在 => 获取被动颜色(skillKey, in 句柄, skillCount),
+                _ => Color.Empty,
+            };
+        }
+
+        // 颜色配置记录类
+        private readonly struct ColorConfig
+        {
+            public string Key { get; }
+            public Keys SkillKey { get; }
+            public int SkillCount { get; }
+            public 技能类型 ColorType { get; }
+
+            public ColorConfig(string key, Keys skillKey, int skillCount, 技能类型 colorType)
+            {
+                Key = key;
+                SkillKey = skillKey;
+                SkillCount = skillCount;
+                ColorType = colorType;
+            }
         }
 
         #endregion

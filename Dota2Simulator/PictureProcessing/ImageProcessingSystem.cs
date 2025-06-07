@@ -16,7 +16,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Timer = System.Threading.Timer;
 
-namespace ImageProcessingSystem
+namespace Dota2Simulator.ImageProcessingSystem
 {
     #region 三缓冲设计
 

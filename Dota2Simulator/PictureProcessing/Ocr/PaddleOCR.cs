@@ -1,4 +1,4 @@
-﻿using ImageProcessingSystem;
+﻿using Dota2Simulator.ImageProcessingSystem;
 using OpenCvSharp;
 using Sdcb.PaddleInference;
 using Sdcb.PaddleOCR;

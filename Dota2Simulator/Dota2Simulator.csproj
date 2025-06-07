@@ -336,6 +336,9 @@
     <None Update="findpoints.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="image_processing_system.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="inference1\ch_PP-OCRv3_det_infer\inference.pdiparams">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

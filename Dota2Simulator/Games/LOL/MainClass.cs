@@ -1,6 +1,6 @@
 ﻿#if LOL
 
-using ImageProcessingSystem;
+using Dota2Simulator.ImageProcessingSystem;
 using System;
 using System.Collections.Generic;
 using System.Drawing;

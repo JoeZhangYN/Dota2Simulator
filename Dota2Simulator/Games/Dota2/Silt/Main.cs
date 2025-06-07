@@ -1,14 +1,21 @@
 ﻿#if DOTA2
 #if Silt
 
+using Dota2Simulator.ImageProcessingSystem;
 using Dota2Simulator.KeyboardMouse;
 using Dota2Simulator.PictureProcessing.OCR;
-using ImageProcessingSystem;
+using Dota2Simulator.PictureProcessing.RustImageProcessingSystem;
 using System;
+using System.Diagnostics;
 using System.Drawing;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using static Dota2Simulator.Games.Dota2.Item;
+using Color = System.Drawing.Color;
+using ImageHandle = Dota2Simulator.ImageProcessingSystem.ImageHandle;
+using Point = System.Drawing.Point;
+using Rectangle = System.Drawing.Rectangle;
 
 namespace Dota2Simulator.Games.Dota2.Silt
 {
@@ -95,7 +102,7 @@ namespace Dota2Simulator.Games.Dota2.Silt
                 获取碎片循环计数++;
                 Task.Run(() =>
                 {
-                    Common.Delay(350, _循环时间);
+                    Common.Delay(325, _循环时间);
                     // 自我调用
                     SimKeyBoard.KeyPress(Keys.NumPad1);
                 }).ConfigureAwait(true);
@@ -144,12 +151,213 @@ namespace Dota2Simulator.Games.Dota2.Silt
 
         public static void 点击暴击(in ImageHandle 句柄)
         {
-            var p = Control.MousePosition;
-            SimKeyBoard.MouseMove(40, 580);
-            Common.Delay(25);
-            SimKeyBoard.MouseLeftClick();
-            Common.Delay(25);
-            SimKeyBoard.MouseMove(p);
+            //var p = Control.MousePosition;
+            //SimKeyBoard.MouseMove(40, 580);
+            //Common.Delay(25);
+            //SimKeyBoard.MouseLeftClick();
+            //Common.Delay(25);
+            //SimKeyBoard.MouseMove(p);
+            // Example 1: Basic screen capture and image finding
+            BasicImageFinding();
+
+            // Example 2: Continuous screen monitoring
+            ContinuousMonitoring();
+
+            // Example 3: Performance testing
+            PerformanceTest();
+        }
+
+        static void BasicImageFinding()
+        {
+            Console.WriteLine("=== Basic Image Finding Example ===");
+
+            using (var processor = new PictureProcessing.RustImageProcessingSystem.ImageProcessor())
+            {
+                // Initialize with screen dimensions
+                if (!processor.Initialize(1920, 1080))
+                {
+                    Console.WriteLine("Failed to initialize image processor");
+                    return;
+                }
+
+                // Load template image
+                var needleHandle = processor.CreateImage("template.png");
+
+                try
+                {
+                    // Capture full screen
+                    if (processor.CaptureScreen(0, 0, 1920, 1080))
+                    {
+                        // Find single occurrence
+                        var point = processor.FindImage(needleHandle, matchRate: 0.95, tolerance: 5);
+                        if (point.HasValue)
+                        {
+                            Console.WriteLine($"Found image at: ({point.Value.X}, {point.Value.Y})");
+
+                            // Get pixel color at found location
+                            var color = processor.GetPixel(point.Value.X, point.Value.Y);
+                            Console.WriteLine($"Pixel color: R={color.R}, G={color.G}, B={color.B}, A={color.A}");
+                        }
+                        else
+                        {
+                            Console.WriteLine("Image not found");
+                        }
+
+                        // Find all occurrences
+                        var allPoints = processor.FindAllImages(needleHandle, matchRate: 0.90, tolerance: 10, maxResults: 50);
+                        Console.WriteLine($"Found {allPoints.Count} occurrences");
+
+                        foreach (var p in allPoints)
+                        {
+                            Console.WriteLine($"  - At ({p.X}, {p.Y})");
+                        }
+                    }
+                }
+                finally
+                {
+                    processor.ReleaseImage(needleHandle);
+                }
+
+                // Show memory stats
+                var stats = processor.GetMemoryStats();
+                Console.WriteLine($"Memory - Total: {stats.totalSize / 1024 / 1024}MB, " +
+                                $"Allocated: {stats.allocated / 1024 / 1024}MB, " +
+                                $"Free: {stats.free / 1024 / 1024}MB");
+            }
+        }
+
+        static void ContinuousMonitoring()
+        {
+            Console.WriteLine("\n=== Continuous Monitoring Example ===");
+
+            using (var processor = new PictureProcessing.RustImageProcessingSystem.ImageProcessor())
+            {
+                processor.Initialize(1920, 1080);
+
+                var targetImage = processor.CreateImage("target_button.png");
+                var stopwatch = new Stopwatch();
+
+                try
+                {
+                    Console.WriteLine("Monitoring for target image... Press any key to stop.");
+
+                    while (!Console.KeyAvailable)
+                    {
+                        stopwatch.Restart();
+
+                        // Capture specific region
+                        processor.CaptureScreen(500, 300, 920, 480);
+
+                        var found = processor.FindImage(targetImage, 0.95, 0);
+
+                        stopwatch.Stop();
+
+                        if (found.HasValue)
+                        {
+                            Console.WriteLine($"Target found at ({found.Value.X}, {found.Value.Y}) " +
+                                            $"in {stopwatch.ElapsedMilliseconds}ms");
+
+                            // Simulate click or other action
+                            ClickAt(found.Value.X + 500, found.Value.Y + 300);
+
+                            Thread.Sleep(1000); // Wait before next check
+                        }
+                        else
+                        {
+                            Thread.Sleep(100); // Small delay when not found
+                        }
+                    }
+
+                    Console.ReadKey(true); // Clear the key press
+                }
+                finally
+                {
+                    processor.ReleaseImage(targetImage);
+                }
+            }
+        }
+
+        static void PerformanceTest()
+        {
+            Console.WriteLine("\n=== Performance Test ===");
+
+            using (var processor = new PictureProcessing.RustImageProcessingSystem.ImageProcessor())
+            {
+                processor.Initialize(1920, 1080);
+
+                var testImage = processor.CreateImage("test_pattern.png");
+                var stopwatch = new Stopwatch();
+
+                try
+                {
+                    // Test single image finding
+                    const int iterations = 100;
+                    double totalTime = 0;
+
+                    for (int i = 0; i < iterations; i++)
+                    {
+                        processor.CaptureScreen(0, 0, 1920, 1080);
+
+                        stopwatch.Restart();
+                        var result = processor.FindImage(testImage, 0.95, 0);
+                        stopwatch.Stop();
+
+                        totalTime += stopwatch.ElapsedMilliseconds;
+                    }
+
+                    Console.WriteLine($"Average time for single find: {totalTime / iterations:F2}ms");
+
+                    // Test multiple image finding
+                    totalTime = 0;
+                    for (int i = 0; i < iterations; i++)
+                    {
+                        processor.CaptureScreen(0, 0, 1920, 1080);
+
+                        stopwatch.Restart();
+                        var results = processor.FindAllImages(testImage, 0.90, 5, 100);
+                        stopwatch.Stop();
+
+                        totalTime += stopwatch.ElapsedMilliseconds;
+                    }
+
+                    Console.WriteLine($"Average time for find all: {totalTime / iterations:F2}ms");
+                }
+                finally
+                {
+                    processor.ReleaseImage(testImage);
+                }
+            }
+        }
+
+        // Helper method to simulate mouse click
+        static void ClickAt(int x, int y)
+        {
+            // Implementation depends on your needs
+            Console.WriteLine($"Simulating click at ({x}, {y})");
+        }
+
+        // Advanced usage with managed resources
+        class AdvancedExample
+        {
+            public static void ManagedResourceExample()
+            {
+                using (var processor = new PictureProcessing.RustImageProcessingSystem.ImageProcessor())
+                {
+                    processor.Initialize(1920, 1080);
+
+                    // Using ManagedImage for automatic cleanup
+                    using (var managedImage = new ManagedImage(processor, processor.CreateImage("icon.png")))
+                    {
+                        processor.CaptureScreen(0, 0, 1920, 1080);
+                        var result = processor.FindImage(managedImage.Handle, 0.95, 0);
+
+                        if (result.HasValue)
+                        {
+                            Console.WriteLine($"Found at: {result.Value.X}, {result.Value.Y}");
+                        }
+                    } // Image automatically released here
+                }
+            }
         }
 
         public static void 测试识别(in ImageHandle 句柄)
@@ -181,7 +389,7 @@ namespace Dota2Simulator.Games.Dota2.Silt
         public static void 沙王自动选择(in ImageHandle gameHandle)
         {
             var p = Control.MousePosition;
-            TalentSelectionExamples.ExecuteHeroSelection("夜魔", gameHandle);
+            TalentSelectionExamples.ExecuteHeroSelection("沙王", gameHandle);
             SimKeyBoard.MouseMove(p);
         }
 
@@ -190,6 +398,9 @@ namespace Dota2Simulator.Games.Dota2.Silt
         }
     }
 }
+
+
+
 
 #endif
 #endif

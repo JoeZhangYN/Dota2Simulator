@@ -1,4 +1,4 @@
-﻿using ImageProcessingSystem;
+﻿using Dota2Simulator.ImageProcessingSystem;
 using System;
 using System.Collections.Concurrent;
 using System.ComponentModel;

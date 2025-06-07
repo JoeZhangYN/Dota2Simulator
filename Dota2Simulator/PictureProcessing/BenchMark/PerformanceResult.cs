@@ -1,4 +1,4 @@
-﻿using ImageProcessingSystem;
+﻿using Dota2Simulator.ImageProcessingSystem;
 using NLog;
 using System;
 using System.Collections.Generic;

@@ -1,13 +1,13 @@
-﻿#if DOTA2
+﻿// Games/Dota2/Item.cs
+#if DOTA2
 
-using ImageProcessingSystem;
+using Dota2Simulator.ImageProcessingSystem;
+using Dota2Simulator.KeyboardMouse;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using static Dota2Simulator.Games.Dota2.Main;
-using static Dota2Simulator.KeyboardMouse.SimKeyBoard;
 
 namespace Dota2Simulator.Games.Dota2
 {
@@ -52,14 +52,18 @@ namespace Dota2Simulator.Games.Dota2
 
         public static 技能切假腿配置 _切假腿配置 = new();
 
-        public static Keys _假腿按键 = Keys.Escape; 
+        public static Keys _假腿按键 = Keys.Escape;
+
+        public static bool _是否魔晶, _是否神杖;
+        public static bool _存在假腿, _条件开启切假腿, _条件保持假腿, _需要切假腿, _条件假腿敏捷, _切假腿中;
+
         #endregion
 
         #region 主要逻辑
 
         public static async Task 根据按键判断技能释放前通用逻辑(KeyEventArgs e)
         {
-            _ = await 设置当前技能数量().ConfigureAwait(true);
+            _ = await Skill.设置当前技能数量().ConfigureAwait(true);
             _存在假腿 = 获取当前假腿按键();
             _是否神杖 = 阿哈利姆神杖(GlobalScreenCapture.GetCurrentHandle());
             _是否魔晶 = 阿哈利姆魔晶(GlobalScreenCapture.GetCurrentHandle());
@@ -72,8 +76,8 @@ namespace Dota2Simulator.Games.Dota2
 
                     break;
                 case Keys.Escape:
-                    _中断条件 = !_中断条件;
-                    TTS.TTS.Speak($"{(_中断条件 ? "中断" : "继续")}运行");
+                    Main._中断条件 = !Main._中断条件;
+                    TTS.TTS.Speak($"{(Main._中断条件 ? "中断" : "继续")}运行");
                     break;
                 case Keys.NumPad7 when _存在假腿:
                     切换假腿状态();
@@ -82,7 +86,7 @@ namespace Dota2Simulator.Games.Dota2
                     切换保持假腿状态();
                     break;
                 case Keys.NumPad9 when _存在假腿:
-                    取消所有功能();
+                    Main.取消所有功能();
                     break;
                 case var _ when e.KeyCode == _假腿按键:
                     return;
@@ -113,8 +117,8 @@ namespace Dota2Simulator.Games.Dota2
                         return;
                     }
 
-                    await 技能释放前切假腿(e, _切假腿配置).ConfigureAwait(true);
-                    if (按键匹配条件更新.TryGetValue(e.KeyCode, out Action value))
+                    await 根据配置技能释放前切假腿(e, _切假腿配置).ConfigureAwait(true);
+                    if (Main.按键匹配条件更新.TryGetValue(e.KeyCode, out Action value))
                     {
                         value.Invoke();
                     }
@@ -144,7 +148,7 @@ namespace Dota2Simulator.Games.Dota2
 #endif
         }
 
-        private static async Task 技能释放前切假腿(KeyEventArgs e, 技能切假腿配置 配置)
+        private static async Task 根据配置技能释放前切假腿(KeyEventArgs e, 技能切假腿配置 配置)
         {
             if (配置.切假腿配置.TryGetValue(e.KeyCode, out (bool 是否激活, string 假腿类型) 配置值) && 配置值.是否激活)
             {
@@ -152,7 +156,7 @@ namespace Dota2Simulator.Games.Dota2
             }
         }
 
-        private static async Task 技能释放前切假腿(string 类型)
+        public static async Task 技能释放前切假腿(string 类型)
         {
             if (_条件开启切假腿 && _条件保持假腿 && _存在假腿)
             {
@@ -189,6 +193,35 @@ namespace Dota2Simulator.Games.Dota2
 
             TTS.TTS.Speak(_条件保持假腿 ? "保持假腿" : "不保持假腿");
         }
+
+
+
+        #region 切假腿
+
+        /// <summary>
+        /// </summary>
+        /// <param name="parByte"></param>
+        /// <param name="size"></param>
+        /// <param name="type"></param>
+        /// <param name="mode"></param>
+        /// <returns></returns>
+        public static async Task<bool> 切假腿类型(string type)
+        {
+            bool 切腿成功 = type switch
+            {
+                "智力" => 根据图片使用物品(Dota2_Pictrue.物品.假腿_力量腿) == 1 ||
+                        根据图片多次使用物品(Dota2_Pictrue.物品.假腿_敏捷腿, 2, 33) == 1,
+                "敏捷" => 根据图片使用物品(Dota2_Pictrue.物品.假腿_智力腿) == 1 ||
+                        根据图片多次使用物品(Dota2_Pictrue.物品.假腿_力量腿, 2, 33) == 1,
+                "力量" => 根据图片使用物品(Dota2_Pictrue.物品.假腿_敏捷腿) == 1 ||
+                        根据图片多次使用物品(Dota2_Pictrue.物品.假腿_智力腿, 2, 33) == 1,
+                _ => false
+            };
+
+            return await Task.FromResult(切腿成功).ConfigureAwait(true);
+        }
+
+        #endregion
 
         #endregion
 
@@ -305,12 +338,12 @@ namespace Dota2Simulator.Games.Dota2
             public byte 物品锁闭颜色容差 { get; }
             public Keys[] 物品位置 { get; } = [Keys.Z, Keys.X, Keys.C, Keys.V, Keys.B, Keys.Space];
             public Rectangle 物品范围 { get; } = new Rectangle(最左侧x, 943, 67 * 3, 48 * 2);
-            public Rectangle 中立TP范围 { get; }= new Rectangle(最左侧x + 197, 968, 47, 101); // 6技能 1377,968,47,101 1180  197
+            public Rectangle 中立TP范围 { get; } = new Rectangle(最左侧x + 197, 968, 47, 101); // 6技能 1377,968,47,101 1180  197
         }
 
         private static bool 判断物品状态(物品信息 物品, int 序号, in ImageHandle 句柄, Point 初始位置, Color 目标颜色, byte 颜色容差)
         {
-            Point 位置 = new(初始位置.X - 坐标偏移x, 初始位置.Y - 坐标偏移y);
+            Point 位置 = new(初始位置.X - Main.坐标偏移x, 初始位置.Y - Main.坐标偏移y);
 
             int 内部序号 = 序号;
             if (序号 >= 3)
@@ -326,7 +359,7 @@ namespace Dota2Simulator.Games.Dota2
 
         private static bool 判断物品状态(物品信息 物品, int 序号, in ImageHandle 句柄, Point 初始位置, Color[] 目标颜色, byte 颜色容差)
         {
-            Point 位置 = new(初始位置.X - 坐标偏移x, 初始位置.Y - 坐标偏移y);
+            Point 位置 = new(初始位置.X - Main.坐标偏移x, 初始位置.Y - Main.坐标偏移y);
 
             int 内部序号 = 序号;
             if (序号 >= 3)
@@ -346,7 +379,7 @@ namespace Dota2Simulator.Games.Dota2
 
         private static bool DOTA2判断序号物品是否CD(int 序号, in ImageHandle 句柄)
         {
-            物品信息 物品 = 根据技能数量获取物品信息(_技能数量);
+            物品信息 物品 = 根据技能数量获取物品信息(Skill._技能数量);
             Point 初始位置 = new(物品.物品CD右上角x, 物品.物品CD右上角y);
             Color 目标颜色 = 物品.物品CD颜色;
             byte 颜色容差 = 物品.物品CD颜色容差;
@@ -356,7 +389,7 @@ namespace Dota2Simulator.Games.Dota2
 
         private static bool DOTA2判断任意物品是否锁闭(in ImageHandle 句柄)
         {
-            物品信息 物品 = 根据技能数量获取物品信息(_技能数量);
+            物品信息 物品 = 根据技能数量获取物品信息(Skill._技能数量);
             Point 初始位置 = new(物品.物品锁闭x, 物品.物品锁闭y);
             Color[] 目标颜色 = 物品.物品锁闭颜色;
             byte 颜色容差 = 物品.物品锁闭颜色容差;
@@ -407,18 +440,18 @@ namespace Dota2Simulator.Games.Dota2
 
         public static bool 重置耗蓝物品委托和条件()
         {
-            _条件z = false;
-            _条件x = false;
-            _条件c = false;
-            _条件v = false;
-            _条件b = false;
-            _条件space = false;
-            _条件根据图片委托z = null;
-            _条件根据图片委托x = null;
-            _条件根据图片委托c = null;
-            _条件根据图片委托v = null;
-            _条件根据图片委托b = null;
-            _条件根据图片委托space = null;
+            Main._条件z = false;
+            Main._条件x = false;
+            Main._条件c = false;
+            Main._条件v = false;
+            Main._条件b = false;
+            Main._条件space = false;
+            Main._条件根据图片委托z = null;
+            Main._条件根据图片委托x = null;
+            Main._条件根据图片委托c = null;
+            Main._条件根据图片委托v = null;
+            Main._条件根据图片委托b = null;
+            Main._条件根据图片委托space = null;
             return true;
         }
 
@@ -452,12 +485,12 @@ namespace Dota2Simulator.Games.Dota2
 
             Dictionary<Keys, Action> 物品进入CD委托 = new()
             {
-                { Keys.Z, () => _条件根据图片委托z ??= 物品z进入CD },
-                { Keys.X, () => _条件根据图片委托x ??= 物品x进入CD },
-                { Keys.C, () => _条件根据图片委托c ??= 物品c进入CD },
-                { Keys.V, () => _条件根据图片委托v ??= 物品v进入CD },
-                { Keys.B, () => _条件根据图片委托b ??= 物品b进入CD },
-                { Keys.Space, () => _条件根据图片委托space ??= 物品space进入CD }
+                { Keys.Z, () => Main._条件根据图片委托z ??= 物品z进入CD },
+                { Keys.X, () => Main._条件根据图片委托x ??= 物品x进入CD },
+                { Keys.C, () => Main._条件根据图片委托c ??= 物品c进入CD },
+                { Keys.V, () => Main._条件根据图片委托v ??= 物品v进入CD },
+                { Keys.B, () => Main._条件根据图片委托b ??= 物品b进入CD },
+                { Keys.Space, () => Main._条件根据图片委托space ??= 物品space进入CD }
             };
 
             foreach (ImageHandle 匹配句柄 in 需切假腿物品句柄)
@@ -481,62 +514,6 @@ namespace Dota2Simulator.Games.Dota2
             return true;
         }
 
-        /*
-        //// 定义一个结构体来表示颜色检查项
-        //private struct ColorCheck
-        //{
-        //    public int Num;
-        //    public Rectangle OcrArea; // OCR 的区域
-        //}
-
-        //private static double 获取当前攻击速度()
-        //{
-        //    // 定义颜色检查项的列表
-        //    List<ColorCheck> colorChecks =
-        //    [
-        //        new()
-        //        {
-        //            Num = 4,
-        //            OcrArea = new Rectangle(663, 959, 28, 30)
-        //        },
-        //        new()
-        //        {
-        //            Num = 5,
-        //            OcrArea = new Rectangle(647, 959, 28, 30)
-        //        },
-        //        new()
-        //        {
-        //            Num = 6,
-        //            OcrArea = new Rectangle(619, 959, 28, 30)
-        //        }
-        //    ];
-
-        //    foreach (ColorCheck check in colorChecks)
-        //    {
-        //        if (check.Num != _技能数量)
-        //        {
-        //            continue;
-        //        }
-
-        //        string ocrResult = PaddleOcr.获取图片文字(check.OcrArea.X, check.OcrArea.Y, check.OcrArea.Width,
-        //            check.OcrArea.Height);
-        //        if (double.TryParse(ocrResult, out double result))
-        //        {
-        //            return result;
-        //        }
-        //        else
-        //        {
-        //            return 100.0;
-        //            // throw new InvalidOperationException("OCR 结果无法转换为双精度浮点数。");
-        //        }
-        //    }
-
-        //    return 100.0;
-        //    // 如果没有匹配的颜色，抛出异常或返回默认值
-        //    // throw new InvalidOperationException("未找到匹配的颜色。");
-        //}
-        */
-
         private static bool 获取当前假腿按键()
         {
             ImageHandle[] 假腿句柄集合 =
@@ -548,12 +525,12 @@ namespace Dota2Simulator.Games.Dota2
 
             Dictionary<Keys, (Action 清空委托, Action 重置条件)> 清空物品进入CD委托和条件映射 = new()
             {
-                { Keys.Z, (() => _条件根据图片委托z = null, () => _条件z = false) },
-                { Keys.X, (() => _条件根据图片委托x = null, () => _条件x = false) },
-                { Keys.C, (() => _条件根据图片委托c = null, () => _条件c = false) },
-                { Keys.V, (() => _条件根据图片委托v = null, () => _条件v = false) },
-                { Keys.B, (() => _条件根据图片委托b = null, () => _条件b = false) },
-                { Keys.Space, (() => _条件根据图片委托space = null, () => _条件space = false) }
+                { Keys.Z, (() => Main._条件根据图片委托z = null, () => Main._条件z = false) },
+                { Keys.X, (() => Main._条件根据图片委托x = null, () => Main._条件x = false) },
+                { Keys.C, (() => Main._条件根据图片委托c = null, () => Main._条件c = false) },
+                { Keys.V, (() => Main._条件根据图片委托v = null, () => Main._条件v = false) },
+                { Keys.B, (() => Main._条件根据图片委托b = null, () => Main._条件b = false) },
+                { Keys.Space, (() => Main._条件根据图片委托space = null, () => Main._条件space = false) }
             };
 
             foreach (ImageHandle 假腿句柄 in 假腿句柄集合)
@@ -576,23 +553,23 @@ namespace Dota2Simulator.Games.Dota2
 
         public static Keys 根据图片获取物品按键(in ImageHandle 句柄)
         {
-            var 位置 = ImageFinder.FindImageInRegion(in 句柄, GlobalScreenCapture.GetCurrentHandle(), 获取物品范围(_技能数量));
+            var 位置 = ImageFinder.FindImageInRegion(in 句柄, GlobalScreenCapture.GetCurrentHandle(), 获取物品范围(Skill._技能数量));
             return 根据位置获取按键(位置);
         }
 
         public static int 根据图片使用物品(in ImageHandle 句柄)
         {
-            return 执行物品操作(句柄, (k) => KeyPress(k));
+            return 执行物品操作(句柄, (k) => SimKeyBoard.KeyPress(k));
         }
 
         public static int 根据图片自我使用物品(in ImageHandle 句柄)
         {
-            return 执行物品操作(句柄, (k) => KeyPressAlt(k));
+            return 执行物品操作(句柄, (k) => SimKeyBoard.KeyPressAlt(k));
         }
 
         public static bool 根据图片队列使用物品(in ImageHandle 句柄)
         {
-            return 执行物品操作(句柄, (k) => KeyPressWhile(k, Keys.Shift)) > 0;
+            return 执行物品操作(句柄, (k) => SimKeyBoard.KeyPressWhile(k, Keys.Shift)) > 0;
         }
 
         public static int 根据图片多次使用物品(in ImageHandle 句柄, int times, int 延迟)
@@ -601,7 +578,7 @@ namespace Dota2Simulator.Games.Dota2
             {
                 for (int i = 0; i < times; i++)
                 {
-                    KeyPress(k);
+                    SimKeyBoard.KeyPress(k);
                     if (i < times - 1)
                     {
                         Common.Delay(延迟);
@@ -612,7 +589,7 @@ namespace Dota2Simulator.Games.Dota2
 
         private static int 执行物品操作(in ImageHandle 句柄, Action<Keys> 按键操作)
         {
-            Point? 位置 = ImageFinder.FindImageInRegion(in 句柄, GlobalScreenCapture.GetCurrentHandle(), 获取物品范围(_技能数量));
+            Point? 位置 = ImageFinder.FindImageInRegion(in 句柄, GlobalScreenCapture.GetCurrentHandle(), 获取物品范围(Skill._技能数量));
             if (ImageManager.是否无效位置(位置))
             {
                 return 0;
@@ -634,9 +611,9 @@ namespace Dota2Simulator.Games.Dota2
                 return Keys.Escape;
             }
 
-            物品信息 物品 = 根据技能数量获取物品信息(_技能数量);
-            int x = 位置.Value.X + 坐标偏移x;
-            int y = 位置.Value.Y + 坐标偏移y;
+            物品信息 物品 = 根据技能数量获取物品信息(Skill._技能数量);
+            int x = 位置.Value.X + Main.坐标偏移x;
+            int y = 位置.Value.Y + Main.坐标偏移y;
 
             // 计算物品在物品栏中的索引
             int index = (int)Math.Floor((float)(x - 物品.物品最左侧x) / 物品.物品间隔x);
@@ -691,7 +668,7 @@ namespace Dota2Simulator.Games.Dota2
         {
             foreach (int xCoord in xCoords)
             {
-                var color = ImageManager.GetColor(in 句柄, xCoord - 坐标偏移x, yCoord - 坐标偏移y);
+                var color = ImageManager.GetColor(in 句柄, xCoord - Main.坐标偏移x, yCoord - Main.坐标偏移y);
                 if (ColorExtensions.ColorAEqualColorB(color, 技能点颜色, 1))
                 {
                     return true;
@@ -776,6 +753,56 @@ namespace Dota2Simulator.Games.Dota2
 
             _ = Task.Run(afterAction).ConfigureAwait(false);
             return await Task.FromResult(false).ConfigureAwait(true);
+        }
+        #endregion
+
+        #region 保存当前物品
+
+        public static void 保存当前物品()
+        {
+            Main.获取图片_2();
+
+            物品信息 物品 = 物品4;
+
+            // 根据阵营设置456,设置物品456
+            Common.Main_Form?.Invoke(() =>
+            {
+                物品 = Common.Main_Form.tb_阵营.Text switch
+                {
+                    "4" => 物品4,
+                    "5" => 物品5,
+                    "6" => 物品6,
+                    _ => 物品4
+                };
+            });
+
+            // 默认物品4 1138,954,50,17
+            ImageManager.SaveImage(GlobalScreenCapture.GetCurrentHandle(), "J:\\Desktop\\物品_1.bmp", new Rectangle(物品.物品最左侧x + 2, 物品.物品最上侧y + 11, 50, 17));
+            ImageManager.SaveImage(GlobalScreenCapture.GetCurrentHandle(), "J:\\Desktop\\物品_2.bmp", new Rectangle(物品.物品最左侧x + 2 + 物品.物品间隔x, 物品.物品最上侧y + 11, 50, 17));
+            ImageManager.SaveImage(GlobalScreenCapture.GetCurrentHandle(), "J:\\Desktop\\物品_3.bmp", new Rectangle(物品.物品最左侧x + 2 + 物品.物品间隔x * 2, 物品.物品最上侧y + 11, 50, 17));
+            ImageManager.SaveImage(GlobalScreenCapture.GetCurrentHandle(), "J:\\Desktop\\物品_4.bmp", new Rectangle(物品.物品最左侧x + 2, 物品.物品最上侧y + 11 + 物品.物品间隔y, 50, 17));
+            ImageManager.SaveImage(GlobalScreenCapture.GetCurrentHandle(), "J:\\Desktop\\物品_5.bmp", new Rectangle(物品.物品最左侧x + 2 + 物品.物品间隔x, 物品.物品最上侧y + 11 + 物品.物品间隔y, 50, 17));
+            ImageManager.SaveImage(GlobalScreenCapture.GetCurrentHandle(), "J:\\Desktop\\物品_6.bmp", new Rectangle(物品.物品最左侧x + 2 + 物品.物品间隔x * 2, 物品.物品最上侧y + 11 + 物品.物品间隔y, 50, 17));
+
+            //var a1 = 获取指定位置颜色(物品.物品锁闭x + i1, 物品.物品锁闭y).Result;
+            //var a2 = 获取指定位置颜色(物品.物品锁闭x + 物品.物品间隔x + i1, 物品.物品锁闭y).Result;
+            //var a3 = 获取指定位置颜色(物品.物品锁闭x + 物品.物品间隔x + 物品.物品间隔x + i1, 物品.物品锁闭y).Result;
+            //var a4 = 获取指定位置颜色(物品.物品锁闭x + i1, 物品.物品锁闭y + 物品.物品间隔y).Result;
+            //var a5 = 获取指定位置颜色(物品.物品锁闭x + 物品.物品间隔x + i1, 物品.物品锁闭y + 物品.物品间隔y).Result;
+            //var a6 = 获取指定位置颜色(物品.物品锁闭x + 物品.物品间隔x + 物品.物品间隔x + i1, 物品.物品锁闭y+ 物品.物品间隔y).Result;
+
+            //tb_x.Text = ($"1{a1}\r\n2{a2}\r\n3{a3}\r\n4{a4}\r\n5{a5}\r\n6{a6}\r\n");
+
+            //Tts.TTS.TTS.Speak(PaddleOcr.获取图片文字(@":\Desktop\1.bmp"));
+
+            //Tts.TTS.TTS.Speak(PaddleOcr.获取图片文字(647, 963, 28, 25));
+
+            //for (int i = 0; i < 200; i++)
+            //{
+            //    _ = 获取图片_2();
+            //}
+            //根据图片使用物品(Dota2_Pictrue.物品.臂章_开启);
+            //DOTA2获取所有释放技能前颜色(GlobalScreenCapture.GetCurrentHandle());
         } 
         #endregion
     }

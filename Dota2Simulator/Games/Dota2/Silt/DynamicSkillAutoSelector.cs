@@ -1,9 +1,9 @@
 ﻿#if DOTA2
 #if Silt
 
+using Dota2Simulator.ImageProcessingSystem;
 using Dota2Simulator.KeyboardMouse;
 using Dota2Simulator.PictureProcessing.OCR;
-using ImageProcessingSystem;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Frozen;
@@ -924,6 +924,7 @@ namespace Dota2Simulator.Games.Dota2.Silt
             if (position != null)
             {
                 var p = (Point)position;
+                p.X = p.X + 10;
                 p.Y = p.Y - 50;
                 SimKeyBoard.MouseMove(p);
                 Thread.Sleep(_options.DelayBetweenChecks);
@@ -1421,9 +1422,9 @@ namespace Dota2Simulator.Games.Dota2.Silt
 
             Selector.SetOptions(new TalentSelector.SelectionOptions
             {
-                EnableLogging = true,
-                EnableTTS = true,
-                EnableDetailedLogging = true,
+                EnableLogging = false,
+                EnableTTS = false,
+                EnableDetailedLogging = false,
                 DelayAfterSelection = 150
             });
 
