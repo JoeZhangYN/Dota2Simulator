@@ -2,6 +2,7 @@
 #if DOTA2
 
 using Dota2Simulator.Vision;
+using Dota2Simulator.GameAutomation.Application;
 using Dota2Simulator.KeyboardMouse;
 using System;
 using System.Collections.Generic;
@@ -440,18 +441,18 @@ namespace Dota2Simulator.Games.Dota2
 
         public static bool 重置耗蓝物品委托和条件()
         {
-            Main._条件z = false;
-            Main._条件x = false;
-            Main._条件c = false;
-            Main._条件v = false;
-            Main._条件b = false;
-            Main._条件space = false;
-            Main._条件根据图片委托z = null;
-            Main._条件根据图片委托x = null;
-            Main._条件根据图片委托c = null;
-            Main._条件根据图片委托v = null;
-            Main._条件根据图片委托b = null;
-            Main._条件根据图片委托space = null;
+            Main._条件集[ConditionSlotKey.Z].Active = false;
+            Main._条件集[ConditionSlotKey.X].Active = false;
+            Main._条件集[ConditionSlotKey.C].Active = false;
+            Main._条件集[ConditionSlotKey.V].Active = false;
+            Main._条件集[ConditionSlotKey.B].Active = false;
+            Main._条件集[ConditionSlotKey.Space].Active = false;
+            Main._条件集[ConditionSlotKey.Z].Probe = null;
+            Main._条件集[ConditionSlotKey.X].Probe = null;
+            Main._条件集[ConditionSlotKey.C].Probe = null;
+            Main._条件集[ConditionSlotKey.V].Probe = null;
+            Main._条件集[ConditionSlotKey.B].Probe = null;
+            Main._条件集[ConditionSlotKey.Space].Probe = null;
             return true;
         }
 
@@ -485,12 +486,12 @@ namespace Dota2Simulator.Games.Dota2
 
             Dictionary<Keys, Action> 物品进入CD委托 = new()
             {
-                { Keys.Z, () => Main._条件根据图片委托z ??= 物品z进入CD },
-                { Keys.X, () => Main._条件根据图片委托x ??= 物品x进入CD },
-                { Keys.C, () => Main._条件根据图片委托c ??= 物品c进入CD },
-                { Keys.V, () => Main._条件根据图片委托v ??= 物品v进入CD },
-                { Keys.B, () => Main._条件根据图片委托b ??= 物品b进入CD },
-                { Keys.Space, () => Main._条件根据图片委托space ??= 物品space进入CD }
+                { Keys.Z, () => Main._条件集[ConditionSlotKey.Z].Probe ??= 物品z进入CD },
+                { Keys.X, () => Main._条件集[ConditionSlotKey.X].Probe ??= 物品x进入CD },
+                { Keys.C, () => Main._条件集[ConditionSlotKey.C].Probe ??= 物品c进入CD },
+                { Keys.V, () => Main._条件集[ConditionSlotKey.V].Probe ??= 物品v进入CD },
+                { Keys.B, () => Main._条件集[ConditionSlotKey.B].Probe ??= 物品b进入CD },
+                { Keys.Space, () => Main._条件集[ConditionSlotKey.Space].Probe ??= 物品space进入CD }
             };
 
             foreach (ImageHandle 匹配句柄 in 需切假腿物品句柄)
@@ -525,12 +526,12 @@ namespace Dota2Simulator.Games.Dota2
 
             Dictionary<Keys, (Action 清空委托, Action 重置条件)> 清空物品进入CD委托和条件映射 = new()
             {
-                { Keys.Z, (() => Main._条件根据图片委托z = null, () => Main._条件z = false) },
-                { Keys.X, (() => Main._条件根据图片委托x = null, () => Main._条件x = false) },
-                { Keys.C, (() => Main._条件根据图片委托c = null, () => Main._条件c = false) },
-                { Keys.V, (() => Main._条件根据图片委托v = null, () => Main._条件v = false) },
-                { Keys.B, (() => Main._条件根据图片委托b = null, () => Main._条件b = false) },
-                { Keys.Space, (() => Main._条件根据图片委托space = null, () => Main._条件space = false) }
+                { Keys.Z, (() => Main._条件集[ConditionSlotKey.Z].Probe = null, () => Main._条件集[ConditionSlotKey.Z].Active = false) },
+                { Keys.X, (() => Main._条件集[ConditionSlotKey.X].Probe = null, () => Main._条件集[ConditionSlotKey.X].Active = false) },
+                { Keys.C, (() => Main._条件集[ConditionSlotKey.C].Probe = null, () => Main._条件集[ConditionSlotKey.C].Active = false) },
+                { Keys.V, (() => Main._条件集[ConditionSlotKey.V].Probe = null, () => Main._条件集[ConditionSlotKey.V].Active = false) },
+                { Keys.B, (() => Main._条件集[ConditionSlotKey.B].Probe = null, () => Main._条件集[ConditionSlotKey.B].Active = false) },
+                { Keys.Space, (() => Main._条件集[ConditionSlotKey.Space].Probe = null, () => Main._条件集[ConditionSlotKey.Space].Active = false) }
             };
 
             foreach (ImageHandle 假腿句柄 in 假腿句柄集合)

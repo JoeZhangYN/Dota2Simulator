@@ -3,6 +3,7 @@
 
 using Collections.Pooled;
 using Dota2Simulator.Vision;
+using Dota2Simulator.GameAutomation.Application;
 using Dota2Simulator.GameAutomation.Domain.Loop;
 using Dota2Simulator.KeyboardMouse;
 using System;
@@ -49,12 +50,12 @@ namespace Dota2Simulator.Games.Dota2
 
         public static readonly Dictionary<Keys, Action> 按键匹配条件更新 = new()
         {
-            { Keys.Z, () => _条件z = true },
-            { Keys.X, () => _条件x = true },
-            { Keys.C, () => _条件c = true },
-            { Keys.V, () => _条件v = true },
-            { Keys.B, () => _条件b = true },
-            { Keys.Space, () => _条件space = true }
+            { Keys.Z, () => _条件集[ConditionSlotKey.Z].Active = true },
+            { Keys.X, () => _条件集[ConditionSlotKey.X].Active = true },
+            { Keys.C, () => _条件集[ConditionSlotKey.C].Active = true },
+            { Keys.V, () => _条件集[ConditionSlotKey.V].Active = true },
+            { Keys.B, () => _条件集[ConditionSlotKey.B].Active = true },
+            { Keys.Space, () => _条件集[ConditionSlotKey.Space].Active = true }
         };
 
         #region 循环用到
@@ -93,11 +94,6 @@ namespace Dota2Simulator.Games.Dota2
         private static readonly Dictionary<string, ImageHandle> _缓存图像句柄 = new();
 
         /// <summary>
-        ///     全局命石选择
-        /// </summary>
-        private static int _命石选择;
-
-        /// <summary>
         ///     获取图片委托
         /// </summary>
         /// <returns></returns>
@@ -109,171 +105,13 @@ namespace Dota2Simulator.Games.Dota2
         private static 截图 _循环内获取图片;
 
         /// <summary>
-        /// </summary>
-        /// <param name="bytes"></param>
-        /// <param name="size"></param>
-        /// <returns></returns>
-        public delegate Task<bool> ConditionDelegateBitmap(ImageHandle 句柄);
-
-        /// <summary>
-        ///     条件1委托
-        /// </summary>
-        private static ConditionDelegateBitmap _条件根据图片委托1;
-
-        /// <summary>
-        ///     条件2委托
-        /// </summary>
-        private static ConditionDelegateBitmap _条件根据图片委托2;
-
-        /// <summary>
-        ///     条件3委托
-        /// </summary>
-        private static ConditionDelegateBitmap _条件根据图片委托3;
-
-        /// <summary>
-        ///     条件4委托
-        /// </summary>
-        private static ConditionDelegateBitmap _条件根据图片委托4;
-
-        /// <summary>
-        ///     条件5委托
-        /// </summary>
-        private static ConditionDelegateBitmap _条件根据图片委托5;
-
-        /// <summary>
-        ///     条件6委托
-        /// </summary>
-        private static ConditionDelegateBitmap _条件根据图片委托6;
-
-        /// <summary>
-        ///     条件7委托
-        /// </summary>
-        private static ConditionDelegateBitmap _条件根据图片委托7;
-
-        /// <summary>
-        ///     条件8委托
-        /// </summary>
-        private static ConditionDelegateBitmap _条件根据图片委托8;
-
-        /// <summary>
-        ///     条件9委托
-        /// </summary>
-        public static ConditionDelegateBitmap _条件根据图片委托9;
-
-        /// <summary>
-        ///     命石委托
-        /// </summary>
-        private static ConditionDelegateBitmap _命石根据图片委托;
-
-        /// <summary>
-        ///     条件9委托
-        /// </summary>
-        public static ConditionDelegateBitmap _条件根据图片委托z;
-
-        /// <summary>
-        ///     条件9委托
-        /// </summary>
-        public static ConditionDelegateBitmap _条件根据图片委托x;
-
-        /// <summary>
-        ///     条件9委托
-        /// </summary>
-        public static ConditionDelegateBitmap _条件根据图片委托c;
-
-        /// <summary>
-        ///     条件9委托
-        /// </summary>
-        public static ConditionDelegateBitmap _条件根据图片委托v;
-
-        /// <summary>
-        ///     条件9委托
-        /// </summary>
-        public static ConditionDelegateBitmap _条件根据图片委托b;
-
-        /// <summary>
-        ///     条件9委托
-        /// </summary>
-        public static ConditionDelegateBitmap _条件根据图片委托space;
-
-        /// <summary>
         ///     中断条件布尔
         /// </summary>
         public static bool _中断条件;
 
-        /// <summary>
-        ///     条件布尔
-        /// </summary>
-        private static bool _条件1;
-
-        /// <summary>
-        ///     条件布尔
-        /// </summary>
-        private static bool _条件2;
-
-        /// <summary>
-        ///     条件布尔
-        /// </summary>
-        private static bool _条件3;
-
-        /// <summary>
-        ///     条件布尔
-        /// </summary>
-        private static bool _条件4;
-
-        /// <summary>
-        ///     条件布尔
-        /// </summary>
-        private static bool _条件5;
-
-        /// <summary>
-        ///     条件布尔
-        /// </summary>
-        private static bool _条件6;
-
-        /// <summary>
-        ///     条件布尔
-        /// </summary>
-        private static bool _条件7;
-
-        /// <summary>
-        ///     条件布尔
-        /// </summary>
-        private static bool _条件8;
-
-        /// <summary>
-        ///     条件布尔
-        /// </summary>
-        public static bool _条件9;
-
-        /// <summary>
-        ///     条件布尔
-        /// </summary>
-        public static bool _条件z;
-
-        /// <summary>
-        ///     条件布尔
-        /// </summary>
-        public static bool _条件x;
-
-        /// <summary>
-        ///     条件布尔
-        /// </summary>
-        public static bool _条件c;
-
-        /// <summary>
-        ///     条件布尔
-        /// </summary>
-        public static bool _条件v;
-
-        /// <summary>
-        ///     条件布尔
-        /// </summary>
-        public static bool _条件b;
-
-        /// <summary>
-        ///     条件布尔
-        /// </summary>
-        public static bool _条件space;
+        /// <summary>15 个条件槽 + 命石委托的容器（收编原 _条件N / _条件根据图片委托N
+        /// / 条件配置项 / 处理条件更新 等）。public 因 Item.cs 跨类访问。</summary>
+        public static readonly ConditionSlotSet _条件集 = new();
 
         /// <summary>
         ///     攻击前摇
@@ -356,9 +194,9 @@ namespace Dota2Simulator.Games.Dota2
                     {
                         if (!_总循环条件)
                         {
-                            _条件根据图片委托1 ??= 回音践踏去后摇;
-                            _条件根据图片委托2 ??= 灵体游魂去后摇;
-                            _条件根据图片委托3 ??= 裂地沟壑去后摇;
+                            _条件集[ConditionSlotKey.C1].Probe ??= 回音践踏去后摇;
+                            _条件集[ConditionSlotKey.C2].Probe ??= 灵体游魂去后摇;
+                            _条件集[ConditionSlotKey.C3].Probe ??= 裂地沟壑去后摇;
                             _总循环条件 = true;
                             await 状态初始化().ConfigureAwait(false);
                             Item._切假腿配置.修改配置(Keys.E, false);
@@ -369,15 +207,15 @@ namespace Dota2Simulator.Games.Dota2
                         switch (e.KeyCode)
                         {
                             case Keys.Q:
-                                _条件1 = true;
+                                _条件集[ConditionSlotKey.C1].Active = true;
                                 break;
                             case Keys.W:
                                 // 用于回收时按W
                                 SimKeyBoard.KeyPress(Keys.A);
-                                _条件2 = true;
+                                _条件集[ConditionSlotKey.C2].Active = true;
                                 break;
                             case Keys.R:
-                                _条件3 = true;
+                                _条件集[ConditionSlotKey.C3].Active = true;
                                 break;
                         }
 
@@ -392,9 +230,9 @@ namespace Dota2Simulator.Games.Dota2
                     {
                         if (!_总循环条件)
                         {
-                            //_条件根据图片委托1 ??= 回音践踏去后摇;
-                            //_条件根据图片委托2 ??= 灵体游魂去后摇;
-                            //_条件根据图片委托3 ??= 裂地沟壑去后摇;
+                            //_条件集[ConditionSlotKey.C1].Probe ??= 回音践踏去后摇;
+                            //_条件集[ConditionSlotKey.C2].Probe ??= 灵体游魂去后摇;
+                            //_条件集[ConditionSlotKey.C3].Probe ??= 裂地沟壑去后摇;
                             _总循环条件 = true;
                             await 状态初始化().ConfigureAwait(false);
                             //Item._切假腿配置.修改配置(Keys.E, false);
@@ -405,15 +243,15 @@ namespace Dota2Simulator.Games.Dota2
                         switch (e.KeyCode)
                         {
                             case Keys.Q:
-                                _条件1 = true;
+                                _条件集[ConditionSlotKey.C1].Active = true;
                                 break;
                             case Keys.W:
                                 // 用于回收时按W
                                 SimKeyBoard.KeyPress(Keys.A);
-                                _条件2 = true;
+                                _条件集[ConditionSlotKey.C2].Active = true;
                                 break;
                             case Keys.R:
-                                _条件3 = true;
+                                _条件集[ConditionSlotKey.C3].Active = true;
                                 break;
                         }
 
@@ -428,10 +266,10 @@ namespace Dota2Simulator.Games.Dota2
                     {
                         if (!_总循环条件)
                         {
-                            _条件根据图片委托1 ??= 腐朽去后摇;
-                            _条件根据图片委托2 ??= 噬魂去后摇;
-                            _条件根据图片委托3 ??= 墓碑去后摇;
-                            _条件根据图片委托4 ??= 血肉傀儡去后摇;
+                            _条件集[ConditionSlotKey.C1].Probe ??= 腐朽去后摇;
+                            _条件集[ConditionSlotKey.C2].Probe ??= 噬魂去后摇;
+                            _条件集[ConditionSlotKey.C3].Probe ??= 墓碑去后摇;
+                            _条件集[ConditionSlotKey.C4].Probe ??= 血肉傀儡去后摇;
                             _总循环条件 = true;
                             await 状态初始化().ConfigureAwait(false);
                         }
@@ -441,16 +279,16 @@ namespace Dota2Simulator.Games.Dota2
                         switch (e.KeyCode)
                         {
                             case Keys.Q:
-                                _条件1 = true;
+                                _条件集[ConditionSlotKey.C1].Active = true;
                                 break;
                             case Keys.W:
-                                _条件2 = true;
+                                _条件集[ConditionSlotKey.C2].Active = true;
                                 break;
                             case Keys.E:
-                                _条件3 = true;
+                                _条件集[ConditionSlotKey.C3].Active = true;
                                 break;
                             case Keys.R:
-                                _条件4 = true;
+                                _条件集[ConditionSlotKey.C4].Active = true;
                                 break;
                         }
 
@@ -465,12 +303,12 @@ namespace Dota2Simulator.Games.Dota2
                     {
                         if (!_总循环条件)
                         {
-                            _命石根据图片委托 ??= 伐木机获取命石;
-                            _条件根据图片委托1 ??= 死亡旋风去后摇;
-                            _条件根据图片委托2 ??= 伐木聚链去后摇;
-                            _条件根据图片委托3 ??= 锯齿轮旋去后摇;
-                            _条件根据图片委托4 ??= 喷火装置去后摇;
-                            _条件根据图片委托5 ??= 锯齿飞轮去后摇;
+                            _条件集.StoneProbe ??= 伐木机获取命石;
+                            _条件集[ConditionSlotKey.C1].Probe ??= 死亡旋风去后摇;
+                            _条件集[ConditionSlotKey.C2].Probe ??= 伐木聚链去后摇;
+                            _条件集[ConditionSlotKey.C3].Probe ??= 锯齿轮旋去后摇;
+                            _条件集[ConditionSlotKey.C4].Probe ??= 喷火装置去后摇;
+                            _条件集[ConditionSlotKey.C5].Probe ??= 锯齿飞轮去后摇;
                             _总循环条件 = true;
                             await 状态初始化().ConfigureAwait(false);
                         }
@@ -480,23 +318,23 @@ namespace Dota2Simulator.Games.Dota2
                         switch (e.KeyCode)
                         {
                             case Keys.Q:
-                                _条件1 = true;
+                                _条件集[ConditionSlotKey.C1].Active = true;
                                 break;
                             case Keys.W:
-                                _条件2 = true;
+                                _条件集[ConditionSlotKey.C2].Active = true;
                                 break;
                             case Keys.D:
-                                if (_命石选择 == 2)
+                                if (_条件集.StoneChoice == 2)
                                 {
-                                    _条件3 = true;
+                                    _条件集[ConditionSlotKey.C3].Active = true;
                                 }
 
                                 break;
                             case Keys.F:
-                                _条件4 = true;
+                                _条件集[ConditionSlotKey.C4].Active = true;
                                 break;
                             case Keys.R:
-                                _条件5 = true;
+                                _条件集[ConditionSlotKey.C5].Active = true;
                                 break;
                         }
 
@@ -511,9 +349,9 @@ namespace Dota2Simulator.Games.Dota2
                     {
                         if (!_总循环条件)
                         {
-                            _条件根据图片委托1 ??= 洗礼去后摇;
-                            _条件根据图片委托2 ??= 驱逐去后摇;
-                            _条件根据图片委托3 ??= 守护天使去后摇;
+                            _条件集[ConditionSlotKey.C1].Probe ??= 洗礼去后摇;
+                            _条件集[ConditionSlotKey.C2].Probe ??= 驱逐去后摇;
+                            _条件集[ConditionSlotKey.C3].Probe ??= 守护天使去后摇;
                             _总循环条件 = true;
                             Item._切假腿配置.修改配置(Keys.E, false);
                             await 状态初始化().ConfigureAwait(false);
@@ -524,13 +362,13 @@ namespace Dota2Simulator.Games.Dota2
                         switch (e.KeyCode)
                         {
                             case Keys.Q:
-                                _条件1 = true;
+                                _条件集[ConditionSlotKey.C1].Active = true;
                                 break;
                             case Keys.W:
-                                _条件2 = true;
+                                _条件集[ConditionSlotKey.C2].Active = true;
                                 break;
                             case Keys.R:
-                                _条件3 = true;
+                                _条件集[ConditionSlotKey.C3].Active = true;
                                 break;
                         }
 
@@ -545,10 +383,10 @@ namespace Dota2Simulator.Games.Dota2
                     {
                         if (!_总循环条件)
                         {
-                            _条件根据图片委托1 ??= 压倒性优势去后摇;
-                            _条件根据图片委托2 ??= 强攻去后摇;
-                            _条件根据图片委托3 ??= 决斗;
-                            _条件根据图片委托4 ??= 决斗去后摇;
+                            _条件集[ConditionSlotKey.C1].Probe ??= 压倒性优势去后摇;
+                            _条件集[ConditionSlotKey.C2].Probe ??= 强攻去后摇;
+                            _条件集[ConditionSlotKey.C3].Probe ??= 决斗;
+                            _条件集[ConditionSlotKey.C4].Probe ??= 决斗去后摇;
                             _总循环条件 = true;
                             _槽.SetStep(SlotKey.Global, -1);
                             Item._切假腿配置.修改配置(Keys.E, false);
@@ -560,19 +398,19 @@ namespace Dota2Simulator.Games.Dota2
                         switch (e.KeyCode)
                         {
                             case Keys.Q:
-                                _条件1 = true;
+                                _条件集[ConditionSlotKey.C1].Active = true;
                                 break;
                             case Keys.W:
-                                _条件2 = true;
+                                _条件集[ConditionSlotKey.C2].Active = true;
                                 break;
                             case Keys.R:
-                                _条件4 = true;
+                                _条件集[ConditionSlotKey.C4].Active = true;
                                 break;
                             case Keys.F:
                                 if (_槽.Step(SlotKey.Global) == -1)
                                 {
                                     _槽.SetStep(SlotKey.Global, 0);
-                                    _条件3 = true;
+                                    _条件集[ConditionSlotKey.C3].Active = true;
                                 }
 
                                 break;
@@ -593,9 +431,9 @@ namespace Dota2Simulator.Games.Dota2
                     {
                         if (!_总循环条件)
                         {
-                            _命石根据图片委托 ??= 骷髅王获取命石;
-                            _条件根据图片委托1 ??= 冥火爆击去后摇;
-                            _条件根据图片委托2 ??= 白骨守卫去后摇;
+                            _条件集.StoneProbe ??= 骷髅王获取命石;
+                            _条件集[ConditionSlotKey.C1].Probe ??= 冥火爆击去后摇;
+                            _条件集[ConditionSlotKey.C2].Probe ??= 白骨守卫去后摇;
                             _总循环条件 = true;
                             Item._切假腿配置.修改配置(Keys.W, false);
                             Item._切假腿配置.修改配置(Keys.E, false);
@@ -607,13 +445,13 @@ namespace Dota2Simulator.Games.Dota2
                         switch (e.KeyCode)
                         {
                             case Keys.Q:
-                                _条件1 = true;
+                                _条件集[ConditionSlotKey.C1].Active = true;
                                 break;
                             case Keys.W:
-                                if (_命石选择 == 1)
+                                if (_条件集.StoneChoice == 1)
                                 {
                                     Item._切假腿配置.修改配置(Keys.W, true);
-                                    _条件2 = true;
+                                    _条件集[ConditionSlotKey.C2].Active = true;
                                 }
 
                                 break;
@@ -630,8 +468,8 @@ namespace Dota2Simulator.Games.Dota2
                     {
                         if (!_总循环条件)
                         {
-                            _条件根据图片委托1 ??= 马蹄践踏接平A;
-                            _条件根据图片委托2 ??= 双刃剑去后摇;
+                            _条件集[ConditionSlotKey.C1].Probe ??= 马蹄践踏接平A;
+                            _条件集[ConditionSlotKey.C2].Probe ??= 双刃剑去后摇;
                             _总循环条件 = true;
                             Item._切假腿配置.修改配置(Keys.E, false);
                             await 状态初始化().ConfigureAwait(false);
@@ -642,10 +480,10 @@ namespace Dota2Simulator.Games.Dota2
                         switch (e.KeyCode)
                         {
                             case Keys.Q:
-                                _条件1 = true;
+                                _条件集[ConditionSlotKey.C1].Active = true;
                                 break;
                             case Keys.W:
-                                _条件2 = true;
+                                _条件集[ConditionSlotKey.C2].Active = true;
                                 break;
                         }
 
@@ -659,8 +497,8 @@ namespace Dota2Simulator.Games.Dota2
                 case "哈斯卡":
                     if (!_总循环条件)
                     {
-                        _条件根据图片委托1 ??= 心炎去后摇;
-                        _条件根据图片委托2 ??= 牺牲去后摇;
+                        _条件集[ConditionSlotKey.C1].Probe ??= 心炎去后摇;
+                        _条件集[ConditionSlotKey.C2].Probe ??= 牺牲去后摇;
                         _总循环条件 = true;
                         Item._切假腿配置.修改配置(Keys.E, false);
                         await 状态初始化().ConfigureAwait(false);
@@ -671,10 +509,10 @@ namespace Dota2Simulator.Games.Dota2
                     switch (e.KeyCode)
                     {
                         case Keys.Q:
-                            _条件1 = true;
+                            _条件集[ConditionSlotKey.C1].Active = true;
                             break;
                         case Keys.R:
-                            _条件2 = true;
+                            _条件集[ConditionSlotKey.C2].Active = true;
                             break;
                     }
 
@@ -688,8 +526,8 @@ namespace Dota2Simulator.Games.Dota2
                     {
                         if (!_总循环条件)
                         {
-                            _条件根据图片委托1 ??= 狂暴去后摇;
-                            _条件根据图片委托2 ??= 撕裂伤口去后摇;
+                            _条件集[ConditionSlotKey.C1].Probe ??= 狂暴去后摇;
+                            _条件集[ConditionSlotKey.C2].Probe ??= 撕裂伤口去后摇;
                             _总循环条件 = true;
                             Item._切假腿配置.修改配置(Keys.E, false);
                             await 状态初始化().ConfigureAwait(false);
@@ -700,10 +538,10 @@ namespace Dota2Simulator.Games.Dota2
                         switch (e.KeyCode)
                         {
                             case Keys.Q:
-                                _条件1 = true;
+                                _条件集[ConditionSlotKey.C1].Active = true;
                                 break;
                             case Keys.W:
-                                _条件2 = true;
+                                _条件集[ConditionSlotKey.C2].Active = true;
                                 break;
                         }
 
@@ -718,9 +556,9 @@ namespace Dota2Simulator.Games.Dota2
                     {
                         if (!_总循环条件)
                         {
-                            _条件根据图片委托1 ??= 巨石冲击去后摇;
-                            _条件根据图片委托2 ??= 地磁之握去后摇;
-                            _条件根据图片委托3 ??= 磁化去后摇;
+                            _条件集[ConditionSlotKey.C1].Probe ??= 巨石冲击去后摇;
+                            _条件集[ConditionSlotKey.C2].Probe ??= 地磁之握去后摇;
+                            _条件集[ConditionSlotKey.C3].Probe ??= 磁化去后摇;
                             _总循环条件 = true;
                             await 状态初始化().ConfigureAwait(false);
                         }
@@ -730,13 +568,13 @@ namespace Dota2Simulator.Games.Dota2
                         switch (e.KeyCode)
                         {
                             case Keys.Q:
-                                _条件1 = true;
+                                _条件集[ConditionSlotKey.C1].Active = true;
                                 break;
                             case Keys.E:
-                                _条件2 = true;
+                                _条件集[ConditionSlotKey.C2].Active = true;
                                 break;
                             case Keys.R:
-                                _条件3 = true;
+                                _条件集[ConditionSlotKey.C3].Active = true;
                                 break;
                         }
 
@@ -751,8 +589,8 @@ namespace Dota2Simulator.Games.Dota2
                     {
                         if (!_总循环条件)
                         {
-                            _条件根据图片委托1 ??= 火焰风暴去后摇;
-                            _条件根据图片委托2 ??= 怨念深渊去后摇;
+                            _条件集[ConditionSlotKey.C1].Probe ??= 火焰风暴去后摇;
+                            _条件集[ConditionSlotKey.C2].Probe ??= 怨念深渊去后摇;
                             _总循环条件 = true;
                             await 状态初始化().ConfigureAwait(false);
                         }
@@ -762,10 +600,10 @@ namespace Dota2Simulator.Games.Dota2
                         switch (e.KeyCode)
                         {
                             case Keys.Q:
-                                _条件1 = true;
+                                _条件集[ConditionSlotKey.C1].Active = true;
                                 break;
                             case Keys.W:
-                                _条件2 = true;
+                                _条件集[ConditionSlotKey.C2].Active = true;
                                 break;
                         }
 
@@ -781,8 +619,8 @@ namespace Dota2Simulator.Games.Dota2
                         if (!_总循环条件)
                         {
                             _总循环条件 = true;
-                            _条件根据图片委托1 ??= 山崩去后摇;
-                            _条件根据图片委托2 ??= 投掷去后摇;
+                            _条件集[ConditionSlotKey.C1].Probe ??= 山崩去后摇;
+                            _条件集[ConditionSlotKey.C2].Probe ??= 投掷去后摇;
                             Item._切假腿配置.修改配置(Keys.E, false);
                             Item._切假腿配置.修改配置(Keys.R, false);
                             await 状态初始化().ConfigureAwait(false);
@@ -793,10 +631,10 @@ namespace Dota2Simulator.Games.Dota2
                         switch (e.KeyCode)
                         {
                             case Keys.Q:
-                                _条件1 = true;
+                                _条件集[ConditionSlotKey.C1].Active = true;
                                 break;
                             case Keys.W:
-                                _条件2 = true;
+                                _条件集[ConditionSlotKey.C2].Active = true;
                                 break;
                         }
 
@@ -811,11 +649,11 @@ namespace Dota2Simulator.Games.Dota2
                     {
                         if (!_总循环条件)
                         {
-                            _命石根据图片委托 ??= 海民获取命石;
-                            _条件根据图片委托1 ??= 冰片去后摇;
-                            _条件根据图片委托2 ??= 摔角行家去后摇;
-                            _条件根据图片委托3 ??= 海象神拳接雪球;
-                            _条件根据图片委托4 ??= 酒友去后摇;
+                            _条件集.StoneProbe ??= 海民获取命石;
+                            _条件集[ConditionSlotKey.C1].Probe ??= 冰片去后摇;
+                            _条件集[ConditionSlotKey.C2].Probe ??= 摔角行家去后摇;
+                            _条件集[ConditionSlotKey.C3].Probe ??= 海象神拳接雪球;
+                            _条件集[ConditionSlotKey.C4].Probe ??= 酒友去后摇;
                             _总循环条件 = true;
                             await 状态初始化().ConfigureAwait(false);
                         }
@@ -825,27 +663,27 @@ namespace Dota2Simulator.Games.Dota2
                         switch (e.KeyCode)
                         {
                             case Keys.Q:
-                                _条件1 = true;
+                                _条件集[ConditionSlotKey.C1].Active = true;
                                 break;
                             case Keys.E:
-                                switch (_命石选择)
+                                switch (_条件集.StoneChoice)
                                 {
                                     case 1:
-                                        _条件2 = true;
+                                        _条件集[ConditionSlotKey.C2].Active = true;
                                         break;
                                     case 2:
-                                        _条件4 = true;
+                                        _条件集[ConditionSlotKey.C4].Active = true;
                                         break;
                                 }
 
                                 break;
                             case Keys.F:
-                                if (_命石选择 == 1)
+                                if (_条件集.StoneChoice == 1)
                                 {
                                     Skill.DOTA2释放CD就绪技能(Keys.E, GlobalScreenCapture.GetCurrentHandle());
                                 }
 
-                                _条件3 = true;
+                                _条件集[ConditionSlotKey.C3].Active = true;
                                 break;
                             case Keys.D2:
                                 _槽.SetTarget(SlotKey.D, Control.MousePosition);
@@ -865,9 +703,9 @@ namespace Dota2Simulator.Games.Dota2
                         if (!_总循环条件)
                         {
                             _总循环条件 = true;
-                            _条件根据图片委托1 ??= 钩子去僵直;
-                            _条件根据图片委托2 ??= 肢解检测状态;
-                            _条件根据图片委托3 ??= 快速接肢解;
+                            _条件集[ConditionSlotKey.C1].Probe ??= 钩子去僵直;
+                            _条件集[ConditionSlotKey.C2].Probe ??= 肢解检测状态;
+                            _条件集[ConditionSlotKey.C3].Probe ??= 快速接肢解;
                             await 状态初始化().ConfigureAwait(false);
                         }
 
@@ -876,10 +714,10 @@ namespace Dota2Simulator.Games.Dota2
                         switch (e.KeyCode)
                         {
                             case Keys.Q:
-                                _条件1 = true;
+                                _条件集[ConditionSlotKey.C1].Active = true;
                                 break;
                             case Keys.R:
-                                _条件2 = true;
+                                _条件集[ConditionSlotKey.C2].Active = true;
                                 break;
                             case Keys.D2:
                                 _槽.ToggleMode(SlotKey.Q);
@@ -898,10 +736,10 @@ namespace Dota2Simulator.Games.Dota2
                     {
                         if (!_总循环条件)
                         {
-                            _条件根据图片委托1 ??= 吼去后摇;
-                            _条件根据图片委托2 ??= 战斗饥渴去后摇;
-                            _条件根据图片委托2 ??= 淘汰之刃去后摇;
-                            _条件根据图片委托4 ??= 跳吼;
+                            _条件集[ConditionSlotKey.C1].Probe ??= 吼去后摇;
+                            _条件集[ConditionSlotKey.C2].Probe ??= 战斗饥渴去后摇;
+                            _条件集[ConditionSlotKey.C2].Probe ??= 淘汰之刃去后摇;
+                            _条件集[ConditionSlotKey.C4].Probe ??= 跳吼;
                             _总循环条件 = true;
                             Item._切假腿配置.修改配置(Keys.E, false);
                             await 状态初始化().ConfigureAwait(false);
@@ -913,18 +751,18 @@ namespace Dota2Simulator.Games.Dota2
                         {
                             case Keys.Q:
                                 Item.根据图片使用物品(Dota2_Pictrue.物品.魂戒);
-                                _条件1 = true;
+                                _条件集[ConditionSlotKey.C1].Active = true;
                                 break;
                             case Keys.W:
                                 Item.根据图片使用物品(Dota2_Pictrue.物品.魂戒);
-                                _条件2 = true;
+                                _条件集[ConditionSlotKey.C2].Active = true;
                                 break;
                             case Keys.E:
-                                _条件4 = true;
+                                _条件集[ConditionSlotKey.C4].Active = true;
                                 break;
                             case Keys.R:
                                 Item.根据图片使用物品(Dota2_Pictrue.物品.魂戒);
-                                _条件3 = true;
+                                _条件集[ConditionSlotKey.C3].Active = true;
                                 break;
                             case Keys.D4:
                                 _槽.ToggleMode(SlotKey.Q);
@@ -947,10 +785,10 @@ namespace Dota2Simulator.Games.Dota2
                         if (!_总循环条件)
                         {
                             _总循环条件 = true;
-                            _条件根据图片委托1 ??= 踩去后摇;
-                            _条件根据图片委托2 ??= 踩去后摇;
-                            _条件根据图片委托3 ??= 雾霭去后摇;
-                            _条件根据图片委托4 ??= 跳刀接踩;
+                            _条件集[ConditionSlotKey.C1].Probe ??= 踩去后摇;
+                            _条件集[ConditionSlotKey.C2].Probe ??= 踩去后摇;
+                            _条件集[ConditionSlotKey.C3].Probe ??= 雾霭去后摇;
+                            _条件集[ConditionSlotKey.C4].Probe ??= 跳刀接踩;
                             // Item._切假腿配置.修改配置(Keys.E, false);
                             await 状态初始化().ConfigureAwait(false);
                         }
@@ -960,16 +798,16 @@ namespace Dota2Simulator.Games.Dota2
                         switch (e.KeyCode)
                         {
                             case Keys.Q:
-                                _条件1 = true;
+                                _条件集[ConditionSlotKey.C1].Active = true;
                                 break;
                             case Keys.W:
-                                _条件2 = true;
+                                _条件集[ConditionSlotKey.C2].Active = true;
                                 break;
                             case Keys.R:
-                                _条件3 = true;
+                                _条件集[ConditionSlotKey.C3].Active = true;
                                 break;
                             case Keys.E:
-                                _条件4 = true;
+                                _条件集[ConditionSlotKey.C4].Active = true;
                                 break;
                         }
 
@@ -985,9 +823,9 @@ namespace Dota2Simulator.Games.Dota2
                         if (!_总循环条件)
                         {
                             _总循环条件 = true;
-                            _条件根据图片委托1 ??= 风暴之拳去后摇;
-                            _条件根据图片委托2 ??= 战吼去后摇;
-                            _条件根据图片委托3 ??= 神之力量去后摇;
+                            _条件集[ConditionSlotKey.C1].Probe ??= 风暴之拳去后摇;
+                            _条件集[ConditionSlotKey.C2].Probe ??= 战吼去后摇;
+                            _条件集[ConditionSlotKey.C3].Probe ??= 神之力量去后摇;
                             await 状态初始化().ConfigureAwait(false);
                             Item._切假腿配置.修改配置(Keys.W, false);
                         }
@@ -997,13 +835,13 @@ namespace Dota2Simulator.Games.Dota2
                         switch (e.KeyCode)
                         {
                             case Keys.Q:
-                                _条件1 = true;
+                                _条件集[ConditionSlotKey.C1].Active = true;
                                 break;
                             case Keys.E:
-                                _条件2 = true;
+                                _条件集[ConditionSlotKey.C2].Active = true;
                                 break;
                             case Keys.R:
-                                _条件3 = true;
+                                _条件集[ConditionSlotKey.C3].Active = true;
                                 break;
                         }
 
@@ -1018,10 +856,10 @@ namespace Dota2Simulator.Games.Dota2
                     {
                         if (!_总循环条件)
                         {
-                            _条件根据图片委托1 ??= 洪流接x回;
-                            _条件根据图片委托2 ??= x释放后相关逻辑;
-                            _条件根据图片委托3 ??= x2次释放后;
-                            _条件根据图片委托4 ??= 立即释放洪流;
+                            _条件集[ConditionSlotKey.C1].Probe ??= 洪流接x回;
+                            _条件集[ConditionSlotKey.C2].Probe ??= x释放后相关逻辑;
+                            _条件集[ConditionSlotKey.C3].Probe ??= x2次释放后;
+                            _条件集[ConditionSlotKey.C4].Probe ??= 立即释放洪流;
                             _总循环条件 = true;
                             await 状态初始化().ConfigureAwait(false);
                         }
@@ -1031,14 +869,14 @@ namespace Dota2Simulator.Games.Dota2
                         switch (e.KeyCode)
                         {
                             case Keys.Q:
-                                _条件1 = true;
+                                _条件集[ConditionSlotKey.C1].Active = true;
                                 break;
                             case Keys.E:
                                 if (_槽.Step(SlotKey.E) == 1)
                                 {
                                     return;
                                 }
-                                _条件2 = true;
+                                _条件集[ConditionSlotKey.C2].Active = true;
                                 break;
                             case Keys.D2:
                                 _槽.SetStep(SlotKey.R, 1);
@@ -1058,10 +896,10 @@ namespace Dota2Simulator.Games.Dota2
                         if (!_总循环条件)
                         {
                             _总循环条件 = true;
-                            _条件根据图片委托1 ??= 虚空去后摇;
-                            _条件根据图片委托2 ??= 伤残恐惧去后摇;
-                            _条件根据图片委托3 ??= 黑暗飞升去后摇;
-                            _条件根据图片委托4 ??= 暗夜猎影去后摇;
+                            _条件集[ConditionSlotKey.C1].Probe ??= 虚空去后摇;
+                            _条件集[ConditionSlotKey.C2].Probe ??= 伤残恐惧去后摇;
+                            _条件集[ConditionSlotKey.C3].Probe ??= 黑暗飞升去后摇;
+                            _条件集[ConditionSlotKey.C4].Probe ??= 暗夜猎影去后摇;
                             Item._切假腿配置.修改配置(Keys.E, false);
                             await 状态初始化().ConfigureAwait(false);
                         }
@@ -1078,20 +916,20 @@ namespace Dota2Simulator.Games.Dota2
 
                                 break;
                             case Keys.Q:
-                                _条件1 = true;
+                                _条件集[ConditionSlotKey.C1].Active = true;
                                 break;
                             case Keys.W:
-                                _条件2 = true;
+                                _条件集[ConditionSlotKey.C2].Active = true;
                                 break;
                             case Keys.E:
                                 if (Item._是否魔晶)
                                 {
-                                    _条件4 = true;
+                                    _条件集[ConditionSlotKey.C4].Active = true;
                                 }
 
                                 break;
                             case Keys.R:
-                                _条件3 = true;
+                                _条件集[ConditionSlotKey.C3].Active = true;
                                 break;
                         }
 
@@ -1107,11 +945,11 @@ namespace Dota2Simulator.Games.Dota2
                         if (!_总循环条件)
                         {
                             _总循环条件 = true;
-                            _条件根据图片委托1 ??= 自然卷握去后摇;
-                            _条件根据图片委托2 ??= 寄生种子去后摇;
-                            _条件根据图片委托3 ??= 活体护甲去后摇;
-                            _条件根据图片委托4 ??= 丛林之眼去后摇;
-                            _条件根据图片委托5 ??= 疯狂生长去后摇;
+                            _条件集[ConditionSlotKey.C1].Probe ??= 自然卷握去后摇;
+                            _条件集[ConditionSlotKey.C2].Probe ??= 寄生种子去后摇;
+                            _条件集[ConditionSlotKey.C3].Probe ??= 活体护甲去后摇;
+                            _条件集[ConditionSlotKey.C4].Probe ??= 丛林之眼去后摇;
+                            _条件集[ConditionSlotKey.C5].Probe ??= 疯狂生长去后摇;
                             await 状态初始化().ConfigureAwait(false);
                         }
 
@@ -1120,24 +958,24 @@ namespace Dota2Simulator.Games.Dota2
                         switch (e.KeyCode)
                         {
                             case Keys.Q:
-                                _条件1 = true;
+                                _条件集[ConditionSlotKey.C1].Active = true;
                                 break;
                             case Keys.W:
-                                _条件2 = true;
+                                _条件集[ConditionSlotKey.C2].Active = true;
                                 break;
                             case Keys.E:
-                                _条件3 = true;
+                                _条件集[ConditionSlotKey.C3].Active = true;
                                 break;
                             case Keys.D:
                                 if (Item._是否神杖)
                                 {
                                     Item._切假腿配置.修改配置(Keys.D, true);
-                                    _条件4 = true;
+                                    _条件集[ConditionSlotKey.C4].Active = true;
                                 }
 
                                 break;
                             case Keys.R:
-                                _条件5 = true;
+                                _条件集[ConditionSlotKey.C5].Active = true;
                                 break;
                         }
 
@@ -1153,9 +991,9 @@ namespace Dota2Simulator.Games.Dota2
                         if (!_总循环条件)
                         {
                             _总循环条件 = true;
-                            _条件根据图片委托1 ??= 混乱之箭去后摇;
-                            _条件根据图片委托2 ??= 实相裂隙去后摇;
-                            _条件根据图片委托3 ??= 混沌之军去后摇;
+                            _条件集[ConditionSlotKey.C1].Probe ??= 混乱之箭去后摇;
+                            _条件集[ConditionSlotKey.C2].Probe ??= 实相裂隙去后摇;
+                            _条件集[ConditionSlotKey.C3].Probe ??= 混沌之军去后摇;
                             Item._切假腿配置.修改配置(Keys.E, false);
                             await 状态初始化().ConfigureAwait(false);
                         }
@@ -1167,13 +1005,13 @@ namespace Dota2Simulator.Games.Dota2
                             case Keys.Q:
                                 Item.根据图片使用物品(Dota2_Pictrue.物品.紫苑);
                                 Item.根据图片使用物品(Dota2_Pictrue.物品.血棘);
-                                _条件1 = true;
+                                _条件集[ConditionSlotKey.C1].Active = true;
                                 break;
                             case Keys.W:
-                                _条件2 = true;
+                                _条件集[ConditionSlotKey.C2].Active = true;
                                 break;
                             case Keys.R:
-                                _条件3 = true;
+                                _条件集[ConditionSlotKey.C3].Active = true;
                                 break;
                             case Keys.D2:
                                 _槽.ToggleMode(SlotKey.Q);
@@ -1196,9 +1034,9 @@ namespace Dota2Simulator.Games.Dota2
                         if (!_总循环条件)
                         {
                             _总循环条件 = true;
-                            _条件根据图片委托1 ??= 战神迅矛去后摇;
-                            _条件根据图片委托2 ??= 神之谴击去后摇;
-                            _条件根据图片委托3 ??= 热血竞技场去后摇;
+                            _条件集[ConditionSlotKey.C1].Probe ??= 战神迅矛去后摇;
+                            _条件集[ConditionSlotKey.C2].Probe ??= 神之谴击去后摇;
+                            _条件集[ConditionSlotKey.C3].Probe ??= 热血竞技场去后摇;
                             await 状态初始化().ConfigureAwait(false);
                         }
 
@@ -1207,13 +1045,13 @@ namespace Dota2Simulator.Games.Dota2
                         switch (e.KeyCode)
                         {
                             case Keys.Q:
-                                _条件1 = true;
+                                _条件集[ConditionSlotKey.C1].Active = true;
                                 break;
                             case Keys.W:
-                                _条件2 = true;
+                                _条件集[ConditionSlotKey.C2].Active = true;
                                 break;
                             case Keys.R:
-                                _条件3 = true;
+                                _条件集[ConditionSlotKey.C3].Active = true;
                                 break;
                             case Keys.D2:
                                 _槽.ToggleMode(SlotKey.Q);
@@ -1233,7 +1071,7 @@ namespace Dota2Simulator.Games.Dota2
                         if (!_总循环条件)
                         {
                             _总循环条件 = true;
-                            _条件根据图片委托2 ??= 上界重锤去后摇;
+                            _条件集[ConditionSlotKey.C2].Probe ??= 上界重锤去后摇;
                             await 状态初始化().ConfigureAwait(false);
                         }
 
@@ -1242,7 +1080,7 @@ namespace Dota2Simulator.Games.Dota2
                         switch (e.KeyCode)
                         {
                             case Keys.W:
-                                _条件2 = true;
+                                _条件集[ConditionSlotKey.C2].Active = true;
                                 break;
                         }
 
@@ -1258,11 +1096,11 @@ namespace Dota2Simulator.Games.Dota2
                         if (!_总循环条件)
                         {
                             _总循环条件 = true;
-                            //_条件根据图片委托1 ??= 鼻涕去后摇;
-                            //// _条件根据图片委托2 ??= 针刺循环; 已优化不需要
-                            //_条件根据图片委托3 ??= 毛团去后摇;
-                            //_条件根据图片委托4 ??= 钢毛后背去后摇;
-                            //_条件根据图片委托5 ??= 扫射切回假腿;
+                            //_条件集[ConditionSlotKey.C1].Probe ??= 鼻涕去后摇;
+                            //// _条件集[ConditionSlotKey.C2].Probe ??= 针刺循环; 已优化不需要
+                            //_条件集[ConditionSlotKey.C3].Probe ??= 毛团去后摇;
+                            //_条件集[ConditionSlotKey.C4].Probe ??= 钢毛后背去后摇;
+                            //_条件集[ConditionSlotKey.C5].Probe ??= 扫射切回假腿;
                             Item._切假腿配置.修改配置(Keys.E, false);
                             await 状态初始化().ConfigureAwait(false);
                         }
@@ -1284,24 +1122,24 @@ namespace Dota2Simulator.Games.Dota2
 
                                 break;
                             case Keys.Q:
-                                _条件1 = true;
+                                _条件集[ConditionSlotKey.C1].Active = true;
                                 break;
                             case Keys.D:
                                 if (Item._是否魔晶)
                                 {
-                                    _条件3 = true;
+                                    _条件集[ConditionSlotKey.C3].Active = true;
                                 }
 
                                 break;
                             case Keys.E:
                                 if (Item._是否神杖)
                                 {
-                                    _条件4 = true;
+                                    _条件集[ConditionSlotKey.C4].Active = true;
                                 }
 
                                 break;
                             case Keys.W:
-                                _条件5 = true;
+                                _条件集[ConditionSlotKey.C5].Active = true;
                                 break;
                         }
 
@@ -1317,10 +1155,10 @@ namespace Dota2Simulator.Games.Dota2
                         if (!_总循环条件)
                         {
                             _总循环条件 = true;
-                            _条件根据图片委托1 ??= 喷火去后摇;
-                            _条件根据图片委托2 ??= 神龙摆尾去后摇;
-                            _条件根据图片委托3 ??= 变龙去后摇;
-                            _条件根据图片委托4 ??= 火球去后摇;
+                            _条件集[ConditionSlotKey.C1].Probe ??= 喷火去后摇;
+                            _条件集[ConditionSlotKey.C2].Probe ??= 神龙摆尾去后摇;
+                            _条件集[ConditionSlotKey.C3].Probe ??= 变龙去后摇;
+                            _条件集[ConditionSlotKey.C4].Probe ??= 火球去后摇;
                             Item._切假腿配置.修改配置(Keys.E, false);
                             _基础攻击前摇 = 0.5;
                             _基础攻击间隔 = 1.6;
@@ -1339,18 +1177,18 @@ namespace Dota2Simulator.Games.Dota2
 
                                 break;
                             case Keys.Q:
-                                _条件1 = true;
+                                _条件集[ConditionSlotKey.C1].Active = true;
                                 break;
                             case Keys.W:
-                                _条件2 = true;
+                                _条件集[ConditionSlotKey.C2].Active = true;
                                 break;
                             case Keys.R:
-                                _条件3 = true;
+                                _条件集[ConditionSlotKey.C3].Active = true;
                                 break;
                             case Keys.D:
                                 if (Item._是否魔晶)
                                 {
-                                    _条件4 = true;
+                                    _条件集[ConditionSlotKey.C4].Active = true;
                                 }
 
                                 break;
@@ -1380,12 +1218,12 @@ namespace Dota2Simulator.Games.Dota2
                         if (!_总循环条件)
                         {
                             _总循环条件 = true;
-                            _条件根据图片委托1 ??= 扫射去后摇;
-                            _条件根据图片委托2 ??= 焦油去后摇;
-                            _条件根据图片委托3 ??= 死亡契约去后摇;
-                            _条件根据图片委托4 ??= 骨隐步去后摇;
-                            _条件根据图片委托5 ??= 炽烈火雨去后摇;
-                            _条件根据图片委托6 ??= 骷髅之军去后摇;
+                            _条件集[ConditionSlotKey.C1].Probe ??= 扫射去后摇;
+                            _条件集[ConditionSlotKey.C2].Probe ??= 焦油去后摇;
+                            _条件集[ConditionSlotKey.C3].Probe ??= 死亡契约去后摇;
+                            _条件集[ConditionSlotKey.C4].Probe ??= 骨隐步去后摇;
+                            _条件集[ConditionSlotKey.C5].Probe ??= 炽烈火雨去后摇;
+                            _条件集[ConditionSlotKey.C6].Probe ??= 骷髅之军去后摇;
                             _基础攻击前摇 = 0.4;
                             _基础攻击间隔 = 1.7;
                             await 状态初始化().ConfigureAwait(false);
@@ -1408,28 +1246,28 @@ namespace Dota2Simulator.Games.Dota2
 
                                 break;
                             case Keys.Q:
-                                _条件1 = true;
+                                _条件集[ConditionSlotKey.C1].Active = true;
                                 break;
                             case Keys.W:
-                                _条件2 = true;
+                                _条件集[ConditionSlotKey.C2].Active = true;
                                 break;
                             case Keys.E:
-                                _条件3 = true;
+                                _条件集[ConditionSlotKey.C3].Active = true;
                                 break;
                             case Keys.R:
-                                _条件4 = true;
+                                _条件集[ConditionSlotKey.C4].Active = true;
                                 break;
                             case Keys.D:
                                 if (Item._是否魔晶)
                                 {
-                                    _条件5 = true;
+                                    _条件集[ConditionSlotKey.C5].Active = true;
                                 }
 
                                 break;
                             case Keys.F:
                                 if (Item._是否神杖)
                                 {
-                                    _条件6 = true;
+                                    _条件集[ConditionSlotKey.C6].Active = true;
                                 }
 
                                 break;
@@ -1459,9 +1297,9 @@ namespace Dota2Simulator.Games.Dota2
                         if (!_总循环条件)
                         {
                             _总循环条件 = true;
-                            _条件根据图片委托1 ??= 狂风去后摇;
-                            _条件根据图片委托2 ??= 数箭齐发去后摇;
-                            _条件根据图片委托3 ??= 冰川去后摇;
+                            _条件集[ConditionSlotKey.C1].Probe ??= 狂风去后摇;
+                            _条件集[ConditionSlotKey.C2].Probe ??= 数箭齐发去后摇;
+                            _条件集[ConditionSlotKey.C3].Probe ??= 冰川去后摇;
                             await 状态初始化().ConfigureAwait(false);
                         }
 
@@ -1501,15 +1339,15 @@ namespace Dota2Simulator.Games.Dota2
 
                                 break;
                             case Keys.W:
-                                _条件1 = true;
+                                _条件集[ConditionSlotKey.C1].Active = true;
                                 break;
                             case Keys.E:
-                                _条件2 = true;
+                                _条件集[ConditionSlotKey.C2].Active = true;
                                 break;
                             case Keys.F:
                                 if (Item._是否魔晶)
                                 {
-                                    _条件3 = true;
+                                    _条件集[ConditionSlotKey.C3].Active = true;
                                 }
 
                                 break;
@@ -1527,9 +1365,9 @@ namespace Dota2Simulator.Games.Dota2
                         if (!_总循环条件)
                         {
                             _总循环条件 = true;
-                            _条件根据图片委托1 ??= 旋风飞斧远去后摇;
-                            _条件根据图片委托2 ??= 旋风飞斧近去后摇;
-                            _条件根据图片委托3 ??= 战斗专注去后摇;
+                            _条件集[ConditionSlotKey.C1].Probe ??= 旋风飞斧远去后摇;
+                            _条件集[ConditionSlotKey.C2].Probe ??= 旋风飞斧近去后摇;
+                            _条件集[ConditionSlotKey.C3].Probe ??= 战斗专注去后摇;
                             Item._切假腿配置.修改配置(Keys.Q, false);
                             await 状态初始化().ConfigureAwait(false);
                         }
@@ -1539,13 +1377,13 @@ namespace Dota2Simulator.Games.Dota2
                         switch (e.KeyCode)
                         {
                             case Keys.W:
-                                _条件1 = true;
+                                _条件集[ConditionSlotKey.C1].Active = true;
                                 break;
                             case Keys.E:
-                                _条件2 = true;
+                                _条件集[ConditionSlotKey.C2].Active = true;
                                 break;
                             case Keys.R:
-                                _条件3 = true;
+                                _条件集[ConditionSlotKey.C3].Active = true;
                                 break;
                         }
 
@@ -1561,10 +1399,10 @@ namespace Dota2Simulator.Games.Dota2
                         if (!_总循环条件)
                         {
                             _总循环条件 = true;
-                            _条件根据图片委托1 ??= 窒息短匕敏捷;
-                            _条件根据图片委托2 ??= 幻影突袭敏捷;
-                            _条件根据图片委托3 ??= 魅影无形敏捷;
-                            _条件根据图片委托4 ??= 刀阵旋风敏捷;
+                            _条件集[ConditionSlotKey.C1].Probe ??= 窒息短匕敏捷;
+                            _条件集[ConditionSlotKey.C2].Probe ??= 幻影突袭敏捷;
+                            _条件集[ConditionSlotKey.C3].Probe ??= 魅影无形敏捷;
+                            _条件集[ConditionSlotKey.C4].Probe ??= 刀阵旋风敏捷;
                             await 状态初始化().ConfigureAwait(false);
                         }
 
@@ -1579,20 +1417,20 @@ namespace Dota2Simulator.Games.Dota2
                                 }
                                 break;
                             case Keys.Q:
-                                _条件1 = true;
+                                _条件集[ConditionSlotKey.C1].Active = true;
                                 break;
                             case Keys.W:
                                 // 触发激怒机制，2.3秒内不吸引仇恨
                                 SimKeyBoard.KeyPress(Keys.A);
-                                _条件2 = true;
+                                _条件集[ConditionSlotKey.C2].Active = true;
                                 break;
                             case Keys.E:
-                                _条件3 = true;
+                                _条件集[ConditionSlotKey.C3].Active = true;
                                 break;
                             case Keys.D:
                                 if (Item._是否神杖)
                                 {
-                                    _条件4 = true;
+                                    _条件集[ConditionSlotKey.C4].Active = true;
                                 }
                                 break;
                         }
@@ -1609,8 +1447,8 @@ namespace Dota2Simulator.Games.Dota2
                         if (!_总循环条件)
                         {
                             _总循环条件 = true;
-                            _条件根据图片委托1 ??= 灵魂之矛敏捷;
-                            _条件根据图片委托2 ??= 神行百变选择幻象;
+                            _条件集[ConditionSlotKey.C1].Probe ??= 灵魂之矛敏捷;
+                            _条件集[ConditionSlotKey.C2].Probe ??= 神行百变选择幻象;
                             Item._切假腿配置.修改配置(Keys.W, true, "力量");
                             Item._切假腿配置.修改配置(Keys.E, false);
                             Item._切假腿配置.修改配置(Keys.R, false);
@@ -1627,7 +1465,7 @@ namespace Dota2Simulator.Games.Dota2
                                     SimKeyBoard.KeyPress(Keys.E);
                                 }
 
-                                _条件1 = true;
+                                _条件集[ConditionSlotKey.C1].Active = true;
                                 break;
                             case Keys.W:
                                 if (!Skill.DOTA2判断状态技能是否启动(Keys.E, GlobalScreenCapture.GetCurrentHandle()))
@@ -1635,7 +1473,7 @@ namespace Dota2Simulator.Games.Dota2
                                     SimKeyBoard.KeyPress(Keys.E);
                                 }
 
-                                _条件2 = true;
+                                _条件集[ConditionSlotKey.C2].Active = true;
                                 break;
                             case Keys.R:
                                 if (!Skill.DOTA2判断状态技能是否启动(Keys.E, GlobalScreenCapture.GetCurrentHandle()))
@@ -1658,10 +1496,10 @@ namespace Dota2Simulator.Games.Dota2
                         if (!_总循环条件)
                         {
                             _总循环条件 = true;
-                            _条件根据图片委托1 ??= 幽鬼之刃去后摇;
-                            _条件根据图片委托2 ??= 如影随形去后摇;
-                            _条件根据图片委托3 ??= 空降去后摇;
-                            _条件根据图片委托4 ??= 折射去后摇;
+                            _条件集[ConditionSlotKey.C1].Probe ??= 幽鬼之刃去后摇;
+                            _条件集[ConditionSlotKey.C2].Probe ??= 如影随形去后摇;
+                            _条件集[ConditionSlotKey.C3].Probe ??= 空降去后摇;
+                            _条件集[ConditionSlotKey.C4].Probe ??= 折射去后摇;
                             Item._切假腿配置.修改配置(Keys.W, false);
                             Item._切假腿配置.修改配置(Keys.E, false);
                             await 状态初始化().ConfigureAwait(false);
@@ -1679,16 +1517,16 @@ namespace Dota2Simulator.Games.Dota2
 
                                 break;
                             case Keys.Q:
-                                _条件1 = true;
+                                _条件集[ConditionSlotKey.C1].Active = true;
                                 break;
                             case Keys.R:
-                                _条件2 = true;
+                                _条件集[ConditionSlotKey.C2].Active = true;
                                 break;
                             case Keys.D:
-                                _条件3 = true;
+                                _条件集[ConditionSlotKey.C3].Active = true;
                                 break;
                             case Keys.E:
-                                _条件4 = true;
+                                _条件集[ConditionSlotKey.C4].Active = true;
                                 break;
                             case Keys.D2:
                                 _槽.ToggleMode(SlotKey.F);
@@ -1708,11 +1546,11 @@ namespace Dota2Simulator.Games.Dota2
                         if (!_总循环条件)
                         {
                             _总循环条件 = true;
-                            _条件根据图片委托1 ??= z炮去后摇;
-                            _条件根据图片委托2 ??= x炮去后摇;
-                            _条件根据图片委托3 ??= c炮去后摇;
-                            _条件根据图片委托4 ??= 灵魂盛宴去后摇;
-                            //_条件根据图片委托5 ??= 如影随形去后摇;
+                            _条件集[ConditionSlotKey.C1].Probe ??= z炮去后摇;
+                            _条件集[ConditionSlotKey.C2].Probe ??= x炮去后摇;
+                            _条件集[ConditionSlotKey.C3].Probe ??= c炮去后摇;
+                            _条件集[ConditionSlotKey.C4].Probe ??= 灵魂盛宴去后摇;
+                            //_条件集[ConditionSlotKey.C5].Probe ??= 如影随形去后摇;
                             Item._切假腿配置.修改配置(Keys.F, false);
                             await 状态初始化().ConfigureAwait(false);
                         }
@@ -1722,19 +1560,19 @@ namespace Dota2Simulator.Games.Dota2
                         switch (e.KeyCode)
                         {
                             case Keys.Q:
-                                _条件1 = true;
+                                _条件集[ConditionSlotKey.C1].Active = true;
                                 break;
                             case Keys.W:
-                                _条件2 = true;
+                                _条件集[ConditionSlotKey.C2].Active = true;
                                 break;
                             case Keys.E:
-                                _条件3 = true;
+                                _条件集[ConditionSlotKey.C3].Active = true;
                                 break;
                             case Keys.D:
-                                _条件4 = true;
+                                _条件集[ConditionSlotKey.C4].Active = true;
                                 break;
                             case Keys.R:
-                                _条件5 = true;
+                                _条件集[ConditionSlotKey.C5].Active = true;
                                 break;
                         }
 
@@ -1750,12 +1588,12 @@ namespace Dota2Simulator.Games.Dota2
                         if (!_总循环条件)
                         {
                             _总循环条件 = true;
-                            _条件根据图片委托1 ??= 倒影敏捷;
-                            _条件根据图片委托2 ??= 幻惑敏捷;
-                            _条件根据图片委托3 ??= 魔化敏捷;
-                            _条件根据图片委托4 ??= 恶魔狂热去后摇;
-                            _条件根据图片委托5 ??= 恐怖心潮敏捷;
-                            _条件根据图片委托6 ??= 断魂敏捷;
+                            _条件集[ConditionSlotKey.C1].Probe ??= 倒影敏捷;
+                            _条件集[ConditionSlotKey.C2].Probe ??= 幻惑敏捷;
+                            _条件集[ConditionSlotKey.C3].Probe ??= 魔化敏捷;
+                            _条件集[ConditionSlotKey.C4].Probe ??= 恶魔狂热去后摇;
+                            _条件集[ConditionSlotKey.C5].Probe ??= 恐怖心潮敏捷;
+                            _条件集[ConditionSlotKey.C6].Probe ??= 断魂敏捷;
                             Item._切假腿配置.修改配置(Keys.W, false);
                             await 状态初始化().ConfigureAwait(false);
                         }
@@ -1772,30 +1610,30 @@ namespace Dota2Simulator.Games.Dota2
 
                                 break;
                             case Keys.Q:
-                                _条件1 = true;
+                                _条件集[ConditionSlotKey.C1].Active = true;
                                 break;
                             case Keys.W:
-                                _条件2 = true;
+                                _条件集[ConditionSlotKey.C2].Active = true;
                                 break;
                             case Keys.E:
-                                _条件3 = true;
+                                _条件集[ConditionSlotKey.C3].Active = true;
                                 break;
                             case Keys.D:
                                 if (Item._是否魔晶)
                                 {
-                                    _条件4 = true;
+                                    _条件集[ConditionSlotKey.C4].Active = true;
                                 }
 
                                 break;
                             case Keys.F:
                                 if (Item._是否神杖)
                                 {
-                                    _条件5 = true;
+                                    _条件集[ConditionSlotKey.C5].Active = true;
                                 }
 
                                 break;
                             case Keys.R:
-                                _条件6 = true;
+                                _条件集[ConditionSlotKey.C6].Active = true;
                                 break;
                         }
 
@@ -1811,10 +1649,10 @@ namespace Dota2Simulator.Games.Dota2
                         if (!_总循环条件)
                         {
                             _总循环条件 = true;
-                            _条件根据图片委托1 ??= 闪烁敏捷;
-                            _条件根据图片委托2 ??= 法术反制敏捷;
-                            _条件根据图片委托3 ??= 法力虚空取消后摇;
-                            _条件根据图片委托4 ??= 友军法术反制敏捷;
+                            _条件集[ConditionSlotKey.C1].Probe ??= 闪烁敏捷;
+                            _条件集[ConditionSlotKey.C2].Probe ??= 法术反制敏捷;
+                            _条件集[ConditionSlotKey.C3].Probe ??= 法力虚空取消后摇;
+                            _条件集[ConditionSlotKey.C4].Probe ??= 友军法术反制敏捷;
                             Item._切假腿配置.修改配置(Keys.Q, false);
                             await 状态初始化().ConfigureAwait(false);
                         }
@@ -1831,18 +1669,18 @@ namespace Dota2Simulator.Games.Dota2
 
                                 break;
                             case Keys.W:
-                                _条件1 = true;
+                                _条件集[ConditionSlotKey.C1].Active = true;
                                 break;
                             case Keys.E:
-                                _条件2 = true;
+                                _条件集[ConditionSlotKey.C2].Active = true;
                                 break;
                             case Keys.R:
-                                _条件3 = true;
+                                _条件集[ConditionSlotKey.C3].Active = true;
                                 break;
                             case Keys.D:
                                 if (Item._是否魔晶)
                                 {
-                                    _条件4 = true;
+                                    _条件集[ConditionSlotKey.C4].Active = true;
                                 }
 
                                 break;
@@ -1864,10 +1702,10 @@ namespace Dota2Simulator.Games.Dota2
                         if (!_总循环条件)
                         {
                             _总循环条件 = true;
-                            _条件根据图片委托1 ??= 黑暗契约去后摇;
-                            _条件根据图片委托2 ??= 跳水去后摇;
-                            _条件根据图片委托3 ??= 深海护罩去后摇;
-                            _条件根据图片委托4 ??= 暗影之舞去后摇;
+                            _条件集[ConditionSlotKey.C1].Probe ??= 黑暗契约去后摇;
+                            _条件集[ConditionSlotKey.C2].Probe ??= 跳水去后摇;
+                            _条件集[ConditionSlotKey.C3].Probe ??= 深海护罩去后摇;
+                            _条件集[ConditionSlotKey.C4].Probe ??= 暗影之舞去后摇;
                             // 能量转移被动计数 = 0;
                             _基础攻击间隔 = 1.7;
                             _基础攻击前摇 = 0.5;
@@ -1887,18 +1725,18 @@ namespace Dota2Simulator.Games.Dota2
 
                                 break;
                             case Keys.Q:
-                                _条件1 = true;
+                                _条件集[ConditionSlotKey.C1].Active = true;
                                 break;
                             case Keys.W:
-                                _条件2 = true;
+                                _条件集[ConditionSlotKey.C2].Active = true;
                                 break;
                             case Keys.R:
-                                _条件4 = true;
+                                _条件集[ConditionSlotKey.C4].Active = true;
                                 break;
                             case Keys.D:
                                 if (Item._是否魔晶)
                                 {
-                                    _条件3 = true;
+                                    _条件集[ConditionSlotKey.C3].Active = true;
                                 }
 
                                 break;
@@ -1927,10 +1765,10 @@ namespace Dota2Simulator.Games.Dota2
                         if (!_总循环条件)
                         {
                             _总循环条件 = true;
-                            _条件根据图片委托1 ??= 爆栗出击去后摇;
-                            _条件根据图片委托2 ??= 野地奇袭去后摇;
-                            _条件根据图片委托3 ??= 一箭穿心;
-                            _条件根据图片委托4 ??= 猎手旋标去后摇;
+                            _条件集[ConditionSlotKey.C1].Probe ??= 爆栗出击去后摇;
+                            _条件集[ConditionSlotKey.C2].Probe ??= 野地奇袭去后摇;
+                            _条件集[ConditionSlotKey.C3].Probe ??= 一箭穿心;
+                            _条件集[ConditionSlotKey.C4].Probe ??= 猎手旋标去后摇;
                             await 状态初始化().ConfigureAwait(false);
                         }
 
@@ -1946,18 +1784,18 @@ namespace Dota2Simulator.Games.Dota2
 
                                 break;
                             case Keys.Q:
-                                _条件1 = true;
+                                _条件集[ConditionSlotKey.C1].Active = true;
                                 break;
                             case Keys.W:
-                                _条件2 = true;
+                                _条件集[ConditionSlotKey.C2].Active = true;
                                 break;
                             case Keys.R:
-                                _条件3 = true;
+                                _条件集[ConditionSlotKey.C3].Active = true;
                                 break;
                             case Keys.F:
                                 if (Item._是否魔晶)
                                 {
-                                    _条件4 = true;
+                                    _条件集[ConditionSlotKey.C4].Active = true;
                                 }
 
                                 break;
@@ -1983,10 +1821,10 @@ namespace Dota2Simulator.Games.Dota2
                         if (!_总循环条件)
                         {
                             _总循环条件 = true;
-                            _条件根据图片委托1 ??= 无影拳后续处理;
-                            _条件根据图片委托2 ??= 炎阳索去后摇;
-                            _条件根据图片委托3 ??= 烈火罩去后摇;
-                            _条件根据图片委托4 ??= 激活残焰去后摇;
+                            _条件集[ConditionSlotKey.C1].Probe ??= 无影拳后续处理;
+                            _条件集[ConditionSlotKey.C2].Probe ??= 炎阳索去后摇;
+                            _条件集[ConditionSlotKey.C3].Probe ??= 烈火罩去后摇;
+                            _条件集[ConditionSlotKey.C4].Probe ??= 激活残焰去后摇;
                             Item._切假腿配置.修改配置(Keys.D, true);
                             Item._切假腿配置.修改配置(Keys.R, false);
                             await 状态初始化().ConfigureAwait(false);
@@ -1997,7 +1835,7 @@ namespace Dota2Simulator.Games.Dota2
                         switch (e.KeyCode)
                         {
                             case Keys.W:
-                                _条件1 = true;
+                                _条件集[ConditionSlotKey.C1].Active = true;
                                 await Task.Run(() =>
                                 {
                                     Common.Delay(330);
@@ -2005,13 +1843,13 @@ namespace Dota2Simulator.Games.Dota2
                                 }).ConfigureAwait(false);
                                 break;
                             case Keys.Q:
-                                _条件2 = true;
+                                _条件集[ConditionSlotKey.C2].Active = true;
                                 break;
                             case Keys.E:
-                                _条件3 = true;
+                                _条件集[ConditionSlotKey.C3].Active = true;
                                 break;
                             case Keys.D:
-                                _条件4 = true;
+                                _条件集[ConditionSlotKey.C4].Active = true;
                                 break;
                             case Keys.D2:
                                 _槽.ToggleMode(SlotKey.W);
@@ -2031,10 +1869,10 @@ namespace Dota2Simulator.Games.Dota2
                         if (!_总循环条件)
                         {
                             _总循环条件 = true;
-                            _条件根据图片委托1 ??= 震撼大地去后摇;
-                            _条件根据图片委托2 ??= 超强力量去后摇;
-                            _条件根据图片委托3 ??= 跳拍;
-                            _条件根据图片委托4 ??= 狂怒去后摇;
+                            _条件集[ConditionSlotKey.C1].Probe ??= 震撼大地去后摇;
+                            _条件集[ConditionSlotKey.C2].Probe ??= 超强力量去后摇;
+                            _条件集[ConditionSlotKey.C3].Probe ??= 跳拍;
+                            _条件集[ConditionSlotKey.C4].Probe ??= 狂怒去后摇;
                             await 状态初始化().ConfigureAwait(false);
                             Item._切假腿配置.修改配置(Keys.E, false);
                             Item._切假腿配置.修改配置(Keys.R, false);
@@ -2045,16 +1883,16 @@ namespace Dota2Simulator.Games.Dota2
                         switch (e.KeyCode)
                         {
                             case Keys.Q:
-                                _条件1 = true;
+                                _条件集[ConditionSlotKey.C1].Active = true;
                                 break;
                             case Keys.W:
-                                _条件2 = true;
+                                _条件集[ConditionSlotKey.C2].Active = true;
                                 break;
                             case Keys.E:
-                                _条件3 = true;
+                                _条件集[ConditionSlotKey.C3].Active = true;
                                 break;
                             case Keys.R:
-                                _条件4 = true;
+                                _条件集[ConditionSlotKey.C4].Active = true;
                                 break;
                         }
 
@@ -2070,10 +1908,10 @@ namespace Dota2Simulator.Games.Dota2
                         if (!_总循环条件)
                         {
                             _总循环条件 = true;
-                            _条件根据图片委托1 ??= 流霰弹去后摇;
-                            _条件根据图片委托2 ??= 瞄准去后摇;
-                            _条件根据图片委托3 ??= 震荡手雷去后摇;
-                            _条件根据图片委托4 ??= 暗杀去后摇;
+                            _条件集[ConditionSlotKey.C1].Probe ??= 流霰弹去后摇;
+                            _条件集[ConditionSlotKey.C2].Probe ??= 瞄准去后摇;
+                            _条件集[ConditionSlotKey.C3].Probe ??= 震荡手雷去后摇;
+                            _条件集[ConditionSlotKey.C4].Probe ??= 暗杀去后摇;
                             Item._切假腿配置.修改配置(Keys.W, false);
                             await 状态初始化().ConfigureAwait(false);
                         }
@@ -2084,16 +1922,16 @@ namespace Dota2Simulator.Games.Dota2
                         switch (e.KeyCode)
                         {
                             case Keys.Q:
-                                _条件1 = true;
+                                _条件集[ConditionSlotKey.C1].Active = true;
                                 break;
                             case Keys.E:
-                                _条件2 = true;
+                                _条件集[ConditionSlotKey.C2].Active = true;
                                 break;
                             case Keys.D:
-                                _条件3 = true;
+                                _条件集[ConditionSlotKey.C3].Active = true;
                                 break;
                             case Keys.R:
-                                _条件4 = true;
+                                _条件集[ConditionSlotKey.C4].Active = true;
                                 break;
                         }
 
@@ -2109,11 +1947,11 @@ namespace Dota2Simulator.Games.Dota2
                         if (!_总循环条件)
                         {
                             _总循环条件 = true;
-                            //_条件根据图片委托1 ??= 火箭弹幕敏捷;
-                            //_条件根据图片委托2 ??= 追踪导弹敏捷;
-                            //_条件根据图片委托3 ??= 高射火炮敏捷;
-                            //_条件根据图片委托4 ??= 召唤飞弹敏捷;
-                            _条件根据图片委托5 ??= 循环火箭弹幕;
+                            //_条件集[ConditionSlotKey.C1].Probe ??= 火箭弹幕敏捷;
+                            //_条件集[ConditionSlotKey.C2].Probe ??= 追踪导弹敏捷;
+                            //_条件集[ConditionSlotKey.C3].Probe ??= 高射火炮敏捷;
+                            //_条件集[ConditionSlotKey.C4].Probe ??= 召唤飞弹敏捷;
+                            _条件集[ConditionSlotKey.C5].Probe ??= 循环火箭弹幕;
                             await 状态初始化().ConfigureAwait(false);
                         }
 
@@ -2122,20 +1960,20 @@ namespace Dota2Simulator.Games.Dota2
                         switch (e.KeyCode)
                         {
                             //case Keys.Q:
-                            //    _条件1 = true;
+                            //    _条件集[ConditionSlotKey.C1].Active = true;
                             //    break;
                             //case Keys.W:
-                            //    _条件2 = true;
+                            //    _条件集[ConditionSlotKey.C2].Active = true;
                             //    break;
                             //case Keys.E:
-                            //    _条件3 = true;
+                            //    _条件集[ConditionSlotKey.C3].Active = true;
                             //    break;
                             //case Keys.R:
-                            //    _条件4 = true;
+                            //    _条件集[ConditionSlotKey.C4].Active = true;
                             //    break;
                             case Keys.D3:
-                                _条件5 = !_条件5;
-                                TTS.TTS.Speak(_条件5 ? "循环弹幕" : "关闭弹幕");
+                                _条件集[ConditionSlotKey.C5].Active = !_条件集[ConditionSlotKey.C5].Active;
+                                TTS.TTS.Speak(_条件集[ConditionSlotKey.C5].Active ? "循环弹幕" : "关闭弹幕");
                                 break;
                         }
 
@@ -2151,9 +1989,9 @@ namespace Dota2Simulator.Games.Dota2
                         if (!_总循环条件)
                         {
                             _总循环条件 = true;
-                            _条件根据图片委托1 ??= 秘术异蛇去后摇;
-                            _条件根据图片委托2 ??= 罗网剑阵去后摇;
-                            _条件根据图片委托3 ??= 石化凝视去后摇;
+                            _条件集[ConditionSlotKey.C1].Probe ??= 秘术异蛇去后摇;
+                            _条件集[ConditionSlotKey.C2].Probe ??= 罗网剑阵去后摇;
+                            _条件集[ConditionSlotKey.C3].Probe ??= 石化凝视去后摇;
                             Item._切假腿配置.修改配置(Keys.Q, false);
                             await 状态初始化().ConfigureAwait(false);
                         }
@@ -2163,13 +2001,13 @@ namespace Dota2Simulator.Games.Dota2
                         switch (e.KeyCode)
                         {
                             case Keys.W:
-                                _条件1 = true;
+                                _条件集[ConditionSlotKey.C1].Active = true;
                                 break;
                             case Keys.E:
-                                _条件2 = true;
+                                _条件集[ConditionSlotKey.C2].Active = true;
                                 break;
                             case Keys.R:
-                                _条件3 = true;
+                                _条件集[ConditionSlotKey.C3].Active = true;
                                 break;
                         }
 
@@ -2185,9 +2023,9 @@ namespace Dota2Simulator.Games.Dota2
                         if (!_总循环条件)
                         {
                             _总循环条件 = true;
-                            _条件根据图片委托1 ??= 时间漫游敏捷;
-                            _条件根据图片委托2 ??= 时间膨胀敏捷;
-                            _条件根据图片委托3 ??= 时间结界敏捷;
+                            _条件集[ConditionSlotKey.C1].Probe ??= 时间漫游敏捷;
+                            _条件集[ConditionSlotKey.C2].Probe ??= 时间膨胀敏捷;
+                            _条件集[ConditionSlotKey.C3].Probe ??= 时间结界敏捷;
                             Item._切假腿配置.修改配置(Keys.E, false);
                             await 状态初始化().ConfigureAwait(false);
                         }
@@ -2197,13 +2035,13 @@ namespace Dota2Simulator.Games.Dota2
                         switch (e.KeyCode)
                         {
                             case Keys.Q:
-                                _条件1 = true;
+                                _条件集[ConditionSlotKey.C1].Active = true;
                                 break;
                             case Keys.W:
-                                _条件2 = true;
+                                _条件集[ConditionSlotKey.C2].Active = true;
                                 break;
                             case Keys.R:
-                                _条件3 = true;
+                                _条件集[ConditionSlotKey.C3].Active = true;
                                 break;
                         }
 
@@ -2219,9 +2057,9 @@ namespace Dota2Simulator.Games.Dota2
                         if (!_总循环条件)
                         {
                             _总循环条件 = true;
-                            _条件根据图片委托1 ??= 血祭去后摇;
-                            _条件根据图片委托2 ??= 割裂去后摇;
-                            _条件根据图片委托3 ??= 血怒去后摇;
+                            _条件集[ConditionSlotKey.C1].Probe ??= 血祭去后摇;
+                            _条件集[ConditionSlotKey.C2].Probe ??= 割裂去后摇;
+                            _条件集[ConditionSlotKey.C3].Probe ??= 血怒去后摇;
                             Item._切假腿配置.修改配置(Keys.E, false);
                             await 状态初始化().ConfigureAwait(false);
                         }
@@ -2230,19 +2068,19 @@ namespace Dota2Simulator.Games.Dota2
 
                         if (e.KeyValue == (int)Keys.Q && (int)e.Modifiers == (int)Keys.Alt)
                         {
-                            _条件3 = true;
+                            _条件集[ConditionSlotKey.C3].Active = true;
                         }
 
                         switch (e.KeyCode)
                         {
                             case Keys.W:
-                                _条件1 = true;
+                                _条件集[ConditionSlotKey.C1].Active = true;
                                 break;
                             case Keys.R:
-                                _条件2 = true;
+                                _条件集[ConditionSlotKey.C2].Active = true;
                                 break;
                             case Keys.Q:
-                                _条件3 = true;
+                                _条件集[ConditionSlotKey.C3].Active = true;
                                 break;
                         }
 
@@ -2258,9 +2096,9 @@ namespace Dota2Simulator.Games.Dota2
                         if (!_总循环条件)
                         {
                             _总循环条件 = true;
-                            _条件根据图片委托1 ??= 飞镖接平a;
-                            _条件根据图片委托2 ??= 标记去后摇;
-                            _条件根据图片委托3 ??= 循环标记;
+                            _条件集[ConditionSlotKey.C1].Probe ??= 飞镖接平a;
+                            _条件集[ConditionSlotKey.C2].Probe ??= 标记去后摇;
+                            _条件集[ConditionSlotKey.C3].Probe ??= 循环标记;
                             Item._切假腿配置.修改配置(Keys.W, false);
                             await 状态初始化().ConfigureAwait(false);
                         }
@@ -2270,14 +2108,14 @@ namespace Dota2Simulator.Games.Dota2
                         switch (e.KeyCode)
                         {
                             case Keys.Q:
-                                _条件1 = true;
+                                _条件集[ConditionSlotKey.C1].Active = true;
                                 break;
                             case Keys.R:
-                                _条件2 = true;
+                                _条件集[ConditionSlotKey.C2].Active = true;
                                 break;
                             case Keys.D2:
-                                _条件3 = !_条件3;
-                                TTS.TTS.Speak(_条件3 ? "循环标记" : "不循环标记");
+                                _条件集[ConditionSlotKey.C3].Active = !_条件集[ConditionSlotKey.C3].Active;
+                                TTS.TTS.Speak(_条件集[ConditionSlotKey.C3].Active ? "循环标记" : "不循环标记");
                                 break;
                         }
 
@@ -2293,9 +2131,9 @@ namespace Dota2Simulator.Games.Dota2
                         if (!_总循环条件)
                         {
                             _总循环条件 = true;
-                            _条件根据图片委托1 ??= 等离子场去后摇;
-                            _条件根据图片委托2 ??= 静电连接去后摇;
-                            _条件根据图片委托3 ??= 风暴之眼去后摇;
+                            _条件集[ConditionSlotKey.C1].Probe ??= 等离子场去后摇;
+                            _条件集[ConditionSlotKey.C2].Probe ??= 静电连接去后摇;
+                            _条件集[ConditionSlotKey.C3].Probe ??= 风暴之眼去后摇;
                             Item._切假腿配置.修改配置(Keys.E, false);
                             await 状态初始化().ConfigureAwait(false);
                         }
@@ -2305,13 +2143,13 @@ namespace Dota2Simulator.Games.Dota2
                         switch (e.KeyCode)
                         {
                             case Keys.Q:
-                                _条件1 = true;
+                                _条件集[ConditionSlotKey.C1].Active = true;
                                 break;
                             case Keys.W:
-                                _条件2 = true;
+                                _条件集[ConditionSlotKey.C2].Active = true;
                                 break;
                             case Keys.R:
-                                _条件3 = true;
+                                _条件集[ConditionSlotKey.C3].Active = true;
                                 break;
                         }
 
@@ -2327,9 +2165,9 @@ namespace Dota2Simulator.Games.Dota2
                         if (!_总循环条件)
                         {
                             _总循环条件 = true;
-                            _条件根据图片委托1 ??= 月光后敏捷平a;
-                            _条件根据图片委托2 ??= 月刃后敏捷平a;
-                            _条件根据图片委托3 ??= 月蚀后敏捷平a;
+                            _条件集[ConditionSlotKey.C1].Probe ??= 月光后敏捷平a;
+                            _条件集[ConditionSlotKey.C2].Probe ??= 月刃后敏捷平a;
+                            _条件集[ConditionSlotKey.C3].Probe ??= 月蚀后敏捷平a;
                             Item._切假腿配置.修改配置(Keys.E, false);
                             await 状态初始化().ConfigureAwait(false);
                         }
@@ -2339,13 +2177,13 @@ namespace Dota2Simulator.Games.Dota2
                         switch (e.KeyCode)
                         {
                             case Keys.Q:
-                                _条件1 = true;
+                                _条件集[ConditionSlotKey.C1].Active = true;
                                 break;
                             case Keys.W:
-                                _条件2 = true;
+                                _条件集[ConditionSlotKey.C2].Active = true;
                                 break;
                             case Keys.R:
-                                _条件3 = true;
+                                _条件集[ConditionSlotKey.C3].Active = true;
                                 break;
                         }
 
@@ -2361,10 +2199,10 @@ namespace Dota2Simulator.Games.Dota2
                         if (!_总循环条件)
                         {
                             _总循环条件 = true;
-                            _条件根据图片委托1 ??= 棒击大地去后摇;
-                            _条件根据图片委托2 ??= 乾坤之跃敏捷;
-                            _条件根据图片委托3 ??= 猴子猴孙敏捷;
-                            _条件根据图片委托4 ??= 大圣无限跳跃;
+                            _条件集[ConditionSlotKey.C1].Probe ??= 棒击大地去后摇;
+                            _条件集[ConditionSlotKey.C2].Probe ??= 乾坤之跃敏捷;
+                            _条件集[ConditionSlotKey.C3].Probe ??= 猴子猴孙敏捷;
+                            _条件集[ConditionSlotKey.C4].Probe ??= 大圣无限跳跃;
                             Item._切假腿配置.修改配置(Keys.Q, false);
                             Item._切假腿配置.修改配置(Keys.W, false);
                             Skill.重复按键执行间隔阈值 = 100;
@@ -2376,17 +2214,17 @@ namespace Dota2Simulator.Games.Dota2
                         switch (e.KeyCode)
                         {
                             case Keys.Q:
-                                _条件1 = true;
+                                _条件集[ConditionSlotKey.C1].Active = true;
                                 break;
                             case Keys.E:
-                                _条件2 = true;
+                                _条件集[ConditionSlotKey.C2].Active = true;
                                 break;
                             case Keys.R:
-                                _条件3 = true;
+                                _条件集[ConditionSlotKey.C3].Active = true;
                                 break;
                             case Keys.D3:
-                                _条件4 = !_条件4;
-                                TTS.TTS.Speak(_条件4 ? "开启无限跳跃" : "关闭无限跳跃");
+                                _条件集[ConditionSlotKey.C4].Active = !_条件集[ConditionSlotKey.C4].Active;
+                                TTS.TTS.Speak(_条件集[ConditionSlotKey.C4].Active ? "开启无限跳跃" : "关闭无限跳跃");
                                 break;
                         }
 
@@ -2402,10 +2240,10 @@ namespace Dota2Simulator.Games.Dota2
                         if (!_总循环条件)
                         {
                             _总循环条件 = true;
-                            //_条件根据图片委托1 ??= 棒击大地去后摇;
-                            //_条件根据图片委托2 ??= 乾坤之跃敏捷;
-                            //_条件根据图片委托3 ??= 猴子猴孙敏捷;
-                            //_条件根据图片委托4 ??= 大圣无限跳跃;
+                            //_条件集[ConditionSlotKey.C1].Probe ??= 棒击大地去后摇;
+                            //_条件集[ConditionSlotKey.C2].Probe ??= 乾坤之跃敏捷;
+                            //_条件集[ConditionSlotKey.C3].Probe ??= 猴子猴孙敏捷;
+                            //_条件集[ConditionSlotKey.C4].Probe ??= 大圣无限跳跃;
                             //Item._切假腿配置.修改配置(Keys.Q, false);
                             //Item._切假腿配置.修改配置(Keys.W, false);
                             await 状态初始化().ConfigureAwait(false);
@@ -2416,13 +2254,13 @@ namespace Dota2Simulator.Games.Dota2
                         switch (e.KeyCode)
                         {
                             case Keys.Q:
-                                _条件1 = true;
+                                _条件集[ConditionSlotKey.C1].Active = true;
                                 break;
                             case Keys.E:
-                                _条件2 = true;
+                                _条件集[ConditionSlotKey.C2].Active = true;
                                 break;
                             case Keys.R:
-                                _条件3 = true;
+                                _条件集[ConditionSlotKey.C3].Active = true;
                                 break;
                         }
 
@@ -2450,13 +2288,13 @@ namespace Dota2Simulator.Games.Dota2
                         switch (e.KeyCode)
                         {
                             case Keys.Q:
-                                _条件1 = true;
+                                _条件集[ConditionSlotKey.C1].Active = true;
                                 break;
                             case Keys.E:
-                                _条件2 = true;
+                                _条件集[ConditionSlotKey.C2].Active = true;
                                 break;
                             case Keys.R:
-                                _条件3 = true;
+                                _条件集[ConditionSlotKey.C3].Active = true;
                                 break;
                         }
 
@@ -2472,12 +2310,12 @@ namespace Dota2Simulator.Games.Dota2
                         if (!_总循环条件)
                         {
                             _总循环条件 = true;
-                            _条件根据图片委托1 ??= 减少300毫秒蓄力;
-                            _条件根据图片委托2 ??= 炎阳之缚去后摇;
-                            _条件根据图片委托3 ??= 查克拉魔法去后摇;
-                            _条件根据图片委托4 ??= 循环查克拉;
-                            _条件根据图片委托5 ??= 致盲之光去后摇;
-                            _条件根据图片委托6 ??= 灵光去后摇接炎阳;
+                            _条件集[ConditionSlotKey.C1].Probe ??= 减少300毫秒蓄力;
+                            _条件集[ConditionSlotKey.C2].Probe ??= 炎阳之缚去后摇;
+                            _条件集[ConditionSlotKey.C3].Probe ??= 查克拉魔法去后摇;
+                            _条件集[ConditionSlotKey.C4].Probe ??= 循环查克拉;
+                            _条件集[ConditionSlotKey.C5].Probe ??= 致盲之光去后摇;
+                            _条件集[ConditionSlotKey.C6].Probe ??= 灵光去后摇接炎阳;
                             Skill.重复按键执行间隔阈值 = 100;
                             await 状态初始化().ConfigureAwait(false);
                         }
@@ -2486,29 +2324,29 @@ namespace Dota2Simulator.Games.Dota2
 
                         if (e.KeyValue == (int)Keys.E && (int)e.Modifiers == (int)Keys.Alt)
                         {
-                            _条件4 = true;
+                            _条件集[ConditionSlotKey.C4].Active = true;
                         }
 
                         switch (e.KeyCode)
                         {
                             case Keys.Q:
-                                _条件1 = true;
+                                _条件集[ConditionSlotKey.C1].Active = true;
                                 break;
                             case Keys.W:
-                                _条件2 = true;
+                                _条件集[ConditionSlotKey.C2].Active = true;
                                 break;
                             case Keys.E:
-                                _条件3 = true;
+                                _条件集[ConditionSlotKey.C3].Active = true;
                                 break;
                             case Keys.D:
-                                _条件5 = true;
+                                _条件集[ConditionSlotKey.C5].Active = true;
                                 break;
                             case Keys.F:
-                                _条件6 = true;
+                                _条件集[ConditionSlotKey.C6].Active = true;
                                 break;
                             case Keys.D2:
-                                _条件4 = !_条件4;
-                                TTS.TTS.Speak(_条件4 ? "开启循环查克拉" : "关闭循环查克拉");
+                                _条件集[ConditionSlotKey.C4].Active = !_条件集[ConditionSlotKey.C4].Active;
+                                TTS.TTS.Speak(_条件集[ConditionSlotKey.C4].Active ? "开启循环查克拉" : "关闭循环查克拉");
                                 break;
                         }
 
@@ -2524,12 +2362,12 @@ namespace Dota2Simulator.Games.Dota2
                         if (!_总循环条件)
                         {
                             _总循环条件 = true;
-                            _条件根据图片委托1 ??= 循环奥数鹰隼;
-                            _条件根据图片委托2 ??= 天怒秒人连招;
-                            _条件根据图片委托3 ??= 奥数鹰隼去后摇;
-                            _条件根据图片委托4 ??= 上古封印去后摇;
-                            _条件根据图片委托5 ??= 神秘之耀去后摇;
-                            _条件根据图片委托6 ??= 震荡光弹去后摇;
+                            _条件集[ConditionSlotKey.C1].Probe ??= 循环奥数鹰隼;
+                            _条件集[ConditionSlotKey.C2].Probe ??= 天怒秒人连招;
+                            _条件集[ConditionSlotKey.C3].Probe ??= 奥数鹰隼去后摇;
+                            _条件集[ConditionSlotKey.C4].Probe ??= 上古封印去后摇;
+                            _条件集[ConditionSlotKey.C5].Probe ??= 神秘之耀去后摇;
+                            _条件集[ConditionSlotKey.C6].Probe ??= 震荡光弹去后摇;
                             Skill.重复按键执行间隔阈值 = 100;
                             await 状态初始化().ConfigureAwait(false);
                         }
@@ -2539,24 +2377,24 @@ namespace Dota2Simulator.Games.Dota2
                         switch (e.KeyCode)
                         {
                             case Keys.Q:
-                                _条件3 = true;
+                                _条件集[ConditionSlotKey.C3].Active = true;
                                 break;
                             case Keys.W:
-                                _条件6 = true;
+                                _条件集[ConditionSlotKey.C6].Active = true;
                                 break;
                             case Keys.E:
-                                _条件4 = true;
+                                _条件集[ConditionSlotKey.C4].Active = true;
                                 break;
                             case Keys.R:
-                                _条件5 = true;
+                                _条件集[ConditionSlotKey.C5].Active = true;
                                 break;
                             case Keys.D2:
-                                _条件1 = !_条件1;
-                                TTS.TTS.Speak(_条件1 ? "循环鹰隼" : "不循环鹰隼");
+                                _条件集[ConditionSlotKey.C1].Active = !_条件集[ConditionSlotKey.C1].Active;
+                                TTS.TTS.Speak(_条件集[ConditionSlotKey.C1].Active ? "循环鹰隼" : "不循环鹰隼");
                                 break;
                             case Keys.D3:
                                 _槽.SetStep(SlotKey.Global, 1);
-                                _条件2 = true;
+                                _条件集[ConditionSlotKey.C2].Active = true;
                                 break;
                         }
 
@@ -2572,11 +2410,11 @@ namespace Dota2Simulator.Games.Dota2
                         if (!_总循环条件)
                         {
                             _总循环条件 = true;
-                            _条件根据图片委托1 ??= 命运之笔去后摇;
-                            _条件根据图片委托2 ??= 幻影之拥去后摇;
-                            _条件根据图片委托3 ??= 墨泳去后摇;
-                            _条件根据图片委托4 ??= 缚魂去后摇;
-                            _条件根据图片委托5 ??= 暗绘去后摇;
+                            _条件集[ConditionSlotKey.C1].Probe ??= 命运之笔去后摇;
+                            _条件集[ConditionSlotKey.C2].Probe ??= 幻影之拥去后摇;
+                            _条件集[ConditionSlotKey.C3].Probe ??= 墨泳去后摇;
+                            _条件集[ConditionSlotKey.C4].Probe ??= 缚魂去后摇;
+                            _条件集[ConditionSlotKey.C5].Probe ??= 暗绘去后摇;
                             await 状态初始化().ConfigureAwait(false);
                         }
 
@@ -2584,25 +2422,25 @@ namespace Dota2Simulator.Games.Dota2
 
                         if (e.KeyValue == (int)Keys.E && (int)e.Modifiers == (int)Keys.Alt)
                         {
-                            _条件3 = true;
+                            _条件集[ConditionSlotKey.C3].Active = true;
                         }
 
                         switch (e.KeyCode)
                         {
                             case Keys.Q:
-                                _条件1 = true;
+                                _条件集[ConditionSlotKey.C1].Active = true;
                                 break;
                             case Keys.W:
-                                _条件2 = true;
+                                _条件集[ConditionSlotKey.C2].Active = true;
                                 break;
                             case Keys.E:
-                                _条件3 = true;
+                                _条件集[ConditionSlotKey.C3].Active = true;
                                 break;
                             case Keys.R:
-                                _条件4 = true;
+                                _条件集[ConditionSlotKey.C4].Active = true;
                                 break;
                             case Keys.D:
-                                _条件5 = true;
+                                _条件集[ConditionSlotKey.C5].Active = true;
                                 break;
                         }
 
@@ -2618,11 +2456,11 @@ namespace Dota2Simulator.Games.Dota2
                         if (!_总循环条件)
                         {
                             _总循环条件 = true;
-                            _条件根据图片委托1 ??= 弧形闪电去后摇;
-                            _条件根据图片委托2 ??= 雷击去后摇;
-                            _条件根据图片委托3 ??= 神圣一跳去后摇;
-                            _条件根据图片委托4 ??= 雷神之怒去后摇;
-                            _条件根据图片委托5 ??= 雷云去后摇;
+                            _条件集[ConditionSlotKey.C1].Probe ??= 弧形闪电去后摇;
+                            _条件集[ConditionSlotKey.C2].Probe ??= 雷击去后摇;
+                            _条件集[ConditionSlotKey.C3].Probe ??= 神圣一跳去后摇;
+                            _条件集[ConditionSlotKey.C4].Probe ??= 雷神之怒去后摇;
+                            _条件集[ConditionSlotKey.C5].Probe ??= 雷云去后摇;
                             await 状态初始化().ConfigureAwait(false);
                         }
 
@@ -2631,19 +2469,19 @@ namespace Dota2Simulator.Games.Dota2
                         switch (e.KeyCode)
                         {
                             case Keys.Q:
-                                _条件1 = true;
+                                _条件集[ConditionSlotKey.C1].Active = true;
                                 break;
                             case Keys.W:
-                                _条件2 = true;
+                                _条件集[ConditionSlotKey.C2].Active = true;
                                 break;
                             case Keys.E:
-                                _条件3 = true;
+                                _条件集[ConditionSlotKey.C3].Active = true;
                                 break;
                             case Keys.R:
-                                _条件4 = true;
+                                _条件集[ConditionSlotKey.C4].Active = true;
                                 break;
                             case Keys.D:
-                                _条件5 = true;
+                                _条件集[ConditionSlotKey.C5].Active = true;
                                 break;
                         }
 
@@ -2659,9 +2497,9 @@ namespace Dota2Simulator.Games.Dota2
                         if (!_总循环条件)
                         {
                             _总循环条件 = true;
-                            _条件根据图片委托1 ??= 麻痹药剂去后摇;
-                            _条件根据图片委托2 ??= 巫蛊咒术去后摇;
-                            _条件根据图片委托3 ??= 死亡守卫隐身;
+                            _条件集[ConditionSlotKey.C1].Probe ??= 麻痹药剂去后摇;
+                            _条件集[ConditionSlotKey.C2].Probe ??= 巫蛊咒术去后摇;
+                            _条件集[ConditionSlotKey.C3].Probe ??= 死亡守卫隐身;
                             await 状态初始化().ConfigureAwait(false);
                         }
 
@@ -2670,13 +2508,13 @@ namespace Dota2Simulator.Games.Dota2
                         switch (e.KeyCode)
                         {
                             case Keys.Q:
-                                _条件1 = true;
+                                _条件集[ConditionSlotKey.C1].Active = true;
                                 break;
                             case Keys.E:
-                                _条件2 = true;
+                                _条件集[ConditionSlotKey.C2].Active = true;
                                 break;
                             case Keys.R:
-                                _条件3 = true;
+                                _条件集[ConditionSlotKey.C3].Active = true;
                                 break;
                         }
 
@@ -2692,11 +2530,11 @@ namespace Dota2Simulator.Games.Dota2
                         if (!_总循环条件)
                         {
                             _总循环条件 = true;
-                            _条件根据图片委托1 ??= 寒霜爆发去后摇;
-                            _条件根据图片委托2 ??= 冰霜魔盾去后摇;
-                            _条件根据图片委托3 ??= 阴邪凝视去后摇;
-                            _条件根据图片委托4 ??= 连环霜冻去后摇;
-                            _条件根据图片委托5 ??= 寒冰尖柱去后摇;
+                            _条件集[ConditionSlotKey.C1].Probe ??= 寒霜爆发去后摇;
+                            _条件集[ConditionSlotKey.C2].Probe ??= 冰霜魔盾去后摇;
+                            _条件集[ConditionSlotKey.C3].Probe ??= 阴邪凝视去后摇;
+                            _条件集[ConditionSlotKey.C4].Probe ??= 连环霜冻去后摇;
+                            _条件集[ConditionSlotKey.C5].Probe ??= 寒冰尖柱去后摇;
                             await 状态初始化().ConfigureAwait(false);
                         }
 
@@ -2704,25 +2542,25 @@ namespace Dota2Simulator.Games.Dota2
 
                         if (e.KeyValue == (int)Keys.W && (int)e.Modifiers == (int)Keys.Alt)
                         {
-                            _条件2 = true;
+                            _条件集[ConditionSlotKey.C2].Active = true;
                         }
 
                         switch (e.KeyCode)
                         {
                             case Keys.Q:
-                                _条件1 = true;
+                                _条件集[ConditionSlotKey.C1].Active = true;
                                 break;
                             case Keys.W:
-                                _条件2 = true;
+                                _条件集[ConditionSlotKey.C2].Active = true;
                                 break;
                             case Keys.E:
-                                _条件3 = true;
+                                _条件集[ConditionSlotKey.C3].Active = true;
                                 break;
                             case Keys.R:
-                                _条件4 = true;
+                                _条件集[ConditionSlotKey.C4].Active = true;
                                 break;
                             case Keys.D:
-                                _条件5 = true;
+                                _条件集[ConditionSlotKey.C5].Active = true;
                                 break;
                         }
 
@@ -2738,10 +2576,10 @@ namespace Dota2Simulator.Games.Dota2
                         if (!_总循环条件)
                         {
                             _总循环条件 = true;
-                            _条件根据图片委托1 ??= 幻象法球去后摇;
-                            _条件根据图片委托2 ??= 新月之痕去后摇;
-                            _条件根据图片委托4 ??= 梦境缠绕去后摇;
-                            _条件根据图片委托5 ??= 灵动之翼定位;
+                            _条件集[ConditionSlotKey.C1].Probe ??= 幻象法球去后摇;
+                            _条件集[ConditionSlotKey.C2].Probe ??= 新月之痕去后摇;
+                            _条件集[ConditionSlotKey.C4].Probe ??= 梦境缠绕去后摇;
+                            _条件集[ConditionSlotKey.C5].Probe ??= 灵动之翼定位;
                             await 状态初始化().ConfigureAwait(false);
                         }
 
@@ -2749,22 +2587,22 @@ namespace Dota2Simulator.Games.Dota2
 
                         if (e.KeyValue == (int)Keys.W && (int)e.Modifiers == (int)Keys.Control)
                         {
-                            _条件2 = true;
+                            _条件集[ConditionSlotKey.C2].Active = true;
                         }
 
                         switch (e.KeyCode)
                         {
                             case Keys.Q:
-                                _条件1 = true;
+                                _条件集[ConditionSlotKey.C1].Active = true;
                                 break;
                             case Keys.W:
-                                _条件2 = true;
+                                _条件集[ConditionSlotKey.C2].Active = true;
                                 break;
                             case Keys.R:
-                                _条件4 = true;
+                                _条件集[ConditionSlotKey.C4].Active = true;
                                 break;
                             case Keys.D:
-                                _条件5 = true;
+                                _条件集[ConditionSlotKey.C5].Active = true;
                                 break;
                             case Keys.D2:
                                 _槽.ToggleMode(SlotKey.D);
@@ -2784,10 +2622,10 @@ namespace Dota2Simulator.Games.Dota2
                         if (!_总循环条件)
                         {
                             _总循环条件 = true;
-                            _条件根据图片委托1 ??= 幽冥轰爆去后摇;
-                            _条件根据图片委托2 ??= 衰老去后摇;
-                            _条件根据图片委托3 ??= 幽冥守卫去后摇;
-                            _条件根据图片委托4 ??= 生命吸取去后摇;
+                            _条件集[ConditionSlotKey.C1].Probe ??= 幽冥轰爆去后摇;
+                            _条件集[ConditionSlotKey.C2].Probe ??= 衰老去后摇;
+                            _条件集[ConditionSlotKey.C3].Probe ??= 幽冥守卫去后摇;
+                            _条件集[ConditionSlotKey.C4].Probe ??= 生命吸取去后摇;
                             await 状态初始化().ConfigureAwait(false);
                         }
 
@@ -2796,18 +2634,18 @@ namespace Dota2Simulator.Games.Dota2
                         switch (e.KeyCode)
                         {
                             case Keys.Q:
-                                _条件1 = true;
+                                _条件集[ConditionSlotKey.C1].Active = true;
                                 break;
                             case Keys.W:
-                                _条件2 = true;
+                                _条件集[ConditionSlotKey.C2].Active = true;
                                 break;
                             case Keys.E:
-                                _条件3 = true;
+                                _条件集[ConditionSlotKey.C3].Active = true;
                                 break;
                             case Keys.R:
                                 Item.根据图片使用物品(Dota2_Pictrue.物品.希瓦);
                                 Item.根据图片使用物品(Dota2_Pictrue.物品.纷争);
-                                _条件4 = true;
+                                _条件集[ConditionSlotKey.C4].Active = true;
                                 break;
                             case Keys.D2:
                                 _槽.ToggleMode(SlotKey.R);
@@ -2827,11 +2665,11 @@ namespace Dota2Simulator.Games.Dota2
                         if (!_总循环条件)
                         {
                             _总循环条件 = true;
-                            _条件根据图片委托1 ??= 风雷之击去后摇;
-                            _条件根据图片委托2 ??= 恶念瞥视去后摇;
-                            _条件根据图片委托3 ??= 动能力场去后摇;
-                            _条件根据图片委托4 ??= 静态风暴去后摇;
-                            _条件根据图片委托5 ??= 静态风暴动能立场风雷之击;
+                            _条件集[ConditionSlotKey.C1].Probe ??= 风雷之击去后摇;
+                            _条件集[ConditionSlotKey.C2].Probe ??= 恶念瞥视去后摇;
+                            _条件集[ConditionSlotKey.C3].Probe ??= 动能力场去后摇;
+                            _条件集[ConditionSlotKey.C4].Probe ??= 静态风暴去后摇;
+                            _条件集[ConditionSlotKey.C5].Probe ??= 静态风暴动能立场风雷之击;
                             await 状态初始化().ConfigureAwait(false);
                         }
 
@@ -2840,20 +2678,20 @@ namespace Dota2Simulator.Games.Dota2
                         switch (e.KeyCode)
                         {
                             case Keys.Q:
-                                _条件1 = true;
+                                _条件集[ConditionSlotKey.C1].Active = true;
                                 break;
                             case Keys.W:
-                                _条件2 = true;
+                                _条件集[ConditionSlotKey.C2].Active = true;
                                 break;
                             case Keys.E:
-                                _条件3 = true;
+                                _条件集[ConditionSlotKey.C3].Active = true;
                                 break;
                             case Keys.R:
-                                _条件4 = true;
+                                _条件集[ConditionSlotKey.C4].Active = true;
                                 break;
                             case Keys.D2:
                                 _槽.SetStep(SlotKey.W, 0);
-                                _条件5 = true;
+                                _条件集[ConditionSlotKey.C5].Active = true;
                                 break;
                         }
 
@@ -2869,8 +2707,8 @@ namespace Dota2Simulator.Games.Dota2
                         if (!_总循环条件)
                         {
                             _总循环条件 = true;
-                            _条件根据图片委托1 ??= 神智之蚀去后摇;
-                            _条件根据图片委托2 ??= 关接跳;
+                            _条件集[ConditionSlotKey.C1].Probe ??= 神智之蚀去后摇;
+                            _条件集[ConditionSlotKey.C2].Probe ??= 关接跳;
                             await 状态初始化().ConfigureAwait(false);
                         }
 
@@ -2878,16 +2716,16 @@ namespace Dota2Simulator.Games.Dota2
                         {
                             case Keys.D:
                                 SimKeyBoard.KeyPress(Keys.W);
-                                _条件1 = true;
+                                _条件集[ConditionSlotKey.C1].Active = true;
                                 break;
                             case Keys.W:
                                 Item.根据图片使用物品(Dota2_Pictrue.物品.纷争);
                                 break;
                             case Keys.E:
-                                _条件3 = true;
+                                _条件集[ConditionSlotKey.C3].Active = true;
                                 break;
                             case Keys.R:
-                                _条件2 = true;
+                                _条件集[ConditionSlotKey.C2].Active = true;
                                 break;
                         }
 
@@ -2926,9 +2764,9 @@ namespace Dota2Simulator.Games.Dota2
                         if (!_总循环条件)
                         {
                             _总循环条件 = true;
-                            _条件根据图片委托1 ??= 龙破斩去后摇;
-                            _条件根据图片委托2 ??= 光击阵去后摇;
-                            _条件根据图片委托3 ??= 神灭斩去后摇;
+                            _条件集[ConditionSlotKey.C1].Probe ??= 龙破斩去后摇;
+                            _条件集[ConditionSlotKey.C2].Probe ??= 光击阵去后摇;
+                            _条件集[ConditionSlotKey.C3].Probe ??= 神灭斩去后摇;
                             await 状态初始化().ConfigureAwait(false);
                         }
 
@@ -2936,13 +2774,13 @@ namespace Dota2Simulator.Games.Dota2
                         switch (e.KeyCode)
                         {
                             case Keys.Q:
-                                _条件1 = true;
+                                _条件集[ConditionSlotKey.C1].Active = true;
                                 break;
                             case Keys.W:
-                                _条件2 = true;
+                                _条件集[ConditionSlotKey.C2].Active = true;
                                 break;
                             case Keys.R:
-                                _条件3 = true;
+                                _条件集[ConditionSlotKey.C3].Active = true;
                                 break;
                         }
 
@@ -2958,8 +2796,8 @@ namespace Dota2Simulator.Games.Dota2
                         if (!_总循环条件)
                         {
                             _总循环条件 = true;
-                            _条件根据图片委托1 ??= 拉接平A;
-                            _条件根据图片委托2 ??= 滚接平A;
+                            _条件集[ConditionSlotKey.C1].Probe ??= 拉接平A;
+                            _条件集[ConditionSlotKey.C2].Probe ??= 滚接平A;
                             await 状态初始化().ConfigureAwait(false);
                         }
 
@@ -2970,13 +2808,13 @@ namespace Dota2Simulator.Games.Dota2
                                 await Task.Run(残影接平A).ConfigureAwait(true);
                                 break;
                             case Keys.W:
-                                _条件1 = true;
+                                _条件集[ConditionSlotKey.C1].Active = true;
                                 break;
                             case Keys.R:
-                                _条件2 = true;
+                                _条件集[ConditionSlotKey.C2].Active = true;
                                 break;
                             case Keys.D4:
-                                _条件3 = true;
+                                _条件集[ConditionSlotKey.C3].Active = true;
                                 break;
                         }
 
@@ -2992,10 +2830,10 @@ namespace Dota2Simulator.Games.Dota2
                         if (!_总循环条件)
                         {
                             _总循环条件 = true;
-                            _条件根据图片委托1 ??= 三冰对线;
-                            _条件根据图片委托2 ??= 三雷对线;
-                            _条件根据图片委托3 ??= 三雷幽灵;
-                            _条件根据图片委托4 ??= 极冷吹风陨星锤雷暴;
+                            _条件集[ConditionSlotKey.C1].Probe ??= 三冰对线;
+                            _条件集[ConditionSlotKey.C2].Probe ??= 三雷对线;
+                            _条件集[ConditionSlotKey.C3].Probe ??= 三雷幽灵;
+                            _条件集[ConditionSlotKey.C4].Probe ??= 极冷吹风陨星锤雷暴;
                             await 状态初始化().ConfigureAwait(false);
                         }
 
@@ -3004,16 +2842,16 @@ namespace Dota2Simulator.Games.Dota2
                         switch (e.KeyCode)
                         {
                             case Keys.D1:
-                                _条件1 = true;
+                                _条件集[ConditionSlotKey.C1].Active = true;
                                 break;
                             case Keys.D2:
-                                _条件2 = true;
+                                _条件集[ConditionSlotKey.C2].Active = true;
                                 break;
                             case Keys.D3:
-                                _条件3 = true;
+                                _条件集[ConditionSlotKey.C3].Active = true;
                                 break;
                             case Keys.D4:
-                                _条件4 = true;
+                                _条件集[ConditionSlotKey.C4].Active = true;
                                 break;
                         }
 
@@ -3029,11 +2867,11 @@ namespace Dota2Simulator.Games.Dota2
                         if (!_总循环条件)
                         {
                             _总循环条件 = true;
-                            _条件根据图片委托1 ??= 撕裂大地去后摇;
-                            _条件根据图片委托2 ??= 恶魔敕令去后摇;
-                            _条件根据图片委托3 ??= 闪电风暴去后摇;
-                            _条件根据图片委托4 ??= 脉冲新星去后摇;
-                            _条件根据图片委托5 ??= 虚无主义去后摇;
+                            _条件集[ConditionSlotKey.C1].Probe ??= 撕裂大地去后摇;
+                            _条件集[ConditionSlotKey.C2].Probe ??= 恶魔敕令去后摇;
+                            _条件集[ConditionSlotKey.C3].Probe ??= 闪电风暴去后摇;
+                            _条件集[ConditionSlotKey.C4].Probe ??= 脉冲新星去后摇;
+                            _条件集[ConditionSlotKey.C5].Probe ??= 虚无主义去后摇;
                             await 状态初始化().ConfigureAwait(false);
                         }
 
@@ -3042,19 +2880,19 @@ namespace Dota2Simulator.Games.Dota2
                         switch (e.KeyCode)
                         {
                             case Keys.Q:
-                                _条件1 = true;
+                                _条件集[ConditionSlotKey.C1].Active = true;
                                 break;
                             case Keys.W:
-                                _条件2 = true;
+                                _条件集[ConditionSlotKey.C2].Active = true;
                                 break;
                             case Keys.E:
-                                _条件3 = true;
+                                _条件集[ConditionSlotKey.C3].Active = true;
                                 break;
                             case Keys.D:
-                                _条件5 = true;
+                                _条件集[ConditionSlotKey.C5].Active = true;
                                 break;
                             case Keys.R:
-                                _条件4 = true;
+                                _条件集[ConditionSlotKey.C4].Active = true;
                                 break;
                         }
 
@@ -3070,9 +2908,9 @@ namespace Dota2Simulator.Games.Dota2
                         if (!_总循环条件)
                         {
                             _总循环条件 = true;
-                            _条件根据图片委托1 ??= 致命链接去后摇;
-                            _条件根据图片委托2 ??= 暗言术去后摇;
-                            _条件根据图片委托3 ??= 混乱之祭去后摇;
+                            _条件集[ConditionSlotKey.C1].Probe ??= 致命链接去后摇;
+                            _条件集[ConditionSlotKey.C2].Probe ??= 暗言术去后摇;
+                            _条件集[ConditionSlotKey.C3].Probe ??= 混乱之祭去后摇;
                             await 状态初始化().ConfigureAwait(false);
                         }
 
@@ -3081,17 +2919,17 @@ namespace Dota2Simulator.Games.Dota2
                         {
                             case Keys.Q:
                                 Item.根据图片使用物品(Dota2_Pictrue.物品.纷争);
-                                _条件1 = true;
+                                _条件集[ConditionSlotKey.C1].Active = true;
                                 break;
                             case Keys.W:
-                                _条件2 = true;
+                                _条件集[ConditionSlotKey.C2].Active = true;
                                 break;
                             case Keys.E:
                                 _槽.SetTime(SlotKey.E, Common.获取当前时间毫秒());
                                 break;
                             case Keys.R:
                                 _槽.SetTime(SlotKey.R, Common.获取当前时间毫秒());
-                                _条件3 = true;
+                                _条件集[ConditionSlotKey.C3].Active = true;
                                 break;
                         }
 
@@ -3107,11 +2945,11 @@ namespace Dota2Simulator.Games.Dota2
                         if (!_总循环条件)
                         {
                             _总循环条件 = true;
-                            _条件根据图片委托1 ??= 苍穹振击取消后摇;
-                            _条件根据图片委托2 ??= 变羊取消后摇;
-                            _条件根据图片委托3 ??= 释放群蛇守卫取消后摇;
-                            _条件根据图片委托4 ??= 推推破林肯秒羊;
-                            _条件根据图片委托5 ??= 枷锁持续施法隐身;
+                            _条件集[ConditionSlotKey.C1].Probe ??= 苍穹振击取消后摇;
+                            _条件集[ConditionSlotKey.C2].Probe ??= 变羊取消后摇;
+                            _条件集[ConditionSlotKey.C3].Probe ??= 释放群蛇守卫取消后摇;
+                            _条件集[ConditionSlotKey.C4].Probe ??= 推推破林肯秒羊;
+                            _条件集[ConditionSlotKey.C5].Probe ??= 枷锁持续施法隐身;
                             await 状态初始化().ConfigureAwait(false);
                         }
 
@@ -3119,7 +2957,7 @@ namespace Dota2Simulator.Games.Dota2
                         switch (e.KeyCode)
                         {
                             case Keys.Q:
-                                _条件1 = true;
+                                _条件集[ConditionSlotKey.C1].Active = true;
                                 break;
                             case Keys.W:
                                 if (ImageFinder.FindImageInRegionBool(Dota2_Pictrue.物品.中立_祭礼长袍, GlobalScreenCapture.GetCurrentHandle(), Item.获取中立TP范围(Skill._技能数量)))
@@ -3132,13 +2970,13 @@ namespace Dota2Simulator.Games.Dota2
                                     _状态抗性倍数 *= 1.2;
                                 }
 
-                                _条件2 = true;
+                                _条件集[ConditionSlotKey.C2].Active = true;
                                 break;
                             case Keys.E:
-                                _条件5 = true;
+                                _条件集[ConditionSlotKey.C5].Active = true;
                                 break;
                             case Keys.R:
-                                _条件3 = true;
+                                _条件集[ConditionSlotKey.C3].Active = true;
                                 break;
                             case Keys.D1:
                                 switch (_槽.Mode(SlotKey.W))
@@ -3167,7 +3005,7 @@ namespace Dota2Simulator.Games.Dota2
 
                                 break;
                             case Keys.D2:
-                                _条件4 = true;
+                                _条件集[ConditionSlotKey.C4].Active = true;
                                 break;
                             case Keys.D3:
                                 _槽.ToggleMode(SlotKey.Q);
@@ -3187,7 +3025,7 @@ namespace Dota2Simulator.Games.Dota2
                         if (!_总循环条件)
                         {
                             _总循环条件 = true;
-                            _条件根据图片委托5 ??= 无限暗影之境;
+                            _条件集[ConditionSlotKey.C5].Probe ??= 无限暗影之境;
                             await 状态初始化().ConfigureAwait(false);
                         }
 
@@ -3198,12 +3036,12 @@ namespace Dota2Simulator.Games.Dota2
                             case Keys.F:
                                 if (Item._是否魔晶)
                                 {
-                                    _条件4 = true;
+                                    _条件集[ConditionSlotKey.C4].Active = true;
                                 }
                                 break;
                             case Keys.D3:
-                                _条件5 = !_条件5;
-                                TTS.TTS.Speak(_条件5 ? "续暗影" : "不续暗影");
+                                _条件集[ConditionSlotKey.C5].Active = !_条件集[ConditionSlotKey.C5].Active;
+                                TTS.TTS.Speak(_条件集[ConditionSlotKey.C5].Active ? "续暗影" : "不续暗影");
                                 break;
                         }
 
@@ -3219,10 +3057,10 @@ namespace Dota2Simulator.Games.Dota2
                         if (!_总循环条件)
                         {
                             _总循环条件 = true;
-                            _条件根据图片委托1 ??= 粘性炸弹去后摇;
-                            _条件根据图片委托2 ??= 活性电击去后摇;
-                            _条件根据图片委托3 ??= 爆破起飞去后摇;
-                            _条件根据图片委托4 ??= 爆破后接3雷粘性炸弹;
+                            _条件集[ConditionSlotKey.C1].Probe ??= 粘性炸弹去后摇;
+                            _条件集[ConditionSlotKey.C2].Probe ??= 活性电击去后摇;
+                            _条件集[ConditionSlotKey.C3].Probe ??= 爆破起飞去后摇;
+                            _条件集[ConditionSlotKey.C4].Probe ??= 爆破后接3雷粘性炸弹;
                             await 状态初始化().ConfigureAwait(false);
                         }
 
@@ -3230,14 +3068,14 @@ namespace Dota2Simulator.Games.Dota2
                         switch (e.KeyCode)
                         {
                             case Keys.Q:
-                                _条件1 = true;
+                                _条件集[ConditionSlotKey.C1].Active = true;
                                 break;
                             case Keys.W:
-                                _条件2 = true;
+                                _条件集[ConditionSlotKey.C2].Active = true;
                                 break;
                             case Keys.E:
                                 Item.根据图片使用物品(Dota2_Pictrue.物品.纷争);
-                                _条件3 = true;
+                                _条件集[ConditionSlotKey.C3].Active = true;
                                 break;
                             case Keys.D2:
                                 _槽.ToggleMode(SlotKey.E);
@@ -3257,10 +3095,10 @@ namespace Dota2Simulator.Games.Dota2
                         if (!_总循环条件)
                         {
                             _总循环条件 = true;
-                            _条件根据图片委托1 ??= 命运敕令去后摇;
-                            _条件根据图片委托2 ??= 涤罪之焰去后摇;
-                            _条件根据图片委托3 ??= 虚妄之诺去后摇;
-                            _条件根据图片委托5 ??= 天命之雨去后摇;
+                            _条件集[ConditionSlotKey.C1].Probe ??= 命运敕令去后摇;
+                            _条件集[ConditionSlotKey.C2].Probe ??= 涤罪之焰去后摇;
+                            _条件集[ConditionSlotKey.C3].Probe ??= 虚妄之诺去后摇;
+                            _条件集[ConditionSlotKey.C5].Probe ??= 天命之雨去后摇;
                             await 状态初始化().ConfigureAwait(false);
                         }
 
@@ -3269,16 +3107,16 @@ namespace Dota2Simulator.Games.Dota2
                         switch (e.KeyCode)
                         {
                             case Keys.W:
-                                _条件1 = true;
+                                _条件集[ConditionSlotKey.C1].Active = true;
                                 break;
                             case Keys.E:
-                                _条件2 = true;
+                                _条件集[ConditionSlotKey.C2].Active = true;
                                 break;
                             case Keys.D:
-                                _条件5 = true;
+                                _条件集[ConditionSlotKey.C5].Active = true;
                                 break;
                             case Keys.R:
-                                _条件3 = true;
+                                _条件集[ConditionSlotKey.C3].Active = true;
                                 break;
                         }
 
@@ -3294,10 +3132,10 @@ namespace Dota2Simulator.Games.Dota2
                         if (!_总循环条件)
                         {
                             _总循环条件 = true;
-                            _条件根据图片委托1 ??= 莱恩羊接技能;
-                            _条件根据图片委托2 ??= 死亡一指去后摇;
-                            _条件根据图片委托3 ??= 推推破林肯秒羊;
-                            _条件根据图片委托4 ??= 羊刺刷新秒人;
+                            _条件集[ConditionSlotKey.C1].Probe ??= 莱恩羊接技能;
+                            _条件集[ConditionSlotKey.C2].Probe ??= 死亡一指去后摇;
+                            _条件集[ConditionSlotKey.C3].Probe ??= 推推破林肯秒羊;
+                            _条件集[ConditionSlotKey.C4].Probe ??= 羊刺刷新秒人;
 
                             await 状态初始化().ConfigureAwait(false);
                         }
@@ -3306,37 +3144,37 @@ namespace Dota2Simulator.Games.Dota2
                         switch (e.KeyCode)
                         {
                             case Keys.W:
-                                _条件1 = true;
+                                _条件集[ConditionSlotKey.C1].Active = true;
                                 break;
                             case Keys.R:
                                 await 大招前纷争(GlobalScreenCapture.GetCurrentHandle()).ConfigureAwait(true);
-                                _条件2 = true;
+                                _条件集[ConditionSlotKey.C2].Active = true;
                                 break;
                             case Keys.E:
                                 break;
                             case Keys.D2:
-                                _条件3 = true;
+                                _条件集[ConditionSlotKey.C3].Active = true;
                                 break;
                             case Keys.S:
                                 _中断条件 = true;
                                 break;
                             case Keys.D3:
-                                _条件4 = true;
+                                _条件集[ConditionSlotKey.C4].Active = true;
                                 break;
-                            case Keys.D4 when !_条件5:
-                                _条件5 = true;
+                            case Keys.D4 when !_条件集[ConditionSlotKey.C5].Active:
+                                _条件集[ConditionSlotKey.C5].Active = true;
                                 TTS.TTS.Speak("开启刷新秒人");
                                 break;
                             case Keys.D4:
-                                _条件5 = false;
+                                _条件集[ConditionSlotKey.C5].Active = false;
                                 TTS.TTS.Speak("关闭刷新秒人");
                                 break;
-                            case Keys.D5 when !_条件6:
-                                _条件6 = true;
+                            case Keys.D5 when !_条件集[ConditionSlotKey.C6].Active:
+                                _条件集[ConditionSlotKey.C6].Active = true;
                                 TTS.TTS.Speak("开启羊接吸");
                                 break;
                             case Keys.D5:
-                                _条件6 = false;
+                                _条件集[ConditionSlotKey.C6].Active = false;
                                 TTS.TTS.Speak("开启羊接A");
                                 break;
                         }
@@ -3353,8 +3191,8 @@ namespace Dota2Simulator.Games.Dota2
                         if (!_总循环条件)
                         {
                             _总循环条件 = true;
-                            _条件根据图片委托1 ??= 奥数诅咒去后摇;
-                            _条件根据图片委托2 ??= 全领域沉默去后摇;
+                            _条件集[ConditionSlotKey.C1].Probe ??= 奥数诅咒去后摇;
+                            _条件集[ConditionSlotKey.C2].Probe ??= 全领域沉默去后摇;
                             await 状态初始化().ConfigureAwait(false);
                         }
 
@@ -3362,10 +3200,10 @@ namespace Dota2Simulator.Games.Dota2
                         switch (e.KeyCode)
                         {
                             case Keys.Q:
-                                _条件1 = true;
+                                _条件集[ConditionSlotKey.C1].Active = true;
                                 break;
                             case Keys.R:
-                                _条件2 = true;
+                                _条件集[ConditionSlotKey.C2].Active = true;
                                 break;
                         }
 
@@ -3381,10 +3219,10 @@ namespace Dota2Simulator.Games.Dota2
                         if (!_总循环条件)
                         {
                             _总循环条件 = true;
-                            _条件根据图片委托1 ??= 剧毒之触去后摇;
-                            _条件根据图片委托2 ??= 薄葬去后摇;
-                            _条件根据图片委托3 ??= 暗影波去后摇;
-                            _条件根据图片委托4 ??= 邪能去后摇;
+                            _条件集[ConditionSlotKey.C1].Probe ??= 剧毒之触去后摇;
+                            _条件集[ConditionSlotKey.C2].Probe ??= 薄葬去后摇;
+                            _条件集[ConditionSlotKey.C3].Probe ??= 暗影波去后摇;
+                            _条件集[ConditionSlotKey.C4].Probe ??= 邪能去后摇;
                             _基础攻击前摇 = 0.3;
                             _基础攻击间隔 = 1.7;
                             await 状态初始化().ConfigureAwait(false);
@@ -3395,19 +3233,19 @@ namespace Dota2Simulator.Games.Dota2
                         {
                             case Keys.Q:
                                 _槽.SetTime(SlotKey.Q, Common.获取当前时间毫秒());
-                                _条件1 = true;
+                                _条件集[ConditionSlotKey.C1].Active = true;
                                 break;
                             case Keys.W:
                                 _槽.SetTime(SlotKey.W, Common.获取当前时间毫秒());
-                                _条件2 = true;
+                                _条件集[ConditionSlotKey.C2].Active = true;
                                 break;
                             case Keys.E:
                                 _槽.SetTime(SlotKey.E, Common.获取当前时间毫秒());
-                                _条件3 = true;
+                                _条件集[ConditionSlotKey.C3].Active = true;
                                 break;
                             case Keys.R:
                                 _槽.SetTime(SlotKey.R, Common.获取当前时间毫秒());
-                                _条件4 = true;
+                                _条件集[ConditionSlotKey.C4].Active = true;
                                 break;
                         }
 
@@ -3423,10 +3261,10 @@ namespace Dota2Simulator.Games.Dota2
                         if (!_总循环条件)
                         {
                             _总循环条件 = true;
-                            _条件根据图片委托1 ??= 冰火交加去后摇;
-                            _条件根据图片委托2 ??= 冰封路径去后摇;
-                            _条件根据图片委托3 ??= 烈焰焚身去后摇;
-                            _条件根据图片委托4 ??= 吹风接冰封路径;
+                            _条件集[ConditionSlotKey.C1].Probe ??= 冰火交加去后摇;
+                            _条件集[ConditionSlotKey.C2].Probe ??= 冰封路径去后摇;
+                            _条件集[ConditionSlotKey.C3].Probe ??= 烈焰焚身去后摇;
+                            _条件集[ConditionSlotKey.C4].Probe ??= 吹风接冰封路径;
                             await 状态初始化().ConfigureAwait(false);
                         }
 
@@ -3435,16 +3273,16 @@ namespace Dota2Simulator.Games.Dota2
                         switch (e.KeyCode)
                         {
                             case Keys.Q:
-                                _条件1 = true;
+                                _条件集[ConditionSlotKey.C1].Active = true;
                                 break;
                             case Keys.W:
-                                _条件2 = true;
+                                _条件集[ConditionSlotKey.C2].Active = true;
                                 break;
                             case Keys.R:
-                                _条件3 = true;
+                                _条件集[ConditionSlotKey.C3].Active = true;
                                 break;
                             case Keys.D3:
-                                _条件4 = true;
+                                _条件集[ConditionSlotKey.C4].Active = true;
                                 break;
                         }
 
@@ -3460,11 +3298,11 @@ namespace Dota2Simulator.Games.Dota2
                         if (!_总循环条件)
                         {
                             _总循环条件 = true;
-                            _条件根据图片委托1 ??= 弹无虚发去后摇;
-                            _条件根据图片委托2 ??= 唤魂去后摇;
-                            _条件根据图片委托3 ??= 越界去后摇;
-                            _条件根据图片委托4 ??= 临别一枪去后摇;
-                            _条件根据图片委托5 ??= 祭台去后摇;
+                            _条件集[ConditionSlotKey.C1].Probe ??= 弹无虚发去后摇;
+                            _条件集[ConditionSlotKey.C2].Probe ??= 唤魂去后摇;
+                            _条件集[ConditionSlotKey.C3].Probe ??= 越界去后摇;
+                            _条件集[ConditionSlotKey.C4].Probe ??= 临别一枪去后摇;
+                            _条件集[ConditionSlotKey.C5].Probe ??= 祭台去后摇;
                             Item._切假腿配置.修改配置(Keys.E, false);
                             await 状态初始化().ConfigureAwait(false);
                         }
@@ -3474,13 +3312,13 @@ namespace Dota2Simulator.Games.Dota2
                         switch (e.KeyCode)
                         {
                             case Keys.Q:
-                                _条件1 = true;
+                                _条件集[ConditionSlotKey.C1].Active = true;
                                 break;
                             case Keys.W:
-                                _条件2 = true;
+                                _条件集[ConditionSlotKey.C2].Active = true;
                                 break;
                             case Keys.R:
-                                _条件3 = true;
+                                _条件集[ConditionSlotKey.C3].Active = true;
                                 break;
                         }
 
@@ -3496,10 +3334,10 @@ namespace Dota2Simulator.Games.Dota2
                         if (!_总循环条件)
                         {
                             _总循环条件 = true;
-                            _条件根据图片委托1 ??= 暗影突袭去后摇;
-                            _条件根据图片委托2 ??= 闪烁去后摇;
-                            _条件根据图片委托3 ??= 痛苦尖叫去后摇;
-                            _条件根据图片委托4 ??= 冲击波去后摇;
+                            _条件集[ConditionSlotKey.C1].Probe ??= 暗影突袭去后摇;
+                            _条件集[ConditionSlotKey.C2].Probe ??= 闪烁去后摇;
+                            _条件集[ConditionSlotKey.C3].Probe ??= 痛苦尖叫去后摇;
+                            _条件集[ConditionSlotKey.C4].Probe ??= 冲击波去后摇;
                             await 状态初始化().ConfigureAwait(false);
                         }
 
@@ -3507,16 +3345,16 @@ namespace Dota2Simulator.Games.Dota2
                         switch (e.KeyCode)
                         {
                             case Keys.Q:
-                                _条件1 = true;
+                                _条件集[ConditionSlotKey.C1].Active = true;
                                 break;
                             case Keys.W:
-                                _条件2 = true;
+                                _条件集[ConditionSlotKey.C2].Active = true;
                                 break;
                             case Keys.E:
-                                _条件3 = true;
+                                _条件集[ConditionSlotKey.C3].Active = true;
                                 break;
                             case Keys.R:
-                                _条件4 = true;
+                                _条件集[ConditionSlotKey.C4].Active = true;
                                 break;
                             case Keys.S:
                                 _中断条件 = true;
@@ -3535,11 +3373,11 @@ namespace Dota2Simulator.Games.Dota2
                         if (!_总循环条件)
                         {
                             _总循环条件 = true;
-                            _条件根据图片委托1 ??= 火焰轰爆去后摇;
-                            _条件根据图片委托2 ??= 引燃去后摇;
-                            _条件根据图片委托3 ??= 嗜血术去后摇;
-                            _条件根据图片委托4 ??= 烈火护盾去后摇;
-                            _条件根据图片委托5 ??= 未精通火焰轰爆去后摇;
+                            _条件集[ConditionSlotKey.C1].Probe ??= 火焰轰爆去后摇;
+                            _条件集[ConditionSlotKey.C2].Probe ??= 引燃去后摇;
+                            _条件集[ConditionSlotKey.C3].Probe ??= 嗜血术去后摇;
+                            _条件集[ConditionSlotKey.C4].Probe ??= 烈火护盾去后摇;
+                            _条件集[ConditionSlotKey.C5].Probe ??= 未精通火焰轰爆去后摇;
                             await 状态初始化().ConfigureAwait(false);
                         }
 
@@ -3547,16 +3385,16 @@ namespace Dota2Simulator.Games.Dota2
                         switch (e.KeyCode)
                         {
                             case Keys.Q:
-                                _条件1 = true;
+                                _条件集[ConditionSlotKey.C1].Active = true;
                                 break;
                             case Keys.W:
-                                _条件2 = true;
+                                _条件集[ConditionSlotKey.C2].Active = true;
                                 break;
                             case Keys.F:
-                                _条件4 = true;
+                                _条件集[ConditionSlotKey.C4].Active = true;
                                 break;
                             case Keys.D:
-                                _条件5 = true;
+                                _条件集[ConditionSlotKey.C5].Active = true;
                                 break;
                             case Keys.D2:
                                 _槽.ToggleMode(SlotKey.W);
@@ -3576,9 +3414,9 @@ namespace Dota2Simulator.Games.Dota2
                         if (!_总循环条件)
                         {
                             _总循环条件 = true;
-                            _条件根据图片委托1 ??= 虚弱去后摇;
-                            _条件根据图片委托2 ??= 噬脑去后摇;
-                            _条件根据图片委托3 ??= 噩梦接平A锤;
+                            _条件集[ConditionSlotKey.C1].Probe ??= 虚弱去后摇;
+                            _条件集[ConditionSlotKey.C2].Probe ??= 噬脑去后摇;
+                            _条件集[ConditionSlotKey.C3].Probe ??= 噩梦接平A锤;
                             await 状态初始化().ConfigureAwait(false);
                         }
 
@@ -3586,10 +3424,10 @@ namespace Dota2Simulator.Games.Dota2
                         switch (e.KeyCode)
                         {
                             case Keys.Q:
-                                _条件1 = true;
+                                _条件集[ConditionSlotKey.C1].Active = true;
                                 break;
                             case Keys.W:
-                                _条件2 = true;
+                                _条件集[ConditionSlotKey.C2].Active = true;
                                 break;
                             case Keys.E:
                                 Color 技能点颜色 = Color.FromArgb(203, 183, 124);
@@ -3611,7 +3449,7 @@ namespace Dota2Simulator.Games.Dota2
                                     _槽.SetTime(SlotKey.Global, 4000);
                                 }
 
-                                _条件3 = true;
+                                _条件集[ConditionSlotKey.C3].Active = true;
                                 break;
                             case Keys.D2:
                                 _槽.ToggleMode(SlotKey.E);
@@ -3631,10 +3469,10 @@ namespace Dota2Simulator.Games.Dota2
                         if (!_总循环条件)
                         {
                             _总循环条件 = true;
-                            _条件根据图片委托1 ??= 死亡脉冲去后摇;
-                            _条件根据图片委托2 ??= 幽魂护罩去后摇;
-                            _条件根据图片委托3 ??= 死神镰刀去后摇;
-                            _条件根据图片委托5 ??= 循环死亡脉冲;
+                            _条件集[ConditionSlotKey.C1].Probe ??= 死亡脉冲去后摇;
+                            _条件集[ConditionSlotKey.C2].Probe ??= 幽魂护罩去后摇;
+                            _条件集[ConditionSlotKey.C3].Probe ??= 死神镰刀去后摇;
+                            _条件集[ConditionSlotKey.C5].Probe ??= 循环死亡脉冲;
                             Skill.重复按键执行间隔阈值 = 100;
                             Item._切假腿配置.修改配置(Keys.E, false);
                             await 状态初始化().ConfigureAwait(false);
@@ -3652,23 +3490,23 @@ namespace Dota2Simulator.Games.Dota2
 
                                 break;
                             case Keys.Q:
-                                _条件1 = true;
+                                _条件集[ConditionSlotKey.C1].Active = true;
                                 break;
                             case Keys.W:
-                                _条件2 = true;
+                                _条件集[ConditionSlotKey.C2].Active = true;
                                 break;
                             case Keys.R:
-                                _条件3 = true;
+                                _条件集[ConditionSlotKey.C3].Active = true;
                                 break;
                             case Keys.F:
                                 if (Item._是否魔晶)
                                 {
-                                    _条件4 = true;
+                                    _条件集[ConditionSlotKey.C4].Active = true;
                                 }
                                 break;
                             case Keys.D3:
-                                _条件5 = !_条件5;
-                                TTS.TTS.Speak(_条件5 ? "循环脉冲" : "终止循环");
+                                _条件集[ConditionSlotKey.C5].Active = !_条件集[ConditionSlotKey.C5].Active;
+                                TTS.TTS.Speak(_条件集[ConditionSlotKey.C5].Active ? "循环脉冲" : "终止循环");
                                 break;
                         }
 
@@ -3688,10 +3526,10 @@ namespace Dota2Simulator.Games.Dota2
                         if (!_总循环条件)
                         {
                             _总循环条件 = true;
-                            _条件根据图片委托1 ??= 瘴气去后摇;
-                            _条件根据图片委托2 ??= 蛇棒去后摇;
-                            _条件根据图片委托3 ??= 恶性瘟疫去后摇;
-                            _条件根据图片委托4 ??= 循环蛇棒;
+                            _条件集[ConditionSlotKey.C1].Probe ??= 瘴气去后摇;
+                            _条件集[ConditionSlotKey.C2].Probe ??= 蛇棒去后摇;
+                            _条件集[ConditionSlotKey.C3].Probe ??= 恶性瘟疫去后摇;
+                            _条件集[ConditionSlotKey.C4].Probe ??= 循环蛇棒;
                             Skill.重复按键执行间隔阈值 = 100;
                             await 状态初始化().ConfigureAwait(false);
                             Item._切假腿配置.修改配置(Keys.W, false);
@@ -3702,27 +3540,27 @@ namespace Dota2Simulator.Games.Dota2
                         switch (e.KeyCode)
                         {
                             case Keys.Q:
-                                _条件1 = true;
+                                _条件集[ConditionSlotKey.C1].Active = true;
                                 break;
                             case Keys.E:
-                                _条件2 = true;
+                                _条件集[ConditionSlotKey.C2].Active = true;
                                 break;
                             case Keys.R:
-                                _条件3 = true;
+                                _条件集[ConditionSlotKey.C3].Active = true;
                                 break;
                             case Keys.D3:
                                 {
-                                    _条件4 = !_条件4;
-                                    TTS.TTS.Speak(_条件4 ? "循环蛇棒" : "终止循环");
+                                    _条件集[ConditionSlotKey.C4].Active = !_条件集[ConditionSlotKey.C4].Active;
+                                    TTS.TTS.Speak(_条件集[ConditionSlotKey.C4].Active ? "循环蛇棒" : "终止循环");
                                     break;
                                 }
                             case Keys.S:
                                 _中断条件 = true;
-                                _条件1 = false;
-                                _条件2 = false;
-                                _条件3 = false;
-                                _条件4 = false;
-                                _条件5 = false;
+                                _条件集[ConditionSlotKey.C1].Active = false;
+                                _条件集[ConditionSlotKey.C2].Active = false;
+                                _条件集[ConditionSlotKey.C3].Active = false;
+                                _条件集[ConditionSlotKey.C4].Active = false;
+                                _条件集[ConditionSlotKey.C5].Active = false;
                                 break;
                         }
 
@@ -3738,11 +3576,11 @@ namespace Dota2Simulator.Games.Dota2
                         if (!_总循环条件)
                         {
                             _总循环条件 = true;
-                            _条件根据图片委托1 = 震荡波去后摇;
-                            _条件根据图片委托2 = 授予力量去后摇;
-                            _条件根据图片委托3 = 巨角冲撞去后摇;
-                            _条件根据图片委托4 = 两级反转去后摇;
-                            _条件根据图片委托5 = 长角抛物去后摇;
+                            _条件集[ConditionSlotKey.C1].Probe = 震荡波去后摇;
+                            _条件集[ConditionSlotKey.C2].Probe = 授予力量去后摇;
+                            _条件集[ConditionSlotKey.C3].Probe = 巨角冲撞去后摇;
+                            _条件集[ConditionSlotKey.C4].Probe = 两级反转去后摇;
+                            _条件集[ConditionSlotKey.C5].Probe = 长角抛物去后摇;
                             await 状态初始化().ConfigureAwait(false);
                         }
 
@@ -3751,19 +3589,19 @@ namespace Dota2Simulator.Games.Dota2
                         switch (e.KeyCode)
                         {
                             case Keys.Q:
-                                _条件1 = true;
+                                _条件集[ConditionSlotKey.C1].Active = true;
                                 break;
                             case Keys.W:
-                                _条件2 = true;
+                                _条件集[ConditionSlotKey.C2].Active = true;
                                 break;
                             case Keys.E:
-                                _条件3 = true;
+                                _条件集[ConditionSlotKey.C3].Active = true;
                                 break;
                             case Keys.R:
-                                _条件4 = true;
+                                _条件集[ConditionSlotKey.C4].Active = true;
                                 break;
                             case Keys.D:
-                                _条件5 = true;
+                                _条件集[ConditionSlotKey.C5].Active = true;
                                 break;
                             case Keys.F:
                                 await Task.Run(跳拱指定地点).ConfigureAwait(false);
@@ -3785,10 +3623,10 @@ namespace Dota2Simulator.Games.Dota2
                         if (!_总循环条件)
                         {
                             _总循环条件 = true;
-                            _条件根据图片委托1 ??= 招狼去后摇;
-                            _条件根据图片委托2 ??= 嚎叫去后摇;
-                            _条件根据图片委托3 ??= 撕咬去后摇;
-                            _条件根据图片委托4 ??= 变狼去后摇;
+                            _条件集[ConditionSlotKey.C1].Probe ??= 招狼去后摇;
+                            _条件集[ConditionSlotKey.C2].Probe ??= 嚎叫去后摇;
+                            _条件集[ConditionSlotKey.C3].Probe ??= 撕咬去后摇;
+                            _条件集[ConditionSlotKey.C4].Probe ??= 变狼去后摇;
                             await 状态初始化().ConfigureAwait(false);
                         }
 
@@ -3797,16 +3635,16 @@ namespace Dota2Simulator.Games.Dota2
                         switch (e.KeyCode)
                         {
                             case Keys.Q:
-                                _条件1 = true;
+                                _条件集[ConditionSlotKey.C1].Active = true;
                                 break;
                             case Keys.W:
-                                _条件2 = true;
+                                _条件集[ConditionSlotKey.C2].Active = true;
                                 break;
                             case Keys.D:
-                                _条件3 = true;
+                                _条件集[ConditionSlotKey.C3].Active = true;
                                 break;
                             case Keys.R:
-                                _条件4 = true;
+                                _条件集[ConditionSlotKey.C4].Active = true;
                                 break;
                         }
 
@@ -3822,7 +3660,7 @@ namespace Dota2Simulator.Games.Dota2
                         if (!_总循环条件)
                         {
                             _总循环条件 = true;
-                            //_条件根据图片委托1 ??= 共鸣脉冲去后摇;
+                            //_条件集[ConditionSlotKey.C1].Probe ??= 共鸣脉冲去后摇;
                             await 状态初始化().ConfigureAwait(false);
                         }
 
@@ -3831,16 +3669,16 @@ namespace Dota2Simulator.Games.Dota2
                         switch (e.KeyCode)
                         {
                             case Keys.Q:
-                                _条件1 = true;
+                                _条件集[ConditionSlotKey.C1].Active = true;
                                 break;
                             case Keys.W:
-                                _条件2 = true;
+                                _条件集[ConditionSlotKey.C2].Active = true;
                                 break;
                             case Keys.D:
-                                _条件3 = true;
+                                _条件集[ConditionSlotKey.C3].Active = true;
                                 break;
                             case Keys.R:
-                                _条件4 = true;
+                                _条件集[ConditionSlotKey.C4].Active = true;
                                 break;
                         }
 
@@ -3855,9 +3693,9 @@ namespace Dota2Simulator.Games.Dota2
                     {
                         if (!_总循环条件)
                         {
-                            _条件根据图片委托1 ??= 魔法箭去后摇;
-                            _条件根据图片委托2 ??= 恐怖波动去后摇;
-                            _条件根据图片委托3 ??= 移形换位去后摇;
+                            _条件集[ConditionSlotKey.C1].Probe ??= 魔法箭去后摇;
+                            _条件集[ConditionSlotKey.C2].Probe ??= 恐怖波动去后摇;
+                            _条件集[ConditionSlotKey.C3].Probe ??= 移形换位去后摇;
                             _总循环条件 = true;
                             await 状态初始化().ConfigureAwait(false);
                         }
@@ -3867,13 +3705,13 @@ namespace Dota2Simulator.Games.Dota2
                         switch (e.KeyCode)
                         {
                             case Keys.Q:
-                                _条件1 = true;
+                                _条件集[ConditionSlotKey.C1].Active = true;
                                 break;
                             case Keys.W:
-                                _条件3 = true;
+                                _条件集[ConditionSlotKey.C3].Active = true;
                                 break;
                             case Keys.R:
-                                _条件3 = true;
+                                _条件集[ConditionSlotKey.C3].Active = true;
                                 break;
                         }
 
@@ -3889,8 +3727,8 @@ namespace Dota2Simulator.Games.Dota2
                         if (!_总循环条件)
                         {
                             _总循环条件 = true;
-                            _条件根据图片委托2 ??= 幽魂检测;
-                            _条件根据图片委托3 ??= 循环续过载;
+                            _条件集[ConditionSlotKey.C2].Probe ??= 幽魂检测;
+                            _条件集[ConditionSlotKey.C3].Probe ??= 循环续过载;
                             Skill.重复按键执行间隔阈值 = 150;
                             await 状态初始化().ConfigureAwait(false);
                         }
@@ -3906,13 +3744,13 @@ namespace Dota2Simulator.Games.Dota2
                                         break;
                                     }
 
-                                    _条件2 = true;
+                                    _条件集[ConditionSlotKey.C2].Active = true;
                                     break;
                                 }
                             case Keys.D3:
                                 {
-                                    _条件3 = !_条件3;
-                                    TTS.TTS.Speak(_条件3 ? "开启续过载" : "关闭续过载");
+                                    _条件集[ConditionSlotKey.C3].Active = !_条件集[ConditionSlotKey.C3].Active;
+                                    TTS.TTS.Speak(_条件集[ConditionSlotKey.C3].Active ? "开启续过载" : "关闭续过载");
                                     break;
                                 }
                         }
@@ -3929,7 +3767,7 @@ namespace Dota2Simulator.Games.Dota2
                         if (!_总循环条件)
                         {
                             _总循环条件 = true;
-                            _条件根据图片委托2 ??= 幽魂检测;
+                            _条件集[ConditionSlotKey.C2].Probe ??= 幽魂检测;
                             await 状态初始化().ConfigureAwait(false);
                         }
 
@@ -3944,7 +3782,7 @@ namespace Dota2Simulator.Games.Dota2
                                         break;
                                     }
 
-                                    _条件2 = true;
+                                    _条件集[ConditionSlotKey.C2].Active = true;
                                     break;
                                 }
                         }
@@ -3961,11 +3799,11 @@ namespace Dota2Simulator.Games.Dota2
                         if (!_总循环条件)
                         {
                             _总循环条件 = true;
-                            //_条件根据图片委托1 ??= 穿刺去后摇;
-                            //_条件根据图片委托2 ??= 神智爆裂去后摇;
-                            //_条件根据图片委托3 ??= 尖刺外壳去后摇;
-                            //_条件根据图片委托4 ??= 复仇接穿刺;
-                            _条件根据图片委托5 ??= 循环接爆裂;
+                            //_条件集[ConditionSlotKey.C1].Probe ??= 穿刺去后摇;
+                            //_条件集[ConditionSlotKey.C2].Probe ??= 神智爆裂去后摇;
+                            //_条件集[ConditionSlotKey.C3].Probe ??= 尖刺外壳去后摇;
+                            //_条件集[ConditionSlotKey.C4].Probe ??= 复仇接穿刺;
+                            _条件集[ConditionSlotKey.C5].Probe ??= 循环接爆裂;
                             Skill.重复按键执行间隔阈值 = 150;
                             await 状态初始化().ConfigureAwait(false);
                         }
@@ -3975,7 +3813,7 @@ namespace Dota2Simulator.Games.Dota2
                         switch (e.KeyCode)
                         {
                             //case Keys.Q:
-                            //    _条件1 = true;
+                            //    _条件集[ConditionSlotKey.C1].Active = true;
                             //    break;
                             //case Keys.W:
                             //    Common.Delay(33 * Item.根据图片使用物品(Dota2_Pictrue.物品.虚灵之刃));
@@ -3984,18 +3822,18 @@ namespace Dota2Simulator.Games.Dota2
                             //                Item.根据图片使用物品(Dota2_Pictrue.物品.红杖3) +
                             //                Item.根据图片使用物品(Dota2_Pictrue.物品.红杖4) +
                             //                Item.根据图片使用物品(Dota2_Pictrue.物品.红杖5)));
-                            //    _条件2 = true;
+                            //    _条件集[ConditionSlotKey.C2].Active = true;
                             //    break;
                             //case Keys.E:
-                            //    _条件3 = true;
+                            //    _条件集[ConditionSlotKey.C3].Active = true;
                             //    break;
                             //case Keys.R:
                             //    设置全局步骤r(0);
-                            //    // _条件4 = true;
+                            //    // _条件集[ConditionSlotKey.C4].Active = true;
                             //    break;
                             case Keys.D3:
-                                _条件5 = !_条件5;
-                                TTS.TTS.Speak(_条件5 ? "循环爆裂" : "终止循环");
+                                _条件集[ConditionSlotKey.C5].Active = !_条件集[ConditionSlotKey.C5].Active;
+                                TTS.TTS.Speak(_条件集[ConditionSlotKey.C5].Active ? "循环爆裂" : "终止循环");
                                 break;
                         }
 
@@ -4020,7 +3858,7 @@ namespace Dota2Simulator.Games.Dota2
                         //switch (e.KeyCode)
                         //{
                         //    //case Keys.Q:
-                        //    //    _条件1 = true;
+                        //    //    _条件集[ConditionSlotKey.C1].Active = true;
                         //    //    break;
                         //    //case Keys.W:
                         //    //    Common.Delay(33 * Item.根据图片使用物品(Dota2_Pictrue.物品.虚灵之刃));
@@ -4029,14 +3867,14 @@ namespace Dota2Simulator.Games.Dota2
                         //    //                Item.根据图片使用物品(Dota2_Pictrue.物品.红杖3) +
                         //    //                Item.根据图片使用物品(Dota2_Pictrue.物品.红杖4) +
                         //    //                Item.根据图片使用物品(Dota2_Pictrue.物品.红杖5)));
-                        //    //    _条件2 = true;
+                        //    //    _条件集[ConditionSlotKey.C2].Active = true;
                         //    //    break;
                         //    //case Keys.E:
-                        //    //    _条件3 = true;
+                        //    //    _条件集[ConditionSlotKey.C3].Active = true;
                         //    //    break;
                         //    //case Keys.R:
                         //    //    设置全局步骤r(0);
-                        //    //    // _条件4 = true;
+                        //    //    // _条件集[ConditionSlotKey.C4].Active = true;
                         //    //    break;
                         //}
 
@@ -4102,15 +3940,15 @@ namespace Dota2Simulator.Games.Dota2
                                 //    });
                                 //    break;
                                 //case Keys.Z:
-                                //    if (_条件z)
+                                //    if (_条件集[ConditionSlotKey.Z].Active)
                                 //    {
-                                //        _条件z = false;
+                                //        _条件集[ConditionSlotKey.Z].Active = false;
                                 //    }
                                 //    else
                                 //    {
                                 //        命运2按键(Keys.D3);
                                 //        命运2按键(Keys.Space);
-                                //        _条件z = true;
+                                //        _条件集[ConditionSlotKey.Z].Active = true;
                                 //        Common.Delay(300);
                                 //        _ = Task.Run(() =>
                                 //        {
@@ -4550,20 +4388,20 @@ namespace Dota2Simulator.Games.Dota2
 
         private static async Task<bool> 伐木机获取命石(ImageHandle 句柄)
         {
-            if (_命石选择 == 0)
+            if (_条件集.StoneChoice == 0)
             {
                 if (ImageFinder.FindImageInRegionBool(Dota2_Pictrue.命石.伐木机_碎木击, GlobalScreenCapture.GetCurrentHandle(), 命石区域))
                 {
-                    _命石选择 = 1;
+                    _条件集.StoneChoice = 1;
                 }
                 else if (ImageFinder.FindImageInRegionBool(Dota2_Pictrue.命石.伐木机_锯齿轮旋, GlobalScreenCapture.GetCurrentHandle(), 命石区域))
                 {
-                    _命石选择 = 2;
+                    _条件集.StoneChoice = 2;
                     Item._切假腿配置.修改配置(Keys.D, true);
                 }
             }
 
-            _命石根据图片委托 = null;
+            _条件集.StoneProbe = null;
             return await Task.FromResult(false).ConfigureAwait(true);
         }
 
@@ -4709,12 +4547,12 @@ namespace Dota2Simulator.Games.Dota2
 
         private static async Task<bool> 骷髅王获取命石(ImageHandle 句柄)
         {
-            if (_命石选择 == 0)
+            if (_条件集.StoneChoice == 0)
             {
-                _命石选择 = ImageFinder.FindImageInRegionBool(Dota2_Pictrue.命石.骷髅王_白骨守卫, GlobalScreenCapture.GetCurrentHandle(), 命石区域) ? 1 : 2;
+                _条件集.StoneChoice = ImageFinder.FindImageInRegionBool(Dota2_Pictrue.命石.骷髅王_白骨守卫, GlobalScreenCapture.GetCurrentHandle(), 命石区域) ? 1 : 2;
             }
 
-            _命石根据图片委托 = null;
+            _条件集.StoneProbe = null;
             return await Task.FromResult(false).ConfigureAwait(true);
         }
 
@@ -4851,12 +4689,12 @@ namespace Dota2Simulator.Games.Dota2
 
         private static async Task<bool> 海民获取命石(ImageHandle 句柄)
         {
-            if (_命石选择 == 0)
+            if (_条件集.StoneChoice == 0)
             {
-                _命石选择 = ImageFinder.FindImageInRegionBool(Dota2_Pictrue.命石.海民_酒友, GlobalScreenCapture.GetCurrentHandle(), 命石区域) ? 2 : 1;
+                _条件集.StoneChoice = ImageFinder.FindImageInRegionBool(Dota2_Pictrue.命石.海民_酒友, GlobalScreenCapture.GetCurrentHandle(), 命石区域) ? 2 : 1;
             }
 
-            _命石根据图片委托 = null;
+            _条件集.StoneProbe = null;
             return await Task.FromResult(false).ConfigureAwait(true);
         }
 
@@ -4926,7 +4764,7 @@ namespace Dota2Simulator.Games.Dota2
                 SimKeyBoard.KeyPress(Keys.A);
                 if (_槽.Mode(SlotKey.Q) == 1)
                 {
-                    _条件3 = true;
+                    _条件集[ConditionSlotKey.C3].Active = true;
                 }
             }).ConfigureAwait(true);
         }
@@ -5078,7 +4916,7 @@ namespace Dota2Simulator.Games.Dota2
         {
             return await Skill.主动技能释放后续(Keys.Q, () =>
             {
-                _条件4 = false;
+                _条件集[ConditionSlotKey.C4].Active = false;
                 _槽.SetTime(SlotKey.Q, Common.获取当前时间毫秒());
 
                 // 如果E已经释放
@@ -5086,7 +4924,7 @@ namespace Dota2Simulator.Games.Dota2
                 {
                     // 1600 延迟 返回200施法时间
                     Common.Delay(1350, _槽.Time(SlotKey.Q));
-                    _条件4 = false;
+                    _条件集[ConditionSlotKey.C4].Active = false;
                     SimKeyBoard.KeyPress(Keys.E);
                 }
             }).ConfigureAwait(true);
@@ -5112,12 +4950,12 @@ namespace Dota2Simulator.Games.Dota2
                 lock (_全局模式e_lock)
                 {
                     _槽.SetStep(SlotKey.E, 1);
-                    _条件3 = true;
+                    _条件集[ConditionSlotKey.C3].Active = true;
                 }
 
                 int 等待时间 = (int)Math.Floor(3000 * _状态抗性倍数) - 1670;
                 Common.Delay(等待时间, _槽.Time(SlotKey.E));
-                _条件4 = true;
+                _条件集[ConditionSlotKey.C4].Active = true;
             }).ConfigureAwait(true);
         }
 
@@ -5864,7 +5702,7 @@ namespace Dota2Simulator.Games.Dota2
                 _槽.SetTime(SlotKey.Q, Common.获取当前时间毫秒());
             }).ConfigureAwait(true);
 
-            return await Task.FromResult(_条件5);
+            return await Task.FromResult(_条件集[ConditionSlotKey.C5].Active);
         }
 
         #endregion
@@ -5955,7 +5793,7 @@ namespace Dota2Simulator.Games.Dota2
         private static async Task<bool> 循环标记(ImageHandle 句柄)
         {
             await Skill.技能通用判断(Keys.R, 2).ConfigureAwait(true);
-            return await Task.FromResult(_条件3).ConfigureAwait(true);
+            return await Task.FromResult(_条件集[ConditionSlotKey.C3].Active).ConfigureAwait(true);
         }
 
         #endregion
@@ -6018,7 +5856,7 @@ namespace Dota2Simulator.Games.Dota2
         private static async Task<bool> 大圣无限跳跃(ImageHandle 句柄)
         {
             await Skill.技能通用判断(Keys.W, 2).ConfigureAwait(true);
-            return await Task.FromResult(_条件4).ConfigureAwait(true);
+            return await Task.FromResult(_条件集[ConditionSlotKey.C4].Active).ConfigureAwait(true);
         }
 
         #endregion
@@ -6071,16 +5909,16 @@ namespace Dota2Simulator.Games.Dota2
             //    //var r_down = 0;
             //    //if (ImageFinder.FindImageBool(修补匠_再填装施法, 773, 727, 75, 77, 0.7))
             //    //{
-            //    //    if (_条件3)
+            //    //    if (_条件集[ConditionSlotKey.C3].Active)
             //    //        await 检测希瓦();
             //    //    while (r_down == 0)
             //    //        if (!ImageFinder.FindImageBool(修补匠_再填装施法, 773, 727, 75, 77, 0.7))
             //    //        {
             //    //            r_down = 1;
             //    //            all_down = 1;
-            //    //            if (_条件1)
+            //    //            if (_条件集[ConditionSlotKey.C1].Active)
             //    //                await 检测敌方英雄自动导弹();
-            //    //            if (_条件2)
+            //    //            if (_条件集[ConditionSlotKey.C2].Active)
             //    //            {
             //    //                Common.Delay(60);
             //    //                SimKeyBoard.KeyPress(Keys.Space);
@@ -6151,7 +5989,7 @@ namespace Dota2Simulator.Games.Dota2
         private static async Task<bool> 循环查克拉(ImageHandle 句柄)
         {
             await Skill.技能通用判断(Keys.E, 2).ConfigureAwait(true);
-            return await Task.FromResult(_条件4).ConfigureAwait(true);
+            return await Task.FromResult(_条件集[ConditionSlotKey.C4].Active).ConfigureAwait(true);
         }
 
         #endregion
@@ -6161,7 +5999,7 @@ namespace Dota2Simulator.Games.Dota2
         private static async Task<bool> 循环奥数鹰隼(ImageHandle 句柄)
         {
             await Skill.技能通用判断(Keys.Q, 2).ConfigureAwait(true);
-            return await Task.FromResult(_条件1).ConfigureAwait(true);
+            return await Task.FromResult(_条件集[ConditionSlotKey.C1].Active).ConfigureAwait(true);
         }
 
         private static async Task<bool> 天怒秒人连招(ImageHandle 句柄)
@@ -6209,7 +6047,7 @@ namespace Dota2Simulator.Games.Dota2
                             return await Task.FromResult(true).ConfigureAwait(true);
                         }
 
-                        _条件1 = true;
+                        _条件集[ConditionSlotKey.C1].Active = true;
                         _槽.SetStep(SlotKey.Global, 3);
 
                         return await Task.FromResult(false).ConfigureAwait(true);
@@ -6974,7 +6812,7 @@ namespace Dota2Simulator.Games.Dota2
         private static async Task<bool> 无限暗影之境(ImageHandle 句柄)
         {
             await Skill.技能通用判断(Keys.W, 2).ConfigureAwait(true);
-            return await Task.FromResult(_条件5).ConfigureAwait(true);
+            return await Task.FromResult(_条件集[ConditionSlotKey.C5].Active).ConfigureAwait(true);
         }
 
         #endregion
@@ -7026,7 +6864,7 @@ namespace Dota2Simulator.Games.Dota2
                 switch (_槽.Mode(SlotKey.E))
                 {
                     case 1:
-                        _条件4 = true;
+                        _条件集[ConditionSlotKey.C4].Active = true;
                         _槽.SetTarget(SlotKey.R, Control.MousePosition);
                         _槽.SetTime(SlotKey.R, Common.获取当前时间毫秒());
                         break;
@@ -7137,7 +6975,7 @@ namespace Dota2Simulator.Games.Dota2
         {
             static void 莱恩羊后()
             {
-                if (_条件6)
+                if (_条件集[ConditionSlotKey.C6].Active)
                 {
                     SimKeyBoard.KeyPress(Keys.E);
                 }
@@ -7272,7 +7110,7 @@ namespace Dota2Simulator.Games.Dota2
                     return await Task.FromResult(true).ConfigureAwait(true);
                 }
 
-                if (_条件5 && Item.根据图片使用物品(Dota2_Pictrue.物品.刷新球) == 1)
+                if (_条件集[ConditionSlotKey.C5].Active && Item.根据图片使用物品(Dota2_Pictrue.物品.刷新球) == 1)
                 {
                     _槽.SetStep(SlotKey.Global, 1);
                     Common.Delay(120);
@@ -7807,7 +7645,7 @@ namespace Dota2Simulator.Games.Dota2
         private static async Task<bool> 循环死亡脉冲(ImageHandle 句柄)
         {
             await Skill.技能通用判断(Keys.Q, 2).ConfigureAwait(true);
-            return await Task.FromResult(_条件5).ConfigureAwait(true);
+            return await Task.FromResult(_条件集[ConditionSlotKey.C5].Active).ConfigureAwait(true);
         }
 
         #endregion
@@ -8031,12 +7869,12 @@ namespace Dota2Simulator.Games.Dota2
             if (guozai)
             {
                 _槽.SetStep(SlotKey.E, 3);
-                return await Task.FromResult(_条件3).ConfigureAwait(true);
+                return await Task.FromResult(_条件集[ConditionSlotKey.C3].Active).ConfigureAwait(true);
             }
             else
             {
                 await Skill.技能通用判断(Keys.E, 2).ConfigureAwait(true);
-                return await Task.FromResult(_条件3).ConfigureAwait(true);
+                return await Task.FromResult(_条件集[ConditionSlotKey.C3].Active).ConfigureAwait(true);
             }
         }
 
@@ -8101,7 +7939,7 @@ namespace Dota2Simulator.Games.Dota2
         private static async Task<bool> 循环接爆裂(ImageHandle 句柄)
         {
             await Skill.技能通用判断(Keys.W, 2).ConfigureAwait(true);
-            return await Task.FromResult(_条件5).ConfigureAwait(true);
+            return await Task.FromResult(_条件集[ConditionSlotKey.C5].Active).ConfigureAwait(true);
         }
 
         #endregion
@@ -8993,35 +8831,8 @@ namespace Dota2Simulator.Games.Dota2
 
         #region 循环
 
-        private readonly record struct 条件配置项(
-            int 索引,
-            string 名称,
-            Func<bool> 获取条件,
-            Action<bool> 设置条件,
-            ConditionDelegateBitmap 委托);
-
         private static async Task 一般程序循环()
         {
-            // 条件配置
-            var 条件配置 = new[]
-            {
-        new 条件配置项(0, "条件1", () => _条件1, val => _条件1 = val, _条件根据图片委托1),
-        new 条件配置项(1, "条件2", () => _条件2, val => _条件2 = val, _条件根据图片委托2),
-        new 条件配置项(2, "条件3", () => _条件3, val => _条件3 = val, _条件根据图片委托3),
-        new 条件配置项(3, "条件4", () => _条件4, val => _条件4 = val, _条件根据图片委托4),
-        new 条件配置项(4, "条件5", () => _条件5, val => _条件5 = val, _条件根据图片委托5),
-        new 条件配置项(5, "条件6", () => _条件6, val => _条件6 = val, _条件根据图片委托6),
-        new 条件配置项(6, "条件7", () => _条件7, val => _条件7 = val, _条件根据图片委托7),
-        new 条件配置项(7, "条件8", () => _条件8, val => _条件8 = val, _条件根据图片委托8),
-        new 条件配置项(8, "条件9", () => _条件9, val => _条件9 = val, _条件根据图片委托9),
-        new 条件配置项(9, "条件z", () => _条件z, val => _条件z = val, _条件根据图片委托z),
-        new 条件配置项(10, "条件x", () => _条件x, val => _条件x = val, _条件根据图片委托x),
-        new 条件配置项(11, "条件c", () => _条件c, val => _条件c = val, _条件根据图片委托c),
-        new 条件配置项(12, "条件v", () => _条件v, val => _条件v = val, _条件根据图片委托v),
-        new 条件配置项(13, "条件b", () => _条件b, val => _条件b = val, _条件根据图片委托b),
-        new 条件配置项(14, "条件space", () => _条件space, val => _条件space = val, _条件根据图片委托space)
-    };
-
             const int 主循环间隔 = 1;
             const int 中断检查间隔 = 1;
 
@@ -9045,16 +8856,16 @@ namespace Dota2Simulator.Games.Dota2
                     _循环内获取图片();
 
                     // 处理命石相关逻辑
-                    if (_命石根据图片委托 is not null)
+                    if (_条件集.StoneProbe is not null)
                     {
-                        await _命石根据图片委托(GlobalScreenCapture.GetCurrentHandle()).ConfigureAwait(true);
+                        await _条件集.StoneProbe(GlobalScreenCapture.GetCurrentHandle()).ConfigureAwait(true);
                     }
 
                     // 获取技能颜色信息
                     Skill.DOTA2获取所有释放技能前颜色(GlobalScreenCapture.GetCurrentHandle());
 
                     // 核心逻辑：处理条件更新，包括运行期外部修改
-                    await 处理条件更新_带外部变化检测(条件配置).ConfigureAwait(true);
+                    await _条件集.TickAsync().ConfigureAwait(true);
 
                     // 处理假腿切换逻辑
                     await 处理假腿切换().ConfigureAwait(true);
@@ -9066,92 +8877,6 @@ namespace Dota2Simulator.Games.Dota2
 
                 await Task.Delay(主循环间隔).ConfigureAwait(true);
             }
-        }
-
-        // 重新设计的条件更新处理 - 支持运行期外部修改检测
-        private static async Task 处理条件更新_带外部变化检测(条件配置项[] 条件配置)
-        {
-            // 1. 获取初始条件状态
-            bool[] 条件数组 = [.. 条件配置.Select(配置 => 配置.获取条件())];
-            bool[] 原始数组 = (bool[])条件数组.Clone();
-
-            // 2. 启动初始的并行委托执行
-            var 更新任务 = 更新条件数组(条件数组, 条件配置);
-
-            // 3. 关键逻辑：在委托执行期间，持续检查外部条件变化
-            var 已处理的新条件 = new HashSet<int>(); // 记录已处理的新true条件
-
-            while (!更新任务.IsCompleted)
-            {
-                // 检查是否有新的条件被外部设置为true
-                for (int i = 0; i < 条件配置.Length; i++)
-                {
-                    bool 当前条件 = 条件配置[i].获取条件();
-
-                    // 如果这个条件现在是true，且原始状态是false，且还没有处理过
-                    if (当前条件 && !原始数组[i] && !已处理的新条件.Contains(i))
-                    {
-                        // 标记为已处理
-                        已处理的新条件.Add(i);
-
-                        // 为这个新的true条件启动委托执行
-                        _ = Task.Run(async () =>
-                        {
-                            try
-                            {
-                                bool 结果 = await 检查条件并执行委托(true, 条件配置[i].委托).ConfigureAwait(false);
-                                if (当前条件) // 再次检查条件是否仍为true（可能被其他委托修改）
-                                {
-                                    条件配置[i].设置条件(结果);
-                                }
-                            }
-                            catch (Exception ex)
-                            {
-                                Common.Main_Logger.Error($"新条件委托执行失败 [{条件配置[i].名称}]: {ex.Message}");
-                            }
-                        });
-                    }
-                }
-
-                await Task.Delay(1).ConfigureAwait(true); // 避免CPU占用过高
-            }
-
-            // 4. 等待初始任务完成
-            await 更新任务.ConfigureAwait(true);
-
-            // 5. 应用初始条件的检测结果
-            for (int i = 0; i < 原始数组.Length; i++)
-            {
-                if (原始数组[i])  // 只有原始条件为true时才更新
-                {
-                    条件配置[i].设置条件(条件数组[i]);
-                }
-            }
-        }
-
-        // 并行执行初始条件的委托检测
-        private static async Task 更新条件数组(bool[] 条件数组, 条件配置项[] 条件配置)
-        {
-            var 检测任务 = 条件配置.Select(async (配置, index) =>
-            {
-                try
-                {
-                    bool 新条件 = await 检查条件并执行委托(条件数组[index], 配置.委托).ConfigureAwait(false);
-                    条件数组[index] = 新条件;
-                }
-                catch (Exception ex)
-                {
-                    Common.Main_Logger.Error($"条件检测失败 [{配置.名称}]: {ex.Message}");
-                }
-            });
-
-            await Task.WhenAll(检测任务).ConfigureAwait(false);
-        }
-
-        // 保持原有的检查条件并执行委托逻辑
-        private static async Task<bool> 检查条件并执行委托(bool 条件, ConditionDelegateBitmap 委托)
-        {
-            return 条件 && 委托 is not null ? await 委托(GlobalScreenCapture.GetCurrentHandle()).ConfigureAwait(true) : 条件;
         }
 
         private static async Task 处理假腿切换()
@@ -9197,8 +8922,8 @@ namespace Dota2Simulator.Games.Dota2
         private static async Task 状态初始化()
         {
 #if Silt
-            _条件根据图片委托8 ??= Silt.Main.有书吃书;
-            _条件8 = true;
+            _条件集[ConditionSlotKey.C8].Probe ??= Silt.Main.有书吃书;
+            _条件集[ConditionSlotKey.C8].Active = true;
 #endif
             _循环内获取图片 ??= 获取图片_2;
             await 一般程序循环().ConfigureAwait(true);
@@ -9214,29 +8939,9 @@ namespace Dota2Simulator.Games.Dota2
 
             // _丢装备条件 = false;
 
-            _条件1 = false;
-            _条件2 = false;
-            _条件3 = false;
-            _条件4 = false;
-            _条件5 = false;
-            _条件6 = false;
-            _条件7 = false;
-            _条件8 = false;
-            _条件9 = false;
-            _条件根据图片委托1 = null;
-            _条件根据图片委托2 = null;
-            _条件根据图片委托3 = null;
-            _条件根据图片委托4 = null;
-            _条件根据图片委托5 = null;
-            _条件根据图片委托6 = null;
-            _条件根据图片委托7 = null;
-            _条件根据图片委托8 = null;
-            _条件根据图片委托9 = null;
+            _条件集.Reset();
 
             _ = Item.重置耗蓝物品委托和条件();
-
-            _命石选择 = 0;
-            _命石根据图片委托 = null;
 
             Item._条件开启切假腿 = false;
             Item._条件保持假腿 = false;
