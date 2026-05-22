@@ -1,0 +1,146 @@
+#if DOTA2
+using System.Threading.Tasks;
+using System.Windows.Forms;
+using Dota2Simulator.GameAutomation.Application;
+using Dota2Simulator.GameAutomation.Domain.Actuation;
+using Dota2Simulator.GameAutomation.Domain.Heroes;
+using Dota2Simulator.GameAutomation.Domain.Loop;
+using Dota2Simulator.Games;
+using Dota2Simulator.Games.Dota2;
+using Dota2Simulator.KeyboardMouse;
+using Dota2Simulator.Vision;
+
+namespace Dota2Simulator.GameAutomation.Heroes.Intelligence;
+
+public sealed class 双头龙Strategy : IHeroStrategy
+{
+    private const int 等待延迟 = 33;
+
+    public HeroId Hero => new("双头龙", HeroAttribute.Intelligence);
+
+    public void OnActivate(HeroContext ctx)
+    {
+        Main._聚合.Conditions[ConditionSlotKey.C1].Probe ??= 冰火交加去后摇;
+        Main._聚合.Conditions[ConditionSlotKey.C2].Probe ??= 冰封路径去后摇;
+        Main._聚合.Conditions[ConditionSlotKey.C3].Probe ??= 烈焰焚身去后摇;
+        Main._聚合.Conditions[ConditionSlotKey.C4].Probe ??= 吹风接冰封路径;
+    }
+
+    public async Task OnKeyAsync(VirtualKey key, HeroContext ctx)
+    {
+        await Item.根据按键判断技能释放前通用逻辑(new KeyEventArgs((Keys)key.ToNative())).ConfigureAwait(true);
+
+        if (key == VirtualKey.Q)
+        {
+            Main._聚合.Conditions[ConditionSlotKey.C1].Active = true;
+        }
+        else if (key == VirtualKey.W)
+        {
+            Main._聚合.Conditions[ConditionSlotKey.C2].Active = true;
+        }
+        else if (key == VirtualKey.R)
+        {
+            Main._聚合.Conditions[ConditionSlotKey.C3].Active = true;
+        }
+        else if (key == VirtualKey.From(Keys.D3))
+        {
+            Main._聚合.Conditions[ConditionSlotKey.C4].Active = true;
+        }
+    }
+
+    private static async Task<bool> 冰火交加去后摇(ImageHandle 句柄)
+    {
+        static void 冰火交加后()
+        {
+            Main._聚合.Skills.SetTime(SlotKey.Q, -1);
+            SimKeyBoard.MouseRightClick();
+        }
+
+        // 超时则切回 总体释放时间
+        if (Common.获取当前时间毫秒() - Main._聚合.Skills.Time(SlotKey.Q) > 1200 && Main._聚合.Skills.Time(SlotKey.Q) != -1)
+        {
+            冰火交加后();
+            return await Task.FromResult(false).ConfigureAwait(true);
+        }
+
+        if (Skill.DOTA2判断技能是否CD(Keys.Q, in 句柄))
+        {
+            return await Task.FromResult(true).ConfigureAwait(true);
+        }
+
+        冰火交加后();
+        return await Task.FromResult(false).ConfigureAwait(true);
+    }
+
+    private static async Task<bool> 冰封路径去后摇(ImageHandle 句柄)
+    {
+        static void 冰封路径后()
+        {
+            Main._聚合.Skills.SetTime(SlotKey.W, -1);
+            SimKeyBoard.MouseRightClick();
+        }
+
+        // 超时则切回 总体释放时间
+        if (Common.获取当前时间毫秒() - Main._聚合.Skills.Time(SlotKey.W) > 1200 && Main._聚合.Skills.Time(SlotKey.W) != -1)
+        {
+            冰封路径后();
+            return await Task.FromResult(false).ConfigureAwait(true);
+        }
+
+        if (Skill.DOTA2判断技能是否CD(Keys.W, in 句柄))
+        {
+            return await Task.FromResult(true).ConfigureAwait(true);
+        }
+
+        冰封路径后();
+        return await Task.FromResult(false).ConfigureAwait(true);
+    }
+
+    private static async Task<bool> 烈焰焚身去后摇(ImageHandle 句柄)
+    {
+        static void 烈焰焚身后()
+        {
+            Main._聚合.Skills.SetTime(SlotKey.R, -1);
+            // RightClick();
+        }
+
+        // 超时则切回 总体释放时间
+        if (Common.获取当前时间毫秒() - Main._聚合.Skills.Time(SlotKey.R) > 1200 && Main._聚合.Skills.Time(SlotKey.R) != -1)
+        {
+            烈焰焚身后();
+            return await Task.FromResult(false).ConfigureAwait(true);
+        }
+
+        if (Skill.DOTA2判断技能是否CD(Keys.R, in 句柄))
+        {
+            return await Task.FromResult(true).ConfigureAwait(true);
+        }
+
+        烈焰焚身后();
+        return await Task.FromResult(false).ConfigureAwait(true);
+    }
+
+    private static async Task<bool> 吹风接冰封路径(ImageHandle 句柄)
+    {
+        if (Item.根据图片使用物品(Dota2_Pictrue.物品.吹风) == 1)
+        {
+            Common.Delay(等待延迟);
+            return await Task.FromResult(true).ConfigureAwait(true);
+        }
+
+        if (!ImageFinder.FindImageInRegionBool(Dota2_Pictrue.物品.吹风, in 句柄, Item.获取物品范围(Skill._技能数量)) && Main._聚合.Skills.Time(SlotKey.Global) == -1)
+        {
+            Main._聚合.Skills.SetTime(SlotKey.Global, Common.获取当前时间毫秒());
+        }
+
+        if (Common.获取当前时间毫秒() - Main._聚合.Skills.Time(SlotKey.Global) < 2500 - 650 - 600)
+        {
+            return await Task.FromResult(true).ConfigureAwait(true);
+        }
+
+        SimKeyBoard.KeyPress(Keys.W);
+        Main._聚合.Skills.SetTime(SlotKey.Global, -1);
+        return await Task.FromResult(false).ConfigureAwait(true);
+    }
+}
+#endif

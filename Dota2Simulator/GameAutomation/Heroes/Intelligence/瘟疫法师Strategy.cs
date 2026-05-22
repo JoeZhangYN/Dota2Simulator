@@ -1,0 +1,84 @@
+#if DOTA2
+using System.Threading.Tasks;
+using System.Windows.Forms;
+using Dota2Simulator.GameAutomation.Application;
+using Dota2Simulator.GameAutomation.Domain.Actuation;
+using Dota2Simulator.GameAutomation.Domain.Heroes;
+using Dota2Simulator.Games.Dota2;
+using Dota2Simulator.Vision;
+
+namespace Dota2Simulator.GameAutomation.Heroes.Intelligence;
+
+public sealed class 瘟疫法师Strategy : IHeroStrategy
+{
+    public HeroId Hero => new("瘟疫法师", HeroAttribute.Intelligence);
+
+    public void OnActivate(HeroContext ctx)
+    {
+        Main._聚合.Conditions[ConditionSlotKey.C1].Probe ??= 死亡脉冲去后摇;
+        Main._聚合.Conditions[ConditionSlotKey.C2].Probe ??= 幽魂护罩去后摇;
+        Main._聚合.Conditions[ConditionSlotKey.C3].Probe ??= 死神镰刀去后摇;
+        Main._聚合.Conditions[ConditionSlotKey.C5].Probe ??= 循环死亡脉冲;
+        Skill.重复按键执行间隔阈值 = 100;
+        Item._切假腿配置.修改配置(Keys.E, false);
+    }
+
+    public async Task OnKeyAsync(VirtualKey key, HeroContext ctx)
+    {
+        await Item.根据按键判断技能释放前通用逻辑(new KeyEventArgs((Keys)key.ToNative())).ConfigureAwait(true);
+
+        if (key == VirtualKey.From(Keys.F1))
+        {
+            if (Item._是否魔晶)
+            {
+                Item._切假腿配置.修改配置(Keys.F, true);
+            }
+        }
+        else if (key == VirtualKey.Q)
+        {
+            Main._聚合.Conditions[ConditionSlotKey.C1].Active = true;
+        }
+        else if (key == VirtualKey.W)
+        {
+            Main._聚合.Conditions[ConditionSlotKey.C2].Active = true;
+        }
+        else if (key == VirtualKey.R)
+        {
+            Main._聚合.Conditions[ConditionSlotKey.C3].Active = true;
+        }
+        else if (key == VirtualKey.F)
+        {
+            if (Item._是否魔晶)
+            {
+                Main._聚合.Conditions[ConditionSlotKey.C4].Active = true;
+            }
+        }
+        else if (key == VirtualKey.From(Keys.D3))
+        {
+            Main._聚合.Conditions[ConditionSlotKey.C5].Active = !Main._聚合.Conditions[ConditionSlotKey.C5].Active;
+            TTS.TTS.Speak(Main._聚合.Conditions[ConditionSlotKey.C5].Active ? "循环脉冲" : "终止循环");
+        }
+    }
+
+    private static async Task<bool> 死亡脉冲去后摇(ImageHandle 句柄)
+    {
+        return await Skill.技能通用判断(Keys.Q, 0, 是否接按键: false).ConfigureAwait(true);
+    }
+
+    private static async Task<bool> 幽魂护罩去后摇(ImageHandle 句柄)
+    {
+        return await Skill.技能通用判断(Keys.W, 0, 是否接按键: false).ConfigureAwait(true);
+    }
+
+    private static async Task<bool> 死神镰刀去后摇(ImageHandle 句柄)
+    {
+        return await Skill.技能通用判断(Keys.R, 0).ConfigureAwait(true);
+    }
+
+    private static async Task<bool> 循环死亡脉冲(ImageHandle 句柄)
+    {
+        await Skill.技能通用判断(Keys.Q, 2).ConfigureAwait(true);
+        return await Task.FromResult(Main._聚合.Conditions[ConditionSlotKey.C5].Active).ConfigureAwait(true);
+    }
+}
+#endif
