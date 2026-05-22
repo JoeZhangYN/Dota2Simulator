@@ -1,7 +1,7 @@
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 
-namespace Dota2Simulator
+namespace Dota2Simulator.KeyboardMouse
 {
     /// <summary>
     /// Interception 驱动级输入模拟库
