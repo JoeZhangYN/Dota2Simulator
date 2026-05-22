@@ -31,6 +31,9 @@
     <Compile Remove="inference_c\**" />
     <EmbeddedResource Remove="inference_c\**" />
     <None Remove="inference_c\**" />
+    <Compile Remove="_Legacy\**" />
+    <EmbeddedResource Remove="_Legacy\**" />
+    <None Remove="_Legacy\**" />
   </ItemGroup>
 
   <ItemGroup>
