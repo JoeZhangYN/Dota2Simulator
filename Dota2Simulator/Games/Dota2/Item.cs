@@ -441,18 +441,18 @@ namespace Dota2Simulator.Games.Dota2
 
         public static bool 重置耗蓝物品委托和条件()
         {
-            Main._条件集[ConditionSlotKey.Z].Active = false;
-            Main._条件集[ConditionSlotKey.X].Active = false;
-            Main._条件集[ConditionSlotKey.C].Active = false;
-            Main._条件集[ConditionSlotKey.V].Active = false;
-            Main._条件集[ConditionSlotKey.B].Active = false;
-            Main._条件集[ConditionSlotKey.Space].Active = false;
-            Main._条件集[ConditionSlotKey.Z].Probe = null;
-            Main._条件集[ConditionSlotKey.X].Probe = null;
-            Main._条件集[ConditionSlotKey.C].Probe = null;
-            Main._条件集[ConditionSlotKey.V].Probe = null;
-            Main._条件集[ConditionSlotKey.B].Probe = null;
-            Main._条件集[ConditionSlotKey.Space].Probe = null;
+            Main._聚合.Conditions[ConditionSlotKey.Z].Active = false;
+            Main._聚合.Conditions[ConditionSlotKey.X].Active = false;
+            Main._聚合.Conditions[ConditionSlotKey.C].Active = false;
+            Main._聚合.Conditions[ConditionSlotKey.V].Active = false;
+            Main._聚合.Conditions[ConditionSlotKey.B].Active = false;
+            Main._聚合.Conditions[ConditionSlotKey.Space].Active = false;
+            Main._聚合.Conditions[ConditionSlotKey.Z].Probe = null;
+            Main._聚合.Conditions[ConditionSlotKey.X].Probe = null;
+            Main._聚合.Conditions[ConditionSlotKey.C].Probe = null;
+            Main._聚合.Conditions[ConditionSlotKey.V].Probe = null;
+            Main._聚合.Conditions[ConditionSlotKey.B].Probe = null;
+            Main._聚合.Conditions[ConditionSlotKey.Space].Probe = null;
             return true;
         }
 
@@ -486,12 +486,12 @@ namespace Dota2Simulator.Games.Dota2
 
             Dictionary<Keys, Action> 物品进入CD委托 = new()
             {
-                { Keys.Z, () => Main._条件集[ConditionSlotKey.Z].Probe ??= 物品z进入CD },
-                { Keys.X, () => Main._条件集[ConditionSlotKey.X].Probe ??= 物品x进入CD },
-                { Keys.C, () => Main._条件集[ConditionSlotKey.C].Probe ??= 物品c进入CD },
-                { Keys.V, () => Main._条件集[ConditionSlotKey.V].Probe ??= 物品v进入CD },
-                { Keys.B, () => Main._条件集[ConditionSlotKey.B].Probe ??= 物品b进入CD },
-                { Keys.Space, () => Main._条件集[ConditionSlotKey.Space].Probe ??= 物品space进入CD }
+                { Keys.Z, () => Main._聚合.Conditions[ConditionSlotKey.Z].Probe ??= 物品z进入CD },
+                { Keys.X, () => Main._聚合.Conditions[ConditionSlotKey.X].Probe ??= 物品x进入CD },
+                { Keys.C, () => Main._聚合.Conditions[ConditionSlotKey.C].Probe ??= 物品c进入CD },
+                { Keys.V, () => Main._聚合.Conditions[ConditionSlotKey.V].Probe ??= 物品v进入CD },
+                { Keys.B, () => Main._聚合.Conditions[ConditionSlotKey.B].Probe ??= 物品b进入CD },
+                { Keys.Space, () => Main._聚合.Conditions[ConditionSlotKey.Space].Probe ??= 物品space进入CD }
             };
 
             foreach (ImageHandle 匹配句柄 in 需切假腿物品句柄)
@@ -526,12 +526,12 @@ namespace Dota2Simulator.Games.Dota2
 
             Dictionary<Keys, (Action 清空委托, Action 重置条件)> 清空物品进入CD委托和条件映射 = new()
             {
-                { Keys.Z, (() => Main._条件集[ConditionSlotKey.Z].Probe = null, () => Main._条件集[ConditionSlotKey.Z].Active = false) },
-                { Keys.X, (() => Main._条件集[ConditionSlotKey.X].Probe = null, () => Main._条件集[ConditionSlotKey.X].Active = false) },
-                { Keys.C, (() => Main._条件集[ConditionSlotKey.C].Probe = null, () => Main._条件集[ConditionSlotKey.C].Active = false) },
-                { Keys.V, (() => Main._条件集[ConditionSlotKey.V].Probe = null, () => Main._条件集[ConditionSlotKey.V].Active = false) },
-                { Keys.B, (() => Main._条件集[ConditionSlotKey.B].Probe = null, () => Main._条件集[ConditionSlotKey.B].Active = false) },
-                { Keys.Space, (() => Main._条件集[ConditionSlotKey.Space].Probe = null, () => Main._条件集[ConditionSlotKey.Space].Active = false) }
+                { Keys.Z, (() => Main._聚合.Conditions[ConditionSlotKey.Z].Probe = null, () => Main._聚合.Conditions[ConditionSlotKey.Z].Active = false) },
+                { Keys.X, (() => Main._聚合.Conditions[ConditionSlotKey.X].Probe = null, () => Main._聚合.Conditions[ConditionSlotKey.X].Active = false) },
+                { Keys.C, (() => Main._聚合.Conditions[ConditionSlotKey.C].Probe = null, () => Main._聚合.Conditions[ConditionSlotKey.C].Active = false) },
+                { Keys.V, (() => Main._聚合.Conditions[ConditionSlotKey.V].Probe = null, () => Main._聚合.Conditions[ConditionSlotKey.V].Active = false) },
+                { Keys.B, (() => Main._聚合.Conditions[ConditionSlotKey.B].Probe = null, () => Main._聚合.Conditions[ConditionSlotKey.B].Active = false) },
+                { Keys.Space, (() => Main._聚合.Conditions[ConditionSlotKey.Space].Probe = null, () => Main._聚合.Conditions[ConditionSlotKey.Space].Active = false) }
             };
 
             foreach (ImageHandle 假腿句柄 in 假腿句柄集合)
