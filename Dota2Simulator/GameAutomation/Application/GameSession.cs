@@ -13,13 +13,11 @@ using Main = Dota2Simulator.Games.Dota2.Main;
 namespace Dota2Simulator.GameAutomation.Application;
 
 /// <summary>
-/// 入站端口 <see cref="IGameSession"/> 的实现：双轨分发。
+/// 入站端口 <see cref="IGameSession"/> 的实现：单轨策略分发。
 ///
-/// 策略路径：英雄已在 <see cref="HeroStrategyRegistry"/> 注册（Wave 4 后才有）→ 走 IHeroStrategy。
-/// fallback 路径：未注册 → 回退旧 Main.根据当前英雄增强 switch。
-///
-/// 4.7 阶段 registry 为空，DispatchAsync 永远走 fallback，行为与
-/// Form2 原来直调 根据当前英雄增强(name, e) 逐字节等价。
+/// 策略路径：英雄已在 <see cref="HeroStrategyRegistry"/> 注册 → 走 IHeroStrategy。
+/// 未注册路径：no-op（旧 Main.根据当前英雄增强 switch 已于 Chunk 4.24 删除；
+/// 原 switch 对未知英雄名同样什么都不做，二者等价）。
 /// </summary>
 public sealed class GameSession : IGameSession
 {
@@ -53,13 +51,9 @@ public sealed class GameSession : IGameSession
         }
         else
         {
-            // fallback：旧 switch。重建 KeyEventArgs(KeyCode) 与原 e 逐字节等价——
-            // 全项目 根据当前英雄增强 及其调用链零使用 e.Handled / SuppressKeyPress，仅用 e.KeyCode。
-            await Main.根据当前英雄增强(
-                hero.Name,
-                new System.Windows.Forms.KeyEventArgs(
-                    (System.Windows.Forms.Keys)trigger.Key.ToNative()))
-                .ConfigureAwait(false);
+            // 未注册英雄：策略未实现，no-op。
+            // 旧 Main.根据当前英雄增强 switch 已于 Chunk 4.24 删除——其 switch(name)
+            // 对未命中的 name 本就走默认分支什么都不做，此 no-op 与之行为等价。
         }
     }
 
