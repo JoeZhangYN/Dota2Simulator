@@ -3,6 +3,7 @@
 
 using Collections.Pooled;
 using Dota2Simulator.Vision;
+using Dota2Simulator.GameAutomation.Domain.Loop;
 using Dota2Simulator.KeyboardMouse;
 using System;
 using System.Collections.Generic;
@@ -331,151 +332,79 @@ namespace Dota2Simulator.Games.Dota2
         #region 模式
 
         /// <summary>
-        ///     全局时间
+        ///     七套技能槽状态聚合：原 28 个 static 字段（_全局时间 / _全局模式 / _全局步骤 /
+        ///     _指定地点 各 Global+QWERDF 七变体）收编进 SkillSlotSet。下方 28 个同名转发
+        ///     属性是过渡垫片，保持 89 英雄 case 既有读写语法不变，4.24 收口删除。
         /// </summary>
-        private static long _全局时间 = -1;
+        private static readonly SkillSlotSet _槽 = new();
 
-        /// <summary>
-        ///     全局时间
-        /// </summary>
-        private static long _全局时间q;
+        // --- _全局时间组（long；Global 初值 -1，其余 0）---
+        private static long _全局时间
+        { get => _槽[SlotKey.Global].TimeMs; set => _槽[SlotKey.Global] = _槽[SlotKey.Global] with { TimeMs = value }; }
+        private static long _全局时间q
+        { get => _槽[SlotKey.Q].TimeMs; set => _槽[SlotKey.Q] = _槽[SlotKey.Q] with { TimeMs = value }; }
+        private static long _全局时间w
+        { get => _槽[SlotKey.W].TimeMs; set => _槽[SlotKey.W] = _槽[SlotKey.W] with { TimeMs = value }; }
+        private static long _全局时间e
+        { get => _槽[SlotKey.E].TimeMs; set => _槽[SlotKey.E] = _槽[SlotKey.E] with { TimeMs = value }; }
+        private static long _全局时间r
+        { get => _槽[SlotKey.R].TimeMs; set => _槽[SlotKey.R] = _槽[SlotKey.R] with { TimeMs = value }; }
+        private static long _全局时间d
+        { get => _槽[SlotKey.D].TimeMs; set => _槽[SlotKey.D] = _槽[SlotKey.D] with { TimeMs = value }; }
+        private static long _全局时间f
+        { get => _槽[SlotKey.F].TimeMs; set => _槽[SlotKey.F] = _槽[SlotKey.F] with { TimeMs = value }; }
 
-        /// <summary>
-        ///     全局时间
-        /// </summary>
-        private static long _全局时间w;
+        // --- _指定地点组（Point；p 对应 Global 槽）---
+        private static Point _指定地点p
+        { get => _槽[SlotKey.Global].TargetPoint; set => _槽[SlotKey.Global] = _槽[SlotKey.Global] with { TargetPoint = value }; }
+        private static Point _指定地点q
+        { get => _槽[SlotKey.Q].TargetPoint; set => _槽[SlotKey.Q] = _槽[SlotKey.Q] with { TargetPoint = value }; }
+        private static Point _指定地点w
+        { get => _槽[SlotKey.W].TargetPoint; set => _槽[SlotKey.W] = _槽[SlotKey.W] with { TargetPoint = value }; }
+        private static Point _指定地点e
+        { get => _槽[SlotKey.E].TargetPoint; set => _槽[SlotKey.E] = _槽[SlotKey.E] with { TargetPoint = value }; }
+        private static Point _指定地点r
+        { get => _槽[SlotKey.R].TargetPoint; set => _槽[SlotKey.R] = _槽[SlotKey.R] with { TargetPoint = value }; }
+        private static Point _指定地点d
+        { get => _槽[SlotKey.D].TargetPoint; set => _槽[SlotKey.D] = _槽[SlotKey.D] with { TargetPoint = value }; }
+        private static Point _指定地点f
+        { get => _槽[SlotKey.F].TargetPoint; set => _槽[SlotKey.F] = _槽[SlotKey.F] with { TargetPoint = value }; }
 
-        /// <summary>
-        ///     全局时间
-        /// </summary>
-        private static long _全局时间e;
+        // --- _全局模式组（int）---
+        private static int _全局模式
+        { get => _槽[SlotKey.Global].Mode; set => _槽[SlotKey.Global] = _槽[SlotKey.Global] with { Mode = value }; }
+        private static int _全局模式q
+        { get => _槽[SlotKey.Q].Mode; set => _槽[SlotKey.Q] = _槽[SlotKey.Q] with { Mode = value }; }
+        private static int _全局模式w
+        { get => _槽[SlotKey.W].Mode; set => _槽[SlotKey.W] = _槽[SlotKey.W] with { Mode = value }; }
+        private static int _全局模式e
+        { get => _槽[SlotKey.E].Mode; set => _槽[SlotKey.E] = _槽[SlotKey.E] with { Mode = value }; }
 
-        /// <summary>
-        ///     全局时间
-        /// </summary>
-        private static long _全局时间r;
-
-        /// <summary>
-        ///     全局时间
-        /// </summary>
-        private static long _全局时间d;
-
-        /// <summary>
-        ///     全局时间
-        /// </summary>
-        private static long _全局时间f;
-
-        /// <summary>
-        ///     全局时间
-        /// </summary>
-        // private static long _全局时间f;
-
-        /// <summary>
-        ///     用于跳拱地点
-        /// </summary>
-        private static Point _指定地点p = new(0, 0);
-
-        /// <summary>
-        ///     用于跳拱地点
-        /// </summary>
-        private static Point _指定地点q;
-
-        /// <summary>
-        ///     用于跳拱地点
-        /// </summary>
-        private static Point _指定地点w;
-
-        /// <summary>
-        ///     用于跳拱地点
-        /// </summary>
-        private static Point _指定地点e;
-
-        /// <summary>
-        ///     用于跳拱地点
-        /// </summary>
-        private static Point _指定地点r;
-
-        /// <summary>
-        ///     用于跳拱地点
-        /// </summary>
-        private static Point _指定地点d;
-
-        /// <summary>
-        ///     用于跳拱地点
-        /// </summary>
-        private static Point _指定地点f;
-
-        /// <summary>
-        ///     用于不同设定
-        /// </summary>
-        private static int _全局模式;
-
-        /// <summary>
-        ///     用于不同设定
-        /// </summary>
-        private static int _全局模式q;
-
-        /// <summary>
-        ///     用于不同设定
-        /// </summary>
-        private static int _全局模式w;
-
-        /// <summary>
-        ///     用于不同设定
-        /// </summary>
-        private static int _全局模式e;
-
+        /// <summary>_全局模式e 的并发锁，沿用原 Main.cs 设计。</summary>
         private static readonly Lock _全局模式e_lock = new();
 
-        /// <summary>
-        ///     用于不同设定
-        /// </summary>
-        private static int _全局模式r;
+        private static int _全局模式r
+        { get => _槽[SlotKey.R].Mode; set => _槽[SlotKey.R] = _槽[SlotKey.R] with { Mode = value }; }
+        private static int _全局模式d
+        { get => _槽[SlotKey.D].Mode; set => _槽[SlotKey.D] = _槽[SlotKey.D] with { Mode = value }; }
+        private static int _全局模式f
+        { get => _槽[SlotKey.F].Mode; set => _槽[SlotKey.F] = _槽[SlotKey.F] with { Mode = value }; }
 
-        /// <summary>
-        ///     用于不同设定
-        /// </summary>
-        private static int _全局模式d;
-
-        /// <summary>
-        ///     用于不同设定
-        /// </summary>
-        private static int _全局模式f;
-
-        /// <summary>
-        ///     用于阶段性
-        /// </summary>
-        private static int _全局步骤;
-
-        /// <summary>
-        ///     用于阶段性
-        /// </summary>
-        private static int _全局步骤q;
-
-        /// <summary>
-        ///     用于阶段性
-        /// </summary>
-        private static int _全局步骤w;
-
-        /// <summary>
-        ///     用于阶段性
-        /// </summary>
-        private static int _全局步骤e;
-
-        /// <summary>
-        ///     用于阶段性
-        /// </summary>
-        private static int _全局步骤r;
-
-        /// <summary>
-        ///     用于阶段性
-        /// </summary>
-        private static int _全局步骤d;
-
-        /// <summary>
-        ///     用于阶段性
-        /// </summary>
-        private static int _全局步骤f;
+        // --- _全局步骤组（int；另见下方 14 个 获取/设置全局步骤* 访问器）---
+        private static int _全局步骤
+        { get => _槽[SlotKey.Global].Step; set => _槽[SlotKey.Global] = _槽[SlotKey.Global] with { Step = value }; }
+        private static int _全局步骤q
+        { get => _槽[SlotKey.Q].Step; set => _槽[SlotKey.Q] = _槽[SlotKey.Q] with { Step = value }; }
+        private static int _全局步骤w
+        { get => _槽[SlotKey.W].Step; set => _槽[SlotKey.W] = _槽[SlotKey.W] with { Step = value }; }
+        private static int _全局步骤e
+        { get => _槽[SlotKey.E].Step; set => _槽[SlotKey.E] = _槽[SlotKey.E] with { Step = value }; }
+        private static int _全局步骤r
+        { get => _槽[SlotKey.R].Step; set => _槽[SlotKey.R] = _槽[SlotKey.R] with { Step = value }; }
+        private static int _全局步骤d
+        { get => _槽[SlotKey.D].Step; set => _槽[SlotKey.D] = _槽[SlotKey.D] with { Step = value }; }
+        private static int _全局步骤f
+        { get => _槽[SlotKey.F].Step; set => _槽[SlotKey.F] = _槽[SlotKey.F] with { Step = value }; }
 
         private static int 获取全局步骤()
         {
@@ -3293,10 +3222,10 @@ namespace Dota2Simulator.Games.Dota2
                                 _条件2 = true;
                                 break;
                             case Keys.E:
-                                Common.初始化全局时间(ref _全局时间e);
+                                _全局时间e = Common.获取当前时间毫秒();
                                 break;
                             case Keys.R:
-                                Common.初始化全局时间(ref _全局时间r);
+                                _全局时间r = Common.获取当前时间毫秒();
                                 _条件3 = true;
                                 break;
                         }
@@ -3600,19 +3529,19 @@ namespace Dota2Simulator.Games.Dota2
                         switch (e.KeyCode)
                         {
                             case Keys.Q:
-                                Common.初始化全局时间(ref _全局时间q);
+                                _全局时间q = Common.获取当前时间毫秒();
                                 _条件1 = true;
                                 break;
                             case Keys.W:
-                                Common.初始化全局时间(ref _全局时间w);
+                                _全局时间w = Common.获取当前时间毫秒();
                                 _条件2 = true;
                                 break;
                             case Keys.E:
-                                Common.初始化全局时间(ref _全局时间e);
+                                _全局时间e = Common.获取当前时间毫秒();
                                 _条件3 = true;
                                 break;
                             case Keys.R:
-                                Common.初始化全局时间(ref _全局时间r);
+                                _全局时间r = Common.获取当前时间毫秒();
                                 _条件4 = true;
                                 break;
                         }
@@ -5285,7 +5214,7 @@ namespace Dota2Simulator.Games.Dota2
             return await Skill.主动技能释放后续(Keys.Q, () =>
             {
                 _条件4 = false;
-                Common.初始化全局时间(ref _全局时间q);
+                _全局时间q = Common.获取当前时间毫秒();
 
                 // 如果E已经释放
                 if (!_中断条件 && 获取全局步骤e() == 1)
@@ -5307,7 +5236,7 @@ namespace Dota2Simulator.Games.Dota2
 
                 if (步骤e == 1) return;
 
-                Common.初始化全局时间(ref _全局时间e);
+                _全局时间e = Common.获取当前时间毫秒();
 
                 if (获取全局步骤r() == 1)
                 {
@@ -6766,7 +6695,7 @@ namespace Dota2Simulator.Games.Dota2
             static void 关后(int time, in ImageHandle 句柄)
             {
                 Common.Delay(110);
-                Common.初始化全局时间(ref _全局时间w);
+                _全局时间w = Common.获取当前时间毫秒();
                 SimKeyBoard.MouseRightClick();
                 Common.Delay(150);
                 SimKeyBoard.KeyPress(Keys.S);
@@ -7108,7 +7037,7 @@ namespace Dota2Simulator.Games.Dota2
         {
             static void 萨满变羊后(ImageHandle 句柄)
             {
-                Common.初始化全局时间(ref _全局时间w);
+                _全局时间w = Common.获取当前时间毫秒();
 
                 Task.Run(() =>
                 {
@@ -7234,7 +7163,7 @@ namespace Dota2Simulator.Games.Dota2
                     case 1:
                         _条件4 = true;
                         _指定地点r = Control.MousePosition;
-                        Common.初始化全局时间(ref _全局时间r);
+                        _全局时间r = Common.获取当前时间毫秒();
                         break;
                     case 0:
                         break;
@@ -7744,7 +7673,7 @@ namespace Dota2Simulator.Games.Dota2
 
             if (!ImageFinder.FindImageInRegionBool(Dota2_Pictrue.物品.吹风, in 句柄, Item.获取物品范围(Skill._技能数量)) && _全局时间 == -1)
             {
-                Common.初始化全局时间(ref _全局时间);
+                _全局时间 = Common.获取当前时间毫秒();
             }
 
             if (Common.获取当前时间毫秒() - _全局时间 < 2500 - 650 - 600)
@@ -9034,7 +8963,7 @@ namespace Dota2Simulator.Games.Dota2
 
             colors.Add(Color.FromArgb(0, 0, 0));
             points.Add(new Point(100, 13));
-            Common.初始化全局时间(ref _全局时间);
+            _全局时间 = Common.获取当前时间毫秒();
 
 
             PooledList<Point> list1 = ImageManager.FindColors(colors, points, 句柄, 1);
@@ -9088,7 +9017,7 @@ namespace Dota2Simulator.Games.Dota2
             colors.Add(Color.FromArgb(0, 1, 0));
             points.Add(new Point(107, 19));
 
-            Common.初始化全局时间(ref _全局时间);
+            _全局时间 = Common.获取当前时间毫秒();
 
             PooledList<Point> list1 = ImageManager.FindColors(colors, points, 句柄, 1);
 
