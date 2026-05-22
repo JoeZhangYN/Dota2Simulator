@@ -4,6 +4,7 @@
 using Collections.Pooled;
 using Dota2Simulator.Vision;
 using Dota2Simulator.GameAutomation.Application;
+using Dota2Simulator.GameAutomation.Domain.Combat;
 using Dota2Simulator.GameAutomation.Domain.Loop;
 using Dota2Simulator.KeyboardMouse;
 using System;
@@ -113,57 +114,11 @@ namespace Dota2Simulator.Games.Dota2
         /// / 条件配置项 / 处理条件更新 等）。public 因 Item.cs 跨类访问。</summary>
         public static readonly ConditionSlotSet _条件集 = new();
 
-        /// <summary>
-        ///     攻击前摇
-        /// </summary>
-        private static double _基础攻击前摇 = 0.5;
-
-        /// <summary>
-        ///     攻击前摇
-        /// </summary>
-        private static double _基础攻击间隔 = 1.7;
-
-        /// <summary>
-        ///     攻击速度
-        /// </summary>
-        private static double _攻击速度 = 100;
-
-        /// <summary>
-        ///     当前出手时间
-        /// </summary>
-        private static long _实际出手时间;
-
-
-        private static long _停止走A;
-
-        private static bool _开启走A;
-
-        /// <summary>
-        ///     当前出手时间 650ms 为火女的攻击点（最长），30ms 为服务器延迟
-        /// </summary>
-        private static long _实际攻击前摇 = 650 + 30;
-
-        /// <summary>
-        ///     当前出手时间
-        /// </summary>
-        private static long _实际攻击间隔 = 1700;
-
-        /// <summary>
-        ///     能量转移
-        /// </summary>
-        // private static int 能量转移被动计数;
-
-        /// <summary>
-        ///     状态抗性
-        /// </summary>
-        private static double _状态抗性倍数;
+        /// <summary>攻击计时与走 A 状态聚合（收编原 9 个攻击相关 static 字段）。
+        /// public 因 Item.cs 跨类访问。</summary>
+        public static readonly AttackProfile _攻击 = new();
 
         #endregion
-
-        /// <summary>
-        ///     仅用于快速吸引仇恨
-        /// </summary>
-        private static int _阵营_int; 
 
         #endregion
 
@@ -1160,8 +1115,8 @@ namespace Dota2Simulator.Games.Dota2
                             _条件集[ConditionSlotKey.C3].Probe ??= 变龙去后摇;
                             _条件集[ConditionSlotKey.C4].Probe ??= 火球去后摇;
                             Item._切假腿配置.修改配置(Keys.E, false);
-                            _基础攻击前摇 = 0.5;
-                            _基础攻击间隔 = 1.6;
+                            _攻击.基础攻击前摇 = 0.5;
+                            _攻击.基础攻击间隔 = 1.6;
                             await 状态初始化().ConfigureAwait(false);
                         }
 
@@ -1224,8 +1179,8 @@ namespace Dota2Simulator.Games.Dota2
                             _条件集[ConditionSlotKey.C4].Probe ??= 骨隐步去后摇;
                             _条件集[ConditionSlotKey.C5].Probe ??= 炽烈火雨去后摇;
                             _条件集[ConditionSlotKey.C6].Probe ??= 骷髅之军去后摇;
-                            _基础攻击前摇 = 0.4;
-                            _基础攻击间隔 = 1.7;
+                            _攻击.基础攻击前摇 = 0.4;
+                            _攻击.基础攻击间隔 = 1.7;
                             await 状态初始化().ConfigureAwait(false);
                         }
 
@@ -1707,8 +1662,8 @@ namespace Dota2Simulator.Games.Dota2
                             _条件集[ConditionSlotKey.C3].Probe ??= 深海护罩去后摇;
                             _条件集[ConditionSlotKey.C4].Probe ??= 暗影之舞去后摇;
                             // 能量转移被动计数 = 0;
-                            _基础攻击间隔 = 1.7;
-                            _基础攻击前摇 = 0.5;
+                            _攻击.基础攻击间隔 = 1.7;
+                            _攻击.基础攻击前摇 = 0.5;
                             Item._切假腿配置.修改配置(Keys.E, false);
                             await 状态初始化().ConfigureAwait(false);
                         }
@@ -2962,12 +2917,12 @@ namespace Dota2Simulator.Games.Dota2
                             case Keys.W:
                                 if (ImageFinder.FindImageInRegionBool(Dota2_Pictrue.物品.中立_祭礼长袍, GlobalScreenCapture.GetCurrentHandle(), Item.获取中立TP范围(Skill._技能数量)))
                                 {
-                                    _状态抗性倍数 *= 1.1;
+                                    _攻击.状态抗性倍数 *= 1.1;
                                 }
 
                                 if (ImageFinder.FindImageInRegionBool(Dota2_Pictrue.物品.中立_永恒遗物, GlobalScreenCapture.GetCurrentHandle(), Item.获取中立TP范围(Skill._技能数量)))
                                 {
-                                    _状态抗性倍数 *= 1.2;
+                                    _攻击.状态抗性倍数 *= 1.2;
                                 }
 
                                 _条件集[ConditionSlotKey.C2].Active = true;
@@ -3223,8 +3178,8 @@ namespace Dota2Simulator.Games.Dota2
                             _条件集[ConditionSlotKey.C2].Probe ??= 薄葬去后摇;
                             _条件集[ConditionSlotKey.C3].Probe ??= 暗影波去后摇;
                             _条件集[ConditionSlotKey.C4].Probe ??= 邪能去后摇;
-                            _基础攻击前摇 = 0.3;
-                            _基础攻击间隔 = 1.7;
+                            _攻击.基础攻击前摇 = 0.3;
+                            _攻击.基础攻击间隔 = 1.7;
                             await 状态初始化().ConfigureAwait(false);
                         }
 
@@ -4953,7 +4908,7 @@ namespace Dota2Simulator.Games.Dota2
                     _条件集[ConditionSlotKey.C3].Active = true;
                 }
 
-                int 等待时间 = (int)Math.Floor(3000 * _状态抗性倍数) - 1670;
+                int 等待时间 = (int)Math.Floor(3000 * _攻击.状态抗性倍数) - 1670;
                 Common.Delay(等待时间, _槽.Time(SlotKey.E));
                 _条件集[ConditionSlotKey.C4].Active = true;
             }).ConfigureAwait(true);
@@ -6765,7 +6720,7 @@ namespace Dota2Simulator.Games.Dota2
                         time = 1150;
                     }
 
-                    time = Convert.ToInt32(_状态抗性倍数 * time);
+                    time = Convert.ToInt32(_攻击.状态抗性倍数 * time);
 
                     TTS.TTS.Speak(string.Concat("延时", time.ToString(CultureInfo.InvariantCulture)));
 
@@ -8096,14 +8051,14 @@ namespace Dota2Simulator.Games.Dota2
             bool 等待平A = false;
             while (true)
             {
-                if (!_开启走A)
+                if (!_攻击.开启走A)
                 {
                     return;
                 }
 
-                if (_停止走A > 0)
+                if (_攻击.停止走A > 0)
                 {
-                    _停止走A = 0;
+                    _攻击.停止走A = 0;
                     break;
                 }
 
@@ -8113,7 +8068,7 @@ namespace Dota2Simulator.Games.Dota2
                 if (!等待平A)
                 {
                     // A+等待前摇 = 实际出手时间， 实际出手时间+等待间隔 = 下一次攻击开始时间 转身速率0.7 转180°157ms延时 
-                    remainingTime = _实际出手时间 - currentTime + 180;
+                    remainingTime = _攻击.实际出手时间 - currentTime + 180;
 
                     if (remainingTime > 10)
                     {
@@ -8138,7 +8093,7 @@ namespace Dota2Simulator.Games.Dota2
                 else
                 {
                     // 攻击前摇算在攻击间隔里面
-                    remainingTime = _实际出手时间 + _实际攻击间隔 - _实际攻击前摇 - currentTime;
+                    remainingTime = _攻击.实际出手时间 + _攻击.实际攻击间隔 - _攻击.实际攻击前摇 - currentTime;
 
                     if (remainingTime > 10)
                     {
@@ -8976,14 +8931,7 @@ namespace Dota2Simulator.Games.Dota2
             _槽.SetTime(SlotKey.D, -1);
             _槽.SetTime(SlotKey.F, -1);
 
-            _攻击速度 = 100;
-            _基础攻击前摇 = 0.3;
-            _基础攻击间隔 = 1.7;
-            _实际出手时间 = 0;
-            _停止走A = 0;
-            _开启走A = false;
-            _实际攻击前摇 = 0;
-            _实际攻击间隔 = 0;
+            _攻击.Reset();
 
             _槽.SetTarget(SlotKey.Global, new Point(0, 0));
             _槽.SetTarget(SlotKey.Q, new Point(0, 0));
