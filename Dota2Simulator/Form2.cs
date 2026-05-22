@@ -5,11 +5,9 @@ using System;
 using System.Diagnostics;
 using System.Drawing;
 using System.Globalization;
-using System.Threading;
 using System.Windows.Forms;
 using static Dota2Simulator.SetWindowTop;
 using KeyEventArgs = System.Windows.Forms.KeyEventArgs;
-using Keys = System.Windows.Forms.Keys;
 using Point = System.Drawing.Point;
 
 namespace Dota2Simulator
@@ -100,15 +98,6 @@ namespace Dota2Simulator
         ///     用于捕捉按键 现在使用
         /// </summary>
         private readonly HookUserActivity _hookUser = new();
-
-        #endregion
-
-        #region 获取当前时间毫秒
-
-        private static long 获取当前时间毫秒()
-        {
-            return new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds();
-        }
 
         #endregion
 
@@ -224,7 +213,7 @@ namespace Dota2Simulator
             //i += KeyboardMouseSimulateDriverAPI.Initialize((uint)SimulateWays.Event);
 
             // 设置窗体显示在最上层
-            SetWindowPos(Handle, -1, 0, 0, 0, 0, 0x0001 | 0x0002 | 0x0010 | 0x0080);
+            _ = SetWindowPos(Handle, -1, 0, 0, 0, 0, 0x0001 | 0x0002 | 0x0010 | 0x0080);
 
             // 设置本窗体为活动窗体
             SetActiveWindow(Handle);
@@ -284,6 +273,7 @@ namespace Dota2Simulator
 
         #endregion
 
+        #region 点击显示全部
         private void checkBox_showAll_CheckedChanged(object sender, EventArgs e)
         {
 
@@ -299,6 +289,7 @@ namespace Dota2Simulator
             {
                 Location = new Point(338, 1060);
             }
-        }
+        } 
+        #endregion
     }
 }

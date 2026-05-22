@@ -9,9 +9,12 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Globalization;
 using System.Linq;
+using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using YamlDotNet.Core.Tokens;
 
 namespace Dota2Simulator.Games.Dota2
 {
@@ -2323,7 +2326,7 @@ namespace Dota2Simulator.Games.Dota2
                         await Item.根据按键判断技能释放前通用逻辑(e).ConfigureAwait(true);
 
                         switch (e.KeyCode)
-                        {                            
+                        {
                             //case Keys.Q:
                             //    _条件1 = true;
                             //    break;
@@ -4220,28 +4223,28 @@ namespace Dota2Simulator.Games.Dota2
 
                         await Item.根据按键判断技能释放前通用逻辑(e).ConfigureAwait(true);
 
-                        switch (e.KeyCode)
-                        {
-                            //case Keys.Q:
-                            //    _条件1 = true;
-                            //    break;
-                            //case Keys.W:
-                            //    Common.Delay(33 * Item.根据图片使用物品(Dota2_Pictrue.物品.虚灵之刃));
-                            //    Common.Delay(33 * (Item.根据图片使用物品(Dota2_Pictrue.物品.红杖) +
-                            //                Item.根据图片使用物品(Dota2_Pictrue.物品.红杖2) +
-                            //                Item.根据图片使用物品(Dota2_Pictrue.物品.红杖3) +
-                            //                Item.根据图片使用物品(Dota2_Pictrue.物品.红杖4) +
-                            //                Item.根据图片使用物品(Dota2_Pictrue.物品.红杖5)));
-                            //    _条件2 = true;
-                            //    break;
-                            //case Keys.E:
-                            //    _条件3 = true;
-                            //    break;
-                            //case Keys.R:
-                            //    设置全局步骤r(0);
-                            //    // _条件4 = true;
-                            //    break;
-                        }
+                        //switch (e.KeyCode)
+                        //{
+                        //    //case Keys.Q:
+                        //    //    _条件1 = true;
+                        //    //    break;
+                        //    //case Keys.W:
+                        //    //    Common.Delay(33 * Item.根据图片使用物品(Dota2_Pictrue.物品.虚灵之刃));
+                        //    //    Common.Delay(33 * (Item.根据图片使用物品(Dota2_Pictrue.物品.红杖) +
+                        //    //                Item.根据图片使用物品(Dota2_Pictrue.物品.红杖2) +
+                        //    //                Item.根据图片使用物品(Dota2_Pictrue.物品.红杖3) +
+                        //    //                Item.根据图片使用物品(Dota2_Pictrue.物品.红杖4) +
+                        //    //                Item.根据图片使用物品(Dota2_Pictrue.物品.红杖5)));
+                        //    //    _条件2 = true;
+                        //    //    break;
+                        //    //case Keys.E:
+                        //    //    _条件3 = true;
+                        //    //    break;
+                        //    //case Keys.R:
+                        //    //    设置全局步骤r(0);
+                        //    //    // _条件4 = true;
+                        //    //    break;
+                        //}
 
                         break;
                     }
@@ -4249,6 +4252,158 @@ namespace Dota2Simulator.Games.Dota2
                 #endregion
 
                 #endregion
+
+                #region 进化岛
+                case "进化岛":
+                    {
+                        switch (e.KeyCode)
+                        {
+                            case Keys.D:
+                                _ = Task.Run(() =>
+                                {
+                                    Common.Delay(200);
+                                    SimEnigo.KeyPress(Keys.A);
+                                }).ConfigureAwait(false);
+                                break;
+                            case Keys.T:
+                                _ = Task.Run(() =>
+                                {
+                                    Common.Delay(200);
+                                    SimEnigo.KeyPress(Keys.A);
+                                }).ConfigureAwait(false);
+                                break;
+                            case Keys.F3:
+                                _ = Task.Run(() =>
+                                {
+                                    Common.Delay(200);
+                                    SimEnigo.KeyPress(Keys.A);
+                                }).ConfigureAwait(false);
+                                break;
+                        }
+                        break;
+                    }
+                #endregion
+
+                case "命运2":
+                    {
+                        switch (e.KeyCode)
+                        {
+                            //case Keys.D3:
+                            //    _ = Task.Run(命运2急切);
+                            //    break;
+                            case Keys.V:
+                                _ = Task.Run(命运2冰好耶);
+                                break;
+                            case Keys.B:
+                                _ = Task.Run(命运2冰好耶1);
+                                break;
+                            case Keys.Q:
+                                SimKeyBoard.MouseMoveTo(1920, 1080);
+                                break;
+                                //case Keys.LControlKey:
+                                //    _ = Task.Run(() =>
+                                //    {
+                                //        Common.Delay(200);
+                                //        命运2按键(Keys.LShiftKey);
+                                //    });
+                                //    break;
+                                //case Keys.Z:
+                                //    if (_条件z)
+                                //    {
+                                //        _条件z = false;
+                                //    }
+                                //    else
+                                //    {
+                                //        命运2按键(Keys.D3);
+                                //        命运2按键(Keys.Space);
+                                //        _条件z = true;
+                                //        Common.Delay(300);
+                                //        _ = Task.Run(() =>
+                                //        {
+                                //            命运2按键(Keys.Z); // 需要350ms
+                                //        }).ConfigureAwait(false);
+                                //    }
+                                //    break;
+                                //case Keys.F:
+                                //    if (_全局模式f == 4) {
+                                //    }
+                                //    else
+                                //    {
+                                //        命运2按键(Keys.D3);
+
+                                //        切配装通用(2);
+
+                                //        _全局模式f = 4;
+
+                                //        Common.Delay(500); // 等待切换装备完成
+
+                                //        SimKeyBoard.MouseLeftDown();
+
+                                //        Common.Delay(200); // 喷喷
+
+                                //        SimKeyBoard.MouseLeftUp();
+
+                                //        _ = Task.Run(() =>
+                                //        {
+                                //            命运2按键(Keys.F);
+                                //        });
+
+                                //        TTS.TTS.Speak("喷喷陨星");
+                                //    }
+                                //    break;
+
+                                #region 删除角色 领取
+                                //case Keys.1:
+                                //    _ = Task.Run(() =>
+                                //    {
+                                //        删除角色();
+                                //    }).ConfigureAwait(false);
+                                //    break;
+                                //case Keys.D2:
+                                //    _ = Task.Run(() =>
+                                //    {
+                                //        创建角色();
+                                //    }).ConfigureAwait(false);
+                                //    break;
+                                //case Keys.D3:
+                                //    _ = Task.Run(() =>
+                                //    {
+                                //       领取();
+                                //    }).ConfigureAwait(false);
+                                //    break;
+                                //case Keys.D4:
+                                //    _ = Task.Run(() =>
+                                //    {
+                                //        退出();
+                                //    }).ConfigureAwait(false);
+                                //    break;
+                                //case Keys.D5:
+                                //    _ = Task.Run(() =>
+                                //    {
+                                //        while (true)
+                                //        {
+                                //            删除角色();
+                                //            SimKeyBoard.MouseMove(0, 0);
+                                //            Common.Delay(1500);
+                                //            创建角色();
+                                //            SimKeyBoard.MouseMove(0, 0);
+                                //            Common.Delay(2500);
+                                //            领取();
+                                //            SimKeyBoard.MouseMove(0, 0);
+                                //            Common.Delay(1500);
+                                //            退出();
+                                //            SimKeyBoard.MouseMove(0, 0);
+                                //            Common.Delay(3500);
+                                //        }
+                                //    }).ConfigureAwait(false);
+                                //    break;
+                                //case Keys.P:
+                                //    Application.Exit();
+                                //    break; 
+                                #endregion
+                        }
+                        break;
+                    }
 
                 #region 测试
 
@@ -4303,6 +4458,236 @@ namespace Dota2Simulator.Games.Dota2
             }
         }
         #endregion
+
+        /// <summary>
+        ///     分辨率 3840*2160
+        /// </summary>
+        /// <param name="i"></param>
+        private static void 切配装通用(int i)
+        {
+            Point p = Control.MousePosition;
+            int x, y;
+            // x295,483  678 + 174 * Math.Floor((n - 1) / 2)
+            if (i % 2 == 0)
+                x = 483;
+            else
+                x = 295;
+
+            y = 678 + 174 * (int)Math.Floor((double)(i - 1) / 2);
+
+            命运2按键(Keys.F1);
+            Common.Delay(600);
+            命运2按键(Keys.Left);
+            SimKeyBoard.MouseMove(x, y);
+            Common.Delay(300);
+            SimKeyBoard.MouseLeftClick();
+            Common.Delay(25);
+            SimKeyBoard.MouseLeftClick();
+            Common.Delay(25);
+            SimKeyBoard.MouseLeftClick();
+            命运2按键(Keys.F1);
+            SimKeyBoard.MouseMove(p);
+        }
+
+        /// <summary>
+        ///     耗时10ms左右 延迟 原先50ms
+        ///     CTRL SHIFT 键无法模拟？
+        /// </summary>
+        /// <param name="Key"></param>
+        private static void 命运2按键(Keys Key)
+        {
+            SimKeyBoard.KeyDown(Key);
+            Common.Delay(10); // 命运2操作延迟不然不切
+            SimKeyBoard.KeyUp(Key);
+        }
+
+        private static void 命运2急切()
+        {
+            Common.Delay(400);
+            SimKeyBoard.MouseLeftDown();
+            Common.Delay(10);
+            SimKeyBoard.MouseLeftUp();
+            Task.Run(() =>
+            {
+                Common.Delay(2700);
+                TTS.TTS.Speak("好");
+            }).ConfigureAwait(false);
+            命运2按键(Keys.LShiftKey);
+            命运2按键(Keys.D2);
+            Common.Delay(200);
+            命运2按键(Keys.Space);
+        }
+
+        private static void 命运2冰好耶()
+        {
+            SimKeyBoard.KeyDown(Keys.W);
+            命运2按键(Keys.LShiftKey);
+            Common.Delay(150);
+            SimKeyBoard.KeyUp(Keys.W);
+            命运2按键(Keys.LControlKey);
+            Common.Delay(150);
+            命运2按键(Keys.C);
+            Common.Delay(100);
+            SimKeyBoard.KeyDown(Keys.S);
+            Common.Delay(500);
+            SimKeyBoard.KeyUp(Keys.S);
+        }
+
+        private static void 命运2冰好耶1()
+        {
+            SimKeyBoard.KeyDown(Keys.W);
+            命运2按键(Keys.LShiftKey);
+            Common.Delay(150);
+            SimKeyBoard.KeyUp(Keys.W);
+            命运2按键(Keys.LControlKey);
+            Common.Delay(150);
+            SimKeyBoard.MouseLeftClick();
+            Common.Delay(100);
+            SimKeyBoard.KeyDown(Keys.S);
+            Common.Delay(500);
+            SimKeyBoard.KeyUp(Keys.S);
+        }
+
+        private static void 删除角色()
+        {
+            // 移动 1341,658 位置 长按 f 10秒
+            // AFD鼠标右键 长按回车 10秒
+            // 1341,658 位置
+            // 1344,349 位置 
+            // 1189,873 位置
+            // 1372,443 位置
+            // 182,612 位置
+            // 1475,860 位置
+            // esc 3次
+            // 724,559 位置 单
+
+            // 删除角色
+
+            SimKeyBoard.MouseMove(1341, 658);
+            Common.Delay(1200);
+
+            SimKeyBoard.KeyDown(Keys.F);
+            Common.Delay(4500);
+            SimKeyBoard.KeyUp(Keys.F);
+
+            Common.Delay(500);
+            确认删除();
+        }
+
+        public static void 确认删除()
+        {
+            SimKeyBoard.KeyDown(Keys.A);
+            Common.Delay(100);
+            SimKeyBoard.KeyUp(Keys.A);
+            Common.Delay(100);
+            SimKeyBoard.KeyDown(Keys.A);
+            Common.Delay(100);
+            SimKeyBoard.KeyUp(Keys.A);
+            Common.Delay(100);
+            SimKeyBoard.KeyDown(Keys.F);
+            Common.Delay(100);
+            SimKeyBoard.KeyUp(Keys.F);
+            Common.Delay(100);
+            SimKeyBoard.KeyDown(Keys.F);
+            Common.Delay(100);
+            SimKeyBoard.KeyUp(Keys.F);
+            Common.Delay(100);
+            SimKeyBoard.KeyDown(Keys.D);
+            Common.Delay(100);
+            SimKeyBoard.KeyUp(Keys.D);
+            Common.Delay(100);
+            SimKeyBoard.KeyDown(Keys.D);
+            Common.Delay(100);
+            SimKeyBoard.KeyUp(Keys.D);
+            Common.Delay(100);
+            SimKeyBoard.MouseRightClick();
+            Common.Delay(100);
+            SimKeyBoard.MouseRightClick();
+            Common.Delay(100);
+
+            SimKeyBoard.KeyDown(Keys.Enter);
+            Common.Delay(4500);
+            SimKeyBoard.KeyUp(Keys.Enter);
+        }
+
+        public static void 创建角色()
+        {
+            // 创建角色
+            SimKeyBoard.MouseMove(1341, 658);
+            Common.Delay(300);
+            SimKeyBoard.MouseLeftClick();
+
+            Common.Delay(500);
+
+            SimKeyBoard.MouseMove(1344, 349);
+            Common.Delay(300);
+            SimKeyBoard.MouseLeftClick();
+
+            Common.Delay(500);
+
+            SimKeyBoard.MouseMove(1189, 873);
+            Common.Delay(300);
+            SimKeyBoard.MouseLeftClick();
+        }
+
+        public static void 领取()
+        {
+            // 进入老角色
+
+            SimKeyBoard.MouseMove(1372, 443);
+            Common.Delay(300);
+            SimKeyBoard.MouseLeftClick();
+
+            Common.Delay(3000);
+
+            // 门户
+
+            SimKeyBoard.MouseMove(1128, 823);
+            Common.Delay(300);
+            SimKeyBoard.MouseLeftClick();
+
+            Common.Delay(1200);
+
+            // 武器周
+
+            SimKeyBoard.MouseMove(182, 612);
+            Common.Delay(300);
+            SimKeyBoard.MouseLeftClick();
+
+            Common.Delay(800);
+
+            // 领取
+
+            SimKeyBoard.MouseMove(1475, 860);
+            Common.Delay(300);
+            SimKeyBoard.MouseLeftClick();
+            Common.Delay(300);
+            SimKeyBoard.MouseLeftClick();
+        }
+
+        public static void 退出()
+        {
+            // 退出
+
+            SimKeyBoard.KeyPress(Keys.Escape);
+            Common.Delay(500);
+            SimKeyBoard.KeyPress(Keys.Escape);
+            Common.Delay(500);
+            SimKeyBoard.KeyPress(Keys.Escape);
+
+            Common.Delay(1000);
+
+            // 更换角色
+            SimKeyBoard.MouseMove(724, 589);
+            Common.Delay(300);
+            SimKeyBoard.MouseLeftClick();
+            Common.Delay(300);
+            SimKeyBoard.MouseLeftClick();
+
+            Common.Delay(300);
+
+            SimKeyBoard.KeyPress(Keys.Enter);
+        }
 
         #region 获取指定位置颜色
 
@@ -6750,7 +7135,7 @@ namespace Dota2Simulator.Games.Dota2
 
                     time = Convert.ToInt32(_状态抗性倍数 * time);
 
-                    TTS.TTS.Speak(string.Concat("延时", time.ToString()));
+                    TTS.TTS.Speak(string.Concat("延时", time.ToString(CultureInfo.InvariantCulture)));
 
                     SimKeyBoard.KeyPress(Keys.A);
 
@@ -8149,119 +8534,119 @@ namespace Dota2Simulator.Games.Dota2
 
         #region 扔装备
 
-        private void 批量扔装备()
-        {
-            //SimKeyBoard.KeyPress(Keys.S);
-            //Common.Delay(40);
-            //SimKeyBoard.KeyPress(Keys.F1);
-            //Common.Delay(40);
-            //SimKeyBoard.KeyPress(Keys.F1);
+        //private void 批量扔装备()
+        //{
+        //    //SimKeyBoard.KeyPress(Keys.S);
+        //    //Common.Delay(40);
+        //    //SimKeyBoard.KeyPress(Keys.F1);
+        //    //Common.Delay(40);
+        //    //SimKeyBoard.KeyPress(Keys.F1);
 
-            //using PooledList<string> list1 = [.. tb_阵营.Text.Split(',')];
+        //    //using PooledList<string> list1 = [.. tb_阵营.Text.Split(',')];
 
-            //try
-            //{
-            //    switch (Skill._技能数量)
-            //    {
-            //        case 6:
-            //            foreach (string t in list1)
-            //            {
-            //                switch (t)
-            //                {
-            //                    case "1":
-            //                        扔装备(new Point(1191, 963));
-            //                        break;
-            //                    case "2":
-            //                        扔装备(new Point(1259, 963));
-            //                        break;
-            //                    case "3":
-            //                        扔装备(new Point(1325, 963));
-            //                        break;
-            //                    case "4":
-            //                        扔装备(new Point(1191, 1011));
-            //                        break;
-            //                    case "5":
-            //                        扔装备(new Point(1259, 1011));
-            //                        break;
-            //                    case "6":
-            //                        扔装备(new Point(1325, 1011));
-            //                        break;
-            //                    case "7":
-            //                        扔装备(new Point(1384, 994));
-            //                        break;
-            //                }
-            //            }
+        //    //try
+        //    //{
+        //    //    switch (Skill._技能数量)
+        //    //    {
+        //    //        case 6:
+        //    //            foreach (string t in list1)
+        //    //            {
+        //    //                switch (t)
+        //    //                {
+        //    //                    case "1":
+        //    //                        扔装备(new Point(1191, 963));
+        //    //                        break;
+        //    //                    case "2":
+        //    //                        扔装备(new Point(1259, 963));
+        //    //                        break;
+        //    //                    case "3":
+        //    //                        扔装备(new Point(1325, 963));
+        //    //                        break;
+        //    //                    case "4":
+        //    //                        扔装备(new Point(1191, 1011));
+        //    //                        break;
+        //    //                    case "5":
+        //    //                        扔装备(new Point(1259, 1011));
+        //    //                        break;
+        //    //                    case "6":
+        //    //                        扔装备(new Point(1325, 1011));
+        //    //                        break;
+        //    //                    case "7":
+        //    //                        扔装备(new Point(1384, 994));
+        //    //                        break;
+        //    //                }
+        //    //            }
 
-            //            break;
-            //        case 4:
-            //            foreach (string t in list1)
-            //            {
-            //                switch (t)
-            //                {
-            //                    case "1":
-            //                        扔装备(new Point(1145, 966));
-            //                        break;
-            //                    case "2":
-            //                        扔装备(new Point(1214, 963));
-            //                        break;
-            //                    case "3":
-            //                        扔装备(new Point(1288, 963));
-            //                        break;
-            //                    case "4":
-            //                        扔装备(new Point(1145, 1011));
-            //                        break;
-            //                    case "5":
-            //                        扔装备(new Point(1214, 1011));
-            //                        break;
-            //                    case "6":
-            //                        扔装备(new Point(1288, 1011));
-            //                        break;
-            //                    case "7":
-            //                        扔装备(new Point(1337, 994));
-            //                        break;
-            //                }
-            //            }
+        //    //            break;
+        //    //        case 4:
+        //    //            foreach (string t in list1)
+        //    //            {
+        //    //                switch (t)
+        //    //                {
+        //    //                    case "1":
+        //    //                        扔装备(new Point(1145, 966));
+        //    //                        break;
+        //    //                    case "2":
+        //    //                        扔装备(new Point(1214, 963));
+        //    //                        break;
+        //    //                    case "3":
+        //    //                        扔装备(new Point(1288, 963));
+        //    //                        break;
+        //    //                    case "4":
+        //    //                        扔装备(new Point(1145, 1011));
+        //    //                        break;
+        //    //                    case "5":
+        //    //                        扔装备(new Point(1214, 1011));
+        //    //                        break;
+        //    //                    case "6":
+        //    //                        扔装备(new Point(1288, 1011));
+        //    //                        break;
+        //    //                    case "7":
+        //    //                        扔装备(new Point(1337, 994));
+        //    //                        break;
+        //    //                }
+        //    //            }
 
-            //            break;
-            //        case 5:
-            //            foreach (string t in list1)
-            //            {
-            //                switch (t)
-            //                {
-            //                    case "1":
-            //                        扔装备(new Point(1160, 966));
-            //                        break;
-            //                    case "2":
-            //                        扔装备(new Point(1227, 963));
-            //                        break;
-            //                    case "3":
-            //                        扔装备(new Point(1295, 963));
-            //                        break;
-            //                    case "4":
-            //                        扔装备(new Point(1160, 1011));
-            //                        break;
-            //                    case "5":
-            //                        扔装备(new Point(1227, 1011));
-            //                        break;
-            //                    case "6":
-            //                        扔装备(new Point(1295, 1011));
-            //                        break;
-            //                    case "7":
-            //                        扔装备(new Point(1352, 994));
-            //                        break;
-            //                }
-            //            }
+        //    //            break;
+        //    //        case 5:
+        //    //            foreach (string t in list1)
+        //    //            {
+        //    //                switch (t)
+        //    //                {
+        //    //                    case "1":
+        //    //                        扔装备(new Point(1160, 966));
+        //    //                        break;
+        //    //                    case "2":
+        //    //                        扔装备(new Point(1227, 963));
+        //    //                        break;
+        //    //                    case "3":
+        //    //                        扔装备(new Point(1295, 963));
+        //    //                        break;
+        //    //                    case "4":
+        //    //                        扔装备(new Point(1160, 1011));
+        //    //                        break;
+        //    //                    case "5":
+        //    //                        扔装备(new Point(1227, 1011));
+        //    //                        break;
+        //    //                    case "6":
+        //    //                        扔装备(new Point(1295, 1011));
+        //    //                        break;
+        //    //                    case "7":
+        //    //                        扔装备(new Point(1352, 994));
+        //    //                        break;
+        //    //                }
+        //    //            }
 
-            //            break;
-            //    }
-            //}
-            //catch (Exception)
-            //{
-            //    // ignored
-            //}
+        //    //            break;
+        //    //    }
+        //    //}
+        //    //catch (Exception)
+        //    //{
+        //    //    // ignored
+        //    //}
 
-            //list1.Dispose();
-        }
+        //    //list1.Dispose();
+        //}
 
         private static void 扔装备(Point p)
         {
@@ -8277,20 +8662,20 @@ namespace Dota2Simulator.Games.Dota2
             Common.Delay(40);
         }
 
-        private void 捡装备()
-        {
-            //using PooledList<string> list1 = new(tb_阵营.Text.Split(','));
-            //SimKeyBoard.KeyDown(Keys.Y);
-            //Common.Delay(40);
-            //for (int i = 0; i < list1.Count + 2; i++)
-            //{
-            //    SimKeyBoard.MouseRightClick();
-            //    Common.Delay(100);
-            //}
+        //private void 捡装备()
+        //{
+        //    //using PooledList<string> list1 = new(tb_阵营.Text.Split(','));
+        //    //SimKeyBoard.KeyDown(Keys.Y);
+        //    //Common.Delay(40);
+        //    //for (int i = 0; i < list1.Count + 2; i++)
+        //    //{
+        //    //    SimKeyBoard.MouseRightClick();
+        //    //    Common.Delay(100);
+        //    //}
 
-            //list1.Dispose();
-            //SimKeyBoard.KeyUp(Keys.Y);
-        }
+        //    //list1.Dispose();
+        //    //SimKeyBoard.KeyUp(Keys.Y);
+        //}
 
         #endregion
 
@@ -8654,7 +9039,7 @@ namespace Dota2Simulator.Games.Dota2
 
             PooledList<Point> list1 = ImageManager.FindColors(colors, points, 句柄, 1);
 
-            检测时间播报(_全局时间, 0);
+            _ = 检测时间播报(_全局时间, 0);
             //Tts.TTS.TTS.Speak(string.Concat("1找到",list1.Count));
             Common.Delay(2000);
 
@@ -8707,7 +9092,7 @@ namespace Dota2Simulator.Games.Dota2
 
             PooledList<Point> list1 = ImageManager.FindColors(colors, points, 句柄, 1);
 
-            检测时间播报(_全局时间, 0);
+            _ = 检测时间播报(_全局时间, 0);
             //Tts.TTS.TTS.Speak(string.Concat("1找到",list1.Count));
             Common.Delay(2000);
 

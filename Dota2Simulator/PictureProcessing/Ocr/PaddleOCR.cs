@@ -29,7 +29,7 @@ namespace Dota2Simulator.PictureProcessing.OCR
 
         public static bool 初始化PaddleOcr()
         {
-            _PaddleOcrAll = new PaddleOcrAll(LocalFullModels.ChineseV4, PaddleDevice.Mkldnn())
+            _PaddleOcrAll = new PaddleOcrAll(LocalFullModels.ChineseV5, PaddleDevice.Mkldnn())
             {
                 AllowRotateDetection = false, /* 允许识别有角度的文字 */
                 Enable180Classification = false /* 允许识别旋转角度大于90度的文字 */

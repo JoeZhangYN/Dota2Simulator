@@ -7,7 +7,6 @@ using Dota2Simulator.PictureProcessing.OCR;
 using Dota2Simulator.PictureProcessing.RustImageProcessingSystem;
 using System;
 using System.Diagnostics;
-using System.Drawing;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -151,20 +150,20 @@ namespace Dota2Simulator.Games.Dota2.Silt
 
         public static void 点击暴击(in ImageHandle 句柄)
         {
-            //var p = Control.MousePosition;
-            //SimKeyBoard.MouseMove(40, 580);
-            //Common.Delay(25);
-            //SimKeyBoard.MouseLeftClick();
-            //Common.Delay(25);
-            //SimKeyBoard.MouseMove(p);
-            // Example 1: Basic screen capture and image finding
-            BasicImageFinding();
+            var p = Control.MousePosition;
+            SimKeyBoard.MouseMove(40, 580);
+            Common.Delay(25);
+            SimKeyBoard.MouseLeftClick();
+            Common.Delay(25);
+            SimKeyBoard.MouseMove(p);
+            //// Example 1: Basic screen capture and image finding
+            //BasicImageFinding();
 
-            // Example 2: Continuous screen monitoring
-            ContinuousMonitoring();
+            //// Example 2: Continuous screen monitoring
+            //ContinuousMonitoring();
 
-            // Example 3: Performance testing
-            PerformanceTest();
+            //// Example 3: Performance testing
+            //PerformanceTest();
         }
 
         static void BasicImageFinding()

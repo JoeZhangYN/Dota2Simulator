@@ -68,32 +68,32 @@ namespace Dota2Simulator.KeyboardMouse
 
         public static void MouseLeftClick()
         {
-            SimEnigo.MouseLeftClick();
+            InterceptionInput.MouseLeftClick();
         }
 
         public static void MouseRightClick()
         {
-            SimEnigo.MouseRightClick();
+            InterceptionInput.MouseRightClick();
         }
 
         public static void MouseLeftUp()
         {
-            SimEnigo.MouseLeftUp();
+            InterceptionInput.MouseLeftUp();
         }
 
         public static void MouseLeftDown()
         {
-            SimEnigo.MouseLeftDown();
+            InterceptionInput.MouseLeftDown();
         }
 
         public static void MouseRightUp()
         {
-            SimEnigo.MouseRightUp();
+            InterceptionInput.MouseRightUp();
         }
 
         public static void MouseRightDown()
         {
-            SimEnigo.MouseRightDown();
+            InterceptionInput.MouseRightDown();
         }
 
         /// <summary>
@@ -102,17 +102,17 @@ namespace Dota2Simulator.KeyboardMouse
         /// <param name="key"></param>
         public static void KeyPress(Keys key)
         {
-            SimEnigo.KeyPress(key);
+            InterceptionInput.KeyPress(key);
         }
 
         public static void KeyUp(Keys key)
         {
-            SimEnigo.KeyUp(key);
+            InterceptionInput.KeyUp(key);
         }
 
         public static void KeyDown(Keys key)
         {
-            SimEnigo.KeyDown(key);
+            InterceptionInput.KeyDown(key);
         }
 
         /// <summary>
@@ -142,6 +142,10 @@ namespace Dota2Simulator.KeyboardMouse
         public static void KeyPressAlt(Keys key)
         {
             SimEnigo.KeyPressAlt(key);
+        }
+        public static void MouseMoveTo(int x, int y)
+        {
+            InterceptionInput.MouseMoveTo(x, y, 3840, 2160);
         }
 
         public static void MouseMove(int x, int y, bool relative = false)

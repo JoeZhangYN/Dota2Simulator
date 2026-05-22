@@ -15,6 +15,7 @@ using System.Runtime.Intrinsics.X86;
 using System.Threading;
 using System.Threading.Tasks;
 using Timer = System.Threading.Timer;
+using Tuple = Dota2Simulator.ImageProcessingSystem.ImageFinder.Tuple;
 
 namespace Dota2Simulator.ImageProcessingSystem
 {
@@ -250,14 +251,6 @@ namespace Dota2Simulator.ImageProcessingSystem
     //{
     //    private byte _element0;
     //}
-
-    // Rust 交互结构
-    [StructLayout(LayoutKind.Sequential)]
-    public struct Tuple
-    {
-        public uint x;
-        public uint y;
-    }
 
     #endregion
 
@@ -2127,23 +2120,23 @@ namespace Dota2Simulator.ImageProcessingSystem
     {
         private static Logger _logger = LogManager.GetCurrentClassLogger();
 
-        // Rust DLL 导入
+        // Rust DLL 导入 - 新的统一接口
         [DllImport("findpoints.dll", CallingConvention = CallingConvention.Cdecl)]
-        private static extern Tuple FindBytesRust(
-       IntPtr n1,
-       UIntPtr len1,
-       Tuple t1,
-       IntPtr n2,
-       UIntPtr len2,
-       Tuple t2,
-       double matchRate,
-       byte ignore_r,
-       byte ignore_g,
-       byte ignore_b
-   );
+        private static extern Tuple FindBytes(
+            IntPtr n1,
+            UIntPtr len1,
+            Tuple t1,
+            IntPtr n2,
+            UIntPtr len2,
+            Tuple t2,
+            double matchRate,
+            byte ignore_r,
+            byte ignore_g,
+            byte ignore_b
+        );
 
         [DllImport("findpoints.dll", CallingConvention = CallingConvention.Cdecl)]
-        private static extern Tuple FindBytesTolerance(
+        private static extern Tuple FindBytesWithTolerance(
             IntPtr n1,
             UIntPtr len1,
             Tuple t1,
@@ -2157,8 +2150,37 @@ namespace Dota2Simulator.ImageProcessingSystem
             byte tolerance
         );
 
+        [DllImport("findpoints.dll", CallingConvention = CallingConvention.Cdecl)]
+        private static extern Tuple FindBytesInRegion(
+            IntPtr n1, UIntPtr len1, Tuple t1,
+            IntPtr n2, UIntPtr len2, Tuple t2,
+            Region region,
+            double matchRate,
+            byte ignore_r, byte ignore_g, byte ignore_b
+        );
+
+        [DllImport("findpoints.dll", CallingConvention = CallingConvention.Cdecl)]
+        private static extern MultipleResults FindAllBytesInRegion(
+            IntPtr n1, UIntPtr len1, Tuple t1,
+            IntPtr n2, UIntPtr len2, Tuple t2,
+            Region region,
+            double matchRate,
+            byte ignore_r, byte ignore_g, byte ignore_b,
+            FindAllConfig config
+        );
+
+        [DllImport("findpoints.dll", CallingConvention = CallingConvention.Cdecl)]
+        private static extern void FreeMultipleResults(MultipleResults results);
+
         // 查找失败时的返回值
         private static readonly Tuple NotFound = new() { x = 245760, y = 143640 };
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct Tuple
+        {
+            public uint x;
+            public uint y;
+        }
 
         [StructLayout(LayoutKind.Sequential)]
         public struct Region
@@ -2169,158 +2191,25 @@ namespace Dota2Simulator.ImageProcessingSystem
             public uint height;
         }
 
-        [DllImport("findpoints.dll", CallingConvention = CallingConvention.Cdecl)]
-        private static extern Tuple FindBytesInRegion(
-            IntPtr n1, UIntPtr len1, Tuple t1,
-            IntPtr n2, UIntPtr len2, Tuple t2,
-            Region region,
-            double matchRate,
-            byte ignore_r, byte ignore_g, byte ignore_b
-        );
-
-        /// <summary>
-        ///     指定区域大图小图对比
-        /// </summary>
-        /// <param name="subImage"></param>
-        /// <param name="mainImage"></param>
-        /// <param name="region"></param>
-        /// <param name="matchRate"></param>
-        /// <param name="ignoreColor"></param>
-        /// <returns></returns>
-        public static Point? FindImageInRegion(
-            in ImageHandle subImage,
-            in ImageHandle mainImage,
-            Rectangle region,
-            double matchRate = 0.9,
-            Color? ignoreColor = null)
+        [StructLayout(LayoutKind.Sequential)]
+        public struct FindAllConfig
         {
-            // 调用新的 Rust 函数
-            var regionStruct = new Region
-            {
-                x = (uint)region.X,
-                y = (uint)region.Y,
-                width = (uint)region.Width,
-                height = (uint)region.Height
-            };
+            public int max_results;
+            public int min_distance;
+            [MarshalAs(UnmanagedType.I1)]
+            public bool early_exit;
+        }
 
-
-            // 获取图像数据，增加异常处理
-            IntPtr mainPtr, subPtr;
-            int mainLen, subLen;
-            Tuple mainSize, subSize;
-
-            try
-            {
-                var mainData = ImageManager.GetImageData(in mainImage);
-                mainPtr = mainData.ptr;
-                mainLen = mainData.length;
-                mainSize = mainData.size;
-
-                var subData = ImageManager.GetImageData(in subImage);
-                subPtr = subData.ptr;
-                subLen = subData.length;
-                subSize = subData.size;
-            }
-            catch (Exception ex)
-            {
-                _logger?.Error($"获取图像数据失败: {ex.Message}");
-                return null;
-            }
-
-            // 处理忽略色
-            byte ignoreR = 255, ignoreG = 20, ignoreB = 147;
-            if (ignoreColor.HasValue)
-            {
-                ignoreR = ignoreColor.Value.R;
-                ignoreG = ignoreColor.Value.G;
-                ignoreB = ignoreColor.Value.B;
-            }
-
-            var result = FindBytesInRegion(
-                mainPtr, (UIntPtr)mainLen, mainSize,
-                subPtr, (UIntPtr)subLen, subSize,
-                regionStruct,
-                matchRate,
-                ignoreR, ignoreG, ignoreB
-            );
-
-            // 结果已经是相对于原始大图的坐标
-            return result.x == NotFound.x ? null : new Point((int)result.x, (int)result.y);
+        [StructLayout(LayoutKind.Sequential)]
+        public struct MultipleResults
+        {
+            public IntPtr points;
+            public int count;
+            public int capacity;
         }
 
         /// <summary>
-        ///     指定区域大图存在小图
-        /// </summary>
-        /// <param name="subImage"></param>
-        /// <param name="mainImage"></param>
-        /// <param name="region"></param>
-        /// <param name="matchRate"></param>
-        /// <param name="ignoreColor"></param>
-        /// <returns></returns>
-        public static bool FindImageInRegionBool(
-            in ImageHandle subImage,
-            in ImageHandle mainImage,
-            Rectangle region,
-            double matchRate = 0.9,
-            Color? ignoreColor = null)
-        {
-            // 调用新的 Rust 函数
-            var regionStruct = new Region
-            {
-                x = (uint)region.X,
-                y = (uint)region.Y,
-                width = (uint)region.Width,
-                height = (uint)region.Height
-            };
-
-
-            // 获取图像数据，增加异常处理
-            IntPtr mainPtr, subPtr;
-            int mainLen, subLen;
-            Tuple mainSize, subSize;
-
-            try
-            {
-                var mainData = ImageManager.GetImageData(in mainImage);
-                mainPtr = mainData.ptr;
-                mainLen = mainData.length;
-                mainSize = mainData.size;
-
-                var subData = ImageManager.GetImageData(in subImage);
-                subPtr = subData.ptr;
-                subLen = subData.length;
-                subSize = subData.size;
-            }
-            catch (Exception ex)
-            {
-                _logger?.Error($"获取图像数据失败: {ex.Message}");
-                return false;
-            }
-
-            // 处理忽略色
-            byte ignoreR = 255, ignoreG = 20, ignoreB = 147;
-            if (ignoreColor.HasValue)
-            {
-                ignoreR = ignoreColor.Value.R;
-                ignoreG = ignoreColor.Value.G;
-                ignoreB = ignoreColor.Value.B;
-            }
-
-            var result = FindBytesInRegion(
-                mainPtr, (UIntPtr)mainLen, mainSize,
-                subPtr, (UIntPtr)subLen, subSize,
-                regionStruct,
-                matchRate,
-                ignoreR, ignoreG, ignoreB
-            );
-
-            // 结果已经是相对于原始大图的坐标
-            return result.x == NotFound.x ? false : true;
-        }
-
-        // 在大图中查找小图（精确匹配）
-        /// <summary>
-        /// 查找图像 - 增加安全检查
+        /// 在大图中查找小图（精确匹配）
         /// </summary>
         public static unsafe Point? FindImage(
             in ImageHandle subImage,
@@ -2330,74 +2219,9 @@ namespace Dota2Simulator.ImageProcessingSystem
         {
             try
             {
-                // 验证句柄有效性
-                if (!mainImage.IsValid || !subImage.IsValid)
-                {
-                    _logger?.Error("无效的图像句柄");
-                    return null;
-                }
-
-                // 获取图像数据，增加异常处理
-                IntPtr mainPtr, subPtr;
-                int mainLen, subLen;
-                Tuple mainSize, subSize;
-
-                try
-                {
-                    var mainData = ImageManager.GetImageData(in mainImage);
-                    mainPtr = mainData.ptr;
-                    mainLen = mainData.length;
-                    mainSize = mainData.size;
-
-                    var subData = ImageManager.GetImageData(in subImage);
-                    subPtr = subData.ptr;
-                    subLen = subData.length;
-                    subSize = subData.size;
-                }
-                catch (Exception ex)
-                {
-                    _logger? .Error($"获取图像数据失败: {ex.Message}");
-                    return null;
-                }
-
-                // 验证指针和长度
-                if (mainPtr == IntPtr.Zero || subPtr == IntPtr.Zero)
-                {
-                    _logger?.Error("图像数据指针为空");
-                    return null;
-                }
-
-                if (mainLen <= 0 || subLen <= 0)
-                {
-                    _logger?.Error($"无效的图像数据长度: main={mainLen}, sub={subLen}");
-                    return null;
-                }
-
-                // 验证图像尺寸
-                if (mainSize.x == 0 || mainSize.y == 0 || subSize.x == 0 || subSize.y == 0)
-                {
-                    _logger?.Error("无效的图像尺寸");
-                    return null;
-                }
-
-                // 确保子图像不大于主图像
-                if (subSize.x > mainSize.x || subSize.y > mainSize.y)
-                {
-                    _logger?.Error($"子图像尺寸大于主图像\n\n子图像{subSize.x},{subSize.y}\r\n母图像{mainSize.x},{mainSize.y}");
-                    return null;
-                }
-
-                // 验证数据长度与尺寸匹配
-                int expectedMainLen = (int)(mainSize.x * mainSize.y * 4);
-                int expectedSubLen = (int)(subSize.x * subSize.y * 4);
-
-                if (mainLen != expectedMainLen || subLen != expectedSubLen)
-                {
-                    _logger?.Error($"数据长度与图像尺寸不匹配: " +
-                        $"main expected={expectedMainLen}, actual={mainLen}, " +
-                        $"sub expected={expectedSubLen}, actual={subLen}");
-                    return null;
-                }
+                // 获取图像数据
+                var mainData = ImageManager.GetImageData(in mainImage);
+                var subData = ImageManager.GetImageData(in subImage);
 
                 // 处理忽略色
                 byte ignoreR = 255, ignoreG = 20, ignoreB = 147;
@@ -2408,18 +2232,18 @@ namespace Dota2Simulator.ImageProcessingSystem
                     ignoreB = ignoreColor.Value.B;
                 }
 
-                // 确保内存对齐和有效性
+                // 确保内存有效性
                 GC.KeepAlive(mainImage);
                 GC.KeepAlive(subImage);
 
-                // 调用 Rust 函数
-                var result = FindBytesRust(
-                    mainPtr,
-                    (UIntPtr)mainLen,
-                    mainSize,
-                    subPtr,
-                    (UIntPtr)subLen,
-                    subSize,
+                // 调用 Rust 函数（所有验证逻辑已在Rust端处理）
+                var result = FindBytes(
+                    mainData.ptr,
+                    (UIntPtr)mainData.length,
+                    mainData.size,
+                    subData.ptr,
+                    (UIntPtr)subData.length,
+                    subData.size,
                     matchRate,
                     ignoreR, ignoreG, ignoreB
                 );
@@ -2427,13 +2251,6 @@ namespace Dota2Simulator.ImageProcessingSystem
                 // 检查是否找到
                 if (result.x == NotFound.x && result.y == NotFound.y)
                     return null;
-
-                // 验证结果在合理范围内
-                if (result.x >= mainSize.x || result.y >= mainSize.y)
-                {
-                    _logger?.Error($"查找结果超出图像范围: ({result.x}, {result.y})");
-                    return null;
-                }
 
                 return new Point((int)result.x, (int)result.y);
             }
@@ -2444,131 +2261,20 @@ namespace Dota2Simulator.ImageProcessingSystem
             }
         }
 
-        public static unsafe bool FindImageBool(
+        /// <summary>
+        /// 在大图中查找小图（返回bool）
+        /// </summary>
+        public static bool FindImageBool(
             in ImageHandle subImage,
             in ImageHandle mainImage,
             double matchRate = 0.9,
             Color? ignoreColor = null)
         {
-            try
-            {
-                // 验证句柄有效性
-                if (!mainImage.IsValid || !subImage.IsValid)
-                {
-                    _logger?.Error("无效的图像句柄");
-                    return false;
-                }
-
-                // 获取图像数据，增加异常处理
-                IntPtr mainPtr, subPtr;
-                int mainLen, subLen;
-                Tuple mainSize, subSize;
-
-                try
-                {
-                    var mainData = ImageManager.GetImageData(in mainImage);
-                    mainPtr = mainData.ptr;
-                    mainLen = mainData.length;
-                    mainSize = mainData.size;
-
-                    var subData = ImageManager.GetImageData(in subImage);
-                    subPtr = subData.ptr;
-                    subLen = subData.length;
-                    subSize = subData.size;
-                }
-                catch (Exception ex)
-                {
-                    _logger?.Error($"获取图像数据失败: {ex.Message}");
-                    return false;
-                }
-
-                // 验证指针和长度
-                if (mainPtr == IntPtr.Zero || subPtr == IntPtr.Zero)
-                {
-                    _logger?.Error("图像数据指针为空");
-                    return false;
-                }
-
-                if (mainLen <= 0 || subLen <= 0)
-                {
-                    _logger?.Error($"无效的图像数据长度: main={mainLen}, sub={subLen}");
-                    return false;
-                }
-
-                // 验证图像尺寸
-                if (mainSize.x == 0 || mainSize.y == 0 || subSize.x == 0 || subSize.y == 0)
-                {
-                    _logger?.Error("无效的图像尺寸");
-                    return false;
-                }
-
-                // 确保子图像不大于主图像
-                if (subSize.x > mainSize.x || subSize.y > mainSize.y)
-                {
-                    _logger?.Error($"子图像尺寸大于主图像\n\n 子图像{subSize.x},{subSize.y}\r\n母图像{mainSize.x},{mainSize.y}");
-                    return false;
-                }
-
-                // 验证数据长度与尺寸匹配
-                int expectedMainLen = (int)(mainSize.x * mainSize.y * 4);
-                int expectedSubLen = (int)(subSize.x * subSize.y * 4);
-
-                if (mainLen != expectedMainLen || subLen != expectedSubLen)
-                {
-                    _logger?.Error($"数据长度与图像尺寸不匹配: " +
-                        $"main expected={expectedMainLen}, actual={mainLen}, " +
-                        $"sub expected={expectedSubLen}, actual={subLen}");
-                    return false;
-                }
-
-                // 处理忽略色
-                byte ignoreR = 255, ignoreG = 20, ignoreB = 147;
-                if (ignoreColor.HasValue)
-                {
-                    ignoreR = ignoreColor.Value.R;
-                    ignoreG = ignoreColor.Value.G;
-                    ignoreB = ignoreColor.Value.B;
-                }
-
-                // 确保内存对齐和有效性
-                GC.KeepAlive(mainImage);
-                GC.KeepAlive(subImage);
-
-                // 调用 Rust 函数
-                var result = FindBytesRust(
-                    mainPtr,
-                    (UIntPtr)mainLen,
-                    mainSize,
-                    subPtr,
-                    (UIntPtr)subLen,
-                    subSize,
-                    matchRate,
-                    ignoreR, ignoreG, ignoreB
-                );
-
-                // 检查是否找到
-                if (result.x == NotFound.x && result.y == NotFound.y)
-                    return false;
-
-                // 验证结果在合理范围内
-                if (result.x >= mainSize.x || result.y >= mainSize.y)
-                {
-                    _logger?.Error($"查找结果超出图像范围: ({result.x}, {result.y})");
-                    return false;
-                }
-
-                return true;
-            }
-            catch (Exception ex)
-            {
-                _logger?.Error($"图像查找失败: {ex.Message}\n{ex.StackTrace}");
-                return false;
-            }
+            return FindImage(in subImage, in mainImage, matchRate, ignoreColor) != null;
         }
 
-        // 带容差的查找
         /// <summary>
-        /// 带容差的查找 - 增加安全检查
+        /// 带容差的查找
         /// </summary>
         public static unsafe Point? FindImageWithTolerance(
             in ImageHandle subImage,
@@ -2579,24 +2285,9 @@ namespace Dota2Simulator.ImageProcessingSystem
         {
             try
             {
-                // 验证句柄有效性
-                if (!mainImage.IsValid || !subImage.IsValid)
-                {
-                    _logger?.Error("无效的图像句柄");
-                    return null;
-                }
-
                 // 获取图像数据
                 var mainData = ImageManager.GetImageData(in mainImage);
                 var subData = ImageManager.GetImageData(in subImage);
-
-                // 验证数据
-                if (mainData.ptr == IntPtr.Zero || subData.ptr == IntPtr.Zero ||
-                    mainData.length <= 0 || subData.length <= 0)
-                {
-                    _logger?.Error("无效的图像数据");
-                    return null;
-                }
 
                 byte ignoreR = 255, ignoreG = 20, ignoreB = 147;
                 if (ignoreColor.HasValue)
@@ -2610,7 +2301,7 @@ namespace Dota2Simulator.ImageProcessingSystem
                 GC.KeepAlive(mainImage);
                 GC.KeepAlive(subImage);
 
-                var result = FindBytesTolerance(
+                var result = FindBytesWithTolerance(
                     mainData.ptr,
                     (UIntPtr)mainData.length,
                     mainData.size,
@@ -2634,37 +2325,71 @@ namespace Dota2Simulator.ImageProcessingSystem
             }
         }
 
-        // 新增：批量查找配置
-        [StructLayout(LayoutKind.Sequential)]
-        public struct FindAllConfig
+        /// <summary>
+        /// 指定区域大图小图对比
+        /// </summary>
+        public static Point? FindImageInRegion(
+            in ImageHandle subImage,
+            in ImageHandle mainImage,
+            Rectangle region,
+            double matchRate = 0.9,
+            Color? ignoreColor = null)
         {
-            public int max_results;
-            public int min_distance;
-            [MarshalAs(UnmanagedType.I1)]
-            public bool early_exit;
+            try
+            {
+                var regionStruct = new Region
+                {
+                    x = (uint)region.X,
+                    y = (uint)region.Y,
+                    width = (uint)region.Width,
+                    height = (uint)region.Height
+                };
+
+                // 获取图像数据
+                var mainData = ImageManager.GetImageData(in mainImage);
+                var subData = ImageManager.GetImageData(in subImage);
+
+                // 处理忽略色
+                byte ignoreR = 255, ignoreG = 20, ignoreB = 147;
+                if (ignoreColor.HasValue)
+                {
+                    ignoreR = ignoreColor.Value.R;
+                    ignoreG = ignoreColor.Value.G;
+                    ignoreB = ignoreColor.Value.B;
+                }
+
+                GC.KeepAlive(mainImage);
+                GC.KeepAlive(subImage);
+
+                var result = FindBytesInRegion(
+                    mainData.ptr, (UIntPtr)mainData.length, mainData.size,
+                    subData.ptr, (UIntPtr)subData.length, subData.size,
+                    regionStruct,
+                    matchRate,
+                    ignoreR, ignoreG, ignoreB
+                );
+
+                return result.x == NotFound.x ? null : new Point((int)result.x, (int)result.y);
+            }
+            catch (Exception ex)
+            {
+                _logger?.Error($"区域图像查找失败: {ex.Message}");
+                return null;
+            }
         }
 
-        // 新增：批量查找结果
-        [StructLayout(LayoutKind.Sequential)]
-        public struct MultipleResults
+        /// <summary>
+        /// 指定区域大图存在小图
+        /// </summary>
+        public static bool FindImageInRegionBool(
+            in ImageHandle subImage,
+            in ImageHandle mainImage,
+            Rectangle region,
+            double matchRate = 0.9,
+            Color? ignoreColor = null)
         {
-            public IntPtr points;
-            public int count;
-            public int capacity;
+            return FindImageInRegion(in subImage, in mainImage, region, matchRate, ignoreColor) != null;
         }
-
-        [DllImport("findpoints.dll", CallingConvention = CallingConvention.Cdecl)]
-        private static extern MultipleResults FindAllBytesInRegion(
-            IntPtr n1, UIntPtr len1, Tuple t1,
-            IntPtr n2, UIntPtr len2, Tuple t2,
-            Region region,
-            double matchRate,
-            byte ignore_r, byte ignore_g, byte ignore_b,
-            FindAllConfig config
-        );
-
-        [DllImport("findpoints.dll", CallingConvention = CallingConvention.Cdecl)]
-        private static extern void FreeMultipleResults(MultipleResults results);
 
         /// <summary>
         /// 查找所有匹配的图像（高性能Rust实现）
@@ -2682,13 +2407,6 @@ namespace Dota2Simulator.ImageProcessingSystem
 
             try
             {
-                // 验证句柄
-                if (!mainImage.IsValid || !subImage.IsValid)
-                {
-                    _logger?.Error("无效的图像句柄");
-                    return results;
-                }
-
                 // 获取图像数据
                 var mainData = ImageManager.GetImageData(mainImage);
                 var subData = ImageManager.GetImageData(subImage);
@@ -2830,7 +2548,7 @@ namespace Dota2Simulator.ImageProcessingSystem
 
             return results;
         }
-    } 
+    }
     #endregion
 
     #region 其他查找功能
