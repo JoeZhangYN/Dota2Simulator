@@ -1,62 +1,23 @@
-﻿using System;
+using System;
 using System.Drawing;
 using System.Threading;
 using System.Windows.Forms;
+using Dota2Simulator.GameAutomation.Domain.Actuation;
+using Dota2Simulator.GameAutomation.Domain.Perception;
+using Dota2Simulator.GameAutomation.Ports;
+using Dota2Simulator.Input.Adapters;
 
 namespace Dota2Simulator.KeyboardMouse
 {
+    /// <summary>
+    /// 键鼠操作门面。Strangler Fig 过渡形态：保留原静态 API 供 ~120 处业务调用，
+    /// 内部转发到 IInputExecutor 端口。Phase 4 业务层直连端口后，本门面于 Phase 6 删除。
+    /// </summary>
     internal class SimKeyBoard
     {
+        private static readonly IInputExecutor _executor = new HybridInputAdapter();
+
         #region 模拟按键
-
-        #region 旧API 要按需修改 但KeyPress
-
-        ///// <summary>
-        /////     单个耗时 0.8ms
-        ///// </summary>
-        //public static void RightClick()
-        //{
-        //    KeyboardMouseSimulateDriverAPI.MouseDown((uint)Dota2Simulator.MouseButtons.RightDown);
-        //    KeyboardMouseSimulateDriverAPI.MouseUp((uint)Dota2Simulator.MouseButtons.RightUp);
-        //}
-
-        //public static void LeftClick()
-        //{
-        //    KeyboardMouseSimulateDriverAPI.MouseDown((uint)Dota2Simulator.MouseButtons.LeftDown);
-        //    KeyboardMouseSimulateDriverAPI.MouseUp((uint)Dota2Simulator.MouseButtons.LeftUp);
-        //}
-
-        //public static void LeftDown()
-        //{
-        //    KeyboardMouseSimulateDriverAPI.MouseDown((uint)Dota2Simulator.MouseButtons.LeftDown);
-        //}
-
-        //public static void LeftUp()
-        //{
-        //    KeyboardMouseSimulateDriverAPI.MouseDown((uint)Dota2Simulator.MouseButtons.LeftUp);
-        //}
-
-        //public new static void KeyPress(uint key)
-        //{
-        //    KeyboardMouseSimulateDriverAPI.KeyDown(key);
-        //    KeyboardMouseSimulateDriverAPI.KeyUp(key);
-        //}
-
-        //public new static void KeyDown(uint key)
-        //{
-        //    KeyboardMouseSimulateDriverAPI.KeyDown(key);
-        //}
-        //public new static void KeyUp(uint key)
-        //{
-        //    KeyboardMouseSimulateDriverAPI.KeyUp(key);
-        //}
-
-        //public new static void MouseMove(int x, int y, bool relative = false)
-        //{
-        //    KeyboardMouseSimulateDriverAPI.MouseMove(x, y, !relative);
-        //} 
-
-        #endregion
 
         /// <summary>
         ///     用于预热,基本没用.
@@ -66,92 +27,48 @@ namespace Dota2Simulator.KeyboardMouse
             SimEnigo.init_enigo_threadlocal();
         }
 
-        public static void MouseLeftClick()
-        {
-            InterceptionInput.MouseLeftClick();
-        }
+        public static void MouseLeftClick() => _executor.MouseClick(MouseButton.Left);
 
-        public static void MouseRightClick()
-        {
-            InterceptionInput.MouseRightClick();
-        }
+        public static void MouseRightClick() => _executor.MouseClick(MouseButton.Right);
 
-        public static void MouseLeftUp()
-        {
-            InterceptionInput.MouseLeftUp();
-        }
+        public static void MouseLeftUp() => _executor.MouseUp(MouseButton.Left);
 
-        public static void MouseLeftDown()
-        {
-            InterceptionInput.MouseLeftDown();
-        }
+        public static void MouseLeftDown() => _executor.MouseDown(MouseButton.Left);
 
-        public static void MouseRightUp()
-        {
-            InterceptionInput.MouseRightUp();
-        }
+        public static void MouseRightUp() => _executor.MouseUp(MouseButton.Right);
 
-        public static void MouseRightDown()
-        {
-            InterceptionInput.MouseRightDown();
-        }
+        public static void MouseRightDown() => _executor.MouseDown(MouseButton.Right);
 
         /// <summary>
         ///     单个耗时 1-3ms
         /// </summary>
-        /// <param name="key"></param>
-        public static void KeyPress(Keys key)
-        {
-            InterceptionInput.KeyPress(key);
-        }
+        public static void KeyPress(Keys key) => _executor.Press(VirtualKey.From(key));
 
-        public static void KeyUp(Keys key)
-        {
-            InterceptionInput.KeyUp(key);
-        }
+        public static void KeyUp(Keys key) => _executor.KeyUp(VirtualKey.From(key));
 
-        public static void KeyDown(Keys key)
-        {
-            InterceptionInput.KeyDown(key);
-        }
+        public static void KeyDown(Keys key) => _executor.KeyDown(VirtualKey.From(key));
 
         /// <summary>
         ///     优化原先逻辑，原先默认key_click 需要等待30ms，现取消
         /// </summary>
-        /// <param name="key"></param>
         /// <param name="key1">Keys.LShift</param>
         public static void KeyPressWhile(Keys key, Keys key1)
-        {
-            SimEnigo.KeyPressWhile(key, key1);
-        }
+            => _executor.ComboWhile(VirtualKey.From(key), VirtualKey.From(key1));
 
-        /// <summary>
-        /// </summary>
-        /// <param name="key"></param>
         /// <param name="key1">Keys.LShift</param>
-        /// <param name="key1">Keys.Alt</param>
+        /// <param name="key2">Keys.Alt</param>
         public static void KeyPressWhileTwo(Keys key, Keys key1, Keys key2)
-        {
-            SimEnigo.KeyPressWhileTwo(key, key1, key2);
-        }
+            => _executor.ComboWhile(VirtualKey.From(key), VirtualKey.From(key1), VirtualKey.From(key2));
 
         /// <summary>
         ///     优化原先逻辑，原先默认key_click 需要等待30ms，现取消
         /// </summary>
-        /// <param name="key"></param>
-        public static void KeyPressAlt(Keys key)
-        {
-            SimEnigo.KeyPressAlt(key);
-        }
-        public static void MouseMoveTo(int x, int y)
-        {
-            InterceptionInput.MouseMoveTo(x, y, 3840, 2160);
-        }
+        public static void KeyPressAlt(Keys key) => _executor.ComboAlt(VirtualKey.From(key));
+
+        public static void MouseMoveTo(int x, int y) => _executor.MouseMoveTo(new ScreenPoint(x, y));
 
         public static void MouseMove(int x, int y, bool relative = false)
-        {
-            SimEnigo.MouseMove(x, y, relative ? 1 : 0);
-        }
+            => _executor.MouseMove(x, y, relative);
 
         public static void MouseMoveSim(int X, int Y)
         {
