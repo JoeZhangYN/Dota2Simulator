@@ -24,8 +24,9 @@ public sealed class 蓝胖Strategy : IHeroStrategy
         Main._聚合.Conditions[ConditionSlotKey.C5].Probe ??= 未精通火焰轰爆去后摇;
     }
 
-    public Task OnKeyAsync(VirtualKey key, HeroContext ctx)
+    public Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)
     {
+        VirtualKey key = trigger.Key;
         if (key == VirtualKey.Q)
         {
             Main._聚合.Conditions[ConditionSlotKey.C1].Active = true;

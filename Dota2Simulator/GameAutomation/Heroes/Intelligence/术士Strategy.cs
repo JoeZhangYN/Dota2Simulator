@@ -22,8 +22,9 @@ public sealed class 术士Strategy : IHeroStrategy
         Main._聚合.Conditions[ConditionSlotKey.C3].Probe ??= 混乱之祭去后摇;
     }
 
-    public Task OnKeyAsync(VirtualKey key, HeroContext ctx)
+    public Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)
     {
+        VirtualKey key = trigger.Key;
         if (key == VirtualKey.Q)
         {
             Item.根据图片使用物品(Dota2_Pictrue.物品.纷争);

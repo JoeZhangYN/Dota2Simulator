@@ -18,8 +18,9 @@ public sealed class 进化岛Strategy : IHeroStrategy
     {
     }
 
-    public Task OnKeyAsync(VirtualKey key, HeroContext ctx)
+    public Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)
     {
+        VirtualKey key = trigger.Key;
         if (key == VirtualKey.D)
         {
             _ = Task.Run(() =>

@@ -21,8 +21,9 @@ public sealed class 火女Strategy : IHeroStrategy
         Main._聚合.Conditions[ConditionSlotKey.C3].Probe ??= 神灭斩去后摇;
     }
 
-    public Task OnKeyAsync(VirtualKey key, HeroContext ctx)
+    public Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)
     {
+        VirtualKey key = trigger.Key;
         if (key == VirtualKey.Q)
         {
             Main._聚合.Conditions[ConditionSlotKey.C1].Active = true;

@@ -27,9 +27,10 @@ public sealed class 光法Strategy : IHeroStrategy
         Skill.重复按键执行间隔阈值 = 100;
     }
 
-    public async Task OnKeyAsync(VirtualKey key, HeroContext ctx)
+    public async Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)
     {
-        KeyEventArgs e = new((Keys)key.ToNative());
+        VirtualKey key = trigger.Key;
+        KeyEventArgs e = new((Keys)key.ToNative() | ConvertModifiers(trigger.Modifiers));
 
         await Item.根据按键判断技能释放前通用逻辑(e).ConfigureAwait(true);
 
@@ -63,6 +64,16 @@ public sealed class 光法Strategy : IHeroStrategy
             Main._聚合.Conditions[ConditionSlotKey.C4].Active = !Main._聚合.Conditions[ConditionSlotKey.C4].Active;
             TTS.TTS.Speak(Main._聚合.Conditions[ConditionSlotKey.C4].Active ? "开启循环查克拉" : "关闭循环查克拉");
         }
+    }
+
+    /// <summary>把领域中性的 <see cref="KeyModifiers"/> 转回 WinForms <see cref="Keys"/> 修饰键标志。</summary>
+    private static Keys ConvertModifiers(KeyModifiers modifiers)
+    {
+        Keys result = Keys.None;
+        if ((modifiers & KeyModifiers.Alt) != 0) result |= Keys.Alt;
+        if ((modifiers & KeyModifiers.Control) != 0) result |= Keys.Control;
+        if ((modifiers & KeyModifiers.Shift) != 0) result |= Keys.Shift;
+        return result;
     }
 
     private static async Task<bool> 减少300毫秒蓄力(ImageHandle 句柄)

@@ -25,9 +25,10 @@ public sealed class 血魔Strategy : IHeroStrategy
         Item._切假腿配置.修改配置(Keys.E, false);
     }
 
-    public async Task OnKeyAsync(VirtualKey key, HeroContext ctx)
+    public async Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)
     {
-        KeyEventArgs e = new((Keys)key.ToNative());
+        VirtualKey key = trigger.Key;
+        KeyEventArgs e = new((Keys)key.ToNative() | ConvertModifiers(trigger.Modifiers));
 
         await Item.根据按键判断技能释放前通用逻辑(e).ConfigureAwait(true);
 
@@ -48,6 +49,16 @@ public sealed class 血魔Strategy : IHeroStrategy
         {
             Main._聚合.Conditions[ConditionSlotKey.C3].Active = true;
         }
+    }
+
+    /// <summary>把领域中性的 <see cref="KeyModifiers"/> 转回 WinForms <see cref="Keys"/> 修饰键标志。</summary>
+    private static Keys ConvertModifiers(KeyModifiers modifiers)
+    {
+        Keys result = Keys.None;
+        if ((modifiers & KeyModifiers.Alt) != 0) result |= Keys.Alt;
+        if ((modifiers & KeyModifiers.Control) != 0) result |= Keys.Control;
+        if ((modifiers & KeyModifiers.Shift) != 0) result |= Keys.Shift;
+        return result;
     }
 
     private static async Task<bool> 血祭去后摇(ImageHandle 句柄)

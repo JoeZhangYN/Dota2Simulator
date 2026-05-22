@@ -49,7 +49,7 @@ public sealed class GameSession : IGameSession
                 _ = Main.状态初始化();
             }
 
-            await strategy.OnKeyAsync(trigger.Key, _current).ConfigureAwait(false);
+            await strategy.OnKeyAsync(trigger, _current).ConfigureAwait(false);
         }
         else
         {

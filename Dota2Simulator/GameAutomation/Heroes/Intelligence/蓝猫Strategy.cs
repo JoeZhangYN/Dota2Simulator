@@ -23,8 +23,9 @@ public sealed class 蓝猫Strategy : IHeroStrategy
         Main._聚合.Conditions[ConditionSlotKey.C2].Probe ??= 滚接平A;
     }
 
-    public async Task OnKeyAsync(VirtualKey key, HeroContext ctx)
+    public async Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)
     {
+        VirtualKey key = trigger.Key;
         if (key == VirtualKey.Q)
         {
             await Task.Run(残影接平A).ConfigureAwait(true);

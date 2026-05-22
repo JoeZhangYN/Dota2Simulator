@@ -18,5 +18,5 @@ public interface IHeroStrategy
     void OnActivate(HeroContext ctx);
 
     /// <summary>每次按键时调用——把按键映射为条件激活、技能释放等。</summary>
-    Task OnKeyAsync(VirtualKey key, HeroContext ctx);
+    Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx);
 }

@@ -23,8 +23,9 @@ public sealed class 黑鸟Strategy : IHeroStrategy
         Main._聚合.Conditions[ConditionSlotKey.C2].Probe ??= 关接跳;
     }
 
-    public Task OnKeyAsync(VirtualKey key, HeroContext ctx)
+    public Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)
     {
+        VirtualKey key = trigger.Key;
         if (key == VirtualKey.D)
         {
             SimKeyBoard.KeyPress(Keys.W);

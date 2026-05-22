@@ -23,8 +23,9 @@ public sealed class 干扰者Strategy : IHeroStrategy
         Main._聚合.Conditions[ConditionSlotKey.C5].Probe ??= 静态风暴动能立场风雷之击;
     }
 
-    public async Task OnKeyAsync(VirtualKey key, HeroContext ctx)
+    public async Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)
     {
+        VirtualKey key = trigger.Key;
         await Item.根据按键判断技能释放前通用逻辑(new KeyEventArgs((Keys)key.ToNative())).ConfigureAwait(true);
 
         if (key == VirtualKey.Q)

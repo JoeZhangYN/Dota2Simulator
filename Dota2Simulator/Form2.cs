@@ -58,7 +58,7 @@ namespace Dota2Simulator
             // HeroAttribute.Strength 此处是占位——fallback 路径只用 hero.Name。
             await CompositionRoot.AppComposition.GameSession.DispatchAsync(
                 new HeroId(tb_name.Text.Trim(), HeroAttribute.Strength),
-                new KeyTrigger(VirtualKey.From(e.KeyCode)));
+                new KeyTrigger(VirtualKey.From(e.KeyCode), ToKeyModifiers(e.Modifiers)));
 #endif
 #if LOL
             Games.LOL.MainClass.根据当前英雄增强(tb_name.Text.Trim(), e);
@@ -67,6 +67,18 @@ namespace Dota2Simulator
             Games.HF2.MainClass.根据当前英雄增强(tb_name.Text.Trim(), e);
 #endif
         }
+
+#if DOTA2
+        /// <summary>把 WinForms 修饰键标志（Alt/Control/Shift）转为领域中性的 <see cref="KeyModifiers"/>。</summary>
+        private static KeyModifiers ToKeyModifiers(Keys modifiers)
+        {
+            KeyModifiers result = KeyModifiers.None;
+            if ((modifiers & Keys.Alt) != 0) result |= KeyModifiers.Alt;
+            if ((modifiers & Keys.Control) != 0) result |= KeyModifiers.Control;
+            if ((modifiers & Keys.Shift) != 0) result |= KeyModifiers.Shift;
+            return result;
+        }
+#endif
 
         #endregion
 

@@ -26,8 +26,9 @@ public sealed class 莱恩Strategy : IHeroStrategy
         Main._聚合.Conditions[ConditionSlotKey.C4].Probe ??= 羊刺刷新秒人;
     }
 
-    public async Task OnKeyAsync(VirtualKey key, HeroContext ctx)
+    public async Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)
     {
+        VirtualKey key = trigger.Key;
         if (key == VirtualKey.W)
         {
             Main._聚合.Conditions[ConditionSlotKey.C1].Active = true;

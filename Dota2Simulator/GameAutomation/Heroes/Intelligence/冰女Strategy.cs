@@ -14,8 +14,9 @@ public sealed class 冰女Strategy : IHeroStrategy
     {
     }
 
-    public Task OnKeyAsync(VirtualKey key, HeroContext ctx)
+    public Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)
     {
+        VirtualKey key = trigger.Key;
         return Task.CompletedTask;
     }
 }

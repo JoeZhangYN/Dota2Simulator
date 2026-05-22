@@ -23,8 +23,9 @@ public sealed class 幻刺Strategy : IHeroStrategy
         Main._聚合.Conditions[ConditionSlotKey.C4].Probe ??= 刀阵旋风敏捷;
     }
 
-    public async Task OnKeyAsync(VirtualKey key, HeroContext ctx)
+    public async Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)
     {
+        VirtualKey key = trigger.Key;
         await Item.根据按键判断技能释放前通用逻辑(new KeyEventArgs((Keys)key.ToNative())).ConfigureAwait(true);
 
         if (key == VirtualKey.From(Keys.F1))

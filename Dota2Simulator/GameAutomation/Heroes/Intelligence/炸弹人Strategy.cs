@@ -24,8 +24,9 @@ public sealed class 炸弹人Strategy : IHeroStrategy
         Main._聚合.Conditions[ConditionSlotKey.C4].Probe ??= 爆破后接3雷粘性炸弹;
     }
 
-    public Task OnKeyAsync(VirtualKey key, HeroContext ctx)
+    public Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)
     {
+        VirtualKey key = trigger.Key;
         if (key == VirtualKey.Q)
         {
             Main._聚合.Conditions[ConditionSlotKey.C1].Active = true;

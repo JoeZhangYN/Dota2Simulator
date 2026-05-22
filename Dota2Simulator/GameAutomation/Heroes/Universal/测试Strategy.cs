@@ -22,8 +22,9 @@ public sealed class 测试Strategy : IHeroStrategy
     {
     }
 
-    public async Task OnKeyAsync(VirtualKey key, HeroContext ctx)
+    public async Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)
     {
+        VirtualKey key = trigger.Key;
         if (key == VirtualKey.From(Keys.D1))
         {
             _ = Task.Run(测试其他功能).ConfigureAwait(true);

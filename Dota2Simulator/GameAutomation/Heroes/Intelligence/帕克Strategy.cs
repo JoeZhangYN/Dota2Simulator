@@ -24,9 +24,10 @@ public sealed class 帕克Strategy : IHeroStrategy
         Main._聚合.Conditions[ConditionSlotKey.C5].Probe ??= 灵动之翼定位;
     }
 
-    public async Task OnKeyAsync(VirtualKey key, HeroContext ctx)
+    public async Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)
     {
-        KeyEventArgs e = new((Keys)key.ToNative());
+        VirtualKey key = trigger.Key;
+        KeyEventArgs e = new((Keys)key.ToNative() | ConvertModifiers(trigger.Modifiers));
 
         await Item.根据按键判断技能释放前通用逻辑(e).ConfigureAwait(true);
 
@@ -56,6 +57,16 @@ public sealed class 帕克Strategy : IHeroStrategy
             Main._聚合.Skills.ToggleMode(SlotKey.D);
             TTS.TTS.Speak(Main._聚合.Skills.Mode(SlotKey.D) == 1 ? "传" : "不传");
         }
+    }
+
+    /// <summary>把领域中性的 <see cref="KeyModifiers"/> 转回 WinForms <see cref="Keys"/> 修饰键标志。</summary>
+    private static Keys ConvertModifiers(KeyModifiers modifiers)
+    {
+        Keys result = Keys.None;
+        if ((modifiers & KeyModifiers.Alt) != 0) result |= Keys.Alt;
+        if ((modifiers & KeyModifiers.Control) != 0) result |= Keys.Control;
+        if ((modifiers & KeyModifiers.Shift) != 0) result |= Keys.Shift;
+        return result;
     }
 
     private static async Task<bool> 幻象法球去后摇(ImageHandle 句柄)

@@ -21,8 +21,9 @@ public sealed class 巫医Strategy : IHeroStrategy
         Main._聚合.Conditions[ConditionSlotKey.C3].Probe ??= 死亡守卫隐身;
     }
 
-    public async Task OnKeyAsync(VirtualKey key, HeroContext ctx)
+    public async Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)
     {
+        VirtualKey key = trigger.Key;
         await Item.根据按键判断技能释放前通用逻辑(new KeyEventArgs((Keys)key.ToNative())).ConfigureAwait(true);
 
         if (key == VirtualKey.Q)

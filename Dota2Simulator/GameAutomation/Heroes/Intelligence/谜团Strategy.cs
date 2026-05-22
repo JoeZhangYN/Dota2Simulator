@@ -19,8 +19,9 @@ public sealed class 谜团Strategy : IHeroStrategy
     {
     }
 
-    public async Task OnKeyAsync(VirtualKey key, HeroContext ctx)
+    public async Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)
     {
+        VirtualKey key = trigger.Key;
         if (key == VirtualKey.F)
         {
             await Task.Run(刷新接凋零黑洞).ConfigureAwait(true);

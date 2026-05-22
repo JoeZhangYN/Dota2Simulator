@@ -18,8 +18,9 @@ public sealed class 命运2Strategy : IHeroStrategy
     {
     }
 
-    public Task OnKeyAsync(VirtualKey key, HeroContext ctx)
+    public Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)
     {
+        VirtualKey key = trigger.Key;
         if (key == VirtualKey.From(Keys.V))
         {
             _ = Task.Run(命运2冰好耶);

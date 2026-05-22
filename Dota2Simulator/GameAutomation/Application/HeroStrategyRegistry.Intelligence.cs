@@ -10,13 +10,13 @@ public sealed partial class HeroStrategyRegistry
     partial void RegisterIntelligence()
     {
         Register(new Heroes.Intelligence.修补匠Strategy());
-        // Register(new Heroes.Intelligence.光法Strategy());  // modifier 待修：依赖 e.Modifiers 组合键，暂走旧 switch fallback
+        Register(new Heroes.Intelligence.光法Strategy());
         Register(new Heroes.Intelligence.天怒Strategy());
-        // Register(new Heroes.Intelligence.墨客Strategy());  // modifier 待修：依赖 e.Modifiers 组合键，暂走旧 switch fallback
+        Register(new Heroes.Intelligence.墨客Strategy());
         Register(new Heroes.Intelligence.宙斯Strategy());
         Register(new Heroes.Intelligence.巫医Strategy());
-        // Register(new Heroes.Intelligence.巫妖Strategy());  // modifier 待修：依赖 e.Modifiers 组合键，暂走旧 switch fallback
-        // Register(new Heroes.Intelligence.帕克Strategy());  // modifier 待修：依赖 e.Modifiers 组合键，暂走旧 switch fallback
+        Register(new Heroes.Intelligence.巫妖Strategy());
+        Register(new Heroes.Intelligence.帕克Strategy());
         Register(new Heroes.Intelligence.骨法Strategy());
         Register(new Heroes.Intelligence.干扰者Strategy());
         Register(new Heroes.Intelligence.黑鸟Strategy());

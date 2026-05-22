@@ -26,7 +26,7 @@ public sealed partial class HeroStrategyRegistry
         Register(new Heroes.Agility.飞机Strategy());
         Register(new Heroes.Agility.美杜莎Strategy());
         Register(new Heroes.Agility.虚空Strategy());
-        // Register(new Heroes.Agility.血魔Strategy());  // modifier 待修：依赖 e.Modifiers 组合键，暂走旧 switch fallback
+        Register(new Heroes.Agility.血魔Strategy());
         Register(new Heroes.Agility.赏金Strategy());
         Register(new Heroes.Agility.电棍Strategy());
         Register(new Heroes.Agility.露娜Strategy());

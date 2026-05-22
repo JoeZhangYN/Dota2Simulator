@@ -18,8 +18,9 @@ public sealed class 紫猫Strategy : IHeroStrategy
         //Main._聚合.Conditions[ConditionSlotKey.C1].Probe ??= 共鸣脉冲去后摇;
     }
 
-    public async Task OnKeyAsync(VirtualKey key, HeroContext ctx)
+    public async Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)
     {
+        VirtualKey key = trigger.Key;
         await Item.根据按键判断技能释放前通用逻辑(new KeyEventArgs((Keys)key.ToNative())).ConfigureAwait(true);
 
         if (key == VirtualKey.Q)

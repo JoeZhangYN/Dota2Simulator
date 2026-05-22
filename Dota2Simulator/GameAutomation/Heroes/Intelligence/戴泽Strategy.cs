@@ -25,8 +25,9 @@ public sealed class 戴泽Strategy : IHeroStrategy
         Main._聚合.Attack.基础攻击间隔 = 1.7;
     }
 
-    public Task OnKeyAsync(VirtualKey key, HeroContext ctx)
+    public Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)
     {
+        VirtualKey key = trigger.Key;
         if (key == VirtualKey.Q)
         {
             Main._聚合.Skills.SetTime(SlotKey.Q, Common.获取当前时间毫秒());

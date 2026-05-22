@@ -30,8 +30,9 @@ public sealed class 暗影萨满Strategy : IHeroStrategy
         Main._聚合.Conditions[ConditionSlotKey.C5].Probe ??= 枷锁持续施法隐身;
     }
 
-    public Task OnKeyAsync(VirtualKey key, HeroContext ctx)
+    public Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)
     {
+        VirtualKey key = trigger.Key;
         if (key == VirtualKey.Q)
         {
             Main._聚合.Conditions[ConditionSlotKey.C1].Active = true;

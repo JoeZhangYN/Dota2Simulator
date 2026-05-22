@@ -23,8 +23,9 @@ public sealed class 火枪Strategy : IHeroStrategy
         Item._切假腿配置.修改配置(Keys.W, false);
     }
 
-    public async Task OnKeyAsync(VirtualKey key, HeroContext ctx)
+    public async Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)
     {
+        VirtualKey key = trigger.Key;
         Item._切假腿配置.修改配置(Keys.D, Item._是否魔晶);
         await Item.根据按键判断技能释放前通用逻辑(new KeyEventArgs((Keys)key.ToNative())).ConfigureAwait(true);
 
