@@ -82,8 +82,7 @@ namespace Dota2Simulator.PictureProcessing
                 using Stream stream = assembly.GetManifestResourceStream(resourceName);
                 if (stream == null)
                 {
-                    TTS.TTS.Speak($"[LazyLoad] 图片不存在: {imageName}");
-                    Thread.Sleep(3000);
+                    Console.WriteLine($"[LazyLoad] 图片不存在: {imageName}");
                     OnImageLoadAttempt?.Invoke(imageName, false);
                     return ImageHandle.Invalid;
                 }
