@@ -1,0 +1,81 @@
+#if DOTA2
+using System.Threading.Tasks;
+using System.Windows.Forms;
+using Dota2Simulator.GameAutomation.Application;
+using Dota2Simulator.GameAutomation.Domain.Actuation;
+using Dota2Simulator.GameAutomation.Domain.Heroes;
+using Dota2Simulator.Games.Dota2;
+using Dota2Simulator.KeyboardMouse;
+using Dota2Simulator.Vision;
+
+namespace Dota2Simulator.GameAutomation.Heroes.Universal;
+
+/// <summary>剧毒（全才）策略——迁移自 Main.根据当前英雄增强 的 case "剧毒"。</summary>
+public sealed class 剧毒Strategy : IHeroStrategy
+{
+    public HeroId Hero => new("剧毒", HeroAttribute.Universal);
+
+    public void OnActivate(HeroContext ctx)
+    {
+        Main._聚合.Conditions[ConditionSlotKey.C1].Probe ??= 瘴气去后摇;
+        Main._聚合.Conditions[ConditionSlotKey.C2].Probe ??= 蛇棒去后摇;
+        Main._聚合.Conditions[ConditionSlotKey.C3].Probe ??= 恶性瘟疫去后摇;
+        Main._聚合.Conditions[ConditionSlotKey.C4].Probe ??= 循环蛇棒;
+        Skill.重复按键执行间隔阈值 = 100;
+        Item._切假腿配置.修改配置(Keys.W, false);
+    }
+
+    public async Task OnKeyAsync(VirtualKey key, HeroContext ctx)
+    {
+        await Item.根据按键判断技能释放前通用逻辑(new KeyEventArgs((Keys)key.ToNative())).ConfigureAwait(true);
+
+        if (key == VirtualKey.Q)
+        {
+            Main._聚合.Conditions[ConditionSlotKey.C1].Active = true;
+        }
+        else if (key == VirtualKey.E)
+        {
+            Main._聚合.Conditions[ConditionSlotKey.C2].Active = true;
+        }
+        else if (key == VirtualKey.R)
+        {
+            Main._聚合.Conditions[ConditionSlotKey.C3].Active = true;
+        }
+        else if (key == VirtualKey.From(Keys.D3))
+        {
+            Main._聚合.Conditions[ConditionSlotKey.C4].Active = !Main._聚合.Conditions[ConditionSlotKey.C4].Active;
+            Dota2Simulator.TTS.TTS.Speak(Main._聚合.Conditions[ConditionSlotKey.C4].Active ? "循环蛇棒" : "终止循环");
+        }
+        else if (key == VirtualKey.From(Keys.S))
+        {
+            Main._中断条件 = true;
+            Main._聚合.Conditions[ConditionSlotKey.C1].Active = false;
+            Main._聚合.Conditions[ConditionSlotKey.C2].Active = false;
+            Main._聚合.Conditions[ConditionSlotKey.C3].Active = false;
+            Main._聚合.Conditions[ConditionSlotKey.C4].Active = false;
+            Main._聚合.Conditions[ConditionSlotKey.C5].Active = false;
+        }
+    }
+
+    private static async Task<bool> 瘴气去后摇(ImageHandle 句柄)
+    {
+        return await Skill.技能通用判断(Keys.Q, 1).ConfigureAwait(true);
+    }
+
+    private static async Task<bool> 蛇棒去后摇(ImageHandle 句柄)
+    {
+        SimKeyBoard.MouseRightClick();
+        return await Task.FromResult(false).ConfigureAwait(true);
+    }
+
+    private static async Task<bool> 恶性瘟疫去后摇(ImageHandle 句柄)
+    {
+        return await Skill.技能通用判断(Keys.R, 1).ConfigureAwait(true);
+    }
+
+    private static async Task<bool> 循环蛇棒(ImageHandle 句柄)
+    {
+        return await Skill.技能通用判断(Keys.E, 2).ConfigureAwait(true);
+    }
+}
+#endif

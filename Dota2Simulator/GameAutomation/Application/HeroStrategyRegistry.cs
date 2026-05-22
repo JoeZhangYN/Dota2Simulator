@@ -29,10 +29,12 @@ public sealed partial class HeroStrategyRegistry
         RegisterStrength();
         RegisterAgility();
         RegisterIntelligence();
+        RegisterUniversal();
     }
 
-    // Wave 4 三个 partial 文件各实现一个；未实现的 partial void 调用编译期消除。
+    // Wave 4 各 partial 文件实现一个；未实现的 partial void 调用编译期消除。
     partial void RegisterStrength();
     partial void RegisterAgility();
     partial void RegisterIntelligence();
+    partial void RegisterUniversal();
 }
