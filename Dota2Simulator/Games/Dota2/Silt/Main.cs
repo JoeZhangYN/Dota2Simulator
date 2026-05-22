@@ -1,10 +1,10 @@
 ﻿#if DOTA2
 #if Silt
 
-using Dota2Simulator.ImageProcessingSystem;
+using Dota2Simulator.Vision;
 using Dota2Simulator.KeyboardMouse;
-using Dota2Simulator.PictureProcessing.OCR;
-using Dota2Simulator.PictureProcessing.RustImageProcessingSystem;
+using Dota2Simulator.Vision.Ocr;
+using Dota2Simulator.Vision.Rust;
 using System;
 using System.Diagnostics;
 using System.Threading;
@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using static Dota2Simulator.Games.Dota2.Item;
 using Color = System.Drawing.Color;
-using ImageHandle = Dota2Simulator.ImageProcessingSystem.ImageHandle;
+using ImageHandle = Dota2Simulator.Vision.ImageHandle;
 using Point = System.Drawing.Point;
 using Rectangle = System.Drawing.Rectangle;
 
@@ -170,7 +170,7 @@ namespace Dota2Simulator.Games.Dota2.Silt
         {
             Console.WriteLine("=== Basic Image Finding Example ===");
 
-            using (var processor = new PictureProcessing.RustImageProcessingSystem.ImageProcessor())
+            using (var processor = new Vision.Rust.ImageProcessor())
             {
                 // Initialize with screen dimensions
                 if (!processor.Initialize(1920, 1080))
@@ -229,7 +229,7 @@ namespace Dota2Simulator.Games.Dota2.Silt
         {
             Console.WriteLine("\n=== Continuous Monitoring Example ===");
 
-            using (var processor = new PictureProcessing.RustImageProcessingSystem.ImageProcessor())
+            using (var processor = new Vision.Rust.ImageProcessor())
             {
                 processor.Initialize(1920, 1080);
 
@@ -280,7 +280,7 @@ namespace Dota2Simulator.Games.Dota2.Silt
         {
             Console.WriteLine("\n=== Performance Test ===");
 
-            using (var processor = new PictureProcessing.RustImageProcessingSystem.ImageProcessor())
+            using (var processor = new Vision.Rust.ImageProcessor())
             {
                 processor.Initialize(1920, 1080);
 
@@ -340,7 +340,7 @@ namespace Dota2Simulator.Games.Dota2.Silt
         {
             public static void ManagedResourceExample()
             {
-                using (var processor = new PictureProcessing.RustImageProcessingSystem.ImageProcessor())
+                using (var processor = new Vision.Rust.ImageProcessor())
                 {
                     processor.Initialize(1920, 1080);
 

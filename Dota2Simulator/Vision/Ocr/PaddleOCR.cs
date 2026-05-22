@@ -1,4 +1,4 @@
-﻿using Dota2Simulator.ImageProcessingSystem;
+﻿using Dota2Simulator.Vision;
 using OpenCvSharp;
 using Sdcb.PaddleInference;
 using Sdcb.PaddleOCR;
@@ -9,7 +9,7 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.Threading.Tasks;
 
-namespace Dota2Simulator.PictureProcessing.OCR
+namespace Dota2Simulator.Vision.Ocr
 {
     /*
      *

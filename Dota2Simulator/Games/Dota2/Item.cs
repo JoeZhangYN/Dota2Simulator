@@ -1,7 +1,7 @@
 ﻿// Games/Dota2/Item.cs
 #if DOTA2
 
-using Dota2Simulator.ImageProcessingSystem;
+using Dota2Simulator.Vision;
 using Dota2Simulator.KeyboardMouse;
 using System;
 using System.Collections.Generic;

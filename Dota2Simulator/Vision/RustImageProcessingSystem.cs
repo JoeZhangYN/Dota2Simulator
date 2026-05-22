@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Runtime.InteropServices;
 
-namespace Dota2Simulator.PictureProcessing.RustImageProcessingSystem
+namespace Dota2Simulator.Vision.Rust
 {
     // Structures matching Rust types
     [StructLayout(LayoutKind.Sequential)]

@@ -15,15 +15,15 @@ using System.Runtime.Intrinsics.X86;
 using System.Threading;
 using System.Threading.Tasks;
 using Timer = System.Threading.Timer;
-using Tuple = Dota2Simulator.ImageProcessingSystem.ImageFinder.Tuple;
+using Tuple = Dota2Simulator.Vision.ImageFinder.Tuple;
 
-namespace Dota2Simulator.ImageProcessingSystem
+namespace Dota2Simulator.Vision
 {
-    // 默认控制台日志实现
-    public class ConsoleLogger : ILogger
+    // 日志接口，用于依赖注入
+    public interface ILogger
     {
-        public void LogInfo(string message) => Console.WriteLine($"[INFO] {message}");
-        public void LogWarning(string message) => Console.WriteLine($"[WARN] {message}");
-        public void LogError(string message) => Console.WriteLine($"[ERROR] {message}");
+        void LogInfo(string message);
+        void LogWarning(string message);
+        void LogError(string message);
     }
 }

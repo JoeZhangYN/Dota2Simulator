@@ -15,9 +15,9 @@ using System.Runtime.Intrinsics.X86;
 using System.Threading;
 using System.Threading.Tasks;
 using Timer = System.Threading.Timer;
-using Tuple = Dota2Simulator.ImageProcessingSystem.ImageFinder.Tuple;
+using Tuple = Dota2Simulator.Vision.ImageFinder.Tuple;
 
-namespace Dota2Simulator.ImageProcessingSystem
+namespace Dota2Simulator.Vision
 {
     /// <summary>
     /// 像素代码缓存 - 用于缓存特定位置的颜色信息

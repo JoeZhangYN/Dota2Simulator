@@ -1,4 +1,4 @@
-﻿using Dota2Simulator.ImageProcessingSystem;
+﻿using Dota2Simulator.Vision;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -9,7 +9,7 @@ using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Dota2Simulator.PictureProcessing
+namespace Dota2Simulator.Vision
 {
     /// <summary>
     /// 懒加载图片管理器 - 只在真正需要时才加载图片资源

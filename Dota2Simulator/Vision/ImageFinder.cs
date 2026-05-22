@@ -15,9 +15,9 @@ using System.Runtime.Intrinsics.X86;
 using System.Threading;
 using System.Threading.Tasks;
 using Timer = System.Threading.Timer;
-using Tuple = Dota2Simulator.ImageProcessingSystem.ImageFinder.Tuple;
+using Tuple = Dota2Simulator.Vision.ImageFinder.Tuple;
 
-namespace Dota2Simulator.ImageProcessingSystem
+namespace Dota2Simulator.Vision
 {
     // 图像查找器（与Rust交互）
     public static class ImageFinder

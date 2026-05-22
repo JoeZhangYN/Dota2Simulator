@@ -1,9 +1,9 @@
 ﻿#if DOTA2
 #if Silt
 
-using Dota2Simulator.ImageProcessingSystem;
+using Dota2Simulator.Vision;
 using Dota2Simulator.KeyboardMouse;
-using Dota2Simulator.PictureProcessing.OCR;
+using Dota2Simulator.Vision.Ocr;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Frozen;

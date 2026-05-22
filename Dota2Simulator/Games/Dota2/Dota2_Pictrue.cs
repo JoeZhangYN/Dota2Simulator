@@ -1,7 +1,6 @@
 ﻿#if DOTA2
 
-using Dota2Simulator.PictureProcessing;
-using Dota2Simulator.ImageProcessingSystem;
+using Dota2Simulator.Vision;
 
 namespace Dota2Simulator.Games.Dota2
 {

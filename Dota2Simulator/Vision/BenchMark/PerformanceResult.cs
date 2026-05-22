@@ -1,4 +1,4 @@
-﻿using Dota2Simulator.ImageProcessingSystem;
+﻿using Dota2Simulator.Vision;
 using NLog;
 using System;
 using System.Collections.Generic;
@@ -8,7 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using static ModifyGraphics;
 
-namespace Dota2Simulator.PictureProcessing.BenchMark
+namespace Dota2Simulator.Vision.Benchmark
 {
     #region 测试结果
     /*

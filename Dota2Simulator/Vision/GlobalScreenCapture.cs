@@ -15,9 +15,9 @@ using System.Runtime.Intrinsics.X86;
 using System.Threading;
 using System.Threading.Tasks;
 using Timer = System.Threading.Timer;
-using Tuple = Dota2Simulator.ImageProcessingSystem.ImageFinder.Tuple;
+using Tuple = Dota2Simulator.Vision.ImageFinder.Tuple;
 
-namespace Dota2Simulator.ImageProcessingSystem
+namespace Dota2Simulator.Vision
 {
     /// <summary>
     /// 全局截图管理器 - 直接使用三重缓冲系统
