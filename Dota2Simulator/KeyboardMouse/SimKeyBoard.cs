@@ -2,6 +2,7 @@ using System;
 using System.Drawing;
 using System.Threading;
 using System.Windows.Forms;
+using Dota2Simulator.Diagnostics;
 using Dota2Simulator.GameAutomation.Domain.Actuation;
 using Dota2Simulator.GameAutomation.Domain.Perception;
 using Dota2Simulator.GameAutomation.Ports;
@@ -15,7 +16,9 @@ namespace Dota2Simulator.KeyboardMouse
     /// </summary>
     internal class SimKeyBoard
     {
-        private static readonly IInputExecutor _executor = new HybridInputAdapter();
+        // 经探针装饰器包裹——探针默认关闭、零开销；冒烟测试时 RecordReplayProbe.BeginSession 开录。
+        private static readonly IInputExecutor _executor =
+            RecordReplayProbe.Wrap(new HybridInputAdapter());
 
         #region 模拟按键
 
