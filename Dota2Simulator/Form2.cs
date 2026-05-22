@@ -1,6 +1,10 @@
 ﻿using Collections.Pooled;
 using Dota2Simulator.KeyboardMouse;
 using Dota2Simulator.Vision.Ocr;
+#if DOTA2
+using Dota2Simulator.GameAutomation.Domain.Actuation;
+using Dota2Simulator.GameAutomation.Domain.Heroes;
+#endif
 using System;
 using System.Diagnostics;
 using System.Drawing;
@@ -50,7 +54,11 @@ namespace Dota2Simulator
             #endregion
 
 #if DOTA2
-            await Games.Dota2.Main.根据当前英雄增强(tb_name.Text.Trim(), e);
+            // 经入站端口 GameSession 分发（取代直调 Main.根据当前英雄增强）。
+            // HeroAttribute.Strength 此处是占位——fallback 路径只用 hero.Name。
+            await CompositionRoot.AppComposition.GameSession.DispatchAsync(
+                new HeroId(tb_name.Text.Trim(), HeroAttribute.Strength),
+                new KeyTrigger(VirtualKey.From(e.KeyCode)));
 #endif
 #if LOL
             Games.LOL.MainClass.根据当前英雄增强(tb_name.Text.Trim(), e);

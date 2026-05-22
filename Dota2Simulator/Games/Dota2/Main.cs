@@ -8863,7 +8863,9 @@ namespace Dota2Simulator.Games.Dota2
             }).ConfigureAwait(false);
         }
 
-        private static async Task 状态初始化()
+        // internal：GameSession 策略路径首次激活英雄后调此启动主循环（一般程序循环）。
+        // _总循环条件 守卫由调用方负责（策略路径在 OnActivate 前已置位，与旧 case 块一致）。
+        internal static async Task 状态初始化()
         {
 #if Silt
             _聚合.Conditions[ConditionSlotKey.C8].Probe ??= Silt.Main.有书吃书;
