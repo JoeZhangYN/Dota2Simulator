@@ -53,6 +53,9 @@ namespace Dota2Simulator.GameAutomation.Application
         private readonly IUiInvoker _ui;
         private readonly HeroAggregate _aggregate;
 
+        // Phase 11 P2: setter 注入消反向 service locator (SkillEngine ctor 先于 ItemEngine, 不能 ctor 注 Item).
+        private ItemEngine? _item;
+
         public SkillEngine(IInputExecutor input, IScreenVision vision, IUiInvoker ui, HeroAggregate aggregate)
         {
             _input = input;
@@ -60,6 +63,9 @@ namespace Dota2Simulator.GameAutomation.Application
             _ui = ui;
             _aggregate = aggregate;
         }
+
+        /// <summary>Phase 11 P2: 由 AppContainer.BindUi 在 ItemEngine new 后调用回填. 调用发生在 BindUi 一次性装配内, 后续 method 调时 _item 已注入.</summary>
+        internal void BindItem(ItemEngine item) => _item = item;
 
         #region 模块化技能
 
@@ -1571,7 +1577,7 @@ namespace Dota2Simulator.GameAutomation.Application
 
                 if (是否保持假腿)
                 {
-                    Common.ItemEngine!.要求保持假腿();
+                    _item!.要求保持假腿();
                 }
 
                 if (是否接按键)
@@ -1591,7 +1597,7 @@ namespace Dota2Simulator.GameAutomation.Application
             _ = Task.Run(() =>
             {
                 Common.Delay(等待的延迟);
-                Common.ItemEngine!.要求保持假腿();
+                _item!.要求保持假腿();
             });
         }
 
