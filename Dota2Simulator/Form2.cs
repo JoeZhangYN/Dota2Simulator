@@ -26,6 +26,11 @@ namespace Dota2Simulator
         #endregion
 #endif
 
+#if LOL
+        /// <summary>Phase 11 P12: LolEngine instance (Hook_KeyDown 时分发). 无参 ctor 内 new.</summary>
+        private Games.LOL.LolEngine? _lolEngine;
+#endif
+
         #region 触发重载
 
         /// <summary>
@@ -64,7 +69,8 @@ namespace Dota2Simulator
                 new KeyTrigger(VirtualKey.From(e.KeyCode), ToKeyModifiers(e.Modifiers)));
 #endif
 #if LOL
-            Games.LOL.MainClass.根据当前英雄增强(tb_name.Text.Trim(), e);
+            // Phase 11 P12: 走 instance 化 LolEngine (取代 Games.LOL.MainClass.X static 调).
+            await _lolEngine!.根据当前英雄增强(tb_name.Text.Trim(), e).ConfigureAwait(true);
 #endif
 #if HF2
             Games.HF2.MainClass.根据当前英雄增强(tb_name.Text.Trim(), e);
@@ -187,6 +193,15 @@ namespace Dota2Simulator
             Console.WriteLine($"[Form2.ctor] {DateTime.Now.Ticks}");
 
             InitializeComponent();
+
+#if LOL
+            // Phase 11 P12: LolEngine instance 装配 — InitializeComponent 后 tb_* 可用, 但 LOL stub 暂未用 UI.
+            // 直接 new adapters (无 AppContainer DOTA2 装配链).
+            var lolInput = new Input.Adapters.HybridInputAdapter();
+            var lolVision = new Vision.Adapters.RustVisionAdapter();
+            var lolUi = new Ui.Adapters.Form2UiInvoker(this);
+            _lolEngine = new Games.LOL.LolEngine(lolInput, lolVision, lolUi);
+#endif
 
             StartListen();
         }
