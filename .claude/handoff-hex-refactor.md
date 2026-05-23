@@ -550,7 +550,9 @@ Backup 基础设施：`D:\backup\C\temp\JoezhangYN\C#\Dota2Plus\Dota2Simulator.g
 
 **接口契约自检 PASS**: 详上 §不变量 #6
 
-## Phase 11 硬阻断与 in-scope 调整 (LOL/HF2 skipped 缘由)
+## Phase 11 硬阻断与 in-scope 调整 (LOL/HF2 skipped 缘由) [已被 Phase 11.B 修正达成全打]
+
+> **2026-05-23 update**: 用户拒绝接受 Phase 11.A 自行将 LOL/HF2 推迟的 in-scope 调整, 要求严格"三游戏全打". 详 §Phase 11.B 段, 已完成 P11-P14 4 chunk 达成 LOL/HF2 build 0 错 + LolEngine/Hf2Engine instance 化. 本段记录 11.A 实测时态保留作回溯参考.
 
 **任务规约 in-scope 要求「Silt + LOL + HF2 三游戏全打」**，实施期发现 LOL/HF2 instance 化为硬阻断:
 
@@ -635,11 +637,96 @@ Backup 基础设施：`D:\backup\C\temp\JoezhangYN\C#\Dota2Plus\Dota2Simulator.g
 
 ## 下次 session 起手指引（Phase 12 候选）
 
-1. **Phase 12 优先 LOL/HF2 build 基线修复 epic** (handoff_notes #1, 详上): Common/HeroAggregate/HeroStrategyRegistry 加 `#if DOTA2` + LOL/MainClass CS1988 修 + 然后 LolEngine/Hf2Engine instance 化
+1. ~~**Phase 12 优先 LOL/HF2 build 基线修复 epic**~~ — **已 Phase 11.B P11-P14 完成** ✅, 详下 §Phase 11.B 段
 2. Phase 12 候选 (低优先, 详 handoff_notes #2-#5):
    - Silt/Main.cs 内嵌死代码示例清理
    - Silt/Main.cs 文件名 rename SiltEngine.cs
    - setter 注入纪律 architecture review (引入 mediator port 抑或接受现状)
    - AppContainer BindUi 装配链拆分子方法
-3. 继承 Phase 10D 候选 (Phase 10C handoff_notes 7 项 + Phase 10B 剩余 5 项)
-4. 继承 Phase 10 后续段 M 优先级现代化 + P1 bug (SystemSpeechAdapter Dispose leak) + HeroIdentity epic
+3. **新增 Phase 12 候选 (Phase 11.B 引入)**:
+   - LolEngine / Hf2Engine body 真业务实现 (当前仅 stub骨架; ports 已就位待填)
+   - HF2 helper SimEnigo.X 静态调切 IInputExecutor (low priority, SimEnigo 是 game-agnostic facade 未受 Phase 11.A 影响)
+   - LOL/HF2 build 装配链统一 (当前 Form2 LOL/HF2 block 各自直接 new adapters, 与 DOTA2 走 AppContainer.BindUi 不对称)
+4. 继承 Phase 10D 候选 (Phase 10C handoff_notes 7 项 + Phase 10B 剩余 5 项)
+5. 继承 Phase 10 后续段 M 优先级现代化 + P1 bug (SystemSpeechAdapter Dispose leak) + HeroIdentity epic
+
+## Phase 11.B 完整收尾 (2026-05-23 续, 三游戏全打达成)
+
+**plan SSOT**: 同 Phase 11.A (`luminous-cascading-hopper.md`), 11.B 为用户 grill 后接手续作.
+
+**用户固化约束**: "Silt + LOL + HF2 三游戏全打" — 拒绝接受 Phase 11.A 自行将 LOL/HF2 in-scope 调整为推迟. 11.B 严格全打.
+
+**4 commit (P11-P14, P15 即本 handoff chunk)**:
+
+| chunk | hash | 一句话 |
+|-------|------|-------|
+| **P11** | `aa81a62` | LOL build 0 错基线: 4 application 文件 (HeroAggregate/HeroContext/HeroStrategyRegistry/IHeroStrategy) 加 #if DOTA2 + LOL/MainClass body stub 化 (CS1988 修 + body 全注释保骨架) |
+| **P12** | `2dddc94` | LOL MainClass static → LolEngine instance 化 (3 ports ctor: input/vision/ui) + Form2 #if LOL field + 无参 ctor new + dispatch 切 |
+| **P13** | `aef6ee4` | HF2 build 0 错基线: 仅 CS1988 修 (HF2/MainClass:19 async + in 参数; 无其他错 — P11 application guard 顺带享受) |
+| **P14** | `083a984` | HF2 MainClass static → Hf2Engine instance 化 (3 ports ctor: input/vision/ui) + Form2 #if HF2 field + 无参 ctor new + dispatch 切 (SimEnigo.X helper static 调保留) |
+| **P15** | (本 chunk) | handoff Phase 11.B 段追加 + Phase 11.A §硬阻断段标"已被修正" |
+
+### Phase 11.B 关键发现
+
+1. **Phase 11.A 摸底过时**: 11.A subagent 在 main 3dbef5f (Common.ItemEngine/HeroLoopHost 未删态) 摸底, 但 11.A 9 commit (P1-P10) 已删 Common locator. 11.B 重测于 worktree HEAD ae2c5b9, LOL build 实测错误集只剩 17 错 4 文件:
+   - 4 application 文件 (HeroAggregate/HeroContext/HeroStrategyRegistry/IHeroStrategy) 无 #if DOTA2 guard 但引用 DOTA2-only 类型 (LegSwapState/SkillEngine/ItemEngine/HeroLoopHost)
+   - LOL/MainClass.cs:28 CS1988 async + in (既存 bug)
+   - **Common.cs / AppContainer.cs 无错** (11.A P9 已删字段)
+2. **HF2 build 错误集只剩 1 错**: HF2/MainClass.cs:19 CS1988. DOTA2-only application 文件 P11 加 guard 后 HF2 顺带享受.
+3. **LOL/MainClass body 是上古 stub**: hexagonal 重写 (Chunk 3.2) 起就 stub, 引用 `_总循环条件` / `_条件根据图片委托N` / `_条件N` / `获取指定位置颜色` / `Delay` / `KeyPress` / `RightClick` / `技能CD颜色` / `FromResult` / `ColorAEqualColorB` / `无物品状态初始化` 等**全未定义**, 从未编译过. P11 决策"body stub 化" + 注释保留 case 骨架 + 8 method 名作未来 LolEngine 真业务实现的还原参考.
+
+### Phase 11.B 新增不变量
+
+继承 Phase 11.A 全部不变量, 新增:
+
+1. **三 build 全 PASS** ✅:
+   - 默认 `DOTA2;TRACE;Silt`: 0 错 227 警告
+   - `LOL;TRACE`: 0 错 140 警告
+   - `HF2;TRACE`: 0 错 141 警告
+2. **LolEngine / Hf2Engine 装配序终态文档化**:
+   ```
+   Form2 无参 ctor (LOL/HF2 build):
+     InitializeComponent →
+     [#if LOL] new HybridInputAdapter / RustVisionAdapter / Form2UiInvoker(this) → new LolEngine(...) →
+     [#if HF2] 同上 → new Hf2Engine(...) →
+     StartListen
+   Hook_KeyDown:
+     [#if LOL] await _lolEngine!.根据当前英雄增强(name, e)
+     [#if HF2] await _hf2Engine!.根据当前英雄增强(name, e)
+   ```
+3. **LolEngine / Hf2Engine ctor 字面冻结**: 3 ports (input/vision/ui), 各仅 1 处 new (Form2 #if LOL/#if HF2 block), 接口契约破坏自检 PASS.
+4. **DOTA2-only application 类型 guard 终态**: HeroAggregate / HeroContext / HeroStrategyRegistry / IHeroStrategy 均加 #if DOTA2; 已有 guard 的 GameSession / HeroLoopHost / ItemEngine / SkillEngine / LegSwapState 保持. SG (HeroStrategyGenerator) emit 内部已自含 #if DOTA2.
+
+### Phase 11.B 反预测与实测偏差
+
+1. **预测 LOL build 错误集 = 11.A 摸底的 4 类 + body 标识符雪崩** → **实测 LOL body 标识符在 CS1988 修后才在第二轮编译爆出 60+ CS0103** (编译器分阶段, signature 错先 fail block body 解析). P11 决策 body stub 化 (而非保留 body) 是正确路径. ✅
+2. **预测 HF2 错误同 LOL 级别** → **实测 HF2 仅 1 错** (CS1988). HF2 body 用 SimEnigo.X (静态键鼠驱动, 未删 facade), 全可编译. ✅
+3. **预测 LolEngine 同 Silt P6 4 ports (input/vision/ui/item)** → **实测 LOL body stub 无 ItemEngine 调用, 3 ports 足够**. LolEngine 真业务实现时按需补 item port. 同 Hf2Engine.
+4. **预测 LOL/HF2 build 装配走 AppContainer** → **实测 AppContainer 整文件 #if DOTA2, LOL/HF2 build 不可用. 决策 Form2 无参 ctor 内直接 new adapters + LolEngine / Hf2Engine, 与 DOTA2 装配链不对称** (handoff_notes Phase 12 候选 #3 标注重构候选).
+5. **预测 LolEngine 走 Common.UiInvoker** → **实测 Common.UiInvoker 已 11.A P9 删**, 改 Form2UiInvoker(this) 直 new. 通路顺.
+
+### Phase 11.B 待用户冒烟 (LOL/HF2 专项)
+
+继承 Phase 11.A 全部冒烟清单 + 新增:
+
+10. **LOL build 启动实测** (新增, P12): 切 csproj `LOL;TRACE` build 启动, Form2 无参 ctor 内 new LolEngine 不抛, 切 tb_name "魔腾" / "男枪" 按 Q/W/E/R 不抛 NRE (走 stub no-op).
+11. **HF2 build 启动实测** (新增, P14): 切 csproj `HF2;TRACE` build 启动, Form2 无参 ctor 内 new Hf2Engine 不抛, tb_name "hf2" 按 NumPad1-6 触发 SimEnigo.KeyPress 序列 (HF2_补给/HF2_救援/HF2_飞鹰_空袭/HF2_飞鹰_110/HF2_飞鹰_重填装).
+12. **LOL/HF2 装配 adapter 重复 new 实测** (新增, 设计 review 候选): LOL build 下 `new HybridInputAdapter()` / `new RustVisionAdapter()` 是否与 DOTA2 build 的 AppContainer 装配语义等价 (是否需 Probe 装饰? Phase 12 候选 #3 关联).
+
+### Phase 11.B 回滚锚点
+
+- 单 chunk revert: `git revert <hash>` (P11-P14 任一)
+- 完整撤回 Phase 11.B: `git revert 083a984 aef6ee4 2dddc94 aa81a62` (4 commit 倒序)
+- 撤回 LOL only: `git revert 2dddc94 aa81a62`
+- 撤回 HF2 only: `git revert 083a984 aef6ee4`
+
+注意: Phase 11.B P11 修 application 文件 guard 是 LOL+HF2 共享前提, 撤 P11 会同时打破 LOL+HF2 build.
+
+### 主 lead cherry-pick 范围更新
+
+11 worktree 现含 **14 commit** (Phase 11.A 10 + Phase 11.B 4) + P15 handoff (即本 chunk, 共 15 commit). cherry-pick 顺序保 P1-P15 时序:
+```
+e0e2c37 (P1) → c8165a2 (P2) → cb36e38 (P3) → 23f4b93 (P4) → 3c8a8cd (P5) →
+2e10a72 (P6) → f189b79 (P7) → bec3121 (P9) → ae2c5b9 (P10) → aa81a62 (P11) →
+2dddc94 (P12) → aef6ee4 (P13) → 083a984 (P14) → <P15 hash>
+```
