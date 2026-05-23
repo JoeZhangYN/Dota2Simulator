@@ -45,8 +45,11 @@ namespace Dota2Simulator.Vision
         /// MemoryStream 双拷贝路径自动跳过.</para>
         /// <para>幂等: 重复调用第二次起忽略并 log warning. 由 SG emit 的 Dota2_PictrueSha1.RegisterOnModuleInit
         /// 通过 [ModuleInitializer] 在 assembly load 时一次性调用.</para>
+        /// <para><b>Phase 10B B3 可见性</b>: <c>internal</c> 收紧 —— 唯一 caller = 同 assembly (Dota2Simulator)
+        /// 的 SG emit 代码 <c>Dota2Simulator.Games.Dota2.Dota2_PictrueSha1.RegisterOnModuleInit</c>,
+        /// 跨 assembly 无消费方. 未来若引入测试项目访问, 单点加 <c>[assembly: InternalsVisibleTo("Dota2Simulator.Tests")]</c>.</para>
         /// </remarks>
-        public static void RegisterSha1Manifest(IReadOnlyDictionary<string, string> map)
+        internal static void RegisterSha1Manifest(IReadOnlyDictionary<string, string> map)
         {
             lock (_sha1RegisterLock)
             {
@@ -66,7 +69,11 @@ namespace Dota2Simulator.Vision
         /// <summary>
         /// 累计 SHA1 mismatch 次数 (用于诊断, 不影响运行).
         /// </summary>
-        public static int Sha1MismatchCount => _sha1MismatchCount;
+        /// <remarks>
+        /// Phase 10B B3 可见性: <c>internal</c> 收紧 —— 与 <see cref="RegisterSha1Manifest"/> 同源,
+        /// 诊断 counter 仅本 assembly 内部使用, 跨 assembly 无消费方.
+        /// </remarks>
+        internal static int Sha1MismatchCount => _sha1MismatchCount;
 
         #region 核心加载方法
 
