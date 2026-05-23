@@ -7,14 +7,12 @@ using Dota2Simulator.GameAutomation.Application;
 namespace Dota2Simulator.CompositionRoot;
 
 /// <summary>
-/// 临时静态组合根——把 HeroStrategyRegistry 与 GameSession 接线到一起，供 Form2 取用。
+/// 临时静态组合根——已被 <see cref="AppContainer"/> 取代。
 ///
-/// 过渡形态：Phase 6 将由正式的 AppContainer（实例化、可注入、生命周期受控）取代。
-/// 当前用 static 是为让 Form2 在不改构造签名的前提下经 GameSession 分发按键。
-///
-/// 4.7 阶段 RegisterAll() 注册结果为空（英雄策略 Wave 4 才填充），
-/// 故 GameSession.DispatchAsync 永远走 fallback 回退旧 Main switch。
+/// A1 chunk：Program.cs 不再引用本类，Form2 经构造器注入 AppContainer 拿 GameSession。
+/// A2 chunk：本文件将被删除。当前保留是为保证 A1 commit 单步可回滚。
 /// </summary>
+[System.Obsolete("已被 AppContainer 取代，A2 chunk 删除")]
 internal static class AppComposition
 {
     private static readonly HeroStrategyRegistry _registry = CreateRegistry();

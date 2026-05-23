@@ -14,7 +14,12 @@ namespace Dota2Simulator
             _ = Application.SetHighDpiMode(HighDpiMode.SystemAware);
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
+#if DOTA2
+            CompositionRoot.AppContainer container = new();
+            Application.Run(new Form2(container));
+#else
             Application.Run(new Form2());
+#endif
         }
     }
 }

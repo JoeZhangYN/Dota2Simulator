@@ -20,9 +20,17 @@ namespace Dota2Simulator
     {
         #region 页面单例调用UI线程
         // 单例模式 传递Form,调用UI线程更新
+        // TODO-Phase7: Common.Main_Form?.Invoke 13 站点切 IUiInvoker port 后此单例可删
         private static Form2? _instance;
         public static Form2 Instance => _instance ?? throw new InvalidOperationException("Form2未初始化");
         #endregion
+
+#if DOTA2
+        #region 组合根注入
+        /// <summary>Phase 6 AppContainer 注入入口 — DOTA2 构建专属。LOL/HF2 走无参构造器。</summary>
+        private readonly CompositionRoot.AppContainer? _app;
+        #endregion
+#endif
 
         #region 触发重载
 
@@ -56,7 +64,7 @@ namespace Dota2Simulator
 #if DOTA2
             // 经入站端口 GameSession 分发（取代直调 Main.根据当前英雄增强）。
             // HeroAttribute.Strength 此处是占位——fallback 路径只用 hero.Name。
-            await CompositionRoot.AppComposition.GameSession.DispatchAsync(
+            await _app!.GameSession.DispatchAsync(
                 new HeroId(tb_name.Text.Trim(), HeroAttribute.Strength),
                 new KeyTrigger(VirtualKey.From(e.KeyCode), ToKeyModifiers(e.Modifiers)));
 #endif
@@ -175,7 +183,7 @@ namespace Dota2Simulator
         #region 页面初始化和注销
 
         /// <summary>
-        ///     页面初始化
+        ///     页面初始化（无参 — WinForms 设计器需要，LOL/HF2 构建走此路径）
         /// </summary>
         public Form2()
         {
@@ -185,6 +193,17 @@ namespace Dota2Simulator
 
             StartListen();
         }
+
+#if DOTA2
+        /// <summary>
+        ///     Phase 6 组合根注入构造器（DOTA2 构建专属）。
+        ///     Program.cs 构造 AppContainer 后调本路径，把 GameSession 实例注入。
+        /// </summary>
+        public Form2(CompositionRoot.AppContainer container) : this()
+        {
+            _app = container ?? throw new ArgumentNullException(nameof(container));
+        }
+#endif
 
         /// <summary>
         ///     页面关闭运行，释放
