@@ -1,10 +1,10 @@
 ﻿// Games/Common.cs
+// Phase 11 P9: 真删 ItemEngine / HeroLoopHost 两 service locator 字段 (0 service locator 终态).
+// 历史: Phase 9 F 引入这两字段作为「最后过渡」桥, P11 P1-P7 全 8 处调用方分别切 ctor / setter / 形参注入完成消除.
 
 using NLog;
 using System;
 using System.Threading;
-using Dota2Simulator.GameAutomation.Application;
-using Dota2Simulator.GameAutomation.Ports;
 
 namespace Dota2Simulator.Games
 {
@@ -15,19 +15,6 @@ namespace Dota2Simulator.Games
         ///     静态 Logger 实例
         /// </summary>
         public static readonly Logger Main_Logger = LogManager.GetCurrentClassLogger();
-
-        /// <summary>
-        /// Phase 9 F 残留 service locator：仅 2 处反向依赖用：
-        /// (1) SkillEngine.cs:1573/1593 内 ItemEngine.要求保持假腿()——SkillEngine 先于 ItemEngine 构造，不能 ctor 注；
-        /// (2) Silt/Main.cs:29/34 内 ItemEngine.根据图片使用物品()——Silt 还是 static class，未 instance 化 (Phase 11 处理)。
-        /// </summary>
-        public static ItemEngine? ItemEngine;
-
-        /// <summary>
-        /// Phase 9 F 残留 service locator：Form2/GameSession/ItemEngine/SkillEngine/Silt 调 HeroLoopHost 都仍走桥。
-        /// Phase 11 改 Form2/GameSession ctor 注入 + Silt instance 化后可删本字段。
-        /// </summary>
-        public static HeroLoopHost? HeroLoopHost;
         #endregion
 
         #region 延时

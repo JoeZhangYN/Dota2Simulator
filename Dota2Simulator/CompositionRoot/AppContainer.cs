@@ -70,11 +70,7 @@ internal sealed class AppContainer
         item.BindSilt(silt);
         HeroLoopHost.BindSilt(silt);
 #endif
-        // Common.ItemEngine 保留 (P9 真删): Silt/Main.cs:29/34 仍 2 处反向 (Silt instance 化 P6 处理).
-        Common.ItemEngine = item;
-        // Common.HeroLoopHost 保留：Silt 子 BC 经 Common.HeroLoopHost.Ui 访问 UI
-        // （Phase 11 Silt instance 化时本桥可删）。
-        Common.HeroLoopHost = HeroLoopHost;
+        // Phase 11 P9: Common.ItemEngine + Common.HeroLoopHost 两 service locator 字段真删 (0 service locator 终态).
         Registry.RegisterAll(Ui, skill, item, HeroLoopHost);
     }
 }
