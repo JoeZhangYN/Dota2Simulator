@@ -31,6 +31,11 @@ namespace Dota2Simulator
         private Games.LOL.LolEngine? _lolEngine;
 #endif
 
+#if HF2
+        /// <summary>Phase 11 P14: Hf2Engine instance (Hook_KeyDown 时分发). 无参 ctor 内 new.</summary>
+        private Games.HF2.Hf2Engine? _hf2Engine;
+#endif
+
         #region 触发重载
 
         /// <summary>
@@ -73,7 +78,8 @@ namespace Dota2Simulator
             await _lolEngine!.根据当前英雄增强(tb_name.Text.Trim(), e).ConfigureAwait(true);
 #endif
 #if HF2
-            Games.HF2.MainClass.根据当前英雄增强(tb_name.Text.Trim(), e);
+            // Phase 11 P14: 走 instance 化 Hf2Engine (取代 Games.HF2.MainClass.X static 调).
+            await _hf2Engine!.根据当前英雄增强(tb_name.Text.Trim(), e).ConfigureAwait(true);
 #endif
         }
 
@@ -201,6 +207,14 @@ namespace Dota2Simulator
             var lolVision = new Vision.Adapters.RustVisionAdapter();
             var lolUi = new Ui.Adapters.Form2UiInvoker(this);
             _lolEngine = new Games.LOL.LolEngine(lolInput, lolVision, lolUi);
+#endif
+
+#if HF2
+            // Phase 11 P14: Hf2Engine instance 装配 — 同 LOL 路径 (无 AppContainer).
+            var hf2Input = new Input.Adapters.HybridInputAdapter();
+            var hf2Vision = new Vision.Adapters.RustVisionAdapter();
+            var hf2Ui = new Ui.Adapters.Form2UiInvoker(this);
+            _hf2Engine = new Games.HF2.Hf2Engine(hf2Input, hf2Vision, hf2Ui);
 #endif
 
             StartListen();
