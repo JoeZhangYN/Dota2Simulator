@@ -1,6 +1,7 @@
 ﻿#if DOTA2
 #if Silt
 
+using Dota2Simulator.GameAutomation.Ports;
 using Dota2Simulator.Vision;
 using Dota2Simulator.KeyboardMouse;
 using Dota2Simulator.Vision.Ocr;
@@ -1437,13 +1438,7 @@ namespace Dota2Simulator.Games.Dota2.Silt
             var resultText = report.ToDetailedString();
             resultText += report.DetailedLog;
 
-            Common.Main_Form?.Invoke(() =>
-            {
-                if (Common.Main_Form.tb_阵营 != null)
-                {
-                    Common.Main_Form.tb_阵营.Text = resultText;
-                }
-            });
+            Common.UiInvoker?.Invoke(() => Common.UiInvoker.SetText(UiField.阵营, resultText));
 
             Console.WriteLine(resultText);
         }

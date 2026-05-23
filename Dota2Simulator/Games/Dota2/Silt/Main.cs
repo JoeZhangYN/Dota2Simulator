@@ -1,6 +1,7 @@
 ﻿#if DOTA2
 #if Silt
 
+using Dota2Simulator.GameAutomation.Ports;
 using Dota2Simulator.Vision;
 using Dota2Simulator.KeyboardMouse;
 using Dota2Simulator.Vision.Ocr;
@@ -59,9 +60,9 @@ namespace Dota2Simulator.Games.Dota2.Silt
                 之前位置 = new();
                 TTS.TTS.Speak("12次退出");
                 var 当前英雄 = "";
-                Common.Main_Form?.Invoke(() =>
+                Common.UiInvoker?.Invoke(() =>
                 {
-                    当前英雄 = Common.Main_Form.tb_name.Text.Trim();
+                    当前英雄 = Common.UiInvoker.GetText(UiField.Name).Trim();
                 });
                 if (当前英雄 == "飞机")
                 {
@@ -74,7 +75,7 @@ namespace Dota2Simulator.Games.Dota2.Silt
             else
             {
                 var 描述 = PaddleOCR.获取图片文字(GlobalScreenCapture.GetCurrentHandle(), new Rectangle(730, 503, 71, 39)).Trim();
-                // Common.Main_Form.Invoke(() => { Common.Main_Form.tb_阵营.Text = 描述; });
+                // Common.UiInvoker?.Invoke(() => Common.UiInvoker.SetText(UiField.阵营, 描述));
                 if (ImageFinder.FindImageInRegionBool(Dota2_Pictrue.Silt.选择天赋, GlobalScreenCapture.GetCurrentHandle(), RPG选择技能范围)
                     && ImageFinder.FindImageInRegionBool(Dota2_Pictrue.Silt.普通天赋, GlobalScreenCapture.GetCurrentHandle(), RPG第一技能金))
                 {
@@ -377,10 +378,7 @@ namespace Dota2Simulator.Games.Dota2.Silt
                 SimKeyBoard.MouseMove(b_skip);
                 Common.Delay(500);
             }
-            Common.Main_Form.Invoke(() =>
-            {
-                Common.Main_Form.tb_阵营.Text = string1;
-            });
+            Common.UiInvoker?.Invoke(() => Common.UiInvoker.SetText(UiField.阵营, string1));
             TTS.TTS.Speak("完成");
             // Tts.Speak(PaddleOCR.获取图片文字(in 句柄, new Rectangle(620, 437, 120, 40)));
         }
