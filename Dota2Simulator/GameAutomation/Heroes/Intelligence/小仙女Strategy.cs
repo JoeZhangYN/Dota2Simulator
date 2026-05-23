@@ -38,7 +38,7 @@ public sealed class 小仙女Strategy : IHeroStrategy
 
         if (key == VirtualKey.F)
         {
-            if (Item._是否魔晶)
+            if (Main._聚合.HasShard)
             {
                 Main._聚合.Conditions[ConditionSlotKey.C4].Active = true;
             }

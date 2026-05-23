@@ -50,7 +50,7 @@ public sealed class 小黑Strategy : IHeroStrategy
                 Color.FromArgb(246, 178, 60), 0)
                 ? 1
                 : 0);
-            if (Item._是否魔晶)
+            if (Main._聚合.HasShard)
             {
                 Main._聚合.LegSwap.配置.修改配置(Keys.F, true);
             }
@@ -83,7 +83,7 @@ public sealed class 小黑Strategy : IHeroStrategy
         }
         else if (key == VirtualKey.F)
         {
-            if (Item._是否魔晶)
+            if (Main._聚合.HasShard)
             {
                 Main._聚合.Conditions[ConditionSlotKey.C3].Active = true;
             }

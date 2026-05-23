@@ -22,11 +22,23 @@ namespace Dota2Simulator.GameAutomation.Application;
 public sealed class GameSession : IGameSession
 {
     private readonly HeroStrategyRegistry _registry;
+    private readonly SessionState _sessionState;
 
     /// <summary>当前激活的英雄上下文；未激活或被 CancelAll 清空时为 null。</summary>
     private HeroContext? _current;
 
-    public GameSession(HeroStrategyRegistry registry) => _registry = registry;
+    public GameSession(HeroStrategyRegistry registry, SessionState sessionState)
+    {
+        _registry = registry;
+        _sessionState = sessionState;
+    }
+
+    /// <inheritdoc />
+    public bool IsPaused
+    {
+        get => _sessionState.IsPaused;
+        set => _sessionState.IsPaused = value;
+    }
 
     /// <inheritdoc />
     public async Task DispatchAsync(HeroId hero, KeyTrigger trigger)

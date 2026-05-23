@@ -59,7 +59,7 @@ public sealed class 莱恩Strategy : IHeroStrategy
         }
         else if (key == VirtualKey.From(Keys.S))
         {
-            Main._中断条件 = true;
+            Main._session!.IsPaused = true;
         }
         else if (key == VirtualKey.From(Keys.D3))
         {

@@ -45,7 +45,7 @@ public sealed class 龙骑Strategy : IHeroStrategy
 
         if (key == VirtualKey.From(Keys.F1))
         {
-            if (Item._是否魔晶)
+            if (Main._聚合.HasShard)
             {
                 Main._聚合.LegSwap.配置.修改配置(Keys.D, true);
             }
@@ -64,7 +64,7 @@ public sealed class 龙骑Strategy : IHeroStrategy
         }
         else if (key == VirtualKey.D)
         {
-            if (Item._是否魔晶)
+            if (Main._聚合.HasShard)
             {
                 Main._聚合.Conditions[ConditionSlotKey.C4].Active = true;
             }
@@ -91,7 +91,7 @@ public sealed class 龙骑Strategy : IHeroStrategy
         return await Skill.主动技能进入CD后续(Keys.W, () =>
         {
             _input.Press(VirtualKey.From(Keys.A));
-            _ = Main._聚合.Skills.Mode(SlotKey.W) == 1 && Item._是否魔晶 ? Skill.DOTA2释放CD就绪技能(Keys.D, in 句柄) : Skill.DOTA2释放CD就绪技能(Keys.Q, in 句柄);
+            _ = Main._聚合.Skills.Mode(SlotKey.W) == 1 && Main._聚合.HasShard ? Skill.DOTA2释放CD就绪技能(Keys.D, in 句柄) : Skill.DOTA2释放CD就绪技能(Keys.Q, in 句柄);
 
             Item.要求保持假腿();
         }).ConfigureAwait(true);

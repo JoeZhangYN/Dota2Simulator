@@ -56,7 +56,7 @@ public sealed class 女王Strategy : IHeroStrategy
         }
         else if (key == VirtualKey.From(Keys.S))
         {
-            Main._中断条件 = true;
+            Main._session!.IsPaused = true;
         }
 
         return Task.CompletedTask;

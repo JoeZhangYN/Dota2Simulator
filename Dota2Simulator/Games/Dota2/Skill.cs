@@ -156,7 +156,7 @@ namespace Dota2Simulator.Games.Dota2
             推荐学习技能
         }
 
-        public static int _技能数量;
+        // Phase 8 C3: 原 static int 字段迁 HeroAggregate.SkillCount（跨 BC SSOT），同类内 10 处访问统一走 Main._聚合 路径。
 
         #endregion
 
@@ -282,9 +282,9 @@ namespace Dota2Simulator.Games.Dota2
                 // 技能数量改变后，技能判断色全部重置
                 // 只有两种情况需要重置，一种是还没学，到学习了
                 // 另一种是技能改变了
-                if (_技能数量 != i)
+                if (Main._聚合.SkillCount != i)
                 {
-                    _技能数量 = i;
+                    Main._聚合.SkillCount = i;
 
                     // 重置所有技能判断
                     重置所有技能判断();
@@ -536,12 +536,12 @@ namespace Dota2Simulator.Games.Dota2
         /// <returns>如果技能在CD状态返回真，否则返回假</returns>
         public static bool 判断技能状态(Keys 技能位置, in ImageHandle 句柄, 技能类型 类型 = 技能类型.图标CD)
         {
-            if (_技能数量 == 4 && (技能位置 == Keys.D || 技能位置 == Keys.F))
+            if (Main._聚合.SkillCount == 4 && (技能位置 == Keys.D || 技能位置 == Keys.F))
             {
                 return false;
             }
 
-            技能信息 技能信息 = 获取技能信息(_技能数量);
+            技能信息 技能信息 = 获取技能信息(Main._聚合.SkillCount);
             int offsetX = 获取技能位置偏移(技能位置, 技能信息);
             (int x, int y, Color 颜色, byte 颜色容差) = 获取技能位置信息(技能信息, offsetX, 类型);
             return ColorExtensions.ColorAEqualColorB(颜色, ImageManager.GetColor(in 句柄, x, y), 颜色容差);
@@ -743,8 +743,8 @@ namespace Dota2Simulator.Games.Dota2
             重置指定技能判断(技能位置);
 
             // 获取当前技能颜色
-            Color 获取当前颜色 = 获取技能释放判断颜色(技能位置, in 句柄, _技能数量);
-            if (判断是否更新释放技能前颜色(技能位置, 获取技能信息(_技能数量), in 句柄))
+            Color 获取当前颜色 = 获取技能释放判断颜色(技能位置, in 句柄, Main._聚合.SkillCount);
+            if (判断是否更新释放技能前颜色(技能位置, 获取技能信息(Main._聚合.SkillCount), in 句柄))
             {
                 更新释放前颜色(技能位置, 获取当前颜色);
             }
@@ -761,10 +761,10 @@ namespace Dota2Simulator.Games.Dota2
         {
             static void 更新指定释放色(Keys 技能位置, in ImageHandle 句柄)
             {
-                更新释放前颜色(技能位置, 获取技能释放判断颜色(技能位置, in 句柄, _技能数量));
+                更新释放前颜色(技能位置, 获取技能释放判断颜色(技能位置, in 句柄, Main._聚合.SkillCount));
             }
 
-            技能信息 技能信息 = 获取技能信息(_技能数量);
+            技能信息 技能信息 = 获取技能信息(Main._聚合.SkillCount);
 
             foreach (Keys 位置 in 技能信息.技能位置)
             {
@@ -831,11 +831,11 @@ namespace Dota2Simulator.Games.Dota2
         private static bool DOTA2对比释放技能前后颜色(Keys 技能位置, in ImageHandle 句柄)
         {
             // 指向性技能CD栏基本全白
-            Color 技能CD颜色 = 获取技能进入CD判断颜色(技能位置, in 句柄, _技能数量);
+            Color 技能CD颜色 = 获取技能进入CD判断颜色(技能位置, in 句柄, Main._聚合.SkillCount);
             if (!ColorExtensions.ColorAEqualColorB(技能CD颜色, Color.FromArgb(255, 255, 255), 10))
             {
                 // 获取当前技能颜色
-                Color 当前释放颜色 = 获取技能释放判断颜色(技能位置, in 句柄, _技能数量);
+                Color 当前释放颜色 = 获取技能释放判断颜色(技能位置, in 句柄, Main._聚合.SkillCount);
 
                 return 处理技能释放(技能位置, 当前释放颜色);
             }

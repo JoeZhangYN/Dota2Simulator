@@ -108,9 +108,11 @@ namespace Dota2Simulator.Games.Dota2
         private static 截图 _循环内获取图片;
 
         /// <summary>
-        ///     中断条件布尔
+        /// Phase 8 C3 过渡 service locator：AppContainer 装配后注入 SessionState 单例；
+        /// 取代原 static `_中断条件` 字段——所有读写经此 ref 走 SessionState.IsPaused。
+        /// C5/C6 ItemEngine/HeroLoopHost 实例化后改 ctor 注入，D1 删此 field。
         /// </summary>
-        public static bool _中断条件;
+        internal static GameAutomation.Application.SessionState? _session;
 
         /// <summary>当前英雄的运行态聚合（技能槽 + 条件槽 + 攻击计时）。
         /// public 因 Item.cs 跨类访问。</summary>
@@ -559,7 +561,7 @@ namespace Dota2Simulator.Games.Dota2
             {
                 try
                 {
-                    if (_中断条件)
+                    if (_session!.IsPaused)
                     {
                         await Task.Delay(中断检查间隔).ConfigureAwait(true);
                         continue;
@@ -622,7 +624,7 @@ namespace Dota2Simulator.Games.Dota2
                     _ => throw new NotImplementedException()
                 };
 
-                if (ImageFinder.FindImageInRegionBool(句柄, GlobalScreenCapture.GetCurrentHandle(), Item.获取物品范围(Skill._技能数量)))
+                if (ImageFinder.FindImageInRegionBool(句柄, GlobalScreenCapture.GetCurrentHandle(), Item.获取物品范围(Main._聚合.SkillCount)))
                 {
                     return;
                 }
@@ -656,7 +658,7 @@ namespace Dota2Simulator.Games.Dota2
         {
             _总循环条件 = false;
             _循环内获取图片 = null;
-            _中断条件 = false;
+            _session!.IsPaused = false;
 
             // _丢装备条件 = false;
 
@@ -670,8 +672,8 @@ namespace Dota2Simulator.Games.Dota2
             Main._聚合.LegSwap.切假腿中 = false;
             Main._聚合.LegSwap.需要切假腿 = false;
 
-            Item._是否魔晶 = false;
-            Item._是否神杖 = false;
+            Main._聚合.HasAghanim = false;  // 原 Item._是否神杖
+            Main._聚合.HasShard = false;    // 原 Item._是否魔晶
 
             _聚合.Skills.SetStep(SlotKey.Global, 0);
             _聚合.Skills.SetStep(SlotKey.Q, 0);

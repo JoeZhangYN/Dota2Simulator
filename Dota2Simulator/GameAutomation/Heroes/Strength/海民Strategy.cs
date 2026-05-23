@@ -123,7 +123,7 @@ public sealed class 海民Strategy : IHeroStrategy
                 Common.Delay(100);
                 _input.MouseMoveTo(new ScreenPoint(p.X, p.Y));
                 Common.Delay(850);
-                if (Main._中断条件)
+                if (Main._session!.IsPaused)
                 {
                     return;
                 }

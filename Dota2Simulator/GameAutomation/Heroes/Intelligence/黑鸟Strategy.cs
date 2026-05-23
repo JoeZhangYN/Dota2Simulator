@@ -83,7 +83,7 @@ public sealed class 黑鸟Strategy : IHeroStrategy
             Common.Delay(150);
             _input.Press(VirtualKey.From(Keys.S));
             Common.Delay(time - 3000, Main._聚合.Skills.Time(SlotKey.W));
-            if (!Main._中断条件)
+            if (!Main._session!.IsPaused)
             {
                 _ = Item.根据图片使用物品(Dota2_Pictrue.物品.陨星锤);
             }

@@ -18,8 +18,8 @@ namespace Dota2Simulator.Games.Dota2
     {
         #region 全局变量
         // Phase 8 C1: 切假腿 8 个字段 (配置 / 假腿按键 / 6 bool flag) 迁入 HeroAggregate.LegSwap (Domain.LegSwapState)。
-        // 杖晶检测 2 个 bool 仍是 Item BC 内部状态（不属切假腿语义），暂留 static。
-        public static bool _是否魔晶, _是否神杖;
+        // Phase 8 C3: 杖晶 2 bool 迁 HeroAggregate.HasAghanim/HasShard；技能数量 迁 HeroAggregate.SkillCount；
+        // 暂停标志 迁 SessionState.IsPaused（经 Main._session 桥接，D1 删）。
 
         #endregion
 
@@ -29,8 +29,8 @@ namespace Dota2Simulator.Games.Dota2
         {
             _ = await Skill.设置当前技能数量().ConfigureAwait(true);
             Main._聚合.LegSwap.存在假腿 = 获取当前假腿按键();
-            _是否神杖 = 阿哈利姆神杖(GlobalScreenCapture.GetCurrentHandle());
-            _是否魔晶 = 阿哈利姆魔晶(GlobalScreenCapture.GetCurrentHandle());
+            Main._聚合.HasAghanim = 阿哈利姆神杖(GlobalScreenCapture.GetCurrentHandle());
+            Main._聚合.HasShard = 阿哈利姆魔晶(GlobalScreenCapture.GetCurrentHandle());
 
             switch (e.KeyCode)
             {
@@ -40,8 +40,8 @@ namespace Dota2Simulator.Games.Dota2
 
                     break;
                 case Keys.Escape:
-                    Main._中断条件 = !Main._中断条件;
-                    TTS.TTS.Speak($"{(Main._中断条件 ? "中断" : "继续")}运行");
+                    Main._session!.IsPaused = !Main._session!.IsPaused;
+                    TTS.TTS.Speak($"{(Main._session!.IsPaused ? "中断" : "继续")}运行");
                     break;
                 case Keys.NumPad7 when Main._聚合.LegSwap.存在假腿:
                     切换假腿状态();
@@ -343,7 +343,7 @@ namespace Dota2Simulator.Games.Dota2
 
         private static bool DOTA2判断序号物品是否CD(int 序号, in ImageHandle 句柄)
         {
-            物品信息 物品 = 根据技能数量获取物品信息(Skill._技能数量);
+            物品信息 物品 = 根据技能数量获取物品信息(Main._聚合.SkillCount);
             Point 初始位置 = new(物品.物品CD右上角x, 物品.物品CD右上角y);
             Color 目标颜色 = 物品.物品CD颜色;
             byte 颜色容差 = 物品.物品CD颜色容差;
@@ -353,7 +353,7 @@ namespace Dota2Simulator.Games.Dota2
 
         private static bool DOTA2判断任意物品是否锁闭(in ImageHandle 句柄)
         {
-            物品信息 物品 = 根据技能数量获取物品信息(Skill._技能数量);
+            物品信息 物品 = 根据技能数量获取物品信息(Main._聚合.SkillCount);
             Point 初始位置 = new(物品.物品锁闭x, 物品.物品锁闭y);
             Color[] 目标颜色 = 物品.物品锁闭颜色;
             byte 颜色容差 = 物品.物品锁闭颜色容差;
@@ -517,7 +517,7 @@ namespace Dota2Simulator.Games.Dota2
 
         public static Keys 根据图片获取物品按键(in ImageHandle 句柄)
         {
-            var 位置 = ImageFinder.FindImageInRegion(in 句柄, GlobalScreenCapture.GetCurrentHandle(), 获取物品范围(Skill._技能数量));
+            var 位置 = ImageFinder.FindImageInRegion(in 句柄, GlobalScreenCapture.GetCurrentHandle(), 获取物品范围(Main._聚合.SkillCount));
             return 根据位置获取按键(位置);
         }
 
@@ -553,7 +553,7 @@ namespace Dota2Simulator.Games.Dota2
 
         private static int 执行物品操作(in ImageHandle 句柄, Action<Keys> 按键操作)
         {
-            Point? 位置 = ImageFinder.FindImageInRegion(in 句柄, GlobalScreenCapture.GetCurrentHandle(), 获取物品范围(Skill._技能数量));
+            Point? 位置 = ImageFinder.FindImageInRegion(in 句柄, GlobalScreenCapture.GetCurrentHandle(), 获取物品范围(Main._聚合.SkillCount));
             if (ImageManager.是否无效位置(位置))
             {
                 return 0;
@@ -575,7 +575,7 @@ namespace Dota2Simulator.Games.Dota2
                 return Keys.Escape;
             }
 
-            物品信息 物品 = 根据技能数量获取物品信息(Skill._技能数量);
+            物品信息 物品 = 根据技能数量获取物品信息(Main._聚合.SkillCount);
             int x = 位置.Value.X + Main.坐标偏移x;
             int y = 位置.Value.Y + Main.坐标偏移y;
 

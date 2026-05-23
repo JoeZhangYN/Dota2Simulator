@@ -90,7 +90,7 @@ public sealed class 大鱼人Strategy : IHeroStrategy
 
     private static async Task<bool> 踩去后摇(ImageHandle 句柄)
     {
-        return await Skill.技能通用判断(Keys.W, 1, 要接的按键: Item._是否魔晶 ? Keys.A : Keys.R).ConfigureAwait(true);
+        return await Skill.技能通用判断(Keys.W, 1, 要接的按键: Main._聚合.HasShard ? Keys.A : Keys.R).ConfigureAwait(true);
     }
 
     private static async Task<bool> 雾霭去后摇(ImageHandle 句柄)

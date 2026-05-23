@@ -35,20 +35,27 @@ internal sealed class AppContainer
 
     public GameSession GameSession { get; }
 
+    public SessionState SessionState { get; }
+
     public AppContainer()
     {
         // ports 装饰链：HybridInputAdapter / RustVisionAdapter → ProbeXxx 录像装饰 → 注入下游
-        // RecordReplayProbe.Enabled 默认 false，装饰器零开销（仅一次 volatile bool 读）
+        // RecordReplayProbe.Enabled 默认 false，装饰器零开销（仅一次 volatile bool 读)
         Input = new ProbeInputExecutor(new HybridInputAdapter());
         Vision = new ProbeScreenVision(new RustVisionAdapter());
         Registry = new HeroStrategyRegistry(Input, Vision);
+        SessionState = new SessionState();
         // D2 双阶段：测试Strategy 需 IUiInvoker，但 Ui 要等 Form2 构造后 BindUi 才到位。
         // 故 RegisterAll 推迟到 BindUi 内调；ctor 期 Registry.Count == 0，
         // GameSession 在此窗口期收到按键也只是 no-op 查不到策略——Form2 ctor 立刻接 BindUi。
-        GameSession = new GameSession(Registry);
+        GameSession = new GameSession(Registry, SessionState);
 
         // A5 双阶段：Main._聚合 类型加载期已 new 出来，AppContainer 构造后补注入 vision。
         Games.Dota2.Main._聚合.Init(Vision);
+
+        // C3 过渡 service locator：Main / Item / Skill 仍是 static class，
+        // 无法 ctor 注入 SessionState；先经 static field 桥接，D1 删（届时 Main/Item/Skill 已实例化走 ctor 注入）。
+        Games.Dota2.Main._session = SessionState;
     }
 
     /// <summary>

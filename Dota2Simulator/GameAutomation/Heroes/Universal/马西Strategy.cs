@@ -42,7 +42,7 @@ public sealed class 马西Strategy : IHeroStrategy
 
         if (key == VirtualKey.W)
         {
-            if (Item._是否神杖)
+            if (Main._聚合.HasAghanim)
             {
                 return;
             }

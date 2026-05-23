@@ -48,12 +48,12 @@ public sealed class 小骷髅Strategy : IHeroStrategy
 
         if (key == VirtualKey.From(Keys.F1))
         {
-            if (Item._是否魔晶)
+            if (Main._聚合.HasShard)
             {
                 Main._聚合.LegSwap.配置.修改配置(Keys.D, true, "敏捷");
             }
 
-            if (Item._是否神杖)
+            if (Main._聚合.HasAghanim)
             {
                 Main._聚合.LegSwap.配置.修改配置(Keys.F, true);
             }
@@ -76,14 +76,14 @@ public sealed class 小骷髅Strategy : IHeroStrategy
         }
         else if (key == VirtualKey.D)
         {
-            if (Item._是否魔晶)
+            if (Main._聚合.HasShard)
             {
                 Main._聚合.Conditions[ConditionSlotKey.C5].Active = true;
             }
         }
         else if (key == VirtualKey.F)
         {
-            if (Item._是否神杖)
+            if (Main._聚合.HasAghanim)
             {
                 Main._聚合.Conditions[ConditionSlotKey.C6].Active = true;
             }
@@ -95,7 +95,7 @@ public sealed class 小骷髅Strategy : IHeroStrategy
         }
         else if (key == VirtualKey.From(Keys.D3))
         {
-            if (Item._是否魔晶)
+            if (Main._聚合.HasShard)
             {
                 Main._聚合.Skills.ToggleMode(SlotKey.F);
                 Dota2Simulator.TTS.TTS.Speak(Main._聚合.Skills.Mode(SlotKey.F) == 1 ? "炽烈火雨隐身" : "炽烈火雨不隐身");

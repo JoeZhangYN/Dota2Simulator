@@ -14,4 +14,8 @@ public interface IGameSession
 
     /// <summary>取消所有进行中的自动化逻辑。</summary>
     void CancelAll();
+
+    /// <summary>Phase 8 C3: 会话级暂停标志。
+    /// 转发到内部 SessionState，所有读写经此 port——取代 Main._中断条件 static。</summary>
+    bool IsPaused { get; set; }
 }

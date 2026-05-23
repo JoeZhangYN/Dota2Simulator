@@ -54,7 +54,7 @@ public sealed class 树精Strategy : IHeroStrategy
         }
         else if (key == VirtualKey.D)
         {
-            if (Item._是否神杖)
+            if (Main._聚合.HasAghanim)
             {
                 Main._聚合.LegSwap.配置.修改配置(Keys.D, true);
                 Main._聚合.Conditions[ConditionSlotKey.C4].Active = true;

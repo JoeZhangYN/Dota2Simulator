@@ -61,7 +61,7 @@ public sealed class 剧毒Strategy : IHeroStrategy
         }
         else if (key == VirtualKey.From(Keys.S))
         {
-            Main._中断条件 = true;
+            Main._session!.IsPaused = true;
             Main._聚合.Conditions[ConditionSlotKey.C1].Active = false;
             Main._聚合.Conditions[ConditionSlotKey.C2].Active = false;
             Main._聚合.Conditions[ConditionSlotKey.C3].Active = false;

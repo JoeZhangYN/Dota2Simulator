@@ -51,12 +51,12 @@ public sealed class 暗影萨满Strategy : IHeroStrategy
         }
         else if (key == VirtualKey.W)
         {
-            if (ImageFinder.FindImageInRegionBool(Dota2_Pictrue.物品.中立_祭礼长袍, GlobalScreenCapture.GetCurrentHandle(), Item.获取中立TP范围(Skill._技能数量)))
+            if (ImageFinder.FindImageInRegionBool(Dota2_Pictrue.物品.中立_祭礼长袍, GlobalScreenCapture.GetCurrentHandle(), Item.获取中立TP范围(Main._聚合.SkillCount)))
             {
                 Main._聚合.Attack.状态抗性倍数 *= 1.1;
             }
 
-            if (ImageFinder.FindImageInRegionBool(Dota2_Pictrue.物品.中立_永恒遗物, GlobalScreenCapture.GetCurrentHandle(), Item.获取中立TP范围(Skill._技能数量)))
+            if (ImageFinder.FindImageInRegionBool(Dota2_Pictrue.物品.中立_永恒遗物, GlobalScreenCapture.GetCurrentHandle(), Item.获取中立TP范围(Main._聚合.SkillCount)))
             {
                 Main._聚合.Attack.状态抗性倍数 *= 1.2;
             }

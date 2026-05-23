@@ -141,7 +141,7 @@ public sealed class 双头龙Strategy : IHeroStrategy
             return await Task.FromResult(true).ConfigureAwait(true);
         }
 
-        if (!ImageFinder.FindImageInRegionBool(Dota2_Pictrue.物品.吹风, in 句柄, Item.获取物品范围(Skill._技能数量)) && Main._聚合.Skills.Time(SlotKey.Global) == -1)
+        if (!ImageFinder.FindImageInRegionBool(Dota2_Pictrue.物品.吹风, in 句柄, Item.获取物品范围(Main._聚合.SkillCount)) && Main._聚合.Skills.Time(SlotKey.Global) == -1)
         {
             Main._聚合.Skills.SetTime(SlotKey.Global, Common.获取当前时间毫秒());
         }

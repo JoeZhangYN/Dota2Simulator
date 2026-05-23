@@ -73,7 +73,7 @@ public sealed class 船长Strategy : IHeroStrategy
             Main._聚合.Skills.SetTime(SlotKey.Q, Common.获取当前时间毫秒());
 
             // 如果E已经释放
-            if (!Main._中断条件 && Main._聚合.Skills.Step(SlotKey.E) == 1)
+            if (!Main._session!.IsPaused && Main._聚合.Skills.Step(SlotKey.E) == 1)
             {
                 // 1600 延迟 返回200施法时间
                 Common.Delay(1350, Main._聚合.Skills.Time(SlotKey.Q));
