@@ -62,6 +62,12 @@ namespace Dota2Simulator.GameAutomation.Application
         /// Phase 11 Silt 子 BC instance 化时 Silt ctor 接 IUiInvoker，本属性可保留作 HeroLoopHost 内部 ui 出口）。</summary>
         public IUiInvoker Ui => _ui;
 
+#if Silt
+        // Phase 11 P6: setter 注入 SiltEngine (状态初始化 内 ConditionSlotKey.C8.Probe 绑 SiltEngine.有书吃书 method group).
+        private Dota2Simulator.Games.Dota2.Silt.SiltEngine? _silt;
+        internal void BindSilt(Dota2Simulator.Games.Dota2.Silt.SiltEngine silt) => _silt = silt;
+#endif
+
         public HeroLoopHost(
             IInputExecutor input,
             IScreenVision vision,
@@ -282,7 +288,7 @@ namespace Dota2Simulator.GameAutomation.Application
         public async Task 状态初始化()
         {
 #if Silt
-            _aggregate.Conditions[ConditionSlotKey.C8].Probe ??= Dota2Simulator.Games.Dota2.Silt.Main.有书吃书;
+            _aggregate.Conditions[ConditionSlotKey.C8].Probe ??= _silt!.有书吃书;
             _aggregate.Conditions[ConditionSlotKey.C8].Active = true;
 #endif
             _循环内获取图片 ??= 获取图片_2;

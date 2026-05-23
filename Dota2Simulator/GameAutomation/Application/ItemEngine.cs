@@ -32,6 +32,11 @@ namespace Dota2Simulator.GameAutomation.Application
         // Phase 11 P3: setter 注入消反向 service locator (ItemEngine ctor 先于 HeroLoopHost; HeroLoopHost ctor 接 skill+item).
         private HeroLoopHost? _host;
 
+#if Silt
+        // Phase 11 P6: setter 注入 SiltEngine (ItemEngine NumPad1-6 dispatch SiltEngine 5 处, SiltEngine ctor 接 ItemEngine).
+        private Dota2Simulator.Games.Dota2.Silt.SiltEngine? _silt;
+#endif
+
         public ItemEngine(IInputExecutor input, IScreenVision vision, IUiInvoker ui, HeroAggregate aggregate, SkillEngine skill, SessionState session)
         {
             _input = input;
@@ -44,6 +49,11 @@ namespace Dota2Simulator.GameAutomation.Application
 
         /// <summary>Phase 11 P3: 由 AppContainer.BindUi 在 HeroLoopHost new 后调用回填. setter 路径一次性装配.</summary>
         internal void BindHost(HeroLoopHost host) => _host = host;
+
+#if Silt
+        /// <summary>Phase 11 P6: 由 AppContainer.BindUi 在 SiltEngine new 后调用回填.</summary>
+        internal void BindSilt(Dota2Simulator.Games.Dota2.Silt.SiltEngine silt) => _silt = silt;
+#endif
         #region 全局变量
         // Phase 8 C1: 切假腿 8 个字段 (配置 / 假腿按键 / 6 bool flag) 迁入 HeroAggregate.LegSwap (Domain.LegSwapState)。
         // Phase 8 C3: 杖晶 2 bool 迁 HeroAggregate.HasAghanim/HasShard；技能数量 迁 HeroAggregate.SkillCount；
@@ -85,21 +95,21 @@ namespace Dota2Simulator.GameAutomation.Application
                 #region Silt
 #if Silt
                 case Keys.NumPad1:
-                    Dota2Simulator.Games.Dota2.Silt.Main.跳过循环获取金碎片(_vision.GetCurrentFrame());
+                    _silt!.跳过循环获取金碎片(_vision.GetCurrentFrame());
                     break;
                 case Keys.NumPad2:
-                    Dota2Simulator.Games.Dota2.Silt.Main.自动屏蔽3个选项(_vision.GetCurrentFrame());
+                    _silt!.自动屏蔽3个选项(_vision.GetCurrentFrame());
                     break;
                 case Keys.NumPad3:
                     break;
                 case Keys.NumPad4:
-                    Dota2Simulator.Games.Dota2.Silt.Main.点击暴击(_vision.GetCurrentFrame());
+                    _silt!.点击暴击(_vision.GetCurrentFrame());
                     break;
                 case Keys.NumPad5:
-                    Dota2Simulator.Games.Dota2.Silt.Main.点击黑皇(_vision.GetCurrentFrame());
+                    _silt!.点击黑皇(_vision.GetCurrentFrame());
                     break;
                 case Keys.NumPad6:
-                    Dota2Simulator.Games.Dota2.Silt.Main.沙王自动选择(_vision.GetCurrentFrame());
+                    _silt!.沙王自动选择(_vision.GetCurrentFrame());
                     break;
 #endif
                 #endregion

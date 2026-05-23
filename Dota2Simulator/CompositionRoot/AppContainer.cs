@@ -64,6 +64,12 @@ internal sealed class AppContainer
         skill.BindHost(HeroLoopHost);
         // Phase 11 P5: GameSession ctor 接 HeroLoopHost (消 3 处 Common.HeroLoopHost! 直调).
         GameSession = new GameSession(Registry, SessionState, HeroLoopHost);
+#if Silt
+        // Phase 11 P6: SiltEngine 装配——ctor 接 (input/vision/ui/item); ItemEngine NumPad1-6 dispatch + HeroLoopHost 状态初始化 经 BindSilt setter 注入.
+        var silt = new Dota2Simulator.Games.Dota2.Silt.SiltEngine(Input, Vision, Ui, item);
+        item.BindSilt(silt);
+        HeroLoopHost.BindSilt(silt);
+#endif
         // Common.ItemEngine 保留 (P9 真删): Silt/Main.cs:29/34 仍 2 处反向 (Silt instance 化 P6 处理).
         Common.ItemEngine = item;
         // Common.HeroLoopHost 保留：Silt 子 BC 经 Common.HeroLoopHost.Ui 访问 UI

@@ -1,6 +1,16 @@
+// Phase 11 P6: Silt/Main.cs static god class → SiltEngine instance 化.
+// - class Main (static) → class SiltEngine (sealed, ctor 接 4 ports: input/vision/ui/item).
+// - 5 public static method → public instance method (有书吃书 / 跳过循环获取金碎片 / 自动屏蔽3个选项 / 点击黑皇 / 点击暴击 / 测试识别 / 沙王自动选择 / 初始化天赋选择).
+// - private static field (已吃书 / 获取碎片循环计数 / 之前位置 / _循环时间) → instance field.
+// - readonly static Rectangle 常量保持 static (纯只读, Phase 8 C6 模板).
+// - 内嵌死代码示例 (BasicImageFinding / ContinuousMonitoring / PerformanceTest / ClickAt / AdvancedExample) 保持 static 不动 (Phase 12+ 清理候选).
+// - 2 处 Common.ItemEngine! → _item; 3 处 Common.HeroLoopHost!.Ui → _ui.
+// - 跳过重新选择 内部 static local function → instance local function.
+// 调用方 (ItemEngine.cs:80-95 NumPad1-NumPad6 dispatch) 5 处 Dota2Simulator.Games.Dota2.Silt.Main.X → _silt!.X (P6 同 commit 改).
 #if DOTA2
 #if Silt
 
+using Dota2Simulator.GameAutomation.Application;
 using Dota2Simulator.GameAutomation.Ports;
 using Dota2Simulator.Vision;
 using Dota2Simulator.KeyboardMouse;
@@ -19,19 +29,32 @@ using Rectangle = System.Drawing.Rectangle;
 
 namespace Dota2Simulator.Games.Dota2.Silt
 {
-    internal class Main
+    public sealed class SiltEngine
     {
-        private static bool 已吃书;
+        private readonly IInputExecutor _input;
+        private readonly IScreenVision _vision;
+        private readonly IUiInvoker _ui;
+        private readonly ItemEngine _item;
 
-        public static async Task<bool> 有书吃书(ImageHandle 句柄)
+        public SiltEngine(IInputExecutor input, IScreenVision vision, IUiInvoker ui, ItemEngine item)
+        {
+            _input = input;
+            _vision = vision;
+            _ui = ui;
+            _item = item;
+        }
+
+        private bool 已吃书;
+
+        public async Task<bool> 有书吃书(ImageHandle 句柄)
         {
             if (已吃书
-                && Common.ItemEngine!.根据图片使用物品(Dota2_Pictrue.物品.书) == 0)
+                && _item.根据图片使用物品(Dota2_Pictrue.物品.书) == 0)
             {
                 SimKeyBoard.KeyPress(Keys.D2);
                 已吃书 = false;
             }
-            else if (Common.ItemEngine!.根据图片使用物品(Dota2_Pictrue.物品.书) == 1)
+            else if (_item.根据图片使用物品(Dota2_Pictrue.物品.书) == 1)
             {
                 Common.Delay(50);
                 已吃书 = true;
@@ -42,12 +65,12 @@ namespace Dota2Simulator.Games.Dota2.Silt
         private readonly static Rectangle RPG选择技能范围 = new(379, 115, 1140, 153);
         private readonly static Rectangle RPG第一技能金 = new(631, 290, 60, 400);
 
-        private static int 获取碎片循环计数;
-        private static Point 之前位置;
+        private int 获取碎片循环计数;
+        private Point 之前位置;
 
-        private static long _循环时间;
+        private long _循环时间;
 
-        public static void 跳过循环获取金碎片(in ImageHandle 句柄)
+        public void 跳过循环获取金碎片(in ImageHandle 句柄)
         {
             if (获取碎片循环计数 == 0) 之前位置 = Control.MousePosition;
 
@@ -60,9 +83,9 @@ namespace Dota2Simulator.Games.Dota2.Silt
                 之前位置 = new();
                 TTS.TTS.Speak("12次退出");
                 var 当前英雄 = "";
-                Common.HeroLoopHost!.Ui?.Invoke(() =>
+                _ui.Invoke(() =>
                 {
-                    当前英雄 = Common.HeroLoopHost!.Ui.GetText(UiField.Name).Trim();
+                    当前英雄 = _ui.GetText(UiField.Name).Trim();
                 });
                 if (当前英雄 == "飞机")
                 {
@@ -75,7 +98,7 @@ namespace Dota2Simulator.Games.Dota2.Silt
             else
             {
                 var 描述 = PaddleOCR.获取图片文字(GlobalScreenCapture.GetCurrentHandle(), new Rectangle(730, 503, 71, 39)).Trim();
-                // Common.HeroLoopHost!.Ui?.Invoke(() => Common.HeroLoopHost!.Ui.SetText(UiField.阵营, 描述));
+                // _ui.Invoke(() => _ui.SetText(UiField.阵营, 描述));
                 if (ImageFinder.FindImageInRegionBool(Dota2_Pictrue.Silt.选择天赋, GlobalScreenCapture.GetCurrentHandle(), RPG选择技能范围)
                     && ImageFinder.FindImageInRegionBool(Dota2_Pictrue.Silt.普通天赋, GlobalScreenCapture.GetCurrentHandle(), RPG第一技能金))
                 {
@@ -91,7 +114,7 @@ namespace Dota2Simulator.Games.Dota2.Silt
                 }
             }
 
-            static void 跳过重新选择()
+            void 跳过重新选择()
             {
                 SimKeyBoard.MouseMove(768, 674);
                 Common.Delay(10);
@@ -110,7 +133,7 @@ namespace Dota2Simulator.Games.Dota2.Silt
         }
 
 
-        public static void 自动屏蔽3个选项(in ImageHandle 句柄)
+        public void 自动屏蔽3个选项(in ImageHandle 句柄)
         {
             if (ImageFinder.FindImageInRegionBool(Dota2_Pictrue.Silt.选择天赋, GlobalScreenCapture.GetCurrentHandle(), RPG选择技能范围))
             {
@@ -139,7 +162,7 @@ namespace Dota2Simulator.Games.Dota2.Silt
                 SimKeyBoard.MouseMove(p);
             }
         }
-        public static void 点击黑皇(in ImageHandle 句柄)
+        public void 点击黑皇(in ImageHandle 句柄)
         {
             var p = Control.MousePosition;
             SimKeyBoard.MouseMove(40, 500);
@@ -149,7 +172,7 @@ namespace Dota2Simulator.Games.Dota2.Silt
             SimKeyBoard.MouseMove(p);
         }
 
-        public static void 点击暴击(in ImageHandle 句柄)
+        public void 点击暴击(in ImageHandle 句柄)
         {
             var p = Control.MousePosition;
             SimKeyBoard.MouseMove(40, 580);
@@ -360,7 +383,7 @@ namespace Dota2Simulator.Games.Dota2.Silt
             }
         }
 
-        public static void 测试识别(in ImageHandle 句柄)
+        public void 测试识别(in ImageHandle 句柄)
         {
             var rustResults = GlobalScreenCapture.FindAllImages(Dota2_Pictrue.Silt.钢毛后背, 0.9, 100, 10);
             var string1 = "";
@@ -378,19 +401,19 @@ namespace Dota2Simulator.Games.Dota2.Silt
                 SimKeyBoard.MouseMove(b_skip);
                 Common.Delay(500);
             }
-            Common.HeroLoopHost!.Ui?.Invoke(() => Common.HeroLoopHost!.Ui.SetText(UiField.阵营, string1));
+            _ui.Invoke(() => _ui.SetText(UiField.阵营, string1));
             TTS.TTS.Speak("完成");
             // Tts.Speak(PaddleOCR.获取图片文字(in 句柄, new Rectangle(620, 437, 120, 40)));
         }
 
-        public static void 沙王自动选择(in ImageHandle gameHandle)
+        public void 沙王自动选择(in ImageHandle gameHandle)
         {
             var p = Control.MousePosition;
             TalentSelectionExamples.ExecuteHeroSelection("沙王", gameHandle);
             SimKeyBoard.MouseMove(p);
         }
 
-        public static void 初始化天赋选择(in ImageHandle gameHandle)
+        public void 初始化天赋选择(in ImageHandle gameHandle)
         {
         }
     }
