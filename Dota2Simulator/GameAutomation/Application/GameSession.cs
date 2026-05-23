@@ -70,9 +70,18 @@ public sealed class GameSession : IGameSession
                 // 重复 key 由 LazyImageLoader 内 ConcurrentDictionary<Lazy<ImageHandle>> 防御零代价.
                 if (PictureHeroPreloadHints.Hints.TryGetValue(hero.Name, out var preloadKeys) && preloadKeys.Length > 0)
                 {
+                    // Phase 10D #10: log tag 统一 [Preload] → [LazyLoad] (与 LazyImageLoader.cs 核心模块对齐).
                     _ = LazyImageLoader.PreloadImagesAsync(preloadKeys).ContinueWith(
-                        t => Console.WriteLine($"[Preload] {hero.Name} 失败: {t.Exception?.GetBaseException().Message}"),
+                        t => Console.WriteLine($"[LazyLoad] {hero.Name} 预加载失败: {t.Exception?.GetBaseException().Message}"),
                         TaskContinuationOptions.OnlyOnFaulted);
+                }
+                else
+                {
+                    // Phase 10D #8: PreloadHints hero key 一致性 runtime warning —
+                    // hero.Name 与 Strategy 文件名 stem 字符串约定耦合 (SG PictureHeroPreloadGenerator 派生),
+                    // miss 路径过去静默. 此处加 Trace.WriteLine 兜底, 便于排查 tb_name 输入笔误 / SG 漂移 / 新英雄漏 Strategy.
+                    // 仅 Trace 不 Console (避免污染 LazyLoad / Preload 主链路 log), 不抛 (与 LazyImageLoader.LoadImageCore 容错风格一致).
+                    System.Diagnostics.Trace.WriteLine($"[Preload-miss] hero={hero.Name} not in PreloadHints.Hints (Strategy 文件名 stem 集合不含此 key)");
                 }
             }
 
