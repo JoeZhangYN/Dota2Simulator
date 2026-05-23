@@ -3,6 +3,7 @@
 #if DOTA2
 
 using Collections.Pooled;
+using Dota2Simulator.GameAutomation.Ports;
 using Dota2Simulator.Vision;
 using Dota2Simulator.KeyboardMouse;
 using System;
@@ -1578,7 +1579,7 @@ namespace Dota2Simulator.Games.Dota2
 
         public static Task 测试方法(int x, int y)
         {
-            if (Common.Main_Form == null) return Task.CompletedTask;
+            if (Common.UiInvoker is null) return Task.CompletedTask;
 
             long startTime = Common.获取当前时间毫秒();
 
@@ -1589,7 +1590,7 @@ namespace Dota2Simulator.Games.Dota2
             // 使用取消令牌控制循环寿命
             using var cts = new CancellationTokenSource();
             int 延迟 = 0;
-            Common.Main_Form.Invoke(() => { 延迟 = int.Parse(Common.Main_Form?.tb_状态抗性.Text.Trim(), CultureInfo.InvariantCulture); });
+            Common.UiInvoker.Invoke(() => { 延迟 = int.Parse(Common.UiInvoker.GetText(UiField.状态抗性).Trim(), CultureInfo.InvariantCulture); });
             cts.CancelAfter(延迟);
 
             try
@@ -1620,11 +1621,11 @@ namespace Dota2Simulator.Games.Dota2
             {
                 // 预期的取消，静默处理
             }
-            Common.Main_Form.Invoke(() =>
+            Common.UiInvoker.Invoke(() =>
             {
                 // 将结果转换为所需格式
-                Common.Main_Form.tb_x.Text = string.Join("|", colors.Select(c => $"{c.R},{c.G},{c.B}"));
-                Common.Main_Form.tb_y.Text = string.Join("|", longs.Select((c, index) => index == 0 ? c : c - longs[index - 1]));
+                Common.UiInvoker.SetText(UiField.X, string.Join("|", colors.Select(c => $"{c.R},{c.G},{c.B}")));
+                Common.UiInvoker.SetText(UiField.Y, string.Join("|", longs.Select((c, index) => index == 0 ? c : c - longs[index - 1])));
             });
 
             TTS.TTS.Speak("完成");
@@ -1635,7 +1636,7 @@ namespace Dota2Simulator.Games.Dota2
 
         public static async Task 捕捉颜色()
         {
-            if (Common.Main_Form == null) return;
+            if (Common.UiInvoker is null) return;
 
             long startTime = Common.获取当前时间毫秒();
 
@@ -1652,10 +1653,10 @@ namespace Dota2Simulator.Games.Dota2
             // 缓存当前选中的颜色键
             var selectedKey = "";
 
-            Common.Main_Form.Invoke(() =>
+            Common.UiInvoker.Invoke(() =>
             {
-                selectedKey = Common.Main_Form.tb_阵营.Text.Trim();
-                timeout = int.Parse(Common.Main_Form.tb_状态抗性.Text.Trim(), CultureInfo.InvariantCulture);
+                selectedKey = Common.UiInvoker.GetText(UiField.阵营).Trim();
+                timeout = int.Parse(Common.UiInvoker.GetText(UiField.状态抗性).Trim(), CultureInfo.InvariantCulture);
             });
 
             using var cts = new CancellationTokenSource(timeout);
@@ -1719,11 +1720,11 @@ namespace Dota2Simulator.Games.Dota2
                 // 预期的取消，静默处理
             }
 
-            Common.Main_Form.Invoke(() =>
+            Common.UiInvoker.Invoke(() =>
             {
                 // 将结果转换为所需格式
-                Common.Main_Form.tb_x.Text = string.Join("|", colors.Select(c => $"{c.R},{c.G},{c.B}"));
-                Common.Main_Form.tb_y.Text = string.Join("|", timestamps.Select((c, index) => index == 0 ? c : c - timestamps[index - 1]));
+                Common.UiInvoker.SetText(UiField.X, string.Join("|", colors.Select(c => $"{c.R},{c.G},{c.B}")));
+                Common.UiInvoker.SetText(UiField.Y, string.Join("|", timestamps.Select((c, index) => index == 0 ? c : c - timestamps[index - 1])));
             });
 
             TTS.TTS.Speak("完成");

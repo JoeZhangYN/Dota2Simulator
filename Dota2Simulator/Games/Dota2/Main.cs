@@ -6,6 +6,7 @@ using Dota2Simulator.Vision;
 using Dota2Simulator.GameAutomation.Application;
 using Dota2Simulator.GameAutomation.Domain.Combat;
 using Dota2Simulator.GameAutomation.Domain.Loop;
+using Dota2Simulator.GameAutomation.Ports;
 using Dota2Simulator.KeyboardMouse;
 using System;
 using System.Collections.Generic;
@@ -473,7 +474,7 @@ namespace Dota2Simulator.Games.Dota2
 
             Item.保存当前物品();
 
-            Common.Main_Form?.Invoke(() => { Common.Main_Form.tb_y.Text = (Common.获取当前时间毫秒() - _聚合.Skills.Time(SlotKey.Global)).ToString(CultureInfo.InvariantCulture); });
+            Common.UiInvoker?.Invoke(() => Common.UiInvoker.SetText(UiField.Y, (Common.获取当前时间毫秒() - _聚合.Skills.Time(SlotKey.Global)).ToString(CultureInfo.InvariantCulture)));
 
             TTS.TTS.Speak("完成");
         }

@@ -3,6 +3,7 @@
 
 using Dota2Simulator.Vision;
 using Dota2Simulator.GameAutomation.Application;
+using Dota2Simulator.GameAutomation.Ports;
 using Dota2Simulator.KeyboardMouse;
 using System;
 using System.Collections.Generic;
@@ -766,9 +767,9 @@ namespace Dota2Simulator.Games.Dota2
             物品信息 物品 = 物品4;
 
             // 根据阵营设置456,设置物品456
-            Common.Main_Form?.Invoke(() =>
+            Common.UiInvoker?.Invoke(() =>
             {
-                物品 = Common.Main_Form.tb_阵营.Text switch
+                物品 = Common.UiInvoker.GetText(UiField.阵营) switch
                 {
                     "4" => 物品4,
                     "5" => 物品5,
