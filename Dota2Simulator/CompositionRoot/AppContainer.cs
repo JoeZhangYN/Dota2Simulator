@@ -61,6 +61,8 @@ internal sealed class AppContainer
         HeroLoopHost = new HeroLoopHost(Input, Vision, Ui, Aggregate, SessionState, skill, item);
         // Phase 11 P3: ItemEngine 4 处反向 HeroLoopHost 经 BindHost setter 注入 (取消所有功能 / 按键匹配条件更新 / 获取图片_2).
         item.BindHost(HeroLoopHost);
+        // Phase 11 P4: SkillEngine 2 处反向 HeroLoopHost 经 BindHost setter 注入 (测试方法 / 捕捉颜色 的获取图片_2).
+        skill.BindHost(HeroLoopHost);
         // Common.ItemEngine 保留 (P9 真删): Silt/Main.cs:29/34 仍 2 处反向 (Silt instance 化 P6 处理).
         Common.ItemEngine = item;
         // Common.HeroLoopHost 保留：Silt 子 BC 经 Common.HeroLoopHost.Ui 访问 UI

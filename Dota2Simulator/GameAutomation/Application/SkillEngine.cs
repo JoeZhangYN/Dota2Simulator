@@ -55,6 +55,8 @@ namespace Dota2Simulator.GameAutomation.Application
 
         // Phase 11 P2: setter 注入消反向 service locator (SkillEngine ctor 先于 ItemEngine, 不能 ctor 注 Item).
         private ItemEngine? _item;
+        // Phase 11 P4: 同模式 setter 注入 (SkillEngine ctor 先于 HeroLoopHost, HeroLoopHost ctor 接 skill).
+        private HeroLoopHost? _host;
 
         public SkillEngine(IInputExecutor input, IScreenVision vision, IUiInvoker ui, HeroAggregate aggregate)
         {
@@ -66,6 +68,9 @@ namespace Dota2Simulator.GameAutomation.Application
 
         /// <summary>Phase 11 P2: 由 AppContainer.BindUi 在 ItemEngine new 后调用回填. 调用发生在 BindUi 一次性装配内, 后续 method 调时 _item 已注入.</summary>
         internal void BindItem(ItemEngine item) => _item = item;
+
+        /// <summary>Phase 11 P4: 由 AppContainer.BindUi 在 HeroLoopHost new 后调用回填.</summary>
+        internal void BindHost(HeroLoopHost host) => _host = host;
 
         #region 模块化技能
 
@@ -1628,7 +1633,7 @@ namespace Dota2Simulator.GameAutomation.Application
                 // 主循环：定期发送时间戳触发屏幕捕获
                 while (!cts.IsCancellationRequested)
                 {
-                    _ = Common.HeroLoopHost!.获取图片_2();
+                    _ = _host!.获取图片_2();
 
                     var color = GlobalScreenCapture.GetColor(x, y);
 
@@ -1699,7 +1704,7 @@ namespace Dota2Simulator.GameAutomation.Application
                 while (!cts.IsCancellationRequested)
                 {
                     // 截图并赋值数组
-                    Common.HeroLoopHost!.获取图片_2();
+                    _host!.获取图片_2();
 
                     // 并行获取所有颜色并缓存结果
                     await Task.Run(() =>
