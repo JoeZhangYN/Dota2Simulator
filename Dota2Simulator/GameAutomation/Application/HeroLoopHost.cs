@@ -58,6 +58,10 @@ namespace Dota2Simulator.GameAutomation.Application
         /// <summary>会话级共享状态——ItemEngine.cs:61/62 等切 `_main.Session.IsPaused` 用。</summary>
         public SessionState Session => _session;
 
+        /// <summary>Phase 9 E：Silt 5 处 Common.UiInvoker → Common.HeroLoopHost!.Ui（service locator 桥，
+        /// Phase 11 Silt 子 BC instance 化时 Silt ctor 接 IUiInvoker，本属性可保留作 HeroLoopHost 内部 ui 出口）。</summary>
+        public IUiInvoker Ui => _ui;
+
         public HeroLoopHost(
             IInputExecutor input,
             IScreenVision vision,

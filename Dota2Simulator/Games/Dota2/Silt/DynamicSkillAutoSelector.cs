@@ -1,4 +1,4 @@
-﻿#if DOTA2
+#if DOTA2
 #if Silt
 
 using Dota2Simulator.GameAutomation.Ports;
@@ -1438,7 +1438,7 @@ namespace Dota2Simulator.Games.Dota2.Silt
             var resultText = report.ToDetailedString();
             resultText += report.DetailedLog;
 
-            Common.UiInvoker?.Invoke(() => Common.UiInvoker.SetText(UiField.阵营, resultText));
+            Common.HeroLoopHost!.Ui?.Invoke(() => Common.HeroLoopHost!.Ui.SetText(UiField.阵营, resultText));
 
             Console.WriteLine(resultText);
         }
