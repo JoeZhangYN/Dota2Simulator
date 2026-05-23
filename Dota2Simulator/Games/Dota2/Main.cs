@@ -27,29 +27,8 @@ namespace Dota2Simulator.Games.Dota2
     {
         #region 全局变量
 
-        /// dota 2 适配7.36 1920 * 1080 动态肖像 法线贴图 地面视差 主界面高画质 计算器渲染器 纹理、特效、阴影 中 渲染 70% 高级水面效果
-        /// 最主要就是主界面高画质,其他没事
-        private const int 截图模式1X = 671;
-        private const int 截图模式1Y = 727;
-        private const int 截图模式1W = 760;
-        private const int 截图模式1H = 346;
-        private static Rectangle 截图模式1Reg = new(截图模式1X, 截图模式1Y, 截图模式1W, 截图模式1H);
-
-        private const int 截图模式2X = 0;
-        private const int 截图模式2Y = 0;
-        private const int 截图模式2W = 1920;
-        private const int 截图模式2H = 1080;
-        private static Rectangle 截图模式2Reg = new(截图模式2X, 截图模式2Y, 截图模式2W, 截图模式2H);
-
-        private const int 等待延迟 = 33;
-
-
-
-        // 根据截图模式不同，用于判断技能 和 物品的具体x, y值随之变化 涉及到 全局假腿，技能位置，使用物品位置，判断神杖、魔晶 中立道具
-        public static int 坐标偏移x;
-        public static int 坐标偏移y;
-
-
+        // Phase 9 B：截图模式 / 坐标偏移 / 等待延迟 const 迁 GameAutomation.Domain.GameLayout。
+        // 各 Strategy 内若用 `等待延迟` 已 local 复刻。
 
         public static readonly Dictionary<Keys, Action> 按键匹配条件更新 = new()
         {
@@ -71,25 +50,7 @@ namespace Dota2Simulator.Games.Dota2
         // 创建全局截图缓冲区
         private static byte[] _initialData = new byte[1920 * 1080 * 4];
 
-        /// <summary>
-        ///     1080p 增益状态栏 
-        ///     <para>12个buff最多 单buff36像素 间隔9像素</para> 962, 857, 526, 80
-        ///     <para>升级框会改变buff位置</para>
-        /// </summary>
-        private static Rectangle buff状态技能栏 = new(962, 826, 526, 80);
-
-        /// <summary>
-        ///     1080p 增益状态栏 
-        ///     <para>12个buff最多 单buff36像素 间隔9像素</para> 962, 857, 526, 80
-        ///     <para>升级框会改变buff位置</para>
-        /// </summary>
-        private static Rectangle debuff状态技能栏 = new(435, 826, 526, 80);
-
-        /// <summary>
-        ///     1080p 命石范围 6技能最左738 4技能最右807 单个25*25大小
-        /// </summary>
-        private static Rectangle 命石区域 = new(738, 945, 70, 26);
-
+        // Phase 9 B：buff/debuff/命石 Rectangle 在 Main.cs 内 0 使用（各 Strategy 已 local 复刻），整块砍。
 
         /// <summary>
         ///     用于记录缓存全局图像句柄
@@ -141,7 +102,7 @@ namespace Dota2Simulator.Games.Dota2
 
         public static Color 获取指定位置颜色(int x, int y, in ImageHandle 句柄)
         {
-            return ImageManager.GetColor(in 句柄, x - 坐标偏移x, y - 坐标偏移y);
+            return ImageManager.GetColor(in 句柄, x - GameLayout.OffsetX, y - GameLayout.OffsetY);
         }
 
         #endregion
@@ -442,14 +403,14 @@ namespace Dota2Simulator.Games.Dota2
             return await Task.FromResult(true).ConfigureAwait(true);
             */
 
-            执行屏幕捕捉捕捉(截图模式1Reg);
+            执行屏幕捕捉捕捉(GameLayout.截图模式1Reg);
 
             return true;
         }
 
         public static bool 获取图片_2()
         {
-            执行屏幕捕捉捕捉(截图模式2Reg);
+            执行屏幕捕捉捕捉(GameLayout.截图模式2Reg);
 
             return true;
 

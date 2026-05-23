@@ -325,7 +325,7 @@ namespace Dota2Simulator.GameAutomation.Application
 
         private static bool 判断物品状态(物品信息 物品, int 序号, in ImageHandle 句柄, Point 初始位置, Color 目标颜色, byte 颜色容差)
         {
-            Point 位置 = new(初始位置.X - Main.坐标偏移x, 初始位置.Y - Main.坐标偏移y);
+            Point 位置 = new(初始位置.X - GameLayout.OffsetX, 初始位置.Y - GameLayout.OffsetY);
 
             int 内部序号 = 序号;
             if (序号 >= 3)
@@ -341,7 +341,7 @@ namespace Dota2Simulator.GameAutomation.Application
 
         private static bool 判断物品状态(物品信息 物品, int 序号, in ImageHandle 句柄, Point 初始位置, Color[] 目标颜色, byte 颜色容差)
         {
-            Point 位置 = new(初始位置.X - Main.坐标偏移x, 初始位置.Y - Main.坐标偏移y);
+            Point 位置 = new(初始位置.X - GameLayout.OffsetX, 初始位置.Y - GameLayout.OffsetY);
 
             int 内部序号 = 序号;
             if (序号 >= 3)
@@ -594,8 +594,8 @@ namespace Dota2Simulator.GameAutomation.Application
             }
 
             物品信息 物品 = 根据技能数量获取物品信息(_aggregate.SkillCount);
-            int x = 位置.Value.X + Main.坐标偏移x;
-            int y = 位置.Value.Y + Main.坐标偏移y;
+            int x = 位置.Value.X + GameLayout.OffsetX;
+            int y = 位置.Value.Y + GameLayout.OffsetY;
 
             // 计算物品在物品栏中的索引
             int index = (int)Math.Floor((float)(x - 物品.物品最左侧x) / 物品.物品间隔x);
@@ -650,7 +650,7 @@ namespace Dota2Simulator.GameAutomation.Application
         {
             foreach (int xCoord in xCoords)
             {
-                var color = ImageManager.GetColor(in 句柄, xCoord - Main.坐标偏移x, yCoord - Main.坐标偏移y);
+                var color = ImageManager.GetColor(in 句柄, xCoord - GameLayout.OffsetX, yCoord - GameLayout.OffsetY);
                 if (ColorExtensions.ColorAEqualColorB(color, 技能点颜色, 1))
                 {
                     return true;

@@ -9,6 +9,7 @@
 #if DOTA2
 
 using Collections.Pooled;
+using Dota2Simulator.GameAutomation.Domain;
 using Dota2Simulator.GameAutomation.Domain.Actuation;
 using Dota2Simulator.GameAutomation.Ports;
 using Dota2Simulator.Games;
@@ -200,62 +201,62 @@ namespace Dota2Simulator.GameAutomation.Application
             switch (类型)
             {
                 case 技能类型.释放变色:
-                    x = 技能信息.释放变色位置x + offsetX - Main.坐标偏移x;
-                    y = 技能信息.释放变色位置y - Main.坐标偏移y;
+                    x = 技能信息.释放变色位置x + offsetX - GameLayout.OffsetX;
+                    y = 技能信息.释放变色位置y - GameLayout.OffsetY;
                     颜色 = default;
                     颜色容差 = 0;
                     break;
                 case 技能类型.图标CD:
-                    x = 技能信息.技能CD图标x + offsetX - Main.坐标偏移x;
-                    y = 技能信息.技能CD图标y - Main.坐标偏移y;
+                    x = 技能信息.技能CD图标x + offsetX - GameLayout.OffsetX;
+                    y = 技能信息.技能CD图标y - GameLayout.OffsetY;
                     颜色 = 技能信息.技能CD颜色;
                     颜色容差 = 技能信息.技能CD颜色容差;
                     break;
                 case 技能类型.法球:
-                    x = 技能信息.法球技能CD位置x + offsetX - Main.坐标偏移x;
-                    y = 技能信息.法球技能CD位置y - Main.坐标偏移y;
+                    x = 技能信息.法球技能CD位置x + offsetX - GameLayout.OffsetX;
+                    y = 技能信息.法球技能CD位置y - GameLayout.OffsetY;
                     颜色 = 技能信息.法球技能CD颜色;
                     颜色容差 = 技能信息.法球技能颜色容差;
                     break;
                 case 技能类型.状态:
-                    x = 技能信息.状态技能位置x + offsetX - Main.坐标偏移x;
-                    y = 技能信息.状态技能位置y - Main.坐标偏移y;
+                    x = 技能信息.状态技能位置x + offsetX - GameLayout.OffsetX;
+                    y = 技能信息.状态技能位置y - GameLayout.OffsetY;
                     颜色 = 技能信息.技能状态激活颜色;
                     颜色容差 = 技能信息.技能状态激活颜色容差;
                     break;
                 case 技能类型.QWERDF图标:
-                    x = 技能信息.QWERDF位置x + offsetX - Main.坐标偏移x;
-                    y = 技能信息.QWERDF位置y - Main.坐标偏移y;
+                    x = 技能信息.QWERDF位置x + offsetX - GameLayout.OffsetX;
+                    y = 技能信息.QWERDF位置y - GameLayout.OffsetY;
                     颜色 = 技能信息.QWERDF框颜色;
                     颜色容差 = 技能信息.QWERDF框颜色容差;
                     break;
                 case 技能类型.被动技能存在:
-                    x = 技能信息.被动位置x + offsetX - Main.坐标偏移x;
-                    y = 技能信息.被动位置y - Main.坐标偏移y;
+                    x = 技能信息.被动位置x + offsetX - GameLayout.OffsetX;
+                    y = 技能信息.被动位置y - GameLayout.OffsetY;
                     颜色 = 技能信息.未学被动技能颜色;
                     颜色容差 = 技能信息.未学被动技能颜色容差;
                     break;
                 case 技能类型.破坏被动技能:
-                    x = 技能信息.被动位置x + offsetX - Main.坐标偏移x;
-                    y = 技能信息.被动位置y - Main.坐标偏移y;
+                    x = 技能信息.被动位置x + offsetX - GameLayout.OffsetX;
+                    y = 技能信息.被动位置y - GameLayout.OffsetY;
                     颜色 = 技能信息.破坏被动技能颜色;
                     颜色容差 = 技能信息.破坏被动技能颜色容差;
                     break;
                 case 技能类型.未学主动技能:
-                    x = 技能信息.技能CD图标x + offsetX - Main.坐标偏移x;
-                    y = 技能信息.技能CD图标y - Main.坐标偏移y;
+                    x = 技能信息.技能CD图标x + offsetX - GameLayout.OffsetX;
+                    y = 技能信息.技能CD图标y - GameLayout.OffsetY;
                     颜色 = 技能信息.未学主动技能CD颜色;
                     颜色容差 = 技能信息.未学主动技能CD颜色容差;
                     break;
                 case 技能类型.未学法球技能:
-                    x = 技能信息.法球技能CD位置x + offsetX - Main.坐标偏移x;
-                    y = 技能信息.法球技能CD位置y - Main.坐标偏移y;
+                    x = 技能信息.法球技能CD位置x + offsetX - GameLayout.OffsetX;
+                    y = 技能信息.法球技能CD位置y - GameLayout.OffsetY;
                     颜色 = 技能信息.未学法球技能CD颜色;
                     颜色容差 = 技能信息.未学法球技能CD颜色容差;
                     break;
                 case 技能类型.推荐学习技能:
-                    x = 技能信息.状态技能位置x + offsetX - Main.坐标偏移x;
-                    y = 技能信息.状态技能位置y - Main.坐标偏移y;
+                    x = 技能信息.状态技能位置x + offsetX - GameLayout.OffsetX;
+                    y = 技能信息.状态技能位置y - GameLayout.OffsetY;
                     颜色 = 技能信息.推荐学习技能颜色;
                     颜色容差 = 技能信息.推荐学习技能颜色容差;
                     break;
@@ -448,11 +449,11 @@ namespace Dota2Simulator.GameAutomation.Application
             if (整体有匹配)
             {
                 // 如果有匹配，输出所有检测点的信息
-                调试信息.AppendLine($"{i + 1} QWERDF图标 :位置X:{检测结果[0].位置.X + Main.坐标偏移x},位置Y:{检测结果[0].位置.Y + Main.坐标偏移y}，RGB:{检测结果[0].颜色.R}, {检测结果[0].颜色.G}, {检测结果[0].颜色.B}");
-                调试信息.AppendLine($"{i + 1} 技能CD图标 :位置X:{检测结果[1].位置.X + Main.坐标偏移x},位置Y:{检测结果[1].位置.Y + Main.坐标偏移y}，RGB:{检测结果[1].颜色.R}, {检测结果[1].颜色.G}, {检测结果[1].颜色.B}。");
-                调试信息.AppendLine($"{i + 1} 技能法球 :位置X:{检测结果[2].位置.X + Main.坐标偏移x},位置Y:{检测结果[2].位置.Y + Main.坐标偏移y}，RGB:{检测结果[2].颜色.R}, {检测结果[2].颜色.G}, {检测结果[2].颜色.B}。");
-                调试信息.AppendLine($"{i + 1} 被动技能 :位置X:{检测结果[3].位置.X + Main.坐标偏移x},位置Y:{检测结果[3].位置.Y + Main.坐标偏移y}，RGB:{检测结果[3].颜色.R}, {检测结果[3].颜色.G}, {检测结果[3].颜色.B}。");
-                调试信息.AppendLine($"{i + 1} 推荐技能 :位置X:{检测结果[4].位置.X + Main.坐标偏移x},位置Y:{检测结果[4].位置.Y + Main.坐标偏移y}，RGB:{检测结果[4].颜色.R}, {检测结果[4].颜色.G}, {检测结果[4].颜色.B}。");
+                调试信息.AppendLine($"{i + 1} QWERDF图标 :位置X:{检测结果[0].位置.X + GameLayout.OffsetX},位置Y:{检测结果[0].位置.Y + GameLayout.OffsetY}，RGB:{检测结果[0].颜色.R}, {检测结果[0].颜色.G}, {检测结果[0].颜色.B}");
+                调试信息.AppendLine($"{i + 1} 技能CD图标 :位置X:{检测结果[1].位置.X + GameLayout.OffsetX},位置Y:{检测结果[1].位置.Y + GameLayout.OffsetY}，RGB:{检测结果[1].颜色.R}, {检测结果[1].颜色.G}, {检测结果[1].颜色.B}。");
+                调试信息.AppendLine($"{i + 1} 技能法球 :位置X:{检测结果[2].位置.X + GameLayout.OffsetX},位置Y:{检测结果[2].位置.Y + GameLayout.OffsetY}，RGB:{检测结果[2].颜色.R}, {检测结果[2].颜色.G}, {检测结果[2].颜色.B}。");
+                调试信息.AppendLine($"{i + 1} 被动技能 :位置X:{检测结果[3].位置.X + GameLayout.OffsetX},位置Y:{检测结果[3].位置.Y + GameLayout.OffsetY}，RGB:{检测结果[3].颜色.R}, {检测结果[3].颜色.G}, {检测结果[3].颜色.B}。");
+                调试信息.AppendLine($"{i + 1} 推荐技能 :位置X:{检测结果[4].位置.X + GameLayout.OffsetX},位置Y:{检测结果[4].位置.Y + GameLayout.OffsetY}，RGB:{检测结果[4].颜色.R}, {检测结果[4].颜色.G}, {检测结果[4].颜色.B}。");
                 调试信息.AppendLine();
                 return (true, 调试信息.ToString());
             }
@@ -461,23 +462,23 @@ namespace Dota2Simulator.GameAutomation.Application
             // QWERDF图标
             if (!检测结果[0].匹配结果.Any(match => match))
             {
-                调试信息.AppendLine($"{i + 1} QWERDF图标 :位置X:{检测结果[0].位置.X + Main.坐标偏移x},位置Y:{检测结果[0].位置.Y + Main.坐标偏移y}，RGB:{检测结果[0].颜色.R}, {检测结果[0].颜色.G}, {检测结果[0].颜色.B}");
+                调试信息.AppendLine($"{i + 1} QWERDF图标 :位置X:{检测结果[0].位置.X + GameLayout.OffsetX},位置Y:{检测结果[0].位置.Y + GameLayout.OffsetY}，RGB:{检测结果[0].颜色.R}, {检测结果[0].颜色.G}, {检测结果[0].颜色.B}");
             }
             if (!检测结果[1].匹配结果.Any(match => match)) // 主动技能
             {
-                调试信息.AppendLine($"{i + 1} 技能CD图标 :位置X:{检测结果[1].位置.X + Main.坐标偏移x},位置Y:{检测结果[1].位置.Y + Main.坐标偏移y}，RGB:{检测结果[1].颜色.R}, {检测结果[1].颜色.G}, {检测结果[1].颜色.B}。");
+                调试信息.AppendLine($"{i + 1} 技能CD图标 :位置X:{检测结果[1].位置.X + GameLayout.OffsetX},位置Y:{检测结果[1].位置.Y + GameLayout.OffsetY}，RGB:{检测结果[1].颜色.R}, {检测结果[1].颜色.G}, {检测结果[1].颜色.B}。");
             }
             if (!检测结果[2].匹配结果.Any(match => match)) // 法球技能
             {
-                调试信息.AppendLine($"{i + 1} 技能法球 :位置X:{检测结果[2].位置.X + Main.坐标偏移x},位置Y:{检测结果[2].位置.Y + Main.坐标偏移y}，RGB:{检测结果[2].颜色.R}, {检测结果[2].颜色.G}, {检测结果[2].颜色.B}。");
+                调试信息.AppendLine($"{i + 1} 技能法球 :位置X:{检测结果[2].位置.X + GameLayout.OffsetX},位置Y:{检测结果[2].位置.Y + GameLayout.OffsetY}，RGB:{检测结果[2].颜色.R}, {检测结果[2].颜色.G}, {检测结果[2].颜色.B}。");
             }
             if (!检测结果[3].匹配结果.Any(match => match)) // 被动技能
             {
-                调试信息.AppendLine($"{i + 1} 被动技能 :位置X:{检测结果[3].位置.X + Main.坐标偏移x},位置Y:{检测结果[3].位置.Y + Main.坐标偏移y}，RGB:{检测结果[3].颜色.R}, {检测结果[3].颜色.G}, {检测结果[3].颜色.B}。");
+                调试信息.AppendLine($"{i + 1} 被动技能 :位置X:{检测结果[3].位置.X + GameLayout.OffsetX},位置Y:{检测结果[3].位置.Y + GameLayout.OffsetY}，RGB:{检测结果[3].颜色.R}, {检测结果[3].颜色.G}, {检测结果[3].颜色.B}。");
             }
             if (!检测结果[4].匹配结果.Any(match => match)) // 推荐技能
             {
-                调试信息.AppendLine($"{i + 1} 推荐技能 :位置X:{检测结果[4].位置.X + Main.坐标偏移x},位置Y:{检测结果[4].位置.Y + Main.坐标偏移y}，RGB:{检测结果[4].颜色.R}, {检测结果[4].颜色.G}, {检测结果[4].颜色.B}。");
+                调试信息.AppendLine($"{i + 1} 推荐技能 :位置X:{检测结果[4].位置.X + GameLayout.OffsetX},位置Y:{检测结果[4].位置.Y + GameLayout.OffsetY}，RGB:{检测结果[4].颜色.R}, {检测结果[4].颜色.G}, {检测结果[4].颜色.B}。");
                 调试信息.AppendLine();
             }
 
@@ -493,11 +494,11 @@ namespace Dota2Simulator.GameAutomation.Application
         {
             int 偏移 = 技能.技能间隔 * i;
 
-            Point p_QWERDF = new(技能.QWERDF位置x + 偏移 - Main.坐标偏移x, 技能.QWERDF位置y - Main.坐标偏移y);
-            Point p_主动 = new(技能.技能CD图标x + 偏移 - Main.坐标偏移x, 技能.技能CD图标y - Main.坐标偏移y);
-            Point p_法球 = new(技能.法球技能CD位置x + 偏移 - Main.坐标偏移x, 技能.法球技能CD位置y - Main.坐标偏移y);
-            Point p_被动 = new(技能.被动位置x + 偏移 - Main.坐标偏移x, 技能.被动位置y - Main.坐标偏移y);
-            Point p_推荐 = new(技能.状态技能位置x + 偏移 - Main.坐标偏移x, 技能.状态技能位置y - Main.坐标偏移y);
+            Point p_QWERDF = new(技能.QWERDF位置x + 偏移 - GameLayout.OffsetX, 技能.QWERDF位置y - GameLayout.OffsetY);
+            Point p_主动 = new(技能.技能CD图标x + 偏移 - GameLayout.OffsetX, 技能.技能CD图标y - GameLayout.OffsetY);
+            Point p_法球 = new(技能.法球技能CD位置x + 偏移 - GameLayout.OffsetX, 技能.法球技能CD位置y - GameLayout.OffsetY);
+            Point p_被动 = new(技能.被动位置x + 偏移 - GameLayout.OffsetX, 技能.被动位置y - GameLayout.OffsetY);
+            Point p_推荐 = new(技能.状态技能位置x + 偏移 - GameLayout.OffsetX, 技能.状态技能位置y - GameLayout.OffsetY);
 
             return
             [
@@ -798,7 +799,7 @@ namespace Dota2Simulator.GameAutomation.Application
         {
             int 偏移 = 获取技能位置偏移(技能位置, 技能信息);
 
-            Point p_主动 = new(技能信息.技能CD图标x + 偏移 - Main.坐标偏移x, 技能信息.技能CD图标y - Main.坐标偏移y);
+            Point p_主动 = new(技能信息.技能CD图标x + 偏移 - GameLayout.OffsetX, 技能信息.技能CD图标y - GameLayout.OffsetY);
 
             Color 获取的颜色_主动 = ImageManager.GetColor(in 句柄, p_主动);
 
