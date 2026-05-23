@@ -45,18 +45,32 @@ public sealed class HeroStrategyGenerator : IIncrementalGenerator
                         ? n
                         : symbol.Name; // fallback (理论不命中, defensive)
 
-                    // HeroAttribute enum field name (Strength/Agility/Intelligence/Universal)
+                    // Phase 10D #1: HeroAttribute enum field name 反查 — 改用 ITypeSymbol.GetMembers 取真 field name.
+                    // 替代旧数值 switch (0=Strength/1=Agility/2=Intelligence/3=Universal) 的健壮性提升:
+                    // (a) enum 插值 (在中间加项) 不再静默落 Universal bucket;
+                    // (b) enum 加新 bucket (如 Sentinel) 自动 emit 正确 name, 无需改 SG;
+                    // (c) 失败兜底 "Universal" 仅当 attribute 元数据极端损坏 (TypedConstant.Type 为 null), 不静默吞 enum 漂移.
                     string heroAttribute = "Universal";
-                    if (attr.ConstructorArguments.Length > 1 && attr.ConstructorArguments[1].Value is int enumValue)
+                    if (attr.ConstructorArguments.Length > 1)
                     {
-                        heroAttribute = enumValue switch
+                        var enumArg = attr.ConstructorArguments[1];
+                        if (enumArg.Type is INamedTypeSymbol enumType
+                            && enumType.TypeKind == TypeKind.Enum
+                            && enumArg.Value is not null)
                         {
-                            0 => "Strength",
-                            1 => "Agility",
-                            2 => "Intelligence",
-                            3 => "Universal",
-                            _ => "Universal",
-                        };
+                            // 在 enum type 内反查与数值匹配的 field name.
+                            foreach (var member in enumType.GetMembers())
+                            {
+                                if (member is IFieldSymbol field
+                                    && field.HasConstantValue
+                                    && field.ConstantValue is not null
+                                    && field.ConstantValue.Equals(enumArg.Value))
+                                {
+                                    heroAttribute = field.Name;
+                                    break;
+                                }
+                            }
+                        }
                     }
 
                     // RequiresUi 命名参数
