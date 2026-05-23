@@ -1,3 +1,4 @@
+#if DOTA2
 using Dota2Simulator.GameAutomation.Domain;
 using Dota2Simulator.GameAutomation.Domain.Combat;
 using Dota2Simulator.GameAutomation.Domain.Loop;
@@ -38,3 +39,5 @@ public sealed class HeroAggregate
         Conditions = new ConditionSlotSet(vision);
     }
 }
+
+#endif

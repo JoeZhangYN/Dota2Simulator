@@ -1,3 +1,4 @@
+#if DOTA2
 using System.Threading.Tasks;
 using Dota2Simulator.GameAutomation.Domain.Actuation;
 using Dota2Simulator.GameAutomation.Domain.Heroes;
@@ -20,3 +21,5 @@ public interface IHeroStrategy
     /// <summary>每次按键时调用——把按键映射为条件激活、技能释放等。</summary>
     Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx);
 }
+
+#endif

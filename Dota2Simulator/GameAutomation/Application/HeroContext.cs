@@ -1,3 +1,4 @@
+#if DOTA2
 using Dota2Simulator.GameAutomation.Domain.Heroes;
 
 namespace Dota2Simulator.GameAutomation.Application;
@@ -19,3 +20,5 @@ public sealed class HeroContext
         Aggregate = aggregate;
     }
 }
+
+#endif

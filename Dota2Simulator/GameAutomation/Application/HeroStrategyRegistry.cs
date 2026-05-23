@@ -1,3 +1,4 @@
+#if DOTA2
 using System;
 using System.Collections.Generic;
 using Dota2Simulator.GameAutomation.Ports;
@@ -57,3 +58,5 @@ public sealed partial class HeroStrategyRegistry
     partial void RegisterIntelligence(IInputExecutor input, IScreenVision vision, SkillEngine skill, ItemEngine item, HeroLoopHost main);
     partial void RegisterUniversal(IInputExecutor input, IScreenVision vision, SkillEngine skill, ItemEngine item, HeroLoopHost main);
 }
+
+#endif
