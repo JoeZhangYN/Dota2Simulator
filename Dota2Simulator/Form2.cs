@@ -182,7 +182,7 @@ namespace Dota2Simulator
         public Form2()
         {
             // Phase 10A Chunk C R2 时序实测 - 与 [ModuleInit] 时间戳对照确认 SHA1 manifest 注册早于 Form2.ctor
-            Console.WriteLine($"[Form2.Load] {DateTime.Now.Ticks}");
+            Console.WriteLine($"[Form2.ctor] {DateTime.Now.Ticks}");
 
             InitializeComponent();
 
