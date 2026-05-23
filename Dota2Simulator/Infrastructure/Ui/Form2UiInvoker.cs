@@ -26,7 +26,17 @@ internal sealed class Form2UiInvoker : IUiInvoker
 
     public string GetText(UiField field) => Resolve(field).Text;
 
-    public void SetText(UiField field, string value) => Resolve(field).Text = value;
+    /// <summary>
+    /// Phase 8 A: 写场景异步化——内部走 BeginInvoke（Post 消息，不阻塞业务线程）。
+    /// 与 Invoke (Send 阻塞) 的差异: 调用返回时 UI 控件未必已更新（消息排队中）。
+    /// 用户判定（2026-05-23）TTS.Speak 抢跑 UI 渲染可接受——音频与 UI 渲染独立。
+    /// 25 调用方 0 改动，外层 Common.UiInvoker.Invoke 包裹现冗余但保留（不破坏行为）。
+    /// </summary>
+    public void SetText(UiField field, string value)
+    {
+        if (_form.IsDisposed) return;
+        _form.BeginInvoke(() => Resolve(field).Text = value);
+    }
 
     private TextBox Resolve(UiField field) => field switch
     {
