@@ -22,10 +22,14 @@ public sealed class 黑鸟Strategy : IHeroStrategy
     private readonly IScreenVision _vision;
 #pragma warning restore IDE0052
 
-    public 黑鸟Strategy(IInputExecutor input, IScreenVision vision)
+    private readonly SkillEngine _skill;
+    private readonly ItemEngine _item;
+    public 黑鸟Strategy(IInputExecutor input, IScreenVision vision, SkillEngine skill, ItemEngine item)
     {
         _input = input;
         _vision = vision;
+        _skill = skill;
+        _item = item;
     }
     public HeroId Hero => new("黑鸟", HeroAttribute.Intelligence);
 
@@ -45,7 +49,7 @@ public sealed class 黑鸟Strategy : IHeroStrategy
         }
         else if (key == VirtualKey.W)
         {
-            Item.根据图片使用物品(Dota2_Pictrue.物品.纷争);
+            _item.根据图片使用物品(Dota2_Pictrue.物品.纷争);
         }
         else if (key == VirtualKey.E)
         {
@@ -85,11 +89,11 @@ public sealed class 黑鸟Strategy : IHeroStrategy
             Common.Delay(time - 3000, Main._聚合.Skills.Time(SlotKey.W));
             if (!Main._session!.IsPaused)
             {
-                _ = Item.根据图片使用物品(Dota2_Pictrue.物品.陨星锤);
+                _ = _item.根据图片使用物品(Dota2_Pictrue.物品.陨星锤);
             }
         }
 
-        if (Skill.DOTA2判断技能是否CD(Keys.W, in 句柄))
+        if (_skill.DOTA2判断技能是否CD(Keys.W, in 句柄))
         {
             return await Task.FromResult(true).ConfigureAwait(true);
         }
@@ -105,7 +109,7 @@ public sealed class 黑鸟Strategy : IHeroStrategy
             _input.Press(VirtualKey.From(Keys.A));
         }
 
-        if (Skill.DOTA2判断技能是否CD(Keys.R, in 句柄))
+        if (_skill.DOTA2判断技能是否CD(Keys.R, in 句柄))
         {
             return await Task.FromResult(true).ConfigureAwait(true);
         }
@@ -116,7 +120,7 @@ public sealed class 黑鸟Strategy : IHeroStrategy
 
     private async Task<bool> 关接跳(ImageHandle 句柄)
     {
-        return Item.根据图片使用物品(Dota2_Pictrue.物品.跳刀) == 1
+        return _item.根据图片使用物品(Dota2_Pictrue.物品.跳刀) == 1
             ? await Task.FromResult(false).ConfigureAwait(true)
             : await Task.FromResult(true).ConfigureAwait(true);
     }

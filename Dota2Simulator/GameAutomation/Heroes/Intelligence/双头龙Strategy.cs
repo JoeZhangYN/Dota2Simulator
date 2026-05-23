@@ -23,10 +23,14 @@ public sealed class 双头龙Strategy : IHeroStrategy
     private readonly IScreenVision _vision;
 #pragma warning restore IDE0052
 
-    public 双头龙Strategy(IInputExecutor input, IScreenVision vision)
+    private readonly SkillEngine _skill;
+    private readonly ItemEngine _item;
+    public 双头龙Strategy(IInputExecutor input, IScreenVision vision, SkillEngine skill, ItemEngine item)
     {
         _input = input;
         _vision = vision;
+        _skill = skill;
+        _item = item;
     }
     public HeroId Hero => new("双头龙", HeroAttribute.Intelligence);
 
@@ -41,7 +45,7 @@ public sealed class 双头龙Strategy : IHeroStrategy
     public async Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)
     {
         VirtualKey key = trigger.Key;
-        await Item.根据按键判断技能释放前通用逻辑(new KeyEventArgs((Keys)key.ToNative())).ConfigureAwait(true);
+        await _item.根据按键判断技能释放前通用逻辑(new KeyEventArgs((Keys)key.ToNative())).ConfigureAwait(true);
 
         if (key == VirtualKey.Q)
         {
@@ -76,7 +80,7 @@ public sealed class 双头龙Strategy : IHeroStrategy
             return await Task.FromResult(false).ConfigureAwait(true);
         }
 
-        if (Skill.DOTA2判断技能是否CD(Keys.Q, in 句柄))
+        if (_skill.DOTA2判断技能是否CD(Keys.Q, in 句柄))
         {
             return await Task.FromResult(true).ConfigureAwait(true);
         }
@@ -100,7 +104,7 @@ public sealed class 双头龙Strategy : IHeroStrategy
             return await Task.FromResult(false).ConfigureAwait(true);
         }
 
-        if (Skill.DOTA2判断技能是否CD(Keys.W, in 句柄))
+        if (_skill.DOTA2判断技能是否CD(Keys.W, in 句柄))
         {
             return await Task.FromResult(true).ConfigureAwait(true);
         }
@@ -124,7 +128,7 @@ public sealed class 双头龙Strategy : IHeroStrategy
             return await Task.FromResult(false).ConfigureAwait(true);
         }
 
-        if (Skill.DOTA2判断技能是否CD(Keys.R, in 句柄))
+        if (_skill.DOTA2判断技能是否CD(Keys.R, in 句柄))
         {
             return await Task.FromResult(true).ConfigureAwait(true);
         }
@@ -135,13 +139,13 @@ public sealed class 双头龙Strategy : IHeroStrategy
 
     private async Task<bool> 吹风接冰封路径(ImageHandle 句柄)
     {
-        if (Item.根据图片使用物品(Dota2_Pictrue.物品.吹风) == 1)
+        if (_item.根据图片使用物品(Dota2_Pictrue.物品.吹风) == 1)
         {
             Common.Delay(等待延迟);
             return await Task.FromResult(true).ConfigureAwait(true);
         }
 
-        if (!ImageFinder.FindImageInRegionBool(Dota2_Pictrue.物品.吹风, in 句柄, Item.获取物品范围(Main._聚合.SkillCount)) && Main._聚合.Skills.Time(SlotKey.Global) == -1)
+        if (!ImageFinder.FindImageInRegionBool(Dota2_Pictrue.物品.吹风, in 句柄, ItemEngine.获取物品范围(Main._聚合.SkillCount)) && Main._聚合.Skills.Time(SlotKey.Global) == -1)
         {
             Main._聚合.Skills.SetTime(SlotKey.Global, Common.获取当前时间毫秒());
         }

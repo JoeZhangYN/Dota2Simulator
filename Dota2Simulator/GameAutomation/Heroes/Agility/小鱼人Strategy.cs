@@ -21,10 +21,14 @@ public sealed class 小鱼人Strategy : IHeroStrategy
     private readonly IScreenVision _vision;
 #pragma warning restore IDE0052
 
-    public 小鱼人Strategy(IInputExecutor input, IScreenVision vision)
+    private readonly SkillEngine _skill;
+    private readonly ItemEngine _item;
+    public 小鱼人Strategy(IInputExecutor input, IScreenVision vision, SkillEngine skill, ItemEngine item)
     {
         _input = input;
         _vision = vision;
+        _skill = skill;
+        _item = item;
     }
     public HeroId Hero => new("小鱼人", HeroAttribute.Agility);
 
@@ -43,7 +47,7 @@ public sealed class 小鱼人Strategy : IHeroStrategy
     public async Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)
     {
         VirtualKey key = trigger.Key;
-        await Item.根据按键判断技能释放前通用逻辑(new KeyEventArgs((Keys)key.ToNative())).ConfigureAwait(true);
+        await _item.根据按键判断技能释放前通用逻辑(new KeyEventArgs((Keys)key.ToNative())).ConfigureAwait(true);
 
         if (key == VirtualKey.From(Keys.F1))
         {
@@ -87,29 +91,29 @@ public sealed class 小鱼人Strategy : IHeroStrategy
 
     private async Task<bool> 黑暗契约去后摇(ImageHandle 句柄)
     {
-        return await Skill.技能通用判断(Keys.Q, 0).ConfigureAwait(true);
+        return await _skill.技能通用判断(Keys.Q, 0).ConfigureAwait(true);
     }
 
     private async Task<bool> 跳水去后摇(ImageHandle 句柄)
     {
         _ = Task.Run(() =>
         {
-            Skill.通用技能后续动作(是否保持假腿: false);
+            _skill.通用技能后续动作(是否保持假腿: false);
             Main._聚合.LegSwap.需要切假腿 = false;
             Common.Delay(200);
-            Item.要求保持假腿();
+            _item.要求保持假腿();
         });
         return await Task.FromResult(false).ConfigureAwait(true);
     }
 
     private async Task<bool> 深海护罩去后摇(ImageHandle 句柄)
     {
-        return await Skill.技能通用判断(Keys.D, 0).ConfigureAwait(true);
+        return await _skill.技能通用判断(Keys.D, 0).ConfigureAwait(true);
     }
 
     private async Task<bool> 暗影之舞去后摇(ImageHandle 句柄)
     {
-        return await Skill.技能通用判断(Keys.R, 0).ConfigureAwait(true);
+        return await _skill.技能通用判断(Keys.R, 0).ConfigureAwait(true);
     }
 }
 #endif

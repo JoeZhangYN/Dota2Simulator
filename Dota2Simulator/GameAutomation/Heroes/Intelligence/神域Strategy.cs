@@ -19,10 +19,14 @@ public sealed class 神域Strategy : IHeroStrategy
     private readonly IScreenVision _vision;
 #pragma warning restore IDE0052
 
-    public 神域Strategy(IInputExecutor input, IScreenVision vision)
+    private readonly SkillEngine _skill;
+    private readonly ItemEngine _item;
+    public 神域Strategy(IInputExecutor input, IScreenVision vision, SkillEngine skill, ItemEngine item)
     {
         _input = input;
         _vision = vision;
+        _skill = skill;
+        _item = item;
     }
     public HeroId Hero => new("神域", HeroAttribute.Intelligence);
 
@@ -37,7 +41,7 @@ public sealed class 神域Strategy : IHeroStrategy
     public async Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)
     {
         VirtualKey key = trigger.Key;
-        await Item.根据按键判断技能释放前通用逻辑(new KeyEventArgs((Keys)key.ToNative())).ConfigureAwait(true);
+        await _item.根据按键判断技能释放前通用逻辑(new KeyEventArgs((Keys)key.ToNative())).ConfigureAwait(true);
 
         if (key == VirtualKey.W)
         {
@@ -66,7 +70,7 @@ public sealed class 神域Strategy : IHeroStrategy
             // _input.Press(VirtualKey.From(Keys.A));
         }
 
-        if (Skill.DOTA2判断技能是否CD(Keys.W, in 句柄))
+        if (_skill.DOTA2判断技能是否CD(Keys.W, in 句柄))
         {
             return await Task.FromResult(true).ConfigureAwait(true);
         }
@@ -83,7 +87,7 @@ public sealed class 神域Strategy : IHeroStrategy
             // RightClick();
         }
 
-        if (Skill.DOTA2判断技能是否CD(Keys.E, in 句柄))
+        if (_skill.DOTA2判断技能是否CD(Keys.E, in 句柄))
         {
             return await Task.FromResult(true).ConfigureAwait(true);
         }
@@ -100,7 +104,7 @@ public sealed class 神域Strategy : IHeroStrategy
             // _input.Press(VirtualKey.From(Keys.A));
         }
 
-        if (Skill.DOTA2判断技能是否CD(Keys.R, in 句柄))
+        if (_skill.DOTA2判断技能是否CD(Keys.R, in 句柄))
         {
             return await Task.FromResult(true).ConfigureAwait(true);
         }
@@ -117,7 +121,7 @@ public sealed class 神域Strategy : IHeroStrategy
             // _input.Press(VirtualKey.From(Keys.A));
         }
 
-        if (Skill.DOTA2判断技能是否CD(Keys.D, in 句柄))
+        if (_skill.DOTA2判断技能是否CD(Keys.D, in 句柄))
         {
             return await Task.FromResult(true).ConfigureAwait(true);
         }

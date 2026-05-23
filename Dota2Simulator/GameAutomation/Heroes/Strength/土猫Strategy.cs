@@ -19,10 +19,14 @@ public sealed class 土猫Strategy : IHeroStrategy
     private readonly IScreenVision _vision;
 #pragma warning restore IDE0052
 
-    public 土猫Strategy(IInputExecutor input, IScreenVision vision)
+    private readonly SkillEngine _skill;
+    private readonly ItemEngine _item;
+    public 土猫Strategy(IInputExecutor input, IScreenVision vision, SkillEngine skill, ItemEngine item)
     {
         _input = input;
         _vision = vision;
+        _skill = skill;
+        _item = item;
     }
     public HeroId Hero => new("土猫", HeroAttribute.Strength);
 
@@ -36,7 +40,7 @@ public sealed class 土猫Strategy : IHeroStrategy
     public async Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)
     {
         VirtualKey key = trigger.Key;
-        await Item.根据按键判断技能释放前通用逻辑(new KeyEventArgs((Keys)key.ToNative())).ConfigureAwait(true);
+        await _item.根据按键判断技能释放前通用逻辑(new KeyEventArgs((Keys)key.ToNative())).ConfigureAwait(true);
 
         if (key == VirtualKey.Q)
         {
@@ -52,19 +56,19 @@ public sealed class 土猫Strategy : IHeroStrategy
         }
     }
 
-    private static async Task<bool> 巨石冲击去后摇(ImageHandle 句柄)
+    private async Task<bool> 巨石冲击去后摇(ImageHandle 句柄)
     {
-        return await Skill.技能通用判断(Keys.Q, 0).ConfigureAwait(true);
+        return await _skill.技能通用判断(Keys.Q, 0).ConfigureAwait(true);
     }
 
-    private static async Task<bool> 地磁之握去后摇(ImageHandle 句柄)
+    private async Task<bool> 地磁之握去后摇(ImageHandle 句柄)
     {
-        return await Skill.技能通用判断(Keys.E, 0).ConfigureAwait(true);
+        return await _skill.技能通用判断(Keys.E, 0).ConfigureAwait(true);
     }
 
-    private static async Task<bool> 磁化去后摇(ImageHandle 句柄)
+    private async Task<bool> 磁化去后摇(ImageHandle 句柄)
     {
-        return await Skill.技能通用判断(Keys.R, 1).ConfigureAwait(true);
+        return await _skill.技能通用判断(Keys.R, 1).ConfigureAwait(true);
     }
 }
 #endif

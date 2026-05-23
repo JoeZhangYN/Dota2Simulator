@@ -19,10 +19,14 @@ public sealed class 小仙女Strategy : IHeroStrategy
     private readonly IScreenVision _vision;
 #pragma warning restore IDE0052
 
-    public 小仙女Strategy(IInputExecutor input, IScreenVision vision)
+    private readonly SkillEngine _skill;
+    private readonly ItemEngine _item;
+    public 小仙女Strategy(IInputExecutor input, IScreenVision vision, SkillEngine skill, ItemEngine item)
     {
         _input = input;
         _vision = vision;
+        _skill = skill;
+        _item = item;
     }
     public HeroId Hero => new("小仙女", HeroAttribute.Intelligence);
 
@@ -34,7 +38,7 @@ public sealed class 小仙女Strategy : IHeroStrategy
     public async Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)
     {
         VirtualKey key = trigger.Key;
-        await Item.根据按键判断技能释放前通用逻辑(new KeyEventArgs((Keys)key.ToNative())).ConfigureAwait(true);
+        await _item.根据按键判断技能释放前通用逻辑(new KeyEventArgs((Keys)key.ToNative())).ConfigureAwait(true);
 
         if (key == VirtualKey.F)
         {
@@ -50,9 +54,9 @@ public sealed class 小仙女Strategy : IHeroStrategy
         }
     }
 
-    private static async Task<bool> 无限暗影之境(ImageHandle 句柄)
+    private async Task<bool> 无限暗影之境(ImageHandle 句柄)
     {
-        await Skill.技能通用判断(Keys.W, 2).ConfigureAwait(true);
+        await _skill.技能通用判断(Keys.W, 2).ConfigureAwait(true);
         return await Task.FromResult(Main._聚合.Conditions[ConditionSlotKey.C5].Active).ConfigureAwait(true);
     }
 }

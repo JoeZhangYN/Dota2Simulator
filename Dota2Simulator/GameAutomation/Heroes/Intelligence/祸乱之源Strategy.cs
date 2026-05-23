@@ -21,10 +21,14 @@ public sealed class 祸乱之源Strategy : IHeroStrategy
     private readonly IScreenVision _vision;
 #pragma warning restore IDE0052
 
-    public 祸乱之源Strategy(IInputExecutor input, IScreenVision vision)
+    private readonly SkillEngine _skill;
+    private readonly ItemEngine _item;
+    public 祸乱之源Strategy(IInputExecutor input, IScreenVision vision, SkillEngine skill, ItemEngine item)
     {
         _input = input;
         _vision = vision;
+        _skill = skill;
+        _item = item;
     }
     public HeroId Hero => new("祸乱之源", HeroAttribute.Intelligence);
 
@@ -40,70 +44,70 @@ public sealed class 祸乱之源Strategy : IHeroStrategy
         VirtualKey key = trigger.Key;
         if (key == VirtualKey.Q)
         {
-            Main._聚合.Conditions[ConditionSlotKey.C1].Active = true;
+          Main._聚合.Conditions[ConditionSlotKey.C1].Active = true;
         }
         else if (key == VirtualKey.W)
         {
-            Main._聚合.Conditions[ConditionSlotKey.C2].Active = true;
+          Main._聚合.Conditions[ConditionSlotKey.C2].Active = true;
         }
         else if (key == VirtualKey.E)
         {
-            Color 技能点颜色 = Color.FromArgb(203, 183, 124);
-            Main._聚合.Skills.SetTime(SlotKey.Global, 0);
-            if (ColorExtensions.ColorAEqualColorB(Main.获取指定位置颜色(971, 1008, GlobalScreenCapture.GetCurrentHandle()), 技能点颜色, 0))
+          Color 技能点颜色 = Color.FromArgb(203, 183, 124);
+          Main._聚合.Skills.SetTime(SlotKey.Global, 0);
+          if (ColorExtensions.ColorAEqualColorB(Main.获取指定位置颜色(971, 1008, GlobalScreenCapture.GetCurrentHandle()), 技能点颜色, 0))
             {
-                Main._聚合.Skills.SetTime(SlotKey.Global, 7000);
+              Main._聚合.Skills.SetTime(SlotKey.Global, 7000);
             }
-            else if (ColorExtensions.ColorAEqualColorB(Main.获取指定位置颜色(964, 1008, GlobalScreenCapture.GetCurrentHandle()), 技能点颜色, 0))
+          else if (ColorExtensions.ColorAEqualColorB(Main.获取指定位置颜色(964, 1008, GlobalScreenCapture.GetCurrentHandle()), 技能点颜色, 0))
             {
-                Main._聚合.Skills.SetTime(SlotKey.Global, 6000);
+              Main._聚合.Skills.SetTime(SlotKey.Global, 6000);
             }
-            else if (ColorExtensions.ColorAEqualColorB(Main.获取指定位置颜色(947, 1008, GlobalScreenCapture.GetCurrentHandle()), 技能点颜色, 0))
+          else if (ColorExtensions.ColorAEqualColorB(Main.获取指定位置颜色(947, 1008, GlobalScreenCapture.GetCurrentHandle()), 技能点颜色, 0))
             {
-                Main._聚合.Skills.SetTime(SlotKey.Global, 5000);
+              Main._聚合.Skills.SetTime(SlotKey.Global, 5000);
             }
-            else if (ColorExtensions.ColorAEqualColorB(Main.获取指定位置颜色(935, 1008, GlobalScreenCapture.GetCurrentHandle()), 技能点颜色, 0))
+          else if (ColorExtensions.ColorAEqualColorB(Main.获取指定位置颜色(935, 1008, GlobalScreenCapture.GetCurrentHandle()), 技能点颜色, 0))
             {
-                Main._聚合.Skills.SetTime(SlotKey.Global, 4000);
+              Main._聚合.Skills.SetTime(SlotKey.Global, 4000);
             }
 
-            Main._聚合.Conditions[ConditionSlotKey.C3].Active = true;
+          Main._聚合.Conditions[ConditionSlotKey.C3].Active = true;
         }
         else if (key == VirtualKey.From(Keys.D2))
         {
-            Main._聚合.Skills.ToggleMode(SlotKey.E);
-            TTS.TTS.Speak(Main._聚合.Skills.Mode(SlotKey.E) == 0 ? "睡不接陨星锤" : "睡接陨星锤");
+          Main._聚合.Skills.ToggleMode(SlotKey.E);
+          TTS.TTS.Speak(Main._聚合.Skills.Mode(SlotKey.E) == 0 ? "睡不接陨星锤" : "睡接陨星锤");
         }
 
         return Task.CompletedTask;
     }
 
-    private static async Task<bool> 虚弱去后摇(ImageHandle 句柄)
+    private async Task<bool> 虚弱去后摇(ImageHandle 句柄)
     {
-        static void 虚弱后()
+        void 虚弱后()
         {
-            Skill.通用技能后续动作(false);
+          _skill.通用技能后续动作(false);
         }
 
-        if (Skill.DOTA2判断技能是否CD(Keys.Q, in 句柄))
+        if (_skill.DOTA2判断技能是否CD(Keys.Q, in 句柄))
         {
-            return await Task.FromResult(true).ConfigureAwait(true);
+          return await Task.FromResult(true).ConfigureAwait(true);
         }
 
         虚弱后();
         return await Task.FromResult(false).ConfigureAwait(true);
     }
 
-    private static async Task<bool> 噬脑去后摇(ImageHandle 句柄)
+    private async Task<bool> 噬脑去后摇(ImageHandle 句柄)
     {
-        static void 噬脑后()
+        void 噬脑后()
         {
-            Skill.通用技能后续动作();
+          _skill.通用技能后续动作();
         }
 
-        if (Skill.DOTA2判断技能是否CD(Keys.W, in 句柄))
+        if (_skill.DOTA2判断技能是否CD(Keys.W, in 句柄))
         {
-            return await Task.FromResult(true).ConfigureAwait(true);
+          return await Task.FromResult(true).ConfigureAwait(true);
         }
 
         噬脑后();

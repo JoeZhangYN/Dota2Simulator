@@ -19,10 +19,14 @@ public sealed class 哈斯卡Strategy : IHeroStrategy
     private readonly IScreenVision _vision;
 #pragma warning restore IDE0052
 
-    public 哈斯卡Strategy(IInputExecutor input, IScreenVision vision)
+    private readonly SkillEngine _skill;
+    private readonly ItemEngine _item;
+    public 哈斯卡Strategy(IInputExecutor input, IScreenVision vision, SkillEngine skill, ItemEngine item)
     {
         _input = input;
         _vision = vision;
+        _skill = skill;
+        _item = item;
     }
     public HeroId Hero => new("哈斯卡", HeroAttribute.Strength);
 
@@ -36,7 +40,7 @@ public sealed class 哈斯卡Strategy : IHeroStrategy
     public async Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)
     {
         VirtualKey key = trigger.Key;
-        await Item.根据按键判断技能释放前通用逻辑(new KeyEventArgs((Keys)key.ToNative())).ConfigureAwait(true);
+        await _item.根据按键判断技能释放前通用逻辑(new KeyEventArgs((Keys)key.ToNative())).ConfigureAwait(true);
 
         if (key == VirtualKey.Q)
         {
@@ -50,16 +54,16 @@ public sealed class 哈斯卡Strategy : IHeroStrategy
 
     private async Task<bool> 心炎去后摇(ImageHandle 句柄)
     {
-        return await Skill.技能通用判断(Keys.W, 1).ConfigureAwait(true);
+        return await _skill.技能通用判断(Keys.W, 1).ConfigureAwait(true);
     }
 
     private async Task<bool> 牺牲去后摇(ImageHandle 句柄)
     {
-        return await Skill.主动技能释放后续(Keys.R, () =>
+        return await _skill.主动技能释放后续(Keys.R, () =>
         {
             _input.MouseClick(MouseButton.Right);
 
-            if (Skill.DOTA2释放CD就绪技能(Keys.Q, in 句柄))
+            if (_skill.DOTA2释放CD就绪技能(Keys.Q, in 句柄))
             {
                 return;
             }

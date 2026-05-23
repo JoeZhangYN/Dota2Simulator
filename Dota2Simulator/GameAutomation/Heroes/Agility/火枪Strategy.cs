@@ -20,10 +20,14 @@ public sealed class 火枪Strategy : IHeroStrategy
     private readonly IScreenVision _vision;
 #pragma warning restore IDE0052
 
-    public 火枪Strategy(IInputExecutor input, IScreenVision vision)
+    private readonly SkillEngine _skill;
+    private readonly ItemEngine _item;
+    public 火枪Strategy(IInputExecutor input, IScreenVision vision, SkillEngine skill, ItemEngine item)
     {
         _input = input;
         _vision = vision;
+        _skill = skill;
+        _item = item;
     }
     public HeroId Hero => new("火枪", HeroAttribute.Agility);
 
@@ -40,7 +44,7 @@ public sealed class 火枪Strategy : IHeroStrategy
     {
         VirtualKey key = trigger.Key;
         Main._聚合.LegSwap.配置.修改配置(Keys.D, Main._聚合.HasShard);
-        await Item.根据按键判断技能释放前通用逻辑(new KeyEventArgs((Keys)key.ToNative())).ConfigureAwait(true);
+        await _item.根据按键判断技能释放前通用逻辑(new KeyEventArgs((Keys)key.ToNative())).ConfigureAwait(true);
 
         if (key == VirtualKey.Q)
         {
@@ -60,29 +64,29 @@ public sealed class 火枪Strategy : IHeroStrategy
         }
     }
 
-    private static async Task<bool> 流霰弹去后摇(ImageHandle 句柄)
+    private async Task<bool> 流霰弹去后摇(ImageHandle 句柄)
     {
-        return await Skill.技能通用判断(Keys.Q, 1).ConfigureAwait(true);
+        return await _skill.技能通用判断(Keys.Q, 1).ConfigureAwait(true);
     }
 
-    private static async Task<bool> 瞄准去后摇(ImageHandle 句柄)
+    private async Task<bool> 瞄准去后摇(ImageHandle 句柄)
     {
-        return await Skill.主动技能进入CD后续(Keys.E, () =>
+        return await _skill.主动技能进入CD后续(Keys.E, () =>
         {
-            _ = Item.根据图片使用物品(Dota2_Pictrue.物品.疯狂面具);
+            _ = _item.根据图片使用物品(Dota2_Pictrue.物品.疯狂面具);
 
-            Skill.通用技能后续动作();
+            _skill.通用技能后续动作();
         }).ConfigureAwait(true);
     }
 
-    private static async Task<bool> 暗杀去后摇(ImageHandle 句柄)
+    private async Task<bool> 暗杀去后摇(ImageHandle 句柄)
     {
-        return await Skill.技能通用判断(Keys.R, 1).ConfigureAwait(true);
+        return await _skill.技能通用判断(Keys.R, 1).ConfigureAwait(true);
     }
 
-    private static async Task<bool> 震荡手雷去后摇(ImageHandle 句柄)
+    private async Task<bool> 震荡手雷去后摇(ImageHandle 句柄)
     {
-        return await Skill.技能通用判断(Keys.D, 1).ConfigureAwait(true);
+        return await _skill.技能通用判断(Keys.D, 1).ConfigureAwait(true);
     }
 }
 #endif

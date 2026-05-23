@@ -22,10 +22,14 @@ public sealed class 飞机Strategy : IHeroStrategy
     private readonly IScreenVision _vision;
 #pragma warning restore IDE0052
 
-    public 飞机Strategy(IInputExecutor input, IScreenVision vision)
+    private readonly SkillEngine _skill;
+    private readonly ItemEngine _item;
+    public 飞机Strategy(IInputExecutor input, IScreenVision vision, SkillEngine skill, ItemEngine item)
     {
         _input = input;
         _vision = vision;
+        _skill = skill;
+        _item = item;
     }
     public HeroId Hero => new("飞机", HeroAttribute.Agility);
 
@@ -41,7 +45,7 @@ public sealed class 飞机Strategy : IHeroStrategy
     public async Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)
     {
         VirtualKey key = trigger.Key;
-        await Item.根据按键判断技能释放前通用逻辑(new KeyEventArgs((Keys)key.ToNative())).ConfigureAwait(true);
+        await _item.根据按键判断技能释放前通用逻辑(new KeyEventArgs((Keys)key.ToNative())).ConfigureAwait(true);
 
         //if (key == VirtualKey.Q)
         //{
@@ -68,28 +72,28 @@ public sealed class 飞机Strategy : IHeroStrategy
 
     private async Task<bool> 火箭弹幕敏捷(ImageHandle 句柄)
     {
-        return await Skill.技能通用判断(Keys.Q, 0).ConfigureAwait(true);
+        return await _skill.技能通用判断(Keys.Q, 0).ConfigureAwait(true);
     }
 
     private async Task<bool> 追踪导弹敏捷(ImageHandle 句柄)
     {
-        return await Skill.技能通用判断(Keys.W, 0).ConfigureAwait(true);
+        return await _skill.技能通用判断(Keys.W, 0).ConfigureAwait(true);
     }
 
     private async Task<bool> 高射火炮敏捷(ImageHandle 句柄)
     {
-        return await Skill.技能通用判断(Keys.E, 0).ConfigureAwait(true);
+        return await _skill.技能通用判断(Keys.E, 0).ConfigureAwait(true);
     }
 
     private async Task<bool> 召唤飞弹敏捷(ImageHandle 句柄)
     {
-        return await Skill.技能通用判断(Keys.R, 1).ConfigureAwait(true);
+        return await _skill.技能通用判断(Keys.R, 1).ConfigureAwait(true);
     }
 
     private async Task<bool> 循环火箭弹幕(ImageHandle 句柄)
     {
         if (Common.获取当前时间毫秒() - Main._聚合.Skills.Time(SlotKey.Q) > 400)
-            await Skill.主动技能已就绪后续(Keys.Q, () =>
+            await _skill.主动技能已就绪后续(Keys.Q, () =>
             {
                 _input.Press(VirtualKey.From(Keys.Q));
                 Main._聚合.Skills.SetTime(SlotKey.Q, Common.获取当前时间毫秒());

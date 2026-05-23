@@ -71,7 +71,8 @@ internal sealed class AppContainer
         // C4 / C5: SkillEngine / ItemEngine 实例化（ctor 接 4 ports），桥接给 BC 内 facade。
         Common.SkillEngine = new SkillEngine(Input, Vision, Ui, Games.Dota2.Main._聚合);
         Common.ItemEngine = new ItemEngine(Input, Vision, Ui, Games.Dota2.Main._聚合);
-        Registry.RegisterAll(Ui);
+        // C7: Registry.RegisterAll 扩参，透传 SkillEngine / ItemEngine 给 92 策略 ctor。
+        Registry.RegisterAll(Ui, Common.SkillEngine, Common.ItemEngine);
     }
 }
 

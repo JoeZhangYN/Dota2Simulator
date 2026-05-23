@@ -33,7 +33,7 @@ using 技能类型 = Dota2Simulator.Games.Dota2.Skill.技能类型;
 
 namespace Dota2Simulator.GameAutomation.Application
 {
-    internal sealed class SkillEngine
+    public sealed class SkillEngine
     {
         private readonly IInputExecutor _input;
         private readonly IScreenVision _vision;

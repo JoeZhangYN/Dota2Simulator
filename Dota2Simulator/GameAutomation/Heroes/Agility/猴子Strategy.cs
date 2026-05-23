@@ -21,10 +21,14 @@ public sealed class 猴子Strategy : IHeroStrategy
     private readonly IScreenVision _vision;
 #pragma warning restore IDE0052
 
-    public 猴子Strategy(IInputExecutor input, IScreenVision vision)
+    private readonly SkillEngine _skill;
+    private readonly ItemEngine _item;
+    public 猴子Strategy(IInputExecutor input, IScreenVision vision, SkillEngine skill, ItemEngine item)
     {
         _input = input;
         _vision = vision;
+        _skill = skill;
+        _item = item;
     }
     public HeroId Hero => new("猴子", HeroAttribute.Agility);
 
@@ -40,11 +44,11 @@ public sealed class 猴子Strategy : IHeroStrategy
     public async Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)
     {
         VirtualKey key = trigger.Key;
-        await Item.根据按键判断技能释放前通用逻辑(new KeyEventArgs((Keys)key.ToNative())).ConfigureAwait(true);
+        await _item.根据按键判断技能释放前通用逻辑(new KeyEventArgs((Keys)key.ToNative())).ConfigureAwait(true);
 
         if (key == VirtualKey.Q)
         {
-            if (!Skill.DOTA2判断状态技能是否启动(Keys.E, GlobalScreenCapture.GetCurrentHandle()))
+            if (!_skill.DOTA2判断状态技能是否启动(Keys.E, GlobalScreenCapture.GetCurrentHandle()))
             {
                 _input.Press(VirtualKey.From(Keys.E));
             }
@@ -53,7 +57,7 @@ public sealed class 猴子Strategy : IHeroStrategy
         }
         else if (key == VirtualKey.W)
         {
-            if (!Skill.DOTA2判断状态技能是否启动(Keys.E, GlobalScreenCapture.GetCurrentHandle()))
+            if (!_skill.DOTA2判断状态技能是否启动(Keys.E, GlobalScreenCapture.GetCurrentHandle()))
             {
                 _input.Press(VirtualKey.From(Keys.E));
             }
@@ -62,7 +66,7 @@ public sealed class 猴子Strategy : IHeroStrategy
         }
         else if (key == VirtualKey.R)
         {
-            if (!Skill.DOTA2判断状态技能是否启动(Keys.E, GlobalScreenCapture.GetCurrentHandle()))
+            if (!_skill.DOTA2判断状态技能是否启动(Keys.E, GlobalScreenCapture.GetCurrentHandle()))
             {
                 _input.Press(VirtualKey.From(Keys.E));
             }
@@ -71,19 +75,19 @@ public sealed class 猴子Strategy : IHeroStrategy
 
     private async Task<bool> 灵魂之矛敏捷(ImageHandle 句柄)
     {
-        return await Skill.技能通用判断(Keys.Q, 1).ConfigureAwait(true);
+        return await _skill.技能通用判断(Keys.Q, 1).ConfigureAwait(true);
     }
 
     private async Task<bool> 神行百变选择幻象(ImageHandle 句柄)
     {
-        return await Skill.主动技能释放后续(Keys.W, () =>
+        return await _skill.主动技能释放后续(Keys.W, () =>
         {
             Common.Delay(1000);
             _input.Press(VirtualKey.From(Keys.D1));
             Common.Delay(33);
             _input.MouseClick(MouseButton.Right);
             _input.Press(VirtualKey.From(Keys.F1));
-            Item.要求保持假腿();
+            _item.要求保持假腿();
         }).ConfigureAwait(true);
     }
 }

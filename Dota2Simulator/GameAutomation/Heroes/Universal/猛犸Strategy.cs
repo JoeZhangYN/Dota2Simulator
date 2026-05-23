@@ -26,10 +26,14 @@ public sealed class 猛犸Strategy : IHeroStrategy
     private readonly IScreenVision _vision;
 #pragma warning restore IDE0052
 
-    public 猛犸Strategy(IInputExecutor input, IScreenVision vision)
+    private readonly SkillEngine _skill;
+    private readonly ItemEngine _item;
+    public 猛犸Strategy(IInputExecutor input, IScreenVision vision, SkillEngine skill, ItemEngine item)
     {
         _input = input;
         _vision = vision;
+        _skill = skill;
+        _item = item;
     }
     public HeroId Hero => new("猛犸", HeroAttribute.Universal);
 
@@ -45,7 +49,7 @@ public sealed class 猛犸Strategy : IHeroStrategy
     public async Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)
     {
         VirtualKey key = trigger.Key;
-        await Item.根据按键判断技能释放前通用逻辑(new KeyEventArgs((Keys)key.ToNative())).ConfigureAwait(true);
+        await _item.根据按键判断技能释放前通用逻辑(new KeyEventArgs((Keys)key.ToNative())).ConfigureAwait(true);
 
         if (key == VirtualKey.Q)
         {
@@ -81,7 +85,7 @@ public sealed class 猛犸Strategy : IHeroStrategy
     {
         void 震荡波后()
         {
-            Skill.通用技能后续动作();
+            _skill.通用技能后续动作();
         }
 
         震荡波后();
@@ -92,7 +96,7 @@ public sealed class 猛犸Strategy : IHeroStrategy
     {
         void 授予力量后()
         {
-            Skill.通用技能后续动作();
+            _skill.通用技能后续动作();
         }
 
         授予力量后();
@@ -103,7 +107,7 @@ public sealed class 猛犸Strategy : IHeroStrategy
     {
         void 巨角冲撞后()
         {
-            Skill.通用技能后续动作();
+            _skill.通用技能后续动作();
         }
 
         巨角冲撞后();
@@ -114,7 +118,7 @@ public sealed class 猛犸Strategy : IHeroStrategy
     {
         void 长角抛物后()
         {
-            Skill.通用技能后续动作();
+            _skill.通用技能后续动作();
         }
 
         长角抛物后();
@@ -125,7 +129,7 @@ public sealed class 猛犸Strategy : IHeroStrategy
     {
         void 两级反转后()
         {
-            Skill.通用技能后续动作();
+            _skill.通用技能后续动作();
         }
 
         两级反转后();

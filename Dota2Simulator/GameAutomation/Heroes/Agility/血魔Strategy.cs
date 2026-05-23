@@ -23,10 +23,14 @@ public sealed class 血魔Strategy : IHeroStrategy
     private readonly IScreenVision _vision;
 #pragma warning restore IDE0052
 
-    public 血魔Strategy(IInputExecutor input, IScreenVision vision)
+    private readonly SkillEngine _skill;
+    private readonly ItemEngine _item;
+    public 血魔Strategy(IInputExecutor input, IScreenVision vision, SkillEngine skill, ItemEngine item)
     {
         _input = input;
         _vision = vision;
+        _skill = skill;
+        _item = item;
     }
     public HeroId Hero => new("血魔", HeroAttribute.Agility);
 
@@ -43,7 +47,7 @@ public sealed class 血魔Strategy : IHeroStrategy
         VirtualKey key = trigger.Key;
         KeyEventArgs e = new((Keys)key.ToNative() | ConvertModifiers(trigger.Modifiers));
 
-        await Item.根据按键判断技能释放前通用逻辑(e).ConfigureAwait(true);
+        await _item.根据按键判断技能释放前通用逻辑(e).ConfigureAwait(true);
 
         if (e.KeyValue == (int)Keys.Q && (int)e.Modifiers == (int)Keys.Alt)
         {
@@ -76,17 +80,17 @@ public sealed class 血魔Strategy : IHeroStrategy
 
     private async Task<bool> 血祭去后摇(ImageHandle 句柄)
     {
-        return await Skill.主动技能释放后续(Keys.W, () =>
+        return await _skill.主动技能释放后续(Keys.W, () =>
         {
             _input.MouseClick(MouseButton.Right);
             _input.Press(VirtualKey.From(Keys.A));
 
-            Item.要求保持假腿();
+            _item.要求保持假腿();
 
             Common.Delay(2400);
             Point p = Control.MousePosition;
             _input.MouseMoveTo(new ScreenPoint(601, 988));
-            if (Skill.DOTA2释放CD就绪技能(Keys.Q, in 句柄))
+            if (_skill.DOTA2释放CD就绪技能(Keys.Q, in 句柄))
             {
                 _input.MouseMoveTo(new ScreenPoint(p.X, p.Y));
             }
@@ -95,12 +99,12 @@ public sealed class 血魔Strategy : IHeroStrategy
 
     private async Task<bool> 割裂去后摇(ImageHandle 句柄)
     {
-        return await Skill.技能通用判断(Keys.R, 1).ConfigureAwait(true);
+        return await _skill.技能通用判断(Keys.R, 1).ConfigureAwait(true);
     }
 
     private async Task<bool> 血怒去后摇(ImageHandle 句柄)
     {
-        return await Skill.技能通用判断(Keys.Q, 0).ConfigureAwait(true);
+        return await _skill.技能通用判断(Keys.Q, 0).ConfigureAwait(true);
     }
 }
 #endif

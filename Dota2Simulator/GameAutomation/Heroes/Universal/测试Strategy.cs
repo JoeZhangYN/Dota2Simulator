@@ -21,12 +21,16 @@ public sealed class 测试Strategy : IHeroStrategy
 #pragma warning disable IDE0052
     private readonly IScreenVision _vision;
 #pragma warning restore IDE0052
+    private readonly SkillEngine _skill;
+    private readonly ItemEngine _item;
     private readonly IUiInvoker _ui;
 
-    public 测试Strategy(IInputExecutor input, IScreenVision vision, IUiInvoker ui)
+    public 测试Strategy(IInputExecutor input, IScreenVision vision, SkillEngine skill, ItemEngine item, IUiInvoker ui)
     {
         _input = input;
         _vision = vision;
+        _skill = skill;
+        _item = item;
         _ui = ui;
     }
     public HeroId Hero => new("测试", HeroAttribute.Universal);
@@ -44,11 +48,11 @@ public sealed class 测试Strategy : IHeroStrategy
         }
         else if (key == VirtualKey.From(Keys.D2))
         {
-            _ = Task.Run(() => { Skill.捕捉颜色().Start(); }).ConfigureAwait(false);
+            _ = Task.Run(() => { _skill.捕捉颜色().Start(); }).ConfigureAwait(false);
         }
         else if (key == VirtualKey.From(Keys.D3))
         {
-            _ = Task.Run(() => { Skill.捕捉颜色().Start(); }).ConfigureAwait(false);
+            _ = Task.Run(() => { _skill.捕捉颜色().Start(); }).ConfigureAwait(false);
             Common.Delay(100);
             Dictionary<char, Keys> keyMapping = new()
             {
@@ -77,7 +81,7 @@ public sealed class 测试Strategy : IHeroStrategy
         }
         else if (key == VirtualKey.From(Keys.D4))
         {
-            await Task.Run(() => Skill.测试方法(802, 946)).ConfigureAwait(false);
+            await Task.Run(() => _skill.测试方法(802, 946)).ConfigureAwait(false);
         }
     }
 
@@ -85,7 +89,7 @@ public sealed class 测试Strategy : IHeroStrategy
     {
         Main._聚合.Skills.SetTime(SlotKey.Global, Common.获取当前时间毫秒());
 
-        Item.保存当前物品();
+        _item.保存当前物品();
 
         _ui.Invoke(() => _ui.SetText(UiField.Y, (Common.获取当前时间毫秒() - Main._聚合.Skills.Time(SlotKey.Global)).ToString(CultureInfo.InvariantCulture)));
 

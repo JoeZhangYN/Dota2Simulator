@@ -20,10 +20,14 @@ public sealed class 马尔斯Strategy : IHeroStrategy
     private readonly IScreenVision _vision;
 #pragma warning restore IDE0052
 
-    public 马尔斯Strategy(IInputExecutor input, IScreenVision vision)
+    private readonly SkillEngine _skill;
+    private readonly ItemEngine _item;
+    public 马尔斯Strategy(IInputExecutor input, IScreenVision vision, SkillEngine skill, ItemEngine item)
     {
         _input = input;
         _vision = vision;
+        _skill = skill;
+        _item = item;
     }
     public HeroId Hero => new("马尔斯", HeroAttribute.Strength);
 
@@ -37,7 +41,7 @@ public sealed class 马尔斯Strategy : IHeroStrategy
     public async Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)
     {
         VirtualKey key = trigger.Key;
-        await Item.根据按键判断技能释放前通用逻辑(new KeyEventArgs((Keys)key.ToNative())).ConfigureAwait(true);
+        await _item.根据按键判断技能释放前通用逻辑(new KeyEventArgs((Keys)key.ToNative())).ConfigureAwait(true);
 
         if (key == VirtualKey.Q)
         {
@@ -60,7 +64,7 @@ public sealed class 马尔斯Strategy : IHeroStrategy
 
     private async Task<bool> 战神迅矛去后摇(ImageHandle 句柄)
     {
-        return await Skill.主动技能释放后续(Keys.Q, () =>
+        return await _skill.主动技能释放后续(Keys.Q, () =>
         {
             if (Main._聚合.Skills.Mode(SlotKey.Q) == 1)
             {
@@ -68,26 +72,26 @@ public sealed class 马尔斯Strategy : IHeroStrategy
             }
             else
             {
-                Skill.通用技能后续动作();
+                _skill.通用技能后续动作();
             }
         }).ConfigureAwait(true);
     }
 
     private async Task<bool> 神之谴击去后摇(ImageHandle 句柄)
     {
-        return await Skill.技能通用判断(Keys.W, 1).ConfigureAwait(true);
+        return await _skill.技能通用判断(Keys.W, 1).ConfigureAwait(true);
     }
 
     private async Task<bool> 热血竞技场去后摇(ImageHandle 句柄)
     {
-        return await Skill.主动技能释放后续(Keys.R, () =>
+        return await _skill.主动技能释放后续(Keys.R, () =>
         {
-            if (Skill.判断技能状态(Keys.E, 句柄, Skill.技能类型.状态))
+            if (_skill.判断技能状态(Keys.E, 句柄, Skill.技能类型.状态))
             {
                 _input.Press(VirtualKey.From(Keys.E));
             }
 
-            Skill.通用技能后续动作();
+            _skill.通用技能后续动作();
         }).ConfigureAwait(true);
     }
 }

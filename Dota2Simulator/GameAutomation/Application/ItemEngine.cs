@@ -20,7 +20,7 @@ using System.Windows.Forms;
 
 namespace Dota2Simulator.GameAutomation.Application
 {
-    internal sealed class ItemEngine
+    public sealed class ItemEngine
     {
         private readonly IInputExecutor _input;
         private readonly IScreenVision _vision;

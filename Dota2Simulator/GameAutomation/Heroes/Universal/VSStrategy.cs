@@ -20,10 +20,14 @@ public sealed class VSStrategy : IHeroStrategy
     private readonly IScreenVision _vision;
 #pragma warning restore IDE0052
 
-    public VSStrategy(IInputExecutor input, IScreenVision vision)
+    private readonly SkillEngine _skill;
+    private readonly ItemEngine _item;
+    public VSStrategy(IInputExecutor input, IScreenVision vision, SkillEngine skill, ItemEngine item)
     {
         _input = input;
         _vision = vision;
+        _skill = skill;
+        _item = item;
     }
     public HeroId Hero => new("VS", HeroAttribute.Universal);
 
@@ -37,7 +41,7 @@ public sealed class VSStrategy : IHeroStrategy
     public async Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)
     {
         VirtualKey key = trigger.Key;
-        await Item.根据按键判断技能释放前通用逻辑(new KeyEventArgs((Keys)key.ToNative())).ConfigureAwait(true);
+        await _item.根据按键判断技能释放前通用逻辑(new KeyEventArgs((Keys)key.ToNative())).ConfigureAwait(true);
 
         if (key == VirtualKey.Q)
         {
@@ -53,19 +57,19 @@ public sealed class VSStrategy : IHeroStrategy
         }
     }
 
-    private static async Task<bool> 魔法箭去后摇(ImageHandle 句柄)
+    private async Task<bool> 魔法箭去后摇(ImageHandle 句柄)
     {
-        return await Skill.技能通用判断(Keys.Q, 1).ConfigureAwait(true);
+        return await _skill.技能通用判断(Keys.Q, 1).ConfigureAwait(true);
     }
 
-    private static async Task<bool> 恐怖波动去后摇(ImageHandle 句柄)
+    private async Task<bool> 恐怖波动去后摇(ImageHandle 句柄)
     {
-        return await Skill.技能通用判断(Keys.W, 1).ConfigureAwait(true);
+        return await _skill.技能通用判断(Keys.W, 1).ConfigureAwait(true);
     }
 
-    private static async Task<bool> 移形换位去后摇(ImageHandle 句柄)
+    private async Task<bool> 移形换位去后摇(ImageHandle 句柄)
     {
-        return await Skill.技能通用判断(Keys.R, 1).ConfigureAwait(true);
+        return await _skill.技能通用判断(Keys.R, 1).ConfigureAwait(true);
     }
 }
 #endif

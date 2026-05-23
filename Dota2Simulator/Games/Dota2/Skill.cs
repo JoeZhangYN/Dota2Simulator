@@ -16,7 +16,7 @@ using Dota2Simulator.Vision;
 
 namespace Dota2Simulator.Games.Dota2
 {
-    internal static class Skill
+    public static class Skill
     {
         /// <summary>技能类型枚举（外部 86 文件引用契约，保留在 facade 内）。</summary>
         public enum 技能类型

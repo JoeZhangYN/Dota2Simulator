@@ -26,10 +26,14 @@ public sealed class 暗影萨满Strategy : IHeroStrategy
     private readonly IScreenVision _vision;
 #pragma warning restore IDE0052
 
-    public 暗影萨满Strategy(IInputExecutor input, IScreenVision vision)
+    private readonly SkillEngine _skill;
+    private readonly ItemEngine _item;
+    public 暗影萨满Strategy(IInputExecutor input, IScreenVision vision, SkillEngine skill, ItemEngine item)
     {
         _input = input;
         _vision = vision;
+        _skill = skill;
+        _item = item;
     }
     public HeroId Hero => new("暗影萨满", HeroAttribute.Intelligence);
 
@@ -51,12 +55,12 @@ public sealed class 暗影萨满Strategy : IHeroStrategy
         }
         else if (key == VirtualKey.W)
         {
-            if (ImageFinder.FindImageInRegionBool(Dota2_Pictrue.物品.中立_祭礼长袍, GlobalScreenCapture.GetCurrentHandle(), Item.获取中立TP范围(Main._聚合.SkillCount)))
+            if (ImageFinder.FindImageInRegionBool(Dota2_Pictrue.物品.中立_祭礼长袍, GlobalScreenCapture.GetCurrentHandle(), ItemEngine.获取中立TP范围(Main._聚合.SkillCount)))
             {
                 Main._聚合.Attack.状态抗性倍数 *= 1.1;
             }
 
-            if (ImageFinder.FindImageInRegionBool(Dota2_Pictrue.物品.中立_永恒遗物, GlobalScreenCapture.GetCurrentHandle(), Item.获取中立TP范围(Main._聚合.SkillCount)))
+            if (ImageFinder.FindImageInRegionBool(Dota2_Pictrue.物品.中立_永恒遗物, GlobalScreenCapture.GetCurrentHandle(), ItemEngine.获取中立TP范围(Main._聚合.SkillCount)))
             {
                 Main._聚合.Attack.状态抗性倍数 *= 1.2;
             }
@@ -128,7 +132,7 @@ public sealed class 暗影萨满Strategy : IHeroStrategy
             }
         }
 
-        if (Skill.DOTA2判断技能是否CD(Keys.Q, in 句柄))
+        if (_skill.DOTA2判断技能是否CD(Keys.Q, in 句柄))
         {
             return await Task.FromResult(true).ConfigureAwait(true);
         }
@@ -146,7 +150,7 @@ public sealed class 暗影萨满Strategy : IHeroStrategy
         {
         }
 
-        if (Skill.DOTA2判断技能是否CD(Keys.E, in 句柄))
+        if (_skill.DOTA2判断技能是否CD(Keys.E, in 句柄))
         {
             return await Task.FromResult(true).ConfigureAwait(true);
         }
@@ -162,7 +166,7 @@ public sealed class 暗影萨满Strategy : IHeroStrategy
             _input.Press(VirtualKey.From(Keys.A));
         }
 
-        if (Skill.DOTA2判断技能是否CD(Keys.R, in 句柄))
+        if (_skill.DOTA2判断技能是否CD(Keys.R, in 句柄))
         {
             return await Task.FromResult(true).ConfigureAwait(true);
         }
@@ -231,7 +235,7 @@ public sealed class 暗影萨满Strategy : IHeroStrategy
             });
         }
 
-        if (Skill.DOTA2判断技能是否CD(Keys.W, in 句柄))
+        if (_skill.DOTA2判断技能是否CD(Keys.W, in 句柄))
         {
             return await Task.FromResult(true).ConfigureAwait(true);
         }
@@ -242,7 +246,7 @@ public sealed class 暗影萨满Strategy : IHeroStrategy
 
     private async Task<bool> 推推破林肯秒羊(ImageHandle 句柄)
     {
-        if (Item.根据图片使用物品(Dota2_Pictrue.物品.推推棒) == 1)
+        if (_item.根据图片使用物品(Dota2_Pictrue.物品.推推棒) == 1)
         {
             Common.Delay(等待延迟);
             return await Task.FromResult(true).ConfigureAwait(true);

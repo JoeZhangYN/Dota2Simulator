@@ -21,10 +21,14 @@ public sealed class 天怒Strategy : IHeroStrategy
     private readonly IScreenVision _vision;
 #pragma warning restore IDE0052
 
-    public 天怒Strategy(IInputExecutor input, IScreenVision vision)
+    private readonly SkillEngine _skill;
+    private readonly ItemEngine _item;
+    public 天怒Strategy(IInputExecutor input, IScreenVision vision, SkillEngine skill, ItemEngine item)
     {
         _input = input;
         _vision = vision;
+        _skill = skill;
+        _item = item;
     }
     public HeroId Hero => new("天怒", HeroAttribute.Intelligence);
 
@@ -36,13 +40,13 @@ public sealed class 天怒Strategy : IHeroStrategy
         Main._聚合.Conditions[ConditionSlotKey.C4].Probe ??= 上古封印去后摇;
         Main._聚合.Conditions[ConditionSlotKey.C5].Probe ??= 神秘之耀去后摇;
         Main._聚合.Conditions[ConditionSlotKey.C6].Probe ??= 震荡光弹去后摇;
-        Skill.重复按键执行间隔阈值 = 100;
+        _skill.重复按键执行间隔阈值 = 100;
     }
 
     public async Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)
     {
         VirtualKey key = trigger.Key;
-        await Item.根据按键判断技能释放前通用逻辑(new KeyEventArgs((Keys)key.ToNative())).ConfigureAwait(true);
+        await _item.根据按键判断技能释放前通用逻辑(new KeyEventArgs((Keys)key.ToNative())).ConfigureAwait(true);
 
         if (key == VirtualKey.Q)
         {
@@ -72,53 +76,53 @@ public sealed class 天怒Strategy : IHeroStrategy
         }
     }
 
-    private static async Task<bool> 循环奥数鹰隼(ImageHandle 句柄)
+    private async Task<bool> 循环奥数鹰隼(ImageHandle 句柄)
     {
-        await Skill.技能通用判断(Keys.Q, 2).ConfigureAwait(true);
+        await _skill.技能通用判断(Keys.Q, 2).ConfigureAwait(true);
         return await Task.FromResult(Main._聚合.Conditions[ConditionSlotKey.C1].Active).ConfigureAwait(true);
     }
 
-    private static async Task<bool> 天怒秒人连招(ImageHandle 句柄)
+    private async Task<bool> 天怒秒人连招(ImageHandle 句柄)
     {
         int 步骤 = Main._聚合.Skills.Step(SlotKey.Global);
 
         switch (步骤)
         {
             case < 2:
-                if (Skill.DOTA2释放CD就绪技能(Keys.W, in 句柄))
+                if (_skill.DOTA2释放CD就绪技能(Keys.W, in 句柄))
                 {
                     return await Task.FromResult(true).ConfigureAwait(true);
                 }
 
-                if (Skill.DOTA2释放CD就绪技能(Keys.E, in 句柄))
+                if (_skill.DOTA2释放CD就绪技能(Keys.E, in 句柄))
                 {
                     return await Task.FromResult(true).ConfigureAwait(true);
                 }
 
-                if (Skill.DOTA2释放CD就绪技能(Keys.Q, in 句柄))
+                if (_skill.DOTA2释放CD就绪技能(Keys.Q, in 句柄))
                 {
                     return await Task.FromResult(true).ConfigureAwait(true);
                 }
 
-                Common.Delay(0 * Item.根据图片使用物品(Dota2_Pictrue.物品.阿托斯之棍));
-                Common.Delay(33 * Item.根据图片使用物品(Dota2_Pictrue.物品.缚灵锁));
-                Common.Delay(33 * Item.根据图片使用物品(Dota2_Pictrue.物品.虚灵之刃));
+                Common.Delay(0 * _item.根据图片使用物品(Dota2_Pictrue.物品.阿托斯之棍));
+                Common.Delay(33 * _item.根据图片使用物品(Dota2_Pictrue.物品.缚灵锁));
+                Common.Delay(33 * _item.根据图片使用物品(Dota2_Pictrue.物品.虚灵之刃));
 
                 Common.Delay(33 * (
-                    Item.根据图片使用物品(Dota2_Pictrue.物品.红杖)
-                    + Item.根据图片使用物品(Dota2_Pictrue.物品.红杖2)
-                    + Item.根据图片使用物品(Dota2_Pictrue.物品.红杖3)
-                    + Item.根据图片使用物品(Dota2_Pictrue.物品.红杖4)
-                    + Item.根据图片使用物品(Dota2_Pictrue.物品.红杖5)));
+                    _item.根据图片使用物品(Dota2_Pictrue.物品.红杖)
+                    + _item.根据图片使用物品(Dota2_Pictrue.物品.红杖2)
+                    + _item.根据图片使用物品(Dota2_Pictrue.物品.红杖3)
+                    + _item.根据图片使用物品(Dota2_Pictrue.物品.红杖4)
+                    + _item.根据图片使用物品(Dota2_Pictrue.物品.红杖5)));
 
-                Common.Delay(33 * Item.根据图片使用物品(Dota2_Pictrue.物品.羊刀));
+                Common.Delay(33 * _item.根据图片使用物品(Dota2_Pictrue.物品.羊刀));
 
                 Main._聚合.Skills.SetStep(SlotKey.Global, 2);
 
                 return await Task.FromResult(true).ConfigureAwait(true);
             case < 3:
                 {
-                    if (Skill.DOTA2释放CD就绪技能(Keys.R, in 句柄))
+                    if (_skill.DOTA2释放CD就绪技能(Keys.R, in 句柄))
                     {
                         return await Task.FromResult(true).ConfigureAwait(true);
                     }
@@ -133,24 +137,24 @@ public sealed class 天怒Strategy : IHeroStrategy
         return await Task.FromResult(true).ConfigureAwait(true);
     }
 
-    private static async Task<bool> 奥数鹰隼去后摇(ImageHandle 句柄)
+    private async Task<bool> 奥数鹰隼去后摇(ImageHandle 句柄)
     {
-        return await Skill.技能通用判断(Keys.Q, 0).ConfigureAwait(true);
+        return await _skill.技能通用判断(Keys.Q, 0).ConfigureAwait(true);
     }
 
-    private static async Task<bool> 上古封印去后摇(ImageHandle 句柄)
+    private async Task<bool> 上古封印去后摇(ImageHandle 句柄)
     {
-        return await Skill.技能通用判断(Keys.E, 0).ConfigureAwait(true);
+        return await _skill.技能通用判断(Keys.E, 0).ConfigureAwait(true);
     }
 
-    private static async Task<bool> 神秘之耀去后摇(ImageHandle 句柄)
+    private async Task<bool> 神秘之耀去后摇(ImageHandle 句柄)
     {
-        return await Skill.技能通用判断(Keys.R, 1).ConfigureAwait(true);
+        return await _skill.技能通用判断(Keys.R, 1).ConfigureAwait(true);
     }
 
-    private static async Task<bool> 震荡光弹去后摇(ImageHandle 句柄)
+    private async Task<bool> 震荡光弹去后摇(ImageHandle 句柄)
     {
-        return await Skill.技能通用判断(Keys.W, 0).ConfigureAwait(true);
+        return await _skill.技能通用判断(Keys.W, 0).ConfigureAwait(true);
     }
 }
 #endif

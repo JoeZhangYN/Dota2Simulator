@@ -20,10 +20,14 @@ public sealed class 干扰者Strategy : IHeroStrategy
     private readonly IScreenVision _vision;
 #pragma warning restore IDE0052
 
-    public 干扰者Strategy(IInputExecutor input, IScreenVision vision)
+    private readonly SkillEngine _skill;
+    private readonly ItemEngine _item;
+    public 干扰者Strategy(IInputExecutor input, IScreenVision vision, SkillEngine skill, ItemEngine item)
     {
         _input = input;
         _vision = vision;
+        _skill = skill;
+        _item = item;
     }
     public HeroId Hero => new("干扰者", HeroAttribute.Intelligence);
 
@@ -39,7 +43,7 @@ public sealed class 干扰者Strategy : IHeroStrategy
     public async Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)
     {
         VirtualKey key = trigger.Key;
-        await Item.根据按键判断技能释放前通用逻辑(new KeyEventArgs((Keys)key.ToNative())).ConfigureAwait(true);
+        await _item.根据按键判断技能释放前通用逻辑(new KeyEventArgs((Keys)key.ToNative())).ConfigureAwait(true);
 
         if (key == VirtualKey.Q)
         {
@@ -64,33 +68,33 @@ public sealed class 干扰者Strategy : IHeroStrategy
         }
     }
 
-    private static async Task<bool> 风雷之击去后摇(ImageHandle 句柄)
+    private async Task<bool> 风雷之击去后摇(ImageHandle 句柄)
     {
-        return await Skill.技能通用判断(Keys.Q, 0).ConfigureAwait(true);
+        return await _skill.技能通用判断(Keys.Q, 0).ConfigureAwait(true);
     }
 
-    private static async Task<bool> 静态风暴去后摇(ImageHandle 句柄)
+    private async Task<bool> 静态风暴去后摇(ImageHandle 句柄)
     {
-        return await Skill.技能通用判断(Keys.R, 0).ConfigureAwait(true);
+        return await _skill.技能通用判断(Keys.R, 0).ConfigureAwait(true);
     }
 
-    private static async Task<bool> 恶念瞥视去后摇(ImageHandle 句柄)
+    private async Task<bool> 恶念瞥视去后摇(ImageHandle 句柄)
     {
-        return await Skill.技能通用判断(Keys.W, 0, false).ConfigureAwait(true);
+        return await _skill.技能通用判断(Keys.W, 0, false).ConfigureAwait(true);
     }
 
-    private static async Task<bool> 动能力场去后摇(ImageHandle 句柄)
+    private async Task<bool> 动能力场去后摇(ImageHandle 句柄)
     {
-        return await Skill.技能通用判断(Keys.E, 0, false).ConfigureAwait(true);
+        return await _skill.技能通用判断(Keys.E, 0, false).ConfigureAwait(true);
     }
 
-    private static async Task<bool> 静态风暴动能立场风雷之击(ImageHandle 句柄)
+    private async Task<bool> 静态风暴动能立场风雷之击(ImageHandle 句柄)
     {
-        return Skill.DOTA2释放CD就绪技能(Keys.R, in 句柄)
+        return _skill.DOTA2释放CD就绪技能(Keys.R, in 句柄)
             ? await Task.FromResult(true).ConfigureAwait(true)
-            : Skill.DOTA2释放CD就绪技能(Keys.E, in 句柄)
+            : _skill.DOTA2释放CD就绪技能(Keys.E, in 句柄)
                 ? await Task.FromResult(true).ConfigureAwait(true)
-                : Skill.DOTA2释放CD就绪技能(Keys.Q, in 句柄)
+                : _skill.DOTA2释放CD就绪技能(Keys.Q, in 句柄)
                     ? await Task.FromResult(true).ConfigureAwait(true)
                     : await Task.FromResult(false).ConfigureAwait(true);
     }

@@ -23,10 +23,14 @@ public sealed class 伐木机Strategy : IHeroStrategy
     private readonly IScreenVision _vision;
 #pragma warning restore IDE0052
 
-    public 伐木机Strategy(IInputExecutor input, IScreenVision vision)
+    private readonly SkillEngine _skill;
+    private readonly ItemEngine _item;
+    public 伐木机Strategy(IInputExecutor input, IScreenVision vision, SkillEngine skill, ItemEngine item)
     {
         _input = input;
         _vision = vision;
+        _skill = skill;
+        _item = item;
     }
     public HeroId Hero => new("伐木机", HeroAttribute.Strength);
 
@@ -43,7 +47,7 @@ public sealed class 伐木机Strategy : IHeroStrategy
     public async Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)
     {
         VirtualKey key = trigger.Key;
-        await Item.根据按键判断技能释放前通用逻辑(new KeyEventArgs((Keys)key.ToNative())).ConfigureAwait(true);
+        await _item.根据按键判断技能释放前通用逻辑(new KeyEventArgs((Keys)key.ToNative())).ConfigureAwait(true);
 
         if (key == VirtualKey.Q)
         {
@@ -89,29 +93,29 @@ public sealed class 伐木机Strategy : IHeroStrategy
         return await Task.FromResult(false).ConfigureAwait(true);
     }
 
-    private static async Task<bool> 死亡旋风去后摇(ImageHandle 句柄)
+    private async Task<bool> 死亡旋风去后摇(ImageHandle 句柄)
     {
-        return await Skill.技能通用判断(Keys.Q, 0).ConfigureAwait(true);
+        return await _skill.技能通用判断(Keys.Q, 0).ConfigureAwait(true);
     }
 
-    private static async Task<bool> 伐木聚链去后摇(ImageHandle 句柄)
+    private async Task<bool> 伐木聚链去后摇(ImageHandle 句柄)
     {
-        return await Skill.技能通用判断(Keys.W, 1).ConfigureAwait(true);
+        return await _skill.技能通用判断(Keys.W, 1).ConfigureAwait(true);
     }
 
-    private static async Task<bool> 锯齿轮旋去后摇(ImageHandle 句柄)
+    private async Task<bool> 锯齿轮旋去后摇(ImageHandle 句柄)
     {
-        return await Skill.技能通用判断(Keys.D, 1).ConfigureAwait(true);
+        return await _skill.技能通用判断(Keys.D, 1).ConfigureAwait(true);
     }
 
-    private static async Task<bool> 锯齿飞轮去后摇(ImageHandle 句柄)
+    private async Task<bool> 锯齿飞轮去后摇(ImageHandle 句柄)
     {
-        return await Skill.释放技能后替换图标技能后续(Keys.R, () => Main._聚合.Skills.Step(Domain.Loop.SlotKey.R), v => Main._聚合.Skills.SetStep(Domain.Loop.SlotKey.R, v)).ConfigureAwait(true);
+        return await _skill.释放技能后替换图标技能后续(Keys.R, () => Main._聚合.Skills.Step(Domain.Loop.SlotKey.R), v => Main._聚合.Skills.SetStep(Domain.Loop.SlotKey.R, v)).ConfigureAwait(true);
     }
 
-    private static async Task<bool> 喷火装置去后摇(ImageHandle 句柄)
+    private async Task<bool> 喷火装置去后摇(ImageHandle 句柄)
     {
-        return await Skill.技能通用判断(Keys.F, 0).ConfigureAwait(true);
+        return await _skill.技能通用判断(Keys.F, 0).ConfigureAwait(true);
     }
 }
 #endif

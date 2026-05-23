@@ -23,10 +23,14 @@ public sealed class 小黑Strategy : IHeroStrategy
     private readonly IScreenVision _vision;
 #pragma warning restore IDE0052
 
-    public 小黑Strategy(IInputExecutor input, IScreenVision vision)
+    private readonly SkillEngine _skill;
+    private readonly ItemEngine _item;
+    public 小黑Strategy(IInputExecutor input, IScreenVision vision, SkillEngine skill, ItemEngine item)
     {
         _input = input;
         _vision = vision;
+        _skill = skill;
+        _item = item;
     }
     public HeroId Hero => new("小黑", HeroAttribute.Agility);
 
@@ -40,7 +44,7 @@ public sealed class 小黑Strategy : IHeroStrategy
     public async Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)
     {
         VirtualKey key = trigger.Key;
-        await Item.根据按键判断技能释放前通用逻辑(new KeyEventArgs((Keys)key.ToNative())).ConfigureAwait(true);
+        await _item.根据按键判断技能释放前通用逻辑(new KeyEventArgs((Keys)key.ToNative())).ConfigureAwait(true);
 
         if (key == VirtualKey.From(Keys.F1))
         {
@@ -63,11 +67,11 @@ public sealed class 小黑Strategy : IHeroStrategy
                 switch (Main._聚合.Skills.Mode(SlotKey.Global))
                 {
                     case 0:
-                        await Item.技能释放前切假腿("智力").ConfigureAwait(true);
+                        await _item.技能释放前切假腿("智力").ConfigureAwait(true);
                         Dota2Simulator.TTS.TTS.Speak("开启冰箭");
                         break;
                     default:
-                        Item.要求保持假腿();
+                        _item.要求保持假腿();
                         Dota2Simulator.TTS.TTS.Speak("关闭冰箭");
                         break;
                 }
@@ -92,9 +96,9 @@ public sealed class 小黑Strategy : IHeroStrategy
 
     private async Task<bool> 狂风去后摇(ImageHandle 句柄)
     {
-        return await Skill.主动技能释放后续(Keys.W, () =>
+        return await _skill.主动技能释放后续(Keys.W, () =>
         {
-            Skill.通用技能后续动作();
+            _skill.通用技能后续动作();
 
             if (Main._聚合.Skills.Mode(SlotKey.Global) == 1)
             {
@@ -105,11 +109,11 @@ public sealed class 小黑Strategy : IHeroStrategy
 
     private async Task<bool> 数箭齐发去后摇(ImageHandle 句柄)
     {
-        return await Skill.主动技能进入CD后续(Keys.E, () =>
+        return await _skill.主动技能进入CD后续(Keys.E, () =>
         {
             Common.Delay(Main._聚合.Skills.Mode(SlotKey.E) == 1 ? 2600 : 1300);
             _input.Press(VirtualKey.From(Keys.S));
-            Skill.通用技能后续动作();
+            _skill.通用技能后续动作();
 
             if (Main._聚合.Skills.Mode(SlotKey.Global) == 1)
             {
@@ -120,9 +124,9 @@ public sealed class 小黑Strategy : IHeroStrategy
 
     private async Task<bool> 冰川去后摇(ImageHandle 句柄)
     {
-        return await Skill.主动技能进入CD后续(Keys.F, () =>
+        return await _skill.主动技能进入CD后续(Keys.F, () =>
         {
-            Skill.通用技能后续动作();
+            _skill.通用技能后续动作();
 
             if (Main._聚合.Skills.Mode(SlotKey.Global) == 1)
             {

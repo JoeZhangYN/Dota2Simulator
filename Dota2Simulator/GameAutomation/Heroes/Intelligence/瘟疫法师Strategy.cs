@@ -19,10 +19,14 @@ public sealed class 瘟疫法师Strategy : IHeroStrategy
     private readonly IScreenVision _vision;
 #pragma warning restore IDE0052
 
-    public 瘟疫法师Strategy(IInputExecutor input, IScreenVision vision)
+    private readonly SkillEngine _skill;
+    private readonly ItemEngine _item;
+    public 瘟疫法师Strategy(IInputExecutor input, IScreenVision vision, SkillEngine skill, ItemEngine item)
     {
         _input = input;
         _vision = vision;
+        _skill = skill;
+        _item = item;
     }
     public HeroId Hero => new("瘟疫法师", HeroAttribute.Intelligence);
 
@@ -32,14 +36,14 @@ public sealed class 瘟疫法师Strategy : IHeroStrategy
         Main._聚合.Conditions[ConditionSlotKey.C2].Probe ??= 幽魂护罩去后摇;
         Main._聚合.Conditions[ConditionSlotKey.C3].Probe ??= 死神镰刀去后摇;
         Main._聚合.Conditions[ConditionSlotKey.C5].Probe ??= 循环死亡脉冲;
-        Skill.重复按键执行间隔阈值 = 100;
+        _skill.重复按键执行间隔阈值 = 100;
         Main._聚合.LegSwap.配置.修改配置(Keys.E, false);
     }
 
     public async Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)
     {
         VirtualKey key = trigger.Key;
-        await Item.根据按键判断技能释放前通用逻辑(new KeyEventArgs((Keys)key.ToNative())).ConfigureAwait(true);
+        await _item.根据按键判断技能释放前通用逻辑(new KeyEventArgs((Keys)key.ToNative())).ConfigureAwait(true);
 
         if (key == VirtualKey.From(Keys.F1))
         {
@@ -74,24 +78,24 @@ public sealed class 瘟疫法师Strategy : IHeroStrategy
         }
     }
 
-    private static async Task<bool> 死亡脉冲去后摇(ImageHandle 句柄)
+    private async Task<bool> 死亡脉冲去后摇(ImageHandle 句柄)
     {
-        return await Skill.技能通用判断(Keys.Q, 0, 是否接按键: false).ConfigureAwait(true);
+        return await _skill.技能通用判断(Keys.Q, 0, 是否接按键: false).ConfigureAwait(true);
     }
 
-    private static async Task<bool> 幽魂护罩去后摇(ImageHandle 句柄)
+    private async Task<bool> 幽魂护罩去后摇(ImageHandle 句柄)
     {
-        return await Skill.技能通用判断(Keys.W, 0, 是否接按键: false).ConfigureAwait(true);
+        return await _skill.技能通用判断(Keys.W, 0, 是否接按键: false).ConfigureAwait(true);
     }
 
-    private static async Task<bool> 死神镰刀去后摇(ImageHandle 句柄)
+    private async Task<bool> 死神镰刀去后摇(ImageHandle 句柄)
     {
-        return await Skill.技能通用判断(Keys.R, 0).ConfigureAwait(true);
+        return await _skill.技能通用判断(Keys.R, 0).ConfigureAwait(true);
     }
 
-    private static async Task<bool> 循环死亡脉冲(ImageHandle 句柄)
+    private async Task<bool> 循环死亡脉冲(ImageHandle 句柄)
     {
-        await Skill.技能通用判断(Keys.Q, 2).ConfigureAwait(true);
+        await _skill.技能通用判断(Keys.Q, 2).ConfigureAwait(true);
         return await Task.FromResult(Main._聚合.Conditions[ConditionSlotKey.C5].Active).ConfigureAwait(true);
     }
 }

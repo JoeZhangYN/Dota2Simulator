@@ -19,10 +19,14 @@ public sealed class 墨客Strategy : IHeroStrategy
     private readonly IScreenVision _vision;
 #pragma warning restore IDE0052
 
-    public 墨客Strategy(IInputExecutor input, IScreenVision vision)
+    private readonly SkillEngine _skill;
+    private readonly ItemEngine _item;
+    public 墨客Strategy(IInputExecutor input, IScreenVision vision, SkillEngine skill, ItemEngine item)
     {
         _input = input;
         _vision = vision;
+        _skill = skill;
+        _item = item;
     }
     public HeroId Hero => new("墨客", HeroAttribute.Intelligence);
 
@@ -40,7 +44,7 @@ public sealed class 墨客Strategy : IHeroStrategy
         VirtualKey key = trigger.Key;
         KeyEventArgs e = new((Keys)key.ToNative() | ConvertModifiers(trigger.Modifiers));
 
-        await Item.根据按键判断技能释放前通用逻辑(e).ConfigureAwait(true);
+        await _item.根据按键判断技能释放前通用逻辑(e).ConfigureAwait(true);
 
         if (e.KeyValue == (int)Keys.E && (int)e.Modifiers == (int)Keys.Alt)
         {
@@ -79,29 +83,29 @@ public sealed class 墨客Strategy : IHeroStrategy
         return result;
     }
 
-    private static async Task<bool> 命运之笔去后摇(ImageHandle 句柄)
+    private async Task<bool> 命运之笔去后摇(ImageHandle 句柄)
     {
-        return await Skill.技能通用判断(Keys.Q, 1).ConfigureAwait(true);
+        return await _skill.技能通用判断(Keys.Q, 1).ConfigureAwait(true);
     }
 
-    private static async Task<bool> 幻影之拥去后摇(ImageHandle 句柄)
+    private async Task<bool> 幻影之拥去后摇(ImageHandle 句柄)
     {
-        return await Skill.技能通用判断(Keys.W, 0).ConfigureAwait(true);
+        return await _skill.技能通用判断(Keys.W, 0).ConfigureAwait(true);
     }
 
-    private static async Task<bool> 墨泳去后摇(ImageHandle 句柄)
+    private async Task<bool> 墨泳去后摇(ImageHandle 句柄)
     {
-        return await Skill.技能通用判断(Keys.E, 1).ConfigureAwait(true);
+        return await _skill.技能通用判断(Keys.E, 1).ConfigureAwait(true);
     }
 
-    private static async Task<bool> 缚魂去后摇(ImageHandle 句柄)
+    private async Task<bool> 缚魂去后摇(ImageHandle 句柄)
     {
-        return await Skill.技能通用判断(Keys.R, 1).ConfigureAwait(true);
+        return await _skill.技能通用判断(Keys.R, 1).ConfigureAwait(true);
     }
 
-    private static async Task<bool> 暗绘去后摇(ImageHandle 句柄)
+    private async Task<bool> 暗绘去后摇(ImageHandle 句柄)
     {
-        return await Skill.技能通用判断(Keys.D, 0).ConfigureAwait(true);
+        return await _skill.技能通用判断(Keys.D, 0).ConfigureAwait(true);
     }
 }
 #endif

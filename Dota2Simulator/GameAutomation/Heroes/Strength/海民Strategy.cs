@@ -26,10 +26,14 @@ public sealed class 海民Strategy : IHeroStrategy
     private readonly IScreenVision _vision;
 #pragma warning restore IDE0052
 
-    public 海民Strategy(IInputExecutor input, IScreenVision vision)
+    private readonly SkillEngine _skill;
+    private readonly ItemEngine _item;
+    public 海民Strategy(IInputExecutor input, IScreenVision vision, SkillEngine skill, ItemEngine item)
     {
         _input = input;
         _vision = vision;
+        _skill = skill;
+        _item = item;
     }
     public HeroId Hero => new("海民", HeroAttribute.Strength);
 
@@ -45,7 +49,7 @@ public sealed class 海民Strategy : IHeroStrategy
     public async Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)
     {
         VirtualKey key = trigger.Key;
-        await Item.根据按键判断技能释放前通用逻辑(new KeyEventArgs((Keys)key.ToNative())).ConfigureAwait(true);
+        await _item.根据按键判断技能释放前通用逻辑(new KeyEventArgs((Keys)key.ToNative())).ConfigureAwait(true);
 
         if (key == VirtualKey.Q)
         {
@@ -67,7 +71,7 @@ public sealed class 海民Strategy : IHeroStrategy
         {
             if (Main._聚合.Conditions.StoneChoice == 1)
             {
-                Skill.DOTA2释放CD就绪技能(Keys.E, GlobalScreenCapture.GetCurrentHandle());
+                _skill.DOTA2释放CD就绪技能(Keys.E, GlobalScreenCapture.GetCurrentHandle());
             }
 
             Main._聚合.Conditions[ConditionSlotKey.C3].Active = true;
@@ -92,23 +96,23 @@ public sealed class 海民Strategy : IHeroStrategy
 
     private async Task<bool> 冰片去后摇(ImageHandle 句柄)
     {
-        return await Skill.技能通用判断(Keys.Q, 1).ConfigureAwait(true);
+        return await _skill.技能通用判断(Keys.Q, 1).ConfigureAwait(true);
     }
 
     private async Task<bool> 摔角行家去后摇(ImageHandle 句柄)
     {
-        return await Skill.技能通用判断(Keys.E, 0).ConfigureAwait(true);
+        return await _skill.技能通用判断(Keys.E, 0).ConfigureAwait(true);
     }
 
     private async Task<bool> 酒友去后摇(ImageHandle 句柄)
     {
-        return await Skill.技能通用判断(Keys.E, 1).ConfigureAwait(true);
+        return await _skill.技能通用判断(Keys.E, 1).ConfigureAwait(true);
     }
 
     // 基本完美了。。。
     private async Task<bool> 海象神拳接雪球(ImageHandle 句柄)
     {
-        return await Skill.法球技能进入CD后续(Keys.R, () =>
+        return await _skill.法球技能进入CD后续(Keys.R, () =>
         {
             Point p = Control.MousePosition;
             for (int i = 0; i < 2; i++)

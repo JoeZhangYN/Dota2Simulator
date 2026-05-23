@@ -21,10 +21,14 @@ public sealed class 炸弹人Strategy : IHeroStrategy
     private readonly IScreenVision _vision;
 #pragma warning restore IDE0052
 
-    public 炸弹人Strategy(IInputExecutor input, IScreenVision vision)
+    private readonly SkillEngine _skill;
+    private readonly ItemEngine _item;
+    public 炸弹人Strategy(IInputExecutor input, IScreenVision vision, SkillEngine skill, ItemEngine item)
     {
         _input = input;
         _vision = vision;
+        _skill = skill;
+        _item = item;
     }
     public HeroId Hero => new("炸弹人", HeroAttribute.Intelligence);
 
@@ -49,7 +53,7 @@ public sealed class 炸弹人Strategy : IHeroStrategy
         }
         else if (key == VirtualKey.E)
         {
-            Item.根据图片使用物品(Dota2_Pictrue.物品.纷争);
+            _item.根据图片使用物品(Dota2_Pictrue.物品.纷争);
             Main._聚合.Conditions[ConditionSlotKey.C3].Active = true;
         }
         else if (key == VirtualKey.From(Keys.D2))
@@ -69,7 +73,7 @@ public sealed class 炸弹人Strategy : IHeroStrategy
             _input.Press(VirtualKey.From(Keys.A));
         }
 
-        if (Skill.DOTA2判断技能是否CD(Keys.Q, in 句柄))
+        if (_skill.DOTA2判断技能是否CD(Keys.Q, in 句柄))
         {
             return await Task.FromResult(true).ConfigureAwait(true);
         }
@@ -86,7 +90,7 @@ public sealed class 炸弹人Strategy : IHeroStrategy
             _input.Press(VirtualKey.From(Keys.A));
         }
 
-        if (Skill.DOTA2判断技能是否CD(Keys.W, in 句柄))
+        if (_skill.DOTA2判断技能是否CD(Keys.W, in 句柄))
         {
             return await Task.FromResult(true).ConfigureAwait(true);
         }
@@ -115,7 +119,7 @@ public sealed class 炸弹人Strategy : IHeroStrategy
             }
         }
 
-        if (Skill.DOTA2判断技能是否CD(Keys.E, in 句柄))
+        if (_skill.DOTA2判断技能是否CD(Keys.E, in 句柄))
         {
             return await Task.FromResult(true).ConfigureAwait(true);
         }

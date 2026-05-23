@@ -26,10 +26,14 @@ public sealed class 斧王Strategy : IHeroStrategy
     private readonly IScreenVision _vision;
 #pragma warning restore IDE0052
 
-    public 斧王Strategy(IInputExecutor input, IScreenVision vision)
+    private readonly SkillEngine _skill;
+    private readonly ItemEngine _item;
+    public 斧王Strategy(IInputExecutor input, IScreenVision vision, SkillEngine skill, ItemEngine item)
     {
         _input = input;
         _vision = vision;
+        _skill = skill;
+        _item = item;
     }
     public HeroId Hero => new("斧王", HeroAttribute.Strength);
 
@@ -45,16 +49,16 @@ public sealed class 斧王Strategy : IHeroStrategy
     public async Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)
     {
         VirtualKey key = trigger.Key;
-        await Item.根据按键判断技能释放前通用逻辑(new KeyEventArgs((Keys)key.ToNative())).ConfigureAwait(true);
+        await _item.根据按键判断技能释放前通用逻辑(new KeyEventArgs((Keys)key.ToNative())).ConfigureAwait(true);
 
         if (key == VirtualKey.Q)
         {
-            Item.根据图片使用物品(Dota2_Pictrue.物品.魂戒);
+            _item.根据图片使用物品(Dota2_Pictrue.物品.魂戒);
             Main._聚合.Conditions[ConditionSlotKey.C1].Active = true;
         }
         else if (key == VirtualKey.W)
         {
-            Item.根据图片使用物品(Dota2_Pictrue.物品.魂戒);
+            _item.根据图片使用物品(Dota2_Pictrue.物品.魂戒);
             Main._聚合.Conditions[ConditionSlotKey.C2].Active = true;
         }
         else if (key == VirtualKey.E)
@@ -63,7 +67,7 @@ public sealed class 斧王Strategy : IHeroStrategy
         }
         else if (key == VirtualKey.R)
         {
-            Item.根据图片使用物品(Dota2_Pictrue.物品.魂戒);
+            _item.根据图片使用物品(Dota2_Pictrue.物品.魂戒);
             Main._聚合.Conditions[ConditionSlotKey.C3].Active = true;
         }
         else if (key == VirtualKey.From(Keys.D4))
@@ -79,11 +83,11 @@ public sealed class 斧王Strategy : IHeroStrategy
 
     private async Task<bool> 吼去后摇(ImageHandle 句柄)
     {
-        return await Skill.主动技能释放后续(Keys.Q, () =>
+        return await _skill.主动技能释放后续(Keys.Q, () =>
         {
             if (Main._聚合.Skills.Mode(SlotKey.Q) == 1)
             {
-                _ = Item.根据图片使用物品(Dota2_Pictrue.物品.刃甲);
+                _ = _item.根据图片使用物品(Dota2_Pictrue.物品.刃甲);
             }
             // 触发激怒
             _input.Press(VirtualKey.From(Keys.A));
@@ -93,25 +97,25 @@ public sealed class 斧王Strategy : IHeroStrategy
 
     private async Task<bool> 战斗饥渴去后摇(ImageHandle 句柄)
     {
-        return await Skill.技能通用判断(Keys.W, 1).ConfigureAwait(true);
+        return await _skill.技能通用判断(Keys.W, 1).ConfigureAwait(true);
     }
 
     private async Task<bool> 淘汰之刃去后摇(ImageHandle 句柄)
     {
-        return await Skill.技能通用判断(Keys.R, 1).ConfigureAwait(true);
+        return await _skill.技能通用判断(Keys.R, 1).ConfigureAwait(true);
     }
 
     private async Task<bool> 跳吼(ImageHandle 句柄)
     {
-        if (Item.根据图片使用物品(Dota2_Pictrue.物品.跳刀)
-            + Item.根据图片使用物品(Dota2_Pictrue.物品.跳刀_力量跳刀)
-            + Item.根据图片使用物品(Dota2_Pictrue.物品.跳刀_智力跳刀)
-            + Item.根据图片使用物品(Dota2_Pictrue.物品.跳刀_敏捷跳刀) == 1)
+        if (_item.根据图片使用物品(Dota2_Pictrue.物品.跳刀)
+            + _item.根据图片使用物品(Dota2_Pictrue.物品.跳刀_力量跳刀)
+            + _item.根据图片使用物品(Dota2_Pictrue.物品.跳刀_智力跳刀)
+            + _item.根据图片使用物品(Dota2_Pictrue.物品.跳刀_敏捷跳刀) == 1)
         {
             Common.Delay(等待延迟);
         }
 
-        _ = Skill.DOTA2释放CD就绪技能(Keys.Q, in 句柄);
+        _ = _skill.DOTA2释放CD就绪技能(Keys.Q, in 句柄);
 
         return await Task.FromResult(false).ConfigureAwait(true);
     }

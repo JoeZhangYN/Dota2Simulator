@@ -19,10 +19,14 @@ public sealed class 夜魔Strategy : IHeroStrategy
     private readonly IScreenVision _vision;
 #pragma warning restore IDE0052
 
-    public 夜魔Strategy(IInputExecutor input, IScreenVision vision)
+    private readonly SkillEngine _skill;
+    private readonly ItemEngine _item;
+    public 夜魔Strategy(IInputExecutor input, IScreenVision vision, SkillEngine skill, ItemEngine item)
     {
         _input = input;
         _vision = vision;
+        _skill = skill;
+        _item = item;
     }
     public HeroId Hero => new("夜魔", HeroAttribute.Strength);
 
@@ -38,7 +42,7 @@ public sealed class 夜魔Strategy : IHeroStrategy
     public async Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)
     {
         VirtualKey key = trigger.Key;
-        await Item.根据按键判断技能释放前通用逻辑(new KeyEventArgs((Keys)key.ToNative())).ConfigureAwait(true);
+        await _item.根据按键判断技能释放前通用逻辑(new KeyEventArgs((Keys)key.ToNative())).ConfigureAwait(true);
 
         if (key == VirtualKey.From(Keys.F1))
         {
@@ -68,24 +72,24 @@ public sealed class 夜魔Strategy : IHeroStrategy
         }
     }
 
-    private static async Task<bool> 虚空去后摇(ImageHandle 句柄)
+    private async Task<bool> 虚空去后摇(ImageHandle 句柄)
     {
-        return await Skill.技能通用判断(Keys.Q, 1).ConfigureAwait(true);
+        return await _skill.技能通用判断(Keys.Q, 1).ConfigureAwait(true);
     }
 
-    private static async Task<bool> 伤残恐惧去后摇(ImageHandle 句柄)
+    private async Task<bool> 伤残恐惧去后摇(ImageHandle 句柄)
     {
-        return await Skill.技能通用判断(Keys.W, 0).ConfigureAwait(true);
+        return await _skill.技能通用判断(Keys.W, 0).ConfigureAwait(true);
     }
 
-    private static async Task<bool> 暗夜猎影去后摇(ImageHandle 句柄)
+    private async Task<bool> 暗夜猎影去后摇(ImageHandle 句柄)
     {
-        return await Skill.技能通用判断(Keys.E, 0).ConfigureAwait(true);
+        return await _skill.技能通用判断(Keys.E, 0).ConfigureAwait(true);
     }
 
-    private static async Task<bool> 黑暗飞升去后摇(ImageHandle 句柄)
+    private async Task<bool> 黑暗飞升去后摇(ImageHandle 句柄)
     {
-        return await Skill.技能通用判断(Keys.R, 1).ConfigureAwait(true);
+        return await _skill.技能通用判断(Keys.R, 1).ConfigureAwait(true);
     }
 }
 #endif

@@ -26,10 +26,14 @@ public sealed class 船长Strategy : IHeroStrategy
     private readonly IScreenVision _vision;
 #pragma warning restore IDE0052
 
-    public 船长Strategy(IInputExecutor input, IScreenVision vision)
+    private readonly SkillEngine _skill;
+    private readonly ItemEngine _item;
+    public 船长Strategy(IInputExecutor input, IScreenVision vision, SkillEngine skill, ItemEngine item)
     {
         _input = input;
         _vision = vision;
+        _skill = skill;
+        _item = item;
     }
     public HeroId Hero => new("船长", HeroAttribute.Strength);
 
@@ -44,7 +48,7 @@ public sealed class 船长Strategy : IHeroStrategy
     public async Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)
     {
         VirtualKey key = trigger.Key;
-        await Item.根据按键判断技能释放前通用逻辑(new KeyEventArgs((Keys)key.ToNative())).ConfigureAwait(true);
+        await _item.根据按键判断技能释放前通用逻辑(new KeyEventArgs((Keys)key.ToNative())).ConfigureAwait(true);
 
         if (key == VirtualKey.Q)
         {
@@ -67,7 +71,7 @@ public sealed class 船长Strategy : IHeroStrategy
 
     private async Task<bool> 洪流接x回(ImageHandle 句柄)
     {
-        return await Skill.主动技能释放后续(Keys.Q, () =>
+        return await _skill.主动技能释放后续(Keys.Q, () =>
         {
             Main._聚合.Conditions[ConditionSlotKey.C4].Active = false;
             Main._聚合.Skills.SetTime(SlotKey.Q, Common.获取当前时间毫秒());
@@ -86,7 +90,7 @@ public sealed class 船长Strategy : IHeroStrategy
     private async Task<bool> x释放后相关逻辑(ImageHandle 句柄)
     {
         // 释放x后放船，x的时间3秒，船0.3秒，3.1秒延迟，控制还是得靠水起来
-        return await Skill.主动技能释放后续(Keys.E, () =>
+        return await _skill.主动技能释放后续(Keys.E, () =>
         {
             int 步骤e = Main._聚合.Skills.Step(SlotKey.E);
 
@@ -114,7 +118,7 @@ public sealed class 船长Strategy : IHeroStrategy
 
     private async Task<bool> x2次释放后(ImageHandle 句柄)
     {
-        return await Skill.主动技能进入CD后续(Keys.E, () =>
+        return await _skill.主动技能进入CD后续(Keys.E, () =>
         {
             lock (_全局模式e_lock)
             {
@@ -129,7 +133,7 @@ public sealed class 船长Strategy : IHeroStrategy
 
     private async Task<bool> 立即释放洪流(ImageHandle 句柄)
     {
-        return await Skill.主动技能已就绪后续(Keys.Q, () => { _input.Press(VirtualKey.From(Keys.Q)); }).ConfigureAwait(true);
+        return await _skill.主动技能已就绪后续(Keys.Q, () => { _input.Press(VirtualKey.From(Keys.Q)); }).ConfigureAwait(true);
     }
 }
 #endif

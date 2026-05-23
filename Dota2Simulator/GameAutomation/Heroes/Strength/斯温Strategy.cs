@@ -19,10 +19,14 @@ public sealed class 斯温Strategy : IHeroStrategy
     private readonly IScreenVision _vision;
 #pragma warning restore IDE0052
 
-    public 斯温Strategy(IInputExecutor input, IScreenVision vision)
+    private readonly SkillEngine _skill;
+    private readonly ItemEngine _item;
+    public 斯温Strategy(IInputExecutor input, IScreenVision vision, SkillEngine skill, ItemEngine item)
     {
         _input = input;
         _vision = vision;
+        _skill = skill;
+        _item = item;
     }
     public HeroId Hero => new("斯温", HeroAttribute.Strength);
 
@@ -37,7 +41,7 @@ public sealed class 斯温Strategy : IHeroStrategy
     public async Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)
     {
         VirtualKey key = trigger.Key;
-        await Item.根据按键判断技能释放前通用逻辑(new KeyEventArgs((Keys)key.ToNative())).ConfigureAwait(true);
+        await _item.根据按键判断技能释放前通用逻辑(new KeyEventArgs((Keys)key.ToNative())).ConfigureAwait(true);
 
         if (key == VirtualKey.Q)
         {
@@ -53,19 +57,19 @@ public sealed class 斯温Strategy : IHeroStrategy
         }
     }
 
-    private static async Task<bool> 风暴之拳去后摇(ImageHandle 句柄)
+    private async Task<bool> 风暴之拳去后摇(ImageHandle 句柄)
     {
-        return await Skill.技能通用判断(Keys.Q, 1).ConfigureAwait(true);
+        return await _skill.技能通用判断(Keys.Q, 1).ConfigureAwait(true);
     }
 
-    private static async Task<bool> 战吼去后摇(ImageHandle 句柄)
+    private async Task<bool> 战吼去后摇(ImageHandle 句柄)
     {
-        return await Skill.技能通用判断(Keys.E, 0).ConfigureAwait(true);
+        return await _skill.技能通用判断(Keys.E, 0).ConfigureAwait(true);
     }
 
-    private static async Task<bool> 神之力量去后摇(ImageHandle 句柄)
+    private async Task<bool> 神之力量去后摇(ImageHandle 句柄)
     {
-        return await Skill.技能通用判断(Keys.R, 0).ConfigureAwait(true);
+        return await _skill.技能通用判断(Keys.R, 0).ConfigureAwait(true);
     }
 }
 #endif

@@ -21,10 +21,14 @@ public sealed class 骨法Strategy : IHeroStrategy
     private readonly IScreenVision _vision;
 #pragma warning restore IDE0052
 
-    public 骨法Strategy(IInputExecutor input, IScreenVision vision)
+    private readonly SkillEngine _skill;
+    private readonly ItemEngine _item;
+    public 骨法Strategy(IInputExecutor input, IScreenVision vision, SkillEngine skill, ItemEngine item)
     {
         _input = input;
         _vision = vision;
+        _skill = skill;
+        _item = item;
     }
     public HeroId Hero => new("骨法", HeroAttribute.Intelligence);
 
@@ -39,7 +43,7 @@ public sealed class 骨法Strategy : IHeroStrategy
     public async Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)
     {
         VirtualKey key = trigger.Key;
-        await Item.根据按键判断技能释放前通用逻辑(new KeyEventArgs((Keys)key.ToNative())).ConfigureAwait(true);
+        await _item.根据按键判断技能释放前通用逻辑(new KeyEventArgs((Keys)key.ToNative())).ConfigureAwait(true);
 
         if (key == VirtualKey.Q)
         {
@@ -55,8 +59,8 @@ public sealed class 骨法Strategy : IHeroStrategy
         }
         else if (key == VirtualKey.R)
         {
-            Item.根据图片使用物品(Dota2_Pictrue.物品.希瓦);
-            Item.根据图片使用物品(Dota2_Pictrue.物品.纷争);
+            _item.根据图片使用物品(Dota2_Pictrue.物品.希瓦);
+            _item.根据图片使用物品(Dota2_Pictrue.物品.纷争);
             Main._聚合.Conditions[ConditionSlotKey.C4].Active = true;
         }
         else if (key == VirtualKey.From(Keys.D2))
@@ -68,31 +72,31 @@ public sealed class 骨法Strategy : IHeroStrategy
 
     private async Task<bool> 幽冥轰爆去后摇(ImageHandle 句柄)
     {
-        return await Skill.技能通用判断(Keys.Q, Main._聚合.Skills.Step(SlotKey.R) > 0 ? 10 : 0).ConfigureAwait(true);
+        return await _skill.技能通用判断(Keys.Q, Main._聚合.Skills.Step(SlotKey.R) > 0 ? 10 : 0).ConfigureAwait(true);
     }
 
     private async Task<bool> 衰老去后摇(ImageHandle 句柄)
     {
-        return await Skill.主动技能进入CD后续(Keys.W, () =>
+        return await _skill.主动技能进入CD后续(Keys.W, () =>
         {
             Common.Delay(33 * (
-                Item.根据图片使用物品(Dota2_Pictrue.物品.红杖)
-                + Item.根据图片使用物品(Dota2_Pictrue.物品.红杖2)
-                + Item.根据图片使用物品(Dota2_Pictrue.物品.红杖3)
-                + Item.根据图片使用物品(Dota2_Pictrue.物品.红杖4)
-                + Item.根据图片使用物品(Dota2_Pictrue.物品.红杖5)
+                _item.根据图片使用物品(Dota2_Pictrue.物品.红杖)
+                + _item.根据图片使用物品(Dota2_Pictrue.物品.红杖2)
+                + _item.根据图片使用物品(Dota2_Pictrue.物品.红杖3)
+                + _item.根据图片使用物品(Dota2_Pictrue.物品.红杖4)
+                + _item.根据图片使用物品(Dota2_Pictrue.物品.红杖5)
             ));
         }).ConfigureAwait(true);
     }
 
     private async Task<bool> 幽冥守卫去后摇(ImageHandle 句柄)
     {
-        return await Skill.技能通用判断(Keys.E, Main._聚合.Skills.Step(SlotKey.R) > 0 ? 10 : 0).ConfigureAwait(true);
+        return await _skill.技能通用判断(Keys.E, Main._聚合.Skills.Step(SlotKey.R) > 0 ? 10 : 0).ConfigureAwait(true);
     }
 
     private async Task<bool> 生命吸取去后摇(ImageHandle 句柄)
     {
-        if (Skill.DOTA2判断技能是否CD(Keys.R, in 句柄))
+        if (_skill.DOTA2判断技能是否CD(Keys.R, in 句柄))
         {
             Main._聚合.Skills.SetStep(SlotKey.R, 0);
             return await Task.FromResult(true).ConfigureAwait(true);
@@ -121,7 +125,7 @@ public sealed class 骨法Strategy : IHeroStrategy
             }
             else
             {
-                if (!Skill.DOTA2判断是否持续施法(in 句柄))
+                if (!SkillEngine.DOTA2判断是否持续施法(in 句柄))
                 {
                     Main._聚合.Skills.SetStep(SlotKey.R, 0);
                     _input.Press(VirtualKey.From(Keys.A));

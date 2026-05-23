@@ -20,10 +20,14 @@ public sealed class 大圣Strategy : IHeroStrategy
     private readonly IScreenVision _vision;
 #pragma warning restore IDE0052
 
-    public 大圣Strategy(IInputExecutor input, IScreenVision vision)
+    private readonly SkillEngine _skill;
+    private readonly ItemEngine _item;
+    public 大圣Strategy(IInputExecutor input, IScreenVision vision, SkillEngine skill, ItemEngine item)
     {
         _input = input;
         _vision = vision;
+        _skill = skill;
+        _item = item;
     }
     public HeroId Hero => new("大圣", HeroAttribute.Agility);
 
@@ -35,13 +39,13 @@ public sealed class 大圣Strategy : IHeroStrategy
         Main._聚合.Conditions[ConditionSlotKey.C4].Probe ??= 大圣无限跳跃;
         Main._聚合.LegSwap.配置.修改配置(Keys.Q, false);
         Main._聚合.LegSwap.配置.修改配置(Keys.W, false);
-        Skill.重复按键执行间隔阈值 = 100;
+        _skill.重复按键执行间隔阈值 = 100;
     }
 
     public async Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)
     {
         VirtualKey key = trigger.Key;
-        await Item.根据按键判断技能释放前通用逻辑(new KeyEventArgs((Keys)key.ToNative())).ConfigureAwait(true);
+        await _item.根据按键判断技能释放前通用逻辑(new KeyEventArgs((Keys)key.ToNative())).ConfigureAwait(true);
 
         if (key == VirtualKey.Q)
         {
@@ -62,24 +66,24 @@ public sealed class 大圣Strategy : IHeroStrategy
         }
     }
 
-    private static async Task<bool> 棒击大地去后摇(ImageHandle 句柄)
+    private async Task<bool> 棒击大地去后摇(ImageHandle 句柄)
     {
-        return await Skill.技能通用判断(Keys.Q, 1).ConfigureAwait(true);
+        return await _skill.技能通用判断(Keys.Q, 1).ConfigureAwait(true);
     }
 
-    private static async Task<bool> 乾坤之跃敏捷(ImageHandle 句柄)
+    private async Task<bool> 乾坤之跃敏捷(ImageHandle 句柄)
     {
-        return await Skill.技能通用判断(Keys.E, 0).ConfigureAwait(true);
+        return await _skill.技能通用判断(Keys.E, 0).ConfigureAwait(true);
     }
 
-    private static async Task<bool> 猴子猴孙敏捷(ImageHandle 句柄)
+    private async Task<bool> 猴子猴孙敏捷(ImageHandle 句柄)
     {
-        return await Skill.技能通用判断(Keys.R, 1).ConfigureAwait(true);
+        return await _skill.技能通用判断(Keys.R, 1).ConfigureAwait(true);
     }
 
-    private static async Task<bool> 大圣无限跳跃(ImageHandle 句柄)
+    private async Task<bool> 大圣无限跳跃(ImageHandle 句柄)
     {
-        await Skill.技能通用判断(Keys.W, 2).ConfigureAwait(true);
+        await _skill.技能通用判断(Keys.W, 2).ConfigureAwait(true);
         return await Task.FromResult(Main._聚合.Conditions[ConditionSlotKey.C4].Active).ConfigureAwait(true);
     }
 }

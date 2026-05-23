@@ -22,10 +22,14 @@ public sealed class 狼人Strategy : IHeroStrategy
     private readonly IScreenVision _vision;
 #pragma warning restore IDE0052
 
-    public 狼人Strategy(IInputExecutor input, IScreenVision vision)
+    private readonly SkillEngine _skill;
+    private readonly ItemEngine _item;
+    public 狼人Strategy(IInputExecutor input, IScreenVision vision, SkillEngine skill, ItemEngine item)
     {
         _input = input;
         _vision = vision;
+        _skill = skill;
+        _item = item;
     }
     public HeroId Hero => new("狼人", HeroAttribute.Universal);
 
@@ -40,7 +44,7 @@ public sealed class 狼人Strategy : IHeroStrategy
     public async Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)
     {
         VirtualKey key = trigger.Key;
-        await Item.根据按键判断技能释放前通用逻辑(new KeyEventArgs((Keys)key.ToNative())).ConfigureAwait(true);
+        await _item.根据按键判断技能释放前通用逻辑(new KeyEventArgs((Keys)key.ToNative())).ConfigureAwait(true);
 
         if (key == VirtualKey.Q)
         {
@@ -74,7 +78,7 @@ public sealed class 狼人Strategy : IHeroStrategy
             return await Task.FromResult(false).ConfigureAwait(true);
         }
 
-        if (Skill.DOTA2判断技能是否CD(Keys.Q, in 句柄))
+        if (_skill.DOTA2判断技能是否CD(Keys.Q, in 句柄))
         {
             return await Task.FromResult(true).ConfigureAwait(true);
         }
@@ -97,7 +101,7 @@ public sealed class 狼人Strategy : IHeroStrategy
             return await Task.FromResult(false).ConfigureAwait(true);
         }
 
-        if (Skill.DOTA2判断技能是否CD(Keys.W, in 句柄))
+        if (_skill.DOTA2判断技能是否CD(Keys.W, in 句柄))
         {
             return await Task.FromResult(true).ConfigureAwait(true);
         }
@@ -120,7 +124,7 @@ public sealed class 狼人Strategy : IHeroStrategy
             return await Task.FromResult(false).ConfigureAwait(true);
         }
 
-        if (Skill.DOTA2判断技能是否CD(Keys.D, in 句柄))
+        if (_skill.DOTA2判断技能是否CD(Keys.D, in 句柄))
         {
             return await Task.FromResult(true).ConfigureAwait(true);
         }

@@ -22,10 +22,14 @@ public sealed class 幽鬼Strategy : IHeroStrategy
     private readonly IScreenVision _vision;
 #pragma warning restore IDE0052
 
-    public 幽鬼Strategy(IInputExecutor input, IScreenVision vision)
+    private readonly SkillEngine _skill;
+    private readonly ItemEngine _item;
+    public 幽鬼Strategy(IInputExecutor input, IScreenVision vision, SkillEngine skill, ItemEngine item)
     {
         _input = input;
         _vision = vision;
+        _skill = skill;
+        _item = item;
     }
     public HeroId Hero => new("幽鬼", HeroAttribute.Agility);
 
@@ -42,7 +46,7 @@ public sealed class 幽鬼Strategy : IHeroStrategy
     public async Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)
     {
         VirtualKey key = trigger.Key;
-        await Item.根据按键判断技能释放前通用逻辑(new KeyEventArgs((Keys)key.ToNative())).ConfigureAwait(true);
+        await _item.根据按键判断技能释放前通用逻辑(new KeyEventArgs((Keys)key.ToNative())).ConfigureAwait(true);
 
         if (key == VirtualKey.From(Keys.F1))
         {
@@ -76,12 +80,12 @@ public sealed class 幽鬼Strategy : IHeroStrategy
 
     private async Task<bool> 幽鬼之刃去后摇(ImageHandle 句柄)
     {
-        return await Skill.技能通用判断(Keys.Q, 1, false).ConfigureAwait(true);
+        return await _skill.技能通用判断(Keys.Q, 1, false).ConfigureAwait(true);
     }
 
     private async Task<bool> 如影随形去后摇(ImageHandle 句柄)
     {
-        return await Skill.主动技能释放后续(Keys.R, () =>
+        return await _skill.主动技能释放后续(Keys.R, () =>
         {
             if (Main._聚合.Skills.Mode(SlotKey.F) == 1)
             {
@@ -92,21 +96,21 @@ public sealed class 幽鬼Strategy : IHeroStrategy
 
     private async Task<bool> 空降去后摇(ImageHandle 句柄)
     {
-        return await Skill.主动技能进入CD后续(Keys.D, () =>
+        return await _skill.主动技能进入CD后续(Keys.D, () =>
         {
             if (Main._聚合.Skills.Mode(SlotKey.F) == 1)
             {
-                if (Item.根据图片使用物品(Dota2_Pictrue.物品.幻影斧) == 1)
+                if (_item.根据图片使用物品(Dota2_Pictrue.物品.幻影斧) == 1)
                 {
                     分身一齐攻击();
                 }
 
-                Common.Delay(33 * Item.根据图片使用物品(Dota2_Pictrue.物品.否决));
-                Common.Delay(33 * Item.根据图片使用物品(Dota2_Pictrue.物品.紫苑));
-                Common.Delay(33 * Item.根据图片使用物品(Dota2_Pictrue.物品.血棘));
+                Common.Delay(33 * _item.根据图片使用物品(Dota2_Pictrue.物品.否决));
+                Common.Delay(33 * _item.根据图片使用物品(Dota2_Pictrue.物品.紫苑));
+                Common.Delay(33 * _item.根据图片使用物品(Dota2_Pictrue.物品.血棘));
             }
 
-            Item.要求保持假腿();
+            _item.要求保持假腿();
 
             _input.Press(VirtualKey.From(Keys.A));
         }).ConfigureAwait(true);
@@ -114,7 +118,7 @@ public sealed class 幽鬼Strategy : IHeroStrategy
 
     private async Task<bool> 折射去后摇(ImageHandle 句柄)
     {
-        return await Skill.技能通用判断(Keys.E, 0).ConfigureAwait(true);
+        return await _skill.技能通用判断(Keys.E, 0).ConfigureAwait(true);
     }
 
     /// <summary>因为有0.1秒的分裂时间，所以必须等待——复制自 Main.分身一齐攻击。</summary>

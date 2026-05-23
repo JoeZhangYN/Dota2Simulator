@@ -20,10 +20,14 @@ public sealed class 幻刺Strategy : IHeroStrategy
     private readonly IScreenVision _vision;
 #pragma warning restore IDE0052
 
-    public 幻刺Strategy(IInputExecutor input, IScreenVision vision)
+    private readonly SkillEngine _skill;
+    private readonly ItemEngine _item;
+    public 幻刺Strategy(IInputExecutor input, IScreenVision vision, SkillEngine skill, ItemEngine item)
     {
         _input = input;
         _vision = vision;
+        _skill = skill;
+        _item = item;
     }
     public HeroId Hero => new("幻刺", HeroAttribute.Agility);
 
@@ -38,7 +42,7 @@ public sealed class 幻刺Strategy : IHeroStrategy
     public async Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)
     {
         VirtualKey key = trigger.Key;
-        await Item.根据按键判断技能释放前通用逻辑(new KeyEventArgs((Keys)key.ToNative())).ConfigureAwait(true);
+        await _item.根据按键判断技能释放前通用逻辑(new KeyEventArgs((Keys)key.ToNative())).ConfigureAwait(true);
 
         if (key == VirtualKey.From(Keys.F1))
         {
@@ -72,22 +76,22 @@ public sealed class 幻刺Strategy : IHeroStrategy
 
     private async Task<bool> 窒息短匕敏捷(ImageHandle 句柄)
     {
-        return await Skill.技能通用判断(Keys.Q, 1).ConfigureAwait(true);
+        return await _skill.技能通用判断(Keys.Q, 1).ConfigureAwait(true);
     }
 
     private async Task<bool> 幻影突袭敏捷(ImageHandle 句柄)
     {
-        return await Skill.技能通用判断(Keys.W, 0).ConfigureAwait(true);
+        return await _skill.技能通用判断(Keys.W, 0).ConfigureAwait(true);
     }
 
     private async Task<bool> 魅影无形敏捷(ImageHandle 句柄)
     {
-        return await Skill.技能通用判断(Keys.E, 0, false).ConfigureAwait(true);
+        return await _skill.技能通用判断(Keys.E, 0, false).ConfigureAwait(true);
     }
 
     private async Task<bool> 刀阵旋风敏捷(ImageHandle 句柄)
     {
-        return await Skill.技能通用判断(Keys.D, 0).ConfigureAwait(true);
+        return await _skill.技能通用判断(Keys.D, 0).ConfigureAwait(true);
     }
 }
 #endif

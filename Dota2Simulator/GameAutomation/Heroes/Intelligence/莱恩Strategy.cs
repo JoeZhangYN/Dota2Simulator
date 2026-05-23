@@ -23,10 +23,14 @@ public sealed class 莱恩Strategy : IHeroStrategy
     private readonly IScreenVision _vision;
 #pragma warning restore IDE0052
 
-    public 莱恩Strategy(IInputExecutor input, IScreenVision vision)
+    private readonly SkillEngine _skill;
+    private readonly ItemEngine _item;
+    public 莱恩Strategy(IInputExecutor input, IScreenVision vision, SkillEngine skill, ItemEngine item)
     {
         _input = input;
         _vision = vision;
+        _skill = skill;
+        _item = item;
     }
     public HeroId Hero => new("莱恩", HeroAttribute.Intelligence);
 
@@ -101,7 +105,7 @@ public sealed class 莱恩Strategy : IHeroStrategy
             }
         }
 
-        if (Skill.DOTA2判断技能是否CD(Keys.W, in 句柄))
+        if (_skill.DOTA2判断技能是否CD(Keys.W, in 句柄))
         {
             return await Task.FromResult(true).ConfigureAwait(true);
         }
@@ -118,7 +122,7 @@ public sealed class 莱恩Strategy : IHeroStrategy
             _input.Press(VirtualKey.From(Keys.A));
         }
 
-        if (Skill.DOTA2判断技能是否CD(Keys.R, in 句柄))
+        if (_skill.DOTA2判断技能是否CD(Keys.R, in 句柄))
         {
             return await Task.FromResult(true).ConfigureAwait(true);
         }
@@ -130,20 +134,20 @@ public sealed class 莱恩Strategy : IHeroStrategy
     private async Task<bool> 大招前纷争(ImageHandle 句柄)
     {
         Common.Delay(33 * (
-            Item.根据图片使用物品(Dota2_Pictrue.物品.虚灵之刃)
-            + Item.根据图片使用物品(Dota2_Pictrue.物品.纷争)
-            + Item.根据图片使用物品(Dota2_Pictrue.物品.红杖)
-            + Item.根据图片使用物品(Dota2_Pictrue.物品.红杖2)
-            + Item.根据图片使用物品(Dota2_Pictrue.物品.红杖3)
-            + Item.根据图片使用物品(Dota2_Pictrue.物品.红杖4)
-            + Item.根据图片使用物品(Dota2_Pictrue.物品.红杖5)
+            _item.根据图片使用物品(Dota2_Pictrue.物品.虚灵之刃)
+            + _item.根据图片使用物品(Dota2_Pictrue.物品.纷争)
+            + _item.根据图片使用物品(Dota2_Pictrue.物品.红杖)
+            + _item.根据图片使用物品(Dota2_Pictrue.物品.红杖2)
+            + _item.根据图片使用物品(Dota2_Pictrue.物品.红杖3)
+            + _item.根据图片使用物品(Dota2_Pictrue.物品.红杖4)
+            + _item.根据图片使用物品(Dota2_Pictrue.物品.红杖5)
         ));
         return await Task.FromResult(false).ConfigureAwait(true);
     }
 
     private async Task<bool> 推推破林肯秒羊(ImageHandle 句柄)
     {
-        if (Item.根据图片使用物品(Dota2_Pictrue.物品.推推棒) == 1)
+        if (_item.根据图片使用物品(Dota2_Pictrue.物品.推推棒) == 1)
         {
             Common.Delay(等待延迟);
             return await Task.FromResult(true).ConfigureAwait(true);
@@ -159,24 +163,24 @@ public sealed class 莱恩Strategy : IHeroStrategy
 
         if (步骤 == 1)
         {
-            if (Item.根据图片使用物品(Dota2_Pictrue.物品.奥术鞋) == 1)
+            if (_item.根据图片使用物品(Dota2_Pictrue.物品.奥术鞋) == 1)
             {
                 return await Task.FromResult(true).ConfigureAwait(true);
             }
 
-            if (Item.根据图片使用物品(Dota2_Pictrue.物品.魂戒) == 1)
+            if (_item.根据图片使用物品(Dota2_Pictrue.物品.魂戒) == 1)
             {
                 return await Task.FromResult(true).ConfigureAwait(true);
             }
 
-            if (Skill.DOTA2判断技能是否CD(Keys.Q, in 句柄))
+            if (_skill.DOTA2判断技能是否CD(Keys.Q, in 句柄))
             {
                 _input.Press(VirtualKey.From(Keys.Q));
                 Common.Delay(60);
                 return await Task.FromResult(true).ConfigureAwait(true);
             }
 
-            if (Skill.DOTA2判断技能是否CD(Keys.R, in 句柄))
+            if (_skill.DOTA2判断技能是否CD(Keys.R, in 句柄))
             {
                 _input.Press(VirtualKey.From(Keys.R));
                 Common.Delay(60);
@@ -185,48 +189,48 @@ public sealed class 莱恩Strategy : IHeroStrategy
         }
         else if (步骤 == 0)
         {
-            if (Item.根据图片使用物品(Dota2_Pictrue.物品.跳刀) == 1)
+            if (_item.根据图片使用物品(Dota2_Pictrue.物品.跳刀) == 1)
             {
                 return await Task.FromResult(true).ConfigureAwait(true);
             }
 
-            if (Item.根据图片使用物品(Dota2_Pictrue.物品.跳刀_智力跳刀) == 1)
+            if (_item.根据图片使用物品(Dota2_Pictrue.物品.跳刀_智力跳刀) == 1)
             {
                 return await Task.FromResult(true).ConfigureAwait(true);
             }
 
-            if (Skill.DOTA2判断技能是否CD(Keys.W, in 句柄))
+            if (_skill.DOTA2判断技能是否CD(Keys.W, in 句柄))
             {
                 _input.Press(VirtualKey.From(Keys.W));
                 Common.Delay(等待延迟);
                 return await Task.FromResult(true).ConfigureAwait(true);
             }
 
-            if (Skill.DOTA2判断技能是否CD(Keys.Q, in 句柄))
+            if (_skill.DOTA2判断技能是否CD(Keys.Q, in 句柄))
             {
                 _input.Press(VirtualKey.From(Keys.Q));
                 Common.Delay(60);
                 return await Task.FromResult(true).ConfigureAwait(true);
             }
 
-            if (Item.根据图片使用物品(Dota2_Pictrue.物品.奥术鞋) == 1)
+            if (_item.根据图片使用物品(Dota2_Pictrue.物品.奥术鞋) == 1)
             {
                 return await Task.FromResult(true).ConfigureAwait(true);
             }
 
-            if (Item.根据图片使用物品(Dota2_Pictrue.物品.魂戒) == 1)
+            if (_item.根据图片使用物品(Dota2_Pictrue.物品.魂戒) == 1)
             {
                 return await Task.FromResult(true).ConfigureAwait(true);
             }
 
-            if (Skill.DOTA2判断技能是否CD(Keys.R, in 句柄))
+            if (_skill.DOTA2判断技能是否CD(Keys.R, in 句柄))
             {
                 _input.Press(VirtualKey.From(Keys.R));
                 Common.Delay(60);
                 return await Task.FromResult(true).ConfigureAwait(true);
             }
 
-            if (Main._聚合.Conditions[ConditionSlotKey.C5].Active && Item.根据图片使用物品(Dota2_Pictrue.物品.刷新球) == 1)
+            if (Main._聚合.Conditions[ConditionSlotKey.C5].Active && _item.根据图片使用物品(Dota2_Pictrue.物品.刷新球) == 1)
             {
                 Main._聚合.Skills.SetStep(SlotKey.Global, 1);
                 Common.Delay(120);

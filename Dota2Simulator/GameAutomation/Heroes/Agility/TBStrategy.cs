@@ -20,10 +20,14 @@ public sealed class TBStrategy : IHeroStrategy
     private readonly IScreenVision _vision;
 #pragma warning restore IDE0052
 
-    public TBStrategy(IInputExecutor input, IScreenVision vision)
+    private readonly SkillEngine _skill;
+    private readonly ItemEngine _item;
+    public TBStrategy(IInputExecutor input, IScreenVision vision, SkillEngine skill, ItemEngine item)
     {
         _input = input;
         _vision = vision;
+        _skill = skill;
+        _item = item;
     }
     public HeroId Hero => new("TB", HeroAttribute.Agility);
 
@@ -41,7 +45,7 @@ public sealed class TBStrategy : IHeroStrategy
     public async Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)
     {
         VirtualKey key = trigger.Key;
-        await Item.根据按键判断技能释放前通用逻辑(new KeyEventArgs((Keys)key.ToNative())).ConfigureAwait(true);
+        await _item.根据按键判断技能释放前通用逻辑(new KeyEventArgs((Keys)key.ToNative())).ConfigureAwait(true);
 
         if (key == VirtualKey.From(Keys.F1))
         {
@@ -82,34 +86,34 @@ public sealed class TBStrategy : IHeroStrategy
         }
     }
 
-    private static async Task<bool> 倒影敏捷(ImageHandle 句柄)
+    private async Task<bool> 倒影敏捷(ImageHandle 句柄)
     {
-        return await Skill.技能通用判断(Keys.Q, 1).ConfigureAwait(true);
+        return await _skill.技能通用判断(Keys.Q, 1).ConfigureAwait(true);
     }
 
-    private static async Task<bool> 幻惑敏捷(ImageHandle 句柄)
+    private async Task<bool> 幻惑敏捷(ImageHandle 句柄)
     {
-        return await Skill.技能通用判断(Keys.W, 1).ConfigureAwait(true);
+        return await _skill.技能通用判断(Keys.W, 1).ConfigureAwait(true);
     }
 
-    private static async Task<bool> 魔化敏捷(ImageHandle 句柄)
+    private async Task<bool> 魔化敏捷(ImageHandle 句柄)
     {
-        return await Skill.技能通用判断(Keys.E, 0).ConfigureAwait(true);
+        return await _skill.技能通用判断(Keys.E, 0).ConfigureAwait(true);
     }
 
-    private static async Task<bool> 恶魔狂热去后摇(ImageHandle 句柄)
+    private async Task<bool> 恶魔狂热去后摇(ImageHandle 句柄)
     {
-        return await Skill.技能通用判断(Keys.D, 1).ConfigureAwait(true);
+        return await _skill.技能通用判断(Keys.D, 1).ConfigureAwait(true);
     }
 
-    private static async Task<bool> 恐怖心潮敏捷(ImageHandle 句柄)
+    private async Task<bool> 恐怖心潮敏捷(ImageHandle 句柄)
     {
-        return await Skill.技能通用判断(Keys.F, 0).ConfigureAwait(true);
+        return await _skill.技能通用判断(Keys.F, 0).ConfigureAwait(true);
     }
 
-    private static async Task<bool> 断魂敏捷(ImageHandle 句柄)
+    private async Task<bool> 断魂敏捷(ImageHandle 句柄)
     {
-        return await Skill.技能通用判断(Keys.R, 1).ConfigureAwait(true);
+        return await _skill.技能通用判断(Keys.R, 1).ConfigureAwait(true);
     }
 }
 #endif

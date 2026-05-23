@@ -21,10 +21,14 @@ public sealed class 光法Strategy : IHeroStrategy
     private readonly IScreenVision _vision;
 #pragma warning restore IDE0052
 
-    public 光法Strategy(IInputExecutor input, IScreenVision vision)
+    private readonly SkillEngine _skill;
+    private readonly ItemEngine _item;
+    public 光法Strategy(IInputExecutor input, IScreenVision vision, SkillEngine skill, ItemEngine item)
     {
         _input = input;
         _vision = vision;
+        _skill = skill;
+        _item = item;
     }
     public HeroId Hero => new("光法", HeroAttribute.Intelligence);
 
@@ -36,7 +40,7 @@ public sealed class 光法Strategy : IHeroStrategy
         Main._聚合.Conditions[ConditionSlotKey.C4].Probe ??= 循环查克拉;
         Main._聚合.Conditions[ConditionSlotKey.C5].Probe ??= 致盲之光去后摇;
         Main._聚合.Conditions[ConditionSlotKey.C6].Probe ??= 灵光去后摇接炎阳;
-        Skill.重复按键执行间隔阈值 = 100;
+        _skill.重复按键执行间隔阈值 = 100;
     }
 
     public async Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)
@@ -44,7 +48,7 @@ public sealed class 光法Strategy : IHeroStrategy
         VirtualKey key = trigger.Key;
         KeyEventArgs e = new((Keys)key.ToNative() | ConvertModifiers(trigger.Modifiers));
 
-        await Item.根据按键判断技能释放前通用逻辑(e).ConfigureAwait(true);
+        await _item.根据按键判断技能释放前通用逻辑(e).ConfigureAwait(true);
 
         if (e.KeyValue == (int)Keys.E && (int)e.Modifiers == (int)Keys.Alt)
         {
@@ -95,7 +99,7 @@ public sealed class 光法Strategy : IHeroStrategy
         switch (全局步骤)
         {
             case 1:
-                return await Skill.主动技能进入CD后续(Keys.Q, () =>
+                return await _skill.主动技能进入CD后续(Keys.Q, () =>
                 {
                     Main._聚合.Skills.SetStep(SlotKey.Q, 0);
                     Main._聚合.LegSwap.配置.修改配置(Keys.Q, true);
@@ -120,27 +124,27 @@ public sealed class 光法Strategy : IHeroStrategy
 
     private async Task<bool> 炎阳之缚去后摇(ImageHandle 句柄)
     {
-        return await Skill.技能通用判断(Keys.D, 1).ConfigureAwait(true);
+        return await _skill.技能通用判断(Keys.D, 1).ConfigureAwait(true);
     }
 
     private async Task<bool> 查克拉魔法去后摇(ImageHandle 句柄)
     {
-        return await Skill.技能通用判断(Keys.E, 1).ConfigureAwait(true);
+        return await _skill.技能通用判断(Keys.E, 1).ConfigureAwait(true);
     }
 
     private async Task<bool> 致盲之光去后摇(ImageHandle 句柄)
     {
-        return await Skill.技能通用判断(Keys.W, 1).ConfigureAwait(true);
+        return await _skill.技能通用判断(Keys.W, 1).ConfigureAwait(true);
     }
 
     private async Task<bool> 灵光去后摇接炎阳(ImageHandle 句柄)
     {
-        return await Skill.技能通用判断(Keys.F, 1).ConfigureAwait(true);
+        return await _skill.技能通用判断(Keys.F, 1).ConfigureAwait(true);
     }
 
     private async Task<bool> 循环查克拉(ImageHandle 句柄)
     {
-        await Skill.技能通用判断(Keys.E, 2).ConfigureAwait(true);
+        await _skill.技能通用判断(Keys.E, 2).ConfigureAwait(true);
         return await Task.FromResult(Main._聚合.Conditions[ConditionSlotKey.C4].Active).ConfigureAwait(true);
     }
 }

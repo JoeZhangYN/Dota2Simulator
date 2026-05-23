@@ -21,10 +21,14 @@ public sealed class 帕克Strategy : IHeroStrategy
     private readonly IScreenVision _vision;
 #pragma warning restore IDE0052
 
-    public 帕克Strategy(IInputExecutor input, IScreenVision vision)
+    private readonly SkillEngine _skill;
+    private readonly ItemEngine _item;
+    public 帕克Strategy(IInputExecutor input, IScreenVision vision, SkillEngine skill, ItemEngine item)
     {
         _input = input;
         _vision = vision;
+        _skill = skill;
+        _item = item;
     }
     public HeroId Hero => new("帕克", HeroAttribute.Intelligence);
 
@@ -41,7 +45,7 @@ public sealed class 帕克Strategy : IHeroStrategy
         VirtualKey key = trigger.Key;
         KeyEventArgs e = new((Keys)key.ToNative() | ConvertModifiers(trigger.Modifiers));
 
-        await Item.根据按键判断技能释放前通用逻辑(e).ConfigureAwait(true);
+        await _item.根据按键判断技能释放前通用逻辑(e).ConfigureAwait(true);
 
         if (e.KeyValue == (int)Keys.W && (int)e.Modifiers == (int)Keys.Control)
         {
@@ -83,7 +87,7 @@ public sealed class 帕克Strategy : IHeroStrategy
 
     private async Task<bool> 幻象法球去后摇(ImageHandle 句柄)
     {
-        return await Skill.主动技能进入CD后续(Keys.Q, () =>
+        return await _skill.主动技能进入CD后续(Keys.Q, () =>
         {
             Main._聚合.Skills.SetStep(SlotKey.Q, 1);
             Common.Delay(3400);
@@ -98,17 +102,17 @@ public sealed class 帕克Strategy : IHeroStrategy
 
     private async Task<bool> 新月之痕去后摇(ImageHandle 句柄)
     {
-        return await Skill.技能通用判断(Keys.W, 0).ConfigureAwait(true);
+        return await _skill.技能通用判断(Keys.W, 0).ConfigureAwait(true);
     }
 
     private async Task<bool> 梦境缠绕去后摇(ImageHandle 句柄)
     {
-        return await Skill.技能通用判断(Keys.R, 0).ConfigureAwait(true);
+        return await _skill.技能通用判断(Keys.R, 0).ConfigureAwait(true);
     }
 
     private async Task<bool> 灵动之翼定位(ImageHandle 句柄)
     {
-        return await Skill.主动技能进入CD后续(Keys.D, () =>
+        return await _skill.主动技能进入CD后续(Keys.D, () =>
         {
             _input.Press(VirtualKey.From(Keys.F1));
             _input.Press(VirtualKey.From(Keys.F1));

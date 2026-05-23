@@ -21,10 +21,14 @@ public sealed class 军团Strategy : IHeroStrategy
     private readonly IScreenVision _vision;
 #pragma warning restore IDE0052
 
-    public 军团Strategy(IInputExecutor input, IScreenVision vision)
+    private readonly SkillEngine _skill;
+    private readonly ItemEngine _item;
+    public 军团Strategy(IInputExecutor input, IScreenVision vision, SkillEngine skill, ItemEngine item)
     {
         _input = input;
         _vision = vision;
+        _skill = skill;
+        _item = item;
     }
     public HeroId Hero => new("军团", HeroAttribute.Strength);
 
@@ -41,7 +45,7 @@ public sealed class 军团Strategy : IHeroStrategy
     public async Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)
     {
         VirtualKey key = trigger.Key;
-        await Item.根据按键判断技能释放前通用逻辑(new KeyEventArgs((Keys)key.ToNative())).ConfigureAwait(true);
+        await _item.根据按键判断技能释放前通用逻辑(new KeyEventArgs((Keys)key.ToNative())).ConfigureAwait(true);
 
         if (key == VirtualKey.Q)
         {
@@ -80,17 +84,17 @@ public sealed class 军团Strategy : IHeroStrategy
             {
                 case < 1:
                     {
-                        Common.Delay(33 * Item.根据图片使用物品(Dota2_Pictrue.物品.臂章));
-                        Common.Delay(33 * Item.根据图片使用物品(Dota2_Pictrue.物品.魂戒));
-                        Common.Delay(33 * Item.根据图片使用物品(Dota2_Pictrue.物品.相位鞋));
+                        Common.Delay(33 * _item.根据图片使用物品(Dota2_Pictrue.物品.臂章));
+                        Common.Delay(33 * _item.根据图片使用物品(Dota2_Pictrue.物品.魂戒));
+                        Common.Delay(33 * _item.根据图片使用物品(Dota2_Pictrue.物品.相位鞋));
 
-                        if (Skill.DOTA2判断技能是否CD(Keys.W, in 句柄))
+                        if (_skill.DOTA2判断技能是否CD(Keys.W, in 句柄))
                         {
                             _input.ComboAlt(VirtualKey.From(Keys.W));
                             return await Task.FromResult(true).ConfigureAwait(true);
                         }
 
-                        Common.Delay(33 * Item.根据图片使用物品(Dota2_Pictrue.物品.刃甲));
+                        Common.Delay(33 * _item.根据图片使用物品(Dota2_Pictrue.物品.刃甲));
 
                         Main._聚合.Skills.SetStep(SlotKey.Global, 1);
                         return await Task.FromResult(true).ConfigureAwait(true);
@@ -99,10 +103,10 @@ public sealed class 军团Strategy : IHeroStrategy
                     {
                         Common.Delay(33 *
                               (
-                                  Item.根据图片使用物品(Dota2_Pictrue.物品.跳刀)
-                                  + Item.根据图片使用物品(Dota2_Pictrue.物品.跳刀_力量跳刀)
-                                  + Item.根据图片使用物品(Dota2_Pictrue.物品.跳刀_智力跳刀)
-                                  + Item.根据图片使用物品(Dota2_Pictrue.物品.跳刀_敏捷跳刀)
+                                  _item.根据图片使用物品(Dota2_Pictrue.物品.跳刀)
+                                  + _item.根据图片使用物品(Dota2_Pictrue.物品.跳刀_力量跳刀)
+                                  + _item.根据图片使用物品(Dota2_Pictrue.物品.跳刀_智力跳刀)
+                                  + _item.根据图片使用物品(Dota2_Pictrue.物品.跳刀_敏捷跳刀)
                               ));
 
                         Main._聚合.Skills.SetStep(SlotKey.Global, 2);
@@ -111,12 +115,12 @@ public sealed class 军团Strategy : IHeroStrategy
                     }
                 case < 3:
                     {
-                        Common.Delay(33 * Item.根据图片使用物品(Dota2_Pictrue.物品.紫苑));
-                        Common.Delay(33 * Item.根据图片使用物品(Dota2_Pictrue.物品.血棘));
-                        Common.Delay(33 * Item.根据图片使用物品(Dota2_Pictrue.物品.否决));
-                        Common.Delay(33 * Item.根据图片使用物品(Dota2_Pictrue.物品.散失));
-                        Common.Delay(33 * Item.根据图片使用物品(Dota2_Pictrue.物品.散魂));
-                        Common.Delay(33 * Item.根据图片使用物品(Dota2_Pictrue.物品.深渊之刃));
+                        Common.Delay(33 * _item.根据图片使用物品(Dota2_Pictrue.物品.紫苑));
+                        Common.Delay(33 * _item.根据图片使用物品(Dota2_Pictrue.物品.血棘));
+                        Common.Delay(33 * _item.根据图片使用物品(Dota2_Pictrue.物品.否决));
+                        Common.Delay(33 * _item.根据图片使用物品(Dota2_Pictrue.物品.散失));
+                        Common.Delay(33 * _item.根据图片使用物品(Dota2_Pictrue.物品.散魂));
+                        Common.Delay(33 * _item.根据图片使用物品(Dota2_Pictrue.物品.深渊之刃));
 
                         Main._聚合.Skills.SetStep(SlotKey.Global, 3);
 
@@ -128,7 +132,7 @@ public sealed class 军团Strategy : IHeroStrategy
                         // 触发激怒，让周围的小兵都攻击你
                         _input.Press(VirtualKey.From(Keys.A));
 
-                        if (Skill.DOTA2释放CD就绪技能(Keys.R, in 句柄))
+                        if (_skill.DOTA2释放CD就绪技能(Keys.R, in 句柄))
                         {
                             Common.Delay(60);
                             return await Task.FromResult(true).ConfigureAwait(true);
@@ -145,17 +149,17 @@ public sealed class 军团Strategy : IHeroStrategy
 
     private async Task<bool> 压倒性优势去后摇(ImageHandle 句柄)
     {
-        return await Skill.技能通用判断(Keys.Q, 0).ConfigureAwait(true);
+        return await _skill.技能通用判断(Keys.Q, 0).ConfigureAwait(true);
     }
 
     private async Task<bool> 强攻去后摇(ImageHandle 句柄)
     {
-        return await Skill.技能通用判断(Keys.W, 1).ConfigureAwait(true);
+        return await _skill.技能通用判断(Keys.W, 1).ConfigureAwait(true);
     }
 
     private async Task<bool> 决斗去后摇(ImageHandle 句柄)
     {
-        return await Skill.技能通用判断(Keys.R, 1, 要接的按键: Keys.Q).ConfigureAwait(true);
+        return await _skill.技能通用判断(Keys.R, 1, 要接的按键: Keys.Q).ConfigureAwait(true);
     }
 }
 #endif

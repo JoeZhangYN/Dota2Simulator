@@ -23,10 +23,14 @@ public sealed class 大鱼人Strategy : IHeroStrategy
     private readonly IScreenVision _vision;
 #pragma warning restore IDE0052
 
-    public 大鱼人Strategy(IInputExecutor input, IScreenVision vision)
+    private readonly SkillEngine _skill;
+    private readonly ItemEngine _item;
+    public 大鱼人Strategy(IInputExecutor input, IScreenVision vision, SkillEngine skill, ItemEngine item)
     {
         _input = input;
         _vision = vision;
+        _skill = skill;
+        _item = item;
     }
     public HeroId Hero => new("大鱼人", HeroAttribute.Strength);
 
@@ -42,7 +46,7 @@ public sealed class 大鱼人Strategy : IHeroStrategy
     public async Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)
     {
         VirtualKey key = trigger.Key;
-        await Item.根据按键判断技能释放前通用逻辑(new KeyEventArgs((Keys)key.ToNative())).ConfigureAwait(true);
+        await _item.根据按键判断技能释放前通用逻辑(new KeyEventArgs((Keys)key.ToNative())).ConfigureAwait(true);
 
         if (key == VirtualKey.Q)
         {
@@ -62,40 +66,40 @@ public sealed class 大鱼人Strategy : IHeroStrategy
         }
     }
 
-    private static async Task<bool> 跳刀接踩(ImageHandle 句柄)
+    private async Task<bool> 跳刀接踩(ImageHandle 句柄)
     {
-        if (Item.根据图片使用物品(Dota2_Pictrue.物品.魂戒) == 1)
+        if (_item.根据图片使用物品(Dota2_Pictrue.物品.魂戒) == 1)
         {
             Common.Delay(等待延迟);
         }
 
-        if (Item.根据图片使用物品(Dota2_Pictrue.物品.跳刀)
-            + Item.根据图片使用物品(Dota2_Pictrue.物品.跳刀_敏捷跳刀)
-            + Item.根据图片使用物品(Dota2_Pictrue.物品.跳刀_智力跳刀)
-            + Item.根据图片使用物品(Dota2_Pictrue.物品.跳刀_力量跳刀) == 1
+        if (_item.根据图片使用物品(Dota2_Pictrue.物品.跳刀)
+            + _item.根据图片使用物品(Dota2_Pictrue.物品.跳刀_敏捷跳刀)
+            + _item.根据图片使用物品(Dota2_Pictrue.物品.跳刀_智力跳刀)
+            + _item.根据图片使用物品(Dota2_Pictrue.物品.跳刀_力量跳刀) == 1
            )
         {
             Common.Delay(等待延迟);
         }
 
-        _ = Skill.DOTA2释放CD就绪技能(Keys.W, in 句柄);
+        _ = _skill.DOTA2释放CD就绪技能(Keys.W, in 句柄);
 
         return await Task.FromResult(false).ConfigureAwait(true);
     }
 
-    private static async Task<bool> 守卫冲刺去后摇(ImageHandle 句柄)
+    private async Task<bool> 守卫冲刺去后摇(ImageHandle 句柄)
     {
-        return await Skill.技能通用判断(Keys.Q, 0).ConfigureAwait(true);
+        return await _skill.技能通用判断(Keys.Q, 0).ConfigureAwait(true);
     }
 
-    private static async Task<bool> 踩去后摇(ImageHandle 句柄)
+    private async Task<bool> 踩去后摇(ImageHandle 句柄)
     {
-        return await Skill.技能通用判断(Keys.W, 1, 要接的按键: Main._聚合.HasShard ? Keys.A : Keys.R).ConfigureAwait(true);
+        return await _skill.技能通用判断(Keys.W, 1, 要接的按键: Main._聚合.HasShard ? Keys.A : Keys.R).ConfigureAwait(true);
     }
 
-    private static async Task<bool> 雾霭去后摇(ImageHandle 句柄)
+    private async Task<bool> 雾霭去后摇(ImageHandle 句柄)
     {
-        return await Skill.技能通用判断(Keys.R, 1).ConfigureAwait(true);
+        return await _skill.技能通用判断(Keys.R, 1).ConfigureAwait(true);
     }
 }
 #endif

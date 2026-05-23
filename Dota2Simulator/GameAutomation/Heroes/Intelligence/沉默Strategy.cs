@@ -21,10 +21,14 @@ public sealed class 沉默Strategy : IHeroStrategy
     private readonly IScreenVision _vision;
 #pragma warning restore IDE0052
 
-    public 沉默Strategy(IInputExecutor input, IScreenVision vision)
+    private readonly SkillEngine _skill;
+    private readonly ItemEngine _item;
+    public 沉默Strategy(IInputExecutor input, IScreenVision vision, SkillEngine skill, ItemEngine item)
     {
         _input = input;
         _vision = vision;
+        _skill = skill;
+        _item = item;
     }
     public HeroId Hero => new("沉默", HeroAttribute.Intelligence);
 
@@ -52,13 +56,13 @@ public sealed class 沉默Strategy : IHeroStrategy
     private async Task<bool> 大招前纷争(ImageHandle 句柄)
     {
         Common.Delay(33 * (
-            Item.根据图片使用物品(Dota2_Pictrue.物品.虚灵之刃)
-            + Item.根据图片使用物品(Dota2_Pictrue.物品.纷争)
-            + Item.根据图片使用物品(Dota2_Pictrue.物品.红杖)
-            + Item.根据图片使用物品(Dota2_Pictrue.物品.红杖2)
-            + Item.根据图片使用物品(Dota2_Pictrue.物品.红杖3)
-            + Item.根据图片使用物品(Dota2_Pictrue.物品.红杖4)
-            + Item.根据图片使用物品(Dota2_Pictrue.物品.红杖5)
+            _item.根据图片使用物品(Dota2_Pictrue.物品.虚灵之刃)
+            + _item.根据图片使用物品(Dota2_Pictrue.物品.纷争)
+            + _item.根据图片使用物品(Dota2_Pictrue.物品.红杖)
+            + _item.根据图片使用物品(Dota2_Pictrue.物品.红杖2)
+            + _item.根据图片使用物品(Dota2_Pictrue.物品.红杖3)
+            + _item.根据图片使用物品(Dota2_Pictrue.物品.红杖4)
+            + _item.根据图片使用物品(Dota2_Pictrue.物品.红杖5)
         ));
         return await Task.FromResult(false).ConfigureAwait(true);
     }
@@ -94,7 +98,7 @@ public sealed class 沉默Strategy : IHeroStrategy
             return await Task.FromResult(false).ConfigureAwait(true);
         }
 
-        if (Skill.DOTA2判断技能是否CD(Keys.Q, in 句柄))
+        if (_skill.DOTA2判断技能是否CD(Keys.Q, in 句柄))
         {
             return await Task.FromResult(true).ConfigureAwait(true);
         }
@@ -119,7 +123,7 @@ public sealed class 沉默Strategy : IHeroStrategy
             return await Task.FromResult(false).ConfigureAwait(true);
         }
 
-        if (Skill.DOTA2判断技能是否CD(Keys.R, in 句柄))
+        if (_skill.DOTA2判断技能是否CD(Keys.R, in 句柄))
         {
             return await Task.FromResult(true).ConfigureAwait(true);
         }

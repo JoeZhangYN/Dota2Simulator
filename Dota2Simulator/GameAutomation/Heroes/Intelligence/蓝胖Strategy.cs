@@ -20,10 +20,14 @@ public sealed class 蓝胖Strategy : IHeroStrategy
     private readonly IScreenVision _vision;
 #pragma warning restore IDE0052
 
-    public 蓝胖Strategy(IInputExecutor input, IScreenVision vision)
+    private readonly SkillEngine _skill;
+    private readonly ItemEngine _item;
+    public 蓝胖Strategy(IInputExecutor input, IScreenVision vision, SkillEngine skill, ItemEngine item)
     {
         _input = input;
         _vision = vision;
+        _skill = skill;
+        _item = item;
     }
     public HeroId Hero => new("蓝胖", HeroAttribute.Intelligence);
 
@@ -71,7 +75,7 @@ public sealed class 蓝胖Strategy : IHeroStrategy
             _input.MouseClick(MouseButton.Right);
         }
 
-        if (Skill.DOTA2判断技能是否CD(Keys.Q, in 句柄))
+        if (_skill.DOTA2判断技能是否CD(Keys.Q, in 句柄))
         {
             return await Task.FromResult(true).ConfigureAwait(true);
         }
@@ -95,7 +99,7 @@ public sealed class 蓝胖Strategy : IHeroStrategy
             }
         }
 
-        if (Skill.DOTA2判断技能是否CD(Keys.W, in 句柄))
+        if (_skill.DOTA2判断技能是否CD(Keys.W, in 句柄))
         {
             return await Task.FromResult(true).ConfigureAwait(true);
         }
@@ -111,7 +115,7 @@ public sealed class 蓝胖Strategy : IHeroStrategy
             _input.MouseClick(MouseButton.Right);
         }
 
-        if (Skill.DOTA2判断技能是否CD(Keys.E, in 句柄))
+        if (_skill.DOTA2判断技能是否CD(Keys.E, in 句柄))
         {
             return await Task.FromResult(true).ConfigureAwait(true);
         }
@@ -127,7 +131,7 @@ public sealed class 蓝胖Strategy : IHeroStrategy
             _input.MouseClick(MouseButton.Right);
         }
 
-        if (Skill.DOTA2判断技能是否CD(Keys.D, in 句柄))
+        if (_skill.DOTA2判断技能是否CD(Keys.D, in 句柄))
         {
             return await Task.FromResult(true).ConfigureAwait(true);
         }
@@ -143,7 +147,7 @@ public sealed class 蓝胖Strategy : IHeroStrategy
             _input.MouseClick(MouseButton.Right);
         }
 
-        if (Skill.DOTA2判断技能是否CD(Keys.F, in 句柄))
+        if (_skill.DOTA2判断技能是否CD(Keys.F, in 句柄))
         {
             return await Task.FromResult(true).ConfigureAwait(true);
         }

@@ -21,10 +21,14 @@ public sealed class 混沌Strategy : IHeroStrategy
     private readonly IScreenVision _vision;
 #pragma warning restore IDE0052
 
-    public 混沌Strategy(IInputExecutor input, IScreenVision vision)
+    private readonly SkillEngine _skill;
+    private readonly ItemEngine _item;
+    public 混沌Strategy(IInputExecutor input, IScreenVision vision, SkillEngine skill, ItemEngine item)
     {
         _input = input;
         _vision = vision;
+        _skill = skill;
+        _item = item;
     }
     public HeroId Hero => new("混沌", HeroAttribute.Strength);
 
@@ -39,12 +43,12 @@ public sealed class 混沌Strategy : IHeroStrategy
     public async Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)
     {
         VirtualKey key = trigger.Key;
-        await Item.根据按键判断技能释放前通用逻辑(new KeyEventArgs((Keys)key.ToNative())).ConfigureAwait(true);
+        await _item.根据按键判断技能释放前通用逻辑(new KeyEventArgs((Keys)key.ToNative())).ConfigureAwait(true);
 
         if (key == VirtualKey.Q)
         {
-            Item.根据图片使用物品(Dota2_Pictrue.物品.紫苑);
-            Item.根据图片使用物品(Dota2_Pictrue.物品.血棘);
+            _item.根据图片使用物品(Dota2_Pictrue.物品.紫苑);
+            _item.根据图片使用物品(Dota2_Pictrue.物品.血棘);
             Main._聚合.Conditions[ConditionSlotKey.C1].Active = true;
         }
         else if (key == VirtualKey.W)
@@ -68,35 +72,35 @@ public sealed class 混沌Strategy : IHeroStrategy
 
     private async Task<bool> 混乱之箭去后摇(ImageHandle 句柄)
     {
-        return await Skill.技能通用判断(Keys.Q, 1, 要接的按键: Main._聚合.Skills.Mode(SlotKey.Q) == 1 ? Keys.W : Keys.A).ConfigureAwait(true);
+        return await _skill.技能通用判断(Keys.Q, 1, 要接的按键: Main._聚合.Skills.Mode(SlotKey.Q) == 1 ? Keys.W : Keys.A).ConfigureAwait(true);
     }
 
     private async Task<bool> 实相裂隙去后摇(ImageHandle 句柄)
     {
-        return await Skill.技能通用判断(Keys.W, 11).ConfigureAwait(true);
+        return await _skill.技能通用判断(Keys.W, 11).ConfigureAwait(true);
     }
 
     private async Task<bool> 混沌之军去后摇(ImageHandle 句柄)
     {
-        return await Skill.技能通用判断(Keys.R, 1).ConfigureAwait(true);
+        return await _skill.技能通用判断(Keys.R, 1).ConfigureAwait(true);
     }
 
     // 沿用 Main.切臂章
     private async Task 切臂章()
     {
-        Keys key = Item.根据图片获取物品按键(Dota2_Pictrue.物品.臂章_开启);
+        Keys key = _item.根据图片获取物品按键(Dota2_Pictrue.物品.臂章_开启);
         if (key != Keys.Escape)
         {
             _input.Press(VirtualKey.From(key));
             Common.Delay(15);
-            _ = Item.根据图片使用物品(Dota2_Pictrue.物品.魔棒);
-            _ = Item.根据图片自我使用物品(Dota2_Pictrue.物品.吊坠);
-            _ = Item.根据图片使用物品(Dota2_Pictrue.物品.仙草);
-            _ = Item.根据图片使用物品(Dota2_Pictrue.物品.假腿_力量腿);
+            _ = _item.根据图片使用物品(Dota2_Pictrue.物品.魔棒);
+            _ = _item.根据图片自我使用物品(Dota2_Pictrue.物品.吊坠);
+            _ = _item.根据图片使用物品(Dota2_Pictrue.物品.仙草);
+            _ = _item.根据图片使用物品(Dota2_Pictrue.物品.假腿_力量腿);
             Common.Delay(15);
             _input.Press(VirtualKey.From(key));
             Main._聚合.LegSwap.条件假腿敏捷 = false;
-            Item.要求保持假腿();
+            _item.要求保持假腿();
 
             _ = await Task.FromResult(false).ConfigureAwait(true);
         }
