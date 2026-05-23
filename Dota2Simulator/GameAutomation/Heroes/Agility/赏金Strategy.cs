@@ -32,7 +32,7 @@ public sealed class 赏金Strategy : IHeroStrategy
         Main._聚合.Conditions[ConditionSlotKey.C1].Probe ??= 飞镖接平a;
         Main._聚合.Conditions[ConditionSlotKey.C2].Probe ??= 标记去后摇;
         Main._聚合.Conditions[ConditionSlotKey.C3].Probe ??= 循环标记;
-        Item._切假腿配置.修改配置(Keys.W, false);
+        Main._聚合.LegSwap.配置.修改配置(Keys.W, false);
     }
 
     public async Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)

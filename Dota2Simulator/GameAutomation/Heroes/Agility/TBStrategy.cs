@@ -35,7 +35,7 @@ public sealed class TBStrategy : IHeroStrategy
         Main._聚合.Conditions[ConditionSlotKey.C4].Probe ??= 恶魔狂热去后摇;
         Main._聚合.Conditions[ConditionSlotKey.C5].Probe ??= 恐怖心潮敏捷;
         Main._聚合.Conditions[ConditionSlotKey.C6].Probe ??= 断魂敏捷;
-        Item._切假腿配置.修改配置(Keys.W, false);
+        Main._聚合.LegSwap.配置.修改配置(Keys.W, false);
     }
 
     public async Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)
@@ -47,7 +47,7 @@ public sealed class TBStrategy : IHeroStrategy
         {
             if (Item._是否神杖)
             {
-                Item._切假腿配置.修改配置(Keys.F, true);
+                Main._聚合.LegSwap.配置.修改配置(Keys.F, true);
             }
         }
         else if (key == VirtualKey.Q)

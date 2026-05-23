@@ -39,8 +39,8 @@ public sealed class 火猫Strategy : IHeroStrategy
         Main._聚合.Conditions[ConditionSlotKey.C2].Probe ??= 炎阳索去后摇;
         Main._聚合.Conditions[ConditionSlotKey.C3].Probe ??= 烈火罩去后摇;
         Main._聚合.Conditions[ConditionSlotKey.C4].Probe ??= 激活残焰去后摇;
-        Item._切假腿配置.修改配置(Keys.D, true);
-        Item._切假腿配置.修改配置(Keys.R, false);
+        Main._聚合.LegSwap.配置.修改配置(Keys.D, true);
+        Main._聚合.LegSwap.配置.修改配置(Keys.R, false);
     }
 
     public async Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)

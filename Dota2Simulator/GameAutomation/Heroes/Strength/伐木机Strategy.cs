@@ -81,7 +81,7 @@ public sealed class 伐木机Strategy : IHeroStrategy
             else if (ImageFinder.FindImageInRegionBool(Dota2_Pictrue.命石.伐木机_锯齿轮旋, GlobalScreenCapture.GetCurrentHandle(), 命石区域))
             {
                 Main._聚合.Conditions.StoneChoice = 2;
-                Item._切假腿配置.修改配置(Keys.D, true);
+                Main._聚合.LegSwap.配置.修改配置(Keys.D, true);
             }
         }
 

@@ -32,8 +32,8 @@ public sealed class 剃刀Strategy : IHeroStrategy
         //_聚合.Conditions[ConditionSlotKey.C2].Probe ??= 乾坤之跃敏捷;
         //_聚合.Conditions[ConditionSlotKey.C3].Probe ??= 猴子猴孙敏捷;
         //_聚合.Conditions[ConditionSlotKey.C4].Probe ??= 大圣无限跳跃;
-        //Item._切假腿配置.修改配置(Keys.Q, false);
-        //Item._切假腿配置.修改配置(Keys.W, false);
+        //Main._聚合.LegSwap.配置.修改配置(Keys.Q, false);
+        //Main._聚合.LegSwap.配置.修改配置(Keys.W, false);
     }
 
     public async Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)

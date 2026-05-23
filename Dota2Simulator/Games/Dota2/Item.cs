@@ -1,8 +1,9 @@
-﻿// Games/Dota2/Item.cs
+// Games/Dota2/Item.cs
 #if DOTA2
 
 using Dota2Simulator.Vision;
 using Dota2Simulator.GameAutomation.Application;
+using Dota2Simulator.GameAutomation.Domain;
 using Dota2Simulator.GameAutomation.Ports;
 using Dota2Simulator.KeyboardMouse;
 using System;
@@ -16,48 +17,9 @@ namespace Dota2Simulator.Games.Dota2
     internal class Item
     {
         #region 全局变量
-        internal class 技能切假腿配置
-        {
-            public 技能切假腿配置()
-            {
-                切假腿配置 = new Dictionary<Keys, (bool, string)>
-                {
-                    { Keys.Q, (true, "智力") },
-                    { Keys.W, (true, "智力") },
-                    { Keys.E, (true, "智力") },
-                    { Keys.R, (true, "智力") },
-                    { Keys.D, (false, "智力") },
-                    { Keys.F, (false, "智力") },
-                    { Keys.Z, (false, "智力") },
-                    { Keys.X, (false, "智力") },
-                    { Keys.C, (false, "智力") },
-                    { Keys.V, (false, "智力") },
-                    { Keys.B, (false, "智力") },
-                    { Keys.Space, (false, "智力") }
-                };
-            }
-
-            public Dictionary<Keys, (bool 是否激活, string 假腿类型)> 切假腿配置 { get; }
-
-            public void 修改配置(Keys key, bool 是否激活, string 假腿类型 = "智力")
-            {
-                if (切假腿配置.ContainsKey(key))
-                {
-                    切假腿配置[key] = (是否激活, 假腿类型);
-                }
-                else
-                {
-                    切假腿配置.Add(key, (是否激活, 假腿类型));
-                }
-            }
-        }
-
-        public static 技能切假腿配置 _切假腿配置 = new();
-
-        public static Keys _假腿按键 = Keys.Escape;
-
+        // Phase 8 C1: 切假腿 8 个字段 (配置 / 假腿按键 / 6 bool flag) 迁入 HeroAggregate.LegSwap (Domain.LegSwapState)。
+        // 杖晶检测 2 个 bool 仍是 Item BC 内部状态（不属切假腿语义），暂留 static。
         public static bool _是否魔晶, _是否神杖;
-        public static bool _存在假腿, _条件开启切假腿, _条件保持假腿, _需要切假腿, _条件假腿敏捷, _切假腿中;
 
         #endregion
 
@@ -66,7 +28,7 @@ namespace Dota2Simulator.Games.Dota2
         public static async Task 根据按键判断技能释放前通用逻辑(KeyEventArgs e)
         {
             _ = await Skill.设置当前技能数量().ConfigureAwait(true);
-            _存在假腿 = 获取当前假腿按键();
+            Main._聚合.LegSwap.存在假腿 = 获取当前假腿按键();
             _是否神杖 = 阿哈利姆神杖(GlobalScreenCapture.GetCurrentHandle());
             _是否魔晶 = 阿哈利姆魔晶(GlobalScreenCapture.GetCurrentHandle());
 
@@ -81,16 +43,16 @@ namespace Dota2Simulator.Games.Dota2
                     Main._中断条件 = !Main._中断条件;
                     TTS.TTS.Speak($"{(Main._中断条件 ? "中断" : "继续")}运行");
                     break;
-                case Keys.NumPad7 when _存在假腿:
+                case Keys.NumPad7 when Main._聚合.LegSwap.存在假腿:
                     切换假腿状态();
                     break;
-                case Keys.NumPad8 when _存在假腿:
+                case Keys.NumPad8 when Main._聚合.LegSwap.存在假腿:
                     切换保持假腿状态();
                     break;
-                case Keys.NumPad9 when _存在假腿:
+                case Keys.NumPad9 when Main._聚合.LegSwap.存在假腿:
                     Main.取消所有功能();
                     break;
-                case var _ when e.KeyCode == _假腿按键:
+                case var _ when e.KeyCode == Main._聚合.LegSwap.假腿按键:
                     return;
                 #region Silt
 #if Silt
@@ -114,12 +76,12 @@ namespace Dota2Simulator.Games.Dota2
 #endif
                 #endregion
                 default:
-                    if (!_存在假腿)
+                    if (!Main._聚合.LegSwap.存在假腿)
                     {
                         return;
                     }
 
-                    await 根据配置技能释放前切假腿(e, _切假腿配置).ConfigureAwait(true);
+                    await 根据配置技能释放前切假腿(e, Main._聚合.LegSwap.配置).ConfigureAwait(true);
                     if (Main.按键匹配条件更新.TryGetValue(e.KeyCode, out Action value))
                     {
                         value.Invoke();
@@ -160,40 +122,40 @@ namespace Dota2Simulator.Games.Dota2
 
         public static async Task 技能释放前切假腿(string 类型)
         {
-            if (_条件开启切假腿 && _条件保持假腿 && _存在假腿)
+            if (Main._聚合.LegSwap.条件开启切假腿 && Main._聚合.LegSwap.条件保持假腿 && Main._聚合.LegSwap.存在假腿)
             {
-                _条件保持假腿 = false;
-                _需要切假腿 = false;
+                Main._聚合.LegSwap.条件保持假腿 = false;
+                Main._聚合.LegSwap.需要切假腿 = false;
                 _ = await 切假腿类型(类型).ConfigureAwait(true);
             }
         }
 
         public static void 要求保持假腿()
         {
-            _条件保持假腿 = _条件开启切假腿;
-            _需要切假腿 = true;
+            Main._聚合.LegSwap.条件保持假腿 = Main._聚合.LegSwap.条件开启切假腿;
+            Main._聚合.LegSwap.需要切假腿 = true;
         }
 
         private static void 切换假腿状态()
         {
-            _条件假腿敏捷 = !_条件假腿敏捷;
+            Main._聚合.LegSwap.条件假腿敏捷 = !Main._聚合.LegSwap.条件假腿敏捷;
             要求保持假腿();
-            TTS.TTS.Speak(_条件假腿敏捷 ? "切敏捷" : "切力量");
+            TTS.TTS.Speak(Main._聚合.LegSwap.条件假腿敏捷 ? "切敏捷" : "切力量");
         }
 
         private static void 切换保持假腿状态()
         {
-            if (!_条件保持假腿 && _条件开启切假腿)
+            if (!Main._聚合.LegSwap.条件保持假腿 && Main._聚合.LegSwap.条件开启切假腿)
             {
                 要求保持假腿();
             }
             else
             {
-                _条件开启切假腿 = !_条件开启切假腿;
+                Main._聚合.LegSwap.条件开启切假腿 = !Main._聚合.LegSwap.条件开启切假腿;
                 要求保持假腿();
             }
 
-            TTS.TTS.Speak(_条件保持假腿 ? "保持假腿" : "不保持假腿");
+            TTS.TTS.Speak(Main._聚合.LegSwap.条件保持假腿 ? "保持假腿" : "不保持假腿");
         }
 
 
@@ -502,11 +464,11 @@ namespace Dota2Simulator.Games.Dota2
                 {
                     if (匹配句柄.Id == Dota2_Pictrue.物品.魂戒.Id)
                     {
-                        _切假腿配置.修改配置(key, true, "力量");
+                        Main._聚合.LegSwap.配置.修改配置(key, true, "力量");
                     }
                     else
                     {
-                        _切假腿配置.修改配置(key, true);
+                        Main._聚合.LegSwap.配置.修改配置(key, true);
                     }
 
                     value.Invoke();
@@ -540,8 +502,8 @@ namespace Dota2Simulator.Games.Dota2
                 Keys key = 根据图片获取物品按键(假腿句柄);
                 if (key != Keys.Escape)
                 {
-                    _假腿按键 = key;
-                    if (清空物品进入CD委托和条件映射.TryGetValue(_假腿按键, out (Action 清空委托, Action 重置条件) actions))
+                    Main._聚合.LegSwap.假腿按键 = key;
+                    if (清空物品进入CD委托和条件映射.TryGetValue(Main._聚合.LegSwap.假腿按键, out (Action 清空委托, Action 重置条件) actions))
                     {
                         actions.清空委托.Invoke();
                         actions.重置条件.Invoke();
@@ -550,7 +512,7 @@ namespace Dota2Simulator.Games.Dota2
                 }
             }
 
-            return _假腿按键 != Keys.Escape;
+            return Main._聚合.LegSwap.假腿按键 != Keys.Escape;
         }
 
         public static Keys 根据图片获取物品按键(in ImageHandle 句柄)

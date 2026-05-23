@@ -33,13 +33,13 @@ public sealed class 火枪Strategy : IHeroStrategy
         Main._聚合.Conditions[ConditionSlotKey.C2].Probe ??= 瞄准去后摇;
         Main._聚合.Conditions[ConditionSlotKey.C3].Probe ??= 震荡手雷去后摇;
         Main._聚合.Conditions[ConditionSlotKey.C4].Probe ??= 暗杀去后摇;
-        Item._切假腿配置.修改配置(Keys.W, false);
+        Main._聚合.LegSwap.配置.修改配置(Keys.W, false);
     }
 
     public async Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)
     {
         VirtualKey key = trigger.Key;
-        Item._切假腿配置.修改配置(Keys.D, Item._是否魔晶);
+        Main._聚合.LegSwap.配置.修改配置(Keys.D, Item._是否魔晶);
         await Item.根据按键判断技能释放前通用逻辑(new KeyEventArgs((Keys)key.ToNative())).ConfigureAwait(true);
 
         if (key == VirtualKey.Q)

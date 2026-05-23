@@ -35,8 +35,8 @@ public sealed class 骷髅王Strategy : IHeroStrategy
         Main._聚合.Conditions.StoneProbe ??= 骷髅王获取命石;
         Main._聚合.Conditions[ConditionSlotKey.C1].Probe ??= 冥火爆击去后摇;
         Main._聚合.Conditions[ConditionSlotKey.C2].Probe ??= 白骨守卫去后摇;
-        Item._切假腿配置.修改配置(Keys.W, false);
-        Item._切假腿配置.修改配置(Keys.E, false);
+        Main._聚合.LegSwap.配置.修改配置(Keys.W, false);
+        Main._聚合.LegSwap.配置.修改配置(Keys.E, false);
     }
 
     public async Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)
@@ -52,7 +52,7 @@ public sealed class 骷髅王Strategy : IHeroStrategy
         {
             if (Main._聚合.Conditions.StoneChoice == 1)
             {
-                Item._切假腿配置.修改配置(Keys.W, true);
+                Main._聚合.LegSwap.配置.修改配置(Keys.W, true);
                 Main._聚合.Conditions[ConditionSlotKey.C2].Active = true;
             }
         }

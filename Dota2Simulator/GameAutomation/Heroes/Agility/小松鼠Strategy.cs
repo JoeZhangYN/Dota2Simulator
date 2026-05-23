@@ -45,7 +45,7 @@ public sealed class 小松鼠Strategy : IHeroStrategy
         {
             if (Item._是否魔晶)
             {
-                Item._切假腿配置.修改配置(Keys.F, true);
+                Main._聚合.LegSwap.配置.修改配置(Keys.F, true);
             }
         }
         else if (key == VirtualKey.Q)

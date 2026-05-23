@@ -1,4 +1,4 @@
-﻿// Games/Dota2/Skill.cs
+// Games/Dota2/Skill.cs
 //#define 输出技能信息
 #if DOTA2
 
@@ -1519,14 +1519,14 @@ namespace Dota2Simulator.Games.Dota2
                     return await 主动技能进入CD后续(key, () =>
                     {
                         设置全局步骤(0);
-                        Item._切假腿配置.修改配置(key, true);
+                        Main._聚合.LegSwap.配置.修改配置(key, true);
                     }).ConfigureAwait(true);
                 default:
                     _ = await 主动技能释放后续(key, () =>
                     {
                         设置全局步骤(1);
                         通用技能后续动作();
-                        Item._切假腿配置.修改配置(key, false);
+                        Main._聚合.LegSwap.配置.修改配置(key, false);
                     }).ConfigureAwait(true);
 
                     return await Task.FromResult(true).ConfigureAwait(true);

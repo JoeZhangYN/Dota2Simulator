@@ -31,7 +31,7 @@ public sealed class 全能Strategy : IHeroStrategy
         Main._聚合.Conditions[ConditionSlotKey.C1].Probe ??= 洗礼去后摇;
         Main._聚合.Conditions[ConditionSlotKey.C2].Probe ??= 驱逐去后摇;
         Main._聚合.Conditions[ConditionSlotKey.C3].Probe ??= 守护天使去后摇;
-        Item._切假腿配置.修改配置(Keys.E, false);
+        Main._聚合.LegSwap.配置.修改配置(Keys.E, false);
     }
 
     public async Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)

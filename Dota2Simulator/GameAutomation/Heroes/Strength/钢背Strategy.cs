@@ -33,7 +33,7 @@ public sealed class 钢背Strategy : IHeroStrategy
         //Main._聚合.Conditions[ConditionSlotKey.C3].Probe ??= 毛团去后摇;
         //Main._聚合.Conditions[ConditionSlotKey.C4].Probe ??= 钢毛后背去后摇;
         //Main._聚合.Conditions[ConditionSlotKey.C5].Probe ??= 扫射切回假腿;
-        Item._切假腿配置.修改配置(Keys.E, false);
+        Main._聚合.LegSwap.配置.修改配置(Keys.E, false);
     }
 
     public async Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)
@@ -45,12 +45,12 @@ public sealed class 钢背Strategy : IHeroStrategy
         {
             if (Item._是否魔晶)
             {
-                Item._切假腿配置.修改配置(Keys.D, true);
+                Main._聚合.LegSwap.配置.修改配置(Keys.D, true);
             }
 
             if (Item._是否神杖)
             {
-                Item._切假腿配置.修改配置(Keys.E, true);
+                Main._聚合.LegSwap.配置.修改配置(Keys.E, true);
             }
         }
         else if (key == VirtualKey.Q)

@@ -35,7 +35,7 @@ public sealed class 军团Strategy : IHeroStrategy
         Main._聚合.Conditions[ConditionSlotKey.C3].Probe ??= 决斗;
         Main._聚合.Conditions[ConditionSlotKey.C4].Probe ??= 决斗去后摇;
         Main._聚合.Skills.SetStep(SlotKey.Global, -1);
-        Item._切假腿配置.修改配置(Keys.E, false);
+        Main._聚合.LegSwap.配置.修改配置(Keys.E, false);
     }
 
     public async Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)

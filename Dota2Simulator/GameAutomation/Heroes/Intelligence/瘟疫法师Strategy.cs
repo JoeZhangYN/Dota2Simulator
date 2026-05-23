@@ -33,7 +33,7 @@ public sealed class 瘟疫法师Strategy : IHeroStrategy
         Main._聚合.Conditions[ConditionSlotKey.C3].Probe ??= 死神镰刀去后摇;
         Main._聚合.Conditions[ConditionSlotKey.C5].Probe ??= 循环死亡脉冲;
         Skill.重复按键执行间隔阈值 = 100;
-        Item._切假腿配置.修改配置(Keys.E, false);
+        Main._聚合.LegSwap.配置.修改配置(Keys.E, false);
     }
 
     public async Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)
@@ -45,7 +45,7 @@ public sealed class 瘟疫法师Strategy : IHeroStrategy
         {
             if (Item._是否魔晶)
             {
-                Item._切假腿配置.修改配置(Keys.F, true);
+                Main._聚合.LegSwap.配置.修改配置(Keys.F, true);
             }
         }
         else if (key == VirtualKey.Q)

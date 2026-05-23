@@ -32,9 +32,9 @@ public sealed class 猴子Strategy : IHeroStrategy
     {
         Main._聚合.Conditions[ConditionSlotKey.C1].Probe ??= 灵魂之矛敏捷;
         Main._聚合.Conditions[ConditionSlotKey.C2].Probe ??= 神行百变选择幻象;
-        Item._切假腿配置.修改配置(Keys.W, true, "力量");
-        Item._切假腿配置.修改配置(Keys.E, false);
-        Item._切假腿配置.修改配置(Keys.R, false);
+        Main._聚合.LegSwap.配置.修改配置(Keys.W, true, "力量");
+        Main._聚合.LegSwap.配置.修改配置(Keys.E, false);
+        Main._聚合.LegSwap.配置.修改配置(Keys.R, false);
     }
 
     public async Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)

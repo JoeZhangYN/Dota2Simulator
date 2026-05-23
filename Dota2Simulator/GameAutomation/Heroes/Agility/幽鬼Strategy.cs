@@ -35,8 +35,8 @@ public sealed class 幽鬼Strategy : IHeroStrategy
         Main._聚合.Conditions[ConditionSlotKey.C2].Probe ??= 如影随形去后摇;
         Main._聚合.Conditions[ConditionSlotKey.C3].Probe ??= 空降去后摇;
         Main._聚合.Conditions[ConditionSlotKey.C4].Probe ??= 折射去后摇;
-        Item._切假腿配置.修改配置(Keys.W, false);
-        Item._切假腿配置.修改配置(Keys.E, false);
+        Main._聚合.LegSwap.配置.修改配置(Keys.W, false);
+        Main._聚合.LegSwap.配置.修改配置(Keys.E, false);
     }
 
     public async Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)
@@ -48,7 +48,7 @@ public sealed class 幽鬼Strategy : IHeroStrategy
         {
             if (Item._是否魔晶)
             {
-                Item._切假腿配置.修改配置(Keys.E, true);
+                Main._聚合.LegSwap.配置.修改配置(Keys.E, true);
             }
         }
         else if (key == VirtualKey.Q)

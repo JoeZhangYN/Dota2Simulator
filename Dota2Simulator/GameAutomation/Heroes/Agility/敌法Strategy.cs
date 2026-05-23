@@ -35,7 +35,7 @@ public sealed class 敌法Strategy : IHeroStrategy
         Main._聚合.Conditions[ConditionSlotKey.C2].Probe ??= 法术反制敏捷;
         Main._聚合.Conditions[ConditionSlotKey.C3].Probe ??= 法力虚空取消后摇;
         Main._聚合.Conditions[ConditionSlotKey.C4].Probe ??= 友军法术反制敏捷;
-        Item._切假腿配置.修改配置(Keys.Q, false);
+        Main._聚合.LegSwap.配置.修改配置(Keys.Q, false);
     }
 
     public async Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)
@@ -47,7 +47,7 @@ public sealed class 敌法Strategy : IHeroStrategy
         {
             if (Item._是否魔晶)
             {
-                Item._切假腿配置.修改配置(Keys.D, true);
+                Main._聚合.LegSwap.配置.修改配置(Keys.D, true);
             }
         }
         else if (key == VirtualKey.W)

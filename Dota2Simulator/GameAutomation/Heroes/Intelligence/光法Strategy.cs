@@ -98,13 +98,13 @@ public sealed class 光法Strategy : IHeroStrategy
                 return await Skill.主动技能进入CD后续(Keys.Q, () =>
                 {
                     Main._聚合.Skills.SetStep(SlotKey.Q, 0);
-                    Item._切假腿配置.修改配置(Keys.Q, true);
+                    Main._聚合.LegSwap.配置.修改配置(Keys.Q, true);
                 }).ConfigureAwait(true);
             default:
                 Main._聚合.Skills.SetStep(SlotKey.Q, 1);
                 if (ImageFinder.FindImageInRegionBool(Dota2_Pictrue.Buff.光法_大招, GlobalScreenCapture.GetCurrentHandle(), new System.Drawing.Rectangle(962, 826, 526, 80)))
                 {
-                    Item._切假腿配置.修改配置(Keys.Q, false);
+                    Main._聚合.LegSwap.配置.修改配置(Keys.Q, false);
                     _input.MouseClick(MouseButton.Right);
                 }
 

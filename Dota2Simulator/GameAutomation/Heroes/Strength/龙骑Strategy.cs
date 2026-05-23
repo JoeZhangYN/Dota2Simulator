@@ -33,7 +33,7 @@ public sealed class 龙骑Strategy : IHeroStrategy
         Main._聚合.Conditions[ConditionSlotKey.C2].Probe ??= 神龙摆尾去后摇;
         Main._聚合.Conditions[ConditionSlotKey.C3].Probe ??= 变龙去后摇;
         Main._聚合.Conditions[ConditionSlotKey.C4].Probe ??= 火球去后摇;
-        Item._切假腿配置.修改配置(Keys.E, false);
+        Main._聚合.LegSwap.配置.修改配置(Keys.E, false);
         Main._聚合.Attack.基础攻击前摇 = 0.5;
         Main._聚合.Attack.基础攻击间隔 = 1.6;
     }
@@ -47,7 +47,7 @@ public sealed class 龙骑Strategy : IHeroStrategy
         {
             if (Item._是否魔晶)
             {
-                Item._切假腿配置.修改配置(Keys.D, true);
+                Main._聚合.LegSwap.配置.修改配置(Keys.D, true);
             }
         }
         else if (key == VirtualKey.Q)

@@ -1,9 +1,10 @@
-﻿// Games/Dota2/Main.cs
+// Games/Dota2/Main.cs
 #if DOTA2
 
 using Collections.Pooled;
 using Dota2Simulator.Vision;
 using Dota2Simulator.GameAutomation.Application;
+using Dota2Simulator.GameAutomation.Domain;
 using Dota2Simulator.GameAutomation.Domain.Combat;
 using Dota2Simulator.GameAutomation.Domain.Loop;
 using Dota2Simulator.GameAutomation.Ports;
@@ -599,15 +600,15 @@ namespace Dota2Simulator.Games.Dota2
 
         private static async Task 处理假腿切换()
         {
-            if (Item._条件保持假腿 && Item._条件开启切假腿 && Item._需要切假腿)
+            if (Main._聚合.LegSwap.条件保持假腿 && Main._聚合.LegSwap.条件开启切假腿 && Main._聚合.LegSwap.需要切假腿)
             {
-                await 切假腿处理(Item._条件假腿敏捷 ? "敏捷" : "力量").ConfigureAwait(true);
+                await 切假腿处理(Main._聚合.LegSwap.条件假腿敏捷 ? "敏捷" : "力量").ConfigureAwait(true);
             }
         }
 
         private static async Task 切假腿处理(string 假腿类型)
         {
-            if (Item._切假腿中)
+            if (Main._聚合.LegSwap.切假腿中)
             {
                 return;
             }
@@ -626,13 +627,13 @@ namespace Dota2Simulator.Games.Dota2
                     return;
                 }
 
-                Item._切假腿中 = true;
+                Main._聚合.LegSwap.切假腿中 = true;
                 _ = await Item.切假腿类型(假腿类型).ConfigureAwait(true);
                 await Task.Run(() =>
                 {
                     Common.Delay(100);
-                    Item._切假腿中 = false;
-                    Item._需要切假腿 = false; // 切假腿完毕，无需再切
+                    Main._聚合.LegSwap.切假腿中 = false;
+                    Main._聚合.LegSwap.需要切假腿 = false; // 切假腿完毕，无需再切
                 }).ConfigureAwait(false);
             }).ConfigureAwait(false);
         }
@@ -663,11 +664,11 @@ namespace Dota2Simulator.Games.Dota2
 
             _ = Item.重置耗蓝物品委托和条件();
 
-            Item._条件开启切假腿 = false;
-            Item._条件保持假腿 = false;
-            Item._条件假腿敏捷 = false;
-            Item._切假腿中 = false;
-            Item._需要切假腿 = false;
+            Main._聚合.LegSwap.条件开启切假腿 = false;
+            Main._聚合.LegSwap.条件保持假腿 = false;
+            Main._聚合.LegSwap.条件假腿敏捷 = false;
+            Main._聚合.LegSwap.切假腿中 = false;
+            Main._聚合.LegSwap.需要切假腿 = false;
 
             Item._是否魔晶 = false;
             Item._是否神杖 = false;
@@ -709,8 +710,8 @@ namespace Dota2Simulator.Games.Dota2
             Skill.重置所有技能判断();
 
             // 重置切假腿配置
-            Item._切假腿配置 = new Item.技能切假腿配置();
-            Item._假腿按键 = Keys.Escape;
+            Main._聚合.LegSwap.配置 = new 技能切假腿配置();
+            Main._聚合.LegSwap.假腿按键 = Keys.Escape;
 
 
         }

@@ -37,7 +37,7 @@ public sealed class 小鱼人Strategy : IHeroStrategy
         // 能量转移被动计数 = 0;
         Main._聚合.Attack.基础攻击间隔 = 1.7;
         Main._聚合.Attack.基础攻击前摇 = 0.5;
-        Item._切假腿配置.修改配置(Keys.E, false);
+        Main._聚合.LegSwap.配置.修改配置(Keys.E, false);
     }
 
     public async Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)
@@ -49,7 +49,7 @@ public sealed class 小鱼人Strategy : IHeroStrategy
         {
             if (Item._是否魔晶)
             {
-                Item._切假腿配置.修改配置(Keys.D, true);
+                Main._聚合.LegSwap.配置.修改配置(Keys.D, true);
             }
         }
         else if (key == VirtualKey.Q)
@@ -95,7 +95,7 @@ public sealed class 小鱼人Strategy : IHeroStrategy
         _ = Task.Run(() =>
         {
             Skill.通用技能后续动作(是否保持假腿: false);
-            Item._需要切假腿 = false;
+            Main._聚合.LegSwap.需要切假腿 = false;
             Common.Delay(200);
             Item.要求保持假腿();
         });

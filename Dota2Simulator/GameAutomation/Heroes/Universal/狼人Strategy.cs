@@ -68,7 +68,7 @@ public sealed class 狼人Strategy : IHeroStrategy
             _input.Press(VirtualKey.From(Keys.A));
         }
 
-        if (Common.获取当前时间毫秒() - Main._聚合.Skills.Time(SlotKey.Q) > 400 && Main._聚合.Skills.Time(SlotKey.Q) != -1 && Item._条件开启切假腿)
+        if (Common.获取当前时间毫秒() - Main._聚合.Skills.Time(SlotKey.Q) > 400 && Main._聚合.Skills.Time(SlotKey.Q) != -1 && Main._聚合.LegSwap.条件开启切假腿)
         {
             招狼后();
             return await Task.FromResult(false).ConfigureAwait(true);
@@ -91,7 +91,7 @@ public sealed class 狼人Strategy : IHeroStrategy
             _input.Press(VirtualKey.From(Keys.A));
         }
 
-        if (Common.获取当前时间毫秒() - Main._聚合.Skills.Time(SlotKey.W) > 400 && Main._聚合.Skills.Time(SlotKey.W) != -1 && Item._条件开启切假腿)
+        if (Common.获取当前时间毫秒() - Main._聚合.Skills.Time(SlotKey.W) > 400 && Main._聚合.Skills.Time(SlotKey.W) != -1 && Main._聚合.LegSwap.条件开启切假腿)
         {
             嚎叫后();
             return await Task.FromResult(false).ConfigureAwait(true);
@@ -114,7 +114,7 @@ public sealed class 狼人Strategy : IHeroStrategy
             _input.Press(VirtualKey.From(Keys.A));
         }
 
-        if (Common.获取当前时间毫秒() - Main._聚合.Skills.Time(SlotKey.D) > 400 && Main._聚合.Skills.Time(SlotKey.D) != -1 && Item._条件开启切假腿)
+        if (Common.获取当前时间毫秒() - Main._聚合.Skills.Time(SlotKey.D) > 400 && Main._聚合.Skills.Time(SlotKey.D) != -1 && Main._聚合.LegSwap.条件开启切假腿)
         {
             撕咬后();
             return await Task.FromResult(false).ConfigureAwait(true);
@@ -131,7 +131,7 @@ public sealed class 狼人Strategy : IHeroStrategy
 
     private async Task<bool> 变狼去后摇(ImageHandle 句柄)
     {
-        if (Common.获取当前时间毫秒() - Main._聚合.Skills.Time(SlotKey.R) > 1200 && Main._聚合.Skills.Time(SlotKey.R) != -1 && Item._条件开启切假腿)
+        if (Common.获取当前时间毫秒() - Main._聚合.Skills.Time(SlotKey.R) > 1200 && Main._聚合.Skills.Time(SlotKey.R) != -1 && Main._聚合.LegSwap.条件开启切假腿)
         {
             Main._聚合.Skills.SetTime(SlotKey.R, -1);
             return await Task.FromResult(false).ConfigureAwait(true);

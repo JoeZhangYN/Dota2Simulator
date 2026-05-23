@@ -31,7 +31,7 @@ public sealed class 斯温Strategy : IHeroStrategy
         Main._聚合.Conditions[ConditionSlotKey.C1].Probe ??= 风暴之拳去后摇;
         Main._聚合.Conditions[ConditionSlotKey.C2].Probe ??= 战吼去后摇;
         Main._聚合.Conditions[ConditionSlotKey.C3].Probe ??= 神之力量去后摇;
-        Item._切假腿配置.修改配置(Keys.W, false);
+        Main._聚合.LegSwap.配置.修改配置(Keys.W, false);
     }
 
     public async Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)

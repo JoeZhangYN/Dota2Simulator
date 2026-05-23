@@ -31,8 +31,8 @@ public sealed class 小小Strategy : IHeroStrategy
     {
         Main._聚合.Conditions[ConditionSlotKey.C1].Probe ??= 山崩去后摇;
         Main._聚合.Conditions[ConditionSlotKey.C2].Probe ??= 投掷去后摇;
-        Item._切假腿配置.修改配置(Keys.E, false);
-        Item._切假腿配置.修改配置(Keys.R, false);
+        Main._聚合.LegSwap.配置.修改配置(Keys.E, false);
+        Main._聚合.LegSwap.配置.修改配置(Keys.R, false);
     }
 
     public async Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)

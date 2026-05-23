@@ -33,8 +33,8 @@ public sealed class 大圣Strategy : IHeroStrategy
         Main._聚合.Conditions[ConditionSlotKey.C2].Probe ??= 乾坤之跃敏捷;
         Main._聚合.Conditions[ConditionSlotKey.C3].Probe ??= 猴子猴孙敏捷;
         Main._聚合.Conditions[ConditionSlotKey.C4].Probe ??= 大圣无限跳跃;
-        Item._切假腿配置.修改配置(Keys.Q, false);
-        Item._切假腿配置.修改配置(Keys.W, false);
+        Main._聚合.LegSwap.配置.修改配置(Keys.Q, false);
+        Main._聚合.LegSwap.配置.修改配置(Keys.W, false);
         Skill.重复按键执行间隔阈值 = 100;
     }
 

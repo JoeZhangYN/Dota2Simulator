@@ -52,12 +52,12 @@ public sealed class 小黑Strategy : IHeroStrategy
                 : 0);
             if (Item._是否魔晶)
             {
-                Item._切假腿配置.修改配置(Keys.F, true);
+                Main._聚合.LegSwap.配置.修改配置(Keys.F, true);
             }
         }
         else if (key == VirtualKey.D)
         {
-            if (Item._条件开启切假腿)
+            if (Main._聚合.LegSwap.条件开启切假腿)
             {
                 Main._聚合.Skills.ToggleMode(SlotKey.Global);
                 switch (Main._聚合.Skills.Mode(SlotKey.Global))
@@ -98,7 +98,7 @@ public sealed class 小黑Strategy : IHeroStrategy
 
             if (Main._聚合.Skills.Mode(SlotKey.Global) == 1)
             {
-                Item._需要切假腿 = false;
+                Main._聚合.LegSwap.需要切假腿 = false;
             }
         }).ConfigureAwait(true);
     }
@@ -113,7 +113,7 @@ public sealed class 小黑Strategy : IHeroStrategy
 
             if (Main._聚合.Skills.Mode(SlotKey.Global) == 1)
             {
-                Item._需要切假腿 = false;
+                Main._聚合.LegSwap.需要切假腿 = false;
             }
         }).ConfigureAwait(true);
     }
@@ -126,7 +126,7 @@ public sealed class 小黑Strategy : IHeroStrategy
 
             if (Main._聚合.Skills.Mode(SlotKey.Global) == 1)
             {
-                Item._需要切假腿 = false;
+                Main._聚合.LegSwap.需要切假腿 = false;
             }
         }).ConfigureAwait(true);
     }

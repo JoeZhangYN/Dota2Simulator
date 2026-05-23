@@ -33,7 +33,7 @@ public sealed class 混沌Strategy : IHeroStrategy
         Main._聚合.Conditions[ConditionSlotKey.C1].Probe ??= 混乱之箭去后摇;
         Main._聚合.Conditions[ConditionSlotKey.C2].Probe ??= 实相裂隙去后摇;
         Main._聚合.Conditions[ConditionSlotKey.C3].Probe ??= 混沌之军去后摇;
-        Item._切假腿配置.修改配置(Keys.E, false);
+        Main._聚合.LegSwap.配置.修改配置(Keys.E, false);
     }
 
     public async Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)
@@ -95,7 +95,7 @@ public sealed class 混沌Strategy : IHeroStrategy
             _ = Item.根据图片使用物品(Dota2_Pictrue.物品.假腿_力量腿);
             Common.Delay(15);
             _input.Press(VirtualKey.From(key));
-            Item._条件假腿敏捷 = false;
+            Main._聚合.LegSwap.条件假腿敏捷 = false;
             Item.要求保持假腿();
 
             _ = await Task.FromResult(false).ConfigureAwait(true);

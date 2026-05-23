@@ -32,7 +32,7 @@ public sealed class 电棍Strategy : IHeroStrategy
         Main._聚合.Conditions[ConditionSlotKey.C1].Probe ??= 等离子场去后摇;
         Main._聚合.Conditions[ConditionSlotKey.C2].Probe ??= 静电连接去后摇;
         Main._聚合.Conditions[ConditionSlotKey.C3].Probe ??= 风暴之眼去后摇;
-        Item._切假腿配置.修改配置(Keys.E, false);
+        Main._聚合.LegSwap.配置.修改配置(Keys.E, false);
     }
 
     public async Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)

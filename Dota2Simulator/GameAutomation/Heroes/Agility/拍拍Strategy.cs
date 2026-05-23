@@ -33,8 +33,8 @@ public sealed class 拍拍Strategy : IHeroStrategy
         Main._聚合.Conditions[ConditionSlotKey.C2].Probe ??= 超强力量去后摇;
         Main._聚合.Conditions[ConditionSlotKey.C3].Probe ??= 跳拍;
         Main._聚合.Conditions[ConditionSlotKey.C4].Probe ??= 狂怒去后摇;
-        Item._切假腿配置.修改配置(Keys.E, false);
-        Item._切假腿配置.修改配置(Keys.R, false);
+        Main._聚合.LegSwap.配置.修改配置(Keys.E, false);
+        Main._聚合.LegSwap.配置.修改配置(Keys.R, false);
     }
 
     public async Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)
