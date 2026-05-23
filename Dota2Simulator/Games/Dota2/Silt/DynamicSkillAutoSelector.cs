@@ -1416,7 +1416,9 @@ namespace Dota2Simulator.Games.Dota2.Silt
     {
         private static readonly TalentSelector Selector = new();
 
-        public static void ExecuteHeroSelection(string heroName, in ImageHandle gameHandle)
+        // Phase 11 P7: 加 IUiInvoker 形参穿透消 Common.HeroLoopHost! service locator.
+        // 调用拓扑 SiltEngine.沙王自动选择(ui) → ExecuteHeroSelection(ui) → ShowResults(ui).
+        public static void ExecuteHeroSelection(string heroName, in ImageHandle gameHandle, Dota2Simulator.GameAutomation.Ports.IUiInvoker ui)
         {
             var builder = HeroConfigManager.GetHeroConfig(heroName);
             var (config, handles) = builder.Build();
@@ -1430,15 +1432,15 @@ namespace Dota2Simulator.Games.Dota2.Silt
             });
 
             var report = Selector.ExecuteSelection(in gameHandle, config, handles);
-            ShowResults(report);
+            ShowResults(report, ui);
         }
 
-        private static void ShowResults(SelectionReport report)
+        private static void ShowResults(SelectionReport report, Dota2Simulator.GameAutomation.Ports.IUiInvoker ui)
         {
             var resultText = report.ToDetailedString();
             resultText += report.DetailedLog;
 
-            Common.HeroLoopHost!.Ui?.Invoke(() => Common.HeroLoopHost!.Ui.SetText(UiField.阵营, resultText));
+            ui.Invoke(() => ui.SetText(UiField.阵营, resultText));
 
             Console.WriteLine(resultText);
         }

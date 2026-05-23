@@ -409,7 +409,8 @@ namespace Dota2Simulator.Games.Dota2.Silt
         public void 沙王自动选择(in ImageHandle gameHandle)
         {
             var p = Control.MousePosition;
-            TalentSelectionExamples.ExecuteHeroSelection("沙王", gameHandle);
+            // Phase 11 P7: 传 _ui 穿透到 TalentSelectionExamples 消 Common.HeroLoopHost! service locator.
+            TalentSelectionExamples.ExecuteHeroSelection("沙王", gameHandle, _ui);
             SimKeyBoard.MouseMove(p);
         }
 
