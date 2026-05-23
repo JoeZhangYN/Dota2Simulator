@@ -13,26 +13,9 @@ namespace Dota2Simulator.GameAutomation.Heroes.Universal;
 
 /// <summary>VS（全才）策略——迁移自 _main.根据当前英雄增强 的 case "VS"。</summary>
 [HeroStrategy("VS", HeroAttribute.Universal)]
-public sealed class VSStrategy : IHeroStrategy
+public sealed partial class VSStrategy : IHeroStrategy
 {
 
-    private readonly IInputExecutor _input;
-#pragma warning disable IDE0052
-    private readonly IScreenVision _vision;
-#pragma warning restore IDE0052
-
-    private readonly SkillEngine _skill;
-    private readonly ItemEngine _item;
-    private readonly HeroLoopHost _main;
-    public VSStrategy(IInputExecutor input, IScreenVision vision, SkillEngine skill, ItemEngine item, HeroLoopHost main)
-    {
-        _input = input;
-        _vision = vision;
-        _skill = skill;
-        _item = item;
-        _main = main;
-    }
-    public HeroId Hero => new("VS", HeroAttribute.Universal);
 
     public void OnActivate(HeroContext ctx)
     {

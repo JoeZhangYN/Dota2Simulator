@@ -12,27 +12,8 @@ using Dota2Simulator.Vision;
 namespace Dota2Simulator.GameAutomation.Heroes.Strength;
 
 [HeroStrategy("大牛", HeroAttribute.Strength)]
-public sealed class 大牛Strategy : IHeroStrategy
+public sealed partial class 大牛Strategy : IHeroStrategy
 {
-    private readonly IInputExecutor _input;
-#pragma warning disable IDE0052 // A4 阶段：_vision 暂未使用，A5 ConditionSlotSet 切 port 后用到
-    private readonly IScreenVision _vision;
-#pragma warning restore IDE0052
-
-    private readonly SkillEngine _skill;
-    private readonly ItemEngine _item;
-    private readonly HeroLoopHost _main;
-    public 大牛Strategy(IInputExecutor input, IScreenVision vision, SkillEngine skill, ItemEngine item, HeroLoopHost main)
-    {
-        _input = input;
-        _vision = vision;
-        _skill = skill;
-        _item = item;
-        _main = main;
-    }
-
-    public HeroId Hero => new("大牛", HeroAttribute.Strength);
-
     public void OnActivate(HeroContext ctx)
     {
         _main._聚合.Conditions[ConditionSlotKey.C1].Probe ??= 回音践踏去后摇;

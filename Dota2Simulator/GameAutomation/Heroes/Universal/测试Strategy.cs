@@ -15,28 +15,9 @@ namespace Dota2Simulator.GameAutomation.Heroes.Universal;
 
 /// <summary>测试策略——迁移自 _main.根据当前英雄增强 的 case "测试"。</summary>
 [HeroStrategy("测试", HeroAttribute.Universal, RequiresUi = true)]
-public sealed class 测试Strategy : IHeroStrategy
+public sealed partial class 测试Strategy : IHeroStrategy
 {
 
-    private readonly IInputExecutor _input;
-#pragma warning disable IDE0052
-    private readonly IScreenVision _vision;
-#pragma warning restore IDE0052
-    private readonly SkillEngine _skill;
-    private readonly ItemEngine _item;
-    private readonly HeroLoopHost _main;
-    private readonly IUiInvoker _ui;
-
-    public 测试Strategy(IInputExecutor input, IScreenVision vision, SkillEngine skill, ItemEngine item, IUiInvoker ui, HeroLoopHost main)
-    {
-        _input = input;
-        _vision = vision;
-        _skill = skill;
-        _item = item;
-        _ui = ui;
-        _main = main;
-    }
-    public HeroId Hero => new("测试", HeroAttribute.Universal);
 
     public void OnActivate(HeroContext ctx)
     {

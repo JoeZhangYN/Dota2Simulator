@@ -12,26 +12,9 @@ using Dota2Simulator.GameAutomation.Ports;
 namespace Dota2Simulator.GameAutomation.Heroes.Strength;
 
 [HeroStrategy("钢背", HeroAttribute.Strength)]
-public sealed class 钢背Strategy : IHeroStrategy
+public sealed partial class 钢背Strategy : IHeroStrategy
 {
 
-    private readonly IInputExecutor _input;
-#pragma warning disable IDE0052
-    private readonly IScreenVision _vision;
-#pragma warning restore IDE0052
-
-    private readonly SkillEngine _skill;
-    private readonly ItemEngine _item;
-    private readonly HeroLoopHost _main;
-    public 钢背Strategy(IInputExecutor input, IScreenVision vision, SkillEngine skill, ItemEngine item, HeroLoopHost main)
-    {
-        _input = input;
-        _vision = vision;
-        _skill = skill;
-        _item = item;
-        _main = main;
-    }
-    public HeroId Hero => new("钢背", HeroAttribute.Strength);
 
     public void OnActivate(HeroContext ctx)
     {

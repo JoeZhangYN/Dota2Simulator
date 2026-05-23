@@ -13,26 +13,9 @@ namespace Dota2Simulator.GameAutomation.Heroes.Universal;
 
 /// <summary>剧毒（全才）策略——迁移自 _main.根据当前英雄增强 的 case "剧毒"。</summary>
 [HeroStrategy("剧毒", HeroAttribute.Universal)]
-public sealed class 剧毒Strategy : IHeroStrategy
+public sealed partial class 剧毒Strategy : IHeroStrategy
 {
 
-    private readonly IInputExecutor _input;
-#pragma warning disable IDE0052
-    private readonly IScreenVision _vision;
-#pragma warning restore IDE0052
-
-    private readonly SkillEngine _skill;
-    private readonly ItemEngine _item;
-    private readonly HeroLoopHost _main;
-    public 剧毒Strategy(IInputExecutor input, IScreenVision vision, SkillEngine skill, ItemEngine item, HeroLoopHost main)
-    {
-        _input = input;
-        _vision = vision;
-        _skill = skill;
-        _item = item;
-        _main = main;
-    }
-    public HeroId Hero => new("剧毒", HeroAttribute.Universal);
 
     public void OnActivate(HeroContext ctx)
     {

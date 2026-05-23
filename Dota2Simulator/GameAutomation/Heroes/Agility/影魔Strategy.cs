@@ -13,26 +13,9 @@ namespace Dota2Simulator.GameAutomation.Heroes.Agility;
 
 /// <summary>影魔（敏捷）策略——迁移自 _main.根据当前英雄增强 的 case "影魔"。</summary>
 [HeroStrategy("影魔", HeroAttribute.Agility)]
-public sealed class 影魔Strategy : IHeroStrategy
+public sealed partial class 影魔Strategy : IHeroStrategy
 {
 
-    private readonly IInputExecutor _input;
-#pragma warning disable IDE0052
-    private readonly IScreenVision _vision;
-#pragma warning restore IDE0052
-
-    private readonly SkillEngine _skill;
-    private readonly ItemEngine _item;
-    private readonly HeroLoopHost _main;
-    public 影魔Strategy(IInputExecutor input, IScreenVision vision, SkillEngine skill, ItemEngine item, HeroLoopHost main)
-    {
-        _input = input;
-        _vision = vision;
-        _skill = skill;
-        _item = item;
-        _main = main;
-    }
-    public HeroId Hero => new("影魔", HeroAttribute.Agility);
 
     public void OnActivate(HeroContext ctx)
     {

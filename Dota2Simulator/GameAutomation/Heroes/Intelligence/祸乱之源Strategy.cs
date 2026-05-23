@@ -14,26 +14,9 @@ using Dota2Simulator.GameAutomation.Ports;
 namespace Dota2Simulator.GameAutomation.Heroes.Intelligence;
 
 [HeroStrategy("祸乱之源", HeroAttribute.Intelligence)]
-public sealed class 祸乱之源Strategy : IHeroStrategy
+public sealed partial class 祸乱之源Strategy : IHeroStrategy
 {
 
-    private readonly IInputExecutor _input;
-#pragma warning disable IDE0052
-    private readonly IScreenVision _vision;
-#pragma warning restore IDE0052
-
-    private readonly SkillEngine _skill;
-    private readonly ItemEngine _item;
-    private readonly HeroLoopHost _main;
-    public 祸乱之源Strategy(IInputExecutor input, IScreenVision vision, SkillEngine skill, ItemEngine item, HeroLoopHost main)
-    {
-        _input = input;
-        _vision = vision;
-        _skill = skill;
-        _item = item;
-        _main = main;
-    }
-    public HeroId Hero => new("祸乱之源", HeroAttribute.Intelligence);
 
     public void OnActivate(HeroContext ctx)
     {

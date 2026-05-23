@@ -13,29 +13,12 @@ using Dota2Simulator.GameAutomation.Ports;
 namespace Dota2Simulator.GameAutomation.Heroes.Strength;
 
 [HeroStrategy("骷髅王", HeroAttribute.Strength)]
-public sealed class 骷髅王Strategy : IHeroStrategy
+public sealed partial class 骷髅王Strategy : IHeroStrategy
 {
     /// <summary>命石范围（沿用 _main.命石区域）。</summary>
     private static readonly Rectangle 命石区域 = new(738, 945, 70, 26);
 
 
-    private readonly IInputExecutor _input;
-#pragma warning disable IDE0052
-    private readonly IScreenVision _vision;
-#pragma warning restore IDE0052
-
-    private readonly SkillEngine _skill;
-    private readonly ItemEngine _item;
-    private readonly HeroLoopHost _main;
-    public 骷髅王Strategy(IInputExecutor input, IScreenVision vision, SkillEngine skill, ItemEngine item, HeroLoopHost main)
-    {
-        _input = input;
-        _vision = vision;
-        _skill = skill;
-        _item = item;
-        _main = main;
-    }
-    public HeroId Hero => new("骷髅王", HeroAttribute.Strength);
 
     public void OnActivate(HeroContext ctx)
     {

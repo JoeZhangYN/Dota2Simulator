@@ -16,29 +16,12 @@ using Dota2Simulator.GameAutomation.Ports;
 namespace Dota2Simulator.GameAutomation.Heroes.Strength;
 
 [HeroStrategy("船长", HeroAttribute.Strength)]
-public sealed class 船长Strategy : IHeroStrategy
+public sealed partial class 船长Strategy : IHeroStrategy
 {
     /// <summary>E 技能并发锁（沿用 _main._全局模式e_lock）。</summary>
     private static readonly Lock _全局模式e_lock = new();
 
 
-    private readonly IInputExecutor _input;
-#pragma warning disable IDE0052
-    private readonly IScreenVision _vision;
-#pragma warning restore IDE0052
-
-    private readonly SkillEngine _skill;
-    private readonly ItemEngine _item;
-    private readonly HeroLoopHost _main;
-    public 船长Strategy(IInputExecutor input, IScreenVision vision, SkillEngine skill, ItemEngine item, HeroLoopHost main)
-    {
-        _input = input;
-        _vision = vision;
-        _skill = skill;
-        _item = item;
-        _main = main;
-    }
-    public HeroId Hero => new("船长", HeroAttribute.Strength);
 
     public void OnActivate(HeroContext ctx)
     {

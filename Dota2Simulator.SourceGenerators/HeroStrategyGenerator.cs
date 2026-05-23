@@ -1,23 +1,184 @@
+#nullable enable
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis.Text;
 
 namespace Dota2Simulator.SourceGenerators;
 
 /// <summary>
-/// Phase 10C S1 hello-world: 验证 SG 项目串联 (与 PictureManifestGenerator / PictureHeroPreloadGenerator 共存).
-/// S3 后扩 EmitStrategyPartial (扫 [HeroStrategy] attribute emit OnActivate/OnKeyAsync partial).
-/// S4 后扩 EmitRegistry (emit HeroStrategyRegistry 静态映射, 删 4 个手写 partial).
+/// Phase 10C S1 hello-world: 验证 SG 项目串联.
+/// Phase 10C S3 扩 EmitStrategyPartial: 扫 [HeroStrategy] attribute (via ForAttributeWithMetadataName)
+/// emit Strategy partial 文件 — 含 ports 字段 + ctor + HeroId Hero property,
+/// 业务 *Strategy.cs 同 commit 真删 ctor/field/Hero (S3 双部分整改 CS0102/CS0111 free).
+/// Phase 10C S4 后扩 EmitRegistry (emit HeroStrategyRegistry 静态映射, 删 4 个手写 partial).
 /// </summary>
 [Generator(LanguageNames.CSharp)]
 public sealed class HeroStrategyGenerator : IIncrementalGenerator
 {
+    private const string AttributeFullName = "Dota2Simulator.GameAutomation.Domain.Heroes.HeroStrategyAttribute";
+
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
-        // S1 hello-world: emit 单一标记文件验证 SG 项目串联
+        // S1 hello-world: emit 单一标记文件验证 SG 项目串联 (S3 起仍保留, 不影响 emit 计数 — verify 已 exclude Hello.g.cs)
         context.RegisterPostInitializationOutput(static ctx =>
         {
             ctx.AddSource("HeroStrategyGenerator.Hello.g.cs",
                 "// Phase 10C S1 HeroStrategyGenerator hello-world\n" +
-                "// SG 项目串联实证 OK; S3 后扩 EmitStrategyPartial / S4 后扩 EmitRegistry\n");
+                "// SG 项目串联实证 OK; S3 起扩 EmitStrategyPartial 已上线\n");
         });
+
+        // S3: ForAttributeWithMetadataName 扫 [HeroStrategy] 命中
+        var strategyClasses = context.SyntaxProvider
+            .ForAttributeWithMetadataName(
+                AttributeFullName,
+                predicate: static (node, _) => node is ClassDeclarationSyntax,
+                transform: static (ctx, _) =>
+                {
+                    var symbol = (INamedTypeSymbol)ctx.TargetSymbol;
+                    var attr = ctx.Attributes[0];
+
+                    // attribute ctor: (string name, HeroAttribute attribute)
+                    string heroName = attr.ConstructorArguments.Length > 0 && attr.ConstructorArguments[0].Value is string n
+                        ? n
+                        : symbol.Name; // fallback (理论不命中, defensive)
+
+                    // HeroAttribute enum field name (Strength/Agility/Intelligence/Universal)
+                    string heroAttribute = "Universal";
+                    if (attr.ConstructorArguments.Length > 1 && attr.ConstructorArguments[1].Value is int enumValue)
+                    {
+                        heroAttribute = enumValue switch
+                        {
+                            0 => "Strength",
+                            1 => "Agility",
+                            2 => "Intelligence",
+                            3 => "Universal",
+                            _ => "Universal",
+                        };
+                    }
+
+                    // RequiresUi 命名参数
+                    bool requiresUi = false;
+                    foreach (var na in attr.NamedArguments)
+                    {
+                        if (na.Key == "RequiresUi" && na.Value.Value is bool b)
+                        {
+                            requiresUi = b;
+                            break;
+                        }
+                    }
+
+                    return new StrategyTarget(
+                        className: symbol.Name,
+                        @namespace: symbol.ContainingNamespace.ToDisplayString(),
+                        heroName: heroName,
+                        heroAttribute: heroAttribute,
+                        requiresUi: requiresUi);
+                });
+
+        context.RegisterSourceOutput(strategyClasses, static (spc, target) =>
+        {
+            var source = EmitPartial(target);
+            // 文件名: <ClassName>.g.cs (中文文件名 SG host 支持; PictureManifestGenerator 中文 key 已实证)
+            spc.AddSource($"{target.ClassName}.g.cs", SourceText.From(source, Encoding.UTF8));
+        });
+    }
+
+    private readonly struct StrategyTarget
+    {
+        public string ClassName { get; }
+        public string Namespace { get; }
+        public string HeroName { get; }
+        public string HeroAttribute { get; }
+        public bool RequiresUi { get; }
+
+        public StrategyTarget(string className, string @namespace, string heroName, string heroAttribute, bool requiresUi)
+        {
+            ClassName = className;
+            Namespace = @namespace;
+            HeroName = heroName;
+            HeroAttribute = heroAttribute;
+            RequiresUi = requiresUi;
+        }
+    }
+
+    private static string EmitPartial(StrategyTarget t)
+    {
+        var sb = new StringBuilder();
+        sb.AppendLine("// <auto-generated />");
+        sb.AppendLine("// SSOT: [HeroStrategy] attribute on " + t.ClassName + "; SG = HeroStrategyGenerator (Phase 10C S3).");
+        sb.AppendLine("// emit partial 提供: ports 字段 + ctor + HeroId Hero property (业务侧已真删, SG 单源).");
+        sb.AppendLine("#nullable enable");
+        sb.AppendLine("#if DOTA2");
+        sb.AppendLine();
+        sb.AppendLine("using Dota2Simulator.GameAutomation.Application;");
+        sb.AppendLine("using Dota2Simulator.GameAutomation.Domain.Actuation;");
+        sb.AppendLine("using Dota2Simulator.GameAutomation.Domain.Heroes;");
+        sb.AppendLine("using Dota2Simulator.GameAutomation.Domain.Loop;");
+        sb.AppendLine("using Dota2Simulator.GameAutomation.Ports;");
+        sb.AppendLine("using Dota2Simulator.Vision;");
+        sb.AppendLine();
+        sb.AppendLine($"namespace {t.Namespace}");
+        sb.AppendLine("{");
+        sb.AppendLine($"    public sealed partial class {t.ClassName}");
+        sb.AppendLine("    {");
+
+        // 字段顺序 (与现状对齐): _input, _vision (pragma 包裹), _skill, _item, (_ui 仅 RequiresUi), _main
+        sb.AppendLine("        private readonly IInputExecutor _input;");
+        sb.AppendLine("#pragma warning disable IDE0052");
+        sb.AppendLine("        private readonly IScreenVision _vision;");
+        sb.AppendLine("#pragma warning restore IDE0052");
+        sb.AppendLine("        private readonly SkillEngine _skill;");
+        sb.AppendLine("        private readonly ItemEngine _item;");
+        if (t.RequiresUi)
+        {
+            sb.AppendLine("        private readonly IUiInvoker _ui;");
+        }
+        sb.AppendLine("        private readonly HeroLoopHost _main;");
+        sb.AppendLine();
+
+        // ctor 签名 (与现状对齐): 普通 (input, vision, skill, item, main); 测试 (input, vision, skill, item, ui, main)
+        if (t.RequiresUi)
+        {
+            sb.AppendLine($"        public {t.ClassName}(IInputExecutor input, IScreenVision vision, SkillEngine skill, ItemEngine item, IUiInvoker ui, HeroLoopHost main)");
+        }
+        else
+        {
+            sb.AppendLine($"        public {t.ClassName}(IInputExecutor input, IScreenVision vision, SkillEngine skill, ItemEngine item, HeroLoopHost main)");
+        }
+        sb.AppendLine("        {");
+        sb.AppendLine("            _input = input;");
+        sb.AppendLine("            _vision = vision;");
+        sb.AppendLine("            _skill = skill;");
+        sb.AppendLine("            _item = item;");
+        if (t.RequiresUi)
+        {
+            sb.AppendLine("            _ui = ui;");
+        }
+        sb.AppendLine("            _main = main;");
+        sb.AppendLine("        }");
+        sb.AppendLine();
+
+        // HeroId Hero property
+        sb.Append("        public HeroId Hero => new(\"")
+          .Append(EscapeStringLiteral(t.HeroName))
+          .Append("\", HeroAttribute.")
+          .Append(t.HeroAttribute)
+          .AppendLine(");");
+
+        sb.AppendLine("    }");
+        sb.AppendLine("}");
+        sb.AppendLine();
+        sb.AppendLine("#endif");
+
+        return sb.ToString();
+    }
+
+    private static string EscapeStringLiteral(string s)
+    {
+        return s.Replace("\\", "\\\\").Replace("\"", "\\\"");
     }
 }

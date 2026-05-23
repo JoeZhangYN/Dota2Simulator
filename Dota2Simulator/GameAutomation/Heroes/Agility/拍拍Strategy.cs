@@ -13,26 +13,9 @@ namespace Dota2Simulator.GameAutomation.Heroes.Agility;
 
 /// <summary>拍拍（敏捷）策略——迁移自 _main.根据当前英雄增强 的 case "拍拍"。</summary>
 [HeroStrategy("拍拍", HeroAttribute.Agility)]
-public sealed class 拍拍Strategy : IHeroStrategy
+public sealed partial class 拍拍Strategy : IHeroStrategy
 {
 
-    private readonly IInputExecutor _input;
-#pragma warning disable IDE0052
-    private readonly IScreenVision _vision;
-#pragma warning restore IDE0052
-
-    private readonly SkillEngine _skill;
-    private readonly ItemEngine _item;
-    private readonly HeroLoopHost _main;
-    public 拍拍Strategy(IInputExecutor input, IScreenVision vision, SkillEngine skill, ItemEngine item, HeroLoopHost main)
-    {
-        _input = input;
-        _vision = vision;
-        _skill = skill;
-        _item = item;
-        _main = main;
-    }
-    public HeroId Hero => new("拍拍", HeroAttribute.Agility);
 
     public void OnActivate(HeroContext ctx)
     {

@@ -15,28 +15,11 @@ namespace Dota2Simulator.GameAutomation.Heroes.Universal;
 
 /// <summary>小精灵（全才）策略——迁移自 _main.根据当前英雄增强 的 case "小精灵"。</summary>
 [HeroStrategy("小精灵", HeroAttribute.Universal)]
-public sealed class 小精灵Strategy : IHeroStrategy
+public sealed partial class 小精灵Strategy : IHeroStrategy
 {
     private static readonly Rectangle buff状态技能栏 = new(962, 826, 526, 80);
 
 
-    private readonly IInputExecutor _input;
-#pragma warning disable IDE0052
-    private readonly IScreenVision _vision;
-#pragma warning restore IDE0052
-
-    private readonly SkillEngine _skill;
-    private readonly ItemEngine _item;
-    private readonly HeroLoopHost _main;
-    public 小精灵Strategy(IInputExecutor input, IScreenVision vision, SkillEngine skill, ItemEngine item, HeroLoopHost main)
-    {
-        _input = input;
-        _vision = vision;
-        _skill = skill;
-        _item = item;
-        _main = main;
-    }
-    public HeroId Hero => new("小精灵", HeroAttribute.Universal);
 
     public void OnActivate(HeroContext ctx)
     {
