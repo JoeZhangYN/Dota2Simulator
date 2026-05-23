@@ -111,7 +111,7 @@ public sealed partial class 骨法Strategy : IHeroStrategy
             }
             else
             {
-                if (!SkillEngine.DOTA2判断是否持续施法(in 句柄))
+                if (!_skill.DOTA2判断是否持续施法(in 句柄))
                 {
                     _main._聚合.Skills.SetStep(SlotKey.R, 0);
                     _input.Press(VirtualKey.From(Keys.A));

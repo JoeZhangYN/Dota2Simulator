@@ -712,11 +712,12 @@ namespace Dota2Simulator.GameAutomation.Application
             return 判断技能状态(技能位置, in 句柄, 技能类型.状态);
         }
 
-        public static bool DOTA2判断是否持续施法(in ImageHandle 句柄)
+        public bool DOTA2判断是否持续施法(in ImageHandle 句柄)
         {
             // 通过添加步骤来等待完全显示
             // 用于检测持续施法，施法中文字的施字颜色，10秒以内有效
-            return ColorExtensions.ColorAEqualColorB(Common.HeroLoopHost!.获取指定位置颜色(953, 764, in 句柄), Color.FromArgb(254, 254, 254), 2);
+            // Phase 11 P1: 去 static——原经 Common.HeroLoopHost!.获取指定位置颜色 service locator 等价 ImageManager.GetColor(in 句柄, x-OffsetX, y-OffsetY)
+            return ColorExtensions.ColorAEqualColorB(ImageManager.GetColor(in 句柄, 953 - GameLayout.OffsetX, 764 - GameLayout.OffsetY), Color.FromArgb(254, 254, 254), 2);
         }
 
         private static void 记录技能释放信息(Keys s1, string s, bool b1, bool b2, Color c1, Color c2, Color c3)

@@ -1,0 +1,2 @@
+{"kind":"proxy_to_rtk","tool":"git","subcommand":"log","original_cmd":"git log ebe996d..main --oneline","rtk_available":true,"downstream":"rtk_proxy","rtk_exit_code":0,"cwd":"C:\\temp\\JoezhangYN\\C#\\Dota2Plus\\Dota2Simulator\\.claude\\worktrees\\agent-a035fef7f15f26d74"}
+{"kind":"proxy_to_rtk","tool":"git","subcommand":"worktree","original_cmd":"git worktree list","rtk_available":true,"downstream":"rtk_proxy","rtk_exit_code":0,"cwd":"C:\\temp\\JoezhangYN\\C#\\Dota2Plus\\Dota2Simulator\\.claude\\worktrees\\agent-a035fef7f15f26d74"}
