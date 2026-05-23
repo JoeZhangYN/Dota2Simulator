@@ -7,10 +7,23 @@ using Dota2Simulator.GameAutomation.Domain.Heroes;
 using Dota2Simulator.Games.Dota2;
 using Dota2Simulator.Vision;
 
+using Dota2Simulator.GameAutomation.Ports;
+
 namespace Dota2Simulator.GameAutomation.Heroes.Intelligence;
 
 public sealed class 小仙女Strategy : IHeroStrategy
 {
+
+    private readonly IInputExecutor _input;
+#pragma warning disable IDE0052
+    private readonly IScreenVision _vision;
+#pragma warning restore IDE0052
+
+    public 小仙女Strategy(IInputExecutor input, IScreenVision vision)
+    {
+        _input = input;
+        _vision = vision;
+    }
     public HeroId Hero => new("小仙女", HeroAttribute.Intelligence);
 
     public void OnActivate(HeroContext ctx)

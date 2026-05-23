@@ -6,13 +6,25 @@ using Dota2Simulator.GameAutomation.Domain.Actuation;
 using Dota2Simulator.GameAutomation.Domain.Heroes;
 using Dota2Simulator.GameAutomation.Domain.Loop;
 using Dota2Simulator.Games.Dota2;
-using Dota2Simulator.KeyboardMouse;
 using Dota2Simulator.Vision;
+
+using Dota2Simulator.GameAutomation.Ports;
 
 namespace Dota2Simulator.GameAutomation.Heroes.Intelligence;
 
 public sealed class 蓝胖Strategy : IHeroStrategy
 {
+
+    private readonly IInputExecutor _input;
+#pragma warning disable IDE0052
+    private readonly IScreenVision _vision;
+#pragma warning restore IDE0052
+
+    public 蓝胖Strategy(IInputExecutor input, IScreenVision vision)
+    {
+        _input = input;
+        _vision = vision;
+    }
     public HeroId Hero => new("蓝胖", HeroAttribute.Intelligence);
 
     public void OnActivate(HeroContext ctx)
@@ -52,11 +64,11 @@ public sealed class 蓝胖Strategy : IHeroStrategy
         return Task.CompletedTask;
     }
 
-    private static async Task<bool> 火焰轰爆去后摇(ImageHandle 句柄)
+    private async Task<bool> 火焰轰爆去后摇(ImageHandle 句柄)
     {
-        static void 火焰轰爆后()
+        void 火焰轰爆后()
         {
-            SimKeyBoard.MouseRightClick();
+            _input.MouseClick(MouseButton.Right);
         }
 
         if (Skill.DOTA2判断技能是否CD(Keys.Q, in 句柄))
@@ -68,17 +80,17 @@ public sealed class 蓝胖Strategy : IHeroStrategy
         return await Task.FromResult(false).ConfigureAwait(true);
     }
 
-    private static async Task<bool> 引燃去后摇(ImageHandle 句柄)
+    private async Task<bool> 引燃去后摇(ImageHandle 句柄)
     {
-        static void 引燃后()
+        void 引燃后()
         {
             switch (Main._聚合.Skills.Mode(SlotKey.W))
             {
                 case 1:
-                    SimKeyBoard.KeyPress(Keys.Q);
+                    _input.Press(VirtualKey.From(Keys.Q));
                     break;
                 default:
-                    SimKeyBoard.MouseRightClick();
+                    _input.MouseClick(MouseButton.Right);
                     break;
             }
         }
@@ -92,11 +104,11 @@ public sealed class 蓝胖Strategy : IHeroStrategy
         return await Task.FromResult(false).ConfigureAwait(true);
     }
 
-    private static async Task<bool> 嗜血术去后摇(ImageHandle 句柄)
+    private async Task<bool> 嗜血术去后摇(ImageHandle 句柄)
     {
-        static void 嗜血术后()
+        void 嗜血术后()
         {
-            SimKeyBoard.MouseRightClick();
+            _input.MouseClick(MouseButton.Right);
         }
 
         if (Skill.DOTA2判断技能是否CD(Keys.E, in 句柄))
@@ -108,11 +120,11 @@ public sealed class 蓝胖Strategy : IHeroStrategy
         return await Task.FromResult(false).ConfigureAwait(true);
     }
 
-    private static async Task<bool> 未精通火焰轰爆去后摇(ImageHandle 句柄)
+    private async Task<bool> 未精通火焰轰爆去后摇(ImageHandle 句柄)
     {
-        static void 未精通火焰轰爆后()
+        void 未精通火焰轰爆后()
         {
-            SimKeyBoard.MouseRightClick();
+            _input.MouseClick(MouseButton.Right);
         }
 
         if (Skill.DOTA2判断技能是否CD(Keys.D, in 句柄))
@@ -124,11 +136,11 @@ public sealed class 蓝胖Strategy : IHeroStrategy
         return await Task.FromResult(false).ConfigureAwait(true);
     }
 
-    private static async Task<bool> 烈火护盾去后摇(ImageHandle 句柄)
+    private async Task<bool> 烈火护盾去后摇(ImageHandle 句柄)
     {
-        static void 烈火护盾后()
+        void 烈火护盾后()
         {
-            SimKeyBoard.MouseRightClick();
+            _input.MouseClick(MouseButton.Right);
         }
 
         if (Skill.DOTA2判断技能是否CD(Keys.F, in 句柄))

@@ -7,13 +7,25 @@ using Dota2Simulator.GameAutomation.Domain.Heroes;
 using Dota2Simulator.GameAutomation.Domain.Loop;
 using Dota2Simulator.Games;
 using Dota2Simulator.Games.Dota2;
-using Dota2Simulator.KeyboardMouse;
 using Dota2Simulator.Vision;
+
+using Dota2Simulator.GameAutomation.Ports;
 
 namespace Dota2Simulator.GameAutomation.Heroes.Intelligence;
 
 public sealed class 巫妖Strategy : IHeroStrategy
 {
+
+    private readonly IInputExecutor _input;
+#pragma warning disable IDE0052
+    private readonly IScreenVision _vision;
+#pragma warning restore IDE0052
+
+    public 巫妖Strategy(IInputExecutor input, IScreenVision vision)
+    {
+        _input = input;
+        _vision = vision;
+    }
     public HeroId Hero => new("巫妖", HeroAttribute.Intelligence);
 
     public void OnActivate(HeroContext ctx)
@@ -69,17 +81,17 @@ public sealed class 巫妖Strategy : IHeroStrategy
         return result;
     }
 
-    private static async Task<bool> 寒霜爆发去后摇(ImageHandle 句柄)
+    private async Task<bool> 寒霜爆发去后摇(ImageHandle 句柄)
     {
         return await Skill.技能通用判断(Keys.Q, Main._聚合.Skills.Step(SlotKey.E) > 0 ? 11 : 1).ConfigureAwait(true);
     }
 
-    private static async Task<bool> 冰霜魔盾去后摇(ImageHandle 句柄)
+    private async Task<bool> 冰霜魔盾去后摇(ImageHandle 句柄)
     {
         return await Skill.技能通用判断(Keys.W, Main._聚合.Skills.Step(SlotKey.E) > 0 ? 11 : 1, false).ConfigureAwait(true);
     }
 
-    private static async Task<bool> 阴邪凝视去后摇(ImageHandle 句柄)
+    private async Task<bool> 阴邪凝视去后摇(ImageHandle 句柄)
     {
         if (Skill.DOTA2判断技能是否CD(Keys.E, in 句柄))
         {
@@ -108,7 +120,7 @@ public sealed class 巫妖Strategy : IHeroStrategy
                 if (!Skill.DOTA2判断是否持续施法(in 句柄))
                 {
                     Main._聚合.Skills.SetStep(SlotKey.E, 0);
-                    SimKeyBoard.KeyPress(Keys.A);
+                    _input.Press(VirtualKey.From(Keys.A));
                     _ = Item.根据图片使用物品(Dota2_Pictrue.物品.羊刀);
                     return await Task.FromResult(false).ConfigureAwait(true);
                 }
@@ -120,12 +132,12 @@ public sealed class 巫妖Strategy : IHeroStrategy
         }).ConfigureAwait(false);
     }
 
-    private static async Task<bool> 连环霜冻去后摇(ImageHandle 句柄)
+    private async Task<bool> 连环霜冻去后摇(ImageHandle 句柄)
     {
         return await Skill.技能通用判断(Keys.R, Main._聚合.Skills.Step(SlotKey.E) > 0 ? 11 : 1).ConfigureAwait(true);
     }
 
-    private static async Task<bool> 寒冰尖柱去后摇(ImageHandle 句柄)
+    private async Task<bool> 寒冰尖柱去后摇(ImageHandle 句柄)
     {
         return await Skill.技能通用判断(Keys.D, Main._聚合.Skills.Step(SlotKey.E) > 0 ? 10 : 0).ConfigureAwait(true);
     }

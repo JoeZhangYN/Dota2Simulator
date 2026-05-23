@@ -9,41 +9,39 @@ namespace Dota2Simulator.GameAutomation.Application;
 /// </summary>
 public sealed partial class HeroStrategyRegistry
 {
-#pragma warning disable IDE0060 // A4a 过渡：Intelligence 内部 new 暂未使用 input/vision，A4c 切完后启用
     partial void RegisterIntelligence(IInputExecutor input, IScreenVision vision)
-#pragma warning restore IDE0060
     {
-        Register(new Heroes.Intelligence.修补匠Strategy());
-        Register(new Heroes.Intelligence.光法Strategy());
-        Register(new Heroes.Intelligence.天怒Strategy());
-        Register(new Heroes.Intelligence.墨客Strategy());
-        Register(new Heroes.Intelligence.宙斯Strategy());
-        Register(new Heroes.Intelligence.巫医Strategy());
-        Register(new Heroes.Intelligence.巫妖Strategy());
-        Register(new Heroes.Intelligence.帕克Strategy());
-        Register(new Heroes.Intelligence.骨法Strategy());
-        Register(new Heroes.Intelligence.干扰者Strategy());
-        Register(new Heroes.Intelligence.黑鸟Strategy());
-        Register(new Heroes.Intelligence.谜团Strategy());
-        Register(new Heroes.Intelligence.冰女Strategy());
-        Register(new Heroes.Intelligence.火女Strategy());
-        Register(new Heroes.Intelligence.蓝猫Strategy());
-        Register(new Heroes.Intelligence.卡尔Strategy());
-        Register(new Heroes.Intelligence.拉席克Strategy());
-        Register(new Heroes.Intelligence.术士Strategy());
-        Register(new Heroes.Intelligence.暗影萨满Strategy());
-        Register(new Heroes.Intelligence.小仙女Strategy());
-        Register(new Heroes.Intelligence.炸弹人Strategy());
-        Register(new Heroes.Intelligence.神域Strategy());
-        Register(new Heroes.Intelligence.莱恩Strategy());
-        Register(new Heroes.Intelligence.沉默Strategy());
-        Register(new Heroes.Intelligence.戴泽Strategy());
-        Register(new Heroes.Intelligence.双头龙Strategy());
-        Register(new Heroes.Intelligence.奶绿Strategy());
-        Register(new Heroes.Intelligence.女王Strategy());
-        Register(new Heroes.Intelligence.蓝胖Strategy());
-        Register(new Heroes.Intelligence.祸乱之源Strategy());
-        Register(new Heroes.Intelligence.瘟疫法师Strategy());
+        Register(new Heroes.Intelligence.修补匠Strategy(input, vision));
+        Register(new Heroes.Intelligence.光法Strategy(input, vision));
+        Register(new Heroes.Intelligence.天怒Strategy(input, vision));
+        Register(new Heroes.Intelligence.墨客Strategy(input, vision));
+        Register(new Heroes.Intelligence.宙斯Strategy(input, vision));
+        Register(new Heroes.Intelligence.巫医Strategy(input, vision));
+        Register(new Heroes.Intelligence.巫妖Strategy(input, vision));
+        Register(new Heroes.Intelligence.帕克Strategy(input, vision));
+        Register(new Heroes.Intelligence.骨法Strategy(input, vision));
+        Register(new Heroes.Intelligence.干扰者Strategy(input, vision));
+        Register(new Heroes.Intelligence.黑鸟Strategy(input, vision));
+        Register(new Heroes.Intelligence.谜团Strategy(input, vision));
+        Register(new Heroes.Intelligence.冰女Strategy(input, vision));
+        Register(new Heroes.Intelligence.火女Strategy(input, vision));
+        Register(new Heroes.Intelligence.蓝猫Strategy(input, vision));
+        Register(new Heroes.Intelligence.卡尔Strategy(input, vision));
+        Register(new Heroes.Intelligence.拉席克Strategy(input, vision));
+        Register(new Heroes.Intelligence.术士Strategy(input, vision));
+        Register(new Heroes.Intelligence.暗影萨满Strategy(input, vision));
+        Register(new Heroes.Intelligence.小仙女Strategy(input, vision));
+        Register(new Heroes.Intelligence.炸弹人Strategy(input, vision));
+        Register(new Heroes.Intelligence.神域Strategy(input, vision));
+        Register(new Heroes.Intelligence.莱恩Strategy(input, vision));
+        Register(new Heroes.Intelligence.沉默Strategy(input, vision));
+        Register(new Heroes.Intelligence.戴泽Strategy(input, vision));
+        Register(new Heroes.Intelligence.双头龙Strategy(input, vision));
+        Register(new Heroes.Intelligence.奶绿Strategy(input, vision));
+        Register(new Heroes.Intelligence.女王Strategy(input, vision));
+        Register(new Heroes.Intelligence.蓝胖Strategy(input, vision));
+        Register(new Heroes.Intelligence.祸乱之源Strategy(input, vision));
+        Register(new Heroes.Intelligence.瘟疫法师Strategy(input, vision));
     }
 }
 #endif

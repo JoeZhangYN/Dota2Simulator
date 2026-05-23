@@ -7,13 +7,25 @@ using Dota2Simulator.GameAutomation.Domain.Heroes;
 using Dota2Simulator.GameAutomation.Domain.Loop;
 using Dota2Simulator.Games;
 using Dota2Simulator.Games.Dota2;
-using Dota2Simulator.KeyboardMouse;
 using Dota2Simulator.Vision;
+
+using Dota2Simulator.GameAutomation.Ports;
 
 namespace Dota2Simulator.GameAutomation.Heroes.Intelligence;
 
 public sealed class 炸弹人Strategy : IHeroStrategy
 {
+
+    private readonly IInputExecutor _input;
+#pragma warning disable IDE0052
+    private readonly IScreenVision _vision;
+#pragma warning restore IDE0052
+
+    public 炸弹人Strategy(IInputExecutor input, IScreenVision vision)
+    {
+        _input = input;
+        _vision = vision;
+    }
     public HeroId Hero => new("炸弹人", HeroAttribute.Intelligence);
 
     public void OnActivate(HeroContext ctx)
@@ -49,12 +61,12 @@ public sealed class 炸弹人Strategy : IHeroStrategy
         return Task.CompletedTask;
     }
 
-    private static async Task<bool> 粘性炸弹去后摇(ImageHandle 句柄)
+    private async Task<bool> 粘性炸弹去后摇(ImageHandle 句柄)
     {
-        static void 粘性炸弹后()
+        void 粘性炸弹后()
         {
             //RightClick();
-            SimKeyBoard.KeyPress(Keys.A);
+            _input.Press(VirtualKey.From(Keys.A));
         }
 
         if (Skill.DOTA2判断技能是否CD(Keys.Q, in 句柄))
@@ -66,12 +78,12 @@ public sealed class 炸弹人Strategy : IHeroStrategy
         return await Task.FromResult(false).ConfigureAwait(true);
     }
 
-    private static async Task<bool> 活性电击去后摇(ImageHandle 句柄)
+    private async Task<bool> 活性电击去后摇(ImageHandle 句柄)
     {
-        static void 活性电击后()
+        void 活性电击后()
         {
             //RightClick();
-            SimKeyBoard.KeyPress(Keys.A);
+            _input.Press(VirtualKey.From(Keys.A));
         }
 
         if (Skill.DOTA2判断技能是否CD(Keys.W, in 句柄))
@@ -83,12 +95,12 @@ public sealed class 炸弹人Strategy : IHeroStrategy
         return await Task.FromResult(false).ConfigureAwait(true);
     }
 
-    private static async Task<bool> 爆破起飞去后摇(ImageHandle 句柄)
+    private async Task<bool> 爆破起飞去后摇(ImageHandle 句柄)
     {
-        static void 爆破起飞后()
+        void 爆破起飞后()
         {
             //RightClick();
-            SimKeyBoard.KeyPress(Keys.A);
+            _input.Press(VirtualKey.From(Keys.A));
             Common.Delay(750);
 
             switch (Main._聚合.Skills.Mode(SlotKey.E))
@@ -113,7 +125,7 @@ public sealed class 炸弹人Strategy : IHeroStrategy
     }
 
     // todo 逻辑修改
-    private static async Task<bool> 爆破后接3雷粘性炸弹(ImageHandle 句柄)
+    private async Task<bool> 爆破后接3雷粘性炸弹(ImageHandle 句柄)
     {
         if (Common.获取当前时间毫秒() - Main._聚合.Skills.Time(SlotKey.R) >= 3000)
         {

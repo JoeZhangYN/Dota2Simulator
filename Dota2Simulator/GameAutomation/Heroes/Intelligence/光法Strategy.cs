@@ -7,13 +7,25 @@ using Dota2Simulator.GameAutomation.Domain.Heroes;
 using Dota2Simulator.GameAutomation.Domain.Loop;
 using Dota2Simulator.Games;
 using Dota2Simulator.Games.Dota2;
-using Dota2Simulator.KeyboardMouse;
 using Dota2Simulator.Vision;
+
+using Dota2Simulator.GameAutomation.Ports;
 
 namespace Dota2Simulator.GameAutomation.Heroes.Intelligence;
 
 public sealed class 光法Strategy : IHeroStrategy
 {
+
+    private readonly IInputExecutor _input;
+#pragma warning disable IDE0052
+    private readonly IScreenVision _vision;
+#pragma warning restore IDE0052
+
+    public 光法Strategy(IInputExecutor input, IScreenVision vision)
+    {
+        _input = input;
+        _vision = vision;
+    }
     public HeroId Hero => new("光法", HeroAttribute.Intelligence);
 
     public void OnActivate(HeroContext ctx)
@@ -76,7 +88,7 @@ public sealed class 光法Strategy : IHeroStrategy
         return result;
     }
 
-    private static async Task<bool> 减少300毫秒蓄力(ImageHandle 句柄)
+    private async Task<bool> 减少300毫秒蓄力(ImageHandle 句柄)
     {
         int 全局步骤 = Main._聚合.Skills.Step(SlotKey.Q);
 
@@ -93,40 +105,40 @@ public sealed class 光法Strategy : IHeroStrategy
                 if (ImageFinder.FindImageInRegionBool(Dota2_Pictrue.Buff.光法_大招, GlobalScreenCapture.GetCurrentHandle(), new System.Drawing.Rectangle(962, 826, 526, 80)))
                 {
                     Item._切假腿配置.修改配置(Keys.Q, false);
-                    SimKeyBoard.MouseRightClick();
+                    _input.MouseClick(MouseButton.Right);
                 }
 
                 _ = Task.Run(() =>
                 {
                     Common.Delay(2700);
-                    SimKeyBoard.KeyPress(Keys.Q);
+                    _input.Press(VirtualKey.From(Keys.Q));
                 }).ConfigureAwait(false);
 
                 return await Task.FromResult(true).ConfigureAwait(true);
         }
     }
 
-    private static async Task<bool> 炎阳之缚去后摇(ImageHandle 句柄)
+    private async Task<bool> 炎阳之缚去后摇(ImageHandle 句柄)
     {
         return await Skill.技能通用判断(Keys.D, 1).ConfigureAwait(true);
     }
 
-    private static async Task<bool> 查克拉魔法去后摇(ImageHandle 句柄)
+    private async Task<bool> 查克拉魔法去后摇(ImageHandle 句柄)
     {
         return await Skill.技能通用判断(Keys.E, 1).ConfigureAwait(true);
     }
 
-    private static async Task<bool> 致盲之光去后摇(ImageHandle 句柄)
+    private async Task<bool> 致盲之光去后摇(ImageHandle 句柄)
     {
         return await Skill.技能通用判断(Keys.W, 1).ConfigureAwait(true);
     }
 
-    private static async Task<bool> 灵光去后摇接炎阳(ImageHandle 句柄)
+    private async Task<bool> 灵光去后摇接炎阳(ImageHandle 句柄)
     {
         return await Skill.技能通用判断(Keys.F, 1).ConfigureAwait(true);
     }
 
-    private static async Task<bool> 循环查克拉(ImageHandle 句柄)
+    private async Task<bool> 循环查克拉(ImageHandle 句柄)
     {
         await Skill.技能通用判断(Keys.E, 2).ConfigureAwait(true);
         return await Task.FromResult(Main._聚合.Conditions[ConditionSlotKey.C4].Active).ConfigureAwait(true);

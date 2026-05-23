@@ -10,8 +10,9 @@ using Dota2Simulator.GameAutomation.Domain.Heroes;
 using Dota2Simulator.GameAutomation.Domain.Loop;
 using Dota2Simulator.Games;
 using Dota2Simulator.Games.Dota2;
-using Dota2Simulator.KeyboardMouse;
 using Dota2Simulator.Vision;
+
+using Dota2Simulator.GameAutomation.Ports;
 
 namespace Dota2Simulator.GameAutomation.Heroes.Intelligence;
 
@@ -19,6 +20,17 @@ public sealed class 暗影萨满Strategy : IHeroStrategy
 {
     private const int 等待延迟 = 33;
 
+
+    private readonly IInputExecutor _input;
+#pragma warning disable IDE0052
+    private readonly IScreenVision _vision;
+#pragma warning restore IDE0052
+
+    public 暗影萨满Strategy(IInputExecutor input, IScreenVision vision)
+    {
+        _input = input;
+        _vision = vision;
+    }
     public HeroId Hero => new("暗影萨满", HeroAttribute.Intelligence);
 
     public void OnActivate(HeroContext ctx)
@@ -101,17 +113,17 @@ public sealed class 暗影萨满Strategy : IHeroStrategy
     /// <summary>
     ///     前摇时间基本在
     /// </summary>
-    private static async Task<bool> 苍穹振击取消后摇(ImageHandle 句柄)
+    private async Task<bool> 苍穹振击取消后摇(ImageHandle 句柄)
     {
-        static void 苍穹振击后()
+        void 苍穹振击后()
         {
             switch (Main._聚合.Skills.Mode(SlotKey.Q))
             {
                 case 1:
-                    SimKeyBoard.KeyPress(Keys.W);
+                    _input.Press(VirtualKey.From(Keys.W));
                     break;
                 default:
-                    SimKeyBoard.KeyPress(Keys.A);
+                    _input.Press(VirtualKey.From(Keys.A));
                     break;
             }
         }
@@ -128,9 +140,9 @@ public sealed class 暗影萨满Strategy : IHeroStrategy
     /// <summary>
     ///     前摇时间基本再380-450 之间
     /// </summary>
-    private static async Task<bool> 枷锁持续施法隐身(ImageHandle 句柄)
+    private async Task<bool> 枷锁持续施法隐身(ImageHandle 句柄)
     {
-        static void 枷锁后(in ImageHandle 句柄)
+        void 枷锁后(in ImageHandle 句柄)
         {
         }
 
@@ -143,11 +155,11 @@ public sealed class 暗影萨满Strategy : IHeroStrategy
         return await Task.FromResult(false).ConfigureAwait(true);
     }
 
-    private static async Task<bool> 释放群蛇守卫取消后摇(ImageHandle 句柄)
+    private async Task<bool> 释放群蛇守卫取消后摇(ImageHandle 句柄)
     {
-        static void 群蛇守卫后()
+        void 群蛇守卫后()
         {
-            SimKeyBoard.KeyPress(Keys.A);
+            _input.Press(VirtualKey.From(Keys.A));
         }
 
         if (Skill.DOTA2判断技能是否CD(Keys.R, in 句柄))
@@ -159,9 +171,9 @@ public sealed class 暗影萨满Strategy : IHeroStrategy
         return await Task.FromResult(false).ConfigureAwait(true);
     }
 
-    private static async Task<bool> 变羊取消后摇(ImageHandle 句柄)
+    private async Task<bool> 变羊取消后摇(ImageHandle 句柄)
     {
-        static void 萨满变羊后(ImageHandle 句柄)
+        void 萨满变羊后(ImageHandle 句柄)
         {
             Main._聚合.Skills.SetTime(SlotKey.W, Common.获取当前时间毫秒());
 
@@ -192,28 +204,28 @@ public sealed class 暗影萨满Strategy : IHeroStrategy
 
                 TTS.TTS.Speak(string.Concat("延时", time.ToString(CultureInfo.InvariantCulture)));
 
-                SimKeyBoard.KeyPress(Keys.A);
+                _input.Press(VirtualKey.From(Keys.A));
 
                 switch (Main._聚合.Skills.Mode(SlotKey.W))
                 {
                     case 1:
                         Common.Delay(time - 435, Main._聚合.Skills.Time(SlotKey.W));
-                        SimKeyBoard.KeyPress(Keys.E);
+                        _input.Press(VirtualKey.From(Keys.E));
                         break;
                     case 2:
-                        SimKeyBoard.KeyPress(Keys.Q);
+                        _input.Press(VirtualKey.From(Keys.Q));
                         break;
                     case 3:
-                        SimKeyBoard.KeyPress(Keys.Q);
+                        _input.Press(VirtualKey.From(Keys.Q));
                         Common.Delay(time - 435, Main._聚合.Skills.Time(SlotKey.W));
-                        SimKeyBoard.KeyPress(Keys.E);
+                        _input.Press(VirtualKey.From(Keys.E));
                         break;
                     case 4:
-                        SimKeyBoard.KeyPress(Keys.R);
+                        _input.Press(VirtualKey.From(Keys.R));
                         Common.Delay(400);
-                        SimKeyBoard.KeyPress(Keys.Q);
+                        _input.Press(VirtualKey.From(Keys.Q));
                         Common.Delay(time - 435, Main._聚合.Skills.Time(SlotKey.W));
-                        SimKeyBoard.KeyPress(Keys.E);
+                        _input.Press(VirtualKey.From(Keys.E));
                         break;
                 }
             });
@@ -228,7 +240,7 @@ public sealed class 暗影萨满Strategy : IHeroStrategy
         return await Task.FromResult(false).ConfigureAwait(true);
     }
 
-    private static async Task<bool> 推推破林肯秒羊(ImageHandle 句柄)
+    private async Task<bool> 推推破林肯秒羊(ImageHandle 句柄)
     {
         if (Item.根据图片使用物品(Dota2_Pictrue.物品.推推棒) == 1)
         {
@@ -236,7 +248,7 @@ public sealed class 暗影萨满Strategy : IHeroStrategy
             return await Task.FromResult(true).ConfigureAwait(true);
         }
 
-        SimKeyBoard.KeyPress(Keys.W);
+        _input.Press(VirtualKey.From(Keys.W));
         return await Task.FromResult(false).ConfigureAwait(true);
     }
 }

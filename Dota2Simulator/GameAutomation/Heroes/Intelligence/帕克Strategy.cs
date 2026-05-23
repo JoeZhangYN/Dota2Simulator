@@ -7,13 +7,25 @@ using Dota2Simulator.GameAutomation.Domain.Heroes;
 using Dota2Simulator.GameAutomation.Domain.Loop;
 using Dota2Simulator.Games;
 using Dota2Simulator.Games.Dota2;
-using Dota2Simulator.KeyboardMouse;
 using Dota2Simulator.Vision;
+
+using Dota2Simulator.GameAutomation.Ports;
 
 namespace Dota2Simulator.GameAutomation.Heroes.Intelligence;
 
 public sealed class 帕克Strategy : IHeroStrategy
 {
+
+    private readonly IInputExecutor _input;
+#pragma warning disable IDE0052
+    private readonly IScreenVision _vision;
+#pragma warning restore IDE0052
+
+    public 帕克Strategy(IInputExecutor input, IScreenVision vision)
+    {
+        _input = input;
+        _vision = vision;
+    }
     public HeroId Hero => new("帕克", HeroAttribute.Intelligence);
 
     public void OnActivate(HeroContext ctx)
@@ -69,7 +81,7 @@ public sealed class 帕克Strategy : IHeroStrategy
         return result;
     }
 
-    private static async Task<bool> 幻象法球去后摇(ImageHandle 句柄)
+    private async Task<bool> 幻象法球去后摇(ImageHandle 句柄)
     {
         return await Skill.主动技能进入CD后续(Keys.Q, () =>
         {
@@ -77,29 +89,29 @@ public sealed class 帕克Strategy : IHeroStrategy
             Common.Delay(3400);
             if (Main._聚合.Skills.Mode(SlotKey.D) == 1)
             {
-                SimKeyBoard.KeyPress(Keys.D);
+                _input.Press(VirtualKey.From(Keys.D));
             }
 
             Main._聚合.Skills.SetStep(SlotKey.Q, 0);
         }).ConfigureAwait(true);
     }
 
-    private static async Task<bool> 新月之痕去后摇(ImageHandle 句柄)
+    private async Task<bool> 新月之痕去后摇(ImageHandle 句柄)
     {
         return await Skill.技能通用判断(Keys.W, 0).ConfigureAwait(true);
     }
 
-    private static async Task<bool> 梦境缠绕去后摇(ImageHandle 句柄)
+    private async Task<bool> 梦境缠绕去后摇(ImageHandle 句柄)
     {
         return await Skill.技能通用判断(Keys.R, 0).ConfigureAwait(true);
     }
 
-    private static async Task<bool> 灵动之翼定位(ImageHandle 句柄)
+    private async Task<bool> 灵动之翼定位(ImageHandle 句柄)
     {
         return await Skill.主动技能进入CD后续(Keys.D, () =>
         {
-            SimKeyBoard.KeyPress(Keys.F1);
-            SimKeyBoard.KeyPress(Keys.F1);
+            _input.Press(VirtualKey.From(Keys.F1));
+            _input.Press(VirtualKey.From(Keys.F1));
         }).ConfigureAwait(true);
     }
 }

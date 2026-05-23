@@ -7,8 +7,9 @@ using Dota2Simulator.GameAutomation.Domain.Heroes;
 using Dota2Simulator.GameAutomation.Domain.Loop;
 using Dota2Simulator.Games;
 using Dota2Simulator.Games.Dota2;
-using Dota2Simulator.KeyboardMouse;
 using Dota2Simulator.Vision;
+
+using Dota2Simulator.GameAutomation.Ports;
 
 namespace Dota2Simulator.GameAutomation.Heroes.Intelligence;
 
@@ -16,6 +17,17 @@ public sealed class 双头龙Strategy : IHeroStrategy
 {
     private const int 等待延迟 = 33;
 
+
+    private readonly IInputExecutor _input;
+#pragma warning disable IDE0052
+    private readonly IScreenVision _vision;
+#pragma warning restore IDE0052
+
+    public 双头龙Strategy(IInputExecutor input, IScreenVision vision)
+    {
+        _input = input;
+        _vision = vision;
+    }
     public HeroId Hero => new("双头龙", HeroAttribute.Intelligence);
 
     public void OnActivate(HeroContext ctx)
@@ -49,12 +61,12 @@ public sealed class 双头龙Strategy : IHeroStrategy
         }
     }
 
-    private static async Task<bool> 冰火交加去后摇(ImageHandle 句柄)
+    private async Task<bool> 冰火交加去后摇(ImageHandle 句柄)
     {
-        static void 冰火交加后()
+        void 冰火交加后()
         {
             Main._聚合.Skills.SetTime(SlotKey.Q, -1);
-            SimKeyBoard.MouseRightClick();
+            _input.MouseClick(MouseButton.Right);
         }
 
         // 超时则切回 总体释放时间
@@ -73,12 +85,12 @@ public sealed class 双头龙Strategy : IHeroStrategy
         return await Task.FromResult(false).ConfigureAwait(true);
     }
 
-    private static async Task<bool> 冰封路径去后摇(ImageHandle 句柄)
+    private async Task<bool> 冰封路径去后摇(ImageHandle 句柄)
     {
-        static void 冰封路径后()
+        void 冰封路径后()
         {
             Main._聚合.Skills.SetTime(SlotKey.W, -1);
-            SimKeyBoard.MouseRightClick();
+            _input.MouseClick(MouseButton.Right);
         }
 
         // 超时则切回 总体释放时间
@@ -97,9 +109,9 @@ public sealed class 双头龙Strategy : IHeroStrategy
         return await Task.FromResult(false).ConfigureAwait(true);
     }
 
-    private static async Task<bool> 烈焰焚身去后摇(ImageHandle 句柄)
+    private async Task<bool> 烈焰焚身去后摇(ImageHandle 句柄)
     {
-        static void 烈焰焚身后()
+        void 烈焰焚身后()
         {
             Main._聚合.Skills.SetTime(SlotKey.R, -1);
             // RightClick();
@@ -121,7 +133,7 @@ public sealed class 双头龙Strategy : IHeroStrategy
         return await Task.FromResult(false).ConfigureAwait(true);
     }
 
-    private static async Task<bool> 吹风接冰封路径(ImageHandle 句柄)
+    private async Task<bool> 吹风接冰封路径(ImageHandle 句柄)
     {
         if (Item.根据图片使用物品(Dota2_Pictrue.物品.吹风) == 1)
         {
@@ -139,7 +151,7 @@ public sealed class 双头龙Strategy : IHeroStrategy
             return await Task.FromResult(true).ConfigureAwait(true);
         }
 
-        SimKeyBoard.KeyPress(Keys.W);
+        _input.Press(VirtualKey.From(Keys.W));
         Main._聚合.Skills.SetTime(SlotKey.Global, -1);
         return await Task.FromResult(false).ConfigureAwait(true);
     }

@@ -7,8 +7,9 @@ using Dota2Simulator.GameAutomation.Domain.Heroes;
 using Dota2Simulator.GameAutomation.Domain.Loop;
 using Dota2Simulator.Games;
 using Dota2Simulator.Games.Dota2;
-using Dota2Simulator.KeyboardMouse;
 using Dota2Simulator.Vision;
+
+using Dota2Simulator.GameAutomation.Ports;
 
 namespace Dota2Simulator.GameAutomation.Heroes.Intelligence;
 
@@ -16,6 +17,17 @@ public sealed class 莱恩Strategy : IHeroStrategy
 {
     private const int 等待延迟 = 33;
 
+
+    private readonly IInputExecutor _input;
+#pragma warning disable IDE0052
+    private readonly IScreenVision _vision;
+#pragma warning restore IDE0052
+
+    public 莱恩Strategy(IInputExecutor input, IScreenVision vision)
+    {
+        _input = input;
+        _vision = vision;
+    }
     public HeroId Hero => new("莱恩", HeroAttribute.Intelligence);
 
     public void OnActivate(HeroContext ctx)
@@ -75,17 +87,17 @@ public sealed class 莱恩Strategy : IHeroStrategy
         }
     }
 
-    private static async Task<bool> 莱恩羊接技能(ImageHandle 句柄)
+    private async Task<bool> 莱恩羊接技能(ImageHandle 句柄)
     {
-        static void 莱恩羊后()
+        void 莱恩羊后()
         {
             if (Main._聚合.Conditions[ConditionSlotKey.C6].Active)
             {
-                SimKeyBoard.KeyPress(Keys.E);
+                _input.Press(VirtualKey.From(Keys.E));
             }
             else
             {
-                SimKeyBoard.KeyPress(Keys.A);
+                _input.Press(VirtualKey.From(Keys.A));
             }
         }
 
@@ -98,12 +110,12 @@ public sealed class 莱恩Strategy : IHeroStrategy
         return await Task.FromResult(false).ConfigureAwait(true);
     }
 
-    private static async Task<bool> 死亡一指去后摇(ImageHandle 句柄)
+    private async Task<bool> 死亡一指去后摇(ImageHandle 句柄)
     {
-        static void 死亡一指后()
+        void 死亡一指后()
         {
             //RightClick();
-            SimKeyBoard.KeyPress(Keys.A);
+            _input.Press(VirtualKey.From(Keys.A));
         }
 
         if (Skill.DOTA2判断技能是否CD(Keys.R, in 句柄))
@@ -115,7 +127,7 @@ public sealed class 莱恩Strategy : IHeroStrategy
         return await Task.FromResult(false).ConfigureAwait(true);
     }
 
-    private static async Task<bool> 大招前纷争(ImageHandle 句柄)
+    private async Task<bool> 大招前纷争(ImageHandle 句柄)
     {
         Common.Delay(33 * (
             Item.根据图片使用物品(Dota2_Pictrue.物品.虚灵之刃)
@@ -129,7 +141,7 @@ public sealed class 莱恩Strategy : IHeroStrategy
         return await Task.FromResult(false).ConfigureAwait(true);
     }
 
-    private static async Task<bool> 推推破林肯秒羊(ImageHandle 句柄)
+    private async Task<bool> 推推破林肯秒羊(ImageHandle 句柄)
     {
         if (Item.根据图片使用物品(Dota2_Pictrue.物品.推推棒) == 1)
         {
@@ -137,11 +149,11 @@ public sealed class 莱恩Strategy : IHeroStrategy
             return await Task.FromResult(true).ConfigureAwait(true);
         }
 
-        SimKeyBoard.KeyPress(Keys.W);
+        _input.Press(VirtualKey.From(Keys.W));
         return await Task.FromResult(false).ConfigureAwait(true);
     }
 
-    private static async Task<bool> 羊刺刷新秒人(ImageHandle 句柄)
+    private async Task<bool> 羊刺刷新秒人(ImageHandle 句柄)
     {
         int 步骤 = Main._聚合.Skills.Step(SlotKey.Global);
 
@@ -159,14 +171,14 @@ public sealed class 莱恩Strategy : IHeroStrategy
 
             if (Skill.DOTA2判断技能是否CD(Keys.Q, in 句柄))
             {
-                SimKeyBoard.KeyPress(Keys.Q);
+                _input.Press(VirtualKey.From(Keys.Q));
                 Common.Delay(60);
                 return await Task.FromResult(true).ConfigureAwait(true);
             }
 
             if (Skill.DOTA2判断技能是否CD(Keys.R, in 句柄))
             {
-                SimKeyBoard.KeyPress(Keys.R);
+                _input.Press(VirtualKey.From(Keys.R));
                 Common.Delay(60);
                 return await Task.FromResult(true).ConfigureAwait(true);
             }
@@ -185,14 +197,14 @@ public sealed class 莱恩Strategy : IHeroStrategy
 
             if (Skill.DOTA2判断技能是否CD(Keys.W, in 句柄))
             {
-                SimKeyBoard.KeyPress(Keys.W);
+                _input.Press(VirtualKey.From(Keys.W));
                 Common.Delay(等待延迟);
                 return await Task.FromResult(true).ConfigureAwait(true);
             }
 
             if (Skill.DOTA2判断技能是否CD(Keys.Q, in 句柄))
             {
-                SimKeyBoard.KeyPress(Keys.Q);
+                _input.Press(VirtualKey.From(Keys.Q));
                 Common.Delay(60);
                 return await Task.FromResult(true).ConfigureAwait(true);
             }
@@ -209,7 +221,7 @@ public sealed class 莱恩Strategy : IHeroStrategy
 
             if (Skill.DOTA2判断技能是否CD(Keys.R, in 句柄))
             {
-                SimKeyBoard.KeyPress(Keys.R);
+                _input.Press(VirtualKey.From(Keys.R));
                 Common.Delay(60);
                 return await Task.FromResult(true).ConfigureAwait(true);
             }

@@ -9,10 +9,23 @@ using Dota2Simulator.GameAutomation.Domain.Loop;
 using Dota2Simulator.Games.Dota2;
 using Dota2Simulator.Vision;
 
+using Dota2Simulator.GameAutomation.Ports;
+
 namespace Dota2Simulator.GameAutomation.Heroes.Intelligence;
 
 public sealed class 祸乱之源Strategy : IHeroStrategy
 {
+
+    private readonly IInputExecutor _input;
+#pragma warning disable IDE0052
+    private readonly IScreenVision _vision;
+#pragma warning restore IDE0052
+
+    public 祸乱之源Strategy(IInputExecutor input, IScreenVision vision)
+    {
+        _input = input;
+        _vision = vision;
+    }
     public HeroId Hero => new("祸乱之源", HeroAttribute.Intelligence);
 
     public void OnActivate(HeroContext ctx)

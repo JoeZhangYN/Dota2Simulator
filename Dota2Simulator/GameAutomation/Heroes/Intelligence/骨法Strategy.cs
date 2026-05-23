@@ -7,13 +7,25 @@ using Dota2Simulator.GameAutomation.Domain.Heroes;
 using Dota2Simulator.GameAutomation.Domain.Loop;
 using Dota2Simulator.Games;
 using Dota2Simulator.Games.Dota2;
-using Dota2Simulator.KeyboardMouse;
 using Dota2Simulator.Vision;
+
+using Dota2Simulator.GameAutomation.Ports;
 
 namespace Dota2Simulator.GameAutomation.Heroes.Intelligence;
 
 public sealed class 骨法Strategy : IHeroStrategy
 {
+
+    private readonly IInputExecutor _input;
+#pragma warning disable IDE0052
+    private readonly IScreenVision _vision;
+#pragma warning restore IDE0052
+
+    public 骨法Strategy(IInputExecutor input, IScreenVision vision)
+    {
+        _input = input;
+        _vision = vision;
+    }
     public HeroId Hero => new("骨法", HeroAttribute.Intelligence);
 
     public void OnActivate(HeroContext ctx)
@@ -54,12 +66,12 @@ public sealed class 骨法Strategy : IHeroStrategy
         }
     }
 
-    private static async Task<bool> 幽冥轰爆去后摇(ImageHandle 句柄)
+    private async Task<bool> 幽冥轰爆去后摇(ImageHandle 句柄)
     {
         return await Skill.技能通用判断(Keys.Q, Main._聚合.Skills.Step(SlotKey.R) > 0 ? 10 : 0).ConfigureAwait(true);
     }
 
-    private static async Task<bool> 衰老去后摇(ImageHandle 句柄)
+    private async Task<bool> 衰老去后摇(ImageHandle 句柄)
     {
         return await Skill.主动技能进入CD后续(Keys.W, () =>
         {
@@ -73,12 +85,12 @@ public sealed class 骨法Strategy : IHeroStrategy
         }).ConfigureAwait(true);
     }
 
-    private static async Task<bool> 幽冥守卫去后摇(ImageHandle 句柄)
+    private async Task<bool> 幽冥守卫去后摇(ImageHandle 句柄)
     {
         return await Skill.技能通用判断(Keys.E, Main._聚合.Skills.Step(SlotKey.R) > 0 ? 10 : 0).ConfigureAwait(true);
     }
 
-    private static async Task<bool> 生命吸取去后摇(ImageHandle 句柄)
+    private async Task<bool> 生命吸取去后摇(ImageHandle 句柄)
     {
         if (Skill.DOTA2判断技能是否CD(Keys.R, in 句柄))
         {
@@ -92,7 +104,7 @@ public sealed class 骨法Strategy : IHeroStrategy
             {
                 if (Main._聚合.Skills.Mode(SlotKey.R) == 1)
                 {
-                    SimKeyBoard.KeyPress(Keys.W);
+                    _input.Press(VirtualKey.From(Keys.W));
                 }
 
                 Main._聚合.Skills.SetStep(SlotKey.R, 1);
@@ -112,7 +124,7 @@ public sealed class 骨法Strategy : IHeroStrategy
                 if (!Skill.DOTA2判断是否持续施法(in 句柄))
                 {
                     Main._聚合.Skills.SetStep(SlotKey.R, 0);
-                    SimKeyBoard.KeyPress(Keys.A);
+                    _input.Press(VirtualKey.From(Keys.A));
                     return await Task.FromResult(false).ConfigureAwait(true);
                 }
                 else

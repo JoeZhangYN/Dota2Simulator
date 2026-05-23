@@ -5,13 +5,25 @@ using Dota2Simulator.GameAutomation.Application;
 using Dota2Simulator.GameAutomation.Domain.Actuation;
 using Dota2Simulator.GameAutomation.Domain.Heroes;
 using Dota2Simulator.Games.Dota2;
-using Dota2Simulator.KeyboardMouse;
 using Dota2Simulator.Vision;
+
+using Dota2Simulator.GameAutomation.Ports;
 
 namespace Dota2Simulator.GameAutomation.Heroes.Intelligence;
 
 public sealed class 火女Strategy : IHeroStrategy
 {
+
+    private readonly IInputExecutor _input;
+#pragma warning disable IDE0052
+    private readonly IScreenVision _vision;
+#pragma warning restore IDE0052
+
+    public 火女Strategy(IInputExecutor input, IScreenVision vision)
+    {
+        _input = input;
+        _vision = vision;
+    }
     public HeroId Hero => new("火女", HeroAttribute.Intelligence);
 
     public void OnActivate(HeroContext ctx)
@@ -40,11 +52,11 @@ public sealed class 火女Strategy : IHeroStrategy
         return Task.CompletedTask;
     }
 
-    private static async Task<bool> 龙破斩去后摇(ImageHandle 句柄)
+    private async Task<bool> 龙破斩去后摇(ImageHandle 句柄)
     {
-        static void 龙破斩后()
+        void 龙破斩后()
         {
-            SimKeyBoard.KeyPress(Keys.A);
+            _input.Press(VirtualKey.From(Keys.A));
         }
 
         if (Skill.DOTA2判断技能是否CD(Keys.Q, in 句柄))
@@ -56,11 +68,11 @@ public sealed class 火女Strategy : IHeroStrategy
         return await Task.FromResult(false).ConfigureAwait(true);
     }
 
-    private static async Task<bool> 光击阵去后摇(ImageHandle 句柄)
+    private async Task<bool> 光击阵去后摇(ImageHandle 句柄)
     {
-        static void 光击阵后()
+        void 光击阵后()
         {
-            SimKeyBoard.KeyPress(Keys.A);
+            _input.Press(VirtualKey.From(Keys.A));
         }
 
         if (Skill.DOTA2判断技能是否CD(Keys.W, in 句柄))
@@ -72,11 +84,11 @@ public sealed class 火女Strategy : IHeroStrategy
         return await Task.FromResult(false).ConfigureAwait(true);
     }
 
-    private static async Task<bool> 神灭斩去后摇(ImageHandle 句柄)
+    private async Task<bool> 神灭斩去后摇(ImageHandle 句柄)
     {
-        static void 神灭斩后()
+        void 神灭斩后()
         {
-            SimKeyBoard.KeyPress(Keys.A);
+            _input.Press(VirtualKey.From(Keys.A));
         }
 
         if (Skill.DOTA2判断技能是否CD(Keys.R, in 句柄))

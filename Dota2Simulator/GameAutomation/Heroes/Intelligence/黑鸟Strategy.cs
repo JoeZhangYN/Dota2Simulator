@@ -8,13 +8,25 @@ using Dota2Simulator.GameAutomation.Domain.Heroes;
 using Dota2Simulator.GameAutomation.Domain.Loop;
 using Dota2Simulator.Games;
 using Dota2Simulator.Games.Dota2;
-using Dota2Simulator.KeyboardMouse;
 using Dota2Simulator.Vision;
+
+using Dota2Simulator.GameAutomation.Ports;
 
 namespace Dota2Simulator.GameAutomation.Heroes.Intelligence;
 
 public sealed class 黑鸟Strategy : IHeroStrategy
 {
+
+    private readonly IInputExecutor _input;
+#pragma warning disable IDE0052
+    private readonly IScreenVision _vision;
+#pragma warning restore IDE0052
+
+    public 黑鸟Strategy(IInputExecutor input, IScreenVision vision)
+    {
+        _input = input;
+        _vision = vision;
+    }
     public HeroId Hero => new("黑鸟", HeroAttribute.Intelligence);
 
     public void OnActivate(HeroContext ctx)
@@ -28,7 +40,7 @@ public sealed class 黑鸟Strategy : IHeroStrategy
         VirtualKey key = trigger.Key;
         if (key == VirtualKey.D)
         {
-            SimKeyBoard.KeyPress(Keys.W);
+            _input.Press(VirtualKey.From(Keys.W));
             Main._聚合.Conditions[ConditionSlotKey.C1].Active = true;
         }
         else if (key == VirtualKey.W)
@@ -48,7 +60,7 @@ public sealed class 黑鸟Strategy : IHeroStrategy
     }
 
     // todo 逻辑修改
-    private static async Task<bool> 关接陨星锤(ImageHandle 句柄)
+    private async Task<bool> 关接陨星锤(ImageHandle 句柄)
     {
         int time = 0;
 
@@ -63,13 +75,13 @@ public sealed class 黑鸟Strategy : IHeroStrategy
             time = 3250;
         }
 
-        static void 关后(int time, in ImageHandle 句柄)
+        void 关后(int time, in ImageHandle 句柄)
         {
             Common.Delay(110);
             Main._聚合.Skills.SetTime(SlotKey.W, Common.获取当前时间毫秒());
-            SimKeyBoard.MouseRightClick();
+            _input.MouseClick(MouseButton.Right);
             Common.Delay(150);
-            SimKeyBoard.KeyPress(Keys.S);
+            _input.Press(VirtualKey.From(Keys.S));
             Common.Delay(time - 3000, Main._聚合.Skills.Time(SlotKey.W));
             if (!Main._中断条件)
             {
@@ -86,11 +98,11 @@ public sealed class 黑鸟Strategy : IHeroStrategy
         return await Task.FromResult(false).ConfigureAwait(true);
     }
 
-    private static async Task<bool> 神智之蚀去后摇(ImageHandle 句柄)
+    private async Task<bool> 神智之蚀去后摇(ImageHandle 句柄)
     {
-        static void 神智之蚀后()
+        void 神智之蚀后()
         {
-            SimKeyBoard.KeyPress(Keys.A);
+            _input.Press(VirtualKey.From(Keys.A));
         }
 
         if (Skill.DOTA2判断技能是否CD(Keys.R, in 句柄))
@@ -102,7 +114,7 @@ public sealed class 黑鸟Strategy : IHeroStrategy
         return await Task.FromResult(false).ConfigureAwait(true);
     }
 
-    private static async Task<bool> 关接跳(ImageHandle 句柄)
+    private async Task<bool> 关接跳(ImageHandle 句柄)
     {
         return Item.根据图片使用物品(Dota2_Pictrue.物品.跳刀) == 1
             ? await Task.FromResult(false).ConfigureAwait(true)
