@@ -1,3 +1,6 @@
+// TODO-dead-Phase7-remove
+// Reason: abstract class with no derived class (do not confuse with Vision.Rust.ImageProcessor)
+// Re-enable: delete this header + restore .csproj Compile line (if any).
 using Collections.Pooled;
 using NLog;
 using System;

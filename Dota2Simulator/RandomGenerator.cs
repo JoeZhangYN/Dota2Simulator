@@ -1,4 +1,7 @@
-﻿using System;
+// TODO-dead-Phase7-remove
+// Reason: grep ref count 0 across all live code
+// Re-enable: delete this header + restore .csproj Compile line (if any).
+using System;
 using System.Text;
 
 namespace Dota2Simulator

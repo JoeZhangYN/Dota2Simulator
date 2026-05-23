@@ -1,4 +1,7 @@
-﻿using System.Runtime.InteropServices;
+// TODO-dead-Phase7-remove
+// Reason: csproj Compile Remove (_Legacy/**), no live ref
+// Re-enable: delete this header + restore .csproj Compile line (if any).
+using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using static TestKeyboard.DriverStageHelper.SendInputHelper;
 

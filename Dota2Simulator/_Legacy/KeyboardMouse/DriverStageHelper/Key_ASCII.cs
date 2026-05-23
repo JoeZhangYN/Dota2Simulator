@@ -1,4 +1,7 @@
-﻿namespace Dota2Simulator.KeyboardMouse.DriverStageHelper
+// TODO-dead-Phase7-remove
+// Reason: csproj Compile Remove (_Legacy/**), no live ref
+// Re-enable: delete this header + restore .csproj Compile line (if any).
+namespace Dota2Simulator.KeyboardMouse.DriverStageHelper
 {
     internal class Key_ASCII
     {

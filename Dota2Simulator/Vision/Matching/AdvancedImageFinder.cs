@@ -1,3 +1,6 @@
+// TODO-dead-Phase7-remove
+// Reason: self-only references; superseded by Vision/Matching/ImageFinder
+// Re-enable: delete this header + restore .csproj Compile line (if any).
 using Collections.Pooled;
 using NLog;
 using System;

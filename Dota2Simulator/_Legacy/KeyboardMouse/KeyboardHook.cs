@@ -1,4 +1,7 @@
-﻿using System;
+// TODO-dead-Phase7-remove
+// Reason: csproj Compile Remove (_Legacy/**), no live ref
+// Re-enable: delete this header + restore .csproj Compile line (if any).
+using System;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;

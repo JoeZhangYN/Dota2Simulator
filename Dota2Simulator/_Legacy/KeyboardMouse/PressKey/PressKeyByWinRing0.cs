@@ -1,4 +1,7 @@
-﻿using System.Threading;
+// TODO-dead-Phase7-remove
+// Reason: csproj Compile Remove (_Legacy/**), no live ref
+// Re-enable: delete this header + restore .csproj Compile line (if any).
+using System.Threading;
 using TestKeyboard.DriverStageHelper;
 using TestKeyboard.PressKey;
 
