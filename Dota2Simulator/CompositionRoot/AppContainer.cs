@@ -6,7 +6,9 @@
 using Dota2Simulator.Diagnostics;
 using Dota2Simulator.GameAutomation.Application;
 using Dota2Simulator.GameAutomation.Ports;
+using Dota2Simulator.Games;
 using Dota2Simulator.Input.Adapters;
+using Dota2Simulator.Ui.Adapters;
 using Dota2Simulator.Vision.Adapters;
 
 namespace Dota2Simulator.CompositionRoot;
@@ -18,12 +20,16 @@ namespace Dota2Simulator.CompositionRoot;
 /// A2 阶段：仅承载 Registry + GameSession（前身静态 AppComposition 已删）。
 /// A3 后：将持有 IInputExecutor / IScreenVision ports，并把它们注入 HeroStrategyRegistry。
 /// A6 后：ports 经 ProbeInputExecutor / ProbeScreenVision 装饰。
+/// D1 后：新增 IUiInvoker 通过 BindUi(Form2) 在 Form2 构造完成后注入；
+///        同时 set Common.UiInvoker 给 BC 内 static class（service locator 临时入口，D5 评估去留）。
 /// </summary>
 internal sealed class AppContainer
 {
     public IInputExecutor Input { get; }
 
     public IScreenVision Vision { get; }
+
+    public IUiInvoker? Ui { get; private set; }
 
     public HeroStrategyRegistry Registry { get; }
 
@@ -41,6 +47,16 @@ internal sealed class AppContainer
 
         // A5 双阶段：Main._聚合 类型加载期已 new 出来，AppContainer 构造后补注入 vision。
         Games.Dota2.Main._聚合.Init(Vision);
+    }
+
+    /// <summary>
+    /// Form2 构造完成后回调——此时 InitializeComponent 已跑过，tb_* 字段已可用。
+    /// 同步 set Common.UiInvoker（BC 内 static class 走的 service locator 入口）。
+    /// </summary>
+    public void BindUi(Form2 form)
+    {
+        Ui = new Form2UiInvoker(form);
+        Common.UiInvoker = Ui;
     }
 }
 

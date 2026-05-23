@@ -202,6 +202,9 @@ namespace Dota2Simulator
         public Form2(CompositionRoot.AppContainer container) : this()
         {
             _app = container ?? throw new ArgumentNullException(nameof(container));
+            // D1: 此时 InitializeComponent 已跑过（无参 base ctor 内），tb_* 字段可用——
+            // 把 this 注给 AppContainer，让 BindUi 构造 Form2UiInvoker + set Common.UiInvoker。
+            _app.BindUi(this);
         }
 #endif
 
