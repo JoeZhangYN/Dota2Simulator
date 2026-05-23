@@ -29,6 +29,11 @@ namespace Dota2Simulator.Games
         /// AppContainer.BindUi 装配。C7 92 策略 ctor 扩参 SkillEngine 后，D1 删本字段 + 删 Skill facade。
         /// </summary>
         public static SkillEngine? SkillEngine;
+
+        /// <summary>
+        /// Phase 8 C5 过渡 service locator：Item facade thin 转发壳调本字段。同 SkillEngine 模式。
+        /// </summary>
+        public static ItemEngine? ItemEngine;
         #endregion
 
         #region 延时
