@@ -91,11 +91,53 @@ C# .NET 10 WinForms 游戏自动化框架，重写为六边形架构。
 
 回滚锚点：每 chunk 单 commit，`git revert <hash>` 单步回滚。完整撤回 Phase 6：`git revert 9dd7319..990c61f`（15 commit）。
 
-## 后续（Phase 7+）
+## Phase 7（2026-05-23 完成）
+
+IUiInvoker port + 25 站点切走 Common.Main_Form 单例 + Form2.Instance 删除。
+
+- `9919cef` D1 IUiInvoker 骨架（port + UiField enum + Form2UiInvoker adapter + AppContainer.BindUi + Common.UiInvoker service locator）
+- `8a27111` D2 GameAutomation 内层 (测试Strategy 4 站点) ctor 注入；Registry 双阶段 RegisterAll(ui)
+- `3c28398` D3 Games.Dota2 BC 14 站点 (Skill 11 / Item 2 / Main 1) 切 Common.UiInvoker
+- `14816bb` D4 Silt BC 7 站点切
+- `65470d1` D5 删 Common.Main_Form / Form2.Instance / TODO
+
+Backup 基础设施同步装好：`D:\backup\C\temp\JoezhangYN\C#\Dota2Plus\Dota2Simulator.git` bare + post-commit hook 自动 push。
+
+## Phase 8（进行中，2026-05-23 起）
+
+**Epic 目标**：现代化全量解耦 = 0 service locator + 0 可变状态 static God class + 0 单例。
+
+**plan SSOT**：`C:\Users\JoeZhang\.claude\plans\sequential-nibbling-lightning.md`
+
+**已完成（2/10 chunk）**：
+- `5232092` A 拆 Invoke 写场景异步化（SetText → BeginInvoke；用户判定 TTS 抢跑无碍）
+- `d82a2ee` C1 抽 LegSwapState 子聚合（Item.cs 8 字段 + 内嵌 `技能切假腿配置` class 迁 GameAutomation/Domain/；HeroAggregate 加 LegSwap 属性；47 文件批替换跨 BC 共享状态）
+
+**剩余 chunk（下次 session 接手）**：
+- **B 子线撤出 epic**（用户决策 2026-05-23）：ConditionDelegateBitmap 签名改非完成形态硬指标，且 C 子线 BC 实例化后 SkillEngine 持 IScreenVision 自然消解
+- **C3** Skill ⇄ Item 双向解耦（Skill 写 Item.\_切假腿配置 已经在 C1 后变 LegSwap 写入；剩 Skill 读 Item.\_技能数量 + Item 读 Skill 状态需走 HeroAggregate）
+- **C4** SkillEngine 实例化（Skill 1806 行 → internal sealed class SkillEngine；纯只读 static const ColorMatcher/RSquared 等查找表保留 static；ctor 接 input/vision/ui/aggregate）
+- **C5** ItemEngine 实例化（同 C4 模式；物品4/5/6 常量保 static）
+- **C6** HeroLoopHost (Games.Dota2.Main) 实例化 + HeroAggregate 单阶段 ctor 注入 vision（删 HeroAggregate.Init 双阶段）
+- **C7** 92 策略 ctor 扩参 +SkillEngine +ItemEngine +HeroLoopHost；Registry 4 partial 扩参；策略类内 Skill./Item./Main. → \_skill./\_item./\_main.（1588 处替换，可拆 C7a-d 按属性并行）
+- **D1** 删 Common.UiInvoker + IScreenVision.GetCurrentFrame[Obsolete] + 收尾 grep 验证
+
+**Phase 8 关键不变量**：
+1. Phase 8 每 chunk 单 commit + dotnet build -c Debug 0 错误 + 自动 backup push（验证 `.git/_unbacked_commits.log` empty）
+2. **HeroAggregate.LegSwap 是 BC 跨边界共享状态的 SSOT**（C1 起）—— 后续 chunk 禁再在 Item/Skill 加 static flag
+3. **0 可变状态 static God class** 解读：纯只读查找表（ColorMatcher / RSquared / 物品4/5/6 / Rectangle 常量）保留 static；可变状态全压 HeroAggregate
+4. SetText 已异步（BeginInvoke）；调用方紧跟 TTS 用户接受抢跑
+5. plan dep graph: C3 依 C1 ✅；C4/C5/C6 依 C3；C7 依 C4+C5+C6；D1 依 C7
+
+**下次 session 起手指引**：
+1. Read `C:\Users\JoeZhang\.claude\plans\sequential-nibbling-lightning.md` 全文
+2. Read 本 handoff 文件 Phase 8 段
+3. 从 C3 开始（先 grep `Skill\._` / `Item\._` 看剩余跨 BC 直读字段，决定是否还需 C3 chunk 还是可直跳 C4）
+
+## 后续（Phase 9+，本 epic 外）
 - 实际删除死代码（_Legacy/ + Other/ + 4 个标 TODO-dead 文件）
-- IUiInvoker port 抽出（去 Common.Main_Form 单例）
-- ConditionDelegateBitmap 签名改不带 ImageHandle（移除 _vision.GetCurrentFrame() Obsolete 临时妥协）
-- Games.Dota2 BC（Main/Item/Skill/Silt）SimKeyBoard 直调切 port
+- ConditionDelegateBitmap 签名改 ImageHandle → IScreenVision（C 完后下游 API 改造便利时再做）
+- Games.Dota2 BC SimKeyBoard 直调切 port（C 后 SkillEngine 持 IInputExecutor 自然消解大部分）
 - KeyboardMouse/ 4 基础驱动文件评估是否迁 Infrastructure/Native/
 - Vision 子 namespace 评估
 - LOL/HF2 切 GameSession（统一入站端口）
