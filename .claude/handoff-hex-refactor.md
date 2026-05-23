@@ -458,6 +458,117 @@ Backup 基础设施：`D:\backup\C\temp\JoezhangYN\C#\Dota2Plus\Dota2Simulator.g
   - 10B #1-#5 PreloadHints hero key lint / Sha1MismatchCount 消费方 / log tag 统一 / plan 措辞勘误 / HeroIdentity epic
 - **Phase 11**：Silt 子 BC 整顿（Silt.Main + DynamicSkillAutoSelector instance 化 + Form2/GameSession ctor 扩 HeroLoopHost → 删 Common.ItemEngine + Common.HeroLoopHost 终态 0 service locator）—— 继承 Phase 10A / 10B / 10C 后续段
 
+## Phase 10D 收尾 (2026-05-23)
+
+**Epic 目标**：把 Phase 10C 7 项 handoff_notes + Phase 10B 5 项剩余 handoff_notes 共 12 项 candidate 全打 —— 含 SG 健壮性提升 (#1) / SG 输出精简 (#2) / YAGNI 真删 (#9) / runtime 兜底 + log 统一 (#8+#10) / 项目级 lessons-learned 知识沉淀 (#7) / 文档勘误 (#3 #4 #11 NO-OP 验证 + #11 B2 措辞) / 文档化跳过 (#5 #6 #12).
+
+**5 commit 主干**（独立 worktree 实施，与 Phase 11 Silt/LOL/HF2 并行 epic 解耦）：
+
+- `4955939` **#2** sg-hello-cleanup 删 HeroStrategyGenerator hello-world emit (plan §8 一致；S3 起 92 Strategy.g.cs + 1 Registry.Generated.g.cs 已充分实证 SG 串联)
+- `4670567` **#1** sg-enum-reflective HeroStrategyGenerator enum 反查改 `ITypeSymbol.GetMembers` (替代数值 switch；enum 插值/加值不再静默落 Universal bucket；4 属性英雄抽样验证 emit 正确)
+- `ee4c93e` **#9** sha1-counter-yagni 删 Sha1MismatchCount counter (YAGNI；B3 internal 后主项目 0 read 永无 consumer)
+- `3235ccf` **#8+#10** gamesession-preload-miss-warning + log-tag-unify (PreloadHints TryGetValue miss 加 Trace.WriteLine 兜底；`[Preload]` → `[LazyLoad]` 与核心模块统一)
+- `35906d5` **#7** lessons-learned 新建项目级 `.claude/rules/lessons-learned.md` (Phase 10C S3 实战 2 经验 + 通用 SG 注意)
+
+**12 项 candidate 一一对应清单**:
+
+| # | 任务 | 状态 | commit / 处理 |
+|---|------|------|--------------|
+| 1 | SG enum 反查改 `ITypeSymbol.GetMembers` | DONE | `4670567` (中优先重点项；4 属性英雄抽样 emit verify PASS) |
+| 2 | `HeroStrategyGenerator.Hello.g.cs` 决断 | DONE | `4955939` (删 hello-world + plan §8 措辞同步) |
+| 3 | plan §S5 v15 AppContainer 路径笔误回写 | NO-OP | 已查证 plan SSOT line 404 已写 `Dota2Simulator/CompositionRoot/AppContainer.cs`（Phase 10C S5 实施期已自纠，无需改） |
+| 4 | plan §S5 v13 `_ui!` verify 改精确匹配 | DONE-DOC | plan SSOT line 391 已改 `\s+_ui!\s*,` 精确匹配剔除注释 false-positive（plan 文件在 `~/.claude/plans/`，非仓库 commit）|
+| 5 | CI 跨平台中文 class name 稳定性 | SKIP-DOC | 已确认无 CI 跨平台暴露面 (Windows-only 部署)，留 Phase 12+ 跨平台 CI 启用时 reverify |
+| 6 | VS hot reload `ForAttributeWithMetadataName` 增量 cache | SKIP-DOC | 已确认无 VS hot reload 暴露面 (dotnet CLI 工作流)，留 IDE 工作流启用时 reverify |
+| 7 | Phase 10C 实战 2 意外入 lessons-learned | DONE | `35906d5` (L1 行尾注释致 regex 漏命中 + L2 SG netstandard2.0 缺 IsExternalInit polyfill)；附通用 SG 注意横切多 epic |
+| 8 | PreloadHints hero key 一致性 runtime warning | DONE | `3235ccf` (DispatchAsync miss 分支 Trace.WriteLine 兜底，不破 fire-and-forget 闭环) |
+| 9 | Sha1MismatchCount 消费方接入或删除 | DONE | `ee4c93e` (删除决断 YAGNI；保留 mismatch log) |
+| 10 | `[Preload]` / `[LazyLoad]` log tag 统一 | DONE | `3235ccf` (统一 `[LazyLoad]` 与核心模块对齐；与 #8 合并单 commit) |
+| 11 | plan SSOT 措辞勘误（B2 + B4）| MIXED | B2 plan SSOT 已改（说明 g.cs 文本恒含 `#if Silt` 包裹段，关 Silt 后是 DLL SiltMap 字段消失而非 g.cs 文本变化）；B4 验证 plan 已是正确单 using，**NO-OP** |
+| 12 | HeroIdentity epic / F1 HUD 英雄名提取 | SKIP-DOC | plan §1.2 显式排除，留 Phase 12+ 候选（真根因解 = OCR/HUD 提取替代 tb_name，消 PreloadHints key 约定耦合） |
+
+**净行数**: 仓库 5 commit 净变化 -8 行 (删 hello + 删 counter + 加注释 + 新 lessons-learned + GameSession 微调)；细分：
+- #1 +23/-9 = +14 (SG enum reflective lookup 逻辑替换)
+- #2 +3/-8 = -5 (删 hello emit 方法体)
+- #9 +4/-10 = -6 (删 counter 三处 + 注释)
+- #8+#10 +10/-1 = +9 (Trace.WriteLine 兜底 + log tag 改名)
+- #7 +57/-0 = +57 (lessons-learned.md 新建)
+
+**关键文件**：
+
+| 文件 | 状态 | commit | 说明 |
+|------|------|--------|------|
+| `Dota2Simulator.SourceGenerators/HeroStrategyGenerator.cs` | EDIT | #1 #2 | 删 hello emit；enum 反查改 ITypeSymbol.GetMembers reflective lookup |
+| `Dota2Simulator/Vision/Cache/LazyImageLoader.cs` | EDIT | #9 | 删 `_sha1MismatchCount` field + `Sha1MismatchCount` property + Interlocked.Increment 调用，保留 mismatch log |
+| `Dota2Simulator/GameAutomation/Application/GameSession.cs` | EDIT | #8 #10 | TryGetValue miss 分支 Trace 兜底；log tag `[Preload]` → `[LazyLoad]` |
+| `.claude/rules/lessons-learned.md` | NEW | #7 | 项目级 lessons-learned，含 Phase 10C S3 实战 2 经验 + 通用 SG 注意 |
+| `~/.claude/plans/crystal-emitting-knuth.md` | EDIT-DOC | #2 #4 | §8 措辞同步；§S5 v15 `_ui!` verify 改精确匹配（仓库外 plan SSOT，不入 commit）|
+| `~/.claude/plans/sturdy-bridging-rabin.md` | EDIT-DOC | #11 | §B2 措辞勘误（DLL SiltMap 字段消失 vs g.cs 文本变化）|
+
+## Phase 10D 关键不变量
+
+**继承 Phase 10A 7 + Phase 10B 6 + Phase 10C 5 不变量**（126 ImageHandle / 33 文件 / 202 处零改 / `#if Silt` 语义 / SHA1 非阻断 / Phase 9 装配序零侵入 / 0 新增警告 / 6 SOFT_FAIL 消除 / SG 单 dict SSOT / SHA1 Silt 分割正确 / LazyImageLoader internal API 收口 / PreloadHints 桥接闭环 / 接口契约自检 / `[HeroStrategy]` attribute SSOT / `ForAttributeWithMetadataName` 实证命中 92 / AppContainer/IHeroStrategy/HeroStrategyRegistry 主 partial 字节零改 / 4 手写 partial Registry 真删 / 同 commit 双部分整改 模板），新增 5 项：
+
+1. **SG enum 反查健壮化** (#1)：`ITypeSymbol.GetMembers` 反射 lookup 取真 field name，HeroAttribute enum 任何形态演化（插值 / 加新 bucket）自动正确，兜底 `Universal` 仅当 attribute 元数据极端损坏 ✅
+2. **SG 输出精简** (#2)：92 Strategy.g.cs + 1 Registry.Generated.g.cs 充分实证 SG 串联，hello-world emit 删除 ✅
+3. **YAGNI 真删** (#9)：B3 internal 收紧后主项目 0 read 的 counter 删除，保持代码精简，mismatch log 完整保留 ✅
+4. **PreloadHints miss 兜底 + log tag 统一** (#8 #10)：DispatchAsync TryGetValue miss 分支 Trace.WriteLine 兜底（不破 B4 fire-and-forget 闭环），所有预加载 log 统一 `[LazyLoad]` tag ✅
+5. **项目级知识沉淀机制启用** (#7)：`.claude/rules/lessons-learned.md` 项目特化经验累积，与全局 fact 库分工明确 ✅
+
+## Phase 10D architecture-sentinel 自审 verdict
+
+**ACCEPT** —— 5 反模式自审全 PASS：
+
+1. **god-class / 万能型** PASS：未引入新万能类；HeroStrategyGenerator.cs SG 仅扩 enum 反查辅助方法，类职责（emit Strategy partial + Registry partial）边界清晰
+2. **anemic-domain（贫血模型）** PASS：所有 commit 在 Application / Domain 边界内；新 Trace.WriteLine 不破业务规则，仅诊断
+3. **shotgun-surgery（散弹手术）** PASS：每 commit 单文件焦点改动（#1 #2 仅 SG / #9 仅 LazyImageLoader / #8+#10 仅 GameSession / #7 新建独立文件）
+4. **leaky-abstraction（泄漏抽象）** PASS：未引新接口；GameSession Trace 兜底属诊断层非业务逻辑，与现有 `[LazyLoad]` log 一致
+5. **temporal-coupling（时序耦合）** PASS：#8 兜底在 fire-and-forget 之外 else 分支，不破 B4 时序；#9 删 counter 不破 SHA1 mismatch 检测时序
+
+**dogfood 双 build verify**：
+- `dotnet build -c Debug` (默认 DOTA2 + Silt) 0 错误 220 warnings (baseline 一致) ✅
+- `dotnet build -c Release` (默认 DOTA2 + Silt) 0 错误 ✅
+- `dotnet build -c Debug -p:DefineConstants="DOTA2%3BTRACE"` (移除 Silt) 0 错误 187 warnings (Silt 代码排除合理 -33) ✅
+
+**接口契约自检 PASS**: IHeroStrategy / HeroStrategyRegistry / AppContainer / GameSession.IGameSession 全部签名零改；SG emit 92 Strategy.g.cs 抽样 4 属性英雄 (大牛 Strength / TB Agility / 卡尔 Intelligence / 猛犸 Universal) 与 attribute 元数据一致 ✅
+
+## Phase 10D handoff_notes (Phase 10E+ 候选，不污染当前 epic 完成状态)
+
+1. **SG 反射 lookup 性能未实证** (低 / Phase 10E+ 候选)：#1 ITypeSymbol.GetMembers 反查 enum field 每次 transform 触发，92 次调用未做缓存。SG 增量编译多数命中 cache 不触发；若未来 enum 扩到大量 bucket (>20) 可考虑 transform 入口 cache enum field name 字典. 当前 4 bucket 性能压根不是 bottleneck.
+2. **plan §S5 v15 `_ui!` 精确匹配未在仓库内 verify gate 跑** (低 / Phase 10E+ 候选)：plan 已改 `\s+_ui!\s*,` 精确匹配，但本 epic 未跑 plan §S5 全 14 项 verify gate；建议下一 SG 改动时 reuse plan verify gate 实证.
+3. **CI 跨平台 / VS hot reload 跳过项**（#5 #6 #12 文档化跳过）：Windows-only + dotnet CLI 当前工作流无暴露面；引入 Linux/macOS CI 或 VS hot reload 工作流时需 reverify SG 输出稳定性 + 增量 cache 行为.
+4. **lessons-learned.md vs 全局 fact 库 双源风险** (低 / Phase 10E+ 候选)：本仓 `.claude/rules/lessons-learned.md` 已声明与 `~/.claude/dream/knowledge/facts/` 分工 (项目特化 vs 跨项目通用)，但同主题条目两库都有时需明示指向避免双源漂移；建议未来 lesson 累积时检查全局 fact 是否已有同主题条目.
+5. **HeroIdentity epic** (Phase 12+ 候选，承袭 Phase 10C handoff_notes #5)：F1 HUD 英雄名提取 / 像素模板多帧投票 / 全 HUD gate；真根因解消 PreloadHints / tb_name 约定耦合，使 #8 兜底 Trace 不再被触发.
+
+## 待用户冒烟（Phase 10D 收尾）
+
+继承 Phase 10A / 10B / 10C 冒烟清单 + 新增 Phase 10D 专项实测：
+
+1. **#1 SG enum 反查 emit 路径实测**（新增）：抽样 4 属性英雄启动 + 切英雄触发 GameSession.DispatchAsync 走 Strategy 路径，验证 SG emit `HeroAttribute.X` 正确（编译期 verify 已 PASS，运行期回归 = SkillEngine/ItemEngine 调用链不中断）：
+   - Strength: 大牛 / 屠夫
+   - Agility: TB / 影魔
+   - Intelligence: 卡尔 / 暗影萨满
+   - Universal: 测试 / 猛犸
+2. **#8 PreloadHints miss 兜底实测**（新增）：tb_name 输入一个 PreloadHints.Hints 不含的英雄名（如 `不存在的英雄` 或意外漏 Strategy 的 hero），切英雄 → 验证 stdout/Trace 出现 `[Preload-miss] hero=<名> not in PreloadHints.Hints` 兜底 log
+3. **#10 log tag 统一实测**（新增）：切已注册英雄 → 验证主链路 log 全 `[LazyLoad]` tag（包含 `[LazyLoad] 加载` / `[LazyLoad] 预加载失败`），无 `[Preload]` 残留
+4. **#9 SHA1 mismatch 验证**（可选）：临时改一张 .bmp，重 build，启动看 stdout `[LazyLoad] SHA1 mismatch:` log（不再有 counter 但 log 完整保留）
+5. **继承 Phase 10A / 10B / 10C 冒烟项**：R2 ModuleInitializer 时序 / 4 属性英雄全技能键 / 物品使用 / SHA1 mismatch / S3 SG emit ctor / S4 测试Strategy 6 ports / Registry 装配
+
+## Phase 10D 回滚锚点
+
+- 单 commit revert：`git revert <hash>`（#1 #2 #7 #8+#10 #9 任一）
+- 完整撤回 Phase 10D：`git revert 35906d5 3235ccf ee4c93e 4670567 4955939`（5 commit 顺序无关，因 5 commit 文件不相交除 #1 #2 同 SG 文件需顺序 revert）
+- **注意**：#1 #2 都改 `HeroStrategyGenerator.cs`，revert 顺序 #1 → #2（倒序）可避免 conflict
+- 主 lead 后续 cherry-pick 范围: 5 commit `4955939..35906d5`（自 oldest 到 newest 顺序：#2 → #1 → #9 → #8+#10 → #7）
+
+## 下次 session 起手指引（Phase 10E / Phase 11 任选）
+
+- **Phase 10E 候选**（5 项 Phase 10D handoff_notes，详上文）：
+  - SG 反射 lookup 性能 cache（当前非 bottleneck，仅未来 enum 扩张时启）
+  - plan §S5 verify gate 复用机制
+  - lessons-learned vs 全局 fact 库 双源治理
+  - HeroIdentity epic（消 PreloadHints / tb_name 约定耦合）
+- **Phase 11**：Silt 子 BC 整顿（继承 Phase 10A / 10B / 10C / 10D 后续段；并行 subagent 已在另一 worktree 实施）
 ## Phase 11 完整收尾 (2026-05-23)
 
 **plan SSOT**：`C:\Users\JoeZhang\.claude\plans\luminous-cascading-hopper.md`
