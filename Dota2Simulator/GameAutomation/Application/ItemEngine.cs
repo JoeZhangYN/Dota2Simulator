@@ -26,13 +26,15 @@ namespace Dota2Simulator.GameAutomation.Application
         private readonly IScreenVision _vision;
         private readonly IUiInvoker _ui;
         private readonly HeroAggregate _aggregate;
+        private readonly SkillEngine _skill;
 
-        public ItemEngine(IInputExecutor input, IScreenVision vision, IUiInvoker ui, HeroAggregate aggregate)
+        public ItemEngine(IInputExecutor input, IScreenVision vision, IUiInvoker ui, HeroAggregate aggregate, SkillEngine skill)
         {
             _input = input;
             _vision = vision;
             _ui = ui;
             _aggregate = aggregate;
+            _skill = skill;
         }
         #region 全局变量
         // Phase 8 C1: 切假腿 8 个字段 (配置 / 假腿按键 / 6 bool flag) 迁入 HeroAggregate.LegSwap (Domain.LegSwapState)。
@@ -45,7 +47,7 @@ namespace Dota2Simulator.GameAutomation.Application
 
         public async Task 根据按键判断技能释放前通用逻辑(KeyEventArgs e)
         {
-            _ = await Skill.设置当前技能数量().ConfigureAwait(true);
+            _ = await _skill.设置当前技能数量().ConfigureAwait(true);
             _aggregate.LegSwap.存在假腿 = 获取当前假腿按键();
             _aggregate.HasAghanim = 阿哈利姆神杖(_vision.GetCurrentFrame());
             _aggregate.HasShard = 阿哈利姆魔晶(_vision.GetCurrentFrame());

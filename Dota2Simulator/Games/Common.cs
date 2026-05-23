@@ -17,27 +17,15 @@ namespace Dota2Simulator.Games
         public static readonly Logger Main_Logger = LogManager.GetCurrentClassLogger();
 
         /// <summary>
-        /// BC 内 static class（Games.Dota2 / Silt）的 IUiInvoker 入口。
-        /// 由 AppContainer.BindUi 在 Form2 构造完成后赋值。LOL/HF2 路径不创建 AppContainer，
-        /// 此字段保持 null——但 BC 业务在 #if DOTA2 / #if Silt 编译开关下也不会被调用。
-        /// 后续 BC 整顿完成后此 service locator 可替换为 ctor 注入。
-        /// </summary>
-        public static IUiInvoker? UiInvoker;
-
-        /// <summary>
-        /// Phase 8 C4 过渡 service locator：Skill facade thin 转发壳调本字段。
-        /// AppContainer.BindUi 装配。C7 92 策略 ctor 扩参 SkillEngine 后，D1 删本字段 + 删 Skill facade。
-        /// </summary>
-        public static SkillEngine? SkillEngine;
-
-        /// <summary>
-        /// Phase 8 C5 过渡 service locator：Item facade thin 转发壳调本字段。同 SkillEngine 模式。
+        /// Phase 9 F 残留 service locator：仅 2 处反向依赖用：
+        /// (1) SkillEngine.cs:1573/1593 内 ItemEngine.要求保持假腿()——SkillEngine 先于 ItemEngine 构造，不能 ctor 注；
+        /// (2) Silt/Main.cs:29/34 内 ItemEngine.根据图片使用物品()——Silt 还是 static class，未 instance 化 (Phase 11 处理)。
         /// </summary>
         public static ItemEngine? ItemEngine;
 
         /// <summary>
-        /// Phase 9 C 过渡 service locator：Main facade thin 转发壳调本字段。
-        /// AppContainer.BindUi 装配。D 阶段 92 策略 ctor 扩参 HeroLoopHost 后，F 删本字段 + 删 Main facade。
+        /// Phase 9 F 残留 service locator：Form2/GameSession/ItemEngine/SkillEngine/Silt 调 HeroLoopHost 都仍走桥。
+        /// Phase 11 改 Form2/GameSession ctor 注入 + Silt instance 化后可删本字段。
         /// </summary>
         public static HeroLoopHost? HeroLoopHost;
         #endregion

@@ -29,13 +29,25 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-// type alias：本类内 `技能类型.X` → `Skill.技能类型.X`（enum 留 facade 内供外部 86 文件引用，C7 后 D1 评估上移到 Domain）
-using 技能类型 = Dota2Simulator.Games.Dota2.Skill.技能类型;
-
 namespace Dota2Simulator.GameAutomation.Application
 {
     public sealed class SkillEngine
     {
+        /// <summary>技能类型枚举（Phase 9 F 从 Games/Dota2/Skill.cs facade 内嵌迁入；马尔斯Strategy 等外部引用走 SkillEngine.技能类型）。</summary>
+        public enum 技能类型
+        {
+            图标CD,
+            法球,
+            状态,
+            释放变色,
+            QWERDF图标,
+            被动技能存在,
+            破坏被动技能,
+            未学主动技能,
+            未学法球技能,
+            推荐学习技能
+        }
+
         private readonly IInputExecutor _input;
         private readonly IScreenVision _vision;
         private readonly IUiInvoker _ui;
@@ -1558,7 +1570,7 @@ namespace Dota2Simulator.GameAutomation.Application
 
                 if (是否保持假腿)
                 {
-                    Item.要求保持假腿();
+                    Common.ItemEngine!.要求保持假腿();
                 }
 
                 if (是否接按键)
@@ -1578,7 +1590,7 @@ namespace Dota2Simulator.GameAutomation.Application
             _ = Task.Run(() =>
             {
                 Common.Delay(等待的延迟);
-                Item.要求保持假腿();
+                Common.ItemEngine!.要求保持假腿();
             });
         }
 

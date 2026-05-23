@@ -11,7 +11,7 @@ using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using static Dota2Simulator.Games.Dota2.Item;
+using Dota2Simulator.Games;
 using Color = System.Drawing.Color;
 using ImageHandle = Dota2Simulator.Vision.ImageHandle;
 using Point = System.Drawing.Point;
@@ -26,12 +26,12 @@ namespace Dota2Simulator.Games.Dota2.Silt
         public static async Task<bool> 有书吃书(ImageHandle 句柄)
         {
             if (已吃书
-                && 根据图片使用物品(Dota2_Pictrue.物品.书) == 0)
+                && Common.ItemEngine!.根据图片使用物品(Dota2_Pictrue.物品.书) == 0)
             {
                 SimKeyBoard.KeyPress(Keys.D2);
                 已吃书 = false;
             }
-            else if (根据图片使用物品(Dota2_Pictrue.物品.书) == 1)
+            else if (Common.ItemEngine!.根据图片使用物品(Dota2_Pictrue.物品.书) == 1)
             {
                 Common.Delay(50);
                 已吃书 = true;

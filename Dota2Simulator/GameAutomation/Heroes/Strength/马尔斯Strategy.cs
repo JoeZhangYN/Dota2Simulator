@@ -88,7 +88,7 @@ public sealed class 马尔斯Strategy : IHeroStrategy
     {
         return await _skill.主动技能释放后续(Keys.R, () =>
         {
-            if (_skill.判断技能状态(Keys.E, 句柄, Skill.技能类型.状态))
+            if (_skill.判断技能状态(Keys.E, 句柄, SkillEngine.技能类型.状态))
             {
                 _input.Press(VirtualKey.From(Keys.E));
             }
