@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using Dota2Simulator.GameAutomation.Domain.Actuation;
 using Dota2Simulator.GameAutomation.Domain.Heroes;
 using Dota2Simulator.GameAutomation.Ports;
-using Main = Dota2Simulator.Games.Dota2.Main;
+using Dota2Simulator.Games;
 
 namespace Dota2Simulator.GameAutomation.Application;
 
@@ -16,7 +16,7 @@ namespace Dota2Simulator.GameAutomation.Application;
 /// 入站端口 <see cref="IGameSession"/> 的实现：单轨策略分发。
 ///
 /// 策略路径：英雄已在 <see cref="HeroStrategyRegistry"/> 注册 → 走 IHeroStrategy。
-/// 未注册路径：no-op（旧 Main.根据当前英雄增强 switch 已于 Chunk 4.24 删除；
+/// 未注册路径：no-op（旧 Common.HeroLoopHost!.根据当前英雄增强 switch 已于 Chunk 4.24 删除；
 /// 原 switch 对未知英雄名同样什么都不做，二者等价）。
 /// </summary>
 public sealed class GameSession : IGameSession
@@ -48,15 +48,15 @@ public sealed class GameSession : IGameSession
             // 策略路径（Wave 4 注册英雄后才会进入）。
             if (_current is null || _current.Hero != strategy.Hero)
             {
-                // 4.7 过渡：复用全局 Main._聚合，待后续 chunk 让每英雄独立聚合。
-                _current = new HeroContext(strategy.Hero, Main._聚合);
+                // 4.7 过渡：复用全局 Common.HeroLoopHost!._聚合，待后续 chunk 让每英雄独立聚合。
+                _current = new HeroContext(strategy.Hero, Common.HeroLoopHost!._聚合);
                 strategy.OnActivate(_current);
 
                 // 启动 Main 主循环（一般程序循环）。状态初始化() 内为 while(_总循环条件)
                 // 无限循环，不能 await（会阻塞 DispatchAsync 永不返回）——fire-and-forget。
                 // OnActivate 须已置位 _总循环条件，与旧 case 块 _总循环条件=true 先于
                 // 状态初始化() 调用的顺序一致。
-                _ = Main.状态初始化();
+                _ = Common.HeroLoopHost!.状态初始化();
             }
 
             await strategy.OnKeyAsync(trigger, _current).ConfigureAwait(false);
@@ -64,7 +64,7 @@ public sealed class GameSession : IGameSession
         else
         {
             // 未注册英雄：策略未实现，no-op。
-            // 旧 Main.根据当前英雄增强 switch 已于 Chunk 4.24 删除——其 switch(name)
+            // 旧 Common.HeroLoopHost!.根据当前英雄增强 switch 已于 Chunk 4.24 删除——其 switch(name)
             // 对未命中的 name 本就走默认分支什么都不做，此 no-op 与之行为等价。
         }
     }
@@ -73,7 +73,7 @@ public sealed class GameSession : IGameSession
     public void CancelAll()
     {
         _current = null;
-        Main.取消所有功能();
+        Common.HeroLoopHost!.取消所有功能();
     }
 }
 

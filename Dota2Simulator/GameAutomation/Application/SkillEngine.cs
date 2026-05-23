@@ -704,7 +704,7 @@ namespace Dota2Simulator.GameAutomation.Application
         {
             // 通过添加步骤来等待完全显示
             // 用于检测持续施法，施法中文字的施字颜色，10秒以内有效
-            return ColorExtensions.ColorAEqualColorB(Main.获取指定位置颜色(953, 764, in 句柄), Color.FromArgb(254, 254, 254), 2);
+            return ColorExtensions.ColorAEqualColorB(Common.HeroLoopHost!.获取指定位置颜色(953, 764, in 句柄), Color.FromArgb(254, 254, 254), 2);
         }
 
         private static void 记录技能释放信息(Keys s1, string s, bool b1, bool b2, Color c1, Color c2, Color c3)
@@ -1609,7 +1609,7 @@ namespace Dota2Simulator.GameAutomation.Application
                 // 主循环：定期发送时间戳触发屏幕捕获
                 while (!cts.IsCancellationRequested)
                 {
-                    _ = Main.获取图片_2();
+                    _ = Common.HeroLoopHost!.获取图片_2();
 
                     var color = GlobalScreenCapture.GetColor(x, y);
 
@@ -1680,7 +1680,7 @@ namespace Dota2Simulator.GameAutomation.Application
                 while (!cts.IsCancellationRequested)
                 {
                     // 截图并赋值数组
-                    Main.获取图片_2();
+                    Common.HeroLoopHost!.获取图片_2();
 
                     // 并行获取所有颜色并缓存结果
                     await Task.Run(() =>

@@ -1,4 +1,5 @@
-﻿using Collections.Pooled;
+using Collections.Pooled;
+using Dota2Simulator.Games;
 using Dota2Simulator.KeyboardMouse;
 using Dota2Simulator.Vision.Ocr;
 #if DOTA2
@@ -55,7 +56,7 @@ namespace Dota2Simulator
             #endregion
 
 #if DOTA2
-            // 经入站端口 GameSession 分发（取代直调 Main.根据当前英雄增强）。
+            // 经入站端口 GameSession 分发（取代直调 Common.HeroLoopHost!.根据当前英雄增强）。
             // HeroAttribute.Strength 此处是占位——fallback 路径只用 hero.Name。
             await _app!.GameSession.DispatchAsync(
                 new HeroId(tb_name.Text.Trim(), HeroAttribute.Strength),
@@ -90,7 +91,7 @@ namespace Dota2Simulator
         private void Tb_name_TextChanged(object sender, EventArgs e)
         {
 #if DOTA2
-            Games.Dota2.Main.取消所有功能();
+            Common.HeroLoopHost!.取消所有功能();
 #endif
         }
 
@@ -276,7 +277,7 @@ namespace Dota2Simulator
             Location = new Point(338, 1060);
 
 #if DOTA2
-            Games.Dota2.Main.获取图片_2(); // 初始化获取截图 避免一开始的黑色
+            Common.HeroLoopHost!.获取图片_2(); // 初始化获取截图 避免一开始的黑色
 #endif
         }
 

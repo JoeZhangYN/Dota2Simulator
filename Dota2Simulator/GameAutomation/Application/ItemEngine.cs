@@ -3,7 +3,7 @@
 // - 可变状态（无显式可变 static field，C1 + C3 已迁 HeroAggregate）；纯只读查找表（物品4/5/6、物品信息嵌套类）保留 static。
 // - 4 端口 ctor 注入：(IInputExecutor, IScreenVision, IUiInvoker, HeroAggregate)。
 // - 替换：SimKeyBoard.X → _input.X；_ui → _ui；_vision.GetCurrentFrame() → _vision.GetCurrentFrame()；_aggregate → _aggregate。
-// Heroes/ 60+ 处 `Item.X` + BC 内 (Main.cs:478/627/633/667 + SkillEngine 2 处) 调用通过 Games/Dota2/Item.cs facade 转发，C7 替换调用方 → D1 删桥。
+// Heroes/ 60+ 处 `Item.X` + BC 内 (Common.HeroLoopHost!.cs:478/627/633/667 + SkillEngine 2 处) 调用通过 Games/Dota2/Item.cs facade 转发，C7 替换调用方 → D1 删桥。
 #if DOTA2
 
 using Dota2Simulator.Vision;
@@ -37,7 +37,7 @@ namespace Dota2Simulator.GameAutomation.Application
         #region 全局变量
         // Phase 8 C1: 切假腿 8 个字段 (配置 / 假腿按键 / 6 bool flag) 迁入 HeroAggregate.LegSwap (Domain.LegSwapState)。
         // Phase 8 C3: 杖晶 2 bool 迁 HeroAggregate.HasAghanim/HasShard；技能数量 迁 HeroAggregate.SkillCount；
-        // 暂停标志 迁 SessionState.IsPaused（经 Main._session 桥接，D1 删）。
+        // 暂停标志 迁 SessionState.IsPaused（经 Common.HeroLoopHost!.Session 桥接，D1 删）。
 
         #endregion
 
@@ -58,8 +58,8 @@ namespace Dota2Simulator.GameAutomation.Application
 
                     break;
                 case Keys.Escape:
-                    Main._session!.IsPaused = !Main._session!.IsPaused;
-                    TTS.TTS.Speak($"{(Main._session!.IsPaused ? "中断" : "继续")}运行");
+                    Common.HeroLoopHost!.Session!.IsPaused = !Common.HeroLoopHost!.Session!.IsPaused;
+                    TTS.TTS.Speak($"{(Common.HeroLoopHost!.Session!.IsPaused ? "中断" : "继续")}运行");
                     break;
                 case Keys.NumPad7 when _aggregate.LegSwap.存在假腿:
                     切换假腿状态();
@@ -68,7 +68,7 @@ namespace Dota2Simulator.GameAutomation.Application
                     切换保持假腿状态();
                     break;
                 case Keys.NumPad9 when _aggregate.LegSwap.存在假腿:
-                    Main.取消所有功能();
+                    Common.HeroLoopHost!.取消所有功能();
                     break;
                 case var _ when e.KeyCode == _aggregate.LegSwap.假腿按键:
                     return;
@@ -100,7 +100,7 @@ namespace Dota2Simulator.GameAutomation.Application
                     }
 
                     await 根据配置技能释放前切假腿(e, _aggregate.LegSwap.配置).ConfigureAwait(true);
-                    if (Main.按键匹配条件更新.TryGetValue(e.KeyCode, out Action value))
+                    if (Common.HeroLoopHost!.按键匹配条件更新.TryGetValue(e.KeyCode, out Action value))
                     {
                         value.Invoke();
                     }
@@ -742,7 +742,7 @@ namespace Dota2Simulator.GameAutomation.Application
 
         public void 保存当前物品()
         {
-            Main.获取图片_2();
+            Common.HeroLoopHost!.获取图片_2();
 
             物品信息 物品 = 物品4;
 
