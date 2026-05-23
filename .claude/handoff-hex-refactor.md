@@ -12,6 +12,7 @@ C# .NET 10 WinForms 游戏自动化框架，重写为六边形架构。
 - [x] **Phase 6 + 6.5**（hex 闭环 + 物理重组）—— 2026-05-23 完成（15 chunk，A1-A6 + B1-B5 + C1）
 - [x] **Phase 7**（IUiInvoker port + 单例终结）—— 2026-05-23 完成（5 chunk，D1-D5）
 - [x] **Phase 8 段落性收尾**（现代化全量解耦 8/10）—— 2026-05-23 完成（A + C1 + C3 + C4 + C5 + C6 + C7 + D1；HeroLoopHost 推迟 Phase 9）
+- [x] **Phase 9 HeroLoopHost 实例化 + 真删收尾**—— 2026-05-23 完成（7 commit，A + B + C + D + D' + E + F；plan SSOT `~/.claude/plans/idempotent-brewing-kurzweil.md`）
 
 ## Phase 6 + 6.5 已完成（main 分支连续 commit，每 chunk 0 build 错误）
 
@@ -114,13 +115,73 @@ Backup 基础设施：`D:\backup\C\temp\JoezhangYN\C#\Dota2Plus\Dota2Simulator.g
 3. **起手做 HeroLoopHost 实例化**（Games.Dota2.Main 823 行 → HeroLoopHost.cs，同 C4/C5 模板 + Common.HeroLoopHost service locator 桥）
 4. HeroLoopHost 完成后做 **真删收尾**：删 Common.UiInvoker / Common.SkillEngine / Common.ItemEngine / Skill+Item+Main facade + ConditionDelegateBitmap 签名改 + 删 IScreenVision.GetCurrentFrame [Obsolete]
 
-## 后续（Phase 9+，本 epic 外）
+## Phase 9 完整收尾（2026-05-23）
 
+**plan SSOT**：`C:\Users\JoeZhang\.claude\plans\idempotent-brewing-kurzweil.md`
+
+**用户 grill 三问对齐**：
+1. 完成形态：**激进删 Main.cs**（整文件删，非 thin facade）
+2. in-scope：**Silt 同步处理**（5 处 Common.UiInvoker 切换）
+3. 类型加载顺序：**HeroLoopHost 在 SkillEngine/ItemEngine 之后**（消除 ItemEngine→Main 循环依赖）
+
+**7 commit 主干**：
+- `b3087b6` **A** 砍 Main.cs 322 行死代码（命运2 4 + 删除角色族 5 + 测试其他功能 + 旧找色注释；grep 0 外调验证）
+- `20918e0` **B** GameLayout 常量类（OffsetX/Y + 截图模式 1/2 Rect）+ 坐标偏移迁移 23 处 + 删 buff/debuff/命石 Rectangle 死代码
+- `cd41124` **C** HeroLoopHost 新建（~360 行，7 ports ctor）+ 主循环 / 截屏 / 取消 / 走A / 获取指定位置颜色 全迁；Main.cs 降级 thin facade
+- `0dfe24b` **D** 92 策略 ctor 扩参 +HeroLoopHost + Heroes/ 90 文件 1075 处 `Main.X` → `_main.X`（PowerShell .NET File API）
+- `06c1b36` **D'** 上层 4 站点 20 处切 Common.HeroLoopHost（Form2 + GameSession + SkillEngine + ItemEngine）
+- `6299a7d` **E** Silt 8 处 Common.UiInvoker → Common.HeroLoopHost!.Ui（轻量桥接；Silt instance 化推迟 Phase 11）
+- `e854115` **F** 真删 Main.cs / Skill.cs / Item.cs 3 facade（271 行）+ enum 技能类型 上移 SkillEngine + ItemEngine ctor 扩 SkillEngine + AppContainer 重写 + 删 Common.UiInvoker/Common.SkillEngine 字段
+
+## Phase 9 关键不变量
+
+1. 每 chunk 单 commit + dotnet build -c Debug 0 错误 + 自动 backup push ✅
+2. **类型加载顺序终态**：Vision → HeroAggregate → SessionState → SkillEngine → ItemEngine(+skill) → HeroLoopHost(+skill,+item) → Registry.RegisterAll
+3. **HeroLoopHost 是 BC 业务入口聚合**：原 Main.cs static 全局状态全压实例字段；92 策略经 `_main.X / _main._聚合.X.Y / _main.Session.IsPaused` 访问
+4. **Common 残留 2 service locator 字段**（Phase 11 处理）：
+   - `Common.ItemEngine`：SkillEngine 反向依赖（SkillEngine 先 new）+ Silt 静态调用
+   - `Common.HeroLoopHost`：Form2/GameSession 未 ctor 扩 + Silt 未 instance 化 + ItemEngine 4 处反向调
+5. **完成不变量 grep verify 通过**：
+   - `Common.UiInvoker` / `Common.SkillEngine` 0 活码引用 ✅
+   - `Games/Dota2/{Main,Skill,Item}.cs` 已删 ✅
+   - Heroes/ 0 `Main.X / Skill.X / Item.X` 活码 ✅
+   - Main.cs 823 行 → 0 ✅
+6. 默认 build（`DOTA2 + Silt`）0 错误 ✅
+
+## 待用户冒烟（Phase 9 收尾）
+
+所有 7 chunk build 0 错误，但**功能未经实战**。建议 5 项关键回归：
+
+1. 启动程序（管理员）+ AppContainer 类型加载顺序无 NRE
+2. 抽样英雄全技能键：大牛/屠夫/海民/斧王/马尔斯（Strength）/影魔/敌法/小黑/猴子/幽鬼（Agility）/光法/卡尔/暗影萨满/莱恩/双头龙（Intelligence）/猛犸/狼人/剧毒/进化岛/命运2（Universal）
+3. **C 关键回归**：HeroLoopHost.状态初始化() / 取消所有功能() / 一般程序循环；猛犸震荡波后摇 / 切假腿 / Esc 暂停 / F1 重置耗蓝物品
+4. **D/D' 关键回归**：92 策略 ctor 扩参 Registry 装配；任意策略英雄 OnActivate / OnKeyAsync 路径；Form2 取消所有功能 / 获取图片_2
+5. **E 关键回归**：Silt 启用时 UI SetText / GetText 正常
+
+回滚锚点：每 chunk 单 commit。完整撤回 Phase 9：`git revert e854115..b3087b6`（7 commit）。
+
+## 后续（Phase 10+，本 epic 外）
+
+**Phase 10 候选**（详 2026-05-23 audit 报告）：
+
+- **10A 图片资源 SG**（H 优先级）：Dota2_Pictrue 127 手写属性 + csproj 250 行重复 + .resx → C# Source Generator 编译期扫 `Assets/**/*.png` 自动生成 partial class。调用方 API `Dota2_Pictrue.Buff.X` 不变，文件名增删自动重生成 + Roslyn analyzer 缺失检测 + SHA1 资源签名 + 按英雄预加载 hint
+- **10B 92 Strategy SG**（H）：`[HeroStrategy("骷髅王", HeroAttribute.Strength)]` attribute + SG 自动生成 ctor + 字段 + Register + Hero——消 ~1500 行样板
+- **10C 单元测试基础设施**（H，Phase 10 SG 重构网兜）：xUnit + FakeItEasy + Phase 6 ports mock + 92 策略 smoke test
+- **Phase 11 Silt 子 BC 整顿**：Silt.Main + DynamicSkillAutoSelector instance 化 + Form2/GameSession ctor 扩 HeroLoopHost → 删 Common.ItemEngine + Common.HeroLoopHost 终态 0 service locator
+
+**M 优先级现代化**：
+- GameLayout 扩 buff/命石区域（6 处 inline 复刻 hoist）
+- VirtualKey SG 全集（消 `.From(Keys.X)` 数百处）
+- Microsoft.Extensions.DependencyInjection 替手工组合根
+- 技能信息 record + named-arg
+
+**P1 bug**：`SystemSpeechAdapter.Speak` 每次 `new SpeechSynthesizer` 不 Dispose（资源 leak，独立修）
+
+**已知 Phase 8 遗留**：
 - 实际删除死代码（_Legacy/ + Other/ + 4 个标 TODO-dead 文件）
 - ConditionDelegateBitmap 签名改 ImageHandle → IScreenVision
-- Games.Dota2 BC SimKeyBoard 直调切 port（HeroLoopHost 实例化后自然消解）
-- KeyboardMouse/ 4 基础驱动文件评估是否迁 Infrastructure/Native/
+- KeyboardMouse/ 4 基础驱动文件评估迁 Infrastructure/Native/
 - Vision 子 namespace 评估
 - LOL/HF2 切 GameSession（统一入站端口）
-- **Vision 性能**：候选区域裁剪 + GpuFusedVisionAdapter（GPU PoC 已验证免回传优势）
-- **HeroIdentity epic**（用户决策 2026-05-23）：F1 触发 HUD 英雄名提取 + 像素模板多帧投票 + 全 HUD gate
+- **Vision 性能**：候选区域裁剪 + GpuFusedVisionAdapter
+- **HeroIdentity epic**：F1 触发 HUD 英雄名提取 + 像素模板多帧投票 + 全 HUD gate
