@@ -7,6 +7,7 @@ C# .NET 10 WinForms 游戏自动化框架，重写为六边形架构。
 - Phase 8 plan SSOT: `C:\Users\JoeZhang\.claude\plans\sequential-nibbling-lightning.md`
 - Phase 9 plan SSOT: `C:\Users\JoeZhang\.claude\plans\idempotent-brewing-kurzweil.md`
 - Phase 10A plan SSOT: `C:\Users\JoeZhang\.claude\plans\generated-glinting-knuth.md`
+- Phase 10B plan SSOT: `C:\Users\JoeZhang\.claude\plans\sturdy-bridging-rabin.md`
 
 ## 进度
 - [x] Phase 1-3（commit `11d51e8` → `3ea4129`）
@@ -16,6 +17,7 @@ C# .NET 10 WinForms 游戏自动化框架，重写为六边形架构。
 - [x] **Phase 8 段落性收尾**（现代化全量解耦 8/10）—— 2026-05-23 完成（A + C1 + C3 + C4 + C5 + C6 + C7 + D1；HeroLoopHost 推迟 Phase 9）
 - [x] **Phase 9 HeroLoopHost 实例化 + 真删收尾**—— 2026-05-23 完成（7 commit，A + B + C + D + D' + E + F；plan SSOT `~/.claude/plans/idempotent-brewing-kurzweil.md`）
 - [x] **Phase 10A SG 图片资源改造**—— 2026-05-23 完成（4 chunk，净 +108 行；plan SSOT `~/.claude/plans/generated-glinting-knuth.md`）
+- [x] **Phase 10B 6 SOFT_FAIL 消除**—— 2026-05-23 完成（5 chunk，B1-B5；plan SSOT `~/.claude/plans/sturdy-bridging-rabin.md`）
 
 ## Phase 6 + 6.5 已完成（main 分支连续 commit，每 chunk 0 build 错误）
 
@@ -265,6 +267,96 @@ Backup 基础设施：`D:\backup\C\temp\JoezhangYN\C#\Dota2Plus\Dota2Simulator.g
   3. Form2 ctor log tag 改名 / 迁 Form2_Load（消 #3）
   4. plan §4 mitigation 补 pragma 豁免清单（消 #4）
   5. SG 反向映射抽公共常量类（消 #5）
+  6. Strategy SG（消 ~1500 行 92 策略样板 ctor + 字段 + Register）
+  7. 单测基础设施（xUnit + FakeItEasy + 92 策略 smoke test）
+- **Phase 11**：Silt 子 BC 整顿（Silt.Main + DynamicSkillAutoSelector instance 化 + Form2/GameSession ctor 扩 HeroLoopHost → 删 Common.ItemEngine + Common.HeroLoopHost 终态 0 service locator）
+
+## Phase 10B 完整收尾 (2026-05-23)
+
+**plan SSOT**：`C:\Users\JoeZhang\.claude\plans\sturdy-bridging-rabin.md` (459 行 / 9 节)
+
+**Epic 目标**：消除 Phase 10A architecture-sentinel 6 项 SOFT_FAIL handoff_notes（PreloadHints 桥半建 / API 可见性偏宽 / Form2 log tag 错位 / pragma 豁免 plan 未同步 / SG 反向映射双 dict / SHA1 Silt 死 key）—— 不引入新功能，只收口架构债务。
+
+**5 commit 主干**（自底向上，6 SOFT_FAIL 一一对应）：
+
+- `b0059c7` **B1** SG 公共常量类 `PictureCategoryMap` 抽取（消 #5 SG 双 dict 漂移）—— 净 +32 / -23
+- `7373d29` **B2** SG SHA1 Silt 分割 + `ModuleInitializer` 合并单次注册（消 #6 SHA1 Silt 死 key）—— ~50 行
+- `f2c60eb` **B3** `LazyImageLoader.RegisterSha1Manifest` + `Sha1MismatchCount` public → internal（消 #2 API 可见性）—— 净 +9 / -2
+- `ca7bdce` **B4** `GameSession.PreloadHints` fire-and-forget 集成（消 #1 PreloadHints 桥半建）—— +9 行
+- `99325d4` **B5** Form2 ctor log tag `[Form2.Load]` → `[Form2.ctor]` + 10A plan §4 跳转（消 #3 log tag + #4 pragma 豁免文档）—— +1 / +1 行
+
+**关键文件**：
+
+| 文件 | 状态 | chunk | 说明 |
+|------|------|-------|------|
+| `Dota2Simulator.SourceGenerators/PictureCategoryMap.cs` | NEW | B1 | internal static class 公共常量 dict + BuildReverse 反向派生 (~30 行) |
+| `Dota2Simulator.SourceGenerators/PictureManifestGenerator.cs` | EDIT | B1+B2 | B1 引用 PictureCategoryMap 删本地 dict / B2 EmitSha1 拆 NonSiltMap + SiltMap + ModuleInitializer 合并注册 |
+| `Dota2Simulator.SourceGenerators/PictureHeroPreloadGenerator.cs` | EDIT | B1 | 引用 PictureCategoryMap 删本地反向 dict |
+| `Dota2Simulator/Vision/Cache/LazyImageLoader.cs` | EDIT | B3 | RegisterSha1Manifest + Sha1MismatchCount public → internal + XML doc 说明 |
+| `Dota2Simulator/GameAutomation/Application/GameSession.cs` | EDIT | B4 | DispatchAsync 新英雄激活分支后追加 PreloadHints fire-and-forget 桥接 |
+| `Dota2Simulator/Form2.cs` | EDIT | B5 | line 185 字面替 `[Form2.Load]` → `[Form2.ctor]` |
+| `~/.claude/plans/generated-glinting-knuth.md` | EDIT | B5 | §4 末尾追加跳转单行（pragma 豁免 SSOT 单源化指引） |
+
+## Phase 10B 关键不变量 (architecture-sentinel ACCEPT)
+
+**继承 Phase 10A 7 不变量**（126 属性 1:1 / 33 文件 0 改 / `#if Silt` 语义 / SHA1 非阻断 / Phase 9 装配序零侵入 / 0 新增警告 / 每 chunk 单 commit 0 错），新增：
+
+1. **6 SOFT_FAIL 100% 消除** ✅（architecture-sentinel 5 反模式 PASS + dogfood 双 build 0 错误）
+2. **SG 单 dict SSOT**：`PictureCategoryMap.DirToClassName` 为唯一来源，反向映射 `BuildReverse` 派生 —— 加新顶层目录只改一处 ✅
+3. **SHA1 Silt 分割语义正确**：`g.cs` 文本恒含 `#if Silt SiltMap #endif` 包裹段，csc 预处理器编译期剔除字段；Silt 关闭时 DLL 0 死 key ✅
+4. **LazyImageLoader internal API 收口**：`RegisterSha1Manifest` / `Sha1MismatchCount` 仅 SG emit `[ModuleInitializer]` 同 assembly 调用，跨 assembly 0 消费方 ✅
+5. **PreloadHints 桥接闭环**：`GameSession.DispatchAsync` 新英雄激活后 fire-and-forget `LazyImageLoader.PreloadImagesAsync(PictureHeroPreloadHints.Hints[hero])` ✅（实测仍 untested，待用户冒烟）
+6. **接口契约破坏自检 PASS**：B3 收紧 internal 跨 assembly 0 引用；B4 GameSession 签名不变；B5 字面替换不动行为 ✅
+
+## Phase 10B architecture-sentinel verdict
+
+**ACCEPT** —— 5 反模式全 PASS / dogfood 双 build（DOTA2 单独 + DOTA2+Silt）0 错误 / 6 SOFT_FAIL 100% 消除 / 接口契约破坏自检 PASS / Phase 10A 7 不变量全保留。
+
+## Phase 10B handoff_notes (5 项 Phase 10C+ 候选，不污染当前 epic 完成状态)
+
+1. **PreloadHints hero key 一致性 lint / runtime warning**（Phase 10C+ 候选）：`hero.Name = Form2.tb_name.Text.Trim()` ↔ Strategy 文件名 stem 字符串约定耦合，miss 路径静默；建议 `GameSession.DispatchAsync` 内 TryGetValue miss 分支加 `Trace.WriteLine` / 单元测试 assert `PreloadHints.Hints.Keys ≡ Strategy 文件名 stem 集合`
+2. **Sha1MismatchCount 消费方缺失**（Phase 10C+ 候选）：B3 internal 收紧后主项目 0 read，counter 永无 consumer；建议 admin 命令 / Form2 调试面板暴露 / 或删该 counter（YAGNI）
+3. **`[Preload]` / `[LazyLoad]` log tag 统一**（Phase 10C+ 候选）：`GameSession.cs:69-71` 用 `[Preload]`，`LazyImageLoader.cs:208` 用 `[LazyLoad]`，建议后续 tag 统一
+4. **plan SSOT 措辞勘误**（Phase 10C+ 候选）：
+   - B2 反预测「g.cs 中 Silt 字段也消失」实际应为「DLL 中 SiltMap 字段消失」（g.cs 文本始终含 `#if Silt` 包裹段，csc 预处理器在编译期剔除）
+   - B4 plan 写双 using `Dota2Simulator.Vision + Cache`，实际 namespace 平铺仅需单 using `Dota2Simulator.Vision`
+5. **HeroIdentity epic / F1 HUD 英雄名提取**（Phase 10C+ 候选 / plan §1.2 显式排除）：真根因解 = 用 OCR / HUD 英雄名提取替代 tb_name 用户输入，从源头消 PreloadHints key 约定耦合
+
+## Phase 10B 反预测与实测三处偏差备忘
+
+- **B2**：g.cs 文本始终含 `#if Silt SiltMap #endif` 段，编译期剔除字段；语义不变量正确，plan 措辞偏严
+- **B4**：plan 双 using → 实际单 using（namespace 平铺，agent 自纠 CS0234 后 PASS）
+- **B5**：跑 Release build 时撞 B1 并发未 commit 中间状态 → B1 完成后已恢复
+
+## 待用户冒烟（Phase 10B 收尾）
+
+继承 Phase 10A 冒烟清单 + 新增 B4 PreloadHints 实测项：
+
+1. **B4 PreloadHints 实测**（新增）：
+   - 启动程序（admin）+ 输入英雄名切换 → stdout 出现 `[LazyLoad] 加载` 系列（B4 fire-and-forget 触发预加载）
+   - 重复切同一英雄第二次起命中缓存（不重复 `[LazyLoad] 加载`，只见命中日志）
+2. **B2 Silt 关闭 rebuild 自检**（B2 已实测，用户可二次确认）：
+   - csproj `DefineConstants` 移除 `Silt` → `dotnet build` → 0 错误 + DLL 内 SiltMap 字段消失
+3. **继承 Phase 10A 冒烟项**：
+   - R2 ModuleInitializer 时序：`[ModuleInit] <ticks1>` 早于 `[Form2.ctor] <ticks2>`（B5 tag 已改为 ctor）
+   - 抽样 4 属性英雄全技能键（大牛/影魔/卡尔/猛犸 等，含图片识别路径）
+   - 物品使用（假腿切换 / 神杖魔晶判断）
+   - SHA1 mismatch 测试（可选）：临时改一张 .bmp，重 build，启动看 stdout SHA1 mismatch log
+
+## Phase 10B 回滚锚点
+
+- 单 chunk revert：`git revert <hash>`（B1-B5 任一）
+- 完整撤回 Phase 10B：`git revert ca7bdce f2c60eb 7373d29 b0059c7 99325d4`（5 commit 顺序无关，因 B5 与 B1-B4 文件不相交）
+
+## 下次 session 起手指引（Phase 10C / Phase 11 任选）
+
+- **Phase 10C 候选**（5 项 handoff_notes，详见上文 Phase 10B handoff_notes 段）：
+  1. PreloadHints hero key 一致性 lint / runtime warning
+  2. Sha1MismatchCount 消费方接入或删除（YAGNI）
+  3. `[Preload]` / `[LazyLoad]` log tag 统一
+  4. plan SSOT 措辞勘误回写（B2 + B4）
+  5. HeroIdentity epic / F1 HUD 英雄名提取（真根因解）
+- **Phase 10C 其他候选**（Phase 10A 后续段已写）：
   6. Strategy SG（消 ~1500 行 92 策略样板 ctor + 字段 + Register）
   7. 单测基础设施（xUnit + FakeItEasy + 92 策略 smoke test）
 - **Phase 11**：Silt 子 BC 整顿（Silt.Main + DynamicSkillAutoSelector instance 化 + Form2/GameSession ctor 扩 HeroLoopHost → 删 Common.ItemEngine + Common.HeroLoopHost 终态 0 service locator）
