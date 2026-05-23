@@ -115,8 +115,9 @@ namespace Dota2Simulator.Games.Dota2
         internal static GameAutomation.Application.SessionState? _session;
 
         /// <summary>当前英雄的运行态聚合（技能槽 + 条件槽 + 攻击计时）。
-        /// public 因 Item.cs 跨类访问。</summary>
-        public static readonly HeroAggregate _聚合 = new();
+        /// public 因 Item.cs 跨类访问。
+        /// C6 单阶段：不再类型加载期 default-ctor 实例化（HeroAggregate ctor 现接 vision），由 AppContainer ctor 内 new HeroAggregate(Vision) 赋值。</summary>
+        public static HeroAggregate _聚合 = null!;
 
         #endregion
 
