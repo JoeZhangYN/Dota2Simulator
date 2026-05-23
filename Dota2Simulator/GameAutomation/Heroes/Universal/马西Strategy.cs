@@ -8,6 +8,8 @@ using Dota2Simulator.GameAutomation.Domain.Heroes;
 using Dota2Simulator.Games.Dota2;
 using Dota2Simulator.Vision;
 
+using Dota2Simulator.GameAutomation.Ports;
+
 namespace Dota2Simulator.GameAutomation.Heroes.Universal;
 
 /// <summary>马西（全才）策略——迁移自 Main.根据当前英雄增强 的 case "马西"。</summary>
@@ -15,6 +17,17 @@ public sealed class 马西Strategy : IHeroStrategy
 {
     private static readonly Rectangle buff状态技能栏 = new(962, 826, 526, 80);
 
+
+    private readonly IInputExecutor _input;
+#pragma warning disable IDE0052
+    private readonly IScreenVision _vision;
+#pragma warning restore IDE0052
+
+    public 马西Strategy(IInputExecutor input, IScreenVision vision)
+    {
+        _input = input;
+        _vision = vision;
+    }
     public HeroId Hero => new("马西", HeroAttribute.Universal);
 
     public void OnActivate(HeroContext ctx)

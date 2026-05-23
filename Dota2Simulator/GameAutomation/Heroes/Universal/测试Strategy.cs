@@ -9,13 +9,24 @@ using Dota2Simulator.GameAutomation.Domain.Heroes;
 using Dota2Simulator.GameAutomation.Domain.Loop;
 using Dota2Simulator.Games;
 using Dota2Simulator.Games.Dota2;
-using Dota2Simulator.KeyboardMouse;
+using Dota2Simulator.GameAutomation.Ports;
 
 namespace Dota2Simulator.GameAutomation.Heroes.Universal;
 
 /// <summary>测试策略——迁移自 Main.根据当前英雄增强 的 case "测试"。</summary>
 public sealed class 测试Strategy : IHeroStrategy
 {
+
+    private readonly IInputExecutor _input;
+#pragma warning disable IDE0052
+    private readonly IScreenVision _vision;
+#pragma warning restore IDE0052
+
+    public 测试Strategy(IInputExecutor input, IScreenVision vision)
+    {
+        _input = input;
+        _vision = vision;
+    }
     public HeroId Hero => new("测试", HeroAttribute.Universal);
 
     public void OnActivate(HeroContext ctx)
@@ -57,7 +68,7 @@ public sealed class 测试Strategy : IHeroStrategy
             {
                 if (text.Contains(kvp.Key))
                 {
-                    SimKeyBoard.KeyPress(kvp.Value);
+                    _input.Press(VirtualKey.From(kvp.Value));
                     break; // 如果找到匹配项，退出循环
                 }
             }
@@ -68,7 +79,7 @@ public sealed class 测试Strategy : IHeroStrategy
         }
     }
 
-    private static void 测试其他功能()
+    private void 测试其他功能()
     {
         Main._聚合.Skills.SetTime(SlotKey.Global, Common.获取当前时间毫秒());
 

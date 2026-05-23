@@ -7,11 +7,24 @@ using Dota2Simulator.GameAutomation.Domain.Heroes;
 using Dota2Simulator.Games.Dota2;
 using Dota2Simulator.Vision;
 
+using Dota2Simulator.GameAutomation.Ports;
+
 namespace Dota2Simulator.GameAutomation.Heroes.Universal;
 
 /// <summary>VS（全才）策略——迁移自 Main.根据当前英雄增强 的 case "VS"。</summary>
 public sealed class VSStrategy : IHeroStrategy
 {
+
+    private readonly IInputExecutor _input;
+#pragma warning disable IDE0052
+    private readonly IScreenVision _vision;
+#pragma warning restore IDE0052
+
+    public VSStrategy(IInputExecutor input, IScreenVision vision)
+    {
+        _input = input;
+        _vision = vision;
+    }
     public HeroId Hero => new("VS", HeroAttribute.Universal);
 
     public void OnActivate(HeroContext ctx)

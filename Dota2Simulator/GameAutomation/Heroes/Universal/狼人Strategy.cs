@@ -7,14 +7,26 @@ using Dota2Simulator.GameAutomation.Domain.Heroes;
 using Dota2Simulator.GameAutomation.Domain.Loop;
 using Dota2Simulator.Games;
 using Dota2Simulator.Games.Dota2;
-using Dota2Simulator.KeyboardMouse;
 using Dota2Simulator.Vision;
+
+using Dota2Simulator.GameAutomation.Ports;
 
 namespace Dota2Simulator.GameAutomation.Heroes.Universal;
 
 /// <summary>狼人（全才）策略——迁移自 Main.根据当前英雄增强 的 case "狼人"。</summary>
 public sealed class 狼人Strategy : IHeroStrategy
 {
+
+    private readonly IInputExecutor _input;
+#pragma warning disable IDE0052
+    private readonly IScreenVision _vision;
+#pragma warning restore IDE0052
+
+    public 狼人Strategy(IInputExecutor input, IScreenVision vision)
+    {
+        _input = input;
+        _vision = vision;
+    }
     public HeroId Hero => new("狼人", HeroAttribute.Universal);
 
     public void OnActivate(HeroContext ctx)
@@ -48,12 +60,12 @@ public sealed class 狼人Strategy : IHeroStrategy
         }
     }
 
-    private static async Task<bool> 招狼去后摇(ImageHandle 句柄)
+    private async Task<bool> 招狼去后摇(ImageHandle 句柄)
     {
-        static void 招狼后()
+        void 招狼后()
         {
             Main._聚合.Skills.SetTime(SlotKey.Q, -1);
-            SimKeyBoard.KeyPress(Keys.A);
+            _input.Press(VirtualKey.From(Keys.A));
         }
 
         if (Common.获取当前时间毫秒() - Main._聚合.Skills.Time(SlotKey.Q) > 400 && Main._聚合.Skills.Time(SlotKey.Q) != -1 && Item._条件开启切假腿)
@@ -71,12 +83,12 @@ public sealed class 狼人Strategy : IHeroStrategy
         return await Task.FromResult(false).ConfigureAwait(true);
     }
 
-    private static async Task<bool> 嚎叫去后摇(ImageHandle 句柄)
+    private async Task<bool> 嚎叫去后摇(ImageHandle 句柄)
     {
-        static void 嚎叫后()
+        void 嚎叫后()
         {
             Main._聚合.Skills.SetTime(SlotKey.W, -1);
-            SimKeyBoard.KeyPress(Keys.A);
+            _input.Press(VirtualKey.From(Keys.A));
         }
 
         if (Common.获取当前时间毫秒() - Main._聚合.Skills.Time(SlotKey.W) > 400 && Main._聚合.Skills.Time(SlotKey.W) != -1 && Item._条件开启切假腿)
@@ -94,12 +106,12 @@ public sealed class 狼人Strategy : IHeroStrategy
         return await Task.FromResult(false).ConfigureAwait(true);
     }
 
-    private static async Task<bool> 撕咬去后摇(ImageHandle 句柄)
+    private async Task<bool> 撕咬去后摇(ImageHandle 句柄)
     {
-        static void 撕咬后()
+        void 撕咬后()
         {
             Main._聚合.Skills.SetTime(SlotKey.D, -1);
-            SimKeyBoard.KeyPress(Keys.A);
+            _input.Press(VirtualKey.From(Keys.A));
         }
 
         if (Common.获取当前时间毫秒() - Main._聚合.Skills.Time(SlotKey.D) > 400 && Main._聚合.Skills.Time(SlotKey.D) != -1 && Item._条件开启切假腿)
@@ -117,7 +129,7 @@ public sealed class 狼人Strategy : IHeroStrategy
         return await Task.FromResult(false).ConfigureAwait(true);
     }
 
-    private static async Task<bool> 变狼去后摇(ImageHandle 句柄)
+    private async Task<bool> 变狼去后摇(ImageHandle 句柄)
     {
         if (Common.获取当前时间毫秒() - Main._聚合.Skills.Time(SlotKey.R) > 1200 && Main._聚合.Skills.Time(SlotKey.R) != -1 && Item._条件开启切假腿)
         {

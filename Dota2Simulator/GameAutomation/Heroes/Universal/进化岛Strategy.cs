@@ -5,13 +5,24 @@ using Dota2Simulator.GameAutomation.Application;
 using Dota2Simulator.GameAutomation.Domain.Actuation;
 using Dota2Simulator.GameAutomation.Domain.Heroes;
 using Dota2Simulator.Games;
-using Dota2Simulator.KeyboardMouse;
+using Dota2Simulator.GameAutomation.Ports;
 
 namespace Dota2Simulator.GameAutomation.Heroes.Universal;
 
 /// <summary>进化岛策略——迁移自 Main.根据当前英雄增强 的 case "进化岛"。</summary>
 public sealed class 进化岛Strategy : IHeroStrategy
 {
+
+    private readonly IInputExecutor _input;
+#pragma warning disable IDE0052
+    private readonly IScreenVision _vision;
+#pragma warning restore IDE0052
+
+    public 进化岛Strategy(IInputExecutor input, IScreenVision vision)
+    {
+        _input = input;
+        _vision = vision;
+    }
     public HeroId Hero => new("进化岛", HeroAttribute.Universal);
 
     public void OnActivate(HeroContext ctx)
@@ -26,7 +37,7 @@ public sealed class 进化岛Strategy : IHeroStrategy
             _ = Task.Run(() =>
             {
                 Common.Delay(200);
-                SimEnigo.KeyPress(Keys.A);
+                _input.PressViaEnigo(VirtualKey.From(Keys.A));
             }).ConfigureAwait(false);
         }
         else if (key == VirtualKey.From(Keys.T))
@@ -34,7 +45,7 @@ public sealed class 进化岛Strategy : IHeroStrategy
             _ = Task.Run(() =>
             {
                 Common.Delay(200);
-                SimEnigo.KeyPress(Keys.A);
+                _input.PressViaEnigo(VirtualKey.From(Keys.A));
             }).ConfigureAwait(false);
         }
         else if (key == VirtualKey.From(Keys.F3))
@@ -42,7 +53,7 @@ public sealed class 进化岛Strategy : IHeroStrategy
             _ = Task.Run(() =>
             {
                 Common.Delay(200);
-                SimEnigo.KeyPress(Keys.A);
+                _input.PressViaEnigo(VirtualKey.From(Keys.A));
             }).ConfigureAwait(false);
         }
 

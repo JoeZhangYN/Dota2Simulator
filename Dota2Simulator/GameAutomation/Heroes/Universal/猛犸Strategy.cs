@@ -1,4 +1,5 @@
 #if DOTA2
+using System.Drawing;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Dota2Simulator.GameAutomation.Application;
@@ -7,9 +8,11 @@ using Dota2Simulator.GameAutomation.Domain.Heroes;
 using Dota2Simulator.GameAutomation.Domain.Loop;
 using Dota2Simulator.Games;
 using Dota2Simulator.Games.Dota2;
-using Dota2Simulator.KeyboardMouse;
 using Dota2Simulator.Vision;
 
+using Dota2Simulator.GameAutomation.Ports;
+
+using Dota2Simulator.GameAutomation.Domain.Perception;
 namespace Dota2Simulator.GameAutomation.Heroes.Universal;
 
 /// <summary>猛犸（全才）策略——迁移自 Main.根据当前英雄增强 的 case "猛犸"。</summary>
@@ -17,6 +20,17 @@ public sealed class 猛犸Strategy : IHeroStrategy
 {
     private const int 等待延迟 = 33;
 
+
+    private readonly IInputExecutor _input;
+#pragma warning disable IDE0052
+    private readonly IScreenVision _vision;
+#pragma warning restore IDE0052
+
+    public 猛犸Strategy(IInputExecutor input, IScreenVision vision)
+    {
+        _input = input;
+        _vision = vision;
+    }
     public HeroId Hero => new("猛犸", HeroAttribute.Universal);
 
     public void OnActivate(HeroContext ctx)
@@ -63,9 +77,9 @@ public sealed class 猛犸Strategy : IHeroStrategy
         }
     }
 
-    private static async Task<bool> 震荡波去后摇(ImageHandle 句柄)
+    private async Task<bool> 震荡波去后摇(ImageHandle 句柄)
     {
-        static void 震荡波后()
+        void 震荡波后()
         {
             Skill.通用技能后续动作();
         }
@@ -74,9 +88,9 @@ public sealed class 猛犸Strategy : IHeroStrategy
         return await Task.FromResult(false).ConfigureAwait(true);
     }
 
-    private static async Task<bool> 授予力量去后摇(ImageHandle 句柄)
+    private async Task<bool> 授予力量去后摇(ImageHandle 句柄)
     {
-        static void 授予力量后()
+        void 授予力量后()
         {
             Skill.通用技能后续动作();
         }
@@ -85,9 +99,9 @@ public sealed class 猛犸Strategy : IHeroStrategy
         return await Task.FromResult(false).ConfigureAwait(true);
     }
 
-    private static async Task<bool> 巨角冲撞去后摇(ImageHandle 句柄)
+    private async Task<bool> 巨角冲撞去后摇(ImageHandle 句柄)
     {
-        static void 巨角冲撞后()
+        void 巨角冲撞后()
         {
             Skill.通用技能后续动作();
         }
@@ -96,9 +110,9 @@ public sealed class 猛犸Strategy : IHeroStrategy
         return await Task.FromResult(false).ConfigureAwait(true);
     }
 
-    private static async Task<bool> 长角抛物去后摇(ImageHandle 句柄)
+    private async Task<bool> 长角抛物去后摇(ImageHandle 句柄)
     {
-        static void 长角抛物后()
+        void 长角抛物后()
         {
             Skill.通用技能后续动作();
         }
@@ -107,9 +121,9 @@ public sealed class 猛犸Strategy : IHeroStrategy
         return await Task.FromResult(false).ConfigureAwait(true);
     }
 
-    private static async Task<bool> 两级反转去后摇(ImageHandle 句柄)
+    private async Task<bool> 两级反转去后摇(ImageHandle 句柄)
     {
-        static void 两级反转后()
+        void 两级反转后()
         {
             Skill.通用技能后续动作();
         }
@@ -119,28 +133,29 @@ public sealed class 猛犸Strategy : IHeroStrategy
     }
 
     // todo 逻辑优化 有鱼叉
-    private static void 跳拱指定地点()
+    private void 跳拱指定地点()
     {
-        SimKeyBoard.KeyPress(Keys.Space);
+        _input.Press(VirtualKey.From(Keys.Space));
         Common.Delay(等待延迟);
-        SimKeyBoard.KeyPress(Keys.D9);
-        SimKeyBoard.MouseMove(Main._聚合.Skills.Target(SlotKey.Global));
+        _input.Press(VirtualKey.From(Keys.D9));
+        Point target = Main._聚合.Skills.Target(SlotKey.Global);
+        _input.MouseMoveTo(new ScreenPoint(target.X, target.Y));
         Common.Delay(等待延迟);
-        SimKeyBoard.KeyPress(Keys.E);
+        _input.Press(VirtualKey.From(Keys.E));
         Common.Delay(等待延迟);
-        SimKeyBoard.KeyPress(Keys.D9);
+        _input.Press(VirtualKey.From(Keys.D9));
     }
 
-    private static void 指定地点()
+    private void 指定地点()
     {
         Main._聚合.Skills.SetTarget(SlotKey.Global, Control.MousePosition);
 
         Common.Delay(等待延迟);
-        SimKeyBoard.KeyDown(Keys.Control);
+        _input.KeyDown(VirtualKey.From(Keys.Control));
         Common.Delay(等待延迟);
-        SimKeyBoard.KeyPress(Keys.D9);
+        _input.Press(VirtualKey.From(Keys.D9));
         Common.Delay(等待延迟);
-        SimKeyBoard.KeyUp(Keys.Control);
+        _input.KeyUp(VirtualKey.From(Keys.Control));
     }
 }
 #endif

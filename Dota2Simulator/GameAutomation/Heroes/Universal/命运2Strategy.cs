@@ -5,13 +5,25 @@ using Dota2Simulator.GameAutomation.Application;
 using Dota2Simulator.GameAutomation.Domain.Actuation;
 using Dota2Simulator.GameAutomation.Domain.Heroes;
 using Dota2Simulator.Games;
-using Dota2Simulator.KeyboardMouse;
+using Dota2Simulator.GameAutomation.Ports;
 
+using Dota2Simulator.GameAutomation.Domain.Perception;
 namespace Dota2Simulator.GameAutomation.Heroes.Universal;
 
 /// <summary>命运2策略——迁移自 Main.根据当前英雄增强 的 case "命运2"。</summary>
 public sealed class 命运2Strategy : IHeroStrategy
 {
+
+    private readonly IInputExecutor _input;
+#pragma warning disable IDE0052
+    private readonly IScreenVision _vision;
+#pragma warning restore IDE0052
+
+    public 命运2Strategy(IInputExecutor input, IScreenVision vision)
+    {
+        _input = input;
+        _vision = vision;
+    }
     public HeroId Hero => new("命运2", HeroAttribute.Universal);
 
     public void OnActivate(HeroContext ctx)
@@ -31,7 +43,7 @@ public sealed class 命运2Strategy : IHeroStrategy
         }
         else if (key == VirtualKey.Q)
         {
-            SimKeyBoard.MouseMoveTo(1920, 1080);
+            _input.MouseMoveTo(new ScreenPoint(1920, 1080));
         }
 
         return Task.CompletedTask;
@@ -42,41 +54,41 @@ public sealed class 命运2Strategy : IHeroStrategy
     ///     CTRL SHIFT 键无法模拟？
     /// </summary>
     /// <param name="Key"></param>
-    private static void 命运2按键(Keys Key)
+    private void 命运2按键(Keys Key)
     {
-        SimKeyBoard.KeyDown(Key);
+        _input.KeyDown(VirtualKey.From(Key));
         Common.Delay(10); // 命运2操作延迟不然不切
-        SimKeyBoard.KeyUp(Key);
+        _input.KeyUp(VirtualKey.From(Key));
     }
 
-    private static void 命运2冰好耶()
+    private void 命运2冰好耶()
     {
-        SimKeyBoard.KeyDown(Keys.W);
+        _input.KeyDown(VirtualKey.From(Keys.W));
         命运2按键(Keys.LShiftKey);
         Common.Delay(150);
-        SimKeyBoard.KeyUp(Keys.W);
+        _input.KeyUp(VirtualKey.From(Keys.W));
         命运2按键(Keys.LControlKey);
         Common.Delay(150);
         命运2按键(Keys.C);
         Common.Delay(100);
-        SimKeyBoard.KeyDown(Keys.S);
+        _input.KeyDown(VirtualKey.From(Keys.S));
         Common.Delay(500);
-        SimKeyBoard.KeyUp(Keys.S);
+        _input.KeyUp(VirtualKey.From(Keys.S));
     }
 
-    private static void 命运2冰好耶1()
+    private void 命运2冰好耶1()
     {
-        SimKeyBoard.KeyDown(Keys.W);
+        _input.KeyDown(VirtualKey.From(Keys.W));
         命运2按键(Keys.LShiftKey);
         Common.Delay(150);
-        SimKeyBoard.KeyUp(Keys.W);
+        _input.KeyUp(VirtualKey.From(Keys.W));
         命运2按键(Keys.LControlKey);
         Common.Delay(150);
-        SimKeyBoard.MouseLeftClick();
+        _input.MouseClick(MouseButton.Left);
         Common.Delay(100);
-        SimKeyBoard.KeyDown(Keys.S);
+        _input.KeyDown(VirtualKey.From(Keys.S));
         Common.Delay(500);
-        SimKeyBoard.KeyUp(Keys.S);
+        _input.KeyUp(VirtualKey.From(Keys.S));
     }
 }
 #endif
