@@ -29,8 +29,9 @@ namespace Dota2Simulator.Vision
         public static event Action<string, long> OnImageLoaded;
 
         // Phase 10A Chunk C — SHA1 build artifact 完整性校验链路
+        // Phase 10D #9: 删 _sha1MismatchCount counter (YAGNI) — B3 internal 收紧后主项目 0 read,
+        // counter 永无 consumer. 若未来真需诊断指标 (admin 命令 / Form2 调试面板), 重加单点即可.
         private static IReadOnlyDictionary<string, string> _expectedSha1Map;
-        private static int _sha1MismatchCount;
         private static bool _sha1Registered;
         private static readonly object _sha1RegisterLock = new object();
 
@@ -66,14 +67,7 @@ namespace Dota2Simulator.Vision
             }
         }
 
-        /// <summary>
-        /// 累计 SHA1 mismatch 次数 (用于诊断, 不影响运行).
-        /// </summary>
-        /// <remarks>
-        /// Phase 10B B3 可见性: <c>internal</c> 收紧 —— 与 <see cref="RegisterSha1Manifest"/> 同源,
-        /// 诊断 counter 仅本 assembly 内部使用, 跨 assembly 无消费方.
-        /// </remarks>
-        internal static int Sha1MismatchCount => _sha1MismatchCount;
+        // Phase 10D #9: 删 Sha1MismatchCount property (YAGNI) — 详 _sha1MismatchCount 字段注释.
 
         #region 核心加载方法
 
@@ -152,7 +146,7 @@ namespace Dota2Simulator.Vision
                     var actualHex = Convert.ToHexStringLower(actualHash);
                     if (!string.Equals(actualHex, expectedSha1, StringComparison.OrdinalIgnoreCase))
                     {
-                        Interlocked.Increment(ref _sha1MismatchCount);
+                        // Phase 10D #9: 删 _sha1MismatchCount counter Increment (YAGNI) — mismatch 仅 log, 不再累计.
                         Console.WriteLine($"[LazyLoad] SHA1 mismatch: {imageName} expected={expectedSha1} actual={actualHex}");
                     }
                     ms.Position = 0;
