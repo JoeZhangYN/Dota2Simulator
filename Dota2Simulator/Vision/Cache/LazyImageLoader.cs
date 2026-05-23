@@ -28,6 +28,46 @@ namespace Dota2Simulator.Vision
         public static event Action<string, bool> OnImageLoadAttempt;
         public static event Action<string, long> OnImageLoaded;
 
+        // Phase 10A Chunk C — SHA1 build artifact 完整性校验链路
+        private static IReadOnlyDictionary<string, string> _expectedSha1Map;
+        private static int _sha1MismatchCount;
+        private static bool _sha1Registered;
+        private static readonly object _sha1RegisterLock = new object();
+
+        /// <summary>
+        /// 注册编译期生成的 SHA1 manifest, 用于 build artifact 完整性校验.
+        /// </summary>
+        /// <remarks>
+        /// <para><b>语义边界</b>: 本机制 = build artifact 完整性校验 (检测 dll 被外部篡改 / 文件读取损坏 /
+        /// 嵌入资源解码前 bitstream 一致性), <b>不覆盖 runtime hot-reload 篡改</b> —— SG 在编译时把 SHA1 嵌为常量,
+        /// 磁盘 bmp 运行期换了不会更新常量, 这是设计意图非缺陷.</para>
+        /// <para><b>GPU adapter 走磁盘读取场景</b>: 应禁用本校验 —— 调用方传 null 或新增 disable API,
+        /// MemoryStream 双拷贝路径自动跳过.</para>
+        /// <para>幂等: 重复调用第二次起忽略并 log warning. 由 SG emit 的 Dota2_PictrueSha1.RegisterOnModuleInit
+        /// 通过 [ModuleInitializer] 在 assembly load 时一次性调用.</para>
+        /// </remarks>
+        public static void RegisterSha1Manifest(IReadOnlyDictionary<string, string> map)
+        {
+            lock (_sha1RegisterLock)
+            {
+                if (_sha1Registered)
+                {
+                    Console.WriteLine($"[LazyLoad] SHA1 manifest 已注册过, 忽略重复 (旧 {_expectedSha1Map?.Count} 新 {map?.Count})");
+                    return;
+                }
+                _expectedSha1Map = map;
+                _sha1Registered = true;
+                Console.WriteLine($"[LazyLoad] SHA1 manifest 已注册 ({map?.Count ?? 0} 条)");
+                // R2 时序实测 (修订 3): 加时间戳便于与 Form2.ctor 对照
+                Console.WriteLine($"[ModuleInit] {DateTime.Now.Ticks} RegisterSha1Manifest 已调用");
+            }
+        }
+
+        /// <summary>
+        /// 累计 SHA1 mismatch 次数 (用于诊断, 不影响运行).
+        /// </summary>
+        public static int Sha1MismatchCount => _sha1MismatchCount;
+
         #region 核心加载方法
 
         /// <summary>
@@ -87,22 +127,37 @@ namespace Dota2Simulator.Vision
                     return ImageHandle.Invalid;
                 }
 
-                using Bitmap bitmap = new(stream);
-                byte[] imageData = ImageManager.GetBitmapData(bitmap);
-
-                // 估算内存使用
-                long memoryUsage = imageData.Length;
-                Interlocked.Add(ref _totalMemoryUsed, memoryUsage);
-                Interlocked.Increment(ref _totalLoaded);
-
-                // 创建图片句柄
-                ImageHandle handle = ImageManager.CreateStaticImage(imageData, bitmap.Size, imageName);
-
-                var loadTime = (DateTime.Now - startTime).TotalMilliseconds;
-                Console.WriteLine($"[LazyLoad] 成功加载: {imageName} (耗时: {loadTime:F2}ms, 大小: {memoryUsage / 1024.0:F2}KB)");
-
-                OnImageLoaded?.Invoke(imageName, memoryUsage);
-                return handle;
+                // Phase 10A Chunk C — SHA1 校验路径 (selective_ports 接缝):
+                // _expectedSha1Map != null 且 key 命中 → MemoryStream 拷贝 + SHA1 比对 (mismatch 仅 log + counter, 不阻断).
+                // 未注册或 key miss → 走原 stream 直读 bitmap 路径 (GPU adapter 场景 _expectedSha1Map = null 时同此).
+                if (_expectedSha1Map != null
+                    && _expectedSha1Map.TryGetValue(imageName, out var expectedSha1)
+                    && !string.IsNullOrEmpty(expectedSha1))
+                {
+                    using var ms = new MemoryStream();
+                    stream.CopyTo(ms);
+                    var bytes = ms.ToArray();
+                    // CA5350 抑制理由: SHA1 在此非用作密码学安全, 仅 build artifact 完整性校验 (检测篡改/损坏).
+                    // CA1850 / CA1872 现代化已用 HashData / ToHexStringLower 静态 API.
+#pragma warning disable CA5350
+                    var actualHash = System.Security.Cryptography.SHA1.HashData(bytes);
+#pragma warning restore CA5350
+                    var actualHex = Convert.ToHexStringLower(actualHash);
+                    if (!string.Equals(actualHex, expectedSha1, StringComparison.OrdinalIgnoreCase))
+                    {
+                        Interlocked.Increment(ref _sha1MismatchCount);
+                        Console.WriteLine($"[LazyLoad] SHA1 mismatch: {imageName} expected={expectedSha1} actual={actualHex}");
+                    }
+                    ms.Position = 0;
+                    using Bitmap bitmap = new(ms);
+                    return BitmapToHandle(bitmap, imageName, startTime);
+                }
+                else
+                {
+                    // 未注册 SHA1 manifest 或 key 未命中, 走原路径
+                    using Bitmap bitmap = new(stream);
+                    return BitmapToHandle(bitmap, imageName, startTime);
+                }
             }
             catch (Exception ex)
             {
@@ -110,6 +165,28 @@ namespace Dota2Simulator.Vision
                 OnImageLoadAttempt?.Invoke(imageName, false);
                 return ImageHandle.Invalid;
             }
+        }
+
+        /// <summary>
+        /// Bitmap → ImageHandle 公共尾段 (SHA1 校验分叉两路均收敛于此).
+        /// </summary>
+        private static ImageHandle BitmapToHandle(Bitmap bitmap, string imageName, DateTime startTime)
+        {
+            byte[] imageData = ImageManager.GetBitmapData(bitmap);
+
+            // 估算内存使用
+            long memoryUsage = imageData.Length;
+            Interlocked.Add(ref _totalMemoryUsed, memoryUsage);
+            Interlocked.Increment(ref _totalLoaded);
+
+            // 创建图片句柄
+            ImageHandle handle = ImageManager.CreateStaticImage(imageData, bitmap.Size, imageName);
+
+            var loadTime = (DateTime.Now - startTime).TotalMilliseconds;
+            Console.WriteLine($"[LazyLoad] 成功加载: {imageName} (耗时: {loadTime:F2}ms, 大小: {memoryUsage / 1024.0:F2}KB)");
+
+            OnImageLoaded?.Invoke(imageName, memoryUsage);
+            return handle;
         }
 
         #endregion
