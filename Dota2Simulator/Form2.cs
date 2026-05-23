@@ -58,7 +58,8 @@ namespace Dota2Simulator
 #if DOTA2
             // 经入站端口 GameSession 分发（取代直调 Common.HeroLoopHost!.根据当前英雄增强）。
             // HeroAttribute.Strength 此处是占位——fallback 路径只用 hero.Name。
-            await _app!.GameSession.DispatchAsync(
+            // Phase 11 P5: GameSession 在 BindUi 内 new, 用 ! 断言 (BindUi 由 Form2 sub ctor 调, Hook_KeyDown 触发于 form 已展示后, GameSession 必非 null).
+            await _app!.GameSession!.DispatchAsync(
                 new HeroId(tb_name.Text.Trim(), HeroAttribute.Strength),
                 new KeyTrigger(VirtualKey.From(e.KeyCode), ToKeyModifiers(e.Modifiers)));
 #endif
@@ -91,7 +92,8 @@ namespace Dota2Simulator
         private void Tb_name_TextChanged(object sender, EventArgs e)
         {
 #if DOTA2
-            Common.HeroLoopHost!.取消所有功能();
+            // Phase 11 P5: 切 _app.HeroLoopHost! (BindUi 已在 sub ctor 完成).
+            _app!.HeroLoopHost!.取消所有功能();
 #endif
         }
 
@@ -200,6 +202,8 @@ namespace Dota2Simulator
             // D1: 此时 InitializeComponent 已跑过（无参 base ctor 内），tb_* 字段可用——
             // 把 this 注给 AppContainer，让 BindUi 构造 Form2UiInvoker + set Common.UiInvoker。
             _app.BindUi(this);
+            // Phase 11 P5: 原 StartListen 末调用迁此 (BindUi 后 HeroLoopHost 已 new), 初始化获取截图 避免一开始的黑色.
+            _app.HeroLoopHost!.获取图片_2();
         }
 #endif
 
@@ -279,9 +283,8 @@ namespace Dota2Simulator
 
             Location = new Point(338, 1060);
 
-#if DOTA2
-            Common.HeroLoopHost!.获取图片_2(); // 初始化获取截图 避免一开始的黑色
-#endif
+            // Phase 11 P5: 原 Common.HeroLoopHost!.获取图片_2() 调用迁到 Form2(AppContainer) ctor 内 BindUi 后
+            // (StartListen 由 base ctor Form2() 调, 此时 _app 仍 null, HeroLoopHost 也未 new).
         }
 
         /// <summary>

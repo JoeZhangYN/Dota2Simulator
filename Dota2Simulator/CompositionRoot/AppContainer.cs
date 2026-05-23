@@ -22,7 +22,8 @@ internal sealed class AppContainer
     public IScreenVision Vision { get; }
     public IUiInvoker? Ui { get; private set; }
     public HeroStrategyRegistry Registry { get; }
-    public GameSession GameSession { get; }
+    /// <summary>Phase 11 P5: GameSession 推迟到 BindUi (ctor 接 HeroLoopHost). Form2 经 _app.GameSession! 访问.</summary>
+    public GameSession? GameSession { get; private set; }
     public SessionState SessionState { get; }
     public HeroAggregate Aggregate { get; }
 
@@ -40,9 +41,7 @@ internal sealed class AppContainer
 
         Registry = new HeroStrategyRegistry(Input, Vision);
         SessionState = new SessionState();
-        // D2 双阶段：测试Strategy 需 IUiInvoker，Ui 要等 Form2 构造后 BindUi 才到位。
-        // 故 RegisterAll 推迟到 BindUi 内调；ctor 期 Registry.Count == 0。
-        GameSession = new GameSession(Registry, SessionState);
+        // Phase 11 P5: GameSession 推迟到 BindUi (ctor 接 HeroLoopHost, 后者依 Ui port).
     }
 
     /// <summary>
@@ -63,6 +62,8 @@ internal sealed class AppContainer
         item.BindHost(HeroLoopHost);
         // Phase 11 P4: SkillEngine 2 处反向 HeroLoopHost 经 BindHost setter 注入 (测试方法 / 捕捉颜色 的获取图片_2).
         skill.BindHost(HeroLoopHost);
+        // Phase 11 P5: GameSession ctor 接 HeroLoopHost (消 3 处 Common.HeroLoopHost! 直调).
+        GameSession = new GameSession(Registry, SessionState, HeroLoopHost);
         // Common.ItemEngine 保留 (P9 真删): Silt/Main.cs:29/34 仍 2 处反向 (Silt instance 化 P6 处理).
         Common.ItemEngine = item;
         // Common.HeroLoopHost 保留：Silt 子 BC 经 Common.HeroLoopHost.Ui 访问 UI

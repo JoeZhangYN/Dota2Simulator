@@ -25,14 +25,18 @@ public sealed class GameSession : IGameSession
 {
     private readonly HeroStrategyRegistry _registry;
     private readonly SessionState _sessionState;
+    private readonly HeroLoopHost _host;
 
     /// <summary>当前激活的英雄上下文；未激活或被 CancelAll 清空时为 null。</summary>
     private HeroContext? _current;
 
-    public GameSession(HeroStrategyRegistry registry, SessionState sessionState)
+    // Phase 11 P5: ctor 扩 HeroLoopHost (消 3 处 Common.HeroLoopHost! 直调).
+    // AppContainer 装配序调整: GameSession 推迟到 BindUi 内 new (HeroLoopHost new 后).
+    public GameSession(HeroStrategyRegistry registry, SessionState sessionState, HeroLoopHost host)
     {
         _registry = registry;
         _sessionState = sessionState;
+        _host = host;
     }
 
     /// <inheritdoc />
@@ -50,15 +54,15 @@ public sealed class GameSession : IGameSession
             // 策略路径（Wave 4 注册英雄后才会进入）。
             if (_current is null || _current.Hero != strategy.Hero)
             {
-                // 4.7 过渡：复用全局 Common.HeroLoopHost!._聚合，待后续 chunk 让每英雄独立聚合。
-                _current = new HeroContext(strategy.Hero, Common.HeroLoopHost!._聚合);
+                // 4.7 过渡：复用全局 _host._聚合，待后续 chunk 让每英雄独立聚合.
+                _current = new HeroContext(strategy.Hero, _host._聚合);
                 strategy.OnActivate(_current);
 
                 // 启动 Main 主循环（一般程序循环）。状态初始化() 内为 while(_总循环条件)
                 // 无限循环，不能 await（会阻塞 DispatchAsync 永不返回）——fire-and-forget。
                 // OnActivate 须已置位 _总循环条件，与旧 case 块 _总循环条件=true 先于
                 // 状态初始化() 调用的顺序一致。
-                _ = Common.HeroLoopHost!.状态初始化();
+                _ = _host.状态初始化();
 
                 // Phase 10B B4: 按英雄预加载 SG hint 字典提示的图片资源, fire-and-forget 不阻塞主流程.
                 // 异常仅 log + 不抛 (与 LazyImageLoader.LoadImageCore 容错风格一致).
@@ -86,7 +90,7 @@ public sealed class GameSession : IGameSession
     public void CancelAll()
     {
         _current = null;
-        Common.HeroLoopHost!.取消所有功能();
+        _host.取消所有功能();
     }
 }
 
