@@ -34,6 +34,12 @@ namespace Dota2Simulator.Games
         /// Phase 8 C5 过渡 service locator：Item facade thin 转发壳调本字段。同 SkillEngine 模式。
         /// </summary>
         public static ItemEngine? ItemEngine;
+
+        /// <summary>
+        /// Phase 9 C 过渡 service locator：Main facade thin 转发壳调本字段。
+        /// AppContainer.BindUi 装配。D 阶段 92 策略 ctor 扩参 HeroLoopHost 后，F 删本字段 + 删 Main facade。
+        /// </summary>
+        public static HeroLoopHost? HeroLoopHost;
         #endregion
 
         #region 延时
