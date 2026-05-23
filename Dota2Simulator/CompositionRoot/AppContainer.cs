@@ -54,10 +54,13 @@ internal sealed class AppContainer
         Ui = new Form2UiInvoker(form);
         // SkillEngine 先 new（ItemEngine ctor 接 SkillEngine；HeroLoopHost ctor 接两者）。
         var skill = new SkillEngine(Input, Vision, Ui, Aggregate);
-        var item = new ItemEngine(Input, Vision, Ui, Aggregate, skill);
+        // Phase 11 P3: ItemEngine ctor 扩 SessionState (Esc 暂停经 _session.IsPaused 直调).
+        var item = new ItemEngine(Input, Vision, Ui, Aggregate, skill, SessionState);
         // Phase 11 P2: setter 注入消反向 service locator——SkillEngine 内 2 处 Common.ItemEngine!.要求保持假腿() 改 _item!.要求保持假腿().
         skill.BindItem(item);
         HeroLoopHost = new HeroLoopHost(Input, Vision, Ui, Aggregate, SessionState, skill, item);
+        // Phase 11 P3: ItemEngine 4 处反向 HeroLoopHost 经 BindHost setter 注入 (取消所有功能 / 按键匹配条件更新 / 获取图片_2).
+        item.BindHost(HeroLoopHost);
         // Common.ItemEngine 保留 (P9 真删): Silt/Main.cs:29/34 仍 2 处反向 (Silt instance 化 P6 处理).
         Common.ItemEngine = item;
         // Common.HeroLoopHost 保留：Silt 子 BC 经 Common.HeroLoopHost.Ui 访问 UI
