@@ -398,6 +398,7 @@
 
   <ItemGroup>
     <AdditionalFiles Include="Picture_Dota2\**\*.bmp" />
+    <AdditionalFiles Include="GameAutomation\Heroes\**\*Strategy.cs" />
   </ItemGroup>
 
 </Project>
