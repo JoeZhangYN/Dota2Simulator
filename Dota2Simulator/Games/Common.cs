@@ -16,15 +16,10 @@ namespace Dota2Simulator.Games
         public static readonly Logger Main_Logger = LogManager.GetCurrentClassLogger();
 
         /// <summary>
-        ///     调用UI页面元素
-        /// </summary>
-        public static Form2? Main_Form = Form2.Instance;
-
-        /// <summary>
-        /// Phase 7 D1 引入：BC 内 static class（Games.Dota2 / Silt）的 IUiInvoker 入口。
+        /// BC 内 static class（Games.Dota2 / Silt）的 IUiInvoker 入口。
         /// 由 AppContainer.BindUi 在 Form2 构造完成后赋值。LOL/HF2 路径不创建 AppContainer，
         /// 此字段保持 null——但 BC 业务在 #if DOTA2 / #if Silt 编译开关下也不会被调用。
-        /// D5 评估：BC 整顿完成后此 service locator 可替换为 ctor 注入。
+        /// 后续 BC 整顿完成后此 service locator 可替换为 ctor 注入。
         /// </summary>
         public static IUiInvoker? UiInvoker;
         #endregion

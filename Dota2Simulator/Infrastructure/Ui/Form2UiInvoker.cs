@@ -5,8 +5,8 @@ using Dota2Simulator.GameAutomation.Ports;
 namespace Dota2Simulator.Ui.Adapters;
 
 /// <summary>
-/// IUiInvoker adapter：封装 Form2 单例的线程切换 + 6 个 TextBox 字段读写。
-/// 持 Form2 引用——同 Form2.Instance 单例等价（D5 删 Form2.Instance 后此处仍持构造期注入的引用）。
+/// IUiInvoker adapter：封装 Form2 实例的线程切换 + 6 个 TextBox 字段读写。
+/// 由 AppContainer.BindUi 在 Form2(container) 构造完成后实例化，持构造期注入的引用。
 /// </summary>
 internal sealed class Form2UiInvoker : IUiInvoker
 {

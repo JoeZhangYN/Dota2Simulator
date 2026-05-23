@@ -18,13 +18,6 @@ namespace Dota2Simulator
 {
     internal partial class Form2 : Form
     {
-        #region 页面单例调用UI线程
-        // 单例模式 传递Form,调用UI线程更新
-        // TODO-Phase7: Common.Main_Form?.Invoke 13 站点切 IUiInvoker port 后此单例可删
-        private static Form2? _instance;
-        public static Form2 Instance => _instance ?? throw new InvalidOperationException("Form2未初始化");
-        #endregion
-
 #if DOTA2
         #region 组合根注入
         /// <summary>Phase 6 AppContainer 注入入口 — DOTA2 构建专属。LOL/HF2 走无参构造器。</summary>
@@ -189,8 +182,6 @@ namespace Dota2Simulator
         {
             InitializeComponent();
 
-            _instance = this;
-
             StartListen();
         }
 
@@ -216,7 +207,6 @@ namespace Dota2Simulator
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
             StopListen();
-            _instance = null;
         }
 
         /// <summary>
