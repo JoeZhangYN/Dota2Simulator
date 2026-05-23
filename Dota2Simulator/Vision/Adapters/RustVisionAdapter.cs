@@ -64,4 +64,24 @@ public sealed class RustVisionAdapter : IScreenVision
     /// <summary>读取当前帧指定屏幕坐标的颜色（内部按坐标偏移换算到缓冲坐标）。</summary>
     public Color PixelAt(ScreenPoint point)
         => GlobalScreenCapture.GetColor(point.X, point.Y);
+
+    /// <summary>区域内查找模板（屏幕坐标，1920×1080）。封装 ImageFinder.FindImageInRegionBool。</summary>
+    public bool FindInRegion(Template needle, ScreenRegion region, MatchRate rate)
+    {
+        ImageHandle needleHandle = LazyImageLoader.GetImage(needle.Name);
+        ImageHandle frame = GlobalScreenCapture.GetCurrentHandle();
+        if (!needleHandle.IsValid || !frame.IsValid)
+            return false;
+
+        Rectangle rect = new(region.X, region.Y, region.Width, region.Height);
+        return ImageFinder.FindImageInRegionBool(in needleHandle, in frame, rect, rate.Value);
+    }
+
+    /// <summary>
+    /// 获取三缓冲读缓冲区当前帧句柄，供 ConditionDelegateBitmap 委托链路使用。
+    /// Phase 6 临时方法 — Phase 7+ 改委托签名后移除。
+    /// </summary>
+#pragma warning disable CS0618 // 实现仍允许调本接口已废弃方法
+    public ImageHandle GetCurrentFrame() => GlobalScreenCapture.GetCurrentHandle();
+#pragma warning restore CS0618
 }

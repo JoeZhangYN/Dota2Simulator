@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using Dota2Simulator.GameAutomation.Domain.Perception;
 using Dota2Simulator.GameAutomation.Ports;
+using Dota2Simulator.Vision;
 
 namespace Dota2Simulator.Diagnostics;
 
@@ -46,4 +47,16 @@ public sealed class ProbeScreenVision : IScreenVision
             RecordReplayProbe.Record(Port, nameof(PixelAt), $"{point} => {result}");
         return result;
     }
+
+    public bool FindInRegion(Template needle, ScreenRegion region, MatchRate rate)
+    {
+        bool result = _inner.FindInRegion(needle, region, rate);
+        if (RecordReplayProbe.Enabled)
+            RecordReplayProbe.Record(Port, nameof(FindInRegion), $"{needle}, {region}, {rate} => {result}");
+        return result;
+    }
+
+#pragma warning disable CS0618 // 装饰器须实现接口已废弃方法
+    public ImageHandle GetCurrentFrame() => _inner.GetCurrentFrame();
+#pragma warning restore CS0618
 }

@@ -13,6 +13,12 @@ public interface IInputExecutor
     /// <summary>按下并释放一个键。</summary>
     void Press(VirtualKey key);
 
+    /// <summary>
+    /// 经 SimEnigo 后端按下并释放一个键（simengio.dll）。
+    /// 仅供需要 Enigo 后端行为的策略类使用（如进化岛），不要与 <see cref="Press"/> 混用——两者驱动栈不同。
+    /// </summary>
+    void PressViaEnigo(VirtualKey key);
+
     /// <summary>按下一个键（不释放）。</summary>
     void KeyDown(VirtualKey key);
 

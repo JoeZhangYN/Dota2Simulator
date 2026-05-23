@@ -21,6 +21,12 @@ public sealed class ProbeInputExecutor : IInputExecutor
         _inner.Press(key);
     }
 
+    public void PressViaEnigo(VirtualKey key)
+    {
+        if (RecordReplayProbe.Enabled) RecordReplayProbe.Record(Port, nameof(PressViaEnigo), key.ToString());
+        _inner.PressViaEnigo(key);
+    }
+
     public void KeyDown(VirtualKey key)
     {
         if (RecordReplayProbe.Enabled) RecordReplayProbe.Record(Port, nameof(KeyDown), key.ToString());

@@ -1,6 +1,8 @@
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using Dota2Simulator.GameAutomation.Domain.Perception;
+using Dota2Simulator.Vision;
 
 namespace Dota2Simulator.GameAutomation.Ports;
 
@@ -21,4 +23,17 @@ public interface IScreenVision
 
     /// <summary>读取当前缓冲中指定屏幕坐标的颜色。</summary>
     Color PixelAt(ScreenPoint point);
+
+    /// <summary>在指定屏幕区域内查找模板，命中返回 true。区域坐标 = 1920×1080 桌面绝对坐标。</summary>
+    bool FindInRegion(Template needle, ScreenRegion region, MatchRate rate);
+
+    /// <summary>
+    /// 获取当前帧的 Vision 内部句柄，供 ConditionDelegateBitmap 委托链路使用。
+    /// </summary>
+    /// <remarks>
+    /// Phase 6 临时妥协：ConditionDelegateBitmap 委托签名当前接收 <see cref="Vision.ImageHandle"/>，
+    /// 让 Port 边界泄漏 Vision 内部类型。Phase 7+ 把委托签名改为接收 IScreenVision 自身后移除。
+    /// </remarks>
+    [Obsolete("Phase 7+ 改 ConditionDelegateBitmap 签名后移除；新代码应直接调 Capture / Find / FindInRegion。", error: false)]
+    ImageHandle GetCurrentFrame();
 }

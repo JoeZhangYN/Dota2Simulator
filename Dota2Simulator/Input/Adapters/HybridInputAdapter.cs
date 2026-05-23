@@ -15,6 +15,8 @@ public sealed class HybridInputAdapter : IInputExecutor
 {
     public void Press(VirtualKey key) => InterceptionInput.KeyPress(key.ToNative());
 
+    public void PressViaEnigo(VirtualKey key) => SimEnigo.KeyPress((WinFormsKeys)key.ToNative());
+
     public void KeyDown(VirtualKey key) => InterceptionInput.KeyDown(key.ToNative());
 
     public void KeyUp(VirtualKey key) => InterceptionInput.KeyUp(key.ToNative());
