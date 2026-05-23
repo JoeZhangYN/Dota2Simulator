@@ -16,7 +16,7 @@ namespace Dota2Simulator.Games.HF2
         /// </summary>
         /// <param name="name"></param>
         /// <param name="e"></param>
-        public static async Task 根据当前英雄增强(string name, in KeyEventArgs e)
+        public static async Task 根据当前英雄增强(string name, KeyEventArgs e)
         {
             switch (name)
             {
