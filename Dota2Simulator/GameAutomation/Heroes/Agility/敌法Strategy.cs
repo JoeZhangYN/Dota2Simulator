@@ -7,14 +7,26 @@ using Dota2Simulator.GameAutomation.Domain.Heroes;
 using Dota2Simulator.GameAutomation.Domain.Loop;
 using Dota2Simulator.Games;
 using Dota2Simulator.Games.Dota2;
-using Dota2Simulator.KeyboardMouse;
 using Dota2Simulator.Vision;
+
+using Dota2Simulator.GameAutomation.Ports;
 
 namespace Dota2Simulator.GameAutomation.Heroes.Agility;
 
 /// <summary>敌法（敏捷）策略——迁移自 Main.根据当前英雄增强 的 case "敌法"。</summary>
 public sealed class 敌法Strategy : IHeroStrategy
 {
+
+    private readonly IInputExecutor _input;
+#pragma warning disable IDE0052
+    private readonly IScreenVision _vision;
+#pragma warning restore IDE0052
+
+    public 敌法Strategy(IInputExecutor input, IScreenVision vision)
+    {
+        _input = input;
+        _vision = vision;
+    }
     public HeroId Hero => new("敌法", HeroAttribute.Agility);
 
     public void OnActivate(HeroContext ctx)
@@ -64,7 +76,7 @@ public sealed class 敌法Strategy : IHeroStrategy
         }
     }
 
-    private static async Task<bool> 闪烁敏捷(ImageHandle 句柄)
+    private async Task<bool> 闪烁敏捷(ImageHandle 句柄)
     {
         return await Skill.主动技能释放后续(Keys.W, () =>
         {
@@ -80,28 +92,28 @@ public sealed class 敌法Strategy : IHeroStrategy
         }).ConfigureAwait(true);
     }
 
-    private static async Task<bool> 法力虚空取消后摇(ImageHandle 句柄)
+    private async Task<bool> 法力虚空取消后摇(ImageHandle 句柄)
     {
         return await Skill.技能通用判断(Keys.R, 1).ConfigureAwait(true);
     }
 
-    private static async Task<bool> 法术反制敏捷(ImageHandle 句柄)
+    private async Task<bool> 法术反制敏捷(ImageHandle 句柄)
     {
         return await Skill.技能通用判断(Keys.E, 10).ConfigureAwait(true);
     }
 
-    private static async Task<bool> 友军法术反制敏捷(ImageHandle 句柄)
+    private async Task<bool> 友军法术反制敏捷(ImageHandle 句柄)
     {
         return await Skill.技能通用判断(Keys.D, 10).ConfigureAwait(true);
     }
 
     /// <summary>因为有0.1秒的分裂时间，所以必须等待——复制自 Main.分身一齐攻击。</summary>
-    private static void 分身一齐攻击()
+    private void 分身一齐攻击()
     {
         Common.Delay(140);
-        SimKeyBoard.KeyDown(Keys.Control);
-        SimKeyBoard.KeyPress(Keys.A);
-        SimKeyBoard.KeyUp(Keys.Control);
+        _input.KeyDown(VirtualKey.From(Keys.Control));
+        _input.Press(VirtualKey.From(Keys.A));
+        _input.KeyUp(VirtualKey.From(Keys.Control));
     }
 }
 #endif

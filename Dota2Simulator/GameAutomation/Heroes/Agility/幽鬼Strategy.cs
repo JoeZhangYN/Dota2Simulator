@@ -7,14 +7,26 @@ using Dota2Simulator.GameAutomation.Domain.Heroes;
 using Dota2Simulator.GameAutomation.Domain.Loop;
 using Dota2Simulator.Games;
 using Dota2Simulator.Games.Dota2;
-using Dota2Simulator.KeyboardMouse;
 using Dota2Simulator.Vision;
+
+using Dota2Simulator.GameAutomation.Ports;
 
 namespace Dota2Simulator.GameAutomation.Heroes.Agility;
 
 /// <summary>幽鬼（敏捷）策略——迁移自 Main.根据当前英雄增强 的 case "幽鬼"。</summary>
 public sealed class 幽鬼Strategy : IHeroStrategy
 {
+
+    private readonly IInputExecutor _input;
+#pragma warning disable IDE0052
+    private readonly IScreenVision _vision;
+#pragma warning restore IDE0052
+
+    public 幽鬼Strategy(IInputExecutor input, IScreenVision vision)
+    {
+        _input = input;
+        _vision = vision;
+    }
     public HeroId Hero => new("幽鬼", HeroAttribute.Agility);
 
     public void OnActivate(HeroContext ctx)
@@ -62,23 +74,23 @@ public sealed class 幽鬼Strategy : IHeroStrategy
         }
     }
 
-    private static async Task<bool> 幽鬼之刃去后摇(ImageHandle 句柄)
+    private async Task<bool> 幽鬼之刃去后摇(ImageHandle 句柄)
     {
         return await Skill.技能通用判断(Keys.Q, 1, false).ConfigureAwait(true);
     }
 
-    private static async Task<bool> 如影随形去后摇(ImageHandle 句柄)
+    private async Task<bool> 如影随形去后摇(ImageHandle 句柄)
     {
         return await Skill.主动技能释放后续(Keys.R, () =>
         {
             if (Main._聚合.Skills.Mode(SlotKey.F) == 1)
             {
-                SimKeyBoard.KeyPress(Keys.D);
+                _input.Press(VirtualKey.From(Keys.D));
             }
         }).ConfigureAwait(true);
     }
 
-    private static async Task<bool> 空降去后摇(ImageHandle 句柄)
+    private async Task<bool> 空降去后摇(ImageHandle 句柄)
     {
         return await Skill.主动技能进入CD后续(Keys.D, () =>
         {
@@ -96,22 +108,22 @@ public sealed class 幽鬼Strategy : IHeroStrategy
 
             Item.要求保持假腿();
 
-            SimKeyBoard.KeyPress(Keys.A);
+            _input.Press(VirtualKey.From(Keys.A));
         }).ConfigureAwait(true);
     }
 
-    private static async Task<bool> 折射去后摇(ImageHandle 句柄)
+    private async Task<bool> 折射去后摇(ImageHandle 句柄)
     {
         return await Skill.技能通用判断(Keys.E, 0).ConfigureAwait(true);
     }
 
     /// <summary>因为有0.1秒的分裂时间，所以必须等待——复制自 Main.分身一齐攻击。</summary>
-    private static void 分身一齐攻击()
+    private void 分身一齐攻击()
     {
         Common.Delay(140);
-        SimKeyBoard.KeyDown(Keys.Control);
-        SimKeyBoard.KeyPress(Keys.A);
-        SimKeyBoard.KeyUp(Keys.Control);
+        _input.KeyDown(VirtualKey.From(Keys.Control));
+        _input.Press(VirtualKey.From(Keys.A));
+        _input.KeyUp(VirtualKey.From(Keys.Control));
     }
 }
 #endif

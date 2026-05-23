@@ -7,14 +7,27 @@ using Dota2Simulator.GameAutomation.Domain.Actuation;
 using Dota2Simulator.GameAutomation.Domain.Heroes;
 using Dota2Simulator.Games;
 using Dota2Simulator.Games.Dota2;
-using Dota2Simulator.KeyboardMouse;
 using Dota2Simulator.Vision;
 
+using Dota2Simulator.GameAutomation.Ports;
+
+using Dota2Simulator.GameAutomation.Domain.Perception;
 namespace Dota2Simulator.GameAutomation.Heroes.Agility;
 
 /// <summary>血魔（敏捷）策略——迁移自 Main.根据当前英雄增强 的 case "血魔"。</summary>
 public sealed class 血魔Strategy : IHeroStrategy
 {
+
+    private readonly IInputExecutor _input;
+#pragma warning disable IDE0052
+    private readonly IScreenVision _vision;
+#pragma warning restore IDE0052
+
+    public 血魔Strategy(IInputExecutor input, IScreenVision vision)
+    {
+        _input = input;
+        _vision = vision;
+    }
     public HeroId Hero => new("血魔", HeroAttribute.Agility);
 
     public void OnActivate(HeroContext ctx)
@@ -61,31 +74,31 @@ public sealed class 血魔Strategy : IHeroStrategy
         return result;
     }
 
-    private static async Task<bool> 血祭去后摇(ImageHandle 句柄)
+    private async Task<bool> 血祭去后摇(ImageHandle 句柄)
     {
         return await Skill.主动技能释放后续(Keys.W, () =>
         {
-            SimKeyBoard.MouseRightClick();
-            SimKeyBoard.KeyPress(Keys.A);
+            _input.MouseClick(MouseButton.Right);
+            _input.Press(VirtualKey.From(Keys.A));
 
             Item.要求保持假腿();
 
             Common.Delay(2400);
             Point p = Control.MousePosition;
-            SimKeyBoard.MouseMove(601, 988);
+            _input.MouseMoveTo(new ScreenPoint(601, 988));
             if (Skill.DOTA2释放CD就绪技能(Keys.Q, in 句柄))
             {
-                SimKeyBoard.MouseMove(p);
+                _input.MouseMoveTo(new ScreenPoint(p.X, p.Y));
             }
         }).ConfigureAwait(true);
     }
 
-    private static async Task<bool> 割裂去后摇(ImageHandle 句柄)
+    private async Task<bool> 割裂去后摇(ImageHandle 句柄)
     {
         return await Skill.技能通用判断(Keys.R, 1).ConfigureAwait(true);
     }
 
-    private static async Task<bool> 血怒去后摇(ImageHandle 句柄)
+    private async Task<bool> 血怒去后摇(ImageHandle 句柄)
     {
         return await Skill.技能通用判断(Keys.Q, 0).ConfigureAwait(true);
     }

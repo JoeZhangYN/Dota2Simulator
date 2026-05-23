@@ -6,14 +6,26 @@ using Dota2Simulator.GameAutomation.Domain.Actuation;
 using Dota2Simulator.GameAutomation.Domain.Heroes;
 using Dota2Simulator.Games;
 using Dota2Simulator.Games.Dota2;
-using Dota2Simulator.KeyboardMouse;
 using Dota2Simulator.Vision;
+
+using Dota2Simulator.GameAutomation.Ports;
 
 namespace Dota2Simulator.GameAutomation.Heroes.Agility;
 
 /// <summary>猴子（敏捷）策略——迁移自 Main.根据当前英雄增强 的 case "猴子"。</summary>
 public sealed class 猴子Strategy : IHeroStrategy
 {
+
+    private readonly IInputExecutor _input;
+#pragma warning disable IDE0052
+    private readonly IScreenVision _vision;
+#pragma warning restore IDE0052
+
+    public 猴子Strategy(IInputExecutor input, IScreenVision vision)
+    {
+        _input = input;
+        _vision = vision;
+    }
     public HeroId Hero => new("猴子", HeroAttribute.Agility);
 
     public void OnActivate(HeroContext ctx)
@@ -34,7 +46,7 @@ public sealed class 猴子Strategy : IHeroStrategy
         {
             if (!Skill.DOTA2判断状态技能是否启动(Keys.E, GlobalScreenCapture.GetCurrentHandle()))
             {
-                SimKeyBoard.KeyPress(Keys.E);
+                _input.Press(VirtualKey.From(Keys.E));
             }
 
             Main._聚合.Conditions[ConditionSlotKey.C1].Active = true;
@@ -43,7 +55,7 @@ public sealed class 猴子Strategy : IHeroStrategy
         {
             if (!Skill.DOTA2判断状态技能是否启动(Keys.E, GlobalScreenCapture.GetCurrentHandle()))
             {
-                SimKeyBoard.KeyPress(Keys.E);
+                _input.Press(VirtualKey.From(Keys.E));
             }
 
             Main._聚合.Conditions[ConditionSlotKey.C2].Active = true;
@@ -52,25 +64,25 @@ public sealed class 猴子Strategy : IHeroStrategy
         {
             if (!Skill.DOTA2判断状态技能是否启动(Keys.E, GlobalScreenCapture.GetCurrentHandle()))
             {
-                SimKeyBoard.KeyPress(Keys.E);
+                _input.Press(VirtualKey.From(Keys.E));
             }
         }
     }
 
-    private static async Task<bool> 灵魂之矛敏捷(ImageHandle 句柄)
+    private async Task<bool> 灵魂之矛敏捷(ImageHandle 句柄)
     {
         return await Skill.技能通用判断(Keys.Q, 1).ConfigureAwait(true);
     }
 
-    private static async Task<bool> 神行百变选择幻象(ImageHandle 句柄)
+    private async Task<bool> 神行百变选择幻象(ImageHandle 句柄)
     {
         return await Skill.主动技能释放后续(Keys.W, () =>
         {
             Common.Delay(1000);
-            SimKeyBoard.KeyPress(Keys.D1);
+            _input.Press(VirtualKey.From(Keys.D1));
             Common.Delay(33);
-            SimKeyBoard.MouseRightClick();
-            SimKeyBoard.KeyPress(Keys.F1);
+            _input.MouseClick(MouseButton.Right);
+            _input.Press(VirtualKey.From(Keys.F1));
             Item.要求保持假腿();
         }).ConfigureAwait(true);
     }

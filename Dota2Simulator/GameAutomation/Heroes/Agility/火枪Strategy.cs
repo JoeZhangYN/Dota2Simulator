@@ -7,11 +7,24 @@ using Dota2Simulator.GameAutomation.Domain.Heroes;
 using Dota2Simulator.Games.Dota2;
 using Dota2Simulator.Vision;
 
+using Dota2Simulator.GameAutomation.Ports;
+
 namespace Dota2Simulator.GameAutomation.Heroes.Agility;
 
 /// <summary>火枪（敏捷）策略——迁移自 Main.根据当前英雄增强 的 case "火枪"。</summary>
 public sealed class 火枪Strategy : IHeroStrategy
 {
+
+    private readonly IInputExecutor _input;
+#pragma warning disable IDE0052
+    private readonly IScreenVision _vision;
+#pragma warning restore IDE0052
+
+    public 火枪Strategy(IInputExecutor input, IScreenVision vision)
+    {
+        _input = input;
+        _vision = vision;
+    }
     public HeroId Hero => new("火枪", HeroAttribute.Agility);
 
     public void OnActivate(HeroContext ctx)

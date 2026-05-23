@@ -8,14 +8,26 @@ using Dota2Simulator.GameAutomation.Domain.Heroes;
 using Dota2Simulator.GameAutomation.Domain.Loop;
 using Dota2Simulator.Games;
 using Dota2Simulator.Games.Dota2;
-using Dota2Simulator.KeyboardMouse;
 using Dota2Simulator.Vision;
+
+using Dota2Simulator.GameAutomation.Ports;
 
 namespace Dota2Simulator.GameAutomation.Heroes.Agility;
 
 /// <summary>小黑（敏捷）策略——迁移自 Main.根据当前英雄增强 的 case "小黑"。</summary>
 public sealed class 小黑Strategy : IHeroStrategy
 {
+
+    private readonly IInputExecutor _input;
+#pragma warning disable IDE0052
+    private readonly IScreenVision _vision;
+#pragma warning restore IDE0052
+
+    public 小黑Strategy(IInputExecutor input, IScreenVision vision)
+    {
+        _input = input;
+        _vision = vision;
+    }
     public HeroId Hero => new("小黑", HeroAttribute.Agility);
 
     public void OnActivate(HeroContext ctx)
@@ -78,7 +90,7 @@ public sealed class 小黑Strategy : IHeroStrategy
         }
     }
 
-    private static async Task<bool> 狂风去后摇(ImageHandle 句柄)
+    private async Task<bool> 狂风去后摇(ImageHandle 句柄)
     {
         return await Skill.主动技能释放后续(Keys.W, () =>
         {
@@ -91,12 +103,12 @@ public sealed class 小黑Strategy : IHeroStrategy
         }).ConfigureAwait(true);
     }
 
-    private static async Task<bool> 数箭齐发去后摇(ImageHandle 句柄)
+    private async Task<bool> 数箭齐发去后摇(ImageHandle 句柄)
     {
         return await Skill.主动技能进入CD后续(Keys.E, () =>
         {
             Common.Delay(Main._聚合.Skills.Mode(SlotKey.E) == 1 ? 2600 : 1300);
-            SimKeyBoard.KeyPress(Keys.S);
+            _input.Press(VirtualKey.From(Keys.S));
             Skill.通用技能后续动作();
 
             if (Main._聚合.Skills.Mode(SlotKey.Global) == 1)
@@ -106,7 +118,7 @@ public sealed class 小黑Strategy : IHeroStrategy
         }).ConfigureAwait(true);
     }
 
-    private static async Task<bool> 冰川去后摇(ImageHandle 句柄)
+    private async Task<bool> 冰川去后摇(ImageHandle 句柄)
     {
         return await Skill.主动技能进入CD后续(Keys.F, () =>
         {

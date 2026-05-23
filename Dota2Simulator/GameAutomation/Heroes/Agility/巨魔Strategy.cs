@@ -7,11 +7,24 @@ using Dota2Simulator.GameAutomation.Domain.Heroes;
 using Dota2Simulator.Games.Dota2;
 using Dota2Simulator.Vision;
 
+using Dota2Simulator.GameAutomation.Ports;
+
 namespace Dota2Simulator.GameAutomation.Heroes.Agility;
 
 /// <summary>巨魔（敏捷）策略——迁移自 Main.根据当前英雄增强 的 case "巨魔"。</summary>
 public sealed class 巨魔Strategy : IHeroStrategy
 {
+
+    private readonly IInputExecutor _input;
+#pragma warning disable IDE0052
+    private readonly IScreenVision _vision;
+#pragma warning restore IDE0052
+
+    public 巨魔Strategy(IInputExecutor input, IScreenVision vision)
+    {
+        _input = input;
+        _vision = vision;
+    }
     public HeroId Hero => new("巨魔", HeroAttribute.Agility);
 
     public void OnActivate(HeroContext ctx)

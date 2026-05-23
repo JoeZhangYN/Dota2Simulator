@@ -8,8 +8,9 @@ using Dota2Simulator.GameAutomation.Domain.Heroes;
 using Dota2Simulator.GameAutomation.Domain.Loop;
 using Dota2Simulator.Games;
 using Dota2Simulator.Games.Dota2;
-using Dota2Simulator.KeyboardMouse;
 using Dota2Simulator.Vision;
+
+using Dota2Simulator.GameAutomation.Ports;
 
 namespace Dota2Simulator.GameAutomation.Heroes.Agility;
 
@@ -19,6 +20,17 @@ public sealed class 火猫Strategy : IHeroStrategy
     /// <summary>1080p 增益状态栏区域——内联自 Main.buff状态技能栏。</summary>
     private static readonly Rectangle buff状态技能栏 = new(962, 826, 526, 80);
 
+
+    private readonly IInputExecutor _input;
+#pragma warning disable IDE0052
+    private readonly IScreenVision _vision;
+#pragma warning restore IDE0052
+
+    public 火猫Strategy(IInputExecutor input, IScreenVision vision)
+    {
+        _input = input;
+        _vision = vision;
+    }
     public HeroId Hero => new("火猫", HeroAttribute.Agility);
 
     public void OnActivate(HeroContext ctx)
@@ -64,7 +76,7 @@ public sealed class 火猫Strategy : IHeroStrategy
         }
     }
 
-    private static async Task<bool> 无影拳后续处理(ImageHandle 句柄)
+    private async Task<bool> 无影拳后续处理(ImageHandle 句柄)
     {
         bool b = ImageFinder.FindImageInRegionBool(Dota2_Pictrue.Buff.火猫_无影拳, in 句柄, buff状态技能栏);
 
@@ -72,28 +84,28 @@ public sealed class 火猫Strategy : IHeroStrategy
         {
             if (Main._聚合.Skills.Mode(SlotKey.W) == 1)
             {
-                SimKeyBoard.KeyPress(Keys.Q);
+                _input.Press(VirtualKey.From(Keys.Q));
             }
 
             Item.要求保持假腿();
 
-            SimKeyBoard.KeyPress(Keys.A);
+            _input.Press(VirtualKey.From(Keys.A));
         }
 
         return await Task.FromResult(!b).ConfigureAwait(true);
     }
 
-    private static async Task<bool> 炎阳索去后摇(ImageHandle 句柄)
+    private async Task<bool> 炎阳索去后摇(ImageHandle 句柄)
     {
         return await Skill.技能通用判断(Keys.Q, 0).ConfigureAwait(true);
     }
 
-    private static async Task<bool> 烈火罩去后摇(ImageHandle 句柄)
+    private async Task<bool> 烈火罩去后摇(ImageHandle 句柄)
     {
         return await Skill.技能通用判断(Keys.E, 0).ConfigureAwait(true);
     }
 
-    private static async Task<bool> 激活残焰去后摇(ImageHandle 句柄)
+    private async Task<bool> 激活残焰去后摇(ImageHandle 句柄)
     {
         return await Skill.技能通用判断(Keys.D, 1).ConfigureAwait(true);
     }

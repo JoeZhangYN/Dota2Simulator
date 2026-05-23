@@ -7,14 +7,26 @@ using Dota2Simulator.GameAutomation.Domain.Heroes;
 using Dota2Simulator.GameAutomation.Domain.Loop;
 using Dota2Simulator.Games;
 using Dota2Simulator.Games.Dota2;
-using Dota2Simulator.KeyboardMouse;
 using Dota2Simulator.Vision;
+
+using Dota2Simulator.GameAutomation.Ports;
 
 namespace Dota2Simulator.GameAutomation.Heroes.Agility;
 
 /// <summary>小骷髅（敏捷）策略——迁移自 Main.根据当前英雄增强 的 case "小骷髅"。</summary>
 public sealed class 小骷髅Strategy : IHeroStrategy
 {
+
+    private readonly IInputExecutor _input;
+#pragma warning disable IDE0052
+    private readonly IScreenVision _vision;
+#pragma warning restore IDE0052
+
+    public 小骷髅Strategy(IInputExecutor input, IScreenVision vision)
+    {
+        _input = input;
+        _vision = vision;
+    }
     public HeroId Hero => new("小骷髅", HeroAttribute.Agility);
 
     public void OnActivate(HeroContext ctx)
@@ -91,7 +103,7 @@ public sealed class 小骷髅Strategy : IHeroStrategy
         }
     }
 
-    private static async Task<bool> 扫射去后摇(ImageHandle 句柄)
+    private async Task<bool> 扫射去后摇(ImageHandle 句柄)
     {
         return await Skill.主动技能进入CD后续(Keys.Q, () =>
         {
@@ -111,7 +123,7 @@ public sealed class 小骷髅Strategy : IHeroStrategy
         }).ConfigureAwait(true);
     }
 
-    private static async Task<bool> 焦油去后摇(ImageHandle 句柄)
+    private async Task<bool> 焦油去后摇(ImageHandle 句柄)
     {
         return await Skill.主动技能进入CD后续(Keys.W, () =>
         {
@@ -120,17 +132,17 @@ public sealed class 小骷髅Strategy : IHeroStrategy
         }).ConfigureAwait(true);
     }
 
-    private static async Task<bool> 死亡契约去后摇(ImageHandle 句柄)
+    private async Task<bool> 死亡契约去后摇(ImageHandle 句柄)
     {
-        return await Skill.主动技能释放后续(Keys.E, SimKeyBoard.MouseRightClick).ConfigureAwait(true);
+        return await Skill.主动技能释放后续(Keys.E, () => _input.MouseClick(MouseButton.Right)).ConfigureAwait(true);
     }
 
-    private static async Task<bool> 骨隐步去后摇(ImageHandle 句柄)
+    private async Task<bool> 骨隐步去后摇(ImageHandle 句柄)
     {
-        return await Skill.主动技能进入CD后续(Keys.R, SimKeyBoard.MouseRightClick).ConfigureAwait(true);
+        return await Skill.主动技能进入CD后续(Keys.R, () => _input.MouseClick(MouseButton.Right)).ConfigureAwait(true);
     }
 
-    private static async Task<bool> 炽烈火雨去后摇(ImageHandle 句柄)
+    private async Task<bool> 炽烈火雨去后摇(ImageHandle 句柄)
     {
         return await Skill.主动技能释放后续(Keys.F, () =>
         {
@@ -138,12 +150,12 @@ public sealed class 小骷髅Strategy : IHeroStrategy
             if (Main._聚合.Skills.Mode(SlotKey.F) == 1)
             {
                 Common.Delay(0);
-                SimKeyBoard.KeyPress(Keys.R);
+                _input.Press(VirtualKey.From(Keys.R));
             }
         }).ConfigureAwait(true);
     }
 
-    private static async Task<bool> 骷髅之军去后摇(ImageHandle 句柄)
+    private async Task<bool> 骷髅之军去后摇(ImageHandle 句柄)
     {
         return await Skill.技能通用判断(Keys.F, 0).ConfigureAwait(true);
     }

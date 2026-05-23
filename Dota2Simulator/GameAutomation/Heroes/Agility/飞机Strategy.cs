@@ -7,14 +7,26 @@ using Dota2Simulator.GameAutomation.Domain.Heroes;
 using Dota2Simulator.GameAutomation.Domain.Loop;
 using Dota2Simulator.Games;
 using Dota2Simulator.Games.Dota2;
-using Dota2Simulator.KeyboardMouse;
 using Dota2Simulator.Vision;
+
+using Dota2Simulator.GameAutomation.Ports;
 
 namespace Dota2Simulator.GameAutomation.Heroes.Agility;
 
 /// <summary>飞机（敏捷）策略——迁移自 Main.根据当前英雄增强 的 case "飞机"。</summary>
 public sealed class 飞机Strategy : IHeroStrategy
 {
+
+    private readonly IInputExecutor _input;
+#pragma warning disable IDE0052
+    private readonly IScreenVision _vision;
+#pragma warning restore IDE0052
+
+    public 飞机Strategy(IInputExecutor input, IScreenVision vision)
+    {
+        _input = input;
+        _vision = vision;
+    }
     public HeroId Hero => new("飞机", HeroAttribute.Agility);
 
     public void OnActivate(HeroContext ctx)
@@ -54,32 +66,32 @@ public sealed class 飞机Strategy : IHeroStrategy
         }
     }
 
-    private static async Task<bool> 火箭弹幕敏捷(ImageHandle 句柄)
+    private async Task<bool> 火箭弹幕敏捷(ImageHandle 句柄)
     {
         return await Skill.技能通用判断(Keys.Q, 0).ConfigureAwait(true);
     }
 
-    private static async Task<bool> 追踪导弹敏捷(ImageHandle 句柄)
+    private async Task<bool> 追踪导弹敏捷(ImageHandle 句柄)
     {
         return await Skill.技能通用判断(Keys.W, 0).ConfigureAwait(true);
     }
 
-    private static async Task<bool> 高射火炮敏捷(ImageHandle 句柄)
+    private async Task<bool> 高射火炮敏捷(ImageHandle 句柄)
     {
         return await Skill.技能通用判断(Keys.E, 0).ConfigureAwait(true);
     }
 
-    private static async Task<bool> 召唤飞弹敏捷(ImageHandle 句柄)
+    private async Task<bool> 召唤飞弹敏捷(ImageHandle 句柄)
     {
         return await Skill.技能通用判断(Keys.R, 1).ConfigureAwait(true);
     }
 
-    private static async Task<bool> 循环火箭弹幕(ImageHandle 句柄)
+    private async Task<bool> 循环火箭弹幕(ImageHandle 句柄)
     {
         if (Common.获取当前时间毫秒() - Main._聚合.Skills.Time(SlotKey.Q) > 400)
             await Skill.主动技能已就绪后续(Keys.Q, () =>
             {
-                SimKeyBoard.KeyPress(Keys.Q);
+                _input.Press(VirtualKey.From(Keys.Q));
                 Main._聚合.Skills.SetTime(SlotKey.Q, Common.获取当前时间毫秒());
             }).ConfigureAwait(true);
 

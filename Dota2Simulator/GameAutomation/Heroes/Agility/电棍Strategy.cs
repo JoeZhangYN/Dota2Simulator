@@ -7,11 +7,24 @@ using Dota2Simulator.GameAutomation.Domain.Heroes;
 using Dota2Simulator.Games.Dota2;
 using Dota2Simulator.Vision;
 
+using Dota2Simulator.GameAutomation.Ports;
+
 namespace Dota2Simulator.GameAutomation.Heroes.Agility;
 
 /// <summary>电棍（敏捷）策略——迁移自 Main.根据当前英雄增强 的 case "电棍"。</summary>
 public sealed class 电棍Strategy : IHeroStrategy
 {
+
+    private readonly IInputExecutor _input;
+#pragma warning disable IDE0052
+    private readonly IScreenVision _vision;
+#pragma warning restore IDE0052
+
+    public 电棍Strategy(IInputExecutor input, IScreenVision vision)
+    {
+        _input = input;
+        _vision = vision;
+    }
     public HeroId Hero => new("电棍", HeroAttribute.Agility);
 
     public void OnActivate(HeroContext ctx)

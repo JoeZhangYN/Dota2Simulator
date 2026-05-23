@@ -7,11 +7,24 @@ using Dota2Simulator.GameAutomation.Domain.Heroes;
 using Dota2Simulator.Games.Dota2;
 using Dota2Simulator.Vision;
 
+using Dota2Simulator.GameAutomation.Ports;
+
 namespace Dota2Simulator.GameAutomation.Heroes.Agility;
 
 /// <summary>美杜莎（敏捷）策略——迁移自 Main.根据当前英雄增强 的 case "美杜莎"。</summary>
 public sealed class 美杜莎Strategy : IHeroStrategy
 {
+
+    private readonly IInputExecutor _input;
+#pragma warning disable IDE0052
+    private readonly IScreenVision _vision;
+#pragma warning restore IDE0052
+
+    public 美杜莎Strategy(IInputExecutor input, IScreenVision vision)
+    {
+        _input = input;
+        _vision = vision;
+    }
     public HeroId Hero => new("美杜莎", HeroAttribute.Agility);
 
     public void OnActivate(HeroContext ctx)

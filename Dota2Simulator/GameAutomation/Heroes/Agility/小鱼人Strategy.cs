@@ -6,14 +6,26 @@ using Dota2Simulator.GameAutomation.Domain.Actuation;
 using Dota2Simulator.GameAutomation.Domain.Heroes;
 using Dota2Simulator.Games;
 using Dota2Simulator.Games.Dota2;
-using Dota2Simulator.KeyboardMouse;
 using Dota2Simulator.Vision;
+
+using Dota2Simulator.GameAutomation.Ports;
 
 namespace Dota2Simulator.GameAutomation.Heroes.Agility;
 
 /// <summary>小鱼人（敏捷）策略——迁移自 Main.根据当前英雄增强 的 case "小鱼人"。</summary>
 public sealed class 小鱼人Strategy : IHeroStrategy
 {
+
+    private readonly IInputExecutor _input;
+#pragma warning disable IDE0052
+    private readonly IScreenVision _vision;
+#pragma warning restore IDE0052
+
+    public 小鱼人Strategy(IInputExecutor input, IScreenVision vision)
+    {
+        _input = input;
+        _vision = vision;
+    }
     public HeroId Hero => new("小鱼人", HeroAttribute.Agility);
 
     public void OnActivate(HeroContext ctx)
@@ -62,23 +74,23 @@ public sealed class 小鱼人Strategy : IHeroStrategy
         else if (key == VirtualKey.From(Keys.D2))
         {
             // 径直移动键位
-            SimKeyBoard.KeyDown(Keys.L);
+            _input.KeyDown(VirtualKey.From(Keys.L));
             Common.Delay(33);
-            SimKeyBoard.MouseRightClick();
+            _input.MouseClick(MouseButton.Right);
             Common.Delay(33);
-            SimKeyBoard.KeyUp(Keys.L);
+            _input.KeyUp(VirtualKey.From(Keys.L));
             // 基本上180°310  90°170 75°135 转身定点，配合A杖效果极佳
             Common.Delay(110);
-            SimKeyBoard.KeyPress(Keys.W);
+            _input.Press(VirtualKey.From(Keys.W));
         }
     }
 
-    private static async Task<bool> 黑暗契约去后摇(ImageHandle 句柄)
+    private async Task<bool> 黑暗契约去后摇(ImageHandle 句柄)
     {
         return await Skill.技能通用判断(Keys.Q, 0).ConfigureAwait(true);
     }
 
-    private static async Task<bool> 跳水去后摇(ImageHandle 句柄)
+    private async Task<bool> 跳水去后摇(ImageHandle 句柄)
     {
         _ = Task.Run(() =>
         {
@@ -90,12 +102,12 @@ public sealed class 小鱼人Strategy : IHeroStrategy
         return await Task.FromResult(false).ConfigureAwait(true);
     }
 
-    private static async Task<bool> 深海护罩去后摇(ImageHandle 句柄)
+    private async Task<bool> 深海护罩去后摇(ImageHandle 句柄)
     {
         return await Skill.技能通用判断(Keys.D, 0).ConfigureAwait(true);
     }
 
-    private static async Task<bool> 暗影之舞去后摇(ImageHandle 句柄)
+    private async Task<bool> 暗影之舞去后摇(ImageHandle 句柄)
     {
         return await Skill.技能通用判断(Keys.R, 0).ConfigureAwait(true);
     }
