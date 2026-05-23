@@ -109,30 +109,48 @@ Backup 基础设施同步装好：`D:\backup\C\temp\JoezhangYN\C#\Dota2Plus\Dota
 
 **plan SSOT**：`C:\Users\JoeZhang\.claude\plans\sequential-nibbling-lightning.md`
 
-**已完成（2/10 chunk）**：
+**已完成（4/10 chunk）**：
 - `5232092` A 拆 Invoke 写场景异步化（SetText → BeginInvoke；用户判定 TTS 抢跑无碍）
 - `d82a2ee` C1 抽 LegSwapState 子聚合（Item.cs 8 字段 + 内嵌 `技能切假腿配置` class 迁 GameAutomation/Domain/；HeroAggregate 加 LegSwap 属性；47 文件批替换跨 BC 共享状态）
+- `3477f25` C3 抽 SessionState 单例 + 4 字段迁 HeroAggregate（74 处跨 BC 替换 / 34 文件）：
+  - SessionState 单例（含 Phase 9 `IHeroIdentity` 占位接口供 HeroIdentity epic 挂接），AppContainer 装配
+  - IGameSession.IsPaused 转发；GameSession ctor 接 SessionState
+  - Main._session static field 桥接（C3 过渡 service locator，D1 删）
+  - Skill._技能数量 → HeroAggregate.SkillCount (19 处)
+  - Item._是否魔晶/神杖 → HeroAggregate.HasShard/HasAghanim (44 处，含 Heroes/ 18 文件)
+  - Main._中断条件 → SessionState.IsPaused (11 处)
+- **(待 commit)** C4 SkillEngine 实例化（Skill 1809 行 static class → SkillEngine 实例 + Skill thin facade）：
+  - 新建 `GameAutomation/Application/SkillEngine.cs`（1820 行）= 可变状态字典/锁/时间/缓存/重复按键阈值 instance 化；ctor 接 4 ports (input/vision/ui/aggregate)
+  - 内部 5 处 SimKeyBoard → _input；13 处 Common.UiInvoker → _ui；8 处 GlobalScreenCapture.GetCurrentHandle() → _vision.GetCurrentFrame()；Main._聚合 → _aggregate
+  - 纯只读查找表保留 static：技能4/5/6、StringBuilderPool*、ColorMatcher 嵌套类、ColorConfig、纯 helper 函数（获取技能信息 / 获取技能位置信息 / 6 个 color getter / ShouldEndRelease 等）
+  - Skill.cs 降级 thin facade（150 行）：保留 `技能类型` enum（马尔斯Strategy.cs:85 引用契约）+ `重复按键执行间隔阈值` static property 转发 + 27 个方法一行转发壳
+  - Common.cs 加 `SkillEngine?` service locator 字段（D1 删）；AppContainer.BindUi 装配 `Common.SkillEngine = new SkillEngine(Input, Vision, Ui, Main._聚合)`
+  - SkillEngine.cs `using 技能类型 = Skill.技能类型` type alias 避免内部 57 处 enum 引用改动
+  - BC 内 3 处旧调用（Main:586/712, Item:30）通过 facade 透明转发 0 改动；Heroes/ 86 文件 331 处 `Skill.X` 调用通过 facade 透明转发 0 改动（C7 替换为 _skill.X）
 
 **剩余 chunk（下次 session 接手）**：
 - **B 子线撤出 epic**（用户决策 2026-05-23）：ConditionDelegateBitmap 签名改非完成形态硬指标，且 C 子线 BC 实例化后 SkillEngine 持 IScreenVision 自然消解
-- **C3** Skill ⇄ Item 双向解耦（Skill 写 Item.\_切假腿配置 已经在 C1 后变 LegSwap 写入；剩 Skill 读 Item.\_技能数量 + Item 读 Skill 状态需走 HeroAggregate）
-- **C4** SkillEngine 实例化（Skill 1806 行 → internal sealed class SkillEngine；纯只读 static const ColorMatcher/RSquared 等查找表保留 static；ctor 接 input/vision/ui/aggregate）
-- **C5** ItemEngine 实例化（同 C4 模式；物品4/5/6 常量保 static）
+- **C5** ItemEngine 实例化（Item.cs 813 行；同 C4 模式：可变状态实例化 + ctor 接 4 ports + Common.ItemEngine 桥；物品4/5/6 常量保 static）
 - **C6** HeroLoopHost (Games.Dota2.Main) 实例化 + HeroAggregate 单阶段 ctor 注入 vision（删 HeroAggregate.Init 双阶段）
 - **C7** 92 策略 ctor 扩参 +SkillEngine +ItemEngine +HeroLoopHost；Registry 4 partial 扩参；策略类内 Skill./Item./Main. → \_skill./\_item./\_main.（1588 处替换，可拆 C7a-d 按属性并行）
-- **D1** 删 Common.UiInvoker + IScreenVision.GetCurrentFrame[Obsolete] + 收尾 grep 验证
+- **D1** 删 Common.UiInvoker + Common.SkillEngine + Common.ItemEngine + Skill/Item/Main 三 facade + IScreenVision.GetCurrentFrame[Obsolete] + 收尾 grep 验证
 
 **Phase 8 关键不变量**：
 1. Phase 8 每 chunk 单 commit + dotnet build -c Debug 0 错误 + 自动 backup push（验证 `.git/_unbacked_commits.log` empty）
-2. **HeroAggregate.LegSwap 是 BC 跨边界共享状态的 SSOT**（C1 起）—— 后续 chunk 禁再在 Item/Skill 加 static flag
-3. **0 可变状态 static God class** 解读：纯只读查找表（ColorMatcher / RSquared / 物品4/5/6 / Rectangle 常量）保留 static；可变状态全压 HeroAggregate
-4. SetText 已异步（BeginInvoke）；调用方紧跟 TTS 用户接受抢跑
-5. plan dep graph: C3 依 C1 ✅；C4/C5/C6 依 C3；C7 依 C4+C5+C6；D1 依 C7
+2. **HeroAggregate.LegSwap / SkillCount / HasAghanim / HasShard 是 BC 跨边界共享状态的 SSOT**（C1+C3 起）—— 后续 chunk 禁再在 Item/Skill 加 static flag
+3. **SessionState 单例是会话级共享状态的 SSOT**（C3 起）—— Phase 9 HeroIdentity epic 在此挂接
+4. **0 可变状态 static God class** 解读：纯只读查找表（ColorMatcher / RSquared / 物品4/5/6 / Rectangle 常量）保留 static；可变状态全压 HeroAggregate / SessionState
+5. SetText 已异步（BeginInvoke）；调用方紧跟 TTS 用户接受抢跑
+6. plan dep graph: C3 依 C1 ✅；C4/C5/C6 依 C3 ✅；C7 依 C4+C5+C6；D1 依 C7
+7. **C3 引入 Main._session 过渡 service locator**（commit `3477f25` 内）—— 等 C5/C6 ItemEngine/HeroLoopHost 实例化后改 ctor 注入，D1 删
+
+**Phase 9 epic 占位（C3 引入）**：
+- `GameAutomation/Application/SessionState.cs` 内 `IHeroIdentity` 接口：F1 触发提取 HUD 英雄名区域 → 像素模板多帧一致性投票 → 稳态固化作"自己英雄"绑定；所有 HUD 读取经身份 gate，看别人状态时返回上一稳态快照避免误触（用户决策 2026-05-23 完整形态：识别 + 全 HUD gate + 上一稳态快照回退）
 
 **下次 session 起手指引**：
 1. Read `C:\Users\JoeZhang\.claude\plans\sequential-nibbling-lightning.md` 全文
 2. Read 本 handoff 文件 Phase 8 段
-3. 从 C3 开始（先 grep `Skill\._` / `Item\._` 看剩余跨 BC 直读字段，决定是否还需 C3 chunk 还是可直跳 C4）
+3. 从 C5 开始（ItemEngine 实例化，Item.cs 813 行 → internal sealed class ItemEngine；可复用 C4 模板：facade 转发 + Common.ItemEngine 桥接 + AppContainer.BindUi 装配）
 
 ## 后续（Phase 9+，本 epic 外）
 - 实际删除死代码（_Legacy/ + Other/ + 4 个标 TODO-dead 文件）

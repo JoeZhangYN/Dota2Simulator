@@ -60,12 +60,15 @@ internal sealed class AppContainer
 
     /// <summary>
     /// Form2 构造完成后回调——此时 InitializeComponent 已跑过，tb_* 字段已可用。
-    /// 同步 set Common.UiInvoker（BC 内 static class 走的 service locator 入口）+ Registry.RegisterAll。
+    /// 同步 set Common.UiInvoker / Common.SkillEngine（BC 内 thin facade 走的 service locator 入口）
+    /// + Registry.RegisterAll。
     /// </summary>
     public void BindUi(Form2 form)
     {
         Ui = new Form2UiInvoker(form);
         Common.UiInvoker = Ui;
+        // C4: SkillEngine 实例化（ctor 接 4 ports），桥接给 Games/Dota2/Skill.cs facade。
+        Common.SkillEngine = new SkillEngine(Input, Vision, Ui, Games.Dota2.Main._聚合);
         Registry.RegisterAll(Ui);
     }
 }

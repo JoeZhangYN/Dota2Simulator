@@ -3,6 +3,7 @@
 using NLog;
 using System;
 using System.Threading;
+using Dota2Simulator.GameAutomation.Application;
 using Dota2Simulator.GameAutomation.Ports;
 
 namespace Dota2Simulator.Games
@@ -22,6 +23,12 @@ namespace Dota2Simulator.Games
         /// 后续 BC 整顿完成后此 service locator 可替换为 ctor 注入。
         /// </summary>
         public static IUiInvoker? UiInvoker;
+
+        /// <summary>
+        /// Phase 8 C4 过渡 service locator：Skill facade thin 转发壳调本字段。
+        /// AppContainer.BindUi 装配。C7 92 策略 ctor 扩参 SkillEngine 后，D1 删本字段 + 删 Skill facade。
+        /// </summary>
+        public static SkillEngine? SkillEngine;
         #endregion
 
         #region 延时
