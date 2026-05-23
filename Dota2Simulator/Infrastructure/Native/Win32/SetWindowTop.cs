@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 
-namespace Dota2Simulator
+namespace Dota2Simulator.Infrastructure.Native.Win32
 {
     internal static class SetWindowTop
     {

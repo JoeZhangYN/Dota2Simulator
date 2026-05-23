@@ -336,10 +336,10 @@
     <None Update="Driver\x64\KeyboardMouseSimulateDriver.dll">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </None>
-    <None Update="findpoints.dll">
+    <None Update="Infrastructure\Native\Libs\findpoints.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="image_processing_system.dll">
+    <None Update="Infrastructure\Native\Libs\image_processing_system.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="inference1\ch_PP-OCRv3_det_infer\inference.pdiparams">
@@ -360,10 +360,10 @@
     <None Update="inference1\ch_PP-OCRv3_rec_infer\inference.pdmodel">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="interception.dll">
+    <None Update="Infrastructure\Native\Libs\interception.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="KeyboardMouseSimulateDriver.dll">
+    <None Update="Infrastructure\Native\Libs\KeyboardMouseSimulateDriver.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="nlog.config">
@@ -373,13 +373,13 @@
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
-    <None Update="rscaptrs.dll">
+    <None Update="Infrastructure\Native\Libs\rscaptrs.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="screen_capture.dll">
+    <None Update="Infrastructure\Native\Libs\screen_capture.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="simengio.dll">
+    <None Update="Infrastructure\Native\Libs\simengio.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>

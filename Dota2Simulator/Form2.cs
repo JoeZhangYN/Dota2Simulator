@@ -10,7 +10,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Globalization;
 using System.Windows.Forms;
-using static Dota2Simulator.SetWindowTop;
+using static Dota2Simulator.Infrastructure.Native.Win32.SetWindowTop;
 using KeyEventArgs = System.Windows.Forms.KeyEventArgs;
 using Point = System.Drawing.Point;
 
