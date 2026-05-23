@@ -1,4 +1,6 @@
 #if DOTA2
+using Dota2Simulator.GameAutomation.Ports;
+
 namespace Dota2Simulator.GameAutomation.Application;
 
 /// <summary>
@@ -7,7 +9,9 @@ namespace Dota2Simulator.GameAutomation.Application;
 /// </summary>
 public sealed partial class HeroStrategyRegistry
 {
-    partial void RegisterAgility()
+#pragma warning disable IDE0060 // A4a 过渡：Agility 内部 new 暂未使用 input/vision，A4b 切完后启用
+    partial void RegisterAgility(IInputExecutor input, IScreenVision vision)
+#pragma warning restore IDE0060
     {
         Register(new Heroes.Agility.小骷髅Strategy());
         Register(new Heroes.Agility.小黑Strategy());

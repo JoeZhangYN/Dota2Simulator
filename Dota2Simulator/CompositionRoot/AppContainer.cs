@@ -4,6 +4,9 @@
 #if DOTA2
 
 using Dota2Simulator.GameAutomation.Application;
+using Dota2Simulator.GameAutomation.Ports;
+using Dota2Simulator.Input.Adapters;
+using Dota2Simulator.Vision.Adapters;
 
 namespace Dota2Simulator.CompositionRoot;
 
@@ -17,13 +20,19 @@ namespace Dota2Simulator.CompositionRoot;
 /// </summary>
 internal sealed class AppContainer
 {
+    public IInputExecutor Input { get; }
+
+    public IScreenVision Vision { get; }
+
     public HeroStrategyRegistry Registry { get; }
 
     public GameSession GameSession { get; }
 
     public AppContainer()
     {
-        Registry = new HeroStrategyRegistry();
+        Input = new HybridInputAdapter();
+        Vision = new RustVisionAdapter();
+        Registry = new HeroStrategyRegistry(Input, Vision);
         Registry.RegisterAll();
         GameSession = new GameSession(Registry);
     }

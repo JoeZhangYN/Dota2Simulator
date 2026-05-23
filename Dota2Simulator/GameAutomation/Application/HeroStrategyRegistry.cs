@@ -1,40 +1,53 @@
+using System;
 using System.Collections.Generic;
+using Dota2Simulator.GameAutomation.Ports;
 
 namespace Dota2Simulator.GameAutomation.Application;
 
 /// <summary>
 /// 英雄策略注册表：英雄中文名 → <see cref="IHeroStrategy"/>。
-/// GameSession 据此分发；未注册的英雄 fallback 回旧 Main.根据当前英雄增强 switch（双轨过渡）。
+/// GameSession 据此分发；未注册的英雄 no-op（旧 Main switch 已于 Chunk 4.24 删除）。
 ///
-/// 89 个英雄策略按属性分批注册——partial class 拆 .Strength / .Agility / .Intelligence
-/// 三个文件，Wave 4 三组并行填充 RegisterStrength/Agility/Intelligence 时零合并冲突。
+/// 92 个英雄策略按属性分批注册——partial class 拆 .Strength / .Agility / .Intelligence / .Universal
+/// 四个文件，并行填充 RegisterStrength/Agility/Intelligence/Universal 时零合并冲突。
+///
+/// Phase 6 A4：构造期接收 IInputExecutor / IScreenVision，由 4 个 partial method 透传给各 Strategy ctor，
+/// 让 Heroes/ 内层只依赖端口接口，不再 using Dota2Simulator.KeyboardMouse。
 /// </summary>
 public sealed partial class HeroStrategyRegistry
 {
     private readonly Dictionary<string, IHeroStrategy> _byName = new();
+    private readonly IInputExecutor _input;
+    private readonly IScreenVision _vision;
+
+    public HeroStrategyRegistry(IInputExecutor input, IScreenVision vision)
+    {
+        _input = input ?? throw new ArgumentNullException(nameof(input));
+        _vision = vision ?? throw new ArgumentNullException(nameof(vision));
+    }
 
     /// <summary>注册一个英雄策略（以英雄中文名为键）。</summary>
     public void Register(IHeroStrategy strategy) => _byName[strategy.Hero.Name] = strategy;
 
-    /// <summary>按英雄名查找策略；未注册返回 false（调用方 fallback 旧 switch）。</summary>
+    /// <summary>按英雄名查找策略；未注册返回 false（GameSession 走 no-op）。</summary>
     public bool TryGet(string name, out IHeroStrategy strategy)
         => _byName.TryGetValue(name, out strategy!);
 
     /// <summary>已注册的英雄数。</summary>
     public int Count => _byName.Count;
 
-    /// <summary>注册所有英雄策略。各属性分组在 partial 文件实现（Wave 4 填充）。</summary>
+    /// <summary>注册所有英雄策略。各属性分组在 partial 文件实现。</summary>
     public void RegisterAll()
     {
-        RegisterStrength();
-        RegisterAgility();
-        RegisterIntelligence();
-        RegisterUniversal();
+        RegisterStrength(_input, _vision);
+        RegisterAgility(_input, _vision);
+        RegisterIntelligence(_input, _vision);
+        RegisterUniversal(_input, _vision);
     }
 
-    // Wave 4 各 partial 文件实现一个；未实现的 partial void 调用编译期消除。
-    partial void RegisterStrength();
-    partial void RegisterAgility();
-    partial void RegisterIntelligence();
-    partial void RegisterUniversal();
+    // 各 partial 文件实现一个；未实现的 partial void 调用编译期消除。
+    partial void RegisterStrength(IInputExecutor input, IScreenVision vision);
+    partial void RegisterAgility(IInputExecutor input, IScreenVision vision);
+    partial void RegisterIntelligence(IInputExecutor input, IScreenVision vision);
+    partial void RegisterUniversal(IInputExecutor input, IScreenVision vision);
 }

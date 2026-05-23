@@ -8,6 +8,8 @@ using Dota2Simulator.Games;
 using Dota2Simulator.Games.Dota2;
 using Dota2Simulator.Vision;
 
+using Dota2Simulator.GameAutomation.Ports;
+
 namespace Dota2Simulator.GameAutomation.Heroes.Strength;
 
 public sealed class 大鱼人Strategy : IHeroStrategy
@@ -15,6 +17,17 @@ public sealed class 大鱼人Strategy : IHeroStrategy
     /// <summary>基准帧延迟（沿用 Main.等待延迟）。</summary>
     private const int 等待延迟 = 33;
 
+
+    private readonly IInputExecutor _input;
+#pragma warning disable IDE0052
+    private readonly IScreenVision _vision;
+#pragma warning restore IDE0052
+
+    public 大鱼人Strategy(IInputExecutor input, IScreenVision vision)
+    {
+        _input = input;
+        _vision = vision;
+    }
     public HeroId Hero => new("大鱼人", HeroAttribute.Strength);
 
     public void OnActivate(HeroContext ctx)

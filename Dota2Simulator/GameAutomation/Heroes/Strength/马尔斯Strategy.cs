@@ -6,13 +6,25 @@ using Dota2Simulator.GameAutomation.Domain.Actuation;
 using Dota2Simulator.GameAutomation.Domain.Heroes;
 using Dota2Simulator.GameAutomation.Domain.Loop;
 using Dota2Simulator.Games.Dota2;
-using Dota2Simulator.KeyboardMouse;
 using Dota2Simulator.Vision;
+
+using Dota2Simulator.GameAutomation.Ports;
 
 namespace Dota2Simulator.GameAutomation.Heroes.Strength;
 
 public sealed class 马尔斯Strategy : IHeroStrategy
 {
+
+    private readonly IInputExecutor _input;
+#pragma warning disable IDE0052
+    private readonly IScreenVision _vision;
+#pragma warning restore IDE0052
+
+    public 马尔斯Strategy(IInputExecutor input, IScreenVision vision)
+    {
+        _input = input;
+        _vision = vision;
+    }
     public HeroId Hero => new("马尔斯", HeroAttribute.Strength);
 
     public void OnActivate(HeroContext ctx)
@@ -46,13 +58,13 @@ public sealed class 马尔斯Strategy : IHeroStrategy
         }
     }
 
-    private static async Task<bool> 战神迅矛去后摇(ImageHandle 句柄)
+    private async Task<bool> 战神迅矛去后摇(ImageHandle 句柄)
     {
         return await Skill.主动技能释放后续(Keys.Q, () =>
         {
             if (Main._聚合.Skills.Mode(SlotKey.Q) == 1)
             {
-                SimKeyBoard.KeyPress(Keys.R);
+                _input.Press(VirtualKey.From(Keys.R));
             }
             else
             {
@@ -61,18 +73,18 @@ public sealed class 马尔斯Strategy : IHeroStrategy
         }).ConfigureAwait(true);
     }
 
-    private static async Task<bool> 神之谴击去后摇(ImageHandle 句柄)
+    private async Task<bool> 神之谴击去后摇(ImageHandle 句柄)
     {
         return await Skill.技能通用判断(Keys.W, 1).ConfigureAwait(true);
     }
 
-    private static async Task<bool> 热血竞技场去后摇(ImageHandle 句柄)
+    private async Task<bool> 热血竞技场去后摇(ImageHandle 句柄)
     {
         return await Skill.主动技能释放后续(Keys.R, () =>
         {
             if (Skill.判断技能状态(Keys.E, 句柄, Skill.技能类型.状态))
             {
-                SimKeyBoard.KeyPress(Keys.E);
+                _input.Press(VirtualKey.From(Keys.E));
             }
 
             Skill.通用技能后续动作();

@@ -6,13 +6,25 @@ using Dota2Simulator.GameAutomation.Domain.Actuation;
 using Dota2Simulator.GameAutomation.Domain.Heroes;
 using Dota2Simulator.GameAutomation.Domain.Loop;
 using Dota2Simulator.Games.Dota2;
-using Dota2Simulator.KeyboardMouse;
 using Dota2Simulator.Vision;
+
+using Dota2Simulator.GameAutomation.Ports;
 
 namespace Dota2Simulator.GameAutomation.Heroes.Strength;
 
 public sealed class 龙骑Strategy : IHeroStrategy
 {
+
+    private readonly IInputExecutor _input;
+#pragma warning disable IDE0052
+    private readonly IScreenVision _vision;
+#pragma warning restore IDE0052
+
+    public 龙骑Strategy(IInputExecutor input, IScreenVision vision)
+    {
+        _input = input;
+        _vision = vision;
+    }
     public HeroId Hero => new("龙骑", HeroAttribute.Strength);
 
     public void OnActivate(HeroContext ctx)
@@ -69,28 +81,28 @@ public sealed class 龙骑Strategy : IHeroStrategy
         }
     }
 
-    private static async Task<bool> 喷火去后摇(ImageHandle 句柄)
+    private async Task<bool> 喷火去后摇(ImageHandle 句柄)
     {
         return await Skill.技能通用判断(Keys.Q, 1).ConfigureAwait(true);
     }
 
-    private static async Task<bool> 神龙摆尾去后摇(ImageHandle 句柄)
+    private async Task<bool> 神龙摆尾去后摇(ImageHandle 句柄)
     {
         return await Skill.主动技能进入CD后续(Keys.W, () =>
         {
-            SimKeyBoard.KeyPress(Keys.A);
+            _input.Press(VirtualKey.From(Keys.A));
             _ = Main._聚合.Skills.Mode(SlotKey.W) == 1 && Item._是否魔晶 ? Skill.DOTA2释放CD就绪技能(Keys.D, in 句柄) : Skill.DOTA2释放CD就绪技能(Keys.Q, in 句柄);
 
             Item.要求保持假腿();
         }).ConfigureAwait(true);
     }
 
-    private static async Task<bool> 变龙去后摇(ImageHandle 句柄)
+    private async Task<bool> 变龙去后摇(ImageHandle 句柄)
     {
         return await Skill.技能通用判断(Keys.R, 0).ConfigureAwait(true);
     }
 
-    private static async Task<bool> 火球去后摇(ImageHandle 句柄)
+    private async Task<bool> 火球去后摇(ImageHandle 句柄)
     {
         return await Skill.技能通用判断(Keys.D, 0, 要接的按键: Main._聚合.Skills.Mode(SlotKey.D) == 1 && Skill.DOTA2判断技能是否CD(Keys.Q, in 句柄) ? Keys.Q : Keys.A)
             .ConfigureAwait(true);

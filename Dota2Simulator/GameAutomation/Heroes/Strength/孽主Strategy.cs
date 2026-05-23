@@ -5,13 +5,25 @@ using Dota2Simulator.GameAutomation.Application;
 using Dota2Simulator.GameAutomation.Domain.Actuation;
 using Dota2Simulator.GameAutomation.Domain.Heroes;
 using Dota2Simulator.Games.Dota2;
-using Dota2Simulator.KeyboardMouse;
 using Dota2Simulator.Vision;
+
+using Dota2Simulator.GameAutomation.Ports;
 
 namespace Dota2Simulator.GameAutomation.Heroes.Strength;
 
 public sealed class 孽主Strategy : IHeroStrategy
 {
+
+    private readonly IInputExecutor _input;
+#pragma warning disable IDE0052
+    private readonly IScreenVision _vision;
+#pragma warning restore IDE0052
+
+    public 孽主Strategy(IInputExecutor input, IScreenVision vision)
+    {
+        _input = input;
+        _vision = vision;
+    }
     public HeroId Hero => new("孽主", HeroAttribute.Strength);
 
     public void OnActivate(HeroContext ctx)
@@ -35,22 +47,22 @@ public sealed class 孽主Strategy : IHeroStrategy
         }
     }
 
-    private static async Task<bool> 火焰风暴去后摇(ImageHandle 句柄)
+    private async Task<bool> 火焰风暴去后摇(ImageHandle 句柄)
     {
         return await Skill.技能通用判断(Keys.Q, 1).ConfigureAwait(true);
     }
 
-    private static async Task<bool> 怨念深渊去后摇(ImageHandle 句柄)
+    private async Task<bool> 怨念深渊去后摇(ImageHandle 句柄)
     {
         return await Skill.主动技能释放后续(Keys.W, () =>
         {
-            SimKeyBoard.MouseRightClick();
+            _input.MouseClick(MouseButton.Right);
             if (Skill.DOTA2释放CD就绪技能(Keys.Q, in 句柄))
             {
                 return;
             }
 
-            SimKeyBoard.KeyPress(Keys.A);
+            _input.Press(VirtualKey.From(Keys.A));
         }).ConfigureAwait(true);
     }
 }

@@ -7,13 +7,25 @@ using Dota2Simulator.GameAutomation.Domain.Heroes;
 using Dota2Simulator.GameAutomation.Domain.Loop;
 using Dota2Simulator.Games;
 using Dota2Simulator.Games.Dota2;
-using Dota2Simulator.KeyboardMouse;
 using Dota2Simulator.Vision;
+
+using Dota2Simulator.GameAutomation.Ports;
 
 namespace Dota2Simulator.GameAutomation.Heroes.Strength;
 
 public sealed class 军团Strategy : IHeroStrategy
 {
+
+    private readonly IInputExecutor _input;
+#pragma warning disable IDE0052
+    private readonly IScreenVision _vision;
+#pragma warning restore IDE0052
+
+    public 军团Strategy(IInputExecutor input, IScreenVision vision)
+    {
+        _input = input;
+        _vision = vision;
+    }
     public HeroId Hero => new("军团", HeroAttribute.Strength);
 
     public void OnActivate(HeroContext ctx)
@@ -58,7 +70,7 @@ public sealed class 军团Strategy : IHeroStrategy
         }
     }
 
-    private static async Task<bool> 决斗(ImageHandle 句柄)
+    private async Task<bool> 决斗(ImageHandle 句柄)
     {
         return await Task.Run(async () =>
         {
@@ -74,7 +86,7 @@ public sealed class 军团Strategy : IHeroStrategy
 
                         if (Skill.DOTA2判断技能是否CD(Keys.W, in 句柄))
                         {
-                            SimKeyBoard.KeyPressAlt(Keys.W);
+                            _input.ComboAlt(VirtualKey.From(Keys.W));
                             return await Task.FromResult(true).ConfigureAwait(true);
                         }
 
@@ -114,7 +126,7 @@ public sealed class 军团Strategy : IHeroStrategy
                 case < 4:
                     {
                         // 触发激怒，让周围的小兵都攻击你
-                        SimKeyBoard.KeyPress(Keys.A);
+                        _input.Press(VirtualKey.From(Keys.A));
 
                         if (Skill.DOTA2释放CD就绪技能(Keys.R, in 句柄))
                         {
@@ -131,17 +143,17 @@ public sealed class 军团Strategy : IHeroStrategy
         }).ConfigureAwait(true);
     }
 
-    private static async Task<bool> 压倒性优势去后摇(ImageHandle 句柄)
+    private async Task<bool> 压倒性优势去后摇(ImageHandle 句柄)
     {
         return await Skill.技能通用判断(Keys.Q, 0).ConfigureAwait(true);
     }
 
-    private static async Task<bool> 强攻去后摇(ImageHandle 句柄)
+    private async Task<bool> 强攻去后摇(ImageHandle 句柄)
     {
         return await Skill.技能通用判断(Keys.W, 1).ConfigureAwait(true);
     }
 
-    private static async Task<bool> 决斗去后摇(ImageHandle 句柄)
+    private async Task<bool> 决斗去后摇(ImageHandle 句柄)
     {
         return await Skill.技能通用判断(Keys.R, 1, 要接的按键: Keys.Q).ConfigureAwait(true);
     }

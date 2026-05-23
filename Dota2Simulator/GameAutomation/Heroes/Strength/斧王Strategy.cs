@@ -8,9 +8,11 @@ using Dota2Simulator.GameAutomation.Domain.Heroes;
 using Dota2Simulator.GameAutomation.Domain.Loop;
 using Dota2Simulator.Games;
 using Dota2Simulator.Games.Dota2;
-using Dota2Simulator.KeyboardMouse;
 using Dota2Simulator.Vision;
 
+using Dota2Simulator.GameAutomation.Ports;
+
+using Dota2Simulator.GameAutomation.Domain.Perception;
 namespace Dota2Simulator.GameAutomation.Heroes.Strength;
 
 public sealed class 斧王Strategy : IHeroStrategy
@@ -18,6 +20,17 @@ public sealed class 斧王Strategy : IHeroStrategy
     /// <summary>基准帧延迟（沿用 Main.等待延迟）。</summary>
     private const int 等待延迟 = 33;
 
+
+    private readonly IInputExecutor _input;
+#pragma warning disable IDE0052
+    private readonly IScreenVision _vision;
+#pragma warning restore IDE0052
+
+    public 斧王Strategy(IInputExecutor input, IScreenVision vision)
+    {
+        _input = input;
+        _vision = vision;
+    }
     public HeroId Hero => new("斧王", HeroAttribute.Strength);
 
     public void OnActivate(HeroContext ctx)
@@ -64,7 +77,7 @@ public sealed class 斧王Strategy : IHeroStrategy
         }
     }
 
-    private static async Task<bool> 吼去后摇(ImageHandle 句柄)
+    private async Task<bool> 吼去后摇(ImageHandle 句柄)
     {
         return await Skill.主动技能释放后续(Keys.Q, () =>
         {
@@ -73,22 +86,22 @@ public sealed class 斧王Strategy : IHeroStrategy
                 _ = Item.根据图片使用物品(Dota2_Pictrue.物品.刃甲);
             }
             // 触发激怒
-            SimKeyBoard.KeyPress(Keys.A);
-            SimKeyBoard.KeyPress(Keys.W);
+            _input.Press(VirtualKey.From(Keys.A));
+            _input.Press(VirtualKey.From(Keys.W));
         }).ConfigureAwait(true);
     }
 
-    private static async Task<bool> 战斗饥渴去后摇(ImageHandle 句柄)
+    private async Task<bool> 战斗饥渴去后摇(ImageHandle 句柄)
     {
         return await Skill.技能通用判断(Keys.W, 1).ConfigureAwait(true);
     }
 
-    private static async Task<bool> 淘汰之刃去后摇(ImageHandle 句柄)
+    private async Task<bool> 淘汰之刃去后摇(ImageHandle 句柄)
     {
         return await Skill.技能通用判断(Keys.R, 1).ConfigureAwait(true);
     }
 
-    private static async Task<bool> 跳吼(ImageHandle 句柄)
+    private async Task<bool> 跳吼(ImageHandle 句柄)
     {
         if (Item.根据图片使用物品(Dota2_Pictrue.物品.跳刀)
             + Item.根据图片使用物品(Dota2_Pictrue.物品.跳刀_力量跳刀)
@@ -104,18 +117,18 @@ public sealed class 斧王Strategy : IHeroStrategy
     }
 
     // 沿用 Main.快速触发激怒
-    private static void 快速触发激怒()
+    private void 快速触发激怒()
     {
         var 原始位置 = Control.MousePosition;
 
         for (int i = 0; i < 10; i++)
         {
-            SimKeyBoard.MouseMove(575 + 515 + 61 * i, 20);
-            SimKeyBoard.KeyPress(Keys.A);
+            _input.MouseMoveTo(new ScreenPoint(575 + 515 + 61 * i, 20));
+            _input.Press(VirtualKey.From(Keys.A));
             Common.Delay(2);
         }
 
-        SimKeyBoard.MouseMove(原始位置);
+        _input.MouseMoveTo(new ScreenPoint(原始位置.X, 原始位置.Y));
     }
 }
 #endif

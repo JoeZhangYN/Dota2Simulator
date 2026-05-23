@@ -5,13 +5,25 @@ using Dota2Simulator.GameAutomation.Application;
 using Dota2Simulator.GameAutomation.Domain.Actuation;
 using Dota2Simulator.GameAutomation.Domain.Heroes;
 using Dota2Simulator.Games.Dota2;
-using Dota2Simulator.KeyboardMouse;
 using Dota2Simulator.Vision;
+
+using Dota2Simulator.GameAutomation.Ports;
 
 namespace Dota2Simulator.GameAutomation.Heroes.Strength;
 
 public sealed class 哈斯卡Strategy : IHeroStrategy
 {
+
+    private readonly IInputExecutor _input;
+#pragma warning disable IDE0052
+    private readonly IScreenVision _vision;
+#pragma warning restore IDE0052
+
+    public 哈斯卡Strategy(IInputExecutor input, IScreenVision vision)
+    {
+        _input = input;
+        _vision = vision;
+    }
     public HeroId Hero => new("哈斯卡", HeroAttribute.Strength);
 
     public void OnActivate(HeroContext ctx)
@@ -36,23 +48,23 @@ public sealed class 哈斯卡Strategy : IHeroStrategy
         }
     }
 
-    private static async Task<bool> 心炎去后摇(ImageHandle 句柄)
+    private async Task<bool> 心炎去后摇(ImageHandle 句柄)
     {
         return await Skill.技能通用判断(Keys.W, 1).ConfigureAwait(true);
     }
 
-    private static async Task<bool> 牺牲去后摇(ImageHandle 句柄)
+    private async Task<bool> 牺牲去后摇(ImageHandle 句柄)
     {
         return await Skill.主动技能释放后续(Keys.R, () =>
         {
-            SimKeyBoard.MouseRightClick();
+            _input.MouseClick(MouseButton.Right);
 
             if (Skill.DOTA2释放CD就绪技能(Keys.Q, in 句柄))
             {
                 return;
             }
 
-            SimKeyBoard.KeyPress(Keys.A);
+            _input.Press(VirtualKey.From(Keys.A));
         }).ConfigureAwait(true);
     }
 }

@@ -9,8 +9,9 @@ using Dota2Simulator.GameAutomation.Domain.Heroes;
 using Dota2Simulator.GameAutomation.Domain.Loop;
 using Dota2Simulator.Games;
 using Dota2Simulator.Games.Dota2;
-using Dota2Simulator.KeyboardMouse;
 using Dota2Simulator.Vision;
+
+using Dota2Simulator.GameAutomation.Ports;
 
 namespace Dota2Simulator.GameAutomation.Heroes.Strength;
 
@@ -19,6 +20,17 @@ public sealed class 船长Strategy : IHeroStrategy
     /// <summary>E 技能并发锁（沿用 Main._全局模式e_lock）。</summary>
     private static readonly Lock _全局模式e_lock = new();
 
+
+    private readonly IInputExecutor _input;
+#pragma warning disable IDE0052
+    private readonly IScreenVision _vision;
+#pragma warning restore IDE0052
+
+    public 船长Strategy(IInputExecutor input, IScreenVision vision)
+    {
+        _input = input;
+        _vision = vision;
+    }
     public HeroId Hero => new("船长", HeroAttribute.Strength);
 
     public void OnActivate(HeroContext ctx)
@@ -49,11 +61,11 @@ public sealed class 船长Strategy : IHeroStrategy
         else if (key == VirtualKey.From(Keys.D2))
         {
             Main._聚合.Skills.SetStep(SlotKey.R, 1);
-            SimKeyBoard.KeyPress(Keys.E);
+            _input.Press(VirtualKey.From(Keys.E));
         }
     }
 
-    private static async Task<bool> 洪流接x回(ImageHandle 句柄)
+    private async Task<bool> 洪流接x回(ImageHandle 句柄)
     {
         return await Skill.主动技能释放后续(Keys.Q, () =>
         {
@@ -66,12 +78,12 @@ public sealed class 船长Strategy : IHeroStrategy
                 // 1600 延迟 返回200施法时间
                 Common.Delay(1350, Main._聚合.Skills.Time(SlotKey.Q));
                 Main._聚合.Conditions[ConditionSlotKey.C4].Active = false;
-                SimKeyBoard.KeyPress(Keys.E);
+                _input.Press(VirtualKey.From(Keys.E));
             }
         }).ConfigureAwait(true);
     }
 
-    private static async Task<bool> x释放后相关逻辑(ImageHandle 句柄)
+    private async Task<bool> x释放后相关逻辑(ImageHandle 句柄)
     {
         // 释放x后放船，x的时间3秒，船0.3秒，3.1秒延迟，控制还是得靠水起来
         return await Skill.主动技能释放后续(Keys.E, () =>
@@ -84,7 +96,7 @@ public sealed class 船长Strategy : IHeroStrategy
 
             if (Main._聚合.Skills.Step(SlotKey.R) == 1)
             {
-                SimKeyBoard.KeyPress(Keys.R);
+                _input.Press(VirtualKey.From(Keys.R));
                 Main._聚合.Skills.SetStep(SlotKey.R, 0);
             }
 
@@ -100,7 +112,7 @@ public sealed class 船长Strategy : IHeroStrategy
         }).ConfigureAwait(true);
     }
 
-    private static async Task<bool> x2次释放后(ImageHandle 句柄)
+    private async Task<bool> x2次释放后(ImageHandle 句柄)
     {
         return await Skill.主动技能进入CD后续(Keys.E, () =>
         {
@@ -115,9 +127,9 @@ public sealed class 船长Strategy : IHeroStrategy
         }).ConfigureAwait(true);
     }
 
-    private static async Task<bool> 立即释放洪流(ImageHandle 句柄)
+    private async Task<bool> 立即释放洪流(ImageHandle 句柄)
     {
-        return await Skill.主动技能已就绪后续(Keys.Q, () => { SimKeyBoard.KeyPress(Keys.Q); }).ConfigureAwait(true);
+        return await Skill.主动技能已就绪后续(Keys.Q, () => { _input.Press(VirtualKey.From(Keys.Q)); }).ConfigureAwait(true);
     }
 }
 #endif
