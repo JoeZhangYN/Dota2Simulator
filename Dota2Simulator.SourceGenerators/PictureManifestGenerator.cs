@@ -21,16 +21,7 @@ namespace Dota2Simulator.SourceGenerators;
 [Generator(LanguageNames.CSharp)]
 public sealed class PictureManifestGenerator : IIncrementalGenerator
 {
-    // 磁盘顶层目录 → .cs 嵌套类名 (历史不对称: 技能→英雄技能, 播报→播报信息, BUFF→Buff)
-    private static readonly Dictionary<string, string> DirToClassName = new(StringComparer.Ordinal)
-    {
-        ["BUFF"] = "Buff",
-        ["命石"] = "命石",
-        ["技能"] = "英雄技能",
-        ["播报"] = "播报信息",
-        ["物品"] = "物品",
-        ["Silt"] = "Silt",
-    };
+    // 磁盘顶层目录 → .cs 嵌套类名映射已移至 PictureCategoryMap.DirToClassName (B1: 消双 dict 漂移)
 
     // file stem ≠ 属性名特例 dict (R1 修订: 唯一不对称是 BUFF/物品_暗影护符 → 属性名 暗影护符)
     private static readonly Dictionary<(string Dir, string FileStem), string> FileStemToPropertyName = new()
@@ -95,7 +86,7 @@ public sealed class PictureManifestGenerator : IIncrementalGenerator
             if (segments.Length < 2) continue; // 平铺顶层文件 (现状无, 跳过)
 
             var dirTop = segments[0];
-            if (!DirToClassName.TryGetValue(dirTop, out var className)) continue; // 未登记目录跳过 (扩展可加 dict)
+            if (!PictureCategoryMap.DirToClassName.TryGetValue(dirTop, out var className)) continue; // 未登记目录跳过 (扩展可加 dict)
 
             string subDir;
             string fileWithExt;

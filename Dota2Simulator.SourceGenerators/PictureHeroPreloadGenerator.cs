@@ -20,17 +20,7 @@ namespace Dota2Simulator.SourceGenerators;
 [Generator(LanguageNames.CSharp)]
 public sealed class PictureHeroPreloadGenerator : IIncrementalGenerator
 {
-    // 与 PictureManifestGenerator.DirToClassName 反向映射: .cs 嵌套类名 → manifest 键前缀
-    // 历史不对称: Buff→BUFF, 英雄技能→技能, 播报信息→播报; 命石/物品/Silt 同名
-    private static readonly Dictionary<string, string> ClassNameToManifestPrefix = new(StringComparer.Ordinal)
-    {
-        ["Buff"] = "BUFF",
-        ["英雄技能"] = "技能",
-        ["播报信息"] = "播报",
-        ["命石"] = "命石",
-        ["物品"] = "物品",
-        ["Silt"] = "Silt",
-    };
+    // 反向映射 (.cs 嵌套类名 → manifest 键前缀) 已移至 PictureCategoryMap.ClassNameToManifestPrefix (B1: 消双 dict 漂移)
 
     // regex: Dota2_Pictrue.<嵌套类>.<属性名>
     // \w 不含中文, 用字符类 [\w一-鿿] 覆盖中文标识符 (失败处理 §三条)
@@ -62,7 +52,7 @@ public sealed class PictureHeroPreloadGenerator : IIncrementalGenerator
                 {
                     var className = m.Groups[1].Value;
                     var propertyName = m.Groups[2].Value;
-                    if (!ClassNameToManifestPrefix.TryGetValue(className, out var prefix))
+                    if (!PictureCategoryMap.ClassNameToManifestPrefix.TryGetValue(className, out var prefix))
                         continue; // 未登记类名 (现状仅 6 类, 跳过未知)
                     keys.Add($"{prefix}.{propertyName}");
                 }
