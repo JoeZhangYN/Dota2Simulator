@@ -24,7 +24,7 @@ namespace Dota2Simulator.Vision
     {
         private static long _totalBudget = 512 * 1024 * 1024; // 512mb 默认预算 1920*1080*4 = 6.4mb
         private static long _currentUsage;
-        private static ILogger _logger = new ConsoleLogger();
+        private static NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
 
         public static long TotalBudget
         {
@@ -35,11 +35,6 @@ namespace Dota2Simulator.Vision
         public static long CurrentUsage => Interlocked.Read(ref _currentUsage);
         public static long AvailableMemory => _totalBudget - CurrentUsage;
         public static double UsagePercentage => (double)CurrentUsage / _totalBudget * 100;
-
-        public static void SetLogger(ILogger logger)
-        {
-            _logger = logger ?? new ConsoleLogger();
-        }
 
         public static bool TryAllocate(long size)
         {
@@ -62,7 +57,7 @@ namespace Dota2Simulator.Vision
 
         public static void ReportUsage()
         {
-            _logger.LogInfo($"内存使用: {CurrentUsage / (1024 * 1024):F2}MB / {TotalBudget / (1024 * 1024):F2}MB ({UsagePercentage:F1}%)");
+            _logger.Info($"内存使用: {CurrentUsage / (1024 * 1024):F2}MB / {TotalBudget / (1024 * 1024):F2}MB ({UsagePercentage:F1}%)");
         }
     }
 }

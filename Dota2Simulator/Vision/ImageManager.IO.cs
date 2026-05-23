@@ -83,7 +83,7 @@ namespace Dota2Simulator.Vision
                     // 如果调整后的区域无效，返回false
                     if (saveRegion.Width <= 0 || saveRegion.Height <= 0)
                     {
-                        _logger.LogError($"无效的保存区域: {rect}，图像尺寸: {size.x}x{size.y}");
+                        _logger.Error($"无效的保存区域: {rect}，图像尺寸: {size.x}x{size.y}");
                         return false;
                     }
                 }
@@ -176,12 +176,12 @@ namespace Dota2Simulator.Vision
                 _images[handle.Id] = metadata;
 
                 string regionInfo = region.HasValue ? $"区域: {saveRegion}" : "完整图像";
-                _logger.LogInfo($"图像已保存: {filePath} (类型: {handle.Type}, {regionInfo}, 保存尺寸: {saveRegion.Width}x{saveRegion.Height})");
+                _logger.Info($"图像已保存: {filePath} (类型: {handle.Type}, {regionInfo}, 保存尺寸: {saveRegion.Width}x{saveRegion.Height})");
                 return true;
             }
             catch (Exception ex)
             {
-                _logger.LogError($"保存图像失败: {ex.Message}");
+                _logger.Error($"保存图像失败: {ex.Message}");
                 return false;
             }
         }

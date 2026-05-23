@@ -28,7 +28,7 @@ namespace Dota2Simulator.Vision
         private static int _coordinateOffsetX;
         private static int _coordinateOffsetY;
         private static readonly Lock _initLock = new();
-        private static ILogger _logger = new ConsoleLogger();
+        private static NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
         private static Size _captureSize;
 
         /// <summary>
@@ -55,7 +55,7 @@ namespace Dota2Simulator.Vision
             {
                 if (_tripleBuffer != null)
                 {
-                    _logger.LogWarning("全局截图缓冲区已初始化");
+                    _logger.Warn("全局截图缓冲区已初始化");
                     return;
                 }
 
@@ -67,7 +67,7 @@ namespace Dota2Simulator.Vision
                 _coordinateOffsetX = x;
                 _coordinateOffsetY = y;
 
-                _logger.LogInfo($"全局截图缓冲区初始化完成: {width}x{height}, 偏移({x}, {y})");
+                _logger.Info($"全局截图缓冲区初始化完成: {width}x{height}, 偏移({x}, {y})");
             }
         }
 
@@ -85,7 +85,7 @@ namespace Dota2Simulator.Vision
             // 检查尺寸是否匹配
             if (_captureSize.Width != rectangle.Width || _captureSize.Height != rectangle.Height)
             {
-                _logger.LogWarning($"截图区域尺寸变化，重新初始化缓冲区");
+                _logger.Warn($"截图区域尺寸变化，重新初始化缓冲区");
                 Cleanup();
                 Initialize(rectangle.Width, rectangle.Height, rectangle.X, rectangle.Y);
             }
@@ -104,7 +104,7 @@ namespace Dota2Simulator.Vision
             }
             else
             {
-                _logger.LogError("屏幕捕获失败");
+                _logger.Error("屏幕捕获失败");
             }
         }
 
@@ -335,7 +335,7 @@ namespace Dota2Simulator.Vision
             _tripleBuffer?.Dispose();
             _tripleBuffer = null;
             _captureSize = Size.Empty;
-            _logger.LogInfo("全局截图缓冲区已清理");
+            _logger.Info("全局截图缓冲区已清理");
         }
     }
 }

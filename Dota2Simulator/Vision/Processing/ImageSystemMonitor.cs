@@ -24,20 +24,15 @@ namespace Dota2Simulator.Vision
     {
         private static readonly Timer _maintenanceTimer;
         private static bool _autoMaintenanceEnabled = true;
-        private static ILogger _logger = new ConsoleLogger();
-
-        public static void SetLogger(ILogger logger)
-        {
-            _logger = logger ?? new ConsoleLogger();
-        }
+        private static NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
 
         public static void PrintStatus()
         {
-            _logger.LogInfo("=== 图像系统状态 ===");
+            _logger.Info("=== 图像系统状态 ===");
             ImageProcessingSystem.ReportUsage();
-            _logger.LogInfo($"静态缓存数:{StaticImageCache.Count}");
-            _logger.LogInfo($"像素缓存数: {PixelCodeCache.CacheSize}");
-            _logger.LogInfo("==================");
+            _logger.Info($"静态缓存数:{StaticImageCache.Count}");
+            _logger.Info($"像素缓存数: {PixelCodeCache.CacheSize}");
+            _logger.Info("==================");
         }
 
         public static bool AutoMaintenanceEnabled
@@ -60,7 +55,7 @@ namespace Dota2Simulator.Vision
         // 手动触发完整清理
         public static void PerformFullCleanup()
         {
-            _logger.LogInfo("执行完整清理...");
+            _logger.Info("执行完整清理...");
 
             // 清理缓存
             StaticImageCache.Clear();
@@ -72,7 +67,7 @@ namespace Dota2Simulator.Vision
             GC.WaitForPendingFinalizers();
             GC.Collect();
 
-            _logger.LogInfo("清理完成");
+            _logger.Info("清理完成");
             PrintStatus();
         }
     }

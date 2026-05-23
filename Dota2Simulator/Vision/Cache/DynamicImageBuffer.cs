@@ -30,7 +30,7 @@ namespace Dota2Simulator.Vision
         private static GCHandle _handle;
         private static bool _initialized;
         private static readonly Lock _allocLock = new();
-        private static ILogger _logger = new ConsoleLogger();
+        private static NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
 
         // 使用分段内存池减少碎片
         private const int SEGMENT_SIZE = 64 * 1024 * 1024; // 64MB per segment
@@ -56,7 +56,7 @@ namespace Dota2Simulator.Vision
             _buffer = (byte*)_handle.AddrOfPinnedObject();
             _initialized = true;
 
-            _logger.LogInfo($"动态缓冲区初始化: {_bufferSize / (1024 * 1024)}MB");
+            _logger.Info($"动态缓冲区初始化: {_bufferSize / (1024 * 1024)}MB");
         }
 
         /// <summary>
@@ -112,7 +112,7 @@ namespace Dota2Simulator.Vision
         private static void ExpandBuffer(long additionalSize)
         {
             long newSize = _bufferSize + Math.Max(additionalSize, SEGMENT_SIZE);
-            _logger.LogInfo($"扩容动态缓冲区: {_bufferSize / (1024 * 1024)}MB -> {newSize / (1024 * 1024)}MB");
+            _logger.Info($"扩容动态缓冲区: {_bufferSize / (1024 * 1024)}MB -> {newSize / (1024 * 1024)}MB");
 
             var newArray = new byte[newSize];
             var newHandle = GCHandle.Alloc(newArray, GCHandleType.Pinned);

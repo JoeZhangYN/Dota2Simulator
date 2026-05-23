@@ -26,7 +26,7 @@ namespace Dota2Simulator.Vision
     {
         private static readonly ConcurrentDictionary<int, CachedImage> _cache = new();
         private static readonly Lock _cacheLock = new();
-        private static ILogger _logger = new ConsoleLogger();
+        private static NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
 
         /// <summary>
         /// 缓存的图像数据
@@ -70,11 +70,6 @@ namespace Dota2Simulator.Vision
             }
         }
 
-        public static void SetLogger(ILogger logger)
-        {
-            _logger = logger ?? new ConsoleLogger();
-        }
-
         /// <summary>
         /// 添加静态图像到缓存
         /// </summary>
@@ -104,7 +99,7 @@ namespace Dota2Simulator.Vision
 
                 var cached = new CachedImage(size.Width, size.Height, data);
                 _cache[imageId] = cached;
-                _logger.LogInfo($"缓存静态图像 {imageId}: {size.Width}x{size.Height}");
+                _logger.Info($"缓存静态图像 {imageId}: {size.Width}x{size.Height}");
             }
         }
 
@@ -155,7 +150,7 @@ namespace Dota2Simulator.Vision
                 {
                     cached.Dispose();
                     ImageProcessingSystem.Deallocate(cached.Data.Length);
-                    _logger.LogInfo($"清理静态图像缓存: {id}");
+                    _logger.Info($"清理静态图像缓存: {id}");
                 }
             }
         }

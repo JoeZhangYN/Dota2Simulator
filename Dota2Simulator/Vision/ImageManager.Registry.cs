@@ -13,7 +13,7 @@ namespace Dota2Simulator.Vision
     {
         private static readonly ConcurrentDictionary<int, ImageMetadata> _images = new();
         private static int _nextId = 1;
-        private static ILogger _logger = new ConsoleLogger();
+        private static NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
 
         private struct ImageMetadata
         {
@@ -38,14 +38,14 @@ namespace Dota2Simulator.Vision
                 if (metadata.UseTripleBuffer)
                 {
                     // 三重缓冲由外部管理，这里只移除引用
-                    _logger.LogInfo($"释放三重缓冲图像引用: {metadata.Name}");
+                    _logger.Info($"释放三重缓冲图像引用: {metadata.Name}");
                 }
                 else if (handle.Type == ImageType.Dynamic)
                 {
                     DynamicImageBuffer.ReleaseSpace(metadata.Offset);
                 }
 
-                _logger.LogInfo($"释放图像: {metadata.Name}");
+                _logger.Info($"释放图像: {metadata.Name}");
             }
         }
     }

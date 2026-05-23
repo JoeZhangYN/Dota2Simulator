@@ -28,11 +28,11 @@ namespace Dota2Simulator.Vision
     public abstract class ImageProcessor
     {
         protected ImageHandle CurrentImage { get; private set; }
-        protected ILogger Logger { get; set; }
+        protected NLog.Logger Logger { get; set; }
 
-        protected ImageProcessor(ILogger logger = null)
+        protected ImageProcessor()
         {
-            Logger = logger ?? new ConsoleLogger();
+            Logger = NLog.LogManager.GetCurrentClassLogger();
         }
 
         public virtual async Task<bool> ProcessAsync(ImageHandle image)
@@ -41,14 +41,14 @@ namespace Dota2Simulator.Vision
 
             try
             {
-                Logger.LogInfo($"开始处理图像: {image.Id} ({(image.IsStatic ? "静态" : "动态")})");
+                Logger.Info($"开始处理图像: {image.Id} ({(image.IsStatic ? "静态" : "动态")})");
                 var result = await ProcessCore();
-                Logger.LogInfo($"图像处理完成: {image.Id}");
+                Logger.Info($"图像处理完成: {image.Id}");
                 return result;
             }
             catch (Exception ex)
             {
-                Logger.LogError($"图像处理失败: {ex.Message}");
+                Logger.Error($"图像处理失败: {ex.Message}");
                 return false;
             }
         }
