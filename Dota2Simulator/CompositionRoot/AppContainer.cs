@@ -3,6 +3,7 @@
 // 实例化 + 持有 HeroStrategyRegistry / GameSession，由 Program.cs 构造后传入 Form2。
 #if DOTA2
 
+using Dota2Simulator.Diagnostics;
 using Dota2Simulator.GameAutomation.Application;
 using Dota2Simulator.GameAutomation.Ports;
 using Dota2Simulator.Input.Adapters;
@@ -30,8 +31,10 @@ internal sealed class AppContainer
 
     public AppContainer()
     {
-        Input = new HybridInputAdapter();
-        Vision = new RustVisionAdapter();
+        // ports 装饰链：HybridInputAdapter / RustVisionAdapter → ProbeXxx 录像装饰 → 注入下游
+        // RecordReplayProbe.Enabled 默认 false，装饰器零开销（仅一次 volatile bool 读）
+        Input = new ProbeInputExecutor(new HybridInputAdapter());
+        Vision = new ProbeScreenVision(new RustVisionAdapter());
         Registry = new HeroStrategyRegistry(Input, Vision);
         Registry.RegisterAll();
         GameSession = new GameSession(Registry);
