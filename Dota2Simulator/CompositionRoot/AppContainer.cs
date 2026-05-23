@@ -11,7 +11,7 @@ namespace Dota2Simulator.CompositionRoot;
 /// 应用组合根（Composition Root）：在 Program.cs 单点装配所有依赖，
 /// 把 GameSession 实例从静态全局变为构造器注入到 Form2。
 ///
-/// A1 阶段：仅承载 Registry + GameSession（与原 AppComposition 同形）。
+/// A2 阶段：仅承载 Registry + GameSession（前身静态 AppComposition 已删）。
 /// A3 后：将持有 IInputExecutor / IScreenVision ports，并把它们注入 HeroStrategyRegistry。
 /// A6 后：ports 经 ProbeInputExecutor / ProbeScreenVision 装饰。
 /// </summary>
