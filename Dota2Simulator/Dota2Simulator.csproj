@@ -396,4 +396,8 @@
                       ReferenceOutputAssembly="false" />
   </ItemGroup>
 
+  <ItemGroup>
+    <AdditionalFiles Include="Picture_Dota2\**\*.bmp" />
+  </ItemGroup>
+
 </Project>
