@@ -11,7 +11,7 @@ using Microsoft.CodeAnalysis.Text;
 namespace Dota2Simulator.SourceGenerators;
 
 /// <summary>
-/// Phase 10C S1 hello-world: 验证 SG 项目串联.
+/// Phase 10C S1 hello-world: 验证 SG 项目串联 (Phase 10D #2 已删除 hello-world emit, plan §8 一致).
 /// Phase 10C S3 扩 EmitStrategyPartial: 扫 [HeroStrategy] attribute (via ForAttributeWithMetadataName)
 /// emit Strategy partial 文件 — 含 ports 字段 + ctor + HeroId Hero property,
 /// 业务 *Strategy.cs 同 commit 真删 ctor/field/Hero (S3 双部分整改 CS0102/CS0111 free).
@@ -19,6 +19,7 @@ namespace Dota2Simulator.SourceGenerators;
 /// emit HeroStrategyRegistry.Generated.g.cs 内 4 partial method body (Register* 调用,
 /// attribute 分流 + RequiresUi 测试Strategy 走 _ui! 第 5 参数),
 /// 同 commit 删 4 手写 partial 文件 (CS0759/CS8795 双向 free).
+/// Phase 10D #2: hello-world emit 已删 (S3 起 SG emit 92 Strategy.g.cs + 1 Registry.Generated.g.cs 充分实证 SG 串联, hello 冗余).
 /// </summary>
 [Generator(LanguageNames.CSharp)]
 public sealed class HeroStrategyGenerator : IIncrementalGenerator
@@ -27,13 +28,7 @@ public sealed class HeroStrategyGenerator : IIncrementalGenerator
 
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
-        // S1 hello-world: emit 单一标记文件验证 SG 项目串联 (S3 起仍保留, 不影响 emit 计数 — verify 已 exclude Hello.g.cs)
-        context.RegisterPostInitializationOutput(static ctx =>
-        {
-            ctx.AddSource("HeroStrategyGenerator.Hello.g.cs",
-                "// Phase 10C S1 HeroStrategyGenerator hello-world\n" +
-                "// SG 项目串联实证 OK; S3 起扩 EmitStrategyPartial 已上线\n");
-        });
+        // Phase 10D #2: 删 hello-world emit (S3 起 92 Strategy.g.cs + 1 Registry.Generated.g.cs 充分实证 SG 串联).
 
         // S3: ForAttributeWithMetadataName 扫 [HeroStrategy] 命中
         var strategyClasses = context.SyntaxProvider
