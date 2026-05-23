@@ -1,5 +1,6 @@
 using Dota2Simulator.GameAutomation.Domain.Combat;
 using Dota2Simulator.GameAutomation.Domain.Loop;
+using Dota2Simulator.GameAutomation.Ports;
 
 namespace Dota2Simulator.GameAutomation.Application;
 
@@ -17,4 +18,11 @@ public sealed class HeroAggregate
 
     /// <summary>攻击计时与走 A 状态（原 _攻击）。</summary>
     public AttackProfile Attack { get; } = new();
+
+    /// <summary>
+    /// 双阶段注入 Vision 端口——透传到 ConditionSlotSet。
+    /// Phase 6 A5 引入：Main._聚合 全局 static 字段先于 AppContainer 构造（CLR 类型加载期），
+    /// 无法走 ctor 注入，AppContainer 构造后调本方法补注入。
+    /// </summary>
+    public void Init(IScreenVision vision) => Conditions.Init(vision);
 }

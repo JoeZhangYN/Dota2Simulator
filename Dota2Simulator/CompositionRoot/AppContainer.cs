@@ -35,6 +35,9 @@ internal sealed class AppContainer
         Registry = new HeroStrategyRegistry(Input, Vision);
         Registry.RegisterAll();
         GameSession = new GameSession(Registry);
+
+        // A5 双阶段：Main._聚合 类型加载期已 new 出来，AppContainer 构造后补注入 vision。
+        Games.Dota2.Main._聚合.Init(Vision);
     }
 }
 

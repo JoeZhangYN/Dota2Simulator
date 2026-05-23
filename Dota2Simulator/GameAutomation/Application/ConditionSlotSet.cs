@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Dota2Simulator.GameAutomation.Ports;
 using Dota2Simulator.Games;
 using Dota2Simulator.Vision;
 
@@ -19,11 +20,27 @@ public sealed class ConditionSlotSet
     private const int 槽数 = 15;
     private readonly ConditionSlot[] _slots;
 
+    /// <summary>
+    /// Vision 端口（双阶段 Init 注入）。Phase 6 A5 引入：
+    /// Main._聚合 静态字段在类型加载期 new ConditionSlotSet()，早于 AppContainer 构造，
+    /// 无法走 ctor 注入；AppContainer 构造后调 HeroAggregate.Init(vision) → 本类 Init。
+    /// Init 前的 Probe 调用 fallback 到 GlobalScreenCapture.GetCurrentHandle()，行为同前。
+    /// </summary>
+    private IScreenVision? _vision;
+
     public ConditionSlotSet()
     {
         _slots = new ConditionSlot[槽数];
         for (int i = 0; i < 槽数; i++)
             _slots[i] = new ConditionSlot();
+    }
+
+    /// <summary>双阶段注入 Vision 端口。重复调用抛 InvalidOperationException。</summary>
+    public void Init(IScreenVision vision)
+    {
+        if (_vision != null)
+            throw new InvalidOperationException("ConditionSlotSet 已初始化");
+        _vision = vision ?? throw new ArgumentNullException(nameof(vision));
     }
 
     /// <summary>按槽位访问条件槽（ConditionSlot 是引用类型，读写其 Active/Probe 即原地生效）。</summary>
@@ -121,11 +138,14 @@ public sealed class ConditionSlotSet
         await Task.WhenAll(检测任务).ConfigureAwait(false);
     }
 
-    /// <summary>条件成立且委托非空才执行委托——移植自 Main.cs 检查条件并执行委托。</summary>
-    private static async Task<bool> 检查并执行(bool 条件, ConditionDelegateBitmap? 委托)
+    /// <summary>条件成立且委托非空才执行委托——移植自 Main.cs 检查条件并执行委托。
+    /// A5 切 vision port：Init 后用 _vision.GetCurrentFrame()；未 Init fallback 旧路径。</summary>
+    private async Task<bool> 检查并执行(bool 条件, ConditionDelegateBitmap? 委托)
     {
-        return 条件 && 委托 is not null
-            ? await 委托(GlobalScreenCapture.GetCurrentHandle()).ConfigureAwait(true)
-            : 条件;
+        if (!条件 || 委托 is null) return 条件;
+#pragma warning disable CS0618 // GetCurrentFrame 标 [Obsolete] 是临时妥协，A5 这是唯一合法调用点
+        ImageHandle handle = _vision?.GetCurrentFrame() ?? GlobalScreenCapture.GetCurrentHandle();
+#pragma warning restore CS0618
+        return await 委托(handle).ConfigureAwait(true);
     }
 }
