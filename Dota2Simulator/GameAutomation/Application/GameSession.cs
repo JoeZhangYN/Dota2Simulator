@@ -4,11 +4,13 @@
 #if DOTA2
 #nullable enable
 
+using System;
 using System.Threading.Tasks;
 using Dota2Simulator.GameAutomation.Domain.Actuation;
 using Dota2Simulator.GameAutomation.Domain.Heroes;
 using Dota2Simulator.GameAutomation.Ports;
 using Dota2Simulator.Games;
+using Dota2Simulator.Vision;
 
 namespace Dota2Simulator.GameAutomation.Application;
 
@@ -57,6 +59,17 @@ public sealed class GameSession : IGameSession
                 // OnActivate 须已置位 _总循环条件，与旧 case 块 _总循环条件=true 先于
                 // 状态初始化() 调用的顺序一致。
                 _ = Common.HeroLoopHost!.状态初始化();
+
+                // Phase 10B B4: 按英雄预加载 SG hint 字典提示的图片资源, fire-and-forget 不阻塞主流程.
+                // 异常仅 log + 不抛 (与 LazyImageLoader.LoadImageCore 容错风格一致).
+                // 消 Phase 10A SOFT_FAIL #1 (PreloadHints 桥半建): SG 已 emit 字典但主项目 0 引用.
+                // 重复 key 由 LazyImageLoader 内 ConcurrentDictionary<Lazy<ImageHandle>> 防御零代价.
+                if (PictureHeroPreloadHints.Hints.TryGetValue(hero.Name, out var preloadKeys) && preloadKeys.Length > 0)
+                {
+                    _ = LazyImageLoader.PreloadImagesAsync(preloadKeys).ContinueWith(
+                        t => Console.WriteLine($"[Preload] {hero.Name} 失败: {t.Exception?.GetBaseException().Message}"),
+                        TaskContinuationOptions.OnlyOnFaulted);
+                }
             }
 
             await strategy.OnKeyAsync(trigger, _current).ConfigureAwait(false);
