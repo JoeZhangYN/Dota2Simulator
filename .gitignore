@@ -364,3 +364,10 @@ FodyWeavers.xsd
 /Dota2Simulator/Form1.cs
 /Dota2Simulator/Form1.Designer.cs
 /Dota2Simulator/Form1.resx
+
+# Claude Code / dream binary 运行时状态（每次 hook 调用 mutate，不应 git track）
+.claude/.gate-state/
+.claude/.hooks-log/
+.claude/.state/
+.claude/dream/_feedback/
+.claude/worktrees/
