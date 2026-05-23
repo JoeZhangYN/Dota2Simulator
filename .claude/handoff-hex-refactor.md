@@ -8,6 +8,7 @@ C# .NET 10 WinForms 游戏自动化框架，重写为六边形架构。
 - Phase 9 plan SSOT: `C:\Users\JoeZhang\.claude\plans\idempotent-brewing-kurzweil.md`
 - Phase 10A plan SSOT: `C:\Users\JoeZhang\.claude\plans\generated-glinting-knuth.md`
 - Phase 10B plan SSOT: `C:\Users\JoeZhang\.claude\plans\sturdy-bridging-rabin.md`
+- Phase 10C plan SSOT: `C:\Users\JoeZhang\.claude\plans\crystal-emitting-knuth.md`
 
 ## 进度
 - [x] Phase 1-3（commit `11d51e8` → `3ea4129`）
@@ -18,6 +19,7 @@ C# .NET 10 WinForms 游戏自动化框架，重写为六边形架构。
 - [x] **Phase 9 HeroLoopHost 实例化 + 真删收尾**—— 2026-05-23 完成（7 commit，A + B + C + D + D' + E + F；plan SSOT `~/.claude/plans/idempotent-brewing-kurzweil.md`）
 - [x] **Phase 10A SG 图片资源改造**—— 2026-05-23 完成（4 chunk，净 +108 行；plan SSOT `~/.claude/plans/generated-glinting-knuth.md`）
 - [x] **Phase 10B 6 SOFT_FAIL 消除**—— 2026-05-23 完成（5 chunk，B1-B5；plan SSOT `~/.claude/plans/sturdy-bridging-rabin.md`）
+- [x] **Phase 10C Strategy SG 92 样板消除**—— 2026-05-23 完成（5 chunk，S1-S5；plan SSOT `~/.claude/plans/crystal-emitting-knuth.md`，净 -1479 LOC）
 
 ## Phase 6 + 6.5 已完成（main 分支连续 commit，每 chunk 0 build 错误）
 
@@ -360,3 +362,98 @@ Backup 基础设施：`D:\backup\C\temp\JoezhangYN\C#\Dota2Plus\Dota2Simulator.g
   6. Strategy SG（消 ~1500 行 92 策略样板 ctor + 字段 + Register）
   7. 单测基础设施（xUnit + FakeItEasy + 92 策略 smoke test）
 - **Phase 11**：Silt 子 BC 整顿（Silt.Main + DynamicSkillAutoSelector instance 化 + Form2/GameSession ctor 扩 HeroLoopHost → 删 Common.ItemEngine + Common.HeroLoopHost 终态 0 service locator）
+
+## Phase 10C 完整收尾 (2026-05-23)
+
+**plan SSOT**：`C:\Users\JoeZhang\.claude\plans\crystal-emitting-knuth.md` (847 行)
+
+**Epic 目标**：92 策略类 ctor + `_input`/`_vision`/`_skill`/`_item` 4 字段 + `Hero` enum 属性 + 4 手写 partial Registry 8 样板点 → `[HeroStrategy("name", HeroAttribute.X, RequiresUi=false)]` attribute SSOT + `HeroStrategyGenerator` (`ForAttributeWithMetadataName`) 全量 emit；调用方 API 全保（92 策略类实例化路径不变，AppContainer 装配链字节零改），消 ~1500 行重复样板。
+
+**5 chunk 主干**（自底向上，S1-S5；S3/S4 为「同 commit 双部分整改」即 SG emit 与业务真删一次性配套提交以保 0 build 错）：
+
+- `9f75a9d` **S1** HeroStrategyAttribute SSOT + HeroStrategyGenerator hello-world（SG 项目串联实证；netstandard2.0 / Microsoft.CodeAnalysis.CSharp 4.11.0；attribute 三 metadata: Name / HeroAttribute / RequiresUi；与 HeroAttribute enum 同 namespace 免双 using）
+- `554c864` **S2** 92 *Strategy.cs 加 `[HeroStrategy]` attribute（双源期保编译, 0 删除；distinct hero name = 92 验证；全 Edit 工具路径绕开 PowerShell UTF-8 损毁）
+- `7a2be5b` **S3** **同 commit 双部分整改**：SG emit Strategy partial（`ForAttributeWithMetadataName` 首次实证，92 命中）+ 92 业务真删 ctor/field/Hero（CS0102/CS0111/CS1729/CS0103 free；净 -1407 LOC）
+- `95e2f3a` **S4** **同 commit 双部分整改**：SG emit `HeroStrategyRegistry.Generated`（4 partial method body + 92 Register 调用 + 测试Strategy `_ui!` 6 ports）+ 删 4 手写 partial Registry（CS0759/CS8795 free；净 -72 LOC；主 `HeroStrategyRegistry.cs`/`AppContainer.cs` 字节零改）
+- **S5** verify-only 无 commit（14 项 verify 全 PASS / distinct hero name = 92 核心 gate）
+
+**净行数**：约 -1479 LOC（S2 +92 / S3 净 -1407 / S4 净 -72 / S5 0），消除 92 策略重复样板（ctor + field + Hero + 4 partial Registry register 调用），样板压缩率约 83%。
+
+**关键文件**：
+
+| 文件 | 状态 | chunk | 说明 |
+|------|------|-------|------|
+| `Dota2Simulator/GameAutomation/Domain/Heroes/HeroStrategyAttribute.cs` | NEW | S1 | attribute SSOT (Name / HeroAttribute / RequiresUi 三 metadata)；与 HeroAttribute enum 同 namespace 免双 using |
+| `Dota2Simulator.SourceGenerators/HeroStrategyGenerator.cs` | NEW | S1+S3+S4 | hello-world (S1) → EmitStrategyPartial 92 命中 (S3) → EmitRegistry (S4) 4 partial method body + 92 Register 调用 + 测试Strategy `_ui!` 6 ports；S4 用 `global::` fully qualified namespace 避免 4 sub namespace using 冲突 |
+| `Dota2Simulator/GameAutomation/Heroes/{Strength,Agility,Intelligence,Universal}/*Strategy.cs` (92 文件) | EDIT | S2+S3 | S2 +`[HeroStrategy]` / S3 `sealed` → `sealed partial` + 删 ctor / 4 field / Hero |
+| `Dota2Simulator/GameAutomation/Application/HeroStrategyRegistry.Strength.cs` | DELETE | S4 | 手写 partial Registry 删除 |
+| `Dota2Simulator/GameAutomation/Application/HeroStrategyRegistry.Agility.cs` | DELETE | S4 | 手写 partial Registry 删除 |
+| `Dota2Simulator/GameAutomation/Application/HeroStrategyRegistry.Intelligence.cs` | DELETE | S4 | 手写 partial Registry 删除 |
+| `Dota2Simulator/GameAutomation/Application/HeroStrategyRegistry.Universal.cs` | DELETE | S4 | 手写 partial Registry 删除 |
+| `Dota2Simulator/GameAutomation/Application/HeroStrategyRegistry.cs` | 字节零改 | - | 主 partial 保留：`_ui` 字段 (line 25) + 4 partial method declaration (line 55-58) |
+| `Dota2Simulator/CompositionRoot/AppContainer.cs` | 字节零改 | - | 装配链全程不变 |
+| `Dota2Simulator/GameAutomation/Application/IHeroStrategy.cs` | 字节零改 | - | 接口契约不变 |
+
+## Phase 10C 关键不变量 (architecture-sentinel PASS)
+
+**继承 Phase 10A 7 + Phase 10B 6 不变量**（126 属性 1:1 / 33 文件 0 改 / `#if Silt` 语义 / SHA1 非阻断 / Phase 9 装配序零侵入 / 0 新增警告 / 每 chunk 单 commit 0 错 / 6 SOFT_FAIL 消除 / SG 单 dict SSOT / SHA1 Silt 分割正确 / LazyImageLoader internal API 收口 / PreloadHints 桥接闭环 / 接口契约自检），新增 5 项：
+
+1. **`[HeroStrategy]` attribute 是 92 策略身份 SSOT**：Name / HeroAttribute / RequiresUi 三 metadata 一次声明，SG emit ctor + 4 field + Hero + Register 全派生 ✅
+2. **`ForAttributeWithMetadataName` 实证命中 = 92**（distinct hero name 核心 gate）：S5 verify gate 通过；net new SG 增量 cache 命中点 ✅
+3. **AppContainer.cs / IHeroStrategy.cs / HeroStrategyRegistry.cs 主 partial 字节零改**：装配链 + 接口契约 + 共享字段声明 0 侵入；92 策略调用方实例化路径不变 ✅
+4. **4 手写 partial Registry 真删 + SG emit `Generated` 替代**：Register 调用 SSOT 由 SG `[HeroStrategy].Name` 驱动，加新英雄只改 1 处（attribute）✅
+5. **同 commit 双部分整改不变量**（S3 / S4 模板）：SG emit + 业务真删一次性配套提交，保中间态不出 0 build 错；revert 必须按倒序整 commit 撤回（不可单部分撤）✅
+
+## Phase 10C architecture-sentinel verdict
+
+**PASS** —— 5 反模式全 PASS / dogfood 14 项 13 verified + 1 falsified-by-noise 实质 PASS / 接口契约 8 项全保留字节级 diff = 0 / Phase 10A 7 + Phase 10B 6 不变量全保留 / 反预测 4 verified + 1 falsified-by-noise。
+
+## Phase 10C handoff_notes (7 项 Phase 10D+ 候选，不污染当前 epic 完成状态)
+
+1. **SG enum 反查改用 `ITypeSymbol.GetMembers`**（中优先 / Phase 10D+ 候选）：当前 SG 用数值 switch 反查 HeroAttribute enum (0=Strength, 1=Agility, 2=Intelligence, 3=Universal)，未来 enum 插值/加值时静默落 Universal bucket；建议改 `ITypeSymbol.GetMembers` 取真 field name 解 metadata
+2. **SG `HeroStrategyGenerator.Hello.g.cs` 决断**（低 / Phase 10D+ 候选）：plan §8 预估 S3 起删除，实测 HEAD = S4 仍保留 1 行注释 g.cs；0 功能影响但 plan 实施不一致 —— 删 hello-world 或更新 plan §8
+3. **plan §S5 v15 AppContainer 路径笔误**（低 / Phase 10D+ 候选）：plan 写 `Dota2Simulator/Application/AppContainer.cs`，实际 `Dota2Simulator/CompositionRoot/AppContainer.cs` —— plan SSOT 勘误回写
+4. **plan §S5 v13 `_ui!` verify 改精确匹配**（低 / Phase 10D+ 候选）：当前 grep `_ui!` 实测 = 2（SG 注释 line 3 + 真调用 line 113），实质 PASS；建议改 `\s+_ui!\s*,` 精确匹配剔除注释 false-positive
+5. **Linux/macOS CI 启用时 reverify 中文 class name SG hint name 跨平台稳定性**（低 / Phase 10D+ 候选 / 当前 Windows-only 部署无暴露面）
+6. **VS hot reload 启用时实证 `ForAttributeWithMetadataName` 增量 cache 命中**（低 / Phase 10D+ 候选 / 当前 dotnet CLI 工作流无暴露面）
+7. **plan §3 S3 实战 2 意外累积到 fact 知识库**（低 / Phase 10D+ 候选）：
+   - `大牛Strategy.cs` 行尾注释 `// A4 阶段：_vision 暂未使用` 致 regex 漏命中 → Edit 单文件补刀
+   - subagent 用 `record struct` 触发 CS0518 (netstandard2.0 缺 `IsExternalInit` polyfill) → 改普通 struct 修复
+   - 建议两条经验入 `.claude/dream/knowledge/facts/` 或本仓 lessons-learned
+
+## Phase 10C 反预测与实测三处偏差备忘
+
+- **S3** subagent 实施期遇 2 意外（regex 漏命中 + `record struct` CS0518），均通过 Edit 补刀 + struct 改造解决，非反预测漂移
+- **S4** SG 用 `global::` fully qualified namespace 避免 4 sub namespace using 冲突，plan 描述未提，实际优化
+- **S5** v13 `_ui!` 命中 = 2 注释 false-positive；plan v15 AppContainer 路径笔误（CompositionRoot/ 非 Application/）
+
+## 待用户冒烟（Phase 10C 收尾）
+
+继承 Phase 10A / Phase 10B 冒烟清单 + 新增 Phase 10C 专项实测：
+
+1. **S3 SG emit ctor / field 实测**（新增）：4 属性抽样英雄按 Q/W/E/R 验证 SkillEngine/ItemEngine 调用不中断（条件委托链路无 NRE / `_skill` / `_item` / `_vision` / `_input` 字段经 SG emit 后注入正确）
+   - Strength: 军团 / 屠夫
+   - Agility: 小黑 / 影魔
+   - Intelligence: 卡尔 / 暗影萨满
+   - Universal: 测试 / 猛犸
+2. **S4 测试Strategy 6 ports + `_ui!` 注入实测**（新增）：按 Q 触发 UI 注入路径，验证 `_ui!` (RequiresUi=true) 经 SG emit 后真注入 UiInvoker 不 NPE
+3. **S3/S4 Registry 装配实测**（新增）：启动程序后切英雄触发 GameSession 内 Strategy 实例化路径全程无类型加载顺序异常
+4. **Phase 10B B4 PreloadHints 联动**（继承）：切英雄触发 `GameSession.DispatchAsync` PreloadHints fire-and-forget（Phase 10B B4），`[LazyLoad] 加载` log 正常
+5. **继承 Phase 10A / 10B 冒烟项**：
+   - R2 ModuleInitializer 时序：`[ModuleInit] <ticks1>` 早于 `[Form2.ctor] <ticks2>`
+   - 物品使用（假腿切换 / 神杖魔晶判断）
+   - SHA1 mismatch 测试（可选）
+
+## Phase 10C 回滚锚点
+
+- **完整撤回 Phase 10C**：`git revert 95e2f3a 7a2be5b 554c864 9f75a9d`（4 commit 顺序倒序）
+- **注意**：S3 / S4 是「同 commit 双部分整改」（SG emit + 业务真删一次性配套），revert 单个 commit 会触发编译双源错（field 真删但 SG emit 撤 → CS0103 / Hero 真删但 ctor 撤 → CS0102）；**建议按倒序全 revert** 才能回到稳定态
+- S5 无 commit，无需 revert
+
+## 下次 session 起手指引（Phase 10D / Phase 11 任选）
+
+- **Phase 10D 候选**（7 项 Phase 10C handoff_notes + 5 项 Phase 10B 剩余 handoff_notes，详见各段）：
+  - 10C #1 SG enum 反查改 `ITypeSymbol.GetMembers`（中优先）
+  - 10C #2-#7 plan 勘误 / hello-world g.cs 决断 / `_ui!` 精确匹配 / CI 跨平台 / VS hot reload / fact 知识库累积
+  - 10B #1-#5 PreloadHints hero key lint / Sha1MismatchCount 消费方 / log tag 统一 / plan 措辞勘误 / HeroIdentity epic
+- **Phase 11**：Silt 子 BC 整顿（Silt.Main + DynamicSkillAutoSelector instance 化 + Form2/GameSession ctor 扩 HeroLoopHost → 删 Common.ItemEngine + Common.HeroLoopHost 终态 0 service locator）—— 继承 Phase 10A / 10B / 10C 后续段
