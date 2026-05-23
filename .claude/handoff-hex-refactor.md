@@ -5,6 +5,8 @@ C# .NET 10 WinForms 游戏自动化框架，重写为六边形架构。
 - Phase 4 plan SSOT: `C:\Users\JoeZhang\.claude\plans\noble-percolating-hejlsberg.md`
 - Phase 6 plan SSOT: `C:\Users\JoeZhang\.claude\plans\shimmying-strolling-starfish.md`
 - Phase 8 plan SSOT: `C:\Users\JoeZhang\.claude\plans\sequential-nibbling-lightning.md`
+- Phase 9 plan SSOT: `C:\Users\JoeZhang\.claude\plans\idempotent-brewing-kurzweil.md`
+- Phase 10A plan SSOT: `C:\Users\JoeZhang\.claude\plans\generated-glinting-knuth.md`
 
 ## 进度
 - [x] Phase 1-3（commit `11d51e8` → `3ea4129`）
@@ -13,6 +15,7 @@ C# .NET 10 WinForms 游戏自动化框架，重写为六边形架构。
 - [x] **Phase 7**（IUiInvoker port + 单例终结）—— 2026-05-23 完成（5 chunk，D1-D5）
 - [x] **Phase 8 段落性收尾**（现代化全量解耦 8/10）—— 2026-05-23 完成（A + C1 + C3 + C4 + C5 + C6 + C7 + D1；HeroLoopHost 推迟 Phase 9）
 - [x] **Phase 9 HeroLoopHost 实例化 + 真删收尾**—— 2026-05-23 完成（7 commit，A + B + C + D + D' + E + F；plan SSOT `~/.claude/plans/idempotent-brewing-kurzweil.md`）
+- [x] **Phase 10A SG 图片资源改造**—— 2026-05-23 完成（4 chunk，净 +108 行；plan SSOT `~/.claude/plans/generated-glinting-knuth.md`）
 
 ## Phase 6 + 6.5 已完成（main 分支连续 commit，每 chunk 0 build 错误）
 
@@ -185,3 +188,83 @@ Backup 基础设施：`D:\backup\C\temp\JoezhangYN\C#\Dota2Plus\Dota2Simulator.g
 - LOL/HF2 切 GameSession（统一入站端口）
 - **Vision 性能**：候选区域裁剪 + GpuFusedVisionAdapter
 - **HeroIdentity epic**：F1 触发 HUD 英雄名提取 + 像素模板多帧投票 + 全 HUD gate
+
+## Phase 10A 完整收尾 (2026-05-23)
+
+**plan SSOT**：`C:\Users\JoeZhang\.claude\plans\generated-glinting-knuth.md` (478 行)
+
+**Epic 目标**：Dota2_Pictrue 126 手写懒加载属性 → C# Incremental Source Generator 编译期扫 `Assets/**/*.bmp` 自动生成 partial class；调用方 API `Dota2_Pictrue.Buff.X` 1:1 不变；附带 SHA1 资源签名校验链路 + 按英雄预加载 hint 字典。
+
+**4 commit 主干**：
+- `b52cba7` **A** SG 骨架 + hello-world 注入（PictureManifestGenerator IIncrementalGenerator；netstandard2.0；csproj ProjectReference + EmitCompilerGeneratedFiles）
+- `54a5747` **B** SG 全量复刻 126 属性 + Dota2_Pictrue.cs 降级 partial 占位（418 → 13 行；33 文件 / 202 处调用方零改动 grep 前后一致；`#if Silt` 语义保留；`_fileStemToPropertyName` 特例 dict + Silt flatten）
+- `e98e8a3` **C** SG SHA1 manifest emit + LazyImageLoader RegisterSha1Manifest 校验链路（`_expectedSha1Map` + `Sha1MismatchCount` Interlocked 计数 + `LoadImageCore` SHA1 分叉 + `BitmapToHandle` local helper + `[ModuleInitializer]` 注册；mismatch 非阻断仅 log）
+- `7286e17` **D** SG 英雄预加载 hint emit（PictureHeroPreloadGenerator regex `[\w一-鿿]+` 扫 Strategy + `ClassNameToManifestPrefix` 反向映射；emit `PictureHeroPreloadHints.Hints` 29 entry 字典 —— 集成桥半建主项目 0 引用，Phase 10B 候选）
+
+**净行数**：7 files changed / +535 / -427 / 净 +108 行
+
+**关键文件**：
+
+| 文件 | 状态 | 说明 |
+|------|------|------|
+| `Dota2Simulator.SourceGenerators/Dota2Simulator.SourceGenerators.csproj` | NEW | netstandard2.0 / Microsoft.CodeAnalysis.CSharp 4.11.0 / Microsoft.CodeAnalysis.Analyzers 3.11.0 |
+| `Dota2Simulator.SourceGenerators/PictureManifestGenerator.cs` | NEW | 主 SG，5 类映射 + `_fileStemToPropertyName` 特例 dict + Silt flatten + SHA1 emit + ModuleInitializer；含 `DirToClassName` / `FileStemToPropertyName` 两 dict + `#pragma warning disable RS1035`/`CA5350` |
+| `Dota2Simulator.SourceGenerators/PictureHeroPreloadGenerator.cs` | NEW | 第二 SG，regex `[\w一-鿿]+` 扫 Strategy 文件 + `ClassNameToManifestPrefix` 反向映射 |
+| `Dota2Simulator/Games/Dota2/Dota2_Pictrue.cs` | EDIT | 418 → 13 行降级 partial 占位 |
+| `Dota2Simulator/Vision/Cache/LazyImageLoader.cs` | EDIT | +109 行：`_expectedSha1Map` 字段 + `RegisterSha1Manifest` API + `Sha1MismatchCount` 属性 + `LoadImageCore` SHA1 分叉 + `BitmapToHandle` local helper + XML doc R7 语义边界 |
+| `Dota2Simulator/Dota2Simulator.csproj` | EDIT | +13 行 ProjectReference + `EmitCompilerGeneratedFiles` + 2 AdditionalFiles |
+| `Dota2Simulator/Form2.cs` | EDIT | +3 行 R2 时序 log `[Form2.Load] {DateTime.Now.Ticks}` |
+
+## Phase 10A 关键不变量 (architecture-sentinel 全 PASS)
+
+1. 每 chunk 单 commit + dotnet build 0 错误 + auto backup push ✅
+2. **126 ImageHandle 属性签名 1:1 复刻**（B diff verify = 0）✅
+3. **33 文件 / 202 处调用方零改动**（B 前后 grep 一致）✅
+4. **`#if Silt` 语义保留**：SG 按 define 条件 emit / 调用方 ifdef 边界不变 ✅
+5. **SHA1 校验链路非阻塞**：mismatch 仅 log + Interlocked.Increment，不抛 ✅
+6. **Phase 9 装配序零侵入**：HeroLoopHost / SkillEngine / ItemEngine / Common 不变；ModuleInitializer 早于 Form2 ctor 调用 ✅（实测仍 untested，待用户冒烟）
+7. **0 新增编译警告**：220 = baseline，0 RS1xxx ✅
+
+## Phase 10A architecture-sentinel 6 项 SOFT_FAIL handoff_notes (非阻断)
+
+均作 **Phase 10B 候选**，收尾仅记录不处理：
+
+1. **PreloadHints 集成桥半建**：`PictureHeroPreloadHints.Hints` 29 entry 已 emit 但**主项目 0 引用**。设计预留，Phase 10B 候选接入 `HeroLoopHost.OnHeroChanged` → `await LazyImageLoader.PreloadImagesAsync(PictureHeroPreloadHints.Hints[heroName])`
+2. **API 可见性偏宽**：`LazyImageLoader.RegisterSha1Manifest` public，可考虑收紧 internal（SG emit 的 `[ModuleInitializer]` 同 assembly 调用，跨 assembly 无消费方）。当前 public 不影响功能
+3. **Form2 ctor 注释 tag 错位**：log 在 ctor 非 Load handler，标签 `[Form2.Load]` 易误导。建议改 tag `[Form2.ctor]` 或把 log 移到 `Form2_Load` event
+4. **pragma 豁免未同步 plan**：C chunk 主 SG 内 `#pragma warning disable RS1035`（SG 内 File.ReadAllBytes，bmp 二进制不可 AdditionalText.GetText）+ `#pragma warning disable CA5350`（SHA1 弱加密，完整性校验非密码学，与 plan R7 一致）—— 真豁免但 plan §4 mitigation 未记录
+5. **SG 反向映射双 dict**：`PictureHeroPreloadGenerator.ClassNameToManifestPrefix`（Buff→BUFF / 英雄技能→技能 / 播报信息→播报）与 `PictureManifestGenerator.DirToClassName` 反向重复。未来加新顶层目录需同步改两 SG —— Phase 10B 候选 "抽公共常量类供两 SG 共享"
+6. **SHA1 字典 Silt 关闭时含死 key**：SG 对 Sha1 字典未按 `#if Silt` 分割，全 126 SHA1 整体 `#if DOTA2` 包裹。Silt define 关闭时 dict 仍含 43 Silt key —— 仅诊断微噪不阻断
+
+## 待用户冒烟（Phase 10A 收尾）
+
+**R2 ModuleInitializer 时序实测**（架构师标 untested，等用户冒烟升级 experiential）：
+- 跑 `Dota2Simulator.exe` (admin) 看控制台首屏：
+  - `[LazyLoad] SHA1 manifest 已注册 (126 条)` 出现
+  - `[ModuleInit] <ticks1> RegisterSha1Manifest 已调用`
+  - `[Form2.Load] <ticks2>`
+  - **必须** ticks1 < ticks2（ModuleInit 早于 Form2 实例化）
+- 失序对策：改 `Dota2_PictrueSha1.RegisterOnModuleInit()` 从 ModuleInitializer 改 `Form2.Load` early 手动调
+
+**功能回归冒烟**（建议同 Phase 9 抽样）：
+1. 启动程序（admin）+ AppContainer 类型加载顺序无 NRE
+2. 抽样 4 属性英雄全技能键（大牛/影魔/卡尔/猛犸 等，含图片识别路径）
+3. 物品使用（假腿切换 / 神杖魔晶判断）
+4. SHA1 mismatch 测试（可选）：临时改一张 .bmp，重 build，启动看 stdout `Sha1MismatchCount` 递增
+
+## Phase 10A 回滚锚点
+
+- 单 chunk revert：`git revert <hash>`（A/B/C/D 任一）
+- 完整撤回 Phase 10A：`git revert 7286e17 e98e8a3 54a5747 b52cba7`（4 commit 逆序）
+
+## 下次 session 起手指引（Phase 10B / Phase 11 任选）
+
+- **Phase 10B 优先候选**（与 Phase 10A 自然衔接）：
+  1. PreloadHints 接 HeroLoopHost.OnHeroChanged（消架构师 SOFT_FAIL #1）
+  2. RegisterSha1Manifest 收 internal（消 #2）
+  3. Form2 ctor log tag 改名 / 迁 Form2_Load（消 #3）
+  4. plan §4 mitigation 补 pragma 豁免清单（消 #4）
+  5. SG 反向映射抽公共常量类（消 #5）
+  6. Strategy SG（消 ~1500 行 92 策略样板 ctor + 字段 + Register）
+  7. 单测基础设施（xUnit + FakeItEasy + 92 策略 smoke test）
+- **Phase 11**：Silt 子 BC 整顿（Silt.Main + DynamicSkillAutoSelector instance 化 + Form2/GameSession ctor 扩 HeroLoopHost → 删 Common.ItemEngine + Common.HeroLoopHost 终态 0 service locator）
