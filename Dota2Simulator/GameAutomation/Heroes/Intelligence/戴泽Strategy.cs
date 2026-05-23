@@ -23,23 +23,25 @@ public sealed class 戴泽Strategy : IHeroStrategy
 
     private readonly SkillEngine _skill;
     private readonly ItemEngine _item;
-    public 戴泽Strategy(IInputExecutor input, IScreenVision vision, SkillEngine skill, ItemEngine item)
+    private readonly HeroLoopHost _main;
+    public 戴泽Strategy(IInputExecutor input, IScreenVision vision, SkillEngine skill, ItemEngine item, HeroLoopHost main)
     {
         _input = input;
         _vision = vision;
         _skill = skill;
         _item = item;
+        _main = main;
     }
     public HeroId Hero => new("戴泽", HeroAttribute.Intelligence);
 
     public void OnActivate(HeroContext ctx)
     {
-        Main._聚合.Conditions[ConditionSlotKey.C1].Probe ??= 剧毒之触去后摇;
-        Main._聚合.Conditions[ConditionSlotKey.C2].Probe ??= 薄葬去后摇;
-        Main._聚合.Conditions[ConditionSlotKey.C3].Probe ??= 暗影波去后摇;
-        Main._聚合.Conditions[ConditionSlotKey.C4].Probe ??= 邪能去后摇;
-        Main._聚合.Attack.基础攻击前摇 = 0.3;
-        Main._聚合.Attack.基础攻击间隔 = 1.7;
+        _main._聚合.Conditions[ConditionSlotKey.C1].Probe ??= 剧毒之触去后摇;
+        _main._聚合.Conditions[ConditionSlotKey.C2].Probe ??= 薄葬去后摇;
+        _main._聚合.Conditions[ConditionSlotKey.C3].Probe ??= 暗影波去后摇;
+        _main._聚合.Conditions[ConditionSlotKey.C4].Probe ??= 邪能去后摇;
+        _main._聚合.Attack.基础攻击前摇 = 0.3;
+        _main._聚合.Attack.基础攻击间隔 = 1.7;
     }
 
     public Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)
@@ -47,23 +49,23 @@ public sealed class 戴泽Strategy : IHeroStrategy
         VirtualKey key = trigger.Key;
         if (key == VirtualKey.Q)
         {
-          Main._聚合.Skills.SetTime(SlotKey.Q, Common.获取当前时间毫秒());
-          Main._聚合.Conditions[ConditionSlotKey.C1].Active = true;
+          _main._聚合.Skills.SetTime(SlotKey.Q, Common.获取当前时间毫秒());
+          _main._聚合.Conditions[ConditionSlotKey.C1].Active = true;
         }
         else if (key == VirtualKey.W)
         {
-          Main._聚合.Skills.SetTime(SlotKey.W, Common.获取当前时间毫秒());
-          Main._聚合.Conditions[ConditionSlotKey.C2].Active = true;
+          _main._聚合.Skills.SetTime(SlotKey.W, Common.获取当前时间毫秒());
+          _main._聚合.Conditions[ConditionSlotKey.C2].Active = true;
         }
         else if (key == VirtualKey.E)
         {
-          Main._聚合.Skills.SetTime(SlotKey.E, Common.获取当前时间毫秒());
-          Main._聚合.Conditions[ConditionSlotKey.C3].Active = true;
+          _main._聚合.Skills.SetTime(SlotKey.E, Common.获取当前时间毫秒());
+          _main._聚合.Conditions[ConditionSlotKey.C3].Active = true;
         }
         else if (key == VirtualKey.R)
         {
-          Main._聚合.Skills.SetTime(SlotKey.R, Common.获取当前时间毫秒());
-          Main._聚合.Conditions[ConditionSlotKey.C4].Active = true;
+          _main._聚合.Skills.SetTime(SlotKey.R, Common.获取当前时间毫秒());
+          _main._聚合.Conditions[ConditionSlotKey.C4].Active = true;
         }
 
         return Task.CompletedTask;
@@ -73,12 +75,12 @@ public sealed class 戴泽Strategy : IHeroStrategy
     {
         void 剧毒之触后()
         {
-          Main._聚合.Skills.SetTime(SlotKey.Q, -1);
+          _main._聚合.Skills.SetTime(SlotKey.Q, -1);
           _skill.通用技能后续动作();
         }
 
         // 超时则切回 总体释放时间
-        if (Common.获取当前时间毫秒() - Main._聚合.Skills.Time(SlotKey.Q) > 1200 && Main._聚合.Skills.Time(SlotKey.Q) != -1)
+        if (Common.获取当前时间毫秒() - _main._聚合.Skills.Time(SlotKey.Q) > 1200 && _main._聚合.Skills.Time(SlotKey.Q) != -1)
         {
           剧毒之触后();
           return await Task.FromResult(false).ConfigureAwait(true);
@@ -97,12 +99,12 @@ public sealed class 戴泽Strategy : IHeroStrategy
     {
         void 薄葬后()
         {
-          Main._聚合.Skills.SetTime(SlotKey.W, -1);
+          _main._聚合.Skills.SetTime(SlotKey.W, -1);
           _skill.通用技能后续动作();
         }
 
         // 超时则切回 总体释放时间
-        if (Common.获取当前时间毫秒() - Main._聚合.Skills.Time(SlotKey.W) > 1200 && Main._聚合.Skills.Time(SlotKey.W) != -1)
+        if (Common.获取当前时间毫秒() - _main._聚合.Skills.Time(SlotKey.W) > 1200 && _main._聚合.Skills.Time(SlotKey.W) != -1)
         {
           薄葬后();
           return await Task.FromResult(false).ConfigureAwait(true);
@@ -121,12 +123,12 @@ public sealed class 戴泽Strategy : IHeroStrategy
     {
         void 暗影波后()
         {
-          Main._聚合.Skills.SetTime(SlotKey.E, -1);
+          _main._聚合.Skills.SetTime(SlotKey.E, -1);
           _skill.通用技能后续动作();
         }
 
         // 超时则切回 总体释放时间
-        if (Common.获取当前时间毫秒() - Main._聚合.Skills.Time(SlotKey.E) > 1200 && Main._聚合.Skills.Time(SlotKey.E) != -1)
+        if (Common.获取当前时间毫秒() - _main._聚合.Skills.Time(SlotKey.E) > 1200 && _main._聚合.Skills.Time(SlotKey.E) != -1)
         {
           暗影波后();
           return await Task.FromResult(false).ConfigureAwait(true);
@@ -145,12 +147,12 @@ public sealed class 戴泽Strategy : IHeroStrategy
     {
         void 邪能后()
         {
-          Main._聚合.Skills.SetTime(SlotKey.R, -1);
+          _main._聚合.Skills.SetTime(SlotKey.R, -1);
           _skill.通用技能后续动作();
         }
 
         // 超时则切回 总体释放时间
-        if (Common.获取当前时间毫秒() - Main._聚合.Skills.Time(SlotKey.R) > 1200 && Main._聚合.Skills.Time(SlotKey.R) != -1)
+        if (Common.获取当前时间毫秒() - _main._聚合.Skills.Time(SlotKey.R) > 1200 && _main._聚合.Skills.Time(SlotKey.R) != -1)
         {
           邪能后();
           return await Task.FromResult(false).ConfigureAwait(true);

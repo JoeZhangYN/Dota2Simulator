@@ -22,22 +22,24 @@ public sealed class 蓝胖Strategy : IHeroStrategy
 
     private readonly SkillEngine _skill;
     private readonly ItemEngine _item;
-    public 蓝胖Strategy(IInputExecutor input, IScreenVision vision, SkillEngine skill, ItemEngine item)
+    private readonly HeroLoopHost _main;
+    public 蓝胖Strategy(IInputExecutor input, IScreenVision vision, SkillEngine skill, ItemEngine item, HeroLoopHost main)
     {
         _input = input;
         _vision = vision;
         _skill = skill;
         _item = item;
+        _main = main;
     }
     public HeroId Hero => new("蓝胖", HeroAttribute.Intelligence);
 
     public void OnActivate(HeroContext ctx)
     {
-        Main._聚合.Conditions[ConditionSlotKey.C1].Probe ??= 火焰轰爆去后摇;
-        Main._聚合.Conditions[ConditionSlotKey.C2].Probe ??= 引燃去后摇;
-        Main._聚合.Conditions[ConditionSlotKey.C3].Probe ??= 嗜血术去后摇;
-        Main._聚合.Conditions[ConditionSlotKey.C4].Probe ??= 烈火护盾去后摇;
-        Main._聚合.Conditions[ConditionSlotKey.C5].Probe ??= 未精通火焰轰爆去后摇;
+        _main._聚合.Conditions[ConditionSlotKey.C1].Probe ??= 火焰轰爆去后摇;
+        _main._聚合.Conditions[ConditionSlotKey.C2].Probe ??= 引燃去后摇;
+        _main._聚合.Conditions[ConditionSlotKey.C3].Probe ??= 嗜血术去后摇;
+        _main._聚合.Conditions[ConditionSlotKey.C4].Probe ??= 烈火护盾去后摇;
+        _main._聚合.Conditions[ConditionSlotKey.C5].Probe ??= 未精通火焰轰爆去后摇;
     }
 
     public Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)
@@ -45,24 +47,24 @@ public sealed class 蓝胖Strategy : IHeroStrategy
         VirtualKey key = trigger.Key;
         if (key == VirtualKey.Q)
         {
-            Main._聚合.Conditions[ConditionSlotKey.C1].Active = true;
+            _main._聚合.Conditions[ConditionSlotKey.C1].Active = true;
         }
         else if (key == VirtualKey.W)
         {
-            Main._聚合.Conditions[ConditionSlotKey.C2].Active = true;
+            _main._聚合.Conditions[ConditionSlotKey.C2].Active = true;
         }
         else if (key == VirtualKey.F)
         {
-            Main._聚合.Conditions[ConditionSlotKey.C4].Active = true;
+            _main._聚合.Conditions[ConditionSlotKey.C4].Active = true;
         }
         else if (key == VirtualKey.D)
         {
-            Main._聚合.Conditions[ConditionSlotKey.C5].Active = true;
+            _main._聚合.Conditions[ConditionSlotKey.C5].Active = true;
         }
         else if (key == VirtualKey.From(Keys.D2))
         {
-            Main._聚合.Skills.ToggleMode(SlotKey.W);
-            TTS.TTS.Speak(Main._聚合.Skills.Mode(SlotKey.W) == 0 ? "引燃接轰爆" : "引燃不接轰爆");
+            _main._聚合.Skills.ToggleMode(SlotKey.W);
+            TTS.TTS.Speak(_main._聚合.Skills.Mode(SlotKey.W) == 0 ? "引燃接轰爆" : "引燃不接轰爆");
         }
 
         return Task.CompletedTask;
@@ -88,7 +90,7 @@ public sealed class 蓝胖Strategy : IHeroStrategy
     {
         void 引燃后()
         {
-            switch (Main._聚合.Skills.Mode(SlotKey.W))
+            switch (_main._聚合.Skills.Mode(SlotKey.W))
             {
                 case 1:
                     _input.Press(VirtualKey.From(Keys.Q));

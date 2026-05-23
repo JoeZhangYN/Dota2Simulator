@@ -11,7 +11,7 @@ using Dota2Simulator.GameAutomation.Ports;
 
 namespace Dota2Simulator.GameAutomation.Heroes.Agility;
 
-/// <summary>影魔（敏捷）策略——迁移自 Main.根据当前英雄增强 的 case "影魔"。</summary>
+/// <summary>影魔（敏捷）策略——迁移自 _main.根据当前英雄增强 的 case "影魔"。</summary>
 public sealed class 影魔Strategy : IHeroStrategy
 {
 
@@ -22,23 +22,25 @@ public sealed class 影魔Strategy : IHeroStrategy
 
     private readonly SkillEngine _skill;
     private readonly ItemEngine _item;
-    public 影魔Strategy(IInputExecutor input, IScreenVision vision, SkillEngine skill, ItemEngine item)
+    private readonly HeroLoopHost _main;
+    public 影魔Strategy(IInputExecutor input, IScreenVision vision, SkillEngine skill, ItemEngine item, HeroLoopHost main)
     {
         _input = input;
         _vision = vision;
         _skill = skill;
         _item = item;
+        _main = main;
     }
     public HeroId Hero => new("影魔", HeroAttribute.Agility);
 
     public void OnActivate(HeroContext ctx)
     {
-        Main._聚合.Conditions[ConditionSlotKey.C1].Probe ??= z炮去后摇;
-        Main._聚合.Conditions[ConditionSlotKey.C2].Probe ??= x炮去后摇;
-        Main._聚合.Conditions[ConditionSlotKey.C3].Probe ??= c炮去后摇;
-        Main._聚合.Conditions[ConditionSlotKey.C4].Probe ??= 灵魂盛宴去后摇;
+        _main._聚合.Conditions[ConditionSlotKey.C1].Probe ??= z炮去后摇;
+        _main._聚合.Conditions[ConditionSlotKey.C2].Probe ??= x炮去后摇;
+        _main._聚合.Conditions[ConditionSlotKey.C3].Probe ??= c炮去后摇;
+        _main._聚合.Conditions[ConditionSlotKey.C4].Probe ??= 灵魂盛宴去后摇;
         //_聚合.Conditions[ConditionSlotKey.C5].Probe ??= 如影随形去后摇;
-        Main._聚合.LegSwap.配置.修改配置(Keys.F, false);
+        _main._聚合.LegSwap.配置.修改配置(Keys.F, false);
     }
 
     public async Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)
@@ -48,23 +50,23 @@ public sealed class 影魔Strategy : IHeroStrategy
 
         if (key == VirtualKey.Q)
         {
-            Main._聚合.Conditions[ConditionSlotKey.C1].Active = true;
+            _main._聚合.Conditions[ConditionSlotKey.C1].Active = true;
         }
         else if (key == VirtualKey.W)
         {
-            Main._聚合.Conditions[ConditionSlotKey.C2].Active = true;
+            _main._聚合.Conditions[ConditionSlotKey.C2].Active = true;
         }
         else if (key == VirtualKey.E)
         {
-            Main._聚合.Conditions[ConditionSlotKey.C3].Active = true;
+            _main._聚合.Conditions[ConditionSlotKey.C3].Active = true;
         }
         else if (key == VirtualKey.D)
         {
-            Main._聚合.Conditions[ConditionSlotKey.C4].Active = true;
+            _main._聚合.Conditions[ConditionSlotKey.C4].Active = true;
         }
         else if (key == VirtualKey.R)
         {
-            Main._聚合.Conditions[ConditionSlotKey.C5].Active = true;
+            _main._聚合.Conditions[ConditionSlotKey.C5].Active = true;
         }
     }
 

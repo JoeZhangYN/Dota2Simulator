@@ -10,7 +10,7 @@ using Dota2Simulator.GameAutomation.Ports;
 
 namespace Dota2Simulator.GameAutomation.Heroes.Universal;
 
-/// <summary>沙王（全才）策略——迁移自 Main.根据当前英雄增强 的 case "沙王"。</summary>
+/// <summary>沙王（全才）策略——迁移自 _main.根据当前英雄增强 的 case "沙王"。</summary>
 public sealed class 沙王Strategy : IHeroStrategy
 {
 
@@ -21,12 +21,14 @@ public sealed class 沙王Strategy : IHeroStrategy
 
     private readonly SkillEngine _skill;
     private readonly ItemEngine _item;
-    public 沙王Strategy(IInputExecutor input, IScreenVision vision, SkillEngine skill, ItemEngine item)
+    private readonly HeroLoopHost _main;
+    public 沙王Strategy(IInputExecutor input, IScreenVision vision, SkillEngine skill, ItemEngine item, HeroLoopHost main)
     {
         _input = input;
         _vision = vision;
         _skill = skill;
         _item = item;
+        _main = main;
     }
     public HeroId Hero => new("沙王", HeroAttribute.Universal);
 
@@ -42,7 +44,7 @@ public sealed class 沙王Strategy : IHeroStrategy
 
         //if (key == VirtualKey.Q)
         //{
-        //    Main._聚合.Conditions[ConditionSlotKey.C1].Active = true;
+        //    _main._聚合.Conditions[ConditionSlotKey.C1].Active = true;
         //}
         //else if (key == VirtualKey.W)
         //{
@@ -52,11 +54,11 @@ public sealed class 沙王Strategy : IHeroStrategy
         //                _item.根据图片使用物品(Dota2_Pictrue.物品.红杖3) +
         //                _item.根据图片使用物品(Dota2_Pictrue.物品.红杖4) +
         //                _item.根据图片使用物品(Dota2_Pictrue.物品.红杖5)));
-        //    Main._聚合.Conditions[ConditionSlotKey.C2].Active = true;
+        //    _main._聚合.Conditions[ConditionSlotKey.C2].Active = true;
         //}
         //else if (key == VirtualKey.E)
         //{
-        //    Main._聚合.Conditions[ConditionSlotKey.C3].Active = true;
+        //    _main._聚合.Conditions[ConditionSlotKey.C3].Active = true;
         //}
     }
 }

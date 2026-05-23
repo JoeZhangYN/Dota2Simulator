@@ -21,21 +21,23 @@ public sealed class 尸王Strategy : IHeroStrategy
 
     private readonly SkillEngine _skill;
     private readonly ItemEngine _item;
-    public 尸王Strategy(IInputExecutor input, IScreenVision vision, SkillEngine skill, ItemEngine item)
+    private readonly HeroLoopHost _main;
+    public 尸王Strategy(IInputExecutor input, IScreenVision vision, SkillEngine skill, ItemEngine item, HeroLoopHost main)
     {
         _input = input;
         _vision = vision;
         _skill = skill;
         _item = item;
+        _main = main;
     }
     public HeroId Hero => new("尸王", HeroAttribute.Strength);
 
     public void OnActivate(HeroContext ctx)
     {
-        Main._聚合.Conditions[ConditionSlotKey.C1].Probe ??= 腐朽去后摇;
-        Main._聚合.Conditions[ConditionSlotKey.C2].Probe ??= 噬魂去后摇;
-        Main._聚合.Conditions[ConditionSlotKey.C3].Probe ??= 墓碑去后摇;
-        Main._聚合.Conditions[ConditionSlotKey.C4].Probe ??= 血肉傀儡去后摇;
+        _main._聚合.Conditions[ConditionSlotKey.C1].Probe ??= 腐朽去后摇;
+        _main._聚合.Conditions[ConditionSlotKey.C2].Probe ??= 噬魂去后摇;
+        _main._聚合.Conditions[ConditionSlotKey.C3].Probe ??= 墓碑去后摇;
+        _main._聚合.Conditions[ConditionSlotKey.C4].Probe ??= 血肉傀儡去后摇;
     }
 
     public async Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)
@@ -45,19 +47,19 @@ public sealed class 尸王Strategy : IHeroStrategy
 
         if (key == VirtualKey.Q)
         {
-            Main._聚合.Conditions[ConditionSlotKey.C1].Active = true;
+            _main._聚合.Conditions[ConditionSlotKey.C1].Active = true;
         }
         else if (key == VirtualKey.W)
         {
-            Main._聚合.Conditions[ConditionSlotKey.C2].Active = true;
+            _main._聚合.Conditions[ConditionSlotKey.C2].Active = true;
         }
         else if (key == VirtualKey.E)
         {
-            Main._聚合.Conditions[ConditionSlotKey.C3].Active = true;
+            _main._聚合.Conditions[ConditionSlotKey.C3].Active = true;
         }
         else if (key == VirtualKey.R)
         {
-            Main._聚合.Conditions[ConditionSlotKey.C4].Active = true;
+            _main._聚合.Conditions[ConditionSlotKey.C4].Active = true;
         }
     }
 

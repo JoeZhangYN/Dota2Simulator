@@ -21,23 +21,25 @@ public sealed class 钢背Strategy : IHeroStrategy
 
     private readonly SkillEngine _skill;
     private readonly ItemEngine _item;
-    public 钢背Strategy(IInputExecutor input, IScreenVision vision, SkillEngine skill, ItemEngine item)
+    private readonly HeroLoopHost _main;
+    public 钢背Strategy(IInputExecutor input, IScreenVision vision, SkillEngine skill, ItemEngine item, HeroLoopHost main)
     {
         _input = input;
         _vision = vision;
         _skill = skill;
         _item = item;
+        _main = main;
     }
     public HeroId Hero => new("钢背", HeroAttribute.Strength);
 
     public void OnActivate(HeroContext ctx)
     {
-        //Main._聚合.Conditions[ConditionSlotKey.C1].Probe ??= 鼻涕去后摇;
-        //// Main._聚合.Conditions[ConditionSlotKey.C2].Probe ??= 针刺循环; 已优化不需要
-        //Main._聚合.Conditions[ConditionSlotKey.C3].Probe ??= 毛团去后摇;
-        //Main._聚合.Conditions[ConditionSlotKey.C4].Probe ??= 钢毛后背去后摇;
-        //Main._聚合.Conditions[ConditionSlotKey.C5].Probe ??= 扫射切回假腿;
-        Main._聚合.LegSwap.配置.修改配置(Keys.E, false);
+        //_main._聚合.Conditions[ConditionSlotKey.C1].Probe ??= 鼻涕去后摇;
+        //// _main._聚合.Conditions[ConditionSlotKey.C2].Probe ??= 针刺循环; 已优化不需要
+        //_main._聚合.Conditions[ConditionSlotKey.C3].Probe ??= 毛团去后摇;
+        //_main._聚合.Conditions[ConditionSlotKey.C4].Probe ??= 钢毛后背去后摇;
+        //_main._聚合.Conditions[ConditionSlotKey.C5].Probe ??= 扫射切回假腿;
+        _main._聚合.LegSwap.配置.修改配置(Keys.E, false);
     }
 
     public async Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)
@@ -47,37 +49,37 @@ public sealed class 钢背Strategy : IHeroStrategy
 
         if (key == VirtualKey.From(Keys.F1))
         {
-            if (Main._聚合.HasShard)
+            if (_main._聚合.HasShard)
             {
-                Main._聚合.LegSwap.配置.修改配置(Keys.D, true);
+                _main._聚合.LegSwap.配置.修改配置(Keys.D, true);
             }
 
-            if (Main._聚合.HasAghanim)
+            if (_main._聚合.HasAghanim)
             {
-                Main._聚合.LegSwap.配置.修改配置(Keys.E, true);
+                _main._聚合.LegSwap.配置.修改配置(Keys.E, true);
             }
         }
         else if (key == VirtualKey.Q)
         {
-            Main._聚合.Conditions[ConditionSlotKey.C1].Active = true;
+            _main._聚合.Conditions[ConditionSlotKey.C1].Active = true;
         }
         else if (key == VirtualKey.D)
         {
-            if (Main._聚合.HasShard)
+            if (_main._聚合.HasShard)
             {
-                Main._聚合.Conditions[ConditionSlotKey.C3].Active = true;
+                _main._聚合.Conditions[ConditionSlotKey.C3].Active = true;
             }
         }
         else if (key == VirtualKey.E)
         {
-            if (Main._聚合.HasAghanim)
+            if (_main._聚合.HasAghanim)
             {
-                Main._聚合.Conditions[ConditionSlotKey.C4].Active = true;
+                _main._聚合.Conditions[ConditionSlotKey.C4].Active = true;
             }
         }
         else if (key == VirtualKey.W)
         {
-            Main._聚合.Conditions[ConditionSlotKey.C5].Active = true;
+            _main._聚合.Conditions[ConditionSlotKey.C5].Active = true;
         }
     }
 

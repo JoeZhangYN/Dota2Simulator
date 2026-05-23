@@ -13,7 +13,7 @@ using Dota2Simulator.GameAutomation.Ports;
 
 namespace Dota2Simulator.GameAutomation.Heroes.Agility;
 
-/// <summary>小骷髅（敏捷）策略——迁移自 Main.根据当前英雄增强 的 case "小骷髅"。</summary>
+/// <summary>小骷髅（敏捷）策略——迁移自 _main.根据当前英雄增强 的 case "小骷髅"。</summary>
 public sealed class 小骷髅Strategy : IHeroStrategy
 {
 
@@ -24,25 +24,27 @@ public sealed class 小骷髅Strategy : IHeroStrategy
 
     private readonly SkillEngine _skill;
     private readonly ItemEngine _item;
-    public 小骷髅Strategy(IInputExecutor input, IScreenVision vision, SkillEngine skill, ItemEngine item)
+    private readonly HeroLoopHost _main;
+    public 小骷髅Strategy(IInputExecutor input, IScreenVision vision, SkillEngine skill, ItemEngine item, HeroLoopHost main)
     {
         _input = input;
         _vision = vision;
         _skill = skill;
         _item = item;
+        _main = main;
     }
     public HeroId Hero => new("小骷髅", HeroAttribute.Agility);
 
     public void OnActivate(HeroContext ctx)
     {
-        Main._聚合.Conditions[ConditionSlotKey.C1].Probe ??= 扫射去后摇;
-        Main._聚合.Conditions[ConditionSlotKey.C2].Probe ??= 焦油去后摇;
-        Main._聚合.Conditions[ConditionSlotKey.C3].Probe ??= 死亡契约去后摇;
-        Main._聚合.Conditions[ConditionSlotKey.C4].Probe ??= 骨隐步去后摇;
-        Main._聚合.Conditions[ConditionSlotKey.C5].Probe ??= 炽烈火雨去后摇;
-        Main._聚合.Conditions[ConditionSlotKey.C6].Probe ??= 骷髅之军去后摇;
-        Main._聚合.Attack.基础攻击前摇 = 0.4;
-        Main._聚合.Attack.基础攻击间隔 = 1.7;
+        _main._聚合.Conditions[ConditionSlotKey.C1].Probe ??= 扫射去后摇;
+        _main._聚合.Conditions[ConditionSlotKey.C2].Probe ??= 焦油去后摇;
+        _main._聚合.Conditions[ConditionSlotKey.C3].Probe ??= 死亡契约去后摇;
+        _main._聚合.Conditions[ConditionSlotKey.C4].Probe ??= 骨隐步去后摇;
+        _main._聚合.Conditions[ConditionSlotKey.C5].Probe ??= 炽烈火雨去后摇;
+        _main._聚合.Conditions[ConditionSlotKey.C6].Probe ??= 骷髅之军去后摇;
+        _main._聚合.Attack.基础攻击前摇 = 0.4;
+        _main._聚合.Attack.基础攻击间隔 = 1.7;
     }
 
     public async Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)
@@ -52,57 +54,57 @@ public sealed class 小骷髅Strategy : IHeroStrategy
 
         if (key == VirtualKey.From(Keys.F1))
         {
-            if (Main._聚合.HasShard)
+            if (_main._聚合.HasShard)
             {
-                Main._聚合.LegSwap.配置.修改配置(Keys.D, true, "敏捷");
+                _main._聚合.LegSwap.配置.修改配置(Keys.D, true, "敏捷");
             }
 
-            if (Main._聚合.HasAghanim)
+            if (_main._聚合.HasAghanim)
             {
-                Main._聚合.LegSwap.配置.修改配置(Keys.F, true);
+                _main._聚合.LegSwap.配置.修改配置(Keys.F, true);
             }
         }
         else if (key == VirtualKey.Q)
         {
-            Main._聚合.Conditions[ConditionSlotKey.C1].Active = true;
+            _main._聚合.Conditions[ConditionSlotKey.C1].Active = true;
         }
         else if (key == VirtualKey.W)
         {
-            Main._聚合.Conditions[ConditionSlotKey.C2].Active = true;
+            _main._聚合.Conditions[ConditionSlotKey.C2].Active = true;
         }
         else if (key == VirtualKey.E)
         {
-            Main._聚合.Conditions[ConditionSlotKey.C3].Active = true;
+            _main._聚合.Conditions[ConditionSlotKey.C3].Active = true;
         }
         else if (key == VirtualKey.R)
         {
-            Main._聚合.Conditions[ConditionSlotKey.C4].Active = true;
+            _main._聚合.Conditions[ConditionSlotKey.C4].Active = true;
         }
         else if (key == VirtualKey.D)
         {
-            if (Main._聚合.HasShard)
+            if (_main._聚合.HasShard)
             {
-                Main._聚合.Conditions[ConditionSlotKey.C5].Active = true;
+                _main._聚合.Conditions[ConditionSlotKey.C5].Active = true;
             }
         }
         else if (key == VirtualKey.F)
         {
-            if (Main._聚合.HasAghanim)
+            if (_main._聚合.HasAghanim)
             {
-                Main._聚合.Conditions[ConditionSlotKey.C6].Active = true;
+                _main._聚合.Conditions[ConditionSlotKey.C6].Active = true;
             }
         }
         else if (key == VirtualKey.From(Keys.D2))
         {
-            Main._聚合.Skills.ToggleMode(SlotKey.Q);
-            Dota2Simulator.TTS.TTS.Speak(Main._聚合.Skills.Mode(SlotKey.Q) == 1 ? "无脑接道具" : "手动道具");
+            _main._聚合.Skills.ToggleMode(SlotKey.Q);
+            Dota2Simulator.TTS.TTS.Speak(_main._聚合.Skills.Mode(SlotKey.Q) == 1 ? "无脑接道具" : "手动道具");
         }
         else if (key == VirtualKey.From(Keys.D3))
         {
-            if (Main._聚合.HasShard)
+            if (_main._聚合.HasShard)
             {
-                Main._聚合.Skills.ToggleMode(SlotKey.F);
-                Dota2Simulator.TTS.TTS.Speak(Main._聚合.Skills.Mode(SlotKey.F) == 1 ? "炽烈火雨隐身" : "炽烈火雨不隐身");
+                _main._聚合.Skills.ToggleMode(SlotKey.F);
+                Dota2Simulator.TTS.TTS.Speak(_main._聚合.Skills.Mode(SlotKey.F) == 1 ? "炽烈火雨隐身" : "炽烈火雨不隐身");
             }
         }
     }
@@ -111,7 +113,7 @@ public sealed class 小骷髅Strategy : IHeroStrategy
     {
         return await _skill.主动技能进入CD后续(Keys.Q, () =>
         {
-            if (Main._聚合.Skills.Mode(SlotKey.Q) == 1)
+            if (_main._聚合.Skills.Mode(SlotKey.Q) == 1)
             {
                 Common.Delay(33 * _item.根据图片使用物品(Dota2_Pictrue.物品.散失));
                 Common.Delay(33 * _item.根据图片使用物品(Dota2_Pictrue.物品.散魂));
@@ -151,7 +153,7 @@ public sealed class 小骷髅Strategy : IHeroStrategy
         return await _skill.主动技能释放后续(Keys.F, () =>
         {
             // 持续时间施法，其实啥也不用管？
-            if (Main._聚合.Skills.Mode(SlotKey.F) == 1)
+            if (_main._聚合.Skills.Mode(SlotKey.F) == 1)
             {
                 Common.Delay(0);
                 _input.Press(VirtualKey.From(Keys.R));

@@ -23,19 +23,21 @@ public sealed class 沉默Strategy : IHeroStrategy
 
     private readonly SkillEngine _skill;
     private readonly ItemEngine _item;
-    public 沉默Strategy(IInputExecutor input, IScreenVision vision, SkillEngine skill, ItemEngine item)
+    private readonly HeroLoopHost _main;
+    public 沉默Strategy(IInputExecutor input, IScreenVision vision, SkillEngine skill, ItemEngine item, HeroLoopHost main)
     {
         _input = input;
         _vision = vision;
         _skill = skill;
         _item = item;
+        _main = main;
     }
     public HeroId Hero => new("沉默", HeroAttribute.Intelligence);
 
     public void OnActivate(HeroContext ctx)
     {
-        Main._聚合.Conditions[ConditionSlotKey.C1].Probe ??= 奥数诅咒去后摇;
-        Main._聚合.Conditions[ConditionSlotKey.C2].Probe ??= 全领域沉默去后摇;
+        _main._聚合.Conditions[ConditionSlotKey.C1].Probe ??= 奥数诅咒去后摇;
+        _main._聚合.Conditions[ConditionSlotKey.C2].Probe ??= 全领域沉默去后摇;
     }
 
     public Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)
@@ -43,11 +45,11 @@ public sealed class 沉默Strategy : IHeroStrategy
         VirtualKey key = trigger.Key;
         if (key == VirtualKey.Q)
         {
-            Main._聚合.Conditions[ConditionSlotKey.C1].Active = true;
+            _main._聚合.Conditions[ConditionSlotKey.C1].Active = true;
         }
         else if (key == VirtualKey.R)
         {
-            Main._聚合.Conditions[ConditionSlotKey.C2].Active = true;
+            _main._聚合.Conditions[ConditionSlotKey.C2].Active = true;
         }
 
         return Task.CompletedTask;
@@ -71,10 +73,10 @@ public sealed class 沉默Strategy : IHeroStrategy
     {
         async void 奥数诅咒后(ImageHandle 句柄)
         {
-            Main._聚合.Skills.SetTime(SlotKey.Q, -1);
+            _main._聚合.Skills.SetTime(SlotKey.Q, -1);
             // RightClick();
             // _input.Press(VirtualKey.From(Keys.A));
-            switch (Main._聚合.Skills.Mode(SlotKey.Q))
+            switch (_main._聚合.Skills.Mode(SlotKey.Q))
             {
                 case < 1:
                     _ = await 大招前纷争(句柄).ConfigureAwait(true);
@@ -92,7 +94,7 @@ public sealed class 沉默Strategy : IHeroStrategy
         }
 
         // 超时则切回 总体释放时间
-        if (Common.获取当前时间毫秒() - Main._聚合.Skills.Time(SlotKey.Q) > 1200 && Main._聚合.Skills.Time(SlotKey.Q) != -1)
+        if (Common.获取当前时间毫秒() - _main._聚合.Skills.Time(SlotKey.Q) > 1200 && _main._聚合.Skills.Time(SlotKey.Q) != -1)
         {
             奥数诅咒后(句柄);
             return await Task.FromResult(false).ConfigureAwait(true);
@@ -111,13 +113,13 @@ public sealed class 沉默Strategy : IHeroStrategy
     {
         void 全领域沉默后()
         {
-            Main._聚合.Skills.SetTime(SlotKey.R, -1);
+            _main._聚合.Skills.SetTime(SlotKey.R, -1);
             // RightClick();
             _input.Press(VirtualKey.From(Keys.A));
         }
 
         // 超时则切回 总体释放时间
-        if (Common.获取当前时间毫秒() - Main._聚合.Skills.Time(SlotKey.R) > 1200 && Main._聚合.Skills.Time(SlotKey.R) != -1)
+        if (Common.获取当前时间毫秒() - _main._聚合.Skills.Time(SlotKey.R) > 1200 && _main._聚合.Skills.Time(SlotKey.R) != -1)
         {
             全领域沉默后();
             return await Task.FromResult(false).ConfigureAwait(true);

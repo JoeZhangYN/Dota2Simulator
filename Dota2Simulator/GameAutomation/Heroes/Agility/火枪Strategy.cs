@@ -11,7 +11,7 @@ using Dota2Simulator.GameAutomation.Ports;
 
 namespace Dota2Simulator.GameAutomation.Heroes.Agility;
 
-/// <summary>火枪（敏捷）策略——迁移自 Main.根据当前英雄增强 的 case "火枪"。</summary>
+/// <summary>火枪（敏捷）策略——迁移自 _main.根据当前英雄增强 的 case "火枪"。</summary>
 public sealed class 火枪Strategy : IHeroStrategy
 {
 
@@ -22,45 +22,47 @@ public sealed class 火枪Strategy : IHeroStrategy
 
     private readonly SkillEngine _skill;
     private readonly ItemEngine _item;
-    public 火枪Strategy(IInputExecutor input, IScreenVision vision, SkillEngine skill, ItemEngine item)
+    private readonly HeroLoopHost _main;
+    public 火枪Strategy(IInputExecutor input, IScreenVision vision, SkillEngine skill, ItemEngine item, HeroLoopHost main)
     {
         _input = input;
         _vision = vision;
         _skill = skill;
         _item = item;
+        _main = main;
     }
     public HeroId Hero => new("火枪", HeroAttribute.Agility);
 
     public void OnActivate(HeroContext ctx)
     {
-        Main._聚合.Conditions[ConditionSlotKey.C1].Probe ??= 流霰弹去后摇;
-        Main._聚合.Conditions[ConditionSlotKey.C2].Probe ??= 瞄准去后摇;
-        Main._聚合.Conditions[ConditionSlotKey.C3].Probe ??= 震荡手雷去后摇;
-        Main._聚合.Conditions[ConditionSlotKey.C4].Probe ??= 暗杀去后摇;
-        Main._聚合.LegSwap.配置.修改配置(Keys.W, false);
+        _main._聚合.Conditions[ConditionSlotKey.C1].Probe ??= 流霰弹去后摇;
+        _main._聚合.Conditions[ConditionSlotKey.C2].Probe ??= 瞄准去后摇;
+        _main._聚合.Conditions[ConditionSlotKey.C3].Probe ??= 震荡手雷去后摇;
+        _main._聚合.Conditions[ConditionSlotKey.C4].Probe ??= 暗杀去后摇;
+        _main._聚合.LegSwap.配置.修改配置(Keys.W, false);
     }
 
     public async Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)
     {
         VirtualKey key = trigger.Key;
-        Main._聚合.LegSwap.配置.修改配置(Keys.D, Main._聚合.HasShard);
+        _main._聚合.LegSwap.配置.修改配置(Keys.D, _main._聚合.HasShard);
         await _item.根据按键判断技能释放前通用逻辑(new KeyEventArgs((Keys)key.ToNative())).ConfigureAwait(true);
 
         if (key == VirtualKey.Q)
         {
-            Main._聚合.Conditions[ConditionSlotKey.C1].Active = true;
+            _main._聚合.Conditions[ConditionSlotKey.C1].Active = true;
         }
         else if (key == VirtualKey.E)
         {
-            Main._聚合.Conditions[ConditionSlotKey.C2].Active = true;
+            _main._聚合.Conditions[ConditionSlotKey.C2].Active = true;
         }
         else if (key == VirtualKey.D)
         {
-            Main._聚合.Conditions[ConditionSlotKey.C3].Active = true;
+            _main._聚合.Conditions[ConditionSlotKey.C3].Active = true;
         }
         else if (key == VirtualKey.R)
         {
-            Main._聚合.Conditions[ConditionSlotKey.C4].Active = true;
+            _main._聚合.Conditions[ConditionSlotKey.C4].Active = true;
         }
     }
 

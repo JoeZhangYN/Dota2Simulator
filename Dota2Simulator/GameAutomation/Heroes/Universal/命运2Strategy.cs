@@ -10,7 +10,7 @@ using Dota2Simulator.GameAutomation.Ports;
 using Dota2Simulator.GameAutomation.Domain.Perception;
 namespace Dota2Simulator.GameAutomation.Heroes.Universal;
 
-/// <summary>命运2策略——迁移自 Main.根据当前英雄增强 的 case "命运2"。</summary>
+/// <summary>命运2策略——迁移自 _main.根据当前英雄增强 的 case "命运2"。</summary>
 public sealed class 命运2Strategy : IHeroStrategy
 {
 
@@ -21,12 +21,14 @@ public sealed class 命运2Strategy : IHeroStrategy
 
     private readonly SkillEngine _skill;
     private readonly ItemEngine _item;
-    public 命运2Strategy(IInputExecutor input, IScreenVision vision, SkillEngine skill, ItemEngine item)
+    private readonly HeroLoopHost _main;
+    public 命运2Strategy(IInputExecutor input, IScreenVision vision, SkillEngine skill, ItemEngine item, HeroLoopHost main)
     {
         _input = input;
         _vision = vision;
         _skill = skill;
         _item = item;
+        _main = main;
     }
     public HeroId Hero => new("命运2", HeroAttribute.Universal);
 

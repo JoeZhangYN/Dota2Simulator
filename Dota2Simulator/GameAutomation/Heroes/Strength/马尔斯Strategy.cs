@@ -22,20 +22,22 @@ public sealed class 马尔斯Strategy : IHeroStrategy
 
     private readonly SkillEngine _skill;
     private readonly ItemEngine _item;
-    public 马尔斯Strategy(IInputExecutor input, IScreenVision vision, SkillEngine skill, ItemEngine item)
+    private readonly HeroLoopHost _main;
+    public 马尔斯Strategy(IInputExecutor input, IScreenVision vision, SkillEngine skill, ItemEngine item, HeroLoopHost main)
     {
         _input = input;
         _vision = vision;
         _skill = skill;
         _item = item;
+        _main = main;
     }
     public HeroId Hero => new("马尔斯", HeroAttribute.Strength);
 
     public void OnActivate(HeroContext ctx)
     {
-        Main._聚合.Conditions[ConditionSlotKey.C1].Probe ??= 战神迅矛去后摇;
-        Main._聚合.Conditions[ConditionSlotKey.C2].Probe ??= 神之谴击去后摇;
-        Main._聚合.Conditions[ConditionSlotKey.C3].Probe ??= 热血竞技场去后摇;
+        _main._聚合.Conditions[ConditionSlotKey.C1].Probe ??= 战神迅矛去后摇;
+        _main._聚合.Conditions[ConditionSlotKey.C2].Probe ??= 神之谴击去后摇;
+        _main._聚合.Conditions[ConditionSlotKey.C3].Probe ??= 热血竞技场去后摇;
     }
 
     public async Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)
@@ -45,20 +47,20 @@ public sealed class 马尔斯Strategy : IHeroStrategy
 
         if (key == VirtualKey.Q)
         {
-            Main._聚合.Conditions[ConditionSlotKey.C1].Active = true;
+            _main._聚合.Conditions[ConditionSlotKey.C1].Active = true;
         }
         else if (key == VirtualKey.W)
         {
-            Main._聚合.Conditions[ConditionSlotKey.C2].Active = true;
+            _main._聚合.Conditions[ConditionSlotKey.C2].Active = true;
         }
         else if (key == VirtualKey.R)
         {
-            Main._聚合.Conditions[ConditionSlotKey.C3].Active = true;
+            _main._聚合.Conditions[ConditionSlotKey.C3].Active = true;
         }
         else if (key == VirtualKey.From(Keys.D2))
         {
-            Main._聚合.Skills.ToggleMode(SlotKey.Q);
-            TTS.TTS.Speak(Main._聚合.Skills.Mode(SlotKey.Q) == 1 ? "矛接大招" : "矛不接大招");
+            _main._聚合.Skills.ToggleMode(SlotKey.Q);
+            TTS.TTS.Speak(_main._聚合.Skills.Mode(SlotKey.Q) == 1 ? "矛接大招" : "矛不接大招");
         }
     }
 
@@ -66,7 +68,7 @@ public sealed class 马尔斯Strategy : IHeroStrategy
     {
         return await _skill.主动技能释放后续(Keys.Q, () =>
         {
-            if (Main._聚合.Skills.Mode(SlotKey.Q) == 1)
+            if (_main._聚合.Skills.Mode(SlotKey.Q) == 1)
             {
                 _input.Press(VirtualKey.From(Keys.R));
             }

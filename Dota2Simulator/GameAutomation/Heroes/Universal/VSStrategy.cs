@@ -11,7 +11,7 @@ using Dota2Simulator.GameAutomation.Ports;
 
 namespace Dota2Simulator.GameAutomation.Heroes.Universal;
 
-/// <summary>VS（全才）策略——迁移自 Main.根据当前英雄增强 的 case "VS"。</summary>
+/// <summary>VS（全才）策略——迁移自 _main.根据当前英雄增强 的 case "VS"。</summary>
 public sealed class VSStrategy : IHeroStrategy
 {
 
@@ -22,20 +22,22 @@ public sealed class VSStrategy : IHeroStrategy
 
     private readonly SkillEngine _skill;
     private readonly ItemEngine _item;
-    public VSStrategy(IInputExecutor input, IScreenVision vision, SkillEngine skill, ItemEngine item)
+    private readonly HeroLoopHost _main;
+    public VSStrategy(IInputExecutor input, IScreenVision vision, SkillEngine skill, ItemEngine item, HeroLoopHost main)
     {
         _input = input;
         _vision = vision;
         _skill = skill;
         _item = item;
+        _main = main;
     }
     public HeroId Hero => new("VS", HeroAttribute.Universal);
 
     public void OnActivate(HeroContext ctx)
     {
-        Main._聚合.Conditions[ConditionSlotKey.C1].Probe ??= 魔法箭去后摇;
-        Main._聚合.Conditions[ConditionSlotKey.C2].Probe ??= 恐怖波动去后摇;
-        Main._聚合.Conditions[ConditionSlotKey.C3].Probe ??= 移形换位去后摇;
+        _main._聚合.Conditions[ConditionSlotKey.C1].Probe ??= 魔法箭去后摇;
+        _main._聚合.Conditions[ConditionSlotKey.C2].Probe ??= 恐怖波动去后摇;
+        _main._聚合.Conditions[ConditionSlotKey.C3].Probe ??= 移形换位去后摇;
     }
 
     public async Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)
@@ -45,15 +47,15 @@ public sealed class VSStrategy : IHeroStrategy
 
         if (key == VirtualKey.Q)
         {
-            Main._聚合.Conditions[ConditionSlotKey.C1].Active = true;
+            _main._聚合.Conditions[ConditionSlotKey.C1].Active = true;
         }
         else if (key == VirtualKey.W)
         {
-            Main._聚合.Conditions[ConditionSlotKey.C3].Active = true;
+            _main._聚合.Conditions[ConditionSlotKey.C3].Active = true;
         }
         else if (key == VirtualKey.R)
         {
-            Main._聚合.Conditions[ConditionSlotKey.C3].Active = true;
+            _main._聚合.Conditions[ConditionSlotKey.C3].Active = true;
         }
     }
 

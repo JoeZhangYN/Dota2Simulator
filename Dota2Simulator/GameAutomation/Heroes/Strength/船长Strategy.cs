@@ -17,7 +17,7 @@ namespace Dota2Simulator.GameAutomation.Heroes.Strength;
 
 public sealed class 船长Strategy : IHeroStrategy
 {
-    /// <summary>E 技能并发锁（沿用 Main._全局模式e_lock）。</summary>
+    /// <summary>E 技能并发锁（沿用 _main._全局模式e_lock）。</summary>
     private static readonly Lock _全局模式e_lock = new();
 
 
@@ -28,21 +28,23 @@ public sealed class 船长Strategy : IHeroStrategy
 
     private readonly SkillEngine _skill;
     private readonly ItemEngine _item;
-    public 船长Strategy(IInputExecutor input, IScreenVision vision, SkillEngine skill, ItemEngine item)
+    private readonly HeroLoopHost _main;
+    public 船长Strategy(IInputExecutor input, IScreenVision vision, SkillEngine skill, ItemEngine item, HeroLoopHost main)
     {
         _input = input;
         _vision = vision;
         _skill = skill;
         _item = item;
+        _main = main;
     }
     public HeroId Hero => new("船长", HeroAttribute.Strength);
 
     public void OnActivate(HeroContext ctx)
     {
-        Main._聚合.Conditions[ConditionSlotKey.C1].Probe ??= 洪流接x回;
-        Main._聚合.Conditions[ConditionSlotKey.C2].Probe ??= x释放后相关逻辑;
-        Main._聚合.Conditions[ConditionSlotKey.C3].Probe ??= x2次释放后;
-        Main._聚合.Conditions[ConditionSlotKey.C4].Probe ??= 立即释放洪流;
+        _main._聚合.Conditions[ConditionSlotKey.C1].Probe ??= 洪流接x回;
+        _main._聚合.Conditions[ConditionSlotKey.C2].Probe ??= x释放后相关逻辑;
+        _main._聚合.Conditions[ConditionSlotKey.C3].Probe ??= x2次释放后;
+        _main._聚合.Conditions[ConditionSlotKey.C4].Probe ??= 立即释放洪流;
     }
 
     public async Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)
@@ -52,19 +54,19 @@ public sealed class 船长Strategy : IHeroStrategy
 
         if (key == VirtualKey.Q)
         {
-            Main._聚合.Conditions[ConditionSlotKey.C1].Active = true;
+            _main._聚合.Conditions[ConditionSlotKey.C1].Active = true;
         }
         else if (key == VirtualKey.E)
         {
-            if (Main._聚合.Skills.Step(SlotKey.E) == 1)
+            if (_main._聚合.Skills.Step(SlotKey.E) == 1)
             {
                 return;
             }
-            Main._聚合.Conditions[ConditionSlotKey.C2].Active = true;
+            _main._聚合.Conditions[ConditionSlotKey.C2].Active = true;
         }
         else if (key == VirtualKey.From(Keys.D2))
         {
-            Main._聚合.Skills.SetStep(SlotKey.R, 1);
+            _main._聚合.Skills.SetStep(SlotKey.R, 1);
             _input.Press(VirtualKey.From(Keys.E));
         }
     }
@@ -73,15 +75,15 @@ public sealed class 船长Strategy : IHeroStrategy
     {
         return await _skill.主动技能释放后续(Keys.Q, () =>
         {
-            Main._聚合.Conditions[ConditionSlotKey.C4].Active = false;
-            Main._聚合.Skills.SetTime(SlotKey.Q, Common.获取当前时间毫秒());
+            _main._聚合.Conditions[ConditionSlotKey.C4].Active = false;
+            _main._聚合.Skills.SetTime(SlotKey.Q, Common.获取当前时间毫秒());
 
             // 如果E已经释放
-            if (!Main._session!.IsPaused && Main._聚合.Skills.Step(SlotKey.E) == 1)
+            if (!_main.Session!.IsPaused && _main._聚合.Skills.Step(SlotKey.E) == 1)
             {
                 // 1600 延迟 返回200施法时间
-                Common.Delay(1350, Main._聚合.Skills.Time(SlotKey.Q));
-                Main._聚合.Conditions[ConditionSlotKey.C4].Active = false;
+                Common.Delay(1350, _main._聚合.Skills.Time(SlotKey.Q));
+                _main._聚合.Conditions[ConditionSlotKey.C4].Active = false;
                 _input.Press(VirtualKey.From(Keys.E));
             }
         }).ConfigureAwait(true);
@@ -92,27 +94,27 @@ public sealed class 船长Strategy : IHeroStrategy
         // 释放x后放船，x的时间3秒，船0.3秒，3.1秒延迟，控制还是得靠水起来
         return await _skill.主动技能释放后续(Keys.E, () =>
         {
-            int 步骤e = Main._聚合.Skills.Step(SlotKey.E);
+            int 步骤e = _main._聚合.Skills.Step(SlotKey.E);
 
             if (步骤e == 1) return;
 
-            Main._聚合.Skills.SetTime(SlotKey.E, Common.获取当前时间毫秒());
+            _main._聚合.Skills.SetTime(SlotKey.E, Common.获取当前时间毫秒());
 
-            if (Main._聚合.Skills.Step(SlotKey.R) == 1)
+            if (_main._聚合.Skills.Step(SlotKey.R) == 1)
             {
                 _input.Press(VirtualKey.From(Keys.R));
-                Main._聚合.Skills.SetStep(SlotKey.R, 0);
+                _main._聚合.Skills.SetStep(SlotKey.R, 0);
             }
 
             lock (_全局模式e_lock)
             {
-                Main._聚合.Skills.SetStep(SlotKey.E, 1);
-                Main._聚合.Conditions[ConditionSlotKey.C3].Active = true;
+                _main._聚合.Skills.SetStep(SlotKey.E, 1);
+                _main._聚合.Conditions[ConditionSlotKey.C3].Active = true;
             }
 
-            int 等待时间 = (int)Math.Floor(3000 * Main._聚合.Attack.状态抗性倍数) - 1670;
-            Common.Delay(等待时间, Main._聚合.Skills.Time(SlotKey.E));
-            Main._聚合.Conditions[ConditionSlotKey.C4].Active = true;
+            int 等待时间 = (int)Math.Floor(3000 * _main._聚合.Attack.状态抗性倍数) - 1670;
+            Common.Delay(等待时间, _main._聚合.Skills.Time(SlotKey.E));
+            _main._聚合.Conditions[ConditionSlotKey.C4].Active = true;
         }).ConfigureAwait(true);
     }
 
@@ -126,7 +128,7 @@ public sealed class 船长Strategy : IHeroStrategy
                 // 因为释放q后，会再释放一次E
                 // 等待说明E已经释放过一次，还在有效范围内
                 Common.Delay(2000);
-                Main._聚合.Skills.SetStep(SlotKey.E, 0);
+                _main._聚合.Skills.SetStep(SlotKey.E, 0);
             }
         }).ConfigureAwait(true);
     }

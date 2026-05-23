@@ -13,7 +13,7 @@ using Dota2Simulator.GameAutomation.Ports;
 
 namespace Dota2Simulator.GameAutomation.Heroes.Universal;
 
-/// <summary>小精灵（全才）策略——迁移自 Main.根据当前英雄增强 的 case "小精灵"。</summary>
+/// <summary>小精灵（全才）策略——迁移自 _main.根据当前英雄增强 的 case "小精灵"。</summary>
 public sealed class 小精灵Strategy : IHeroStrategy
 {
     private static readonly Rectangle buff状态技能栏 = new(962, 826, 526, 80);
@@ -26,19 +26,21 @@ public sealed class 小精灵Strategy : IHeroStrategy
 
     private readonly SkillEngine _skill;
     private readonly ItemEngine _item;
-    public 小精灵Strategy(IInputExecutor input, IScreenVision vision, SkillEngine skill, ItemEngine item)
+    private readonly HeroLoopHost _main;
+    public 小精灵Strategy(IInputExecutor input, IScreenVision vision, SkillEngine skill, ItemEngine item, HeroLoopHost main)
     {
         _input = input;
         _vision = vision;
         _skill = skill;
         _item = item;
+        _main = main;
     }
     public HeroId Hero => new("小精灵", HeroAttribute.Universal);
 
     public void OnActivate(HeroContext ctx)
     {
-        Main._聚合.Conditions[ConditionSlotKey.C2].Probe ??= 幽魂检测;
-        Main._聚合.Conditions[ConditionSlotKey.C3].Probe ??= 循环续过载;
+        _main._聚合.Conditions[ConditionSlotKey.C2].Probe ??= 幽魂检测;
+        _main._聚合.Conditions[ConditionSlotKey.C3].Probe ??= 循环续过载;
         _skill.重复按键执行间隔阈值 = 150;
     }
 
@@ -49,17 +51,17 @@ public sealed class 小精灵Strategy : IHeroStrategy
 
         if (key == VirtualKey.W)
         {
-            if (Main._聚合.HasAghanim)
+            if (_main._聚合.HasAghanim)
             {
                 return;
             }
 
-            Main._聚合.Conditions[ConditionSlotKey.C2].Active = true;
+            _main._聚合.Conditions[ConditionSlotKey.C2].Active = true;
         }
         else if (key == VirtualKey.From(Keys.D3))
         {
-            Main._聚合.Conditions[ConditionSlotKey.C3].Active = !Main._聚合.Conditions[ConditionSlotKey.C3].Active;
-            Dota2Simulator.TTS.TTS.Speak(Main._聚合.Conditions[ConditionSlotKey.C3].Active ? "开启续过载" : "关闭续过载");
+            _main._聚合.Conditions[ConditionSlotKey.C3].Active = !_main._聚合.Conditions[ConditionSlotKey.C3].Active;
+            Dota2Simulator.TTS.TTS.Speak(_main._聚合.Conditions[ConditionSlotKey.C3].Active ? "开启续过载" : "关闭续过载");
         }
     }
 
@@ -75,13 +77,13 @@ public sealed class 小精灵Strategy : IHeroStrategy
         bool guozai = ImageFinder.FindImageInRegionBool(Dota2_Pictrue.Buff.小精灵_过载, in 句柄, buff状态技能栏);
         if (guozai)
         {
-            Main._聚合.Skills.SetStep(SlotKey.E, 3);
-            return await Task.FromResult(Main._聚合.Conditions[ConditionSlotKey.C3].Active).ConfigureAwait(true);
+            _main._聚合.Skills.SetStep(SlotKey.E, 3);
+            return await Task.FromResult(_main._聚合.Conditions[ConditionSlotKey.C3].Active).ConfigureAwait(true);
         }
         else
         {
             await _skill.技能通用判断(Keys.E, 2).ConfigureAwait(true);
-            return await Task.FromResult(Main._聚合.Conditions[ConditionSlotKey.C3].Active).ConfigureAwait(true);
+            return await Task.FromResult(_main._聚合.Conditions[ConditionSlotKey.C3].Active).ConfigureAwait(true);
         }
     }
 }

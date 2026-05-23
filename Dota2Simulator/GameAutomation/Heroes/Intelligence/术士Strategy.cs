@@ -23,20 +23,22 @@ public sealed class 术士Strategy : IHeroStrategy
 
     private readonly SkillEngine _skill;
     private readonly ItemEngine _item;
-    public 术士Strategy(IInputExecutor input, IScreenVision vision, SkillEngine skill, ItemEngine item)
+    private readonly HeroLoopHost _main;
+    public 术士Strategy(IInputExecutor input, IScreenVision vision, SkillEngine skill, ItemEngine item, HeroLoopHost main)
     {
         _input = input;
         _vision = vision;
         _skill = skill;
         _item = item;
+        _main = main;
     }
     public HeroId Hero => new("术士", HeroAttribute.Intelligence);
 
     public void OnActivate(HeroContext ctx)
     {
-        Main._聚合.Conditions[ConditionSlotKey.C1].Probe ??= 致命链接去后摇;
-        Main._聚合.Conditions[ConditionSlotKey.C2].Probe ??= 暗言术去后摇;
-        Main._聚合.Conditions[ConditionSlotKey.C3].Probe ??= 混乱之祭去后摇;
+        _main._聚合.Conditions[ConditionSlotKey.C1].Probe ??= 致命链接去后摇;
+        _main._聚合.Conditions[ConditionSlotKey.C2].Probe ??= 暗言术去后摇;
+        _main._聚合.Conditions[ConditionSlotKey.C3].Probe ??= 混乱之祭去后摇;
     }
 
     public Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)
@@ -45,20 +47,20 @@ public sealed class 术士Strategy : IHeroStrategy
         if (key == VirtualKey.Q)
         {
           _item.根据图片使用物品(Dota2_Pictrue.物品.纷争);
-          Main._聚合.Conditions[ConditionSlotKey.C1].Active = true;
+          _main._聚合.Conditions[ConditionSlotKey.C1].Active = true;
         }
         else if (key == VirtualKey.W)
         {
-          Main._聚合.Conditions[ConditionSlotKey.C2].Active = true;
+          _main._聚合.Conditions[ConditionSlotKey.C2].Active = true;
         }
         else if (key == VirtualKey.E)
         {
-          Main._聚合.Skills.SetTime(SlotKey.E, Common.获取当前时间毫秒());
+          _main._聚合.Skills.SetTime(SlotKey.E, Common.获取当前时间毫秒());
         }
         else if (key == VirtualKey.R)
         {
-          Main._聚合.Skills.SetTime(SlotKey.R, Common.获取当前时间毫秒());
-          Main._聚合.Conditions[ConditionSlotKey.C3].Active = true;
+          _main._聚合.Skills.SetTime(SlotKey.R, Common.获取当前时间毫秒());
+          _main._聚合.Conditions[ConditionSlotKey.C3].Active = true;
         }
 
         return Task.CompletedTask;

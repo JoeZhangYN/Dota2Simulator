@@ -25,21 +25,23 @@ public sealed class 莱恩Strategy : IHeroStrategy
 
     private readonly SkillEngine _skill;
     private readonly ItemEngine _item;
-    public 莱恩Strategy(IInputExecutor input, IScreenVision vision, SkillEngine skill, ItemEngine item)
+    private readonly HeroLoopHost _main;
+    public 莱恩Strategy(IInputExecutor input, IScreenVision vision, SkillEngine skill, ItemEngine item, HeroLoopHost main)
     {
         _input = input;
         _vision = vision;
         _skill = skill;
         _item = item;
+        _main = main;
     }
     public HeroId Hero => new("莱恩", HeroAttribute.Intelligence);
 
     public void OnActivate(HeroContext ctx)
     {
-        Main._聚合.Conditions[ConditionSlotKey.C1].Probe ??= 莱恩羊接技能;
-        Main._聚合.Conditions[ConditionSlotKey.C2].Probe ??= 死亡一指去后摇;
-        Main._聚合.Conditions[ConditionSlotKey.C3].Probe ??= 推推破林肯秒羊;
-        Main._聚合.Conditions[ConditionSlotKey.C4].Probe ??= 羊刺刷新秒人;
+        _main._聚合.Conditions[ConditionSlotKey.C1].Probe ??= 莱恩羊接技能;
+        _main._聚合.Conditions[ConditionSlotKey.C2].Probe ??= 死亡一指去后摇;
+        _main._聚合.Conditions[ConditionSlotKey.C3].Probe ??= 推推破林肯秒羊;
+        _main._聚合.Conditions[ConditionSlotKey.C4].Probe ??= 羊刺刷新秒人;
     }
 
     public async Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)
@@ -47,46 +49,46 @@ public sealed class 莱恩Strategy : IHeroStrategy
         VirtualKey key = trigger.Key;
         if (key == VirtualKey.W)
         {
-            Main._聚合.Conditions[ConditionSlotKey.C1].Active = true;
+            _main._聚合.Conditions[ConditionSlotKey.C1].Active = true;
         }
         else if (key == VirtualKey.R)
         {
             await 大招前纷争(GlobalScreenCapture.GetCurrentHandle()).ConfigureAwait(true);
-            Main._聚合.Conditions[ConditionSlotKey.C2].Active = true;
+            _main._聚合.Conditions[ConditionSlotKey.C2].Active = true;
         }
         else if (key == VirtualKey.E)
         {
         }
         else if (key == VirtualKey.From(Keys.D2))
         {
-            Main._聚合.Conditions[ConditionSlotKey.C3].Active = true;
+            _main._聚合.Conditions[ConditionSlotKey.C3].Active = true;
         }
         else if (key == VirtualKey.From(Keys.S))
         {
-            Main._session!.IsPaused = true;
+            _main.Session!.IsPaused = true;
         }
         else if (key == VirtualKey.From(Keys.D3))
         {
-            Main._聚合.Conditions[ConditionSlotKey.C4].Active = true;
+            _main._聚合.Conditions[ConditionSlotKey.C4].Active = true;
         }
-        else if (key == VirtualKey.From(Keys.D4) && !Main._聚合.Conditions[ConditionSlotKey.C5].Active)
+        else if (key == VirtualKey.From(Keys.D4) && !_main._聚合.Conditions[ConditionSlotKey.C5].Active)
         {
-            Main._聚合.Conditions[ConditionSlotKey.C5].Active = true;
+            _main._聚合.Conditions[ConditionSlotKey.C5].Active = true;
             TTS.TTS.Speak("开启刷新秒人");
         }
         else if (key == VirtualKey.From(Keys.D4))
         {
-            Main._聚合.Conditions[ConditionSlotKey.C5].Active = false;
+            _main._聚合.Conditions[ConditionSlotKey.C5].Active = false;
             TTS.TTS.Speak("关闭刷新秒人");
         }
-        else if (key == VirtualKey.From(Keys.D5) && !Main._聚合.Conditions[ConditionSlotKey.C6].Active)
+        else if (key == VirtualKey.From(Keys.D5) && !_main._聚合.Conditions[ConditionSlotKey.C6].Active)
         {
-            Main._聚合.Conditions[ConditionSlotKey.C6].Active = true;
+            _main._聚合.Conditions[ConditionSlotKey.C6].Active = true;
             TTS.TTS.Speak("开启羊接吸");
         }
         else if (key == VirtualKey.From(Keys.D5))
         {
-            Main._聚合.Conditions[ConditionSlotKey.C6].Active = false;
+            _main._聚合.Conditions[ConditionSlotKey.C6].Active = false;
             TTS.TTS.Speak("开启羊接A");
         }
     }
@@ -95,7 +97,7 @@ public sealed class 莱恩Strategy : IHeroStrategy
     {
         void 莱恩羊后()
         {
-            if (Main._聚合.Conditions[ConditionSlotKey.C6].Active)
+            if (_main._聚合.Conditions[ConditionSlotKey.C6].Active)
             {
                 _input.Press(VirtualKey.From(Keys.E));
             }
@@ -159,7 +161,7 @@ public sealed class 莱恩Strategy : IHeroStrategy
 
     private async Task<bool> 羊刺刷新秒人(ImageHandle 句柄)
     {
-        int 步骤 = Main._聚合.Skills.Step(SlotKey.Global);
+        int 步骤 = _main._聚合.Skills.Step(SlotKey.Global);
 
         if (步骤 == 1)
         {
@@ -230,9 +232,9 @@ public sealed class 莱恩Strategy : IHeroStrategy
                 return await Task.FromResult(true).ConfigureAwait(true);
             }
 
-            if (Main._聚合.Conditions[ConditionSlotKey.C5].Active && _item.根据图片使用物品(Dota2_Pictrue.物品.刷新球) == 1)
+            if (_main._聚合.Conditions[ConditionSlotKey.C5].Active && _item.根据图片使用物品(Dota2_Pictrue.物品.刷新球) == 1)
             {
-                Main._聚合.Skills.SetStep(SlotKey.Global, 1);
+                _main._聚合.Skills.SetStep(SlotKey.Global, 1);
                 Common.Delay(120);
                 return await Task.FromResult(true).ConfigureAwait(true);
             }

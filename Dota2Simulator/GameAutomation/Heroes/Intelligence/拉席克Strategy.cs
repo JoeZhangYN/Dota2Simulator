@@ -21,22 +21,24 @@ public sealed class 拉席克Strategy : IHeroStrategy
 
     private readonly SkillEngine _skill;
     private readonly ItemEngine _item;
-    public 拉席克Strategy(IInputExecutor input, IScreenVision vision, SkillEngine skill, ItemEngine item)
+    private readonly HeroLoopHost _main;
+    public 拉席克Strategy(IInputExecutor input, IScreenVision vision, SkillEngine skill, ItemEngine item, HeroLoopHost main)
     {
         _input = input;
         _vision = vision;
         _skill = skill;
         _item = item;
+        _main = main;
     }
     public HeroId Hero => new("拉席克", HeroAttribute.Intelligence);
 
     public void OnActivate(HeroContext ctx)
     {
-        Main._聚合.Conditions[ConditionSlotKey.C1].Probe ??= 撕裂大地去后摇;
-        Main._聚合.Conditions[ConditionSlotKey.C2].Probe ??= 恶魔敕令去后摇;
-        Main._聚合.Conditions[ConditionSlotKey.C3].Probe ??= 闪电风暴去后摇;
-        Main._聚合.Conditions[ConditionSlotKey.C4].Probe ??= 脉冲新星去后摇;
-        Main._聚合.Conditions[ConditionSlotKey.C5].Probe ??= 虚无主义去后摇;
+        _main._聚合.Conditions[ConditionSlotKey.C1].Probe ??= 撕裂大地去后摇;
+        _main._聚合.Conditions[ConditionSlotKey.C2].Probe ??= 恶魔敕令去后摇;
+        _main._聚合.Conditions[ConditionSlotKey.C3].Probe ??= 闪电风暴去后摇;
+        _main._聚合.Conditions[ConditionSlotKey.C4].Probe ??= 脉冲新星去后摇;
+        _main._聚合.Conditions[ConditionSlotKey.C5].Probe ??= 虚无主义去后摇;
     }
 
     public async Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)
@@ -46,23 +48,23 @@ public sealed class 拉席克Strategy : IHeroStrategy
 
         if (key == VirtualKey.Q)
         {
-            Main._聚合.Conditions[ConditionSlotKey.C1].Active = true;
+            _main._聚合.Conditions[ConditionSlotKey.C1].Active = true;
         }
         else if (key == VirtualKey.W)
         {
-            Main._聚合.Conditions[ConditionSlotKey.C2].Active = true;
+            _main._聚合.Conditions[ConditionSlotKey.C2].Active = true;
         }
         else if (key == VirtualKey.E)
         {
-            Main._聚合.Conditions[ConditionSlotKey.C3].Active = true;
+            _main._聚合.Conditions[ConditionSlotKey.C3].Active = true;
         }
         else if (key == VirtualKey.D)
         {
-            Main._聚合.Conditions[ConditionSlotKey.C5].Active = true;
+            _main._聚合.Conditions[ConditionSlotKey.C5].Active = true;
         }
         else if (key == VirtualKey.R)
         {
-            Main._聚合.Conditions[ConditionSlotKey.C4].Active = true;
+            _main._聚合.Conditions[ConditionSlotKey.C4].Active = true;
         }
     }
 

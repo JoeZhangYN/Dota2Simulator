@@ -14,7 +14,7 @@ namespace Dota2Simulator.GameAutomation.Heroes.Strength;
 
 public sealed class 大鱼人Strategy : IHeroStrategy
 {
-    /// <summary>基准帧延迟（沿用 Main.等待延迟）。</summary>
+    /// <summary>基准帧延迟（沿用 _main.等待延迟）。</summary>
     private const int 等待延迟 = 33;
 
 
@@ -25,22 +25,24 @@ public sealed class 大鱼人Strategy : IHeroStrategy
 
     private readonly SkillEngine _skill;
     private readonly ItemEngine _item;
-    public 大鱼人Strategy(IInputExecutor input, IScreenVision vision, SkillEngine skill, ItemEngine item)
+    private readonly HeroLoopHost _main;
+    public 大鱼人Strategy(IInputExecutor input, IScreenVision vision, SkillEngine skill, ItemEngine item, HeroLoopHost main)
     {
         _input = input;
         _vision = vision;
         _skill = skill;
         _item = item;
+        _main = main;
     }
     public HeroId Hero => new("大鱼人", HeroAttribute.Strength);
 
     public void OnActivate(HeroContext ctx)
     {
-        Main._聚合.Conditions[ConditionSlotKey.C1].Probe ??= 踩去后摇;
-        Main._聚合.Conditions[ConditionSlotKey.C2].Probe ??= 踩去后摇;
-        Main._聚合.Conditions[ConditionSlotKey.C3].Probe ??= 雾霭去后摇;
-        Main._聚合.Conditions[ConditionSlotKey.C4].Probe ??= 跳刀接踩;
-        // Main._聚合.LegSwap.配置.修改配置(Keys.E, false);
+        _main._聚合.Conditions[ConditionSlotKey.C1].Probe ??= 踩去后摇;
+        _main._聚合.Conditions[ConditionSlotKey.C2].Probe ??= 踩去后摇;
+        _main._聚合.Conditions[ConditionSlotKey.C3].Probe ??= 雾霭去后摇;
+        _main._聚合.Conditions[ConditionSlotKey.C4].Probe ??= 跳刀接踩;
+        // _main._聚合.LegSwap.配置.修改配置(Keys.E, false);
     }
 
     public async Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)
@@ -50,19 +52,19 @@ public sealed class 大鱼人Strategy : IHeroStrategy
 
         if (key == VirtualKey.Q)
         {
-            Main._聚合.Conditions[ConditionSlotKey.C1].Active = true;
+            _main._聚合.Conditions[ConditionSlotKey.C1].Active = true;
         }
         else if (key == VirtualKey.W)
         {
-            Main._聚合.Conditions[ConditionSlotKey.C2].Active = true;
+            _main._聚合.Conditions[ConditionSlotKey.C2].Active = true;
         }
         else if (key == VirtualKey.R)
         {
-            Main._聚合.Conditions[ConditionSlotKey.C3].Active = true;
+            _main._聚合.Conditions[ConditionSlotKey.C3].Active = true;
         }
         else if (key == VirtualKey.E)
         {
-            Main._聚合.Conditions[ConditionSlotKey.C4].Active = true;
+            _main._聚合.Conditions[ConditionSlotKey.C4].Active = true;
         }
     }
 
@@ -94,7 +96,7 @@ public sealed class 大鱼人Strategy : IHeroStrategy
 
     private async Task<bool> 踩去后摇(ImageHandle 句柄)
     {
-        return await _skill.技能通用判断(Keys.W, 1, 要接的按键: Main._聚合.HasShard ? Keys.A : Keys.R).ConfigureAwait(true);
+        return await _skill.技能通用判断(Keys.W, 1, 要接的按键: _main._聚合.HasShard ? Keys.A : Keys.R).ConfigureAwait(true);
     }
 
     private async Task<bool> 雾霭去后摇(ImageHandle 句柄)

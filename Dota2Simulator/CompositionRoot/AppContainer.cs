@@ -74,8 +74,8 @@ internal sealed class AppContainer
         // Phase 9 C: HeroLoopHost 实例化（ctor 接 7 ports，含 SkillEngine/ItemEngine 消除 Main↔Item 循环依赖）。
         // 装配顺序：SkillEngine/ItemEngine 之后（HeroLoopHost 内自调 _skill.X / _item.X，反向依赖闭合）。
         Common.HeroLoopHost = new HeroLoopHost(Input, Vision, Ui, Games.Dota2.Main._聚合, SessionState, Common.SkillEngine, Common.ItemEngine);
-        // C7: Registry.RegisterAll 扩参，透传 SkillEngine / ItemEngine 给 92 策略 ctor。
-        Registry.RegisterAll(Ui, Common.SkillEngine, Common.ItemEngine);
+        // Phase 9 D: Registry.RegisterAll 扩参 +HeroLoopHost，透传给 92 策略 ctor。
+        Registry.RegisterAll(Ui, Common.SkillEngine, Common.ItemEngine, Common.HeroLoopHost);
     }
 }
 

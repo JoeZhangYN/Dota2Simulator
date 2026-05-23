@@ -17,7 +17,7 @@ namespace Dota2Simulator.GameAutomation.Heroes.Strength;
 
 public sealed class 海民Strategy : IHeroStrategy
 {
-    /// <summary>命石范围（沿用 Main.命石区域）。</summary>
+    /// <summary>命石范围（沿用 _main.命石区域）。</summary>
     private static readonly Rectangle 命石区域 = new(738, 945, 70, 26);
 
 
@@ -28,22 +28,24 @@ public sealed class 海民Strategy : IHeroStrategy
 
     private readonly SkillEngine _skill;
     private readonly ItemEngine _item;
-    public 海民Strategy(IInputExecutor input, IScreenVision vision, SkillEngine skill, ItemEngine item)
+    private readonly HeroLoopHost _main;
+    public 海民Strategy(IInputExecutor input, IScreenVision vision, SkillEngine skill, ItemEngine item, HeroLoopHost main)
     {
         _input = input;
         _vision = vision;
         _skill = skill;
         _item = item;
+        _main = main;
     }
     public HeroId Hero => new("海民", HeroAttribute.Strength);
 
     public void OnActivate(HeroContext ctx)
     {
-        Main._聚合.Conditions.StoneProbe ??= 海民获取命石;
-        Main._聚合.Conditions[ConditionSlotKey.C1].Probe ??= 冰片去后摇;
-        Main._聚合.Conditions[ConditionSlotKey.C2].Probe ??= 摔角行家去后摇;
-        Main._聚合.Conditions[ConditionSlotKey.C3].Probe ??= 海象神拳接雪球;
-        Main._聚合.Conditions[ConditionSlotKey.C4].Probe ??= 酒友去后摇;
+        _main._聚合.Conditions.StoneProbe ??= 海民获取命石;
+        _main._聚合.Conditions[ConditionSlotKey.C1].Probe ??= 冰片去后摇;
+        _main._聚合.Conditions[ConditionSlotKey.C2].Probe ??= 摔角行家去后摇;
+        _main._聚合.Conditions[ConditionSlotKey.C3].Probe ??= 海象神拳接雪球;
+        _main._聚合.Conditions[ConditionSlotKey.C4].Probe ??= 酒友去后摇;
     }
 
     public async Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)
@@ -53,44 +55,44 @@ public sealed class 海民Strategy : IHeroStrategy
 
         if (key == VirtualKey.Q)
         {
-            Main._聚合.Conditions[ConditionSlotKey.C1].Active = true;
+            _main._聚合.Conditions[ConditionSlotKey.C1].Active = true;
         }
         else if (key == VirtualKey.E)
         {
-            switch (Main._聚合.Conditions.StoneChoice)
+            switch (_main._聚合.Conditions.StoneChoice)
             {
                 case 1:
-                    Main._聚合.Conditions[ConditionSlotKey.C2].Active = true;
+                    _main._聚合.Conditions[ConditionSlotKey.C2].Active = true;
                     break;
                 case 2:
-                    Main._聚合.Conditions[ConditionSlotKey.C4].Active = true;
+                    _main._聚合.Conditions[ConditionSlotKey.C4].Active = true;
                     break;
             }
         }
         else if (key == VirtualKey.F)
         {
-            if (Main._聚合.Conditions.StoneChoice == 1)
+            if (_main._聚合.Conditions.StoneChoice == 1)
             {
                 _skill.DOTA2释放CD就绪技能(Keys.E, GlobalScreenCapture.GetCurrentHandle());
             }
 
-            Main._聚合.Conditions[ConditionSlotKey.C3].Active = true;
+            _main._聚合.Conditions[ConditionSlotKey.C3].Active = true;
         }
         else if (key == VirtualKey.From(Keys.D2))
         {
-            Main._聚合.Skills.SetTarget(SlotKey.D, Control.MousePosition);
+            _main._聚合.Skills.SetTarget(SlotKey.D, Control.MousePosition);
             TTS.TTS.Speak("确定指定地点");
         }
     }
 
     private async Task<bool> 海民获取命石(ImageHandle 句柄)
     {
-        if (Main._聚合.Conditions.StoneChoice == 0)
+        if (_main._聚合.Conditions.StoneChoice == 0)
         {
-            Main._聚合.Conditions.StoneChoice = ImageFinder.FindImageInRegionBool(Dota2_Pictrue.命石.海民_酒友, GlobalScreenCapture.GetCurrentHandle(), 命石区域) ? 2 : 1;
+            _main._聚合.Conditions.StoneChoice = ImageFinder.FindImageInRegionBool(Dota2_Pictrue.命石.海民_酒友, GlobalScreenCapture.GetCurrentHandle(), 命石区域) ? 2 : 1;
         }
 
-        Main._聚合.Conditions.StoneProbe = null;
+        _main._聚合.Conditions.StoneProbe = null;
         return await Task.FromResult(false).ConfigureAwait(true);
     }
 
@@ -127,14 +129,14 @@ public sealed class 海民Strategy : IHeroStrategy
                 Common.Delay(100);
                 _input.MouseMoveTo(new ScreenPoint(p.X, p.Y));
                 Common.Delay(850);
-                if (Main._session!.IsPaused)
+                if (_main.Session!.IsPaused)
                 {
                     return;
                 }
 
                 _input.KeyDown(VirtualKey.From(Keys.D));
                 Common.Delay(100);
-                Point target = Main._聚合.Skills.Target(SlotKey.D);
+                Point target = _main._聚合.Skills.Target(SlotKey.D);
                 _input.MouseMoveTo(new ScreenPoint(target.X, target.Y));
                 Common.Delay(100);
                 _input.KeyUp(VirtualKey.From(Keys.D));

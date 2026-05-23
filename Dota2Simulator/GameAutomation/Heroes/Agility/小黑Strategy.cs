@@ -14,7 +14,7 @@ using Dota2Simulator.GameAutomation.Ports;
 
 namespace Dota2Simulator.GameAutomation.Heroes.Agility;
 
-/// <summary>小黑（敏捷）策略——迁移自 Main.根据当前英雄增强 的 case "小黑"。</summary>
+/// <summary>小黑（敏捷）策略——迁移自 _main.根据当前英雄增强 的 case "小黑"。</summary>
 public sealed class 小黑Strategy : IHeroStrategy
 {
 
@@ -25,20 +25,22 @@ public sealed class 小黑Strategy : IHeroStrategy
 
     private readonly SkillEngine _skill;
     private readonly ItemEngine _item;
-    public 小黑Strategy(IInputExecutor input, IScreenVision vision, SkillEngine skill, ItemEngine item)
+    private readonly HeroLoopHost _main;
+    public 小黑Strategy(IInputExecutor input, IScreenVision vision, SkillEngine skill, ItemEngine item, HeroLoopHost main)
     {
         _input = input;
         _vision = vision;
         _skill = skill;
         _item = item;
+        _main = main;
     }
     public HeroId Hero => new("小黑", HeroAttribute.Agility);
 
     public void OnActivate(HeroContext ctx)
     {
-        Main._聚合.Conditions[ConditionSlotKey.C1].Probe ??= 狂风去后摇;
-        Main._聚合.Conditions[ConditionSlotKey.C2].Probe ??= 数箭齐发去后摇;
-        Main._聚合.Conditions[ConditionSlotKey.C3].Probe ??= 冰川去后摇;
+        _main._聚合.Conditions[ConditionSlotKey.C1].Probe ??= 狂风去后摇;
+        _main._聚合.Conditions[ConditionSlotKey.C2].Probe ??= 数箭齐发去后摇;
+        _main._聚合.Conditions[ConditionSlotKey.C3].Probe ??= 冰川去后摇;
     }
 
     public async Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)
@@ -48,23 +50,23 @@ public sealed class 小黑Strategy : IHeroStrategy
 
         if (key == VirtualKey.From(Keys.F1))
         {
-            Main._聚合.Skills.SetMode(SlotKey.E, ColorExtensions.ColorAEqualColorB(Main.获取指定位置颜色(738, 957, GlobalScreenCapture.GetCurrentHandle()),
+            _main._聚合.Skills.SetMode(SlotKey.E, ColorExtensions.ColorAEqualColorB(_main.获取指定位置颜色(738, 957, GlobalScreenCapture.GetCurrentHandle()),
                 Color.FromArgb(246, 178, 60), 0) || ColorExtensions.ColorAEqualColorB(
-                Main.获取指定位置颜色(722, 957, GlobalScreenCapture.GetCurrentHandle()),
+                _main.获取指定位置颜色(722, 957, GlobalScreenCapture.GetCurrentHandle()),
                 Color.FromArgb(246, 178, 60), 0)
                 ? 1
                 : 0);
-            if (Main._聚合.HasShard)
+            if (_main._聚合.HasShard)
             {
-                Main._聚合.LegSwap.配置.修改配置(Keys.F, true);
+                _main._聚合.LegSwap.配置.修改配置(Keys.F, true);
             }
         }
         else if (key == VirtualKey.D)
         {
-            if (Main._聚合.LegSwap.条件开启切假腿)
+            if (_main._聚合.LegSwap.条件开启切假腿)
             {
-                Main._聚合.Skills.ToggleMode(SlotKey.Global);
-                switch (Main._聚合.Skills.Mode(SlotKey.Global))
+                _main._聚合.Skills.ToggleMode(SlotKey.Global);
+                switch (_main._聚合.Skills.Mode(SlotKey.Global))
                 {
                     case 0:
                         await _item.技能释放前切假腿("智力").ConfigureAwait(true);
@@ -79,17 +81,17 @@ public sealed class 小黑Strategy : IHeroStrategy
         }
         else if (key == VirtualKey.W)
         {
-            Main._聚合.Conditions[ConditionSlotKey.C1].Active = true;
+            _main._聚合.Conditions[ConditionSlotKey.C1].Active = true;
         }
         else if (key == VirtualKey.E)
         {
-            Main._聚合.Conditions[ConditionSlotKey.C2].Active = true;
+            _main._聚合.Conditions[ConditionSlotKey.C2].Active = true;
         }
         else if (key == VirtualKey.F)
         {
-            if (Main._聚合.HasShard)
+            if (_main._聚合.HasShard)
             {
-                Main._聚合.Conditions[ConditionSlotKey.C3].Active = true;
+                _main._聚合.Conditions[ConditionSlotKey.C3].Active = true;
             }
         }
     }
@@ -100,9 +102,9 @@ public sealed class 小黑Strategy : IHeroStrategy
         {
             _skill.通用技能后续动作();
 
-            if (Main._聚合.Skills.Mode(SlotKey.Global) == 1)
+            if (_main._聚合.Skills.Mode(SlotKey.Global) == 1)
             {
-                Main._聚合.LegSwap.需要切假腿 = false;
+                _main._聚合.LegSwap.需要切假腿 = false;
             }
         }).ConfigureAwait(true);
     }
@@ -111,13 +113,13 @@ public sealed class 小黑Strategy : IHeroStrategy
     {
         return await _skill.主动技能进入CD后续(Keys.E, () =>
         {
-            Common.Delay(Main._聚合.Skills.Mode(SlotKey.E) == 1 ? 2600 : 1300);
+            Common.Delay(_main._聚合.Skills.Mode(SlotKey.E) == 1 ? 2600 : 1300);
             _input.Press(VirtualKey.From(Keys.S));
             _skill.通用技能后续动作();
 
-            if (Main._聚合.Skills.Mode(SlotKey.Global) == 1)
+            if (_main._聚合.Skills.Mode(SlotKey.Global) == 1)
             {
-                Main._聚合.LegSwap.需要切假腿 = false;
+                _main._聚合.LegSwap.需要切假腿 = false;
             }
         }).ConfigureAwait(true);
     }
@@ -128,9 +130,9 @@ public sealed class 小黑Strategy : IHeroStrategy
         {
             _skill.通用技能后续动作();
 
-            if (Main._聚合.Skills.Mode(SlotKey.Global) == 1)
+            if (_main._聚合.Skills.Mode(SlotKey.Global) == 1)
             {
-                Main._聚合.LegSwap.需要切假腿 = false;
+                _main._聚合.LegSwap.需要切假腿 = false;
             }
         }).ConfigureAwait(true);
     }

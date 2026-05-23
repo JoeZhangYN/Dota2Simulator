@@ -14,7 +14,7 @@ namespace Dota2Simulator.GameAutomation.Heroes.Strength;
 
 public sealed class 骷髅王Strategy : IHeroStrategy
 {
-    /// <summary>命石范围（沿用 Main.命石区域）。</summary>
+    /// <summary>命石范围（沿用 _main.命石区域）。</summary>
     private static readonly Rectangle 命石区域 = new(738, 945, 70, 26);
 
 
@@ -25,22 +25,24 @@ public sealed class 骷髅王Strategy : IHeroStrategy
 
     private readonly SkillEngine _skill;
     private readonly ItemEngine _item;
-    public 骷髅王Strategy(IInputExecutor input, IScreenVision vision, SkillEngine skill, ItemEngine item)
+    private readonly HeroLoopHost _main;
+    public 骷髅王Strategy(IInputExecutor input, IScreenVision vision, SkillEngine skill, ItemEngine item, HeroLoopHost main)
     {
         _input = input;
         _vision = vision;
         _skill = skill;
         _item = item;
+        _main = main;
     }
     public HeroId Hero => new("骷髅王", HeroAttribute.Strength);
 
     public void OnActivate(HeroContext ctx)
     {
-        Main._聚合.Conditions.StoneProbe ??= 骷髅王获取命石;
-        Main._聚合.Conditions[ConditionSlotKey.C1].Probe ??= 冥火爆击去后摇;
-        Main._聚合.Conditions[ConditionSlotKey.C2].Probe ??= 白骨守卫去后摇;
-        Main._聚合.LegSwap.配置.修改配置(Keys.W, false);
-        Main._聚合.LegSwap.配置.修改配置(Keys.E, false);
+        _main._聚合.Conditions.StoneProbe ??= 骷髅王获取命石;
+        _main._聚合.Conditions[ConditionSlotKey.C1].Probe ??= 冥火爆击去后摇;
+        _main._聚合.Conditions[ConditionSlotKey.C2].Probe ??= 白骨守卫去后摇;
+        _main._聚合.LegSwap.配置.修改配置(Keys.W, false);
+        _main._聚合.LegSwap.配置.修改配置(Keys.E, false);
     }
 
     public async Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)
@@ -50,26 +52,26 @@ public sealed class 骷髅王Strategy : IHeroStrategy
 
         if (key == VirtualKey.Q)
         {
-            Main._聚合.Conditions[ConditionSlotKey.C1].Active = true;
+            _main._聚合.Conditions[ConditionSlotKey.C1].Active = true;
         }
         else if (key == VirtualKey.W)
         {
-            if (Main._聚合.Conditions.StoneChoice == 1)
+            if (_main._聚合.Conditions.StoneChoice == 1)
             {
-                Main._聚合.LegSwap.配置.修改配置(Keys.W, true);
-                Main._聚合.Conditions[ConditionSlotKey.C2].Active = true;
+                _main._聚合.LegSwap.配置.修改配置(Keys.W, true);
+                _main._聚合.Conditions[ConditionSlotKey.C2].Active = true;
             }
         }
     }
 
-    private static async Task<bool> 骷髅王获取命石(ImageHandle 句柄)
+    private async Task<bool> 骷髅王获取命石(ImageHandle 句柄)
     {
-        if (Main._聚合.Conditions.StoneChoice == 0)
+        if (_main._聚合.Conditions.StoneChoice == 0)
         {
-            Main._聚合.Conditions.StoneChoice = ImageFinder.FindImageInRegionBool(Dota2_Pictrue.命石.骷髅王_白骨守卫, GlobalScreenCapture.GetCurrentHandle(), 命石区域) ? 1 : 2;
+            _main._聚合.Conditions.StoneChoice = ImageFinder.FindImageInRegionBool(Dota2_Pictrue.命石.骷髅王_白骨守卫, GlobalScreenCapture.GetCurrentHandle(), 命石区域) ? 1 : 2;
         }
 
-        Main._聚合.Conditions.StoneProbe = null;
+        _main._聚合.Conditions.StoneProbe = null;
         return await Task.FromResult(false).ConfigureAwait(true);
     }
 

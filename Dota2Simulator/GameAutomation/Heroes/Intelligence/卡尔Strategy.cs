@@ -21,21 +21,23 @@ public sealed class 卡尔Strategy : IHeroStrategy
 
     private readonly SkillEngine _skill;
     private readonly ItemEngine _item;
-    public 卡尔Strategy(IInputExecutor input, IScreenVision vision, SkillEngine skill, ItemEngine item)
+    private readonly HeroLoopHost _main;
+    public 卡尔Strategy(IInputExecutor input, IScreenVision vision, SkillEngine skill, ItemEngine item, HeroLoopHost main)
     {
         _input = input;
         _vision = vision;
         _skill = skill;
         _item = item;
+        _main = main;
     }
     public HeroId Hero => new("卡尔", HeroAttribute.Intelligence);
 
     public void OnActivate(HeroContext ctx)
     {
-        Main._聚合.Conditions[ConditionSlotKey.C1].Probe ??= 三冰对线;
-        Main._聚合.Conditions[ConditionSlotKey.C2].Probe ??= 三雷对线;
-        Main._聚合.Conditions[ConditionSlotKey.C3].Probe ??= 三雷幽灵;
-        Main._聚合.Conditions[ConditionSlotKey.C4].Probe ??= 极冷吹风陨星锤雷暴;
+        _main._聚合.Conditions[ConditionSlotKey.C1].Probe ??= 三冰对线;
+        _main._聚合.Conditions[ConditionSlotKey.C2].Probe ??= 三雷对线;
+        _main._聚合.Conditions[ConditionSlotKey.C3].Probe ??= 三雷幽灵;
+        _main._聚合.Conditions[ConditionSlotKey.C4].Probe ??= 极冷吹风陨星锤雷暴;
     }
 
     public async Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)
@@ -45,19 +47,19 @@ public sealed class 卡尔Strategy : IHeroStrategy
 
         if (key == VirtualKey.From(Keys.D1))
         {
-            Main._聚合.Conditions[ConditionSlotKey.C1].Active = true;
+            _main._聚合.Conditions[ConditionSlotKey.C1].Active = true;
         }
         else if (key == VirtualKey.From(Keys.D2))
         {
-            Main._聚合.Conditions[ConditionSlotKey.C2].Active = true;
+            _main._聚合.Conditions[ConditionSlotKey.C2].Active = true;
         }
         else if (key == VirtualKey.From(Keys.D3))
         {
-            Main._聚合.Conditions[ConditionSlotKey.C3].Active = true;
+            _main._聚合.Conditions[ConditionSlotKey.C3].Active = true;
         }
         else if (key == VirtualKey.From(Keys.D4))
         {
-            Main._聚合.Conditions[ConditionSlotKey.C4].Active = true;
+            _main._聚合.Conditions[ConditionSlotKey.C4].Active = true;
         }
     }
 

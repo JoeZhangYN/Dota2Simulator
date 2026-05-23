@@ -22,24 +22,26 @@ public sealed class 龙骑Strategy : IHeroStrategy
 
     private readonly SkillEngine _skill;
     private readonly ItemEngine _item;
-    public 龙骑Strategy(IInputExecutor input, IScreenVision vision, SkillEngine skill, ItemEngine item)
+    private readonly HeroLoopHost _main;
+    public 龙骑Strategy(IInputExecutor input, IScreenVision vision, SkillEngine skill, ItemEngine item, HeroLoopHost main)
     {
         _input = input;
         _vision = vision;
         _skill = skill;
         _item = item;
+        _main = main;
     }
     public HeroId Hero => new("龙骑", HeroAttribute.Strength);
 
     public void OnActivate(HeroContext ctx)
     {
-        Main._聚合.Conditions[ConditionSlotKey.C1].Probe ??= 喷火去后摇;
-        Main._聚合.Conditions[ConditionSlotKey.C2].Probe ??= 神龙摆尾去后摇;
-        Main._聚合.Conditions[ConditionSlotKey.C3].Probe ??= 变龙去后摇;
-        Main._聚合.Conditions[ConditionSlotKey.C4].Probe ??= 火球去后摇;
-        Main._聚合.LegSwap.配置.修改配置(Keys.E, false);
-        Main._聚合.Attack.基础攻击前摇 = 0.5;
-        Main._聚合.Attack.基础攻击间隔 = 1.6;
+        _main._聚合.Conditions[ConditionSlotKey.C1].Probe ??= 喷火去后摇;
+        _main._聚合.Conditions[ConditionSlotKey.C2].Probe ??= 神龙摆尾去后摇;
+        _main._聚合.Conditions[ConditionSlotKey.C3].Probe ??= 变龙去后摇;
+        _main._聚合.Conditions[ConditionSlotKey.C4].Probe ??= 火球去后摇;
+        _main._聚合.LegSwap.配置.修改配置(Keys.E, false);
+        _main._聚合.Attack.基础攻击前摇 = 0.5;
+        _main._聚合.Attack.基础攻击间隔 = 1.6;
     }
 
     public async Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)
@@ -49,39 +51,39 @@ public sealed class 龙骑Strategy : IHeroStrategy
 
         if (key == VirtualKey.From(Keys.F1))
         {
-            if (Main._聚合.HasShard)
+            if (_main._聚合.HasShard)
             {
-                Main._聚合.LegSwap.配置.修改配置(Keys.D, true);
+                _main._聚合.LegSwap.配置.修改配置(Keys.D, true);
             }
         }
         else if (key == VirtualKey.Q)
         {
-            Main._聚合.Conditions[ConditionSlotKey.C1].Active = true;
+            _main._聚合.Conditions[ConditionSlotKey.C1].Active = true;
         }
         else if (key == VirtualKey.W)
         {
-            Main._聚合.Conditions[ConditionSlotKey.C2].Active = true;
+            _main._聚合.Conditions[ConditionSlotKey.C2].Active = true;
         }
         else if (key == VirtualKey.R)
         {
-            Main._聚合.Conditions[ConditionSlotKey.C3].Active = true;
+            _main._聚合.Conditions[ConditionSlotKey.C3].Active = true;
         }
         else if (key == VirtualKey.D)
         {
-            if (Main._聚合.HasShard)
+            if (_main._聚合.HasShard)
             {
-                Main._聚合.Conditions[ConditionSlotKey.C4].Active = true;
+                _main._聚合.Conditions[ConditionSlotKey.C4].Active = true;
             }
         }
         else if (key == VirtualKey.From(Keys.D2))
         {
-            Main._聚合.Skills.ToggleMode(SlotKey.W);
-            TTS.TTS.Speak("W接" + (Main._聚合.Skills.Mode(SlotKey.W) == 1 ? "火球" : "喷火"));
+            _main._聚合.Skills.ToggleMode(SlotKey.W);
+            TTS.TTS.Speak("W接" + (_main._聚合.Skills.Mode(SlotKey.W) == 1 ? "火球" : "喷火"));
         }
         else if (key == VirtualKey.From(Keys.D3))
         {
-            Main._聚合.Skills.ToggleMode(SlotKey.D);
-            TTS.TTS.Speak("火球" + (Main._聚合.Skills.Mode(SlotKey.D) == 1 ? "接" : "不接") + "喷火");
+            _main._聚合.Skills.ToggleMode(SlotKey.D);
+            TTS.TTS.Speak("火球" + (_main._聚合.Skills.Mode(SlotKey.D) == 1 ? "接" : "不接") + "喷火");
         }
     }
 
@@ -95,7 +97,7 @@ public sealed class 龙骑Strategy : IHeroStrategy
         return await _skill.主动技能进入CD后续(Keys.W, () =>
         {
             _input.Press(VirtualKey.From(Keys.A));
-            _ = Main._聚合.Skills.Mode(SlotKey.W) == 1 && Main._聚合.HasShard ? _skill.DOTA2释放CD就绪技能(Keys.D, in 句柄) : _skill.DOTA2释放CD就绪技能(Keys.Q, in 句柄);
+            _ = _main._聚合.Skills.Mode(SlotKey.W) == 1 && _main._聚合.HasShard ? _skill.DOTA2释放CD就绪技能(Keys.D, in 句柄) : _skill.DOTA2释放CD就绪技能(Keys.Q, in 句柄);
 
             _item.要求保持假腿();
         }).ConfigureAwait(true);
@@ -108,7 +110,7 @@ public sealed class 龙骑Strategy : IHeroStrategy
 
     private async Task<bool> 火球去后摇(ImageHandle 句柄)
     {
-        return await _skill.技能通用判断(Keys.D, 0, 要接的按键: Main._聚合.Skills.Mode(SlotKey.D) == 1 && _skill.DOTA2判断技能是否CD(Keys.Q, in 句柄) ? Keys.Q : Keys.A)
+        return await _skill.技能通用判断(Keys.D, 0, 要接的按键: _main._聚合.Skills.Mode(SlotKey.D) == 1 && _skill.DOTA2判断技能是否CD(Keys.Q, in 句柄) ? Keys.Q : Keys.A)
             .ConfigureAwait(true);
     }
 }

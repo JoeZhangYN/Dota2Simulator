@@ -14,10 +14,10 @@ using Dota2Simulator.GameAutomation.Ports;
 
 namespace Dota2Simulator.GameAutomation.Heroes.Agility;
 
-/// <summary>火猫（敏捷）策略——迁移自 Main.根据当前英雄增强 的 case "火猫"。</summary>
+/// <summary>火猫（敏捷）策略——迁移自 _main.根据当前英雄增强 的 case "火猫"。</summary>
 public sealed class 火猫Strategy : IHeroStrategy
 {
-    /// <summary>1080p 增益状态栏区域——内联自 Main.buff状态技能栏。</summary>
+    /// <summary>1080p 增益状态栏区域——内联自 _main.buff状态技能栏。</summary>
     private static readonly Rectangle buff状态技能栏 = new(962, 826, 526, 80);
 
 
@@ -28,23 +28,25 @@ public sealed class 火猫Strategy : IHeroStrategy
 
     private readonly SkillEngine _skill;
     private readonly ItemEngine _item;
-    public 火猫Strategy(IInputExecutor input, IScreenVision vision, SkillEngine skill, ItemEngine item)
+    private readonly HeroLoopHost _main;
+    public 火猫Strategy(IInputExecutor input, IScreenVision vision, SkillEngine skill, ItemEngine item, HeroLoopHost main)
     {
         _input = input;
         _vision = vision;
         _skill = skill;
         _item = item;
+        _main = main;
     }
     public HeroId Hero => new("火猫", HeroAttribute.Agility);
 
     public void OnActivate(HeroContext ctx)
     {
-        Main._聚合.Conditions[ConditionSlotKey.C1].Probe ??= 无影拳后续处理;
-        Main._聚合.Conditions[ConditionSlotKey.C2].Probe ??= 炎阳索去后摇;
-        Main._聚合.Conditions[ConditionSlotKey.C3].Probe ??= 烈火罩去后摇;
-        Main._聚合.Conditions[ConditionSlotKey.C4].Probe ??= 激活残焰去后摇;
-        Main._聚合.LegSwap.配置.修改配置(Keys.D, true);
-        Main._聚合.LegSwap.配置.修改配置(Keys.R, false);
+        _main._聚合.Conditions[ConditionSlotKey.C1].Probe ??= 无影拳后续处理;
+        _main._聚合.Conditions[ConditionSlotKey.C2].Probe ??= 炎阳索去后摇;
+        _main._聚合.Conditions[ConditionSlotKey.C3].Probe ??= 烈火罩去后摇;
+        _main._聚合.Conditions[ConditionSlotKey.C4].Probe ??= 激活残焰去后摇;
+        _main._聚合.LegSwap.配置.修改配置(Keys.D, true);
+        _main._聚合.LegSwap.配置.修改配置(Keys.R, false);
     }
 
     public async Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)
@@ -54,7 +56,7 @@ public sealed class 火猫Strategy : IHeroStrategy
 
         if (key == VirtualKey.W)
         {
-            Main._聚合.Conditions[ConditionSlotKey.C1].Active = true;
+            _main._聚合.Conditions[ConditionSlotKey.C1].Active = true;
             await Task.Run(() =>
             {
                 Common.Delay(330);
@@ -63,20 +65,20 @@ public sealed class 火猫Strategy : IHeroStrategy
         }
         else if (key == VirtualKey.Q)
         {
-            Main._聚合.Conditions[ConditionSlotKey.C2].Active = true;
+            _main._聚合.Conditions[ConditionSlotKey.C2].Active = true;
         }
         else if (key == VirtualKey.E)
         {
-            Main._聚合.Conditions[ConditionSlotKey.C3].Active = true;
+            _main._聚合.Conditions[ConditionSlotKey.C3].Active = true;
         }
         else if (key == VirtualKey.D)
         {
-            Main._聚合.Conditions[ConditionSlotKey.C4].Active = true;
+            _main._聚合.Conditions[ConditionSlotKey.C4].Active = true;
         }
         else if (key == VirtualKey.From(Keys.D2))
         {
-            Main._聚合.Skills.ToggleMode(SlotKey.W);
-            Dota2Simulator.TTS.TTS.Speak(Main._聚合.Skills.Mode(SlotKey.W) == 0 ? "不接捆" : "接捆");
+            _main._聚合.Skills.ToggleMode(SlotKey.W);
+            Dota2Simulator.TTS.TTS.Speak(_main._聚合.Skills.Mode(SlotKey.W) == 0 ? "不接捆" : "接捆");
         }
     }
 
@@ -86,7 +88,7 @@ public sealed class 火猫Strategy : IHeroStrategy
 
         if (b)
         {
-            if (Main._聚合.Skills.Mode(SlotKey.W) == 1)
+            if (_main._聚合.Skills.Mode(SlotKey.W) == 1)
             {
                 _input.Press(VirtualKey.From(Keys.Q));
             }

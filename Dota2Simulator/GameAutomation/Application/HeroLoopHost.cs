@@ -50,6 +50,14 @@ namespace Dota2Simulator.GameAutomation.Application
         /// </summary>
         public IReadOnlyDictionary<Keys, Action> 按键匹配条件更新 { get; }
 
+        /// <summary>
+        /// Heroes/ 92 策略调 `_main._聚合.X.Y` 通过本属性访问聚合（同名匹配 Main._聚合，方便 sed 批替换）。
+        /// </summary>
+        public HeroAggregate _聚合 => _aggregate;
+
+        /// <summary>会话级共享状态——ItemEngine.cs:61/62 等切 `_main.Session.IsPaused` 用。</summary>
+        public SessionState Session => _session;
+
         public HeroLoopHost(
             IInputExecutor input,
             IScreenVision vision,

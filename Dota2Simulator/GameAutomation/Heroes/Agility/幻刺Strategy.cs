@@ -11,7 +11,7 @@ using Dota2Simulator.GameAutomation.Ports;
 
 namespace Dota2Simulator.GameAutomation.Heroes.Agility;
 
-/// <summary>幻刺（敏捷）策略——迁移自 Main.根据当前英雄增强 的 case "幻刺"。</summary>
+/// <summary>幻刺（敏捷）策略——迁移自 _main.根据当前英雄增强 的 case "幻刺"。</summary>
 public sealed class 幻刺Strategy : IHeroStrategy
 {
 
@@ -22,21 +22,23 @@ public sealed class 幻刺Strategy : IHeroStrategy
 
     private readonly SkillEngine _skill;
     private readonly ItemEngine _item;
-    public 幻刺Strategy(IInputExecutor input, IScreenVision vision, SkillEngine skill, ItemEngine item)
+    private readonly HeroLoopHost _main;
+    public 幻刺Strategy(IInputExecutor input, IScreenVision vision, SkillEngine skill, ItemEngine item, HeroLoopHost main)
     {
         _input = input;
         _vision = vision;
         _skill = skill;
         _item = item;
+        _main = main;
     }
     public HeroId Hero => new("幻刺", HeroAttribute.Agility);
 
     public void OnActivate(HeroContext ctx)
     {
-        Main._聚合.Conditions[ConditionSlotKey.C1].Probe ??= 窒息短匕敏捷;
-        Main._聚合.Conditions[ConditionSlotKey.C2].Probe ??= 幻影突袭敏捷;
-        Main._聚合.Conditions[ConditionSlotKey.C3].Probe ??= 魅影无形敏捷;
-        Main._聚合.Conditions[ConditionSlotKey.C4].Probe ??= 刀阵旋风敏捷;
+        _main._聚合.Conditions[ConditionSlotKey.C1].Probe ??= 窒息短匕敏捷;
+        _main._聚合.Conditions[ConditionSlotKey.C2].Probe ??= 幻影突袭敏捷;
+        _main._聚合.Conditions[ConditionSlotKey.C3].Probe ??= 魅影无形敏捷;
+        _main._聚合.Conditions[ConditionSlotKey.C4].Probe ??= 刀阵旋风敏捷;
     }
 
     public async Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)
@@ -46,30 +48,30 @@ public sealed class 幻刺Strategy : IHeroStrategy
 
         if (key == VirtualKey.From(Keys.F1))
         {
-            if (Main._聚合.HasAghanim)
+            if (_main._聚合.HasAghanim)
             {
-                Main._聚合.LegSwap.配置.修改配置(Keys.D, true);
+                _main._聚合.LegSwap.配置.修改配置(Keys.D, true);
             }
         }
         else if (key == VirtualKey.Q)
         {
-            Main._聚合.Conditions[ConditionSlotKey.C1].Active = true;
+            _main._聚合.Conditions[ConditionSlotKey.C1].Active = true;
         }
         else if (key == VirtualKey.W)
         {
             // 触发激怒机制，2.3秒内不吸引仇恨
             _input.Press(VirtualKey.From(Keys.A));
-            Main._聚合.Conditions[ConditionSlotKey.C2].Active = true;
+            _main._聚合.Conditions[ConditionSlotKey.C2].Active = true;
         }
         else if (key == VirtualKey.E)
         {
-            Main._聚合.Conditions[ConditionSlotKey.C3].Active = true;
+            _main._聚合.Conditions[ConditionSlotKey.C3].Active = true;
         }
         else if (key == VirtualKey.D)
         {
-            if (Main._聚合.HasAghanim)
+            if (_main._聚合.HasAghanim)
             {
-                Main._聚合.Conditions[ConditionSlotKey.C4].Active = true;
+                _main._聚合.Conditions[ConditionSlotKey.C4].Active = true;
             }
         }
     }

@@ -11,7 +11,7 @@ using Dota2Simulator.GameAutomation.Ports;
 
 namespace Dota2Simulator.GameAutomation.Heroes.Agility;
 
-/// <summary>赏金（敏捷）策略——迁移自 Main.根据当前英雄增强 的 case "赏金"。</summary>
+/// <summary>赏金（敏捷）策略——迁移自 _main.根据当前英雄增强 的 case "赏金"。</summary>
 public sealed class 赏金Strategy : IHeroStrategy
 {
 
@@ -22,21 +22,23 @@ public sealed class 赏金Strategy : IHeroStrategy
 
     private readonly SkillEngine _skill;
     private readonly ItemEngine _item;
-    public 赏金Strategy(IInputExecutor input, IScreenVision vision, SkillEngine skill, ItemEngine item)
+    private readonly HeroLoopHost _main;
+    public 赏金Strategy(IInputExecutor input, IScreenVision vision, SkillEngine skill, ItemEngine item, HeroLoopHost main)
     {
         _input = input;
         _vision = vision;
         _skill = skill;
         _item = item;
+        _main = main;
     }
     public HeroId Hero => new("赏金", HeroAttribute.Agility);
 
     public void OnActivate(HeroContext ctx)
     {
-        Main._聚合.Conditions[ConditionSlotKey.C1].Probe ??= 飞镖接平a;
-        Main._聚合.Conditions[ConditionSlotKey.C2].Probe ??= 标记去后摇;
-        Main._聚合.Conditions[ConditionSlotKey.C3].Probe ??= 循环标记;
-        Main._聚合.LegSwap.配置.修改配置(Keys.W, false);
+        _main._聚合.Conditions[ConditionSlotKey.C1].Probe ??= 飞镖接平a;
+        _main._聚合.Conditions[ConditionSlotKey.C2].Probe ??= 标记去后摇;
+        _main._聚合.Conditions[ConditionSlotKey.C3].Probe ??= 循环标记;
+        _main._聚合.LegSwap.配置.修改配置(Keys.W, false);
     }
 
     public async Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)
@@ -46,16 +48,16 @@ public sealed class 赏金Strategy : IHeroStrategy
 
         if (key == VirtualKey.Q)
         {
-            Main._聚合.Conditions[ConditionSlotKey.C1].Active = true;
+            _main._聚合.Conditions[ConditionSlotKey.C1].Active = true;
         }
         else if (key == VirtualKey.R)
         {
-            Main._聚合.Conditions[ConditionSlotKey.C2].Active = true;
+            _main._聚合.Conditions[ConditionSlotKey.C2].Active = true;
         }
         else if (key == VirtualKey.From(Keys.D2))
         {
-            Main._聚合.Conditions[ConditionSlotKey.C3].Active = !Main._聚合.Conditions[ConditionSlotKey.C3].Active;
-            Dota2Simulator.TTS.TTS.Speak(Main._聚合.Conditions[ConditionSlotKey.C3].Active ? "循环标记" : "不循环标记");
+            _main._聚合.Conditions[ConditionSlotKey.C3].Active = !_main._聚合.Conditions[ConditionSlotKey.C3].Active;
+            Dota2Simulator.TTS.TTS.Speak(_main._聚合.Conditions[ConditionSlotKey.C3].Active ? "循环标记" : "不循环标记");
         }
     }
 
@@ -72,7 +74,7 @@ public sealed class 赏金Strategy : IHeroStrategy
     private async Task<bool> 循环标记(ImageHandle 句柄)
     {
         await _skill.技能通用判断(Keys.R, 2).ConfigureAwait(true);
-        return await Task.FromResult(Main._聚合.Conditions[ConditionSlotKey.C3].Active).ConfigureAwait(true);
+        return await Task.FromResult(_main._聚合.Conditions[ConditionSlotKey.C3].Active).ConfigureAwait(true);
     }
 }
 #endif

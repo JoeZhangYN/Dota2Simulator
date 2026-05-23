@@ -13,7 +13,7 @@ using Dota2Simulator.GameAutomation.Ports;
 
 namespace Dota2Simulator.GameAutomation.Heroes.Universal;
 
-/// <summary>测试策略——迁移自 Main.根据当前英雄增强 的 case "测试"。</summary>
+/// <summary>测试策略——迁移自 _main.根据当前英雄增强 的 case "测试"。</summary>
 public sealed class 测试Strategy : IHeroStrategy
 {
 
@@ -23,15 +23,17 @@ public sealed class 测试Strategy : IHeroStrategy
 #pragma warning restore IDE0052
     private readonly SkillEngine _skill;
     private readonly ItemEngine _item;
+    private readonly HeroLoopHost _main;
     private readonly IUiInvoker _ui;
 
-    public 测试Strategy(IInputExecutor input, IScreenVision vision, SkillEngine skill, ItemEngine item, IUiInvoker ui)
+    public 测试Strategy(IInputExecutor input, IScreenVision vision, SkillEngine skill, ItemEngine item, IUiInvoker ui, HeroLoopHost main)
     {
         _input = input;
         _vision = vision;
         _skill = skill;
         _item = item;
         _ui = ui;
+        _main = main;
     }
     public HeroId Hero => new("测试", HeroAttribute.Universal);
 
@@ -87,11 +89,11 @@ public sealed class 测试Strategy : IHeroStrategy
 
     private void 测试其他功能()
     {
-        Main._聚合.Skills.SetTime(SlotKey.Global, Common.获取当前时间毫秒());
+        _main._聚合.Skills.SetTime(SlotKey.Global, Common.获取当前时间毫秒());
 
         _item.保存当前物品();
 
-        _ui.Invoke(() => _ui.SetText(UiField.Y, (Common.获取当前时间毫秒() - Main._聚合.Skills.Time(SlotKey.Global)).ToString(CultureInfo.InvariantCulture)));
+        _ui.Invoke(() => _ui.SetText(UiField.Y, (Common.获取当前时间毫秒() - _main._聚合.Skills.Time(SlotKey.Global)).ToString(CultureInfo.InvariantCulture)));
 
         Dota2Simulator.TTS.TTS.Speak("完成");
     }

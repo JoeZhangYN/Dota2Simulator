@@ -11,7 +11,7 @@ using Dota2Simulator.GameAutomation.Ports;
 
 namespace Dota2Simulator.GameAutomation.Heroes.Agility;
 
-/// <summary>TB（敏捷）策略——迁移自 Main.根据当前英雄增强 的 case "TB"。</summary>
+/// <summary>TB（敏捷）策略——迁移自 _main.根据当前英雄增强 的 case "TB"。</summary>
 public sealed class TBStrategy : IHeroStrategy
 {
 
@@ -22,24 +22,26 @@ public sealed class TBStrategy : IHeroStrategy
 
     private readonly SkillEngine _skill;
     private readonly ItemEngine _item;
-    public TBStrategy(IInputExecutor input, IScreenVision vision, SkillEngine skill, ItemEngine item)
+    private readonly HeroLoopHost _main;
+    public TBStrategy(IInputExecutor input, IScreenVision vision, SkillEngine skill, ItemEngine item, HeroLoopHost main)
     {
         _input = input;
         _vision = vision;
         _skill = skill;
         _item = item;
+        _main = main;
     }
     public HeroId Hero => new("TB", HeroAttribute.Agility);
 
     public void OnActivate(HeroContext ctx)
     {
-        Main._聚合.Conditions[ConditionSlotKey.C1].Probe ??= 倒影敏捷;
-        Main._聚合.Conditions[ConditionSlotKey.C2].Probe ??= 幻惑敏捷;
-        Main._聚合.Conditions[ConditionSlotKey.C3].Probe ??= 魔化敏捷;
-        Main._聚合.Conditions[ConditionSlotKey.C4].Probe ??= 恶魔狂热去后摇;
-        Main._聚合.Conditions[ConditionSlotKey.C5].Probe ??= 恐怖心潮敏捷;
-        Main._聚合.Conditions[ConditionSlotKey.C6].Probe ??= 断魂敏捷;
-        Main._聚合.LegSwap.配置.修改配置(Keys.W, false);
+        _main._聚合.Conditions[ConditionSlotKey.C1].Probe ??= 倒影敏捷;
+        _main._聚合.Conditions[ConditionSlotKey.C2].Probe ??= 幻惑敏捷;
+        _main._聚合.Conditions[ConditionSlotKey.C3].Probe ??= 魔化敏捷;
+        _main._聚合.Conditions[ConditionSlotKey.C4].Probe ??= 恶魔狂热去后摇;
+        _main._聚合.Conditions[ConditionSlotKey.C5].Probe ??= 恐怖心潮敏捷;
+        _main._聚合.Conditions[ConditionSlotKey.C6].Probe ??= 断魂敏捷;
+        _main._聚合.LegSwap.配置.修改配置(Keys.W, false);
     }
 
     public async Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)
@@ -49,40 +51,40 @@ public sealed class TBStrategy : IHeroStrategy
 
         if (key == VirtualKey.From(Keys.F1))
         {
-            if (Main._聚合.HasAghanim)
+            if (_main._聚合.HasAghanim)
             {
-                Main._聚合.LegSwap.配置.修改配置(Keys.F, true);
+                _main._聚合.LegSwap.配置.修改配置(Keys.F, true);
             }
         }
         else if (key == VirtualKey.Q)
         {
-            Main._聚合.Conditions[ConditionSlotKey.C1].Active = true;
+            _main._聚合.Conditions[ConditionSlotKey.C1].Active = true;
         }
         else if (key == VirtualKey.W)
         {
-            Main._聚合.Conditions[ConditionSlotKey.C2].Active = true;
+            _main._聚合.Conditions[ConditionSlotKey.C2].Active = true;
         }
         else if (key == VirtualKey.E)
         {
-            Main._聚合.Conditions[ConditionSlotKey.C3].Active = true;
+            _main._聚合.Conditions[ConditionSlotKey.C3].Active = true;
         }
         else if (key == VirtualKey.D)
         {
-            if (Main._聚合.HasShard)
+            if (_main._聚合.HasShard)
             {
-                Main._聚合.Conditions[ConditionSlotKey.C4].Active = true;
+                _main._聚合.Conditions[ConditionSlotKey.C4].Active = true;
             }
         }
         else if (key == VirtualKey.F)
         {
-            if (Main._聚合.HasAghanim)
+            if (_main._聚合.HasAghanim)
             {
-                Main._聚合.Conditions[ConditionSlotKey.C5].Active = true;
+                _main._聚合.Conditions[ConditionSlotKey.C5].Active = true;
             }
         }
         else if (key == VirtualKey.R)
         {
-            Main._聚合.Conditions[ConditionSlotKey.C6].Active = true;
+            _main._聚合.Conditions[ConditionSlotKey.C6].Active = true;
         }
     }
 

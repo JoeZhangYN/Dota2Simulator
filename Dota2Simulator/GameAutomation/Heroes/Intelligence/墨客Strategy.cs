@@ -21,22 +21,24 @@ public sealed class 墨客Strategy : IHeroStrategy
 
     private readonly SkillEngine _skill;
     private readonly ItemEngine _item;
-    public 墨客Strategy(IInputExecutor input, IScreenVision vision, SkillEngine skill, ItemEngine item)
+    private readonly HeroLoopHost _main;
+    public 墨客Strategy(IInputExecutor input, IScreenVision vision, SkillEngine skill, ItemEngine item, HeroLoopHost main)
     {
         _input = input;
         _vision = vision;
         _skill = skill;
         _item = item;
+        _main = main;
     }
     public HeroId Hero => new("墨客", HeroAttribute.Intelligence);
 
     public void OnActivate(HeroContext ctx)
     {
-        Main._聚合.Conditions[ConditionSlotKey.C1].Probe ??= 命运之笔去后摇;
-        Main._聚合.Conditions[ConditionSlotKey.C2].Probe ??= 幻影之拥去后摇;
-        Main._聚合.Conditions[ConditionSlotKey.C3].Probe ??= 墨泳去后摇;
-        Main._聚合.Conditions[ConditionSlotKey.C4].Probe ??= 缚魂去后摇;
-        Main._聚合.Conditions[ConditionSlotKey.C5].Probe ??= 暗绘去后摇;
+        _main._聚合.Conditions[ConditionSlotKey.C1].Probe ??= 命运之笔去后摇;
+        _main._聚合.Conditions[ConditionSlotKey.C2].Probe ??= 幻影之拥去后摇;
+        _main._聚合.Conditions[ConditionSlotKey.C3].Probe ??= 墨泳去后摇;
+        _main._聚合.Conditions[ConditionSlotKey.C4].Probe ??= 缚魂去后摇;
+        _main._聚合.Conditions[ConditionSlotKey.C5].Probe ??= 暗绘去后摇;
     }
 
     public async Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)
@@ -48,28 +50,28 @@ public sealed class 墨客Strategy : IHeroStrategy
 
         if (e.KeyValue == (int)Keys.E && (int)e.Modifiers == (int)Keys.Alt)
         {
-            Main._聚合.Conditions[ConditionSlotKey.C3].Active = true;
+            _main._聚合.Conditions[ConditionSlotKey.C3].Active = true;
         }
 
         if (key == VirtualKey.Q)
         {
-            Main._聚合.Conditions[ConditionSlotKey.C1].Active = true;
+            _main._聚合.Conditions[ConditionSlotKey.C1].Active = true;
         }
         else if (key == VirtualKey.W)
         {
-            Main._聚合.Conditions[ConditionSlotKey.C2].Active = true;
+            _main._聚合.Conditions[ConditionSlotKey.C2].Active = true;
         }
         else if (key == VirtualKey.E)
         {
-            Main._聚合.Conditions[ConditionSlotKey.C3].Active = true;
+            _main._聚合.Conditions[ConditionSlotKey.C3].Active = true;
         }
         else if (key == VirtualKey.R)
         {
-            Main._聚合.Conditions[ConditionSlotKey.C4].Active = true;
+            _main._聚合.Conditions[ConditionSlotKey.C4].Active = true;
         }
         else if (key == VirtualKey.D)
         {
-            Main._聚合.Conditions[ConditionSlotKey.C5].Active = true;
+            _main._聚合.Conditions[ConditionSlotKey.C5].Active = true;
         }
     }
 

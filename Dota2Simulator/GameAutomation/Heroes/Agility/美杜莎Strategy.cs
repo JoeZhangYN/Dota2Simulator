@@ -11,7 +11,7 @@ using Dota2Simulator.GameAutomation.Ports;
 
 namespace Dota2Simulator.GameAutomation.Heroes.Agility;
 
-/// <summary>美杜莎（敏捷）策略——迁移自 Main.根据当前英雄增强 的 case "美杜莎"。</summary>
+/// <summary>美杜莎（敏捷）策略——迁移自 _main.根据当前英雄增强 的 case "美杜莎"。</summary>
 public sealed class 美杜莎Strategy : IHeroStrategy
 {
 
@@ -22,21 +22,23 @@ public sealed class 美杜莎Strategy : IHeroStrategy
 
     private readonly SkillEngine _skill;
     private readonly ItemEngine _item;
-    public 美杜莎Strategy(IInputExecutor input, IScreenVision vision, SkillEngine skill, ItemEngine item)
+    private readonly HeroLoopHost _main;
+    public 美杜莎Strategy(IInputExecutor input, IScreenVision vision, SkillEngine skill, ItemEngine item, HeroLoopHost main)
     {
         _input = input;
         _vision = vision;
         _skill = skill;
         _item = item;
+        _main = main;
     }
     public HeroId Hero => new("美杜莎", HeroAttribute.Agility);
 
     public void OnActivate(HeroContext ctx)
     {
-        Main._聚合.Conditions[ConditionSlotKey.C1].Probe ??= 秘术异蛇去后摇;
-        Main._聚合.Conditions[ConditionSlotKey.C2].Probe ??= 罗网剑阵去后摇;
-        Main._聚合.Conditions[ConditionSlotKey.C3].Probe ??= 石化凝视去后摇;
-        Main._聚合.LegSwap.配置.修改配置(Keys.Q, false);
+        _main._聚合.Conditions[ConditionSlotKey.C1].Probe ??= 秘术异蛇去后摇;
+        _main._聚合.Conditions[ConditionSlotKey.C2].Probe ??= 罗网剑阵去后摇;
+        _main._聚合.Conditions[ConditionSlotKey.C3].Probe ??= 石化凝视去后摇;
+        _main._聚合.LegSwap.配置.修改配置(Keys.Q, false);
     }
 
     public async Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)
@@ -46,15 +48,15 @@ public sealed class 美杜莎Strategy : IHeroStrategy
 
         if (key == VirtualKey.W)
         {
-            Main._聚合.Conditions[ConditionSlotKey.C1].Active = true;
+            _main._聚合.Conditions[ConditionSlotKey.C1].Active = true;
         }
         else if (key == VirtualKey.E)
         {
-            Main._聚合.Conditions[ConditionSlotKey.C2].Active = true;
+            _main._聚合.Conditions[ConditionSlotKey.C2].Active = true;
         }
         else if (key == VirtualKey.R)
         {
-            Main._聚合.Conditions[ConditionSlotKey.C3].Active = true;
+            _main._聚合.Conditions[ConditionSlotKey.C3].Active = true;
         }
     }
 

@@ -21,18 +21,20 @@ public sealed class 小仙女Strategy : IHeroStrategy
 
     private readonly SkillEngine _skill;
     private readonly ItemEngine _item;
-    public 小仙女Strategy(IInputExecutor input, IScreenVision vision, SkillEngine skill, ItemEngine item)
+    private readonly HeroLoopHost _main;
+    public 小仙女Strategy(IInputExecutor input, IScreenVision vision, SkillEngine skill, ItemEngine item, HeroLoopHost main)
     {
         _input = input;
         _vision = vision;
         _skill = skill;
         _item = item;
+        _main = main;
     }
     public HeroId Hero => new("小仙女", HeroAttribute.Intelligence);
 
     public void OnActivate(HeroContext ctx)
     {
-        Main._聚合.Conditions[ConditionSlotKey.C5].Probe ??= 无限暗影之境;
+        _main._聚合.Conditions[ConditionSlotKey.C5].Probe ??= 无限暗影之境;
     }
 
     public async Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)
@@ -42,22 +44,22 @@ public sealed class 小仙女Strategy : IHeroStrategy
 
         if (key == VirtualKey.F)
         {
-            if (Main._聚合.HasShard)
+            if (_main._聚合.HasShard)
             {
-                Main._聚合.Conditions[ConditionSlotKey.C4].Active = true;
+                _main._聚合.Conditions[ConditionSlotKey.C4].Active = true;
             }
         }
         else if (key == VirtualKey.From(Keys.D3))
         {
-            Main._聚合.Conditions[ConditionSlotKey.C5].Active = !Main._聚合.Conditions[ConditionSlotKey.C5].Active;
-            TTS.TTS.Speak(Main._聚合.Conditions[ConditionSlotKey.C5].Active ? "续暗影" : "不续暗影");
+            _main._聚合.Conditions[ConditionSlotKey.C5].Active = !_main._聚合.Conditions[ConditionSlotKey.C5].Active;
+            TTS.TTS.Speak(_main._聚合.Conditions[ConditionSlotKey.C5].Active ? "续暗影" : "不续暗影");
         }
     }
 
     private async Task<bool> 无限暗影之境(ImageHandle 句柄)
     {
         await _skill.技能通用判断(Keys.W, 2).ConfigureAwait(true);
-        return await Task.FromResult(Main._聚合.Conditions[ConditionSlotKey.C5].Active).ConfigureAwait(true);
+        return await Task.FromResult(_main._聚合.Conditions[ConditionSlotKey.C5].Active).ConfigureAwait(true);
     }
 }
 #endif

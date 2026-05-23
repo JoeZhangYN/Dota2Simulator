@@ -23,23 +23,25 @@ public sealed class 天怒Strategy : IHeroStrategy
 
     private readonly SkillEngine _skill;
     private readonly ItemEngine _item;
-    public 天怒Strategy(IInputExecutor input, IScreenVision vision, SkillEngine skill, ItemEngine item)
+    private readonly HeroLoopHost _main;
+    public 天怒Strategy(IInputExecutor input, IScreenVision vision, SkillEngine skill, ItemEngine item, HeroLoopHost main)
     {
         _input = input;
         _vision = vision;
         _skill = skill;
         _item = item;
+        _main = main;
     }
     public HeroId Hero => new("天怒", HeroAttribute.Intelligence);
 
     public void OnActivate(HeroContext ctx)
     {
-        Main._聚合.Conditions[ConditionSlotKey.C1].Probe ??= 循环奥数鹰隼;
-        Main._聚合.Conditions[ConditionSlotKey.C2].Probe ??= 天怒秒人连招;
-        Main._聚合.Conditions[ConditionSlotKey.C3].Probe ??= 奥数鹰隼去后摇;
-        Main._聚合.Conditions[ConditionSlotKey.C4].Probe ??= 上古封印去后摇;
-        Main._聚合.Conditions[ConditionSlotKey.C5].Probe ??= 神秘之耀去后摇;
-        Main._聚合.Conditions[ConditionSlotKey.C6].Probe ??= 震荡光弹去后摇;
+        _main._聚合.Conditions[ConditionSlotKey.C1].Probe ??= 循环奥数鹰隼;
+        _main._聚合.Conditions[ConditionSlotKey.C2].Probe ??= 天怒秒人连招;
+        _main._聚合.Conditions[ConditionSlotKey.C3].Probe ??= 奥数鹰隼去后摇;
+        _main._聚合.Conditions[ConditionSlotKey.C4].Probe ??= 上古封印去后摇;
+        _main._聚合.Conditions[ConditionSlotKey.C5].Probe ??= 神秘之耀去后摇;
+        _main._聚合.Conditions[ConditionSlotKey.C6].Probe ??= 震荡光弹去后摇;
         _skill.重复按键执行间隔阈值 = 100;
     }
 
@@ -50,41 +52,41 @@ public sealed class 天怒Strategy : IHeroStrategy
 
         if (key == VirtualKey.Q)
         {
-            Main._聚合.Conditions[ConditionSlotKey.C3].Active = true;
+            _main._聚合.Conditions[ConditionSlotKey.C3].Active = true;
         }
         else if (key == VirtualKey.W)
         {
-            Main._聚合.Conditions[ConditionSlotKey.C6].Active = true;
+            _main._聚合.Conditions[ConditionSlotKey.C6].Active = true;
         }
         else if (key == VirtualKey.E)
         {
-            Main._聚合.Conditions[ConditionSlotKey.C4].Active = true;
+            _main._聚合.Conditions[ConditionSlotKey.C4].Active = true;
         }
         else if (key == VirtualKey.R)
         {
-            Main._聚合.Conditions[ConditionSlotKey.C5].Active = true;
+            _main._聚合.Conditions[ConditionSlotKey.C5].Active = true;
         }
         else if (key == VirtualKey.From(Keys.D2))
         {
-            Main._聚合.Conditions[ConditionSlotKey.C1].Active = !Main._聚合.Conditions[ConditionSlotKey.C1].Active;
-            TTS.TTS.Speak(Main._聚合.Conditions[ConditionSlotKey.C1].Active ? "循环鹰隼" : "不循环鹰隼");
+            _main._聚合.Conditions[ConditionSlotKey.C1].Active = !_main._聚合.Conditions[ConditionSlotKey.C1].Active;
+            TTS.TTS.Speak(_main._聚合.Conditions[ConditionSlotKey.C1].Active ? "循环鹰隼" : "不循环鹰隼");
         }
         else if (key == VirtualKey.From(Keys.D3))
         {
-            Main._聚合.Skills.SetStep(SlotKey.Global, 1);
-            Main._聚合.Conditions[ConditionSlotKey.C2].Active = true;
+            _main._聚合.Skills.SetStep(SlotKey.Global, 1);
+            _main._聚合.Conditions[ConditionSlotKey.C2].Active = true;
         }
     }
 
     private async Task<bool> 循环奥数鹰隼(ImageHandle 句柄)
     {
         await _skill.技能通用判断(Keys.Q, 2).ConfigureAwait(true);
-        return await Task.FromResult(Main._聚合.Conditions[ConditionSlotKey.C1].Active).ConfigureAwait(true);
+        return await Task.FromResult(_main._聚合.Conditions[ConditionSlotKey.C1].Active).ConfigureAwait(true);
     }
 
     private async Task<bool> 天怒秒人连招(ImageHandle 句柄)
     {
-        int 步骤 = Main._聚合.Skills.Step(SlotKey.Global);
+        int 步骤 = _main._聚合.Skills.Step(SlotKey.Global);
 
         switch (步骤)
         {
@@ -117,7 +119,7 @@ public sealed class 天怒Strategy : IHeroStrategy
 
                 Common.Delay(33 * _item.根据图片使用物品(Dota2_Pictrue.物品.羊刀));
 
-                Main._聚合.Skills.SetStep(SlotKey.Global, 2);
+                _main._聚合.Skills.SetStep(SlotKey.Global, 2);
 
                 return await Task.FromResult(true).ConfigureAwait(true);
             case < 3:
@@ -127,8 +129,8 @@ public sealed class 天怒Strategy : IHeroStrategy
                         return await Task.FromResult(true).ConfigureAwait(true);
                     }
 
-                    Main._聚合.Conditions[ConditionSlotKey.C1].Active = true;
-                    Main._聚合.Skills.SetStep(SlotKey.Global, 3);
+                    _main._聚合.Conditions[ConditionSlotKey.C1].Active = true;
+                    _main._聚合.Skills.SetStep(SlotKey.Global, 3);
 
                     return await Task.FromResult(false).ConfigureAwait(true);
                 }

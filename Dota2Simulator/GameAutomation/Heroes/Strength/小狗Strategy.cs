@@ -21,20 +21,22 @@ public sealed class 小狗Strategy : IHeroStrategy
 
     private readonly SkillEngine _skill;
     private readonly ItemEngine _item;
-    public 小狗Strategy(IInputExecutor input, IScreenVision vision, SkillEngine skill, ItemEngine item)
+    private readonly HeroLoopHost _main;
+    public 小狗Strategy(IInputExecutor input, IScreenVision vision, SkillEngine skill, ItemEngine item, HeroLoopHost main)
     {
         _input = input;
         _vision = vision;
         _skill = skill;
         _item = item;
+        _main = main;
     }
     public HeroId Hero => new("小狗", HeroAttribute.Strength);
 
     public void OnActivate(HeroContext ctx)
     {
-        Main._聚合.Conditions[ConditionSlotKey.C1].Probe ??= 狂暴去后摇;
-        Main._聚合.Conditions[ConditionSlotKey.C2].Probe ??= 撕裂伤口去后摇;
-        Main._聚合.LegSwap.配置.修改配置(Keys.E, false);
+        _main._聚合.Conditions[ConditionSlotKey.C1].Probe ??= 狂暴去后摇;
+        _main._聚合.Conditions[ConditionSlotKey.C2].Probe ??= 撕裂伤口去后摇;
+        _main._聚合.LegSwap.配置.修改配置(Keys.E, false);
     }
 
     public async Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)
@@ -44,11 +46,11 @@ public sealed class 小狗Strategy : IHeroStrategy
 
         if (key == VirtualKey.Q)
         {
-            Main._聚合.Conditions[ConditionSlotKey.C1].Active = true;
+            _main._聚合.Conditions[ConditionSlotKey.C1].Active = true;
         }
         else if (key == VirtualKey.W)
         {
-            Main._聚合.Conditions[ConditionSlotKey.C2].Active = true;
+            _main._聚合.Conditions[ConditionSlotKey.C2].Active = true;
         }
     }
 

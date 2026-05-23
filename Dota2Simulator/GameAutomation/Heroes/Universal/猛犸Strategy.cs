@@ -15,7 +15,7 @@ using Dota2Simulator.GameAutomation.Ports;
 using Dota2Simulator.GameAutomation.Domain.Perception;
 namespace Dota2Simulator.GameAutomation.Heroes.Universal;
 
-/// <summary>猛犸（全才）策略——迁移自 Main.根据当前英雄增强 的 case "猛犸"。</summary>
+/// <summary>猛犸（全才）策略——迁移自 _main.根据当前英雄增强 的 case "猛犸"。</summary>
 public sealed class 猛犸Strategy : IHeroStrategy
 {
     private const int 等待延迟 = 33;
@@ -28,22 +28,24 @@ public sealed class 猛犸Strategy : IHeroStrategy
 
     private readonly SkillEngine _skill;
     private readonly ItemEngine _item;
-    public 猛犸Strategy(IInputExecutor input, IScreenVision vision, SkillEngine skill, ItemEngine item)
+    private readonly HeroLoopHost _main;
+    public 猛犸Strategy(IInputExecutor input, IScreenVision vision, SkillEngine skill, ItemEngine item, HeroLoopHost main)
     {
         _input = input;
         _vision = vision;
         _skill = skill;
         _item = item;
+        _main = main;
     }
     public HeroId Hero => new("猛犸", HeroAttribute.Universal);
 
     public void OnActivate(HeroContext ctx)
     {
-        Main._聚合.Conditions[ConditionSlotKey.C1].Probe = 震荡波去后摇;
-        Main._聚合.Conditions[ConditionSlotKey.C2].Probe = 授予力量去后摇;
-        Main._聚合.Conditions[ConditionSlotKey.C3].Probe = 巨角冲撞去后摇;
-        Main._聚合.Conditions[ConditionSlotKey.C4].Probe = 两级反转去后摇;
-        Main._聚合.Conditions[ConditionSlotKey.C5].Probe = 长角抛物去后摇;
+        _main._聚合.Conditions[ConditionSlotKey.C1].Probe = 震荡波去后摇;
+        _main._聚合.Conditions[ConditionSlotKey.C2].Probe = 授予力量去后摇;
+        _main._聚合.Conditions[ConditionSlotKey.C3].Probe = 巨角冲撞去后摇;
+        _main._聚合.Conditions[ConditionSlotKey.C4].Probe = 两级反转去后摇;
+        _main._聚合.Conditions[ConditionSlotKey.C5].Probe = 长角抛物去后摇;
     }
 
     public async Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)
@@ -53,23 +55,23 @@ public sealed class 猛犸Strategy : IHeroStrategy
 
         if (key == VirtualKey.Q)
         {
-            Main._聚合.Conditions[ConditionSlotKey.C1].Active = true;
+            _main._聚合.Conditions[ConditionSlotKey.C1].Active = true;
         }
         else if (key == VirtualKey.W)
         {
-            Main._聚合.Conditions[ConditionSlotKey.C2].Active = true;
+            _main._聚合.Conditions[ConditionSlotKey.C2].Active = true;
         }
         else if (key == VirtualKey.E)
         {
-            Main._聚合.Conditions[ConditionSlotKey.C3].Active = true;
+            _main._聚合.Conditions[ConditionSlotKey.C3].Active = true;
         }
         else if (key == VirtualKey.R)
         {
-            Main._聚合.Conditions[ConditionSlotKey.C4].Active = true;
+            _main._聚合.Conditions[ConditionSlotKey.C4].Active = true;
         }
         else if (key == VirtualKey.D)
         {
-            Main._聚合.Conditions[ConditionSlotKey.C5].Active = true;
+            _main._聚合.Conditions[ConditionSlotKey.C5].Active = true;
         }
         else if (key == VirtualKey.F)
         {
@@ -142,7 +144,7 @@ public sealed class 猛犸Strategy : IHeroStrategy
         _input.Press(VirtualKey.From(Keys.Space));
         Common.Delay(等待延迟);
         _input.Press(VirtualKey.From(Keys.D9));
-        Point target = Main._聚合.Skills.Target(SlotKey.Global);
+        Point target = _main._聚合.Skills.Target(SlotKey.Global);
         _input.MouseMoveTo(new ScreenPoint(target.X, target.Y));
         Common.Delay(等待延迟);
         _input.Press(VirtualKey.From(Keys.E));
@@ -152,7 +154,7 @@ public sealed class 猛犸Strategy : IHeroStrategy
 
     private void 指定地点()
     {
-        Main._聚合.Skills.SetTarget(SlotKey.Global, Control.MousePosition);
+        _main._聚合.Skills.SetTarget(SlotKey.Global, Control.MousePosition);
 
         Common.Delay(等待延迟);
         _input.KeyDown(VirtualKey.From(Keys.Control));

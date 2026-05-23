@@ -10,7 +10,7 @@ using Dota2Simulator.GameAutomation.Ports;
 
 namespace Dota2Simulator.GameAutomation.Heroes.Agility;
 
-/// <summary>剃刀（敏捷）策略——迁移自 Main.根据当前英雄增强 的 case "剃刀"。</summary>
+/// <summary>剃刀（敏捷）策略——迁移自 _main.根据当前英雄增强 的 case "剃刀"。</summary>
 public sealed class 剃刀Strategy : IHeroStrategy
 {
 
@@ -21,12 +21,14 @@ public sealed class 剃刀Strategy : IHeroStrategy
 
     private readonly SkillEngine _skill;
     private readonly ItemEngine _item;
-    public 剃刀Strategy(IInputExecutor input, IScreenVision vision, SkillEngine skill, ItemEngine item)
+    private readonly HeroLoopHost _main;
+    public 剃刀Strategy(IInputExecutor input, IScreenVision vision, SkillEngine skill, ItemEngine item, HeroLoopHost main)
     {
         _input = input;
         _vision = vision;
         _skill = skill;
         _item = item;
+        _main = main;
     }
     public HeroId Hero => new("剃刀", HeroAttribute.Agility);
 
@@ -36,8 +38,8 @@ public sealed class 剃刀Strategy : IHeroStrategy
         //_聚合.Conditions[ConditionSlotKey.C2].Probe ??= 乾坤之跃敏捷;
         //_聚合.Conditions[ConditionSlotKey.C3].Probe ??= 猴子猴孙敏捷;
         //_聚合.Conditions[ConditionSlotKey.C4].Probe ??= 大圣无限跳跃;
-        //Main._聚合.LegSwap.配置.修改配置(Keys.Q, false);
-        //Main._聚合.LegSwap.配置.修改配置(Keys.W, false);
+        //_main._聚合.LegSwap.配置.修改配置(Keys.Q, false);
+        //_main._聚合.LegSwap.配置.修改配置(Keys.W, false);
     }
 
     public async Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)
@@ -47,15 +49,15 @@ public sealed class 剃刀Strategy : IHeroStrategy
 
         if (key == VirtualKey.Q)
         {
-            Main._聚合.Conditions[ConditionSlotKey.C1].Active = true;
+            _main._聚合.Conditions[ConditionSlotKey.C1].Active = true;
         }
         else if (key == VirtualKey.E)
         {
-            Main._聚合.Conditions[ConditionSlotKey.C2].Active = true;
+            _main._聚合.Conditions[ConditionSlotKey.C2].Active = true;
         }
         else if (key == VirtualKey.R)
         {
-            Main._聚合.Conditions[ConditionSlotKey.C3].Active = true;
+            _main._聚合.Conditions[ConditionSlotKey.C3].Active = true;
         }
     }
 }

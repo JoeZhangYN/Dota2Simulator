@@ -23,21 +23,23 @@ public sealed class 炸弹人Strategy : IHeroStrategy
 
     private readonly SkillEngine _skill;
     private readonly ItemEngine _item;
-    public 炸弹人Strategy(IInputExecutor input, IScreenVision vision, SkillEngine skill, ItemEngine item)
+    private readonly HeroLoopHost _main;
+    public 炸弹人Strategy(IInputExecutor input, IScreenVision vision, SkillEngine skill, ItemEngine item, HeroLoopHost main)
     {
         _input = input;
         _vision = vision;
         _skill = skill;
         _item = item;
+        _main = main;
     }
     public HeroId Hero => new("炸弹人", HeroAttribute.Intelligence);
 
     public void OnActivate(HeroContext ctx)
     {
-        Main._聚合.Conditions[ConditionSlotKey.C1].Probe ??= 粘性炸弹去后摇;
-        Main._聚合.Conditions[ConditionSlotKey.C2].Probe ??= 活性电击去后摇;
-        Main._聚合.Conditions[ConditionSlotKey.C3].Probe ??= 爆破起飞去后摇;
-        Main._聚合.Conditions[ConditionSlotKey.C4].Probe ??= 爆破后接3雷粘性炸弹;
+        _main._聚合.Conditions[ConditionSlotKey.C1].Probe ??= 粘性炸弹去后摇;
+        _main._聚合.Conditions[ConditionSlotKey.C2].Probe ??= 活性电击去后摇;
+        _main._聚合.Conditions[ConditionSlotKey.C3].Probe ??= 爆破起飞去后摇;
+        _main._聚合.Conditions[ConditionSlotKey.C4].Probe ??= 爆破后接3雷粘性炸弹;
     }
 
     public Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)
@@ -45,21 +47,21 @@ public sealed class 炸弹人Strategy : IHeroStrategy
         VirtualKey key = trigger.Key;
         if (key == VirtualKey.Q)
         {
-            Main._聚合.Conditions[ConditionSlotKey.C1].Active = true;
+            _main._聚合.Conditions[ConditionSlotKey.C1].Active = true;
         }
         else if (key == VirtualKey.W)
         {
-            Main._聚合.Conditions[ConditionSlotKey.C2].Active = true;
+            _main._聚合.Conditions[ConditionSlotKey.C2].Active = true;
         }
         else if (key == VirtualKey.E)
         {
             _item.根据图片使用物品(Dota2_Pictrue.物品.纷争);
-            Main._聚合.Conditions[ConditionSlotKey.C3].Active = true;
+            _main._聚合.Conditions[ConditionSlotKey.C3].Active = true;
         }
         else if (key == VirtualKey.From(Keys.D2))
         {
-            Main._聚合.Skills.ToggleMode(SlotKey.E);
-            TTS.TTS.Speak(Main._聚合.Skills.Mode(SlotKey.E) == 0 ? "起飞后不接3连炸弹" : "起飞后接3连炸弹");
+            _main._聚合.Skills.ToggleMode(SlotKey.E);
+            TTS.TTS.Speak(_main._聚合.Skills.Mode(SlotKey.E) == 0 ? "起飞后不接3连炸弹" : "起飞后接3连炸弹");
         }
 
         return Task.CompletedTask;
@@ -107,12 +109,12 @@ public sealed class 炸弹人Strategy : IHeroStrategy
             _input.Press(VirtualKey.From(Keys.A));
             Common.Delay(750);
 
-            switch (Main._聚合.Skills.Mode(SlotKey.E))
+            switch (_main._聚合.Skills.Mode(SlotKey.E))
             {
                 case 1:
-                    Main._聚合.Conditions[ConditionSlotKey.C4].Active = true;
-                    Main._聚合.Skills.SetTarget(SlotKey.R, Control.MousePosition);
-                    Main._聚合.Skills.SetTime(SlotKey.R, Common.获取当前时间毫秒());
+                    _main._聚合.Conditions[ConditionSlotKey.C4].Active = true;
+                    _main._聚合.Skills.SetTarget(SlotKey.R, Control.MousePosition);
+                    _main._聚合.Skills.SetTime(SlotKey.R, Common.获取当前时间毫秒());
                     break;
                 case 0:
                     break;
@@ -131,9 +133,9 @@ public sealed class 炸弹人Strategy : IHeroStrategy
     // todo 逻辑修改
     private async Task<bool> 爆破后接3雷粘性炸弹(ImageHandle 句柄)
     {
-        if (Common.获取当前时间毫秒() - Main._聚合.Skills.Time(SlotKey.R) >= 3000)
+        if (Common.获取当前时间毫秒() - _main._聚合.Skills.Time(SlotKey.R) >= 3000)
         {
-            Main._聚合.Skills.SetTime(SlotKey.R, -1);
+            _main._聚合.Skills.SetTime(SlotKey.R, -1);
             return await Task.FromResult(false).ConfigureAwait(true);
         }
 

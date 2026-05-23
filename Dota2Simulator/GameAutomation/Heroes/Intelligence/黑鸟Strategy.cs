@@ -24,19 +24,21 @@ public sealed class 黑鸟Strategy : IHeroStrategy
 
     private readonly SkillEngine _skill;
     private readonly ItemEngine _item;
-    public 黑鸟Strategy(IInputExecutor input, IScreenVision vision, SkillEngine skill, ItemEngine item)
+    private readonly HeroLoopHost _main;
+    public 黑鸟Strategy(IInputExecutor input, IScreenVision vision, SkillEngine skill, ItemEngine item, HeroLoopHost main)
     {
         _input = input;
         _vision = vision;
         _skill = skill;
         _item = item;
+        _main = main;
     }
     public HeroId Hero => new("黑鸟", HeroAttribute.Intelligence);
 
     public void OnActivate(HeroContext ctx)
     {
-        Main._聚合.Conditions[ConditionSlotKey.C1].Probe ??= 神智之蚀去后摇;
-        Main._聚合.Conditions[ConditionSlotKey.C2].Probe ??= 关接跳;
+        _main._聚合.Conditions[ConditionSlotKey.C1].Probe ??= 神智之蚀去后摇;
+        _main._聚合.Conditions[ConditionSlotKey.C2].Probe ??= 关接跳;
     }
 
     public Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)
@@ -45,7 +47,7 @@ public sealed class 黑鸟Strategy : IHeroStrategy
         if (key == VirtualKey.D)
         {
             _input.Press(VirtualKey.From(Keys.W));
-            Main._聚合.Conditions[ConditionSlotKey.C1].Active = true;
+            _main._聚合.Conditions[ConditionSlotKey.C1].Active = true;
         }
         else if (key == VirtualKey.W)
         {
@@ -53,11 +55,11 @@ public sealed class 黑鸟Strategy : IHeroStrategy
         }
         else if (key == VirtualKey.E)
         {
-            Main._聚合.Conditions[ConditionSlotKey.C3].Active = true;
+            _main._聚合.Conditions[ConditionSlotKey.C3].Active = true;
         }
         else if (key == VirtualKey.R)
         {
-            Main._聚合.Conditions[ConditionSlotKey.C2].Active = true;
+            _main._聚合.Conditions[ConditionSlotKey.C2].Active = true;
         }
 
         return Task.CompletedTask;
@@ -70,11 +72,11 @@ public sealed class 黑鸟Strategy : IHeroStrategy
 
         Color 技能点颜色 = Color.FromArgb(203, 183, 124);
 
-        if (ColorExtensions.ColorAEqualColorB(Main.获取指定位置颜色(909, 1008, in 句柄), 技能点颜色, 0))
+        if (ColorExtensions.ColorAEqualColorB(_main.获取指定位置颜色(909, 1008, in 句柄), 技能点颜色, 0))
         {
             time = 4000;
         }
-        else if (ColorExtensions.ColorAEqualColorB(Main.获取指定位置颜色(897, 1008, in 句柄), 技能点颜色, 0))
+        else if (ColorExtensions.ColorAEqualColorB(_main.获取指定位置颜色(897, 1008, in 句柄), 技能点颜色, 0))
         {
             time = 3250;
         }
@@ -82,12 +84,12 @@ public sealed class 黑鸟Strategy : IHeroStrategy
         void 关后(int time, in ImageHandle 句柄)
         {
             Common.Delay(110);
-            Main._聚合.Skills.SetTime(SlotKey.W, Common.获取当前时间毫秒());
+            _main._聚合.Skills.SetTime(SlotKey.W, Common.获取当前时间毫秒());
             _input.MouseClick(MouseButton.Right);
             Common.Delay(150);
             _input.Press(VirtualKey.From(Keys.S));
-            Common.Delay(time - 3000, Main._聚合.Skills.Time(SlotKey.W));
-            if (!Main._session!.IsPaused)
+            Common.Delay(time - 3000, _main._聚合.Skills.Time(SlotKey.W));
+            if (!_main.Session!.IsPaused)
             {
                 _ = _item.根据图片使用物品(Dota2_Pictrue.物品.陨星锤);
             }

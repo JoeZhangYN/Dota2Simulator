@@ -21,20 +21,22 @@ public sealed class 巫医Strategy : IHeroStrategy
 
     private readonly SkillEngine _skill;
     private readonly ItemEngine _item;
-    public 巫医Strategy(IInputExecutor input, IScreenVision vision, SkillEngine skill, ItemEngine item)
+    private readonly HeroLoopHost _main;
+    public 巫医Strategy(IInputExecutor input, IScreenVision vision, SkillEngine skill, ItemEngine item, HeroLoopHost main)
     {
         _input = input;
         _vision = vision;
         _skill = skill;
         _item = item;
+        _main = main;
     }
     public HeroId Hero => new("巫医", HeroAttribute.Intelligence);
 
     public void OnActivate(HeroContext ctx)
     {
-        Main._聚合.Conditions[ConditionSlotKey.C1].Probe ??= 麻痹药剂去后摇;
-        Main._聚合.Conditions[ConditionSlotKey.C2].Probe ??= 巫蛊咒术去后摇;
-        Main._聚合.Conditions[ConditionSlotKey.C3].Probe ??= 死亡守卫隐身;
+        _main._聚合.Conditions[ConditionSlotKey.C1].Probe ??= 麻痹药剂去后摇;
+        _main._聚合.Conditions[ConditionSlotKey.C2].Probe ??= 巫蛊咒术去后摇;
+        _main._聚合.Conditions[ConditionSlotKey.C3].Probe ??= 死亡守卫隐身;
     }
 
     public async Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)
@@ -44,15 +46,15 @@ public sealed class 巫医Strategy : IHeroStrategy
 
         if (key == VirtualKey.Q)
         {
-            Main._聚合.Conditions[ConditionSlotKey.C1].Active = true;
+            _main._聚合.Conditions[ConditionSlotKey.C1].Active = true;
         }
         else if (key == VirtualKey.E)
         {
-            Main._聚合.Conditions[ConditionSlotKey.C2].Active = true;
+            _main._聚合.Conditions[ConditionSlotKey.C2].Active = true;
         }
         else if (key == VirtualKey.R)
         {
-            Main._聚合.Conditions[ConditionSlotKey.C3].Active = true;
+            _main._聚合.Conditions[ConditionSlotKey.C3].Active = true;
         }
     }
 

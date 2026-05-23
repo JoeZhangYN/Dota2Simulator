@@ -21,21 +21,23 @@ public sealed class 神域Strategy : IHeroStrategy
 
     private readonly SkillEngine _skill;
     private readonly ItemEngine _item;
-    public 神域Strategy(IInputExecutor input, IScreenVision vision, SkillEngine skill, ItemEngine item)
+    private readonly HeroLoopHost _main;
+    public 神域Strategy(IInputExecutor input, IScreenVision vision, SkillEngine skill, ItemEngine item, HeroLoopHost main)
     {
         _input = input;
         _vision = vision;
         _skill = skill;
         _item = item;
+        _main = main;
     }
     public HeroId Hero => new("神域", HeroAttribute.Intelligence);
 
     public void OnActivate(HeroContext ctx)
     {
-        Main._聚合.Conditions[ConditionSlotKey.C1].Probe ??= 命运敕令去后摇;
-        Main._聚合.Conditions[ConditionSlotKey.C2].Probe ??= 涤罪之焰去后摇;
-        Main._聚合.Conditions[ConditionSlotKey.C3].Probe ??= 虚妄之诺去后摇;
-        Main._聚合.Conditions[ConditionSlotKey.C5].Probe ??= 天命之雨去后摇;
+        _main._聚合.Conditions[ConditionSlotKey.C1].Probe ??= 命运敕令去后摇;
+        _main._聚合.Conditions[ConditionSlotKey.C2].Probe ??= 涤罪之焰去后摇;
+        _main._聚合.Conditions[ConditionSlotKey.C3].Probe ??= 虚妄之诺去后摇;
+        _main._聚合.Conditions[ConditionSlotKey.C5].Probe ??= 天命之雨去后摇;
     }
 
     public async Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)
@@ -45,19 +47,19 @@ public sealed class 神域Strategy : IHeroStrategy
 
         if (key == VirtualKey.W)
         {
-            Main._聚合.Conditions[ConditionSlotKey.C1].Active = true;
+            _main._聚合.Conditions[ConditionSlotKey.C1].Active = true;
         }
         else if (key == VirtualKey.E)
         {
-            Main._聚合.Conditions[ConditionSlotKey.C2].Active = true;
+            _main._聚合.Conditions[ConditionSlotKey.C2].Active = true;
         }
         else if (key == VirtualKey.D)
         {
-            Main._聚合.Conditions[ConditionSlotKey.C5].Active = true;
+            _main._聚合.Conditions[ConditionSlotKey.C5].Active = true;
         }
         else if (key == VirtualKey.R)
         {
-            Main._聚合.Conditions[ConditionSlotKey.C3].Active = true;
+            _main._聚合.Conditions[ConditionSlotKey.C3].Active = true;
         }
     }
 

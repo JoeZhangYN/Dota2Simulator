@@ -22,21 +22,23 @@ public sealed class 女王Strategy : IHeroStrategy
 
     private readonly SkillEngine _skill;
     private readonly ItemEngine _item;
-    public 女王Strategy(IInputExecutor input, IScreenVision vision, SkillEngine skill, ItemEngine item)
+    private readonly HeroLoopHost _main;
+    public 女王Strategy(IInputExecutor input, IScreenVision vision, SkillEngine skill, ItemEngine item, HeroLoopHost main)
     {
         _input = input;
         _vision = vision;
         _skill = skill;
         _item = item;
+        _main = main;
     }
     public HeroId Hero => new("女王", HeroAttribute.Intelligence);
 
     public void OnActivate(HeroContext ctx)
     {
-        Main._聚合.Conditions[ConditionSlotKey.C1].Probe ??= 暗影突袭去后摇;
-        Main._聚合.Conditions[ConditionSlotKey.C2].Probe ??= 闪烁去后摇;
-        Main._聚合.Conditions[ConditionSlotKey.C3].Probe ??= 痛苦尖叫去后摇;
-        Main._聚合.Conditions[ConditionSlotKey.C4].Probe ??= 冲击波去后摇;
+        _main._聚合.Conditions[ConditionSlotKey.C1].Probe ??= 暗影突袭去后摇;
+        _main._聚合.Conditions[ConditionSlotKey.C2].Probe ??= 闪烁去后摇;
+        _main._聚合.Conditions[ConditionSlotKey.C3].Probe ??= 痛苦尖叫去后摇;
+        _main._聚合.Conditions[ConditionSlotKey.C4].Probe ??= 冲击波去后摇;
     }
 
     public Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)
@@ -44,23 +46,23 @@ public sealed class 女王Strategy : IHeroStrategy
         VirtualKey key = trigger.Key;
         if (key == VirtualKey.Q)
         {
-            Main._聚合.Conditions[ConditionSlotKey.C1].Active = true;
+            _main._聚合.Conditions[ConditionSlotKey.C1].Active = true;
         }
         else if (key == VirtualKey.W)
         {
-            Main._聚合.Conditions[ConditionSlotKey.C2].Active = true;
+            _main._聚合.Conditions[ConditionSlotKey.C2].Active = true;
         }
         else if (key == VirtualKey.E)
         {
-            Main._聚合.Conditions[ConditionSlotKey.C3].Active = true;
+            _main._聚合.Conditions[ConditionSlotKey.C3].Active = true;
         }
         else if (key == VirtualKey.R)
         {
-            Main._聚合.Conditions[ConditionSlotKey.C4].Active = true;
+            _main._聚合.Conditions[ConditionSlotKey.C4].Active = true;
         }
         else if (key == VirtualKey.From(Keys.S))
         {
-            Main._session!.IsPaused = true;
+            _main.Session!.IsPaused = true;
         }
 
         return Task.CompletedTask;
@@ -70,7 +72,7 @@ public sealed class 女王Strategy : IHeroStrategy
     {
         void 暗影突袭后()
         {
-            Main._聚合.Skills.SetTime(SlotKey.Q, -1);
+            _main._聚合.Skills.SetTime(SlotKey.Q, -1);
             _input.Press(VirtualKey.From(Keys.A));
         }
 
@@ -87,7 +89,7 @@ public sealed class 女王Strategy : IHeroStrategy
     {
         void 闪烁后()
         {
-            Main._聚合.Skills.SetTime(SlotKey.W, -1);
+            _main._聚合.Skills.SetTime(SlotKey.W, -1);
             _input.MouseClick(MouseButton.Right);
         }
 
@@ -104,7 +106,7 @@ public sealed class 女王Strategy : IHeroStrategy
     {
         void 痛苦尖叫后()
         {
-            Main._聚合.Skills.SetTime(SlotKey.E, -1);
+            _main._聚合.Skills.SetTime(SlotKey.E, -1);
             _input.Press(VirtualKey.From(Keys.A));
         }
 
@@ -121,7 +123,7 @@ public sealed class 女王Strategy : IHeroStrategy
     {
         void 冲击波后()
         {
-            Main._聚合.Skills.SetTime(SlotKey.R, -1);
+            _main._聚合.Skills.SetTime(SlotKey.R, -1);
             _input.Press(VirtualKey.From(Keys.A));
         }
 

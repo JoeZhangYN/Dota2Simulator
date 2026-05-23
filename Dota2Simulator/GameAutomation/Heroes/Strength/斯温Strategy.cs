@@ -21,21 +21,23 @@ public sealed class 斯温Strategy : IHeroStrategy
 
     private readonly SkillEngine _skill;
     private readonly ItemEngine _item;
-    public 斯温Strategy(IInputExecutor input, IScreenVision vision, SkillEngine skill, ItemEngine item)
+    private readonly HeroLoopHost _main;
+    public 斯温Strategy(IInputExecutor input, IScreenVision vision, SkillEngine skill, ItemEngine item, HeroLoopHost main)
     {
         _input = input;
         _vision = vision;
         _skill = skill;
         _item = item;
+        _main = main;
     }
     public HeroId Hero => new("斯温", HeroAttribute.Strength);
 
     public void OnActivate(HeroContext ctx)
     {
-        Main._聚合.Conditions[ConditionSlotKey.C1].Probe ??= 风暴之拳去后摇;
-        Main._聚合.Conditions[ConditionSlotKey.C2].Probe ??= 战吼去后摇;
-        Main._聚合.Conditions[ConditionSlotKey.C3].Probe ??= 神之力量去后摇;
-        Main._聚合.LegSwap.配置.修改配置(Keys.W, false);
+        _main._聚合.Conditions[ConditionSlotKey.C1].Probe ??= 风暴之拳去后摇;
+        _main._聚合.Conditions[ConditionSlotKey.C2].Probe ??= 战吼去后摇;
+        _main._聚合.Conditions[ConditionSlotKey.C3].Probe ??= 神之力量去后摇;
+        _main._聚合.LegSwap.配置.修改配置(Keys.W, false);
     }
 
     public async Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)
@@ -45,15 +47,15 @@ public sealed class 斯温Strategy : IHeroStrategy
 
         if (key == VirtualKey.Q)
         {
-            Main._聚合.Conditions[ConditionSlotKey.C1].Active = true;
+            _main._聚合.Conditions[ConditionSlotKey.C1].Active = true;
         }
         else if (key == VirtualKey.E)
         {
-            Main._聚合.Conditions[ConditionSlotKey.C2].Active = true;
+            _main._聚合.Conditions[ConditionSlotKey.C2].Active = true;
         }
         else if (key == VirtualKey.R)
         {
-            Main._聚合.Conditions[ConditionSlotKey.C3].Active = true;
+            _main._聚合.Conditions[ConditionSlotKey.C3].Active = true;
         }
     }
 

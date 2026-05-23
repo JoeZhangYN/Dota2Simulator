@@ -40,20 +40,20 @@ public sealed partial class HeroStrategyRegistry
     /// <summary>已注册的英雄数。</summary>
     public int Count => _byName.Count;
 
-    /// <summary>注册所有英雄策略——AppContainer.BindUi 时调用（此刻 ui / skill / item 已到位）。
-    /// C7: 扩 +SkillEngine +ItemEngine 透传给 92 策略 ctor，消灭 Skill./Item. service locator。</summary>
-    public void RegisterAll(IUiInvoker ui, SkillEngine skill, ItemEngine item)
+    /// <summary>注册所有英雄策略——AppContainer.BindUi 时调用（此刻 ui / skill / item / main 已到位）。
+    /// Phase 9 D: 扩 +HeroLoopHost 透传给 92 策略 ctor，消灭 Main.X service locator。</summary>
+    public void RegisterAll(IUiInvoker ui, SkillEngine skill, ItemEngine item, HeroLoopHost main)
     {
         _ui = ui ?? throw new ArgumentNullException(nameof(ui));
-        RegisterStrength(_input, _vision, skill, item);
-        RegisterAgility(_input, _vision, skill, item);
-        RegisterIntelligence(_input, _vision, skill, item);
-        RegisterUniversal(_input, _vision, skill, item);
+        RegisterStrength(_input, _vision, skill, item, main);
+        RegisterAgility(_input, _vision, skill, item, main);
+        RegisterIntelligence(_input, _vision, skill, item, main);
+        RegisterUniversal(_input, _vision, skill, item, main);
     }
 
     // 各 partial 文件实现一个；未实现的 partial void 调用编译期消除。
-    partial void RegisterStrength(IInputExecutor input, IScreenVision vision, SkillEngine skill, ItemEngine item);
-    partial void RegisterAgility(IInputExecutor input, IScreenVision vision, SkillEngine skill, ItemEngine item);
-    partial void RegisterIntelligence(IInputExecutor input, IScreenVision vision, SkillEngine skill, ItemEngine item);
-    partial void RegisterUniversal(IInputExecutor input, IScreenVision vision, SkillEngine skill, ItemEngine item);
+    partial void RegisterStrength(IInputExecutor input, IScreenVision vision, SkillEngine skill, ItemEngine item, HeroLoopHost main);
+    partial void RegisterAgility(IInputExecutor input, IScreenVision vision, SkillEngine skill, ItemEngine item, HeroLoopHost main);
+    partial void RegisterIntelligence(IInputExecutor input, IScreenVision vision, SkillEngine skill, ItemEngine item, HeroLoopHost main);
+    partial void RegisterUniversal(IInputExecutor input, IScreenVision vision, SkillEngine skill, ItemEngine item, HeroLoopHost main);
 }

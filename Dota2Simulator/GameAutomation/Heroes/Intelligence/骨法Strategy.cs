@@ -23,21 +23,23 @@ public sealed class 骨法Strategy : IHeroStrategy
 
     private readonly SkillEngine _skill;
     private readonly ItemEngine _item;
-    public 骨法Strategy(IInputExecutor input, IScreenVision vision, SkillEngine skill, ItemEngine item)
+    private readonly HeroLoopHost _main;
+    public 骨法Strategy(IInputExecutor input, IScreenVision vision, SkillEngine skill, ItemEngine item, HeroLoopHost main)
     {
         _input = input;
         _vision = vision;
         _skill = skill;
         _item = item;
+        _main = main;
     }
     public HeroId Hero => new("骨法", HeroAttribute.Intelligence);
 
     public void OnActivate(HeroContext ctx)
     {
-        Main._聚合.Conditions[ConditionSlotKey.C1].Probe ??= 幽冥轰爆去后摇;
-        Main._聚合.Conditions[ConditionSlotKey.C2].Probe ??= 衰老去后摇;
-        Main._聚合.Conditions[ConditionSlotKey.C3].Probe ??= 幽冥守卫去后摇;
-        Main._聚合.Conditions[ConditionSlotKey.C4].Probe ??= 生命吸取去后摇;
+        _main._聚合.Conditions[ConditionSlotKey.C1].Probe ??= 幽冥轰爆去后摇;
+        _main._聚合.Conditions[ConditionSlotKey.C2].Probe ??= 衰老去后摇;
+        _main._聚合.Conditions[ConditionSlotKey.C3].Probe ??= 幽冥守卫去后摇;
+        _main._聚合.Conditions[ConditionSlotKey.C4].Probe ??= 生命吸取去后摇;
     }
 
     public async Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)
@@ -47,32 +49,32 @@ public sealed class 骨法Strategy : IHeroStrategy
 
         if (key == VirtualKey.Q)
         {
-            Main._聚合.Conditions[ConditionSlotKey.C1].Active = true;
+            _main._聚合.Conditions[ConditionSlotKey.C1].Active = true;
         }
         else if (key == VirtualKey.W)
         {
-            Main._聚合.Conditions[ConditionSlotKey.C2].Active = true;
+            _main._聚合.Conditions[ConditionSlotKey.C2].Active = true;
         }
         else if (key == VirtualKey.E)
         {
-            Main._聚合.Conditions[ConditionSlotKey.C3].Active = true;
+            _main._聚合.Conditions[ConditionSlotKey.C3].Active = true;
         }
         else if (key == VirtualKey.R)
         {
             _item.根据图片使用物品(Dota2_Pictrue.物品.希瓦);
             _item.根据图片使用物品(Dota2_Pictrue.物品.纷争);
-            Main._聚合.Conditions[ConditionSlotKey.C4].Active = true;
+            _main._聚合.Conditions[ConditionSlotKey.C4].Active = true;
         }
         else if (key == VirtualKey.From(Keys.D2))
         {
-            Main._聚合.Skills.ToggleMode(SlotKey.R);
-            TTS.TTS.Speak(Main._聚合.Skills.Mode(SlotKey.R) == 1 ? "吸取接衰老" : "吸取不接衰老");
+            _main._聚合.Skills.ToggleMode(SlotKey.R);
+            TTS.TTS.Speak(_main._聚合.Skills.Mode(SlotKey.R) == 1 ? "吸取接衰老" : "吸取不接衰老");
         }
     }
 
     private async Task<bool> 幽冥轰爆去后摇(ImageHandle 句柄)
     {
-        return await _skill.技能通用判断(Keys.Q, Main._聚合.Skills.Step(SlotKey.R) > 0 ? 10 : 0).ConfigureAwait(true);
+        return await _skill.技能通用判断(Keys.Q, _main._聚合.Skills.Step(SlotKey.R) > 0 ? 10 : 0).ConfigureAwait(true);
     }
 
     private async Task<bool> 衰老去后摇(ImageHandle 句柄)
@@ -91,35 +93,35 @@ public sealed class 骨法Strategy : IHeroStrategy
 
     private async Task<bool> 幽冥守卫去后摇(ImageHandle 句柄)
     {
-        return await _skill.技能通用判断(Keys.E, Main._聚合.Skills.Step(SlotKey.R) > 0 ? 10 : 0).ConfigureAwait(true);
+        return await _skill.技能通用判断(Keys.E, _main._聚合.Skills.Step(SlotKey.R) > 0 ? 10 : 0).ConfigureAwait(true);
     }
 
     private async Task<bool> 生命吸取去后摇(ImageHandle 句柄)
     {
         if (_skill.DOTA2判断技能是否CD(Keys.R, in 句柄))
         {
-            Main._聚合.Skills.SetStep(SlotKey.R, 0);
+            _main._聚合.Skills.SetStep(SlotKey.R, 0);
             return await Task.FromResult(true).ConfigureAwait(true);
         }
 
         return await Task.Run(async () =>
         {
-            if (Main._聚合.Skills.Step(SlotKey.R) == 0)
+            if (_main._聚合.Skills.Step(SlotKey.R) == 0)
             {
-                if (Main._聚合.Skills.Mode(SlotKey.R) == 1)
+                if (_main._聚合.Skills.Mode(SlotKey.R) == 1)
                 {
                     _input.Press(VirtualKey.From(Keys.W));
                 }
 
-                Main._聚合.Skills.SetStep(SlotKey.R, 1);
+                _main._聚合.Skills.SetStep(SlotKey.R, 1);
                 return await Task.FromResult(true).ConfigureAwait(true);
             }
-            else if (Main._聚合.Skills.Step(SlotKey.R) == 1)
+            else if (_main._聚合.Skills.Step(SlotKey.R) == 1)
             {
                 _ = Task.Run(() =>
                 {
                     Common.Delay(200);
-                    Main._聚合.Skills.SetStep(SlotKey.R, 2);
+                    _main._聚合.Skills.SetStep(SlotKey.R, 2);
                 });
                 return await Task.FromResult(true).ConfigureAwait(true);
             }
@@ -127,7 +129,7 @@ public sealed class 骨法Strategy : IHeroStrategy
             {
                 if (!SkillEngine.DOTA2判断是否持续施法(in 句柄))
                 {
-                    Main._聚合.Skills.SetStep(SlotKey.R, 0);
+                    _main._聚合.Skills.SetStep(SlotKey.R, 0);
                     _input.Press(VirtualKey.From(Keys.A));
                     return await Task.FromResult(false).ConfigureAwait(true);
                 }

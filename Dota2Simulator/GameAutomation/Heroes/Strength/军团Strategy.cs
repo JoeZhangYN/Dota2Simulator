@@ -23,23 +23,25 @@ public sealed class 军团Strategy : IHeroStrategy
 
     private readonly SkillEngine _skill;
     private readonly ItemEngine _item;
-    public 军团Strategy(IInputExecutor input, IScreenVision vision, SkillEngine skill, ItemEngine item)
+    private readonly HeroLoopHost _main;
+    public 军团Strategy(IInputExecutor input, IScreenVision vision, SkillEngine skill, ItemEngine item, HeroLoopHost main)
     {
         _input = input;
         _vision = vision;
         _skill = skill;
         _item = item;
+        _main = main;
     }
     public HeroId Hero => new("军团", HeroAttribute.Strength);
 
     public void OnActivate(HeroContext ctx)
     {
-        Main._聚合.Conditions[ConditionSlotKey.C1].Probe ??= 压倒性优势去后摇;
-        Main._聚合.Conditions[ConditionSlotKey.C2].Probe ??= 强攻去后摇;
-        Main._聚合.Conditions[ConditionSlotKey.C3].Probe ??= 决斗;
-        Main._聚合.Conditions[ConditionSlotKey.C4].Probe ??= 决斗去后摇;
-        Main._聚合.Skills.SetStep(SlotKey.Global, -1);
-        Main._聚合.LegSwap.配置.修改配置(Keys.E, false);
+        _main._聚合.Conditions[ConditionSlotKey.C1].Probe ??= 压倒性优势去后摇;
+        _main._聚合.Conditions[ConditionSlotKey.C2].Probe ??= 强攻去后摇;
+        _main._聚合.Conditions[ConditionSlotKey.C3].Probe ??= 决斗;
+        _main._聚合.Conditions[ConditionSlotKey.C4].Probe ??= 决斗去后摇;
+        _main._聚合.Skills.SetStep(SlotKey.Global, -1);
+        _main._聚合.LegSwap.配置.修改配置(Keys.E, false);
     }
 
     public async Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)
@@ -49,28 +51,28 @@ public sealed class 军团Strategy : IHeroStrategy
 
         if (key == VirtualKey.Q)
         {
-            Main._聚合.Conditions[ConditionSlotKey.C1].Active = true;
+            _main._聚合.Conditions[ConditionSlotKey.C1].Active = true;
         }
         else if (key == VirtualKey.W)
         {
-            Main._聚合.Conditions[ConditionSlotKey.C2].Active = true;
+            _main._聚合.Conditions[ConditionSlotKey.C2].Active = true;
         }
         else if (key == VirtualKey.R)
         {
-            Main._聚合.Conditions[ConditionSlotKey.C4].Active = true;
+            _main._聚合.Conditions[ConditionSlotKey.C4].Active = true;
         }
         else if (key == VirtualKey.F)
         {
-            if (Main._聚合.Skills.Step(SlotKey.Global) == -1)
+            if (_main._聚合.Skills.Step(SlotKey.Global) == -1)
             {
-                Main._聚合.Skills.SetStep(SlotKey.Global, 0);
-                Main._聚合.Conditions[ConditionSlotKey.C3].Active = true;
+                _main._聚合.Skills.SetStep(SlotKey.Global, 0);
+                _main._聚合.Conditions[ConditionSlotKey.C3].Active = true;
             }
         }
         else if (key == VirtualKey.From(Keys.D2))
         {
-            Main._聚合.Skills.ToggleMode(SlotKey.Global);
-            TTS.TTS.Speak(Main._聚合.Skills.Mode(SlotKey.Global) == 1 ? "跳刀决斗" : "直接决斗");
+            _main._聚合.Skills.ToggleMode(SlotKey.Global);
+            TTS.TTS.Speak(_main._聚合.Skills.Mode(SlotKey.Global) == 1 ? "跳刀决斗" : "直接决斗");
         }
     }
 
@@ -78,7 +80,7 @@ public sealed class 军团Strategy : IHeroStrategy
     {
         return await Task.Run(async () =>
         {
-            int 步骤 = Main._聚合.Skills.Step(SlotKey.Global);
+            int 步骤 = _main._聚合.Skills.Step(SlotKey.Global);
 
             switch (步骤)
             {
@@ -96,7 +98,7 @@ public sealed class 军团Strategy : IHeroStrategy
 
                         Common.Delay(33 * _item.根据图片使用物品(Dota2_Pictrue.物品.刃甲));
 
-                        Main._聚合.Skills.SetStep(SlotKey.Global, 1);
+                        _main._聚合.Skills.SetStep(SlotKey.Global, 1);
                         return await Task.FromResult(true).ConfigureAwait(true);
                     }
                 case < 2 when 步骤 == 1:
@@ -109,7 +111,7 @@ public sealed class 军团Strategy : IHeroStrategy
                                   + _item.根据图片使用物品(Dota2_Pictrue.物品.跳刀_敏捷跳刀)
                               ));
 
-                        Main._聚合.Skills.SetStep(SlotKey.Global, 2);
+                        _main._聚合.Skills.SetStep(SlotKey.Global, 2);
 
                         return await Task.FromResult(true).ConfigureAwait(true);
                     }
@@ -122,7 +124,7 @@ public sealed class 军团Strategy : IHeroStrategy
                         Common.Delay(33 * _item.根据图片使用物品(Dota2_Pictrue.物品.散魂));
                         Common.Delay(33 * _item.根据图片使用物品(Dota2_Pictrue.物品.深渊之刃));
 
-                        Main._聚合.Skills.SetStep(SlotKey.Global, 3);
+                        _main._聚合.Skills.SetStep(SlotKey.Global, 3);
 
                         return await Task.FromResult(true).ConfigureAwait(true);
                     }
@@ -138,7 +140,7 @@ public sealed class 军团Strategy : IHeroStrategy
                             return await Task.FromResult(true).ConfigureAwait(true);
                         }
 
-                        Main._聚合.Skills.SetStep(SlotKey.Global, -1);
+                        _main._聚合.Skills.SetStep(SlotKey.Global, -1);
                         return await Task.FromResult(false).ConfigureAwait(true);
                     }
             }

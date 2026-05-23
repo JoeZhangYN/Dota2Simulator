@@ -12,7 +12,7 @@ using Dota2Simulator.GameAutomation.Ports;
 
 namespace Dota2Simulator.GameAutomation.Heroes.Agility;
 
-/// <summary>猴子（敏捷）策略——迁移自 Main.根据当前英雄增强 的 case "猴子"。</summary>
+/// <summary>猴子（敏捷）策略——迁移自 _main.根据当前英雄增强 的 case "猴子"。</summary>
 public sealed class 猴子Strategy : IHeroStrategy
 {
 
@@ -23,22 +23,24 @@ public sealed class 猴子Strategy : IHeroStrategy
 
     private readonly SkillEngine _skill;
     private readonly ItemEngine _item;
-    public 猴子Strategy(IInputExecutor input, IScreenVision vision, SkillEngine skill, ItemEngine item)
+    private readonly HeroLoopHost _main;
+    public 猴子Strategy(IInputExecutor input, IScreenVision vision, SkillEngine skill, ItemEngine item, HeroLoopHost main)
     {
         _input = input;
         _vision = vision;
         _skill = skill;
         _item = item;
+        _main = main;
     }
     public HeroId Hero => new("猴子", HeroAttribute.Agility);
 
     public void OnActivate(HeroContext ctx)
     {
-        Main._聚合.Conditions[ConditionSlotKey.C1].Probe ??= 灵魂之矛敏捷;
-        Main._聚合.Conditions[ConditionSlotKey.C2].Probe ??= 神行百变选择幻象;
-        Main._聚合.LegSwap.配置.修改配置(Keys.W, true, "力量");
-        Main._聚合.LegSwap.配置.修改配置(Keys.E, false);
-        Main._聚合.LegSwap.配置.修改配置(Keys.R, false);
+        _main._聚合.Conditions[ConditionSlotKey.C1].Probe ??= 灵魂之矛敏捷;
+        _main._聚合.Conditions[ConditionSlotKey.C2].Probe ??= 神行百变选择幻象;
+        _main._聚合.LegSwap.配置.修改配置(Keys.W, true, "力量");
+        _main._聚合.LegSwap.配置.修改配置(Keys.E, false);
+        _main._聚合.LegSwap.配置.修改配置(Keys.R, false);
     }
 
     public async Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)
@@ -53,7 +55,7 @@ public sealed class 猴子Strategy : IHeroStrategy
                 _input.Press(VirtualKey.From(Keys.E));
             }
 
-            Main._聚合.Conditions[ConditionSlotKey.C1].Active = true;
+            _main._聚合.Conditions[ConditionSlotKey.C1].Active = true;
         }
         else if (key == VirtualKey.W)
         {
@@ -62,7 +64,7 @@ public sealed class 猴子Strategy : IHeroStrategy
                 _input.Press(VirtualKey.From(Keys.E));
             }
 
-            Main._聚合.Conditions[ConditionSlotKey.C2].Active = true;
+            _main._聚合.Conditions[ConditionSlotKey.C2].Active = true;
         }
         else if (key == VirtualKey.R)
         {

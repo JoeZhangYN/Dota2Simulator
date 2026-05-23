@@ -9,7 +9,7 @@ using Dota2Simulator.GameAutomation.Ports;
 
 namespace Dota2Simulator.GameAutomation.Heroes.Universal;
 
-/// <summary>进化岛策略——迁移自 Main.根据当前英雄增强 的 case "进化岛"。</summary>
+/// <summary>进化岛策略——迁移自 _main.根据当前英雄增强 的 case "进化岛"。</summary>
 public sealed class 进化岛Strategy : IHeroStrategy
 {
 
@@ -20,12 +20,14 @@ public sealed class 进化岛Strategy : IHeroStrategy
 
     private readonly SkillEngine _skill;
     private readonly ItemEngine _item;
-    public 进化岛Strategy(IInputExecutor input, IScreenVision vision, SkillEngine skill, ItemEngine item)
+    private readonly HeroLoopHost _main;
+    public 进化岛Strategy(IInputExecutor input, IScreenVision vision, SkillEngine skill, ItemEngine item, HeroLoopHost main)
     {
         _input = input;
         _vision = vision;
         _skill = skill;
         _item = item;
+        _main = main;
     }
     public HeroId Hero => new("进化岛", HeroAttribute.Universal);
 

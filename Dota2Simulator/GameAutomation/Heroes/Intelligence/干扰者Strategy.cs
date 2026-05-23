@@ -22,22 +22,24 @@ public sealed class 干扰者Strategy : IHeroStrategy
 
     private readonly SkillEngine _skill;
     private readonly ItemEngine _item;
-    public 干扰者Strategy(IInputExecutor input, IScreenVision vision, SkillEngine skill, ItemEngine item)
+    private readonly HeroLoopHost _main;
+    public 干扰者Strategy(IInputExecutor input, IScreenVision vision, SkillEngine skill, ItemEngine item, HeroLoopHost main)
     {
         _input = input;
         _vision = vision;
         _skill = skill;
         _item = item;
+        _main = main;
     }
     public HeroId Hero => new("干扰者", HeroAttribute.Intelligence);
 
     public void OnActivate(HeroContext ctx)
     {
-        Main._聚合.Conditions[ConditionSlotKey.C1].Probe ??= 风雷之击去后摇;
-        Main._聚合.Conditions[ConditionSlotKey.C2].Probe ??= 恶念瞥视去后摇;
-        Main._聚合.Conditions[ConditionSlotKey.C3].Probe ??= 动能力场去后摇;
-        Main._聚合.Conditions[ConditionSlotKey.C4].Probe ??= 静态风暴去后摇;
-        Main._聚合.Conditions[ConditionSlotKey.C5].Probe ??= 静态风暴动能立场风雷之击;
+        _main._聚合.Conditions[ConditionSlotKey.C1].Probe ??= 风雷之击去后摇;
+        _main._聚合.Conditions[ConditionSlotKey.C2].Probe ??= 恶念瞥视去后摇;
+        _main._聚合.Conditions[ConditionSlotKey.C3].Probe ??= 动能力场去后摇;
+        _main._聚合.Conditions[ConditionSlotKey.C4].Probe ??= 静态风暴去后摇;
+        _main._聚合.Conditions[ConditionSlotKey.C5].Probe ??= 静态风暴动能立场风雷之击;
     }
 
     public async Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)
@@ -47,24 +49,24 @@ public sealed class 干扰者Strategy : IHeroStrategy
 
         if (key == VirtualKey.Q)
         {
-            Main._聚合.Conditions[ConditionSlotKey.C1].Active = true;
+            _main._聚合.Conditions[ConditionSlotKey.C1].Active = true;
         }
         else if (key == VirtualKey.W)
         {
-            Main._聚合.Conditions[ConditionSlotKey.C2].Active = true;
+            _main._聚合.Conditions[ConditionSlotKey.C2].Active = true;
         }
         else if (key == VirtualKey.E)
         {
-            Main._聚合.Conditions[ConditionSlotKey.C3].Active = true;
+            _main._聚合.Conditions[ConditionSlotKey.C3].Active = true;
         }
         else if (key == VirtualKey.R)
         {
-            Main._聚合.Conditions[ConditionSlotKey.C4].Active = true;
+            _main._聚合.Conditions[ConditionSlotKey.C4].Active = true;
         }
         else if (key == VirtualKey.From(Keys.D2))
         {
-            Main._聚合.Skills.SetStep(SlotKey.W, 0);
-            Main._聚合.Conditions[ConditionSlotKey.C5].Active = true;
+            _main._聚合.Skills.SetStep(SlotKey.W, 0);
+            _main._聚合.Conditions[ConditionSlotKey.C5].Active = true;
         }
     }
 
