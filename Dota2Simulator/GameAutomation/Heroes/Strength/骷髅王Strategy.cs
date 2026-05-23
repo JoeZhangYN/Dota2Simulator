@@ -12,6 +12,7 @@ using Dota2Simulator.GameAutomation.Ports;
 
 namespace Dota2Simulator.GameAutomation.Heroes.Strength;
 
+[HeroStrategy("骷髅王", HeroAttribute.Strength)]
 public sealed class 骷髅王Strategy : IHeroStrategy
 {
     /// <summary>命石范围（沿用 _main.命石区域）。</summary>

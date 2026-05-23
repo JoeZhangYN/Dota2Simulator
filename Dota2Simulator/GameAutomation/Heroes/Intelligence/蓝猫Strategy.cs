@@ -12,6 +12,7 @@ using Dota2Simulator.GameAutomation.Ports;
 
 namespace Dota2Simulator.GameAutomation.Heroes.Intelligence;
 
+[HeroStrategy("蓝猫", HeroAttribute.Intelligence)]
 public sealed class 蓝猫Strategy : IHeroStrategy
 {
     private const int 等待延迟 = 33;

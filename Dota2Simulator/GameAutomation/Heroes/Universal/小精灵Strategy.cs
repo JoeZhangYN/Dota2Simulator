@@ -14,6 +14,7 @@ using Dota2Simulator.GameAutomation.Ports;
 namespace Dota2Simulator.GameAutomation.Heroes.Universal;
 
 /// <summary>小精灵（全才）策略——迁移自 _main.根据当前英雄增强 的 case "小精灵"。</summary>
+[HeroStrategy("小精灵", HeroAttribute.Universal)]
 public sealed class 小精灵Strategy : IHeroStrategy
 {
     private static readonly Rectangle buff状态技能栏 = new(962, 826, 526, 80);

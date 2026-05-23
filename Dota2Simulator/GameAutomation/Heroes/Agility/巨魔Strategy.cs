@@ -12,6 +12,7 @@ using Dota2Simulator.GameAutomation.Ports;
 namespace Dota2Simulator.GameAutomation.Heroes.Agility;
 
 /// <summary>巨魔（敏捷）策略——迁移自 _main.根据当前英雄增强 的 case "巨魔"。</summary>
+[HeroStrategy("巨魔", HeroAttribute.Agility)]
 public sealed class 巨魔Strategy : IHeroStrategy
 {
 

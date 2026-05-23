@@ -13,6 +13,7 @@ using Dota2Simulator.GameAutomation.Ports;
 namespace Dota2Simulator.GameAutomation.Heroes.Agility;
 
 /// <summary>小松鼠（敏捷）策略——迁移自 _main.根据当前英雄增强 的 case "小松鼠"。</summary>
+[HeroStrategy("小松鼠", HeroAttribute.Agility)]
 public sealed class 小松鼠Strategy : IHeroStrategy
 {
 

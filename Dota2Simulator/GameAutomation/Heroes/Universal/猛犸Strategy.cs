@@ -16,6 +16,7 @@ using Dota2Simulator.GameAutomation.Domain.Perception;
 namespace Dota2Simulator.GameAutomation.Heroes.Universal;
 
 /// <summary>猛犸（全才）策略——迁移自 _main.根据当前英雄增强 的 case "猛犸"。</summary>
+[HeroStrategy("猛犸", HeroAttribute.Universal)]
 public sealed class 猛犸Strategy : IHeroStrategy
 {
     private const int 等待延迟 = 33;

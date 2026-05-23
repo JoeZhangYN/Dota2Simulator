@@ -13,6 +13,7 @@ using Dota2Simulator.GameAutomation.Ports;
 
 namespace Dota2Simulator.GameAutomation.Heroes.Strength;
 
+[HeroStrategy("混沌", HeroAttribute.Strength)]
 public sealed class 混沌Strategy : IHeroStrategy
 {
 

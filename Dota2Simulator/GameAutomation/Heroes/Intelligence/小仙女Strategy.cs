@@ -11,6 +11,7 @@ using Dota2Simulator.GameAutomation.Ports;
 
 namespace Dota2Simulator.GameAutomation.Heroes.Intelligence;
 
+[HeroStrategy("小仙女", HeroAttribute.Intelligence)]
 public sealed class 小仙女Strategy : IHeroStrategy
 {
 

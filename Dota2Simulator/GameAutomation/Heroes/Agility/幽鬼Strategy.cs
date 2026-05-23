@@ -14,6 +14,7 @@ using Dota2Simulator.GameAutomation.Ports;
 namespace Dota2Simulator.GameAutomation.Heroes.Agility;
 
 /// <summary>幽鬼（敏捷）策略——迁移自 _main.根据当前英雄增强 的 case "幽鬼"。</summary>
+[HeroStrategy("幽鬼", HeroAttribute.Agility)]
 public sealed class 幽鬼Strategy : IHeroStrategy
 {
 

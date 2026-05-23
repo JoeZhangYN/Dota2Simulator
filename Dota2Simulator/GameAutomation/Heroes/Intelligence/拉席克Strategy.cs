@@ -11,6 +11,7 @@ using Dota2Simulator.GameAutomation.Ports;
 
 namespace Dota2Simulator.GameAutomation.Heroes.Intelligence;
 
+[HeroStrategy("拉席克", HeroAttribute.Intelligence)]
 public sealed class 拉席克Strategy : IHeroStrategy
 {
 

@@ -12,6 +12,7 @@ using Dota2Simulator.GameAutomation.Ports;
 
 namespace Dota2Simulator.GameAutomation.Heroes.Strength;
 
+[HeroStrategy("龙骑", HeroAttribute.Strength)]
 public sealed class 龙骑Strategy : IHeroStrategy
 {
 

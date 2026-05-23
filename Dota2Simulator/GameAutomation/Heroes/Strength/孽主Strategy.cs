@@ -11,6 +11,7 @@ using Dota2Simulator.GameAutomation.Ports;
 
 namespace Dota2Simulator.GameAutomation.Heroes.Strength;
 
+[HeroStrategy("孽主", HeroAttribute.Strength)]
 public sealed class 孽主Strategy : IHeroStrategy
 {
 

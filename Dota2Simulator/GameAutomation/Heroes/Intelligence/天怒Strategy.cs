@@ -13,6 +13,7 @@ using Dota2Simulator.GameAutomation.Ports;
 
 namespace Dota2Simulator.GameAutomation.Heroes.Intelligence;
 
+[HeroStrategy("天怒", HeroAttribute.Intelligence)]
 public sealed class 天怒Strategy : IHeroStrategy
 {
 

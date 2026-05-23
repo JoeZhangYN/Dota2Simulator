@@ -15,6 +15,7 @@ using Dota2Simulator.GameAutomation.Ports;
 namespace Dota2Simulator.GameAutomation.Heroes.Agility;
 
 /// <summary>小黑（敏捷）策略——迁移自 _main.根据当前英雄增强 的 case "小黑"。</summary>
+[HeroStrategy("小黑", HeroAttribute.Agility)]
 public sealed class 小黑Strategy : IHeroStrategy
 {
 

@@ -12,6 +12,7 @@ using Dota2Simulator.GameAutomation.Ports;
 
 namespace Dota2Simulator.GameAutomation.Heroes.Intelligence;
 
+[HeroStrategy("蓝胖", HeroAttribute.Intelligence)]
 public sealed class 蓝胖Strategy : IHeroStrategy
 {
 

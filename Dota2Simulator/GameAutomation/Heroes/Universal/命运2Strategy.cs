@@ -11,6 +11,7 @@ using Dota2Simulator.GameAutomation.Domain.Perception;
 namespace Dota2Simulator.GameAutomation.Heroes.Universal;
 
 /// <summary>命运2策略——迁移自 _main.根据当前英雄增强 的 case "命运2"。</summary>
+[HeroStrategy("命运2", HeroAttribute.Universal)]
 public sealed class 命运2Strategy : IHeroStrategy
 {
 

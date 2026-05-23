@@ -10,6 +10,7 @@ using Dota2Simulator.GameAutomation.Ports;
 
 namespace Dota2Simulator.GameAutomation.Heroes.Intelligence;
 
+[HeroStrategy("修补匠", HeroAttribute.Intelligence)]
 public sealed class 修补匠Strategy : IHeroStrategy
 {
 

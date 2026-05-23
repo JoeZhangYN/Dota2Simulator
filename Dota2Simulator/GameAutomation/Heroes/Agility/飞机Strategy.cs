@@ -14,6 +14,7 @@ using Dota2Simulator.GameAutomation.Ports;
 namespace Dota2Simulator.GameAutomation.Heroes.Agility;
 
 /// <summary>飞机（敏捷）策略——迁移自 _main.根据当前英雄增强 的 case "飞机"。</summary>
+[HeroStrategy("飞机", HeroAttribute.Agility)]
 public sealed class 飞机Strategy : IHeroStrategy
 {
 

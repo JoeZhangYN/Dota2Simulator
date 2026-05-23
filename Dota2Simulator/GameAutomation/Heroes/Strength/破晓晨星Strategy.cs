@@ -11,6 +11,7 @@ using Dota2Simulator.GameAutomation.Ports;
 
 namespace Dota2Simulator.GameAutomation.Heroes.Strength;
 
+[HeroStrategy("破晓晨星", HeroAttribute.Strength)]
 public sealed class 破晓晨星Strategy : IHeroStrategy
 {
 

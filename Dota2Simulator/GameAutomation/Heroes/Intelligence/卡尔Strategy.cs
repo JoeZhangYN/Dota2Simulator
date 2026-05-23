@@ -11,6 +11,7 @@ using Dota2Simulator.GameAutomation.Ports;
 
 namespace Dota2Simulator.GameAutomation.Heroes.Intelligence;
 
+[HeroStrategy("卡尔", HeroAttribute.Intelligence)]
 public sealed class 卡尔Strategy : IHeroStrategy
 {
 

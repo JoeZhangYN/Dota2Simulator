@@ -12,6 +12,7 @@ using Dota2Simulator.GameAutomation.Ports;
 namespace Dota2Simulator.GameAutomation.Heroes.Agility;
 
 /// <summary>露娜（敏捷）策略——迁移自 _main.根据当前英雄增强 的 case "露娜"。</summary>
+[HeroStrategy("露娜", HeroAttribute.Agility)]
 public sealed class 露娜Strategy : IHeroStrategy
 {
 

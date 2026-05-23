@@ -11,6 +11,7 @@ using Dota2Simulator.GameAutomation.Ports;
 
 namespace Dota2Simulator.GameAutomation.Heroes.Strength;
 
+[HeroStrategy("全能", HeroAttribute.Strength)]
 public sealed class 全能Strategy : IHeroStrategy
 {
 

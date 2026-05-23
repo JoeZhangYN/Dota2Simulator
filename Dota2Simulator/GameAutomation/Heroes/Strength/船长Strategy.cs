@@ -15,6 +15,7 @@ using Dota2Simulator.GameAutomation.Ports;
 
 namespace Dota2Simulator.GameAutomation.Heroes.Strength;
 
+[HeroStrategy("船长", HeroAttribute.Strength)]
 public sealed class 船长Strategy : IHeroStrategy
 {
     /// <summary>E 技能并发锁（沿用 _main._全局模式e_lock）。</summary>

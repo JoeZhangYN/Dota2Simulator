@@ -12,6 +12,7 @@ using Dota2Simulator.GameAutomation.Ports;
 
 namespace Dota2Simulator.GameAutomation.Heroes.Strength;
 
+[HeroStrategy("伐木机", HeroAttribute.Strength)]
 public sealed class 伐木机Strategy : IHeroStrategy
 {
     /// <summary>命石范围 6技能最左738 4技能最右807 单个25*25大小（沿用 _main.命石区域）。</summary>

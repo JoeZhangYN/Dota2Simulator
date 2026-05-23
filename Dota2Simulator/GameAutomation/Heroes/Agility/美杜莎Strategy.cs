@@ -12,6 +12,7 @@ using Dota2Simulator.GameAutomation.Ports;
 namespace Dota2Simulator.GameAutomation.Heroes.Agility;
 
 /// <summary>美杜莎（敏捷）策略——迁移自 _main.根据当前英雄增强 的 case "美杜莎"。</summary>
+[HeroStrategy("美杜莎", HeroAttribute.Agility)]
 public sealed class 美杜莎Strategy : IHeroStrategy
 {
 

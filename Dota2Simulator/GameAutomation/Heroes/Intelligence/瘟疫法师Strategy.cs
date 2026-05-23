@@ -11,6 +11,7 @@ using Dota2Simulator.GameAutomation.Ports;
 
 namespace Dota2Simulator.GameAutomation.Heroes.Intelligence;
 
+[HeroStrategy("瘟疫法师", HeroAttribute.Intelligence)]
 public sealed class 瘟疫法师Strategy : IHeroStrategy
 {
 

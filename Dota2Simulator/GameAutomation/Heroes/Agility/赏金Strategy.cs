@@ -12,6 +12,7 @@ using Dota2Simulator.GameAutomation.Ports;
 namespace Dota2Simulator.GameAutomation.Heroes.Agility;
 
 /// <summary>赏金（敏捷）策略——迁移自 _main.根据当前英雄增强 的 case "赏金"。</summary>
+[HeroStrategy("赏金", HeroAttribute.Agility)]
 public sealed class 赏金Strategy : IHeroStrategy
 {
 

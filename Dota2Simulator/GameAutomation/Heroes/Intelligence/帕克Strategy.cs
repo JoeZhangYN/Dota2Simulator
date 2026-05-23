@@ -13,6 +13,7 @@ using Dota2Simulator.GameAutomation.Ports;
 
 namespace Dota2Simulator.GameAutomation.Heroes.Intelligence;
 
+[HeroStrategy("帕克", HeroAttribute.Intelligence)]
 public sealed class 帕克Strategy : IHeroStrategy
 {
 

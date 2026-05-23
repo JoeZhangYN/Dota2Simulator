@@ -14,6 +14,7 @@ using Dota2Simulator.GameAutomation.Ports;
 namespace Dota2Simulator.GameAutomation.Heroes.Universal;
 
 /// <summary>测试策略——迁移自 _main.根据当前英雄增强 的 case "测试"。</summary>
+[HeroStrategy("测试", HeroAttribute.Universal, RequiresUi = true)]
 public sealed class 测试Strategy : IHeroStrategy
 {
 

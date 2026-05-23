@@ -14,6 +14,7 @@ using Dota2Simulator.GameAutomation.Ports;
 namespace Dota2Simulator.GameAutomation.Heroes.Universal;
 
 /// <summary>狼人（全才）策略——迁移自 _main.根据当前英雄增强 的 case "狼人"。</summary>
+[HeroStrategy("狼人", HeroAttribute.Universal)]
 public sealed class 狼人Strategy : IHeroStrategy
 {
 

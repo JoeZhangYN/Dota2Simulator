@@ -15,6 +15,7 @@ using Dota2Simulator.GameAutomation.Ports;
 namespace Dota2Simulator.GameAutomation.Heroes.Agility;
 
 /// <summary>火猫（敏捷）策略——迁移自 _main.根据当前英雄增强 的 case "火猫"。</summary>
+[HeroStrategy("火猫", HeroAttribute.Agility)]
 public sealed class 火猫Strategy : IHeroStrategy
 {
     /// <summary>1080p 增益状态栏区域——内联自 _main.buff状态技能栏。</summary>

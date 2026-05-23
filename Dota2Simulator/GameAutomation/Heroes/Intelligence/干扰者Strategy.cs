@@ -12,6 +12,7 @@ using Dota2Simulator.GameAutomation.Ports;
 
 namespace Dota2Simulator.GameAutomation.Heroes.Intelligence;
 
+[HeroStrategy("干扰者", HeroAttribute.Intelligence)]
 public sealed class 干扰者Strategy : IHeroStrategy
 {
 

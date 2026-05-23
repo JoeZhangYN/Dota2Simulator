@@ -12,6 +12,7 @@ using Dota2Simulator.GameAutomation.Ports;
 
 namespace Dota2Simulator.GameAutomation.Heroes.Strength;
 
+[HeroStrategy("大鱼人", HeroAttribute.Strength)]
 public sealed class 大鱼人Strategy : IHeroStrategy
 {
     /// <summary>基准帧延迟（沿用 _main.等待延迟）。</summary>

@@ -12,6 +12,7 @@ using Dota2Simulator.GameAutomation.Ports;
 namespace Dota2Simulator.GameAutomation.Heroes.Agility;
 
 /// <summary>虚空（敏捷）策略——迁移自 _main.根据当前英雄增强 的 case "虚空"。</summary>
+[HeroStrategy("虚空", HeroAttribute.Agility)]
 public sealed class 虚空Strategy : IHeroStrategy
 {
 

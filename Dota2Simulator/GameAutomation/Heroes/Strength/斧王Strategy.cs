@@ -15,6 +15,7 @@ using Dota2Simulator.GameAutomation.Ports;
 using Dota2Simulator.GameAutomation.Domain.Perception;
 namespace Dota2Simulator.GameAutomation.Heroes.Strength;
 
+[HeroStrategy("斧王", HeroAttribute.Strength)]
 public sealed class 斧王Strategy : IHeroStrategy
 {
     /// <summary>基准帧延迟（沿用 _main.等待延迟）。</summary>

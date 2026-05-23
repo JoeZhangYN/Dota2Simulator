@@ -11,6 +11,7 @@ using Dota2Simulator.GameAutomation.Ports;
 namespace Dota2Simulator.GameAutomation.Heroes.Universal;
 
 /// <summary>紫猫（全才）策略——迁移自 _main.根据当前英雄增强 的 case "紫猫"。</summary>
+[HeroStrategy("紫猫", HeroAttribute.Universal)]
 public sealed class 紫猫Strategy : IHeroStrategy
 {
 

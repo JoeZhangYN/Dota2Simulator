@@ -11,6 +11,7 @@ using Dota2Simulator.Vision;
 
 namespace Dota2Simulator.GameAutomation.Heroes.Strength;
 
+[HeroStrategy("大牛", HeroAttribute.Strength)]
 public sealed class 大牛Strategy : IHeroStrategy
 {
     private readonly IInputExecutor _input;

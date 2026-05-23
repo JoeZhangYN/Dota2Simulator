@@ -8,6 +8,7 @@ using Dota2Simulator.GameAutomation.Ports;
 
 namespace Dota2Simulator.GameAutomation.Heroes.Intelligence;
 
+[HeroStrategy("冰女", HeroAttribute.Intelligence)]
 public sealed class 冰女Strategy : IHeroStrategy
 {
 
