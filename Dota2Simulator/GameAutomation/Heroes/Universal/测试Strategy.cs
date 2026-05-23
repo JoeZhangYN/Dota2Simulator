@@ -21,11 +21,13 @@ public sealed class 测试Strategy : IHeroStrategy
 #pragma warning disable IDE0052
     private readonly IScreenVision _vision;
 #pragma warning restore IDE0052
+    private readonly IUiInvoker _ui;
 
-    public 测试Strategy(IInputExecutor input, IScreenVision vision)
+    public 测试Strategy(IInputExecutor input, IScreenVision vision, IUiInvoker ui)
     {
         _input = input;
         _vision = vision;
+        _ui = ui;
     }
     public HeroId Hero => new("测试", HeroAttribute.Universal);
 
@@ -59,9 +61,9 @@ public sealed class 测试Strategy : IHeroStrategy
             };
 
             string text = "";
-            Common.Main_Form.Invoke(() =>
+            _ui.Invoke(() =>
             {
-                text = Common.Main_Form.tb_阵营.Text.ToLower(CultureInfo.CurrentCulture); // 转换为小写，确保匹配时忽略大小写
+                text = _ui.GetText(UiField.阵营).ToLower(CultureInfo.CurrentCulture); // 转换为小写，确保匹配时忽略大小写
             });
 
             foreach (KeyValuePair<char, Keys> kvp in keyMapping)
@@ -85,7 +87,7 @@ public sealed class 测试Strategy : IHeroStrategy
 
         Item.保存当前物品();
 
-        Common.Main_Form?.Invoke(() => { Common.Main_Form.tb_y.Text = (Common.获取当前时间毫秒() - Main._聚合.Skills.Time(SlotKey.Global)).ToString(CultureInfo.InvariantCulture); });
+        _ui.Invoke(() => _ui.SetText(UiField.Y, (Common.获取当前时间毫秒() - Main._聚合.Skills.Time(SlotKey.Global)).ToString(CultureInfo.InvariantCulture)));
 
         Dota2Simulator.TTS.TTS.Speak("完成");
     }

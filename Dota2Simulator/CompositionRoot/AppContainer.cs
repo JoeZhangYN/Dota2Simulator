@@ -42,7 +42,9 @@ internal sealed class AppContainer
         Input = new ProbeInputExecutor(new HybridInputAdapter());
         Vision = new ProbeScreenVision(new RustVisionAdapter());
         Registry = new HeroStrategyRegistry(Input, Vision);
-        Registry.RegisterAll();
+        // D2 双阶段：测试Strategy 需 IUiInvoker，但 Ui 要等 Form2 构造后 BindUi 才到位。
+        // 故 RegisterAll 推迟到 BindUi 内调；ctor 期 Registry.Count == 0，
+        // GameSession 在此窗口期收到按键也只是 no-op 查不到策略——Form2 ctor 立刻接 BindUi。
         GameSession = new GameSession(Registry);
 
         // A5 双阶段：Main._聚合 类型加载期已 new 出来，AppContainer 构造后补注入 vision。
@@ -51,12 +53,13 @@ internal sealed class AppContainer
 
     /// <summary>
     /// Form2 构造完成后回调——此时 InitializeComponent 已跑过，tb_* 字段已可用。
-    /// 同步 set Common.UiInvoker（BC 内 static class 走的 service locator 入口）。
+    /// 同步 set Common.UiInvoker（BC 内 static class 走的 service locator 入口）+ Registry.RegisterAll。
     /// </summary>
     public void BindUi(Form2 form)
     {
         Ui = new Form2UiInvoker(form);
         Common.UiInvoker = Ui;
+        Registry.RegisterAll(Ui);
     }
 }
 

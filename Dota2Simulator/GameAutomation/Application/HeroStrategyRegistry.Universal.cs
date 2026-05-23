@@ -19,7 +19,7 @@ public sealed partial class HeroStrategyRegistry
         Register(new Heroes.Universal.沙王Strategy(input, vision));
         Register(new Heroes.Universal.进化岛Strategy(input, vision));
         Register(new Heroes.Universal.命运2Strategy(input, vision));
-        Register(new Heroes.Universal.测试Strategy(input, vision));
+        Register(new Heroes.Universal.测试Strategy(input, vision, _ui!));
     }
 }
 #endif

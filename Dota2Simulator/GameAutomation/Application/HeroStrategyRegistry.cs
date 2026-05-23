@@ -19,6 +19,10 @@ public sealed partial class HeroStrategyRegistry
     private readonly Dictionary<string, IHeroStrategy> _byName = new();
     private readonly IInputExecutor _input;
     private readonly IScreenVision _vision;
+    // D2: 测试Strategy 是 92 策略中唯一需要 IUiInvoker 的（反向抓 UI tb_阵营 / tb_y）。
+    // 字段而非 ctor 参数——Registry 在 AppContainer.ctor 期 new，Ui 要等 Form2 构造后 BindUi 才到位。
+    // 走双阶段：ctor 接 input+vision，RegisterAll(ui) 时补 _ui 再分发到 Universal partial。
+    private IUiInvoker? _ui;
 
     public HeroStrategyRegistry(IInputExecutor input, IScreenVision vision)
     {
@@ -36,9 +40,10 @@ public sealed partial class HeroStrategyRegistry
     /// <summary>已注册的英雄数。</summary>
     public int Count => _byName.Count;
 
-    /// <summary>注册所有英雄策略。各属性分组在 partial 文件实现。</summary>
-    public void RegisterAll()
+    /// <summary>注册所有英雄策略——AppContainer.BindUi 时调用（此刻 ui 已到位）。</summary>
+    public void RegisterAll(IUiInvoker ui)
     {
+        _ui = ui ?? throw new ArgumentNullException(nameof(ui));
         RegisterStrength(_input, _vision);
         RegisterAgility(_input, _vision);
         RegisterIntelligence(_input, _vision);
