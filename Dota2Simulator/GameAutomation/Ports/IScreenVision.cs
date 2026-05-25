@@ -15,16 +15,23 @@ public interface IScreenVision
     /// <summary>按指定模式截取屏幕到内部缓冲。</summary>
     void Capture(CaptureMode mode);
 
-    /// <summary>在当前缓冲中查找模板，返回首个命中或 Miss。</summary>
+    /// <summary>在当前缓冲中查找模板，返回首个命中或 Miss。Phase 18 V5 计划真删此重载——业务侧应改用带 <see cref="ScreenRegion"/> 的重载，强制候选区域裁剪。</summary>
     FindResult Find(Template needle, MatchRate rate, Tolerance tolerance);
 
-    /// <summary>在当前缓冲中查找模板的所有命中位置。</summary>
+    /// <summary>在当前缓冲中查找模板的所有命中位置。Phase 18 V5 计划真删此重载——业务侧应改用带 <see cref="ScreenRegion"/> 的重载。</summary>
     IReadOnlyList<ScreenPoint> FindAll(Template needle, MatchRate rate, Tolerance tolerance);
+
+    /// <summary>在指定屏幕区域内查找模板，返回首个命中或 Miss。Phase 18 V1 主力路径。区域坐标 = 1920×1080 桌面绝对坐标。</summary>
+    FindResult Find(Template needle, ScreenRegion region, MatchRate rate, Tolerance tolerance);
+
+    /// <summary>在指定屏幕区域内查找模板的所有命中位置。</summary>
+    IReadOnlyList<ScreenPoint> FindAll(Template needle, ScreenRegion region, MatchRate rate, Tolerance tolerance);
 
     /// <summary>读取当前缓冲中指定屏幕坐标的颜色。</summary>
     Color PixelAt(ScreenPoint point);
 
-    /// <summary>在指定屏幕区域内查找模板，命中返回 true。区域坐标 = 1920×1080 桌面绝对坐标。</summary>
+    /// <summary>在指定屏幕区域内查找模板，命中返回 true。Phase 18 V5 计划真删——改用 <see cref="Find(Template, ScreenRegion, MatchRate, Tolerance)"/>。</summary>
+    [Obsolete("Phase 18 V5 真删；改用 Find(Template, ScreenRegion, MatchRate, Tolerance) 拿 FindResult。", error: false)]
     bool FindInRegion(Template needle, ScreenRegion region, MatchRate rate);
 
     /// <summary>

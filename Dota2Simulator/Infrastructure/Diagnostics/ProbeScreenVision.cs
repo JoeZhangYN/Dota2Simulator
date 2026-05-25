@@ -48,11 +48,29 @@ public sealed class ProbeScreenVision : IScreenVision
         return result;
     }
 
+#pragma warning disable CS0618 // 装饰器须实现接口已废弃方法
     public bool FindInRegion(Template needle, ScreenRegion region, MatchRate rate)
     {
         bool result = _inner.FindInRegion(needle, region, rate);
         if (RecordReplayProbe.Enabled)
             RecordReplayProbe.Record(Port, nameof(FindInRegion), $"{needle}, {region}, {rate} => {result}");
+        return result;
+    }
+#pragma warning restore CS0618
+
+    public FindResult Find(Template needle, ScreenRegion region, MatchRate rate, Tolerance tolerance)
+    {
+        FindResult result = _inner.Find(needle, region, rate, tolerance);
+        if (RecordReplayProbe.Enabled)
+            RecordReplayProbe.Record(Port, nameof(Find), $"{needle}, {region}, {rate} => {result}");
+        return result;
+    }
+
+    public IReadOnlyList<ScreenPoint> FindAll(Template needle, ScreenRegion region, MatchRate rate, Tolerance tolerance)
+    {
+        IReadOnlyList<ScreenPoint> result = _inner.FindAll(needle, region, rate, tolerance);
+        if (RecordReplayProbe.Enabled)
+            RecordReplayProbe.Record(Port, nameof(FindAll), $"{needle}, {region}, {rate} => {result.Count} 命中");
         return result;
     }
 

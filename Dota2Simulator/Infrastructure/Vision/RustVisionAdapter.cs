@@ -66,6 +66,7 @@ public sealed class RustVisionAdapter : IScreenVision
         => GlobalScreenCapture.GetColor(point.X, point.Y);
 
     /// <summary>区域内查找模板（屏幕坐标，1920×1080）。封装 ImageFinder.FindImageInRegionBool。</summary>
+#pragma warning disable CS0618 // 实现仍允许调本接口已废弃方法
     public bool FindInRegion(Template needle, ScreenRegion region, MatchRate rate)
     {
         ImageHandle needleHandle = LazyImageLoader.GetImage(needle.Name);
@@ -75,6 +76,46 @@ public sealed class RustVisionAdapter : IScreenVision
 
         Rectangle rect = new(region.X, region.Y, region.Width, region.Height);
         return ImageFinder.FindImageInRegionBool(in needleHandle, in frame, rect, rate.Value);
+    }
+#pragma warning restore CS0618
+
+    /// <summary>
+    /// V1 主力路径：在指定 region 查找模板，返回首个命中（屏幕坐标）或 Miss。
+    /// 容差为 0 时走精确路径；ignoreColor 走 ImageFinder 默认（255,20,147 magenta）。
+    /// </summary>
+    public FindResult Find(Template needle, ScreenRegion region, MatchRate rate, Tolerance tolerance)
+    {
+        ImageHandle needleHandle = LazyImageLoader.GetImage(needle.Name);
+        ImageHandle frame = GlobalScreenCapture.GetCurrentHandle();
+        if (!needleHandle.IsValid || !frame.IsValid)
+            return FindResult.Miss;
+
+        Rectangle rect = new(region.X, region.Y, region.Width, region.Height);
+        // FindImageInRegion 底层暂未提供 tolerance 参数；tolerance 字段保留以与全屏 Find 签名对齐，
+        // 待 V5/V6 后 Vision BC 内底层 API 扩 tolerance 参数时打通。本期内 tolerance 被忽略。
+        Point? hit = ImageFinder.FindImageInRegion(in needleHandle, in frame, rect, rate.Value);
+
+        if (hit is null)
+            return FindResult.Miss;
+
+        // ImageFinder.FindImageInRegion 返回的是 region 内绝对坐标（已含偏移）。
+        return FindResult.Hit(new ScreenPoint(hit.Value.X, hit.Value.Y));
+    }
+
+    /// <summary>V1 主力路径：在指定 region 查找模板的所有命中位置（屏幕坐标）。</summary>
+    public IReadOnlyList<ScreenPoint> FindAll(Template needle, ScreenRegion region, MatchRate rate, Tolerance tolerance)
+    {
+        ImageHandle needleHandle = LazyImageLoader.GetImage(needle.Name);
+        ImageHandle frame = GlobalScreenCapture.GetCurrentHandle();
+        if (!needleHandle.IsValid || !frame.IsValid)
+            return Array.Empty<ScreenPoint>();
+
+        Rectangle rect = new(region.X, region.Y, region.Width, region.Height);
+        List<Point> hits = ImageFinder.FindAllImagesInRegion(in needleHandle, in frame, rect, rate.Value);
+        var result = new List<ScreenPoint>(hits.Count);
+        foreach (Point p in hits)
+            result.Add(new ScreenPoint(p.X, p.Y));
+        return result;
     }
 
     /// <summary>
