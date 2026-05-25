@@ -1,6 +1,7 @@
 #if DOTA2
 #if Silt
 
+using Dota2Simulator.GameAutomation.Domain.Perception;
 using Dota2Simulator.GameAutomation.Ports;
 using Dota2Simulator.Vision;
 using Dota2Simulator.KeyboardMouse;
@@ -346,7 +347,8 @@ namespace Dota2Simulator.Games.Dota2.Silt
         public SelectionReport ExecuteSelection(
             in ImageHandle gameHandle,
             TalentSelectionConfig config,
-            IReadOnlyDictionary<string, ImageHandle> imageHandles)
+            IReadOnlyDictionary<string, ImageHandle> imageHandles,
+            IScreenVision vision)
         {
             _detailedLogs.Clear();
             _queueManager.Clear();
@@ -361,8 +363,8 @@ namespace Dota2Simulator.Games.Dota2.Silt
 
                 var Result = config.Mode switch
                 {
-                    SelectionMode.Sequential => ProcessSequential(gameHandle, config, imageHandles),
-                    _ => ProcessSkipFirstThenSelect(gameHandle, config, imageHandles)
+                    SelectionMode.Sequential => ProcessSequential(gameHandle, config, imageHandles, vision),
+                    _ => ProcessSkipFirstThenSelect(gameHandle, config, imageHandles, vision)
                 };
 
                 var report = new SelectionReport
@@ -402,20 +404,24 @@ namespace Dota2Simulator.Games.Dota2.Silt
         private List<SelectionResult> ProcessSkipFirstThenSelect(
             in ImageHandle gameHandle,
             TalentSelectionConfig config,
-            IReadOnlyDictionary<string, ImageHandle> imageHandles)
+            IReadOnlyDictionary<string, ImageHandle> imageHandles,
+            IScreenVision vision)
         {
             var results = new List<SelectionResult>();
             var processedPositions = new HashSet<string>();
             int round = 0;
 
-            
-            var point = ImageFinder.FindImageInRegion(Dota2_Pictrue.Silt.左上角选框, GlobalScreenCapture.GetCurrentHandle(), new Rectangle(380, 150, 600, 150));
+
+#pragma warning disable CS0618 // V4 临时妥协调用 Find(ImageHandle, ...) 重载，V6 改 SG 生成 Template 同步删
+            var pointResult = vision.Find(Dota2_Pictrue.Silt.左上角选框, new Rectangle(380, 150, 600, 150), new MatchRate(0.9), Tolerance.Exact);
+#pragma warning restore CS0618
+            Point? point = pointResult.Found ? new Point(pointResult.Point.X, pointResult.Point.Y) : null;
 
             while (round++ < 10)
             {
                 LogDetailed($"\n--- 第 {round} 轮处理 ---");
 
-                var searchResults = FindAllImages(imageHandles, config);
+                var searchResults = FindAllImages(imageHandles, config, vision);
                 var newResults = searchResults
                     .Where(sr => !processedPositions.Contains(GetPositionKey(sr.Position)))
                     .ToList();
@@ -548,10 +554,11 @@ namespace Dota2Simulator.Games.Dota2.Silt
         private List<SelectionResult> ProcessSequential(
             in ImageHandle gameHandle,
             TalentSelectionConfig config,
-            IReadOnlyDictionary<string, ImageHandle> imageHandles)
+            IReadOnlyDictionary<string, ImageHandle> imageHandles,
+            IScreenVision vision)
         {
             var results = new List<SelectionResult>();
-            var searchResults = FindAllImages(imageHandles, config);
+            var searchResults = FindAllImages(imageHandles, config, vision);
 
             foreach (var searchResult in searchResults)
             {
@@ -587,20 +594,21 @@ namespace Dota2Simulator.Games.Dota2.Silt
 
         private List<ImageSearchResult> FindAllImages(
             IReadOnlyDictionary<string, ImageHandle> imageHandles,
-            TalentSelectionConfig config)
+            TalentSelectionConfig config,
+            IScreenVision vision)
         {
             var results = new List<ImageSearchResult>();
 
             foreach (var (name, imageHandle) in imageHandles)
             {
-                var positions = GlobalScreenCapture.FindAllImages(
-                    imageHandle,
-                    _options.ImageMatchThreshold,
-                    _options.MaxSearchResults,
-                    _options.SearchStep);
+#pragma warning disable CS0618 // V4 临时妥协调用 FindAll(ImageHandle, ...) 重载，V6 改 SG 生成 Template 同步删
+                // 用整屏 region 替代原全屏 FindAllImages；_options.MaxSearchResults / SearchStep 暂忽略（底层默认 100/1），V5 评估是否需要扩端口
+                var screenPoints = vision.FindAll(imageHandle, new ScreenRegion(0, 0, 1920, 1080), new MatchRate(_options.ImageMatchThreshold), Tolerance.Exact);
+#pragma warning restore CS0618
 
-                foreach (var position in positions)
+                foreach (var sp in screenPoints)
                 {
+                    Point position = new(sp.X, sp.Y);
                     var matchingRules = config.Rules
                         .Where(r => r.SkillImageHandle == name && !r.AutoSkip)
                         .ToList();
@@ -1418,7 +1426,7 @@ namespace Dota2Simulator.Games.Dota2.Silt
 
         // Phase 11 P7: 加 IUiInvoker 形参穿透消 Common.HeroLoopHost! service locator.
         // 调用拓扑 SiltEngine.沙王自动选择(ui) → ExecuteHeroSelection(ui) → ShowResults(ui).
-        public static void ExecuteHeroSelection(string heroName, in ImageHandle gameHandle, Dota2Simulator.GameAutomation.Ports.IUiInvoker ui)
+        public static void ExecuteHeroSelection(string heroName, in ImageHandle gameHandle, Dota2Simulator.GameAutomation.Ports.IUiInvoker ui, Dota2Simulator.GameAutomation.Ports.IScreenVision vision)
         {
             var builder = HeroConfigManager.GetHeroConfig(heroName);
             var (config, handles) = builder.Build();
@@ -1431,7 +1439,7 @@ namespace Dota2Simulator.Games.Dota2.Silt
                 DelayAfterSelection = 150
             });
 
-            var report = Selector.ExecuteSelection(in gameHandle, config, handles);
+            var report = Selector.ExecuteSelection(in gameHandle, config, handles, vision);
             ShowResults(report, ui);
         }
 

@@ -134,6 +134,21 @@ public sealed class RustVisionAdapter : IScreenVision
             return FindResult.Miss;
         return FindResult.Hit(new ScreenPoint(hit.Value.X, hit.Value.Y));
     }
+
+    /// <summary>V4 临时妥协：ImageHandle 版 region FindAll。V6 删。</summary>
+    public IReadOnlyList<ScreenPoint> FindAll(ImageHandle needle, ScreenRegion region, MatchRate rate, Tolerance tolerance)
+    {
+        ImageHandle frame = GlobalScreenCapture.GetCurrentHandle();
+        if (!needle.IsValid || !frame.IsValid)
+            return Array.Empty<ScreenPoint>();
+
+        Rectangle rect = new(region.X, region.Y, region.Width, region.Height);
+        List<Point> hits = ImageFinder.FindAllImagesInRegion(in needle, in frame, rect, rate.Value);
+        var result = new List<ScreenPoint>(hits.Count);
+        foreach (Point p in hits)
+            result.Add(new ScreenPoint(p.X, p.Y));
+        return result;
+    }
 #pragma warning restore CS0618
 
     /// <summary>

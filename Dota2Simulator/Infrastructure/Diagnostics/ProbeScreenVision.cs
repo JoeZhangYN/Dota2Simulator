@@ -82,6 +82,14 @@ public sealed class ProbeScreenVision : IScreenVision
             RecordReplayProbe.Record(Port, nameof(Find), $"ImageHandle, {region}, {rate} => {result}");
         return result;
     }
+
+    public IReadOnlyList<ScreenPoint> FindAll(ImageHandle needle, ScreenRegion region, MatchRate rate, Tolerance tolerance)
+    {
+        IReadOnlyList<ScreenPoint> result = _inner.FindAll(needle, region, rate, tolerance);
+        if (RecordReplayProbe.Enabled)
+            RecordReplayProbe.Record(Port, nameof(FindAll), $"ImageHandle, {region}, {rate} => {result.Count} 命中");
+        return result;
+    }
 #pragma warning restore CS0618
 
 #pragma warning disable CS0618 // 装饰器须实现接口已废弃方法

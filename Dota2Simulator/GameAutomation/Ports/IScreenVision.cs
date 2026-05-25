@@ -42,6 +42,13 @@ public interface IScreenVision
     FindResult Find(ImageHandle needle, ScreenRegion region, MatchRate rate, Tolerance tolerance);
 
     /// <summary>
+    /// Phase 18 V4 临时妥协：同 <see cref="Find(ImageHandle, ScreenRegion, MatchRate, Tolerance)"/>，用于 Silt BC RPG 模式 FindAll 场景。
+    /// V6 同 SG 改造后统一删除。
+    /// </summary>
+    [Obsolete("Phase 18 V6 真删；改用 FindAll(Template, ScreenRegion, MatchRate, Tolerance) 配合 SG 生成的 Template 静态属性。", error: false)]
+    IReadOnlyList<ScreenPoint> FindAll(ImageHandle needle, ScreenRegion region, MatchRate rate, Tolerance tolerance);
+
+    /// <summary>
     /// 获取当前帧的 Vision 内部句柄，供 ConditionDelegateBitmap 委托链路使用。
     /// </summary>
     /// <remarks>
