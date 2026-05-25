@@ -8,6 +8,7 @@ using Dota2Simulator.GameAutomation.Application.HeroPlans;
 using Dota2Simulator.GameAutomation.Domain.Actuation;
 using Dota2Simulator.GameAutomation.Domain.Heroes;
 using Dota2Simulator.GameAutomation.Domain.Loop;
+using Dota2Simulator.GameAutomation.Domain.Perception;
 using Dota2Simulator.Games;
 using Dota2Simulator.Games.Dota2;
 using Dota2Simulator.Vision;
@@ -35,7 +36,9 @@ public sealed partial class 火猫Strategy : IHeroStrategy
             _item.要求保持假腿();
         }).ConfigureAwait(false)).CustomProbe(async _h =>
         {
-            bool b = ImageFinder.FindImageInRegionBool(Dota2_Pictrue.Buff.火猫_无影拳, in _h, buff状态技能栏);
+#pragma warning disable CS0618 // V3 临时妥协调用 Find(ImageHandle, ...) 重载，V6 改 SG 生成 Template 同步删
+            bool b = _vision.Find(Dota2_Pictrue.Buff.火猫_无影拳, buff状态技能栏, new MatchRate(0.9), Tolerance.Exact).Found;
+#pragma warning restore CS0618
             if (b)
             {
                 if (_main._聚合.Skills.Mode(SlotKey.W) == 1)

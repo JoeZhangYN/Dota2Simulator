@@ -5,6 +5,7 @@ using System.Windows.Forms;
 using Dota2Simulator.GameAutomation.Application;
 using Dota2Simulator.GameAutomation.Domain.Actuation;
 using Dota2Simulator.GameAutomation.Domain.Heroes;
+using Dota2Simulator.GameAutomation.Domain.Perception;
 using Dota2Simulator.Games.Dota2;
 using Dota2Simulator.Vision;
 
@@ -60,15 +61,16 @@ public sealed partial class 伐木机Strategy : IHeroStrategy
         }
     }
 
+#pragma warning disable CS0618 // V3 临时妥协调用 Find(ImageHandle, ...) 重载，V6 改 SG 生成 Template 同步删
     private async Task<bool> 伐木机获取命石(ImageHandle 句柄)
     {
         if (_main._聚合.Conditions.StoneChoice == 0)
         {
-            if (ImageFinder.FindImageInRegionBool(Dota2_Pictrue.命石.伐木机_碎木击, GlobalScreenCapture.GetCurrentHandle(), 命石区域))
+            if (_vision.Find(Dota2_Pictrue.命石.伐木机_碎木击, 命石区域, new MatchRate(0.9), Tolerance.Exact).Found)
             {
                 _main._聚合.Conditions.StoneChoice = 1;
             }
-            else if (ImageFinder.FindImageInRegionBool(Dota2_Pictrue.命石.伐木机_锯齿轮旋, GlobalScreenCapture.GetCurrentHandle(), 命石区域))
+            else if (_vision.Find(Dota2_Pictrue.命石.伐木机_锯齿轮旋, 命石区域, new MatchRate(0.9), Tolerance.Exact).Found)
             {
                 _main._聚合.Conditions.StoneChoice = 2;
                 _main._聚合.LegSwap.配置.修改配置(Keys.D, true);
@@ -78,6 +80,7 @@ public sealed partial class 伐木机Strategy : IHeroStrategy
         _main._聚合.Conditions.StoneProbe = null;
         return await Task.FromResult(false).ConfigureAwait(true);
     }
+#pragma warning restore CS0618
 
     private async Task<bool> 死亡旋风去后摇(ImageHandle 句柄)
     {

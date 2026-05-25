@@ -5,6 +5,7 @@ using Dota2Simulator.GameAutomation.Application;
 using Dota2Simulator.GameAutomation.Domain.Actuation;
 using Dota2Simulator.GameAutomation.Domain.Heroes;
 using Dota2Simulator.GameAutomation.Domain.Loop;
+using Dota2Simulator.GameAutomation.Domain.Perception;
 using Dota2Simulator.Games;
 using Dota2Simulator.Games.Dota2;
 using Dota2Simulator.Vision;
@@ -131,7 +132,9 @@ public sealed partial class 双头龙Strategy : IHeroStrategy
             return await Task.FromResult(true).ConfigureAwait(true);
         }
 
-        if (!ImageFinder.FindImageInRegionBool(Dota2_Pictrue.物品.吹风, in 句柄, ItemEngine.获取物品范围(_main._聚合.SkillCount)) && _main._聚合.Skills.Time(SlotKey.Global) == -1)
+#pragma warning disable CS0618 // V3 临时妥协调用 Find(ImageHandle, ...) 重载，V6 改 SG 生成 Template 同步删
+        if (!_vision.Find(Dota2_Pictrue.物品.吹风, ItemEngine.获取物品范围(_main._聚合.SkillCount), new MatchRate(0.9), Tolerance.Exact).Found && _main._聚合.Skills.Time(SlotKey.Global) == -1)
+#pragma warning restore CS0618
         {
             _main._聚合.Skills.SetTime(SlotKey.Global, Common.获取当前时间毫秒());
         }

@@ -119,6 +119,24 @@ public sealed class RustVisionAdapter : IScreenVision
     }
 
     /// <summary>
+    /// V3 临时妥协路径：业务直接传 ImageHandle，跳过 Template→ImageHandle 反查。V6 删。
+    /// </summary>
+#pragma warning disable CS0618 // 实现仍允许调本接口已废弃方法
+    public FindResult Find(ImageHandle needle, ScreenRegion region, MatchRate rate, Tolerance tolerance)
+    {
+        ImageHandle frame = GlobalScreenCapture.GetCurrentHandle();
+        if (!needle.IsValid || !frame.IsValid)
+            return FindResult.Miss;
+
+        Rectangle rect = new(region.X, region.Y, region.Width, region.Height);
+        Point? hit = ImageFinder.FindImageInRegion(in needle, in frame, rect, rate.Value);
+        if (hit is null)
+            return FindResult.Miss;
+        return FindResult.Hit(new ScreenPoint(hit.Value.X, hit.Value.Y));
+    }
+#pragma warning restore CS0618
+
+    /// <summary>
     /// 获取三缓冲读缓冲区当前帧句柄，供 ConditionDelegateBitmap 委托链路使用。
     /// Phase 6 临时方法 — Phase 7+ 改委托签名后移除。
     /// </summary>

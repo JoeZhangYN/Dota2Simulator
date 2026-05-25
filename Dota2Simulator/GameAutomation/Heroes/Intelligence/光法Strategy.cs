@@ -8,6 +8,7 @@ using Dota2Simulator.GameAutomation.Application.HeroPlans;
 using Dota2Simulator.GameAutomation.Domain.Actuation;
 using Dota2Simulator.GameAutomation.Domain.Heroes;
 using Dota2Simulator.GameAutomation.Domain.Loop;
+using Dota2Simulator.GameAutomation.Domain.Perception;
 using Dota2Simulator.Games;
 using Dota2Simulator.Games.Dota2;
 using Dota2Simulator.Vision;
@@ -37,7 +38,9 @@ public sealed partial class 光法Strategy : IHeroStrategy
                 }).ConfigureAwait(true);
             }
             _main._聚合.Skills.SetStep(SlotKey.Q, 1);
-            if (ImageFinder.FindImageInRegionBool(Dota2_Pictrue.Buff.光法_大招, GlobalScreenCapture.GetCurrentHandle(), new Rectangle(962, 826, 526, 80)))
+#pragma warning disable CS0618 // V3 临时妥协调用 Find(ImageHandle, ...) 重载，V6 改 SG 生成 Template 同步删
+            if (_vision.Find(Dota2_Pictrue.Buff.光法_大招, new Rectangle(962, 826, 526, 80), new MatchRate(0.9), Tolerance.Exact).Found)
+#pragma warning restore CS0618
             {
                 _main._聚合.LegSwap.配置.修改配置(Keys.Q, false);
                 _input.MouseClick(MouseButton.Right);

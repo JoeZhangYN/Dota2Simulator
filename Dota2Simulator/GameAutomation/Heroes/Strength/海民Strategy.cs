@@ -6,13 +6,12 @@ using Dota2Simulator.GameAutomation.Application;
 using Dota2Simulator.GameAutomation.Domain.Actuation;
 using Dota2Simulator.GameAutomation.Domain.Heroes;
 using Dota2Simulator.GameAutomation.Domain.Loop;
+using Dota2Simulator.GameAutomation.Domain.Perception;
 using Dota2Simulator.Games;
 using Dota2Simulator.Games.Dota2;
 using Dota2Simulator.Vision;
 
 using Dota2Simulator.GameAutomation.Ports;
-
-using Dota2Simulator.GameAutomation.Domain.Perception;
 namespace Dota2Simulator.GameAutomation.Heroes.Strength;
 
 [HeroStrategy("海民", HeroAttribute.Strength)]
@@ -69,16 +68,18 @@ public sealed partial class 海民Strategy : IHeroStrategy
         }
     }
 
+#pragma warning disable CS0618 // V3 临时妥协调用 Find(ImageHandle, ...) 重载，V6 改 SG 生成 Template 同步删
     private async Task<bool> 海民获取命石(ImageHandle 句柄)
     {
         if (_main._聚合.Conditions.StoneChoice == 0)
         {
-            _main._聚合.Conditions.StoneChoice = ImageFinder.FindImageInRegionBool(Dota2_Pictrue.命石.海民_酒友, GlobalScreenCapture.GetCurrentHandle(), 命石区域) ? 2 : 1;
+            _main._聚合.Conditions.StoneChoice = _vision.Find(Dota2_Pictrue.命石.海民_酒友, 命石区域, new MatchRate(0.9), Tolerance.Exact).Found ? 2 : 1;
         }
 
         _main._聚合.Conditions.StoneProbe = null;
         return await Task.FromResult(false).ConfigureAwait(true);
     }
+#pragma warning restore CS0618
 
     private async Task<bool> 冰片去后摇(ImageHandle 句柄)
     {

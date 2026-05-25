@@ -10,6 +10,7 @@ using System.Windows.Forms;
 using Dota2Simulator.GameAutomation.Application;
 using Dota2Simulator.GameAutomation.Domain.Actuation;
 using Dota2Simulator.GameAutomation.Domain.Heroes;
+using Dota2Simulator.GameAutomation.Domain.Perception;
 using Dota2Simulator.Games.Dota2;
 using Dota2Simulator.Vision;
 
@@ -46,11 +47,13 @@ public sealed partial class 马西Strategy : IHeroStrategy
         }
     }
 
-    private static async Task<bool> 幽魂检测(ImageHandle 句柄)
+#pragma warning disable CS0618 // V3 临时妥协调用 Find(ImageHandle, ...) 重载，V6 改 SG 生成 Template 同步删
+    private async Task<bool> 幽魂检测(ImageHandle 句柄)
     {
-        return ImageFinder.FindImageInRegionBool(Dota2_Pictrue.Buff.小精灵_幽魂, in 句柄, buff状态技能栏)
+        return _vision.Find(Dota2_Pictrue.Buff.小精灵_幽魂, buff状态技能栏, new MatchRate(0.9), Tolerance.Exact).Found
             ? await Task.FromResult(true).ConfigureAwait(true)
             : await Task.FromResult(false).ConfigureAwait(true);
     }
+#pragma warning restore CS0618
 }
 #endif
