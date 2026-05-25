@@ -1345,3 +1345,142 @@ Phase 14 29 commit + Phase 15 (2 commit + 本 handoff) = **32 commit total** on 
 ... Phase 14 29 commit ...
 a7350ac (C1) → 5f0bfc8 (C2) → <P15-handoff hash>
 ```
+
+---
+
+## Phase 16 完整收尾 (2026-05-25 续, 3 commit on main, 跨越 50% 里程碑)
+
+epic 主题: **3 chunk 全打 Multi-AdjustLegSwap (零 DSL 扩 + OnEveryKey/Dynamic) + KeyModifier + PostAction DSL + 15 英雄迁 (48/92 = 52.2%)**.
+
+触发: 用户 2026-05-25 续 "继续", 按 Phase 15 handoff_notes Phase 16+ 候选清单. 3 agent 并发实测 ROI 校准 (PostAction/KeyModifier/HeroStrategyBase + OnEveryKey 补) 后用户选 "OnEveryKey+KeyModifier 三 chunk" → 合并 OnEveryKey 入 C1 Multi-AdjustLegSwap.
+
+### Phase 16 commit 表
+
+| Chunk | hash | 主题 | 净行 | 新增英雄 |
+|---|---|---|---|---|
+| C1 | `1bdc02c` | hero-plan-multi-adjustlegswap-9-heroes (C1a 零 DSL + C1b OnEveryKey/Dynamic) | -419 | 钢背 / 龙骑 / 小鱼人 / 敌法 / 幽鬼 / 小骷髅 / 小松鼠 / 小黑 + 火枪 |
+| C2 | `991aeee` | hero-plan-keymodifier-dsl-5-heroes (1 维 OnKey overload + clause/setup Modifiers) | -298 | 巫妖 / 墨客 / 帕克 / 光法 / 血魔 |
+| C3 | `2738c65` | hero-plan-postaction-dsl-1-hero (2 维 Post / PostAsync 与 Pre 对称) | -5 | 火猫 |
+
+合计: **-722 业务行净**, 15 英雄新迁 HeroPlan DSL.
+
+### Phase 16 DSL 容量更新 (Phase 15 13 维基础上扩 5 维 → 18 维)
+
+| 维度 | 选项 | 替换源 | 新增于 |
+|---|---|---|---|
+| **OnEveryKey** | () 无 trigger key 入口 (setup-only) | 火枪 OnKeyAsync 入口每键无条件副作用 | **Phase 16 C1b** |
+| **AdjustLegSwapDynamic** | (Keys, Func<HeroContext,bool>) 动态第二参 | 火枪 `LegSwap(D, HasShard)` 第二参为运行期表达式 | **Phase 16 C1b** |
+| **OnKey(Keys, KeyModifiers)** | overload 严格匹配修饰键 | 巫妖 W+Alt / 墨客 E+Alt / 帕克 W+Ctrl / 光法 E+Alt / 血魔 Q+Alt | **Phase 16 C2** |
+| **Post** | (Action) clause Active 后 sync 副作用 | (未实测, 与 PostAsync 对称设计) | **Phase 16 C3** |
+| **PostAsync** | (Func<Task>) clause Active 后 async 副作用 | 火猫 W: `Active=true; await Task.Run(() => { Delay(330); _item.要求保持假腿(); })` | **Phase 16 C3** |
+
+### Phase 16 设计决策 (3 处)
+
+1. **Multi-AdjustLegSwap 不专 DSL (handoff #5 验证 → 不需要)**: 实测 8 F1 多守卫英雄 (钢背 + 7 others) 完全可用现有 `OnKey(F1).WhenHasShard().AdjustLegSwap(D, true) + OnKey(F1).WhenHasAghanim().AdjustLegSwap(E, true)` chain 表达, 无需新 DSL. C1a 零 DSL 扩仅迁移文件 = 实测 + 文件级清理同步完成.
+2. **小骷髅 LegSwap 第三参 "敏捷" 用 Execute lambda 替代 AdjustLegSwap**: 现有 `修改配置(Keys, bool, string="智力")` 第三参默认 "智力", 小骷髅显式 "敏捷". 避污染 DSL 加第三参, 改用 `.OnKey(F1).WhenHasShard().Execute(() => _main._聚合.LegSwap.配置.修改配置(Keys.D, true, "敏捷"))`.
+3. **KeyModifier 共享 ConditionSlot 用 Execute lambda hard-code Cn 索引**: 巫妖 W+Alt / 墨客 E+Alt 等 KeyModifier 形态原意是"修饰键变体也触发同 C{n}.Active=true". 用 Execute lambda 直接 `_main._聚合.Conditions[ConditionSlotKey.Cn].Active = true` (hard-code), 避免占新 ConditionSlot 槽 + Probe 重复注册.
+
+### Phase 16 已迁英雄清单 (15 / 92, 累计 48 / 92 = 52.2%, 跨越 50% 里程碑)
+
+| 属性 | C1 (9) | C2 (5) | C3 (1) |
+|---|---|---|---|
+| 力量 (3) | 钢背 / 龙骑 | — | — |
+| 敏捷 (8) | 小鱼人 / 敌法 / 幽鬼 / 小骷髅 / 小松鼠 / 小黑 / 火枪 | 血魔 | 火猫 |
+| 智力 (4) | — | 巫妖 / 墨客 / 帕克 / 光法 | — |
+
+C1 净 -419, C2 净 -298, C3 净 -5 (PostAsync lambda 比原 inline 长一些). Phase 15 累计 33 + Phase 16 累计 15 = 48 / 92.
+
+### Phase 16 关键不变量 (新增)
+
+1. **HeroPlanClause 字段顺序兼容**: 加 4 个新字段 (Modifiers / PostActionSync / PostActionAsync 共 3 直接, ParamBoolProvider/IsOnEveryKey 在 SetupAction), 全 default null/None/false, 存量 33+15 个迁过英雄 0 改动 ResetPending() 内统一清状态.
+2. **OnEveryKey + KeyModifier 交互**: `matchMod = setup.IsOnEveryKey || setup.Modifiers == trigger.Modifiers` 短路 — OnEveryKey 形态忽略修饰键, 修饰键场景仍跑 OnEveryKey (火枪每键 LegSwap(D, HasShard)).
+3. **DispatchAsync 顺序固化**: setups foreach (OnEveryKey + Multi-Guard, KeyModifier 严格匹配) → clauses for-first-hit (PreAction → Active → PostAction → return). 顺序破坏会改 invariants.
+4. **ConditionSlot 索引 = clause 顺序**: KeyModifier Execute lambda hard-code `Conditions[Cn]` 依赖 clause 顺序稳定, 重排 clauses 会破语义. 已在帕克 (C2 重排 R→C3/D→C4) 实测验证 hard-code 索引不被破坏前提下排版安全.
+5. **ResetPending() 抽 helper**: 替代 6+ 处 inline reset (FinishClause / CustomProbe / NoProbe / Execute / AdjustLegSwap* / Toggle), 统一清状态降低未来扩字段时遗漏 reset 的 bug 面.
+
+### Phase 16 architecture-sentinel verdict (主 lead 自审)
+
+- **依赖倒置**: ✅ Post/PostAsync/Execute lambda 通过 Strategy instance 字段访问 ports (_input/_skill/_item/_main), 与 Pre/CustomProbe 模板一致; 静态 plan vs instance lazy plan 区分基于 lambda 是否捕获 instance.
+- **结构化管道**: ✅ Post/PostAsync 是 clause 终结前的中间状态 (与 Pre 对称), Execute 是 OnKey/OnEveryKey 链终结 (setup-only), AdjustLegSwapDynamic 是 AdjustLegSwap 的动态参版本 (同 Kind).
+- **类型不变量**: ✅ KeyModifiers 是 [Flags] enum 严格等值; OnEveryKey 用 bool field 标识 (非 Keys 哨兵); ParamBoolProvider Func<HeroContext,bool> 显式类型.
+- **高内聚低耦合**: ✅ DSL 扩 5 维分 3 chunk 独立提交, 每 chunk 1 业务关注点 (Multi-LegSwap / KeyModifier / PostAction); 存量 33 文件零破坏, 新加 15 文件无新依赖入侵.
+
+### Phase 16 handoff_notes (Phase 17+ 候选)
+
+继承 Phase 15 handoff_notes #3-#6, 新增 Phase 16 实测发现:
+
+1. **异型 ToggleSlot DSL (中优先, 解锁莱恩 D4/D5 + 光法 D2)**: 现 ToggleSlot 是 Active=!Active 自循环 + TTS 对称形态. 莱恩 D4 = 单方向 (按下开启 = `Active=true; TTS.Speak("开始");`, 同键再次按下关闭 = `Active=false; TTS.Speak("结束");`). 光法 D2 已用 Execute lambda hard-code C4 toggle (Phase 16 C2). DSL 扩 `.OnKey(D2).ToggleSlot(ConditionSlotKey.C4, "开启", "关闭")` 直接 toggle 指定 C 槽 + TTS, 取代 hard-code Cn 索引.
+2. **跨 clause 副作用 lambda (低优先, 解锁屠夫)**: 屠夫钩子去僵直 Probe 内 `if (Mode==1) Conditions[C3].Active=true` 跨 clause. 现 CustomProbe lambda 内访问 ctx.Aggregate.Conditions 行得通但破单 clause 边界. 留待整理.
+3. **NoProbe + Modifier 占位 hack (低优先, 帕克避坑通过 clause 重排)**: 帕克 C1 实测发现可用 clause 重排 (R→C3/D→C4) 紧凑映射, 避 `OnKey(Keys.None).NoProbe()` 占位 hack. 但如果原 Strategy 内 Probe lambda hard-code Conditions[Cn] 索引 (handoff_notes #6 跨 clause), 重排会破语义. 长期解: DSL `.Skip()` / `.PlaceholderSlot()` 显式占位不挂 trigger.
+4. **HeroStrategyBase + SG 改造 (P3 推迟, 实测净省 ~200 行非 2000)**: Phase 16 探索 agent 报告显示真实样板 9-11 行/文件, 33 文件净省 ~200 行不构成 epic blocker. 价值仅在可维护性 (DSL 改 builder 签名时 base 类 1 处改 vs N 文件改). 推 Phase 17+ 或独立 epic.
+5. **业务死代码清理 epic (持续)**: 钢背 4 个 Probe 方法 (鼻涕去后摇 / 毛团去后摇 / 钢毛后背去后摇 / 扫射切回假腿) 全注释 ??= 注册即死代码; Phase 16 C1a 迁移**保留**未删 (顺手清理超 Phase 16 in-scope). 与 handoff_notes #5 业务死代码清理 epic 合并.
+
+### Phase 16 sample 数据 (Phase 15 sample 之外新增 8 个英雄)
+
+| 英雄 | 形态 | 迁移状态 |
+|---|---|---|
+| 钢背 | F1+HasShard/Aghanim 双 LegSwap + Q/D/E/W NoProbe (4 Probe 全死代码) | **已迁 (C1a)** |
+| 龙骑 | F1+HasShard LegSwap + Q AfterCast + W CustomProbe + R AfterEnterCD + D+HasShard CustomProbe 动态 continueKey + D2/D3 Execute ToggleMode | **已迁 (C1a)** |
+| 小骷髅 | F1+HasShard Execute (第三参 "敏捷") + F1+HasAghanim AdjustLegSwap + 6 CustomProbe + D2/D3 Execute (D3+HasShard Guard) | **已迁 (C1a)** |
+| 小黑 | F1 Execute (颜色检测 SetMode 无 Guard) + F1+HasShard AdjustLegSwap + D Execute (复杂 toggle 异步) + W/E CustomProbe + F+HasShard CustomProbe | **已迁 (C1a)** |
+| 火枪 | OnEveryKey + AdjustLegSwapDynamic (动态 HasShard) + Q/D/R AfterCast + E CustomProbe (疯狂面具) | **已迁 (C1b)** |
+| 光法 | RepeatThreshold(100) + Q CustomProbe (减少蓄力 Step 状态机) + W CastSkill(D) + E CastSkill(E) + E+Alt CustomProbe 循环查克拉 + D CastSkill(W) 致盲之光 + F CastSkill(F) + D2 Execute toggle C4 Active | **已迁 (C2)** |
+| 帕克 | Q CustomProbe (Step+3.4s Delay+Mode Press D) + W AfterEnterCD + W+Ctrl Execute 共享 C2 + R AfterEnterCD (重排 C3) + D CustomProbe (Press F1×2) + D2 Execute | **已迁 (C2, clause 重排)** |
+| 火猫 | W CustomProbe (无影拳 ImageFinder + Mode Press Q + 假腿 + Press A) + PostAsync (Task.Run Delay 330 + 假腿) + Q/E AfterEnterCD + D AfterCast + D2 Execute | **已迁 (C3)** |
+
+### Phase 16 反预测与实测偏差
+
+1. **handoff #1 PostAction 高估**: 预测 8-10 候选, 实测仅火猫 1 个纯候选. 大多数 "Active=true; <code>" 形态实为 Phase 15 已实施的 **PreAction** (Active=true 之前的副作用) / Phase 13 **ToggleSlot** / Probe lambda 内副作用 (handoff #6).
+2. **handoff #3 OnEveryKey 与 handoff #5 Multi-AdjustLegSwap 边界模糊**: 预测火枪+钢背都是 OnEveryKey, 实测**钢背是 F1+Guard Multi-AdjustLegSwap 形态 (8 英雄)**, 仅**火枪 1 个 OnEveryKey + 动态 ParamBool**. 合并入 C1 后 9 英雄 (8 现有 DSL + 1 新扩) 一次提交.
+3. **handoff #4 HeroStrategyBase 价值高估 10x**: 预测 ~60 行/文件 = ~2000 行, 实测 ~9-11 行/文件 = ~200 行. P3 推迟.
+4. **handoff #2 KeyModifier 性价比意外最高**: 预测中优先, 实测低难度高 ROI (5 英雄 + 净 -298 行 + 基础设施已 wire).
+5. **小黑 D 键复杂度超预期**: Execute lambda 内 `await _item.技能释放前切假腿("智力")` 含 async 操作, Execute 是 sync Action. 用 `_ = Task.Run(async () => { await ... })` fire-and-forget 包装, 保 await 顺序 (TTS.Speak 在切假腿后). 不破坏行为但失去 await 完成的语义保证.
+
+### 待用户冒烟 (Phase 16 收尾)
+
+继承 Phase 15 全部冒烟清单 + 新增 Phase 16 专项实测:
+
+1. **C1a F1+多守卫回归** (新增 8 英雄): 切英雄 + F1 触发:
+   - 钢背 F1+HasShard 切假腿 D, F1+HasAghanim 切假腿 E; Q/D/W 按键设 Active=true 但 NoProbe (死代码状态)
+   - 龙骑 F1+HasShard 切假腿 D; Q/W/R/D+HasShard 释放; D2 切 W 接火球/喷火 TTS; D3 切 D 接喷火 TTS
+   - 小骷髅 F1+HasShard "敏捷" 假腿 + F1+HasAghanim F 假腿; D3+HasShard 切炽烈火雨 隐身 toggle (Guard 守 D3)
+   - 小黑 F1 颜色检测 SetMode + HasShard 切 F 假腿; D 切冰箭 (异步切假腿 + TTS 顺序)
+2. **C1b OnEveryKey + 动态 ParamBool** (新增 1 英雄, 火枪):
+   - 任意键触发 → LegSwap(D, HasShard) 跑 (HasShard=true 时 LegSwap.D=true; HasShard=false 时 LegSwap.D=false). HasShard 状态切换前后火枪每键应同步 LegSwap.D.
+   - Q/D/R 释放; E 释放后疯狂面具物品组合.
+3. **C2 KeyModifier + 共享 ConditionSlot** (新增 5 英雄):
+   - 巫妖 W (C2 冰霜魔盾) / **W+Alt (同 C2 激活, Execute lambda hard-code)**; E (复杂 Step 状态机) / R / D / Q.
+   - 墨客 5 标准键 + **E+Alt (共享 C3 墨泳)**.
+   - 帕克 Q (3.4s Delay+Mode Press D) / W / **W+Ctrl (共享 C2 新月之痕)** / R / D / D2 TTS.
+   - 光法 Q (Step 蓄力) / W (释放 D) / E / **E+Alt (循环查克拉 CustomProbe)** / D (释放 W) / F / D2 (toggle C4 Active + TTS).
+   - 血魔 W (血祭物品组合) / R / Q (血怒) / **Q+Alt (共享 C3 血怒, Execute lambda)**.
+4. **C3 PostAction 顺序实测** (新增 1 英雄, 火猫):
+   - W 按下 → Active=true 释放 W (无影拳) → PostAsync Task.Run (Delay 330 + 保持假腿) 异步跑. 顺序错则非按预期.
+   - 无影拳 CustomProbe 内 ImageFinder buff 检测 + Mode 1 Press Q + 保持假腿 + Press A.
+
+### Phase 16 回滚锚点
+
+- 完整撤回 Phase 16: `git revert 2738c65 991aeee 1bdc02c` (3 commit 倒序, 回 Phase 15 终态).
+- 仅撤 C3 (保 C1 + C2): `git revert 2738c65` (火猫回滚, PostAction DSL 保留但无用户).
+- 仅撤 C2 (保 C1, C3 编译失败 — C3 火猫不依赖 C2 但 PostAction Builder ResetPending 含 C2 字段). 撤 C3 先于 C2.
+- 仅撤 C1 (保 C2/C3 编译失败 — Builder.OnEveryKey/AdjustLegSwapDynamic 被 C2/C3 ResetPending 引用). 撤 C2/C3 先.
+
+回滚 dependency: **C3 撤先, C2 中间, C1 最后**.
+
+### 下次 session 起手指引 (Phase 17 候选)
+
+按 handoff_notes 优先级:
+
+1. **优先级中**: handoff_notes Phase 16 #1 异型 ToggleSlot DSL (解锁莱恩 D4/D5 + 替换光法 D2 hard-code 形态).
+2. **优先级高**: 业务死代码清理 epic (handoff_notes #5) — 钢背 4 个死 Probe 方法 + 其他英雄历史死代码; 独立 epic 可与功能性 Phase 并行.
+3. **优先级中**: HeroStrategyBase + SG 改造 (handoff #4 P3) — 真实净省 200 行, 价值在可维护性. 若 Phase 17+ 主 DSL 进化稳定可考虑.
+4. **维护性**: PostAction Phase 16 实测仅 1 候选, 若发现新形态 (莱恩等异型 toggle 内含 Post 副作用) 可再扩.
+
+### 主 lead cherry-pick 范围更新 (Phase 16)
+
+Phase 15 32 commit + Phase 16 (3 commit + 本 handoff) = **36 commit total** on main. cherry-pick 顺序:
+
+```
+... Phase 15 32 commit ...
+1bdc02c (C1) → 991aeee (C2) → 2738c65 (C3) → <P16-handoff hash>
+```
