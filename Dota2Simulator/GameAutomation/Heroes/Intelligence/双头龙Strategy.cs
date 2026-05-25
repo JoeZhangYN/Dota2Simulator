@@ -1,16 +1,15 @@
+// Phase 19D: 双头龙 Strategy 迁 HeroPlan — Q/W/R 3 CustomProbe (冰火交加/冰封路径/烈焰焚身 同质 1200ms 超时 + CD 检查) + D3 CustomProbe (吹风接冰封路径 物品组合).
 #if DOTA2
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Dota2Simulator.GameAutomation.Application;
+using Dota2Simulator.GameAutomation.Application.HeroPlans;
 using Dota2Simulator.GameAutomation.Domain.Actuation;
 using Dota2Simulator.GameAutomation.Domain.Heroes;
 using Dota2Simulator.GameAutomation.Domain.Loop;
 using Dota2Simulator.GameAutomation.Domain.Perception;
 using Dota2Simulator.Games;
 using Dota2Simulator.Games.Dota2;
-using Dota2Simulator.Vision;
-
-using Dota2Simulator.GameAutomation.Ports;
 
 namespace Dota2Simulator.GameAutomation.Heroes.Intelligence;
 
@@ -19,38 +18,18 @@ public sealed partial class 双头龙Strategy : IHeroStrategy
 {
     private const int 等待延迟 = 33;
 
+    private HeroPlan? _plan;
 
+    public void OnActivate(HeroContext ctx) => GetPlan().Apply(ctx, _skill);
 
-    public void OnActivate(HeroContext ctx)
-    {
-        _main._聚合.Conditions[ConditionSlotKey.C1].Probe ??= 冰火交加去后摇;
-        _main._聚合.Conditions[ConditionSlotKey.C2].Probe ??= 冰封路径去后摇;
-        _main._聚合.Conditions[ConditionSlotKey.C3].Probe ??= 烈焰焚身去后摇;
-        _main._聚合.Conditions[ConditionSlotKey.C4].Probe ??= 吹风接冰封路径;
-    }
+    public Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx) => GetPlan().DispatchAsync(trigger, ctx, _item);
 
-    public async Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)
-    {
-        VirtualKey key = trigger.Key;
-        await _item.根据按键判断技能释放前通用逻辑(new KeyEventArgs((Keys)key.ToNative())).ConfigureAwait(true);
-
-        if (key == VirtualKey.Q)
-        {
-            _main._聚合.Conditions[ConditionSlotKey.C1].Active = true;
-        }
-        else if (key == VirtualKey.W)
-        {
-            _main._聚合.Conditions[ConditionSlotKey.C2].Active = true;
-        }
-        else if (key == VirtualKey.R)
-        {
-            _main._聚合.Conditions[ConditionSlotKey.C3].Active = true;
-        }
-        else if (key == VirtualKey.From(Keys.D3))
-        {
-            _main._聚合.Conditions[ConditionSlotKey.C4].Active = true;
-        }
-    }
+    private HeroPlan GetPlan() => _plan ??= HeroPlanBuilder.New()
+        .OnKey(Keys.Q).CustomProbe(冰火交加去后摇)
+        .OnKey(Keys.W).CustomProbe(冰封路径去后摇)
+        .OnKey(Keys.R).CustomProbe(烈焰焚身去后摇)
+        .OnKey(Keys.D3).CustomProbe(吹风接冰封路径)
+        .Done();
 
     private async Task<bool> 冰火交加去后摇()
     {
@@ -60,7 +39,6 @@ public sealed partial class 双头龙Strategy : IHeroStrategy
             _input.MouseClick(MouseButton.Right);
         }
 
-        // 超时则切回 总体释放时间
         if (Common.获取当前时间毫秒() - _main._聚合.Skills.Time(SlotKey.Q) > 1200 && _main._聚合.Skills.Time(SlotKey.Q) != -1)
         {
             冰火交加后();
@@ -68,9 +46,7 @@ public sealed partial class 双头龙Strategy : IHeroStrategy
         }
 
         if (_skill.DOTA2判断技能是否CD(Keys.Q))
-        {
             return await Task.FromResult(true).ConfigureAwait(true);
-        }
 
         冰火交加后();
         return await Task.FromResult(false).ConfigureAwait(true);
@@ -84,7 +60,6 @@ public sealed partial class 双头龙Strategy : IHeroStrategy
             _input.MouseClick(MouseButton.Right);
         }
 
-        // 超时则切回 总体释放时间
         if (Common.获取当前时间毫秒() - _main._聚合.Skills.Time(SlotKey.W) > 1200 && _main._聚合.Skills.Time(SlotKey.W) != -1)
         {
             冰封路径后();
@@ -92,9 +67,7 @@ public sealed partial class 双头龙Strategy : IHeroStrategy
         }
 
         if (_skill.DOTA2判断技能是否CD(Keys.W))
-        {
             return await Task.FromResult(true).ConfigureAwait(true);
-        }
 
         冰封路径后();
         return await Task.FromResult(false).ConfigureAwait(true);
@@ -105,10 +78,8 @@ public sealed partial class 双头龙Strategy : IHeroStrategy
         void 烈焰焚身后()
         {
             _main._聚合.Skills.SetTime(SlotKey.R, -1);
-            // RightClick();
         }
 
-        // 超时则切回 总体释放时间
         if (Common.获取当前时间毫秒() - _main._聚合.Skills.Time(SlotKey.R) > 1200 && _main._聚合.Skills.Time(SlotKey.R) != -1)
         {
             烈焰焚身后();
@@ -116,9 +87,7 @@ public sealed partial class 双头龙Strategy : IHeroStrategy
         }
 
         if (_skill.DOTA2判断技能是否CD(Keys.R))
-        {
             return await Task.FromResult(true).ConfigureAwait(true);
-        }
 
         烈焰焚身后();
         return await Task.FromResult(false).ConfigureAwait(true);
