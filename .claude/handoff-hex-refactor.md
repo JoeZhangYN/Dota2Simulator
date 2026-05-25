@@ -22,6 +22,9 @@ C# .NET 10 WinForms 游戏自动化框架，重写为六边形架构。
 - [x] **Phase 10B 6 SOFT_FAIL 消除**—— 2026-05-23 完成（5 chunk，B1-B5；plan SSOT `~/.claude/plans/sturdy-bridging-rabin.md`）
 - [x] **Phase 10C Strategy SG 92 样板消除**—— 2026-05-23 完成（5 chunk，S1-S5；plan SSOT `~/.claude/plans/crystal-emitting-knuth.md`，净 -1479 LOC）
 - [x] **Phase 18 Vision 端口全收口 + 候选区域强制裁剪**—— 2026-05-25 完成（7 chunk，V1-V6d；plan SSOT `~/.claude/plans/precious-cuddling-lecun.md`）
+- [x] **Phase 19A SG Template 收口** —— 2026-05-25 完成（4 chunk，C1-C4；SG +_Tpl emit + 业务 14+1 处切 + ItemEngine 5 API + 116 调用方 + 删 IScreenVision Find/FindAll(ImageHandle) [Obsolete]; 净 -70 行 + 端口 6 → 4 方法纯 Template 语义）
+- [x] **Phase 19B 业务死代码清理** —— 2026-05-25 完成（1 commit; 剃刀/修补匠/紫猫/发条/冰女 5 dead Strategy 迁 HeroPlan NoProbe; 累计 57/92 = 62.0%; Phase 13 #6 业务死代码 epic 完全收尾 7/7）
+- [x] **Phase 19C 反向 Guard + RegisterProbe DSL 双扩** —— 2026-05-25 完成（1 commit; AggGuard +NotHasAghanim/NotHasShard + Builder.WhenNotHasX/RegisterProbe; 小精灵 + 飞机 应用重构; DSL 容量 19 → 21 维）
 
 ## Phase 18 已完成（main 分支连续 commit，每 chunk 0 build 错误）
 
@@ -1634,4 +1637,194 @@ Phase 16 36 commit + Phase 17 (1 commit + 本 handoff) = **38 commit total** on 
 ```
 ... Phase 16 36 commit ...
 e1f46f5 (C1) → <P17-handoff hash>
+```
+
+---
+
+## Phase 19A 完整收尾 (2026-05-25 续, 4 commit on main, SG Template 收口完成)
+
+epic 主题: **PictureManifestGenerator +_Tpl emit + IScreenVision 端口纯化 (删 2 个 [Obsolete] ImageHandle 重载)**.
+
+触发: 用户 2026-05-25 续 "Phase 19A · SG Template 收口". 实际范围超出 Phase 18 handoff 估的"1 处业务侧切换" — 业务侧 14+1 处 _vision.Find/FindAll(Dota2_Pictrue.X.Y) + ItemEngine 5 API + 116 调用方 + ItemEngine 内部 2 needle 数组 + 1 == 比较, 共 ~136 切换点.
+
+### Phase 19A commit 表
+
+| Chunk | hash | 主题 | 净行 |
+|---|---|---|---|
+| C1 | `1f4a33f` | sg-template-emit PictureManifestGenerator +_Tpl emit (132 平行属性) | +9 |
+| C2 | `6184f7f` | vision-direct-call-template-switch 14+1 处业务 _vision.Find/FindAll(_Tpl) + 删 14 pragma | -10 |
+| C3 | `5185f40` | itemengine-template-port ItemEngine 5 API + 116 调用方切 _Tpl + needle 数组 Template[] | -3 |
+| C4 | `e029481` | vision-port-deletion 删 IScreenVision Find/FindAll(ImageHandle) [Obsolete] 重载 + adapter 实现 | -66 |
+
+合计: **-70 业务行净** (含 IScreenVision 端口收口与 RustVisionAdapter / ProbeScreenVision 装饰器 ImageHandle 实现段全删).
+
+### Phase 19A IScreenVision 端口终态 (Phase 18 6 方法 → Phase 19A 4 方法)
+
+```cs
+public interface IScreenVision
+{
+    void Capture(CaptureMode mode);
+    Color PixelAt(ScreenPoint point);
+    FindResult Find(Template needle, ScreenRegion region, MatchRate rate, Tolerance tolerance);
+    IReadOnlyList<ScreenPoint> FindAll(Template needle, ScreenRegion region, MatchRate rate, Tolerance tolerance);
+}
+```
+
+端口 0 泄漏 Vision 内部类型 ImageHandle. 业务侧任意 _vision.Find/FindAll 全走 Template 主力路径; ImageHandle 仍存在但仅作 RustVisionAdapter 内部反查 (LazyImageLoader.GetImage(needle.Name)).
+
+### Phase 19A 关键不变量 (新增)
+
+1. **SG +_Tpl 平行属性 emit**: 每个 ImageHandle 属性配对生成 `public static Template X_Tpl => new Template("manifestKey")`. 132 条目全覆盖 (5 类: Buff / 命石 / Skill / 播报 / 物品 + Silt). Phase 10A 既有 33 文件 / 202 处 ImageHandle 调用方零改 ✅.
+2. **业务侧 0 _vision.Find(ImageHandle, ...) 直调**: 14 处 Strategy + 1 处 Silt FindAll + 1 处 DynamicSkillAutoSelector.cs:416 全切 _Tpl. ItemEngine 内部仍用 needle Template[] (Phase 19A C3 改造) → _vision.Find(Template).
+3. **ItemEngine 5 public API 形参收口**: `in ImageHandle 句柄` → `Template 句柄`. 116 调用方业务侧 Strategy 全切 _Tpl 后缀 (perl regex 批量替换).
+4. **DynamicSkillAutoSelector Dictionary 收口**: `Dictionary<string, ImageHandle>` → `Dictionary<string, Template>`. 5 处签名引用 + 29 AddImageHandle 调用 + 1 vision.Find 直调 全切. gameHandle 形参保留 ImageHandle (PaddleOCR.获取图片文字 当前屏幕帧, 与 needle 模板正交).
+5. **接口契约破坏自检 PASS**: 端口签名 net -2 (2 [Obsolete] 删) + 4 核心方法字面零改 + RustVisionAdapter / ProbeScreenVision 装饰器 ImageHandle 实现段全删. 调用方 0 编译错 (业务全切 Template) verify by build 0 错.
+
+### Phase 19A architecture-sentinel verdict (主 lead 自审)
+
+- **god-class / 万能型** PASS: SG 仅扩 EmitClass 加 _Tpl emit 一对 +Template using; IScreenVision 接口减 2 方法 (净收敛).
+- **anemic-domain** PASS: Template record struct + ImageHandle 内部反查 LazyImageLoader; 业务侧端口接 Template 不破坏值对象语义.
+- **shotgun-surgery** PASS: 4 chunk 分别聚焦 SG / Vision 直调 / ItemEngine API / 端口删除, 关注点拆分清晰. 每 chunk 单文件 / 单语义改动.
+- **leaky-abstraction** PASS: 端口纯化 — 不再泄漏 Vision 内部 ImageHandle 类型; Template 是 Domain.Perception 内值对象, 端口纯领域语义.
+- **temporal-coupling** PASS: SG _Tpl emit 在编译期 (与 ImageHandle 平行); Template / ImageHandle 都引用 manifestKey 字符串, 行为等价 (Template 经 LazyImageLoader.GetImage 反查 ImageHandle).
+
+**dogfood build verify**: dotnet build -c Debug 默认 (DOTA2;TRACE;Silt) 0 错 258 警告 (baseline 一致, 净 0 偏差).
+
+### Phase 19A handoff_notes (Phase 19+ 候选)
+
+1. **GPU adapter epic 前置已就绪**: Phase 18 候选区域强制裁剪 + Phase 19A 端口 Template 纯化 都完成. GpuFusedVisionAdapter (3-5 人日) 可直接实现 IScreenVision Template 路径, 内部用 DXGI ShaderResource + compute shader + 异步回读. 高优先 Phase 20+ 候选.
+2. **ImageHandle 类型保留**: Vision 内部 ImageHandle 仍存在 (RustVisionAdapter 内部 + GlobalScreenCapture frame + PaddleOCR API + ImageManager.SaveImage 调试 API + ItemEngine 内部 GetCurrentHandle + SkillEngine 内 GetColor frame + DynamicSkillAutoSelector gameHandle PaddleOCR 参数). 是 Vision BC 内部值对象, 不再泄漏到端口/业务侧.
+
+### Phase 19A 回滚锚点
+
+- 完整撤回 Phase 19A: `git revert e029481 5185f40 6184f7f 1f4a33f` (4 commit 倒序)
+- 单 chunk revert: C2 / C3 互相独立可单独 revert; C4 依赖 C2+C3 (业务/ItemEngine 已 0 ImageHandle 调用) — 撤 C4 前先 revert C2+C3
+- C1 SG 改造可独立撤 (非破坏 _Tpl 属性 emit 旁路)
+
+---
+
+## Phase 19B 完整收尾 (2026-05-25 续, 1 commit on main, 业务死代码清理)
+
+epic 主题: **5 个 OnActivate Probe 全死代码英雄迁 HeroPlan NoProbe 占槽形态**.
+
+触发: 用户 2026-05-25 mandate "完成所有剩余 handoff 待办". Phase 13 #6 / Phase 16 #5 / Phase 17 #1 累计标记业务死代码 epic 收口.
+
+### Phase 19B commit 表
+
+| Chunk | hash | 主题 | 净行 | 新增英雄 |
+|---|---|---|---|---|
+| C1 | `63f1e44` | dead-probe-cleanup-5-heroes 5 dead Strategy 迁 HeroPlan NoProbe 形态 | -84 | 剃刀 / 修补匠 / 紫猫 / 发条 / 冰女 |
+
+合计: **-84 业务行净**, 5 英雄新迁 HeroPlan DSL (累计 52 + 5 = 57 / 92 = 62.0%).
+
+### Phase 19B 形态分布
+
+| 英雄 | OnActivate 形态 | 迁后 HeroPlan |
+|---|---|---|
+| 剃刀 | Probe 全注释 + Q/E/R Active=true 死设 | NoProbe ×3 (Q/E/R) |
+| 修补匠 | OnActivate 空 + Q/E/R Active=true 死设 | NoProbe ×3 (Q/E/R) |
+| 紫猫 | Probe 注释 + Q/W/D/R Active=true 死设 | NoProbe ×4 (Q/W/D/R) |
+| 发条 | Probe 全注释 + W 内 _input.Press(A) 保 | NoProbe ×3 + W 加 Pre(_input.Press(A)) |
+| 冰女 | OnActivate / OnKeyAsync 完全空 | HeroPlanBuilder.New().Done() 0 clause / 0 setup 空 plan |
+
+形态与 Phase 12-17 已迁 52 个英雄统一 (1 行 OnActivate / 1 行 OnKeyAsync).
+
+### Phase 19B 业务死代码 epic 状态
+
+| Phase 13 #6 标记英雄 | 状态 |
+|---|---|
+| 剃刀 | ✅ Phase 19B 已清 |
+| 修补匠 | ✅ Phase 19B 已清 |
+| 紫猫 | ✅ Phase 19B 已清 |
+| 发条 | ✅ Phase 19B 已清 |
+| 钢背 | ✅ Phase 16 C1a 已迁 (4 死 Probe 保留 NoProbe 占槽) |
+| 冰女 | ✅ Phase 19B 已清 |
+| 大圣 | ✅ Phase 17 已迁 (Q/E/R + D3 ToggleConditionSlot + RegisterProbe Phase 19C 进一步重构) |
+
+Phase 13 业务死代码 epic 完全收尾 (7/7).
+
+### Phase 19B 关键不变量
+
+1. **NoProbe sentinel 占槽语义**: SkillKey == Keys.None 时 HeroPlan.Apply 跳过 Probe 注册, 仅占 ConditionSlotKey.C{i+1} 顺序索引. 业务按 Q/W/E/R 触发设 Active=true 但无 Probe 跑 → 与原 OnKeyAsync 内 死代码 Active=true 设置语义完全等价 (静默 dead state).
+2. **空 plan 形态**: 冰女用 `HeroPlanBuilder.New().Done()` 终结 0 clause / 0 setup, Apply / DispatchAsync 全 no-op, 与原 OnActivate / OnKeyAsync 完全空一致.
+3. **发条 PreAction 保**: W 内 `_input.Press(A)` 回收行为是真实业务 (非死代码), 用 .Pre(() => _input.Press(VirtualKey.From(Keys.A))) 保留.
+
+### Phase 19B 回滚锚点
+
+- 完整撤回: `git revert 63f1e44` (1 commit)
+- 业务行为等价 (NoProbe / 空 plan 与原死代码一致), 回归风险极低
+
+---
+
+## Phase 19C 完整收尾 (2026-05-25 续, 1 commit on main, DSL 扩 21 维 + 2 英雄重构)
+
+epic 主题: **反向 Guard DSL (WhenNotHasShard/Aghanim) + RegisterProbe DSL 标准化** (Phase 17 handoff_notes #1 + #4).
+
+触发: 用户 2026-05-25 mandate. Phase 17 标"反向 Guard 单英雄低 ROI" → 与 RegisterProbe 同 chunk 扩, ROI 集中.
+
+### Phase 19C commit 表
+
+| Chunk | hash | 主题 | 净行 |
+|---|---|---|---|
+| C1 | `bc1572d` | dsl-extension-reverse-guard-register-probe 2 DSL 扩 + 2 英雄重构 | +37 |
+
+合计: **+37 净** (DSL 基础设施 +49 / 2 英雄 -12 重构).
+
+### Phase 19C DSL 容量更新 (Phase 17 19 维 → 21 维)
+
+| 维度 | 选项 | 替换源 | 新增于 |
+|---|---|---|---|
+| **WhenNotHasAghanim** | () 反向 Guard | Execute lambda hard-code `if (!HasAghanim)` (小精灵 W) | **Phase 19C** |
+| **WhenNotHasShard** | () 反向 Guard | (未实证, 与 WhenNotHasAghanim 对称设计) | **Phase 19C** |
+| **RegisterProbe** | (ConditionSlotKey, ConditionDelegateBitmap) 不占 clause 顺序直接注册 Probe 到指定 slot | OnActivate 手动 `_main._聚合.Conditions[Cn].Probe ??= helper` / Phase 17 OnKey(Keys.None).CustomProbe(...) placeholder hack | **Phase 19C** |
+
+### Phase 19C 重构应用 (2 英雄)
+
+| 英雄 | Phase 17 形态 | Phase 19C 重构 |
+|---|---|---|
+| 小精灵 | W Execute lambda 内 if (!HasAghanim) hard-code; OnActivate 手动注册 C2/C3 Probe | .OnKey(W).WhenNotHasAghanim().Execute(...) setup level + RegisterProbe(C2/C3, ...) |
+| 飞机 | OnActivate 手动注册 C5 Probe | RegisterProbe(C5, 循环火箭弹幕) |
+
+### Phase 19C 关键不变量 (新增)
+
+1. **AggGuard 5 元闭包**: None / HasAghanim / HasShard / NotHasAghanim / NotHasShard. CheckGuard switch 全覆盖. 业务侧 0 反向 Guard hard-code.
+2. **RegisterProbe 与 clause 顺序解耦**: clause 占 C1..C9 顺序索引, RegisterProbe 显式指定 slot, 互相独立. HeroPlan.Apply 内 foreach _registeredProbes 注册 (与 clause Probe 注册同一 ??= 幂等模板).
+3. **Phase 17 placeholder hack 替代路径就绪**: `.OnKey(Keys.None).CustomProbe(...)` placeholder 形态可全切 `.RegisterProbe(slot, probe)`. 后续 Phase 19D+ 重构大圣/莱恩 等英雄可用此路径.
+
+### Phase 19C handoff_notes (Phase 19D+ 候选)
+
+1. **大圣/莱恩/卡尔 等 Phase 17 placeholder hack 可重构**: 现有 `.OnKey(Keys.None).CustomProbe(...)` 形态可用 RegisterProbe DSL 重写, 净 -N 行. 低优先维护性收口.
+2. **WhenNotHasShard 未实证**: 当前业务侧无英雄需此反向 Guard. 设计对称保留, 实际形态发现时启用.
+3. **CustomProbe lambda 跨 clause 副作用 (handoff_notes Phase 16 #6)**: 持续存在的低 ROI 议题, 屠夫钩子去僵直 Probe 内 `if (Mode==1) Conditions[C3].Active=true` 跨 clause. Phase 19D+ 候选评估是否扩 DSL.
+
+### Phase 19C 回滚锚点
+
+- 完整撤回: `git revert bc1572d` (1 commit, DSL 扩 + 2 英雄重构同 commit, 同步回 Phase 17 形态)
+
+---
+
+## Phase 19 累计状态 (A + B + C, 6 commit on main)
+
+**已迁 HeroPlan**: 57 / 92 (62.0%) [Phase 12: 14 + Phase 13: 8 + Phase 14: 6 + Phase 15: 5 + Phase 16: 15 + Phase 17: 4 + Phase 19B: 5 = 57]
+
+**DSL 容量**: 21 维 (Phase 16 18 + Phase 17 +1 ToggleConditionSlot + Phase 19C +2 WhenNotHasX / RegisterProbe)
+
+**Vision 端口形态**: 4 核心方法纯 Template 语义 (Capture / PixelAt / Find / FindAll), 0 ImageHandle 端口泄漏
+
+**dotnet build verify**: 0 错 ~260 警告 (baseline 一致)
+
+### Phase 19 后续 (D+E+F 持续推进)
+
+- **Phase 19D**: 继续迁剩余 35 未迁英雄 (扣减 Phase 19B 5 个), 多为复杂状态机 / 物品组合 / 多步骤宏 / 跨 clause 副作用 — 评估 DSL 扩 vs CustomProbe escape-hatch
+- **Phase 19E**: LOL/HF2 装配链统一 (Phase 11 handoff_notes #3) + Silt 内嵌死代码清理 (Phase 11 handoff_notes #2)
+- **Phase 19F**: 运维残留清理 (2 worktree + draft lesson + 未跟踪 .claude/ 新文件)
+
+### 主 lead cherry-pick 范围更新 (Phase 19A+B+C)
+
+Phase 17 38 commit + Phase 19 (6 commit + 本 handoff) = **45 commit total** on main. cherry-pick 顺序:
+
+```
+... Phase 17 38 commit ...
+1f4a33f (19A-C1) → 6184f7f (19A-C2) → 5185f40 (19A-C3) → e029481 (19A-C4) →
+63f1e44 (19B) → bc1572d (19C) → <P19-handoff hash>
 ```
