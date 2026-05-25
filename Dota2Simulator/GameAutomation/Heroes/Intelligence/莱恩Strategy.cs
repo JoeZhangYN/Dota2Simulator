@@ -1,15 +1,15 @@
+// Phase 17: 莱恩 Strategy 迁 HeroPlan — W CustomProbe (莱恩羊接技能 + 局部函数 莱恩羊后 读 C6 接 E/A), R PreAsync (大招前纷争 物品序列) + CustomProbe (死亡一指去后摇), D2/D3 CustomProbe (推推破林肯秒羊 / 羊刺刷新秒人 Step 状态机), D4/D5 ToggleConditionSlot(C5/C6), S Execute (Session.IsPaused=true 暂停). E 键空 case 删除.
 #if DOTA2
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Dota2Simulator.GameAutomation.Application;
+using Dota2Simulator.GameAutomation.Application.HeroPlans;
 using Dota2Simulator.GameAutomation.Domain.Actuation;
 using Dota2Simulator.GameAutomation.Domain.Heroes;
 using Dota2Simulator.GameAutomation.Domain.Loop;
 using Dota2Simulator.Games;
 using Dota2Simulator.Games.Dota2;
 using Dota2Simulator.Vision;
-
-using Dota2Simulator.GameAutomation.Ports;
 
 namespace Dota2Simulator.GameAutomation.Heroes.Intelligence;
 
@@ -18,64 +18,22 @@ public sealed partial class 莱恩Strategy : IHeroStrategy
 {
     private const int 等待延迟 = 33;
 
+    private HeroPlan? _plan;
 
+    public void OnActivate(HeroContext ctx) => GetPlan().Apply(ctx, _skill);
 
-    public void OnActivate(HeroContext ctx)
-    {
-        _main._聚合.Conditions[ConditionSlotKey.C1].Probe ??= 莱恩羊接技能;
-        _main._聚合.Conditions[ConditionSlotKey.C2].Probe ??= 死亡一指去后摇;
-        _main._聚合.Conditions[ConditionSlotKey.C3].Probe ??= 推推破林肯秒羊;
-        _main._聚合.Conditions[ConditionSlotKey.C4].Probe ??= 羊刺刷新秒人;
-    }
+    public Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx) => GetPlan().DispatchAsync(trigger, ctx, _item);
 
-    public async Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)
-    {
-        VirtualKey key = trigger.Key;
-        if (key == VirtualKey.W)
-        {
-            _main._聚合.Conditions[ConditionSlotKey.C1].Active = true;
-        }
-        else if (key == VirtualKey.R)
-        {
-            await 大招前纷争(GlobalScreenCapture.GetCurrentHandle()).ConfigureAwait(true);
-            _main._聚合.Conditions[ConditionSlotKey.C2].Active = true;
-        }
-        else if (key == VirtualKey.E)
-        {
-        }
-        else if (key == VirtualKey.From(Keys.D2))
-        {
-            _main._聚合.Conditions[ConditionSlotKey.C3].Active = true;
-        }
-        else if (key == VirtualKey.From(Keys.S))
-        {
-            _main.Session!.IsPaused = true;
-        }
-        else if (key == VirtualKey.From(Keys.D3))
-        {
-            _main._聚合.Conditions[ConditionSlotKey.C4].Active = true;
-        }
-        else if (key == VirtualKey.From(Keys.D4) && !_main._聚合.Conditions[ConditionSlotKey.C5].Active)
-        {
-            _main._聚合.Conditions[ConditionSlotKey.C5].Active = true;
-            TTS.TTS.Speak("开启刷新秒人");
-        }
-        else if (key == VirtualKey.From(Keys.D4))
-        {
-            _main._聚合.Conditions[ConditionSlotKey.C5].Active = false;
-            TTS.TTS.Speak("关闭刷新秒人");
-        }
-        else if (key == VirtualKey.From(Keys.D5) && !_main._聚合.Conditions[ConditionSlotKey.C6].Active)
-        {
-            _main._聚合.Conditions[ConditionSlotKey.C6].Active = true;
-            TTS.TTS.Speak("开启羊接吸");
-        }
-        else if (key == VirtualKey.From(Keys.D5))
-        {
-            _main._聚合.Conditions[ConditionSlotKey.C6].Active = false;
-            TTS.TTS.Speak("开启羊接A");
-        }
-    }
+    private HeroPlan GetPlan() => _plan ??= HeroPlanBuilder.New()
+        .OnKey(Keys.W).CustomProbe(async _h => await 莱恩羊接技能(_h).ConfigureAwait(true))
+        .OnKey(Keys.R).PreAsync(async () => await 大招前纷争(GlobalScreenCapture.GetCurrentHandle()).ConfigureAwait(true))
+            .CustomProbe(async _h => await 死亡一指去后摇(_h).ConfigureAwait(true))
+        .OnKey(Keys.D2).CustomProbe(async _h => await 推推破林肯秒羊(_h).ConfigureAwait(true))
+        .OnKey(Keys.D3).CustomProbe(async _h => await 羊刺刷新秒人(_h).ConfigureAwait(true))
+        .OnKey(Keys.D4).ToggleConditionSlot(ConditionSlotKey.C5, "开启刷新秒人", "关闭刷新秒人")
+        .OnKey(Keys.D5).ToggleConditionSlot(ConditionSlotKey.C6, "开启羊接吸", "开启羊接A")
+        .OnKey(Keys.S).Execute(() => _main.Session!.IsPaused = true)
+        .Done();
 
     private async Task<bool> 莱恩羊接技能(ImageHandle 句柄)
     {
@@ -102,18 +60,11 @@ public sealed partial class 莱恩Strategy : IHeroStrategy
 
     private async Task<bool> 死亡一指去后摇(ImageHandle 句柄)
     {
-        void 死亡一指后()
-        {
-            //RightClick();
-            _input.Press(VirtualKey.From(Keys.A));
-        }
-
         if (_skill.DOTA2判断技能是否CD(Keys.R, in 句柄))
         {
             return await Task.FromResult(true).ConfigureAwait(true);
         }
-
-        死亡一指后();
+        _input.Press(VirtualKey.From(Keys.A));
         return await Task.FromResult(false).ConfigureAwait(true);
     }
 
@@ -138,7 +89,6 @@ public sealed partial class 莱恩Strategy : IHeroStrategy
             Common.Delay(等待延迟);
             return await Task.FromResult(true).ConfigureAwait(true);
         }
-
         _input.Press(VirtualKey.From(Keys.W));
         return await Task.FromResult(false).ConfigureAwait(true);
     }
@@ -149,23 +99,14 @@ public sealed partial class 莱恩Strategy : IHeroStrategy
 
         if (步骤 == 1)
         {
-            if (_item.根据图片使用物品(Dota2_Pictrue.物品.奥术鞋) == 1)
-            {
-                return await Task.FromResult(true).ConfigureAwait(true);
-            }
-
-            if (_item.根据图片使用物品(Dota2_Pictrue.物品.魂戒) == 1)
-            {
-                return await Task.FromResult(true).ConfigureAwait(true);
-            }
-
+            if (_item.根据图片使用物品(Dota2_Pictrue.物品.奥术鞋) == 1) return await Task.FromResult(true).ConfigureAwait(true);
+            if (_item.根据图片使用物品(Dota2_Pictrue.物品.魂戒) == 1) return await Task.FromResult(true).ConfigureAwait(true);
             if (_skill.DOTA2判断技能是否CD(Keys.Q, in 句柄))
             {
                 _input.Press(VirtualKey.From(Keys.Q));
                 Common.Delay(60);
                 return await Task.FromResult(true).ConfigureAwait(true);
             }
-
             if (_skill.DOTA2判断技能是否CD(Keys.R, in 句柄))
             {
                 _input.Press(VirtualKey.From(Keys.R));
@@ -175,47 +116,28 @@ public sealed partial class 莱恩Strategy : IHeroStrategy
         }
         else if (步骤 == 0)
         {
-            if (_item.根据图片使用物品(Dota2_Pictrue.物品.跳刀) == 1)
-            {
-                return await Task.FromResult(true).ConfigureAwait(true);
-            }
-
-            if (_item.根据图片使用物品(Dota2_Pictrue.物品.跳刀_智力跳刀) == 1)
-            {
-                return await Task.FromResult(true).ConfigureAwait(true);
-            }
-
+            if (_item.根据图片使用物品(Dota2_Pictrue.物品.跳刀) == 1) return await Task.FromResult(true).ConfigureAwait(true);
+            if (_item.根据图片使用物品(Dota2_Pictrue.物品.跳刀_智力跳刀) == 1) return await Task.FromResult(true).ConfigureAwait(true);
             if (_skill.DOTA2判断技能是否CD(Keys.W, in 句柄))
             {
                 _input.Press(VirtualKey.From(Keys.W));
                 Common.Delay(等待延迟);
                 return await Task.FromResult(true).ConfigureAwait(true);
             }
-
             if (_skill.DOTA2判断技能是否CD(Keys.Q, in 句柄))
             {
                 _input.Press(VirtualKey.From(Keys.Q));
                 Common.Delay(60);
                 return await Task.FromResult(true).ConfigureAwait(true);
             }
-
-            if (_item.根据图片使用物品(Dota2_Pictrue.物品.奥术鞋) == 1)
-            {
-                return await Task.FromResult(true).ConfigureAwait(true);
-            }
-
-            if (_item.根据图片使用物品(Dota2_Pictrue.物品.魂戒) == 1)
-            {
-                return await Task.FromResult(true).ConfigureAwait(true);
-            }
-
+            if (_item.根据图片使用物品(Dota2_Pictrue.物品.奥术鞋) == 1) return await Task.FromResult(true).ConfigureAwait(true);
+            if (_item.根据图片使用物品(Dota2_Pictrue.物品.魂戒) == 1) return await Task.FromResult(true).ConfigureAwait(true);
             if (_skill.DOTA2判断技能是否CD(Keys.R, in 句柄))
             {
                 _input.Press(VirtualKey.From(Keys.R));
                 Common.Delay(60);
                 return await Task.FromResult(true).ConfigureAwait(true);
             }
-
             if (_main._聚合.Conditions[ConditionSlotKey.C5].Active && _item.根据图片使用物品(Dota2_Pictrue.物品.刷新球) == 1)
             {
                 _main._聚合.Skills.SetStep(SlotKey.Global, 1);

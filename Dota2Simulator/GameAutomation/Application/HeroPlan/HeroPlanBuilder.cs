@@ -220,6 +220,33 @@ public sealed class HeroPlanBuilder
     }
 
     /// <summary>
+    /// Phase 17: 异型 ToggleSlot — trigger key (通常 D2/D3/D4/D5) toggle 指定 ConditionSlot.Active + TTS 播报.
+    /// 与 Phase 13 <see cref="ToggleSlot(Keys, string, string)"/> 不同 — 那是占 clause 槽 + 注册 Probe 自循环;
+    /// 这是 setup 形态, 不占 clause 槽, toggle 已存在的别的 ConditionSlot (e.g. D3 → C4 toggle, C4 由别的 CustomProbe 占).
+    /// 例: <c>.OnKey(D3).ToggleConditionSlot(ConditionSlotKey.C4, "开启循环查克拉", "关闭循环查克拉")</c> (光法).
+    /// 莱恩 D4/D5 单方向 toggle 形态也用此 (toggle 后 TTS 不同方向标签).
+    /// </summary>
+    public HeroPlanBuilder ToggleConditionSlot(ConditionSlotKey slot, string speakOn, string speakOff)
+    {
+        if (_pendingTrigger is null)
+        {
+            throw new InvalidOperationException("ToggleConditionSlot: 需先调 OnKey (不支持 OnEveryKey 形态).");
+        }
+        _setups.Add(new SetupAction(
+            TriggerKey: Domain.Actuation.VirtualKey.From(_pendingTrigger.Value),
+            Guard: _pendingGuard,
+            Kind: SetupActionKind.ToggleConditionSlot,
+            ParamKey: Keys.None,
+            ParamBool: false,
+            ParamConditionSlot: slot,
+            ParamStringOn: speakOn,
+            ParamStringOff: speakOff,
+            Modifiers: _pendingModifiers));
+        ResetPending();
+        return this;
+    }
+
+    /// <summary>
     /// Phase 16 C1b: 动态 ParamBool 版 AdjustLegSwap — 第二参为 ctx 谓词, 每次派发时调用求值.
     /// 用于火枪 OnEveryKey + 动态 HasShard 第二参形态: <c>.OnEveryKey().AdjustLegSwapDynamic(D, ctx => ctx.Aggregate.HasShard)</c>.
     /// </summary>

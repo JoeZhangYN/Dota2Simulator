@@ -71,7 +71,10 @@ public readonly record struct SetupAction(
     Action? CustomAction = null,
     Func<HeroContext, bool>? ParamBoolProvider = null,
     bool IsOnEveryKey = false,
-    KeyModifiers Modifiers = KeyModifiers.None);
+    KeyModifiers Modifiers = KeyModifiers.None,
+    ConditionSlotKey ParamConditionSlot = ConditionSlotKey.C1,
+    string? ParamStringOn = null,
+    string? ParamStringOff = null);
 
 /// <summary>SetupAction 副作用种类.</summary>
 public enum SetupActionKind
@@ -80,6 +83,8 @@ public enum SetupActionKind
     AdjustLegSwap,
     /// <summary>调 <see cref="SetupAction.CustomAction"/> lambda — 任意副作用 (不挂 ConditionSlot).</summary>
     ExecuteAction,
+    /// <summary>Phase 17: trigger key (通常 D2/D3/D4/D5 数字键) toggle 指定 ConditionSlot.Active + TTS 播报. 与 clause IsToggle 不同 — 这是 setup 形态, 不占 clause 槽, toggle 别的 ConditionSlot (e.g. D3 → C4 Active toggle).</summary>
+    ToggleConditionSlot,
 }
 
 /// <summary>
@@ -212,6 +217,14 @@ public sealed class HeroPlan
                         break;
                     case SetupActionKind.ExecuteAction:
                         setup.CustomAction?.Invoke();
+                        break;
+                    case SetupActionKind.ToggleConditionSlot:
+                        bool newActive = !ctx.Aggregate.Conditions[setup.ParamConditionSlot].Active;
+                        ctx.Aggregate.Conditions[setup.ParamConditionSlot].Active = newActive;
+                        if (setup.ParamStringOn is not null && setup.ParamStringOff is not null)
+                        {
+                            Dota2Simulator.TTS.TTS.Speak(newActive ? setup.ParamStringOn : setup.ParamStringOff);
+                        }
                         break;
                 }
             }

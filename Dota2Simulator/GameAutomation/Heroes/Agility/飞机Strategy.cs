@@ -1,7 +1,9 @@
+// Phase 17: 飞机 Strategy 迁 HeroPlan — D3 ToggleConditionSlot(C5, 循环弹幕/关闭弹幕). 其他 Q/W/E/R 注释死代码, OnActivate 保留 C5 Probe (循环火箭弹幕) ??= 注册.
 #if DOTA2
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Dota2Simulator.GameAutomation.Application;
+using Dota2Simulator.GameAutomation.Application.HeroPlans;
 using Dota2Simulator.GameAutomation.Domain.Actuation;
 using Dota2Simulator.GameAutomation.Domain.Heroes;
 using Dota2Simulator.GameAutomation.Domain.Loop;
@@ -9,72 +11,25 @@ using Dota2Simulator.Games;
 using Dota2Simulator.Games.Dota2;
 using Dota2Simulator.Vision;
 
-using Dota2Simulator.GameAutomation.Ports;
-
 namespace Dota2Simulator.GameAutomation.Heroes.Agility;
 
-/// <summary>飞机（敏捷）策略——迁移自 _main.根据当前英雄增强 的 case "飞机"。</summary>
 [HeroStrategy("飞机", HeroAttribute.Agility)]
 public sealed partial class 飞机Strategy : IHeroStrategy
 {
-
+    private HeroPlan? _plan;
 
     public void OnActivate(HeroContext ctx)
     {
-        //_聚合.Conditions[ConditionSlotKey.C1].Probe ??= 火箭弹幕敏捷;
-        //_聚合.Conditions[ConditionSlotKey.C2].Probe ??= 追踪导弹敏捷;
-        //_聚合.Conditions[ConditionSlotKey.C3].Probe ??= 高射火炮敏捷;
-        //_聚合.Conditions[ConditionSlotKey.C4].Probe ??= 召唤飞弹敏捷;
+        GetPlan().Apply(ctx, _skill);
+        // C5 Probe 单独注册 (DSL plan 只承载 D3 ToggleConditionSlot setup, 不占 clause 槽)
         _main._聚合.Conditions[ConditionSlotKey.C5].Probe ??= 循环火箭弹幕;
     }
 
-    public async Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)
-    {
-        VirtualKey key = trigger.Key;
-        await _item.根据按键判断技能释放前通用逻辑(new KeyEventArgs((Keys)key.ToNative())).ConfigureAwait(true);
+    public Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx) => GetPlan().DispatchAsync(trigger, ctx, _item);
 
-        //if (key == VirtualKey.Q)
-        //{
-        //    _main._聚合.Conditions[ConditionSlotKey.C1].Active = true;
-        //}
-        //else if (key == VirtualKey.W)
-        //{
-        //    _main._聚合.Conditions[ConditionSlotKey.C2].Active = true;
-        //}
-        //else if (key == VirtualKey.E)
-        //{
-        //    _main._聚合.Conditions[ConditionSlotKey.C3].Active = true;
-        //}
-        //else if (key == VirtualKey.R)
-        //{
-        //    _main._聚合.Conditions[ConditionSlotKey.C4].Active = true;
-        //}
-        if (key == VirtualKey.From(Keys.D3))
-        {
-            _main._聚合.Conditions[ConditionSlotKey.C5].Active = !_main._聚合.Conditions[ConditionSlotKey.C5].Active;
-            Dota2Simulator.TTS.TTS.Speak(_main._聚合.Conditions[ConditionSlotKey.C5].Active ? "循环弹幕" : "关闭弹幕");
-        }
-    }
-
-    private async Task<bool> 火箭弹幕敏捷(ImageHandle 句柄)
-    {
-        return await _skill.技能通用判断(Keys.Q, 0).ConfigureAwait(true);
-    }
-
-    private async Task<bool> 追踪导弹敏捷(ImageHandle 句柄)
-    {
-        return await _skill.技能通用判断(Keys.W, 0).ConfigureAwait(true);
-    }
-
-    private async Task<bool> 高射火炮敏捷(ImageHandle 句柄)
-    {
-        return await _skill.技能通用判断(Keys.E, 0).ConfigureAwait(true);
-    }
-
-    private async Task<bool> 召唤飞弹敏捷(ImageHandle 句柄)
-    {
-        return await _skill.技能通用判断(Keys.R, 1).ConfigureAwait(true);
-    }
+    private HeroPlan GetPlan() => _plan ??= HeroPlanBuilder.New()
+        .OnKey(Keys.D3).ToggleConditionSlot(ConditionSlotKey.C5, "循环弹幕", "关闭弹幕")
+        .Done();
 
     private async Task<bool> 循环火箭弹幕(ImageHandle 句柄)
     {

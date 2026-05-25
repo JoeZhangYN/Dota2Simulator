@@ -58,11 +58,7 @@ public sealed partial class 光法Strategy : IHeroStrategy
         })
         .OnKey(Keys.D).CastSkill(Keys.W).AfterCast()
         .OnKey(Keys.F).CastSkill(Keys.F).AfterCast()
-        .OnKey(Keys.D2).Execute(() =>
-        {
-            _main._聚合.Conditions[ConditionSlotKey.C4].Active = !_main._聚合.Conditions[ConditionSlotKey.C4].Active;
-            Dota2Simulator.TTS.TTS.Speak(_main._聚合.Conditions[ConditionSlotKey.C4].Active ? "开启循环查克拉" : "关闭循环查克拉");
-        })
+        .OnKey(Keys.D2).ToggleConditionSlot(ConditionSlotKey.C4, "开启循环查克拉", "关闭循环查克拉")
         .Done();
 }
 #endif
