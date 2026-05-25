@@ -1,48 +1,26 @@
+// Phase 19B: 剃刀 业务死代码清理 — Probe 全注释 + 仅 Active=true 设置 (无 Probe 跑) ⇒ 迁 HeroPlan NoProbe 占槽形态.
 #if DOTA2
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Dota2Simulator.GameAutomation.Application;
+using Dota2Simulator.GameAutomation.Application.HeroPlans;
 using Dota2Simulator.GameAutomation.Domain.Actuation;
 using Dota2Simulator.GameAutomation.Domain.Heroes;
-using Dota2Simulator.Games.Dota2;
-
-using Dota2Simulator.GameAutomation.Ports;
 
 namespace Dota2Simulator.GameAutomation.Heroes.Agility;
 
-/// <summary>剃刀（敏捷）策略——迁移自 _main.根据当前英雄增强 的 case "剃刀"。</summary>
+/// <summary>剃刀（敏捷）策略——Phase 12+ 横向扫荡未迁的形态不 fit 英雄, Phase 19B 用 NoProbe 占槽统一形态.</summary>
 [HeroStrategy("剃刀", HeroAttribute.Agility)]
 public sealed partial class 剃刀Strategy : IHeroStrategy
 {
+    private static readonly HeroPlan _plan = HeroPlanBuilder.New()
+        .OnKey(Keys.Q).NoProbe()
+        .OnKey(Keys.E).NoProbe()
+        .OnKey(Keys.R).NoProbe()
+        .Done();
 
+    public void OnActivate(HeroContext ctx) => _plan.Apply(ctx, _skill);
 
-    public void OnActivate(HeroContext ctx)
-    {
-        //_聚合.Conditions[ConditionSlotKey.C1].Probe ??= 棒击大地去后摇;
-        //_聚合.Conditions[ConditionSlotKey.C2].Probe ??= 乾坤之跃敏捷;
-        //_聚合.Conditions[ConditionSlotKey.C3].Probe ??= 猴子猴孙敏捷;
-        //_聚合.Conditions[ConditionSlotKey.C4].Probe ??= 大圣无限跳跃;
-        //_main._聚合.LegSwap.配置.修改配置(Keys.Q, false);
-        //_main._聚合.LegSwap.配置.修改配置(Keys.W, false);
-    }
-
-    public async Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)
-    {
-        VirtualKey key = trigger.Key;
-        await _item.根据按键判断技能释放前通用逻辑(new KeyEventArgs((Keys)key.ToNative())).ConfigureAwait(true);
-
-        if (key == VirtualKey.Q)
-        {
-            _main._聚合.Conditions[ConditionSlotKey.C1].Active = true;
-        }
-        else if (key == VirtualKey.E)
-        {
-            _main._聚合.Conditions[ConditionSlotKey.C2].Active = true;
-        }
-        else if (key == VirtualKey.R)
-        {
-            _main._聚合.Conditions[ConditionSlotKey.C3].Active = true;
-        }
-    }
+    public Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx) => _plan.DispatchAsync(trigger, ctx, _item);
 }
 #endif

@@ -1,46 +1,26 @@
+// Phase 19B: 发条 业务死代码清理 — Probe 全注释 + W 键 PreAction (_input.Press(A) 后置 Active) ⇒ 迁 HeroPlan NoProbe + Pre 形态.
 #if DOTA2
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Dota2Simulator.GameAutomation.Application;
+using Dota2Simulator.GameAutomation.Application.HeroPlans;
 using Dota2Simulator.GameAutomation.Domain.Actuation;
 using Dota2Simulator.GameAutomation.Domain.Heroes;
-using Dota2Simulator.Games.Dota2;
-using Dota2Simulator.GameAutomation.Ports;
 
 namespace Dota2Simulator.GameAutomation.Heroes.Strength;
 
 [HeroStrategy("发条", HeroAttribute.Strength)]
 public sealed partial class 发条Strategy : IHeroStrategy
 {
+    private HeroPlan? _plan;
+    private HeroPlan GetPlan() => _plan ??= HeroPlanBuilder.New()
+        .OnKey(Keys.Q).NoProbe()
+        .OnKey(Keys.W).Pre(() => _input.Press(VirtualKey.From(Keys.A))).NoProbe()  // 回收时按 W 先 Press A
+        .OnKey(Keys.R).NoProbe()
+        .Done();
 
+    public void OnActivate(HeroContext ctx) => GetPlan().Apply(ctx, _skill);
 
-    public void OnActivate(HeroContext ctx)
-    {
-        //_main._聚合.Conditions[ConditionSlotKey.C1].Probe ??= 回音践踏去后摇;
-        //_main._聚合.Conditions[ConditionSlotKey.C2].Probe ??= 灵体游魂去后摇;
-        //_main._聚合.Conditions[ConditionSlotKey.C3].Probe ??= 裂地沟壑去后摇;
-        //_main._聚合.LegSwap.配置.修改配置(Keys.E, false);
-    }
-
-    public async Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)
-    {
-        VirtualKey key = trigger.Key;
-        await _item.根据按键判断技能释放前通用逻辑(new KeyEventArgs((Keys)key.ToNative())).ConfigureAwait(true);
-
-        if (key == VirtualKey.Q)
-        {
-            _main._聚合.Conditions[ConditionSlotKey.C1].Active = true;
-        }
-        else if (key == VirtualKey.W)
-        {
-            // 用于回收时按W
-            _input.Press(VirtualKey.From(Keys.A));
-            _main._聚合.Conditions[ConditionSlotKey.C2].Active = true;
-        }
-        else if (key == VirtualKey.R)
-        {
-            _main._聚合.Conditions[ConditionSlotKey.C3].Active = true;
-        }
-    }
+    public Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx) => GetPlan().DispatchAsync(trigger, ctx, _item);
 }
 #endif
