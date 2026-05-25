@@ -33,6 +33,9 @@ public sealed class HeroPlanBuilder
     // Phase 16 C2: KeyModifier 匹配 — OnKey(Keys, KeyModifiers) overload 写入此字段, 终结时注入 clause/setup.
     private Domain.Actuation.KeyModifiers _pendingModifiers = Domain.Actuation.KeyModifiers.None;
     private Domain.Actuation.KeyModifiers _lastClauseModifiers = Domain.Actuation.KeyModifiers.None;
+    // Phase 16 C3: PostAction (Active 设置后的副作用, 与 Pre 对称) — Post/PostAsync 写入此字段, 终结时注入 clause.
+    private Action? _pendingPostActionSync;
+    private Func<Task>? _pendingPostActionAsync;
 
     // 缓存最后一个 FinishClause 的 TriggerKey/Guard, 供 AlsoAdjustLegSwap 追加共享的 SetupAction.
     private Keys? _lastClauseTrigger;
@@ -148,6 +151,31 @@ public sealed class HeroPlanBuilder
     }
 
     /// <summary>
+    /// Phase 16 C3: 在 OnKey 链中间插入 PostAction (clause Active 设置后调用), 同步形态. 与 Pre 对称.
+    /// 例: <c>.OnKey(W).Post(() => _input.Press(A)).CastSkill(W).AfterEnterCD()</c> (假设 Active 后立即按 A).
+    /// </summary>
+    public HeroPlanBuilder Post(Action action)
+    {
+        if (_pendingTrigger is null) throw new InvalidOperationException("Post: 需先调 OnKey.");
+        if (action is null) throw new ArgumentNullException(nameof(action));
+        _pendingPostActionSync = action;
+        return this;
+    }
+
+    /// <summary>
+    /// Phase 16 C3: 在 OnKey 链中间插入 PostAction (clause Active 设置后 await), 异步形态. 与 PreAsync 对称.
+    /// 例: <c>.OnKey(W).PostAsync(async () => await Task.Run(() => { Delay(330); _item.要求保持假腿(); })).CustomProbe(...)</c>
+    /// 表示按 W 时, 先 Active=true 释放技能, 再 await 330ms Delay + 保持假腿 (火猫无影拳模板).
+    /// </summary>
+    public HeroPlanBuilder PostAsync(Func<Task> asyncAction)
+    {
+        if (_pendingTrigger is null) throw new InvalidOperationException("PostAsync: 需先调 OnKey.");
+        if (asyncAction is null) throw new ArgumentNullException(nameof(asyncAction));
+        _pendingPostActionAsync = asyncAction;
+        return this;
+    }
+
+    /// <summary>
     /// 终结 OnKey 链为 ExecuteAction SetupAction — 任意 lambda 副作用 (不挂 ConditionSlot, 不挂 Probe).
     /// 例: <c>.OnKey(D2).Execute(() => { _aggregate.Skills.SetMode(W, 1); TTS.Speak("..."); })</c>
     /// 用于 D2 SetMode + TTS 形态 (幻刺) / W 直接 _item 副作用 (黑鸟).
@@ -225,6 +253,8 @@ public sealed class HeroPlanBuilder
         _pendingPreActionAsync = null;
         _pendingIsOnEveryKey = false;
         _pendingModifiers = Domain.Actuation.KeyModifiers.None;
+        _pendingPostActionSync = null;
+        _pendingPostActionAsync = null;
     }
 
     /// <summary>终结子句, 释放模式 = AfterEnterCD (magic 0 — 主动技能进入 CD 后接).</summary>
@@ -303,7 +333,9 @@ public sealed class HeroPlanBuilder
             CustomProbeFn: probe,
             PreActionSync: _pendingPreActionSync,
             PreActionAsync: _pendingPreActionAsync,
-            Modifiers: _pendingModifiers));
+            Modifiers: _pendingModifiers,
+            PostActionSync: _pendingPostActionSync,
+            PostActionAsync: _pendingPostActionAsync));
 
         _lastClauseTrigger = _pendingTrigger;
         _lastClauseGuard = _pendingGuard;
@@ -333,7 +365,9 @@ public sealed class HeroPlanBuilder
             Guard: _pendingGuard,
             PreActionSync: _pendingPreActionSync,
             PreActionAsync: _pendingPreActionAsync,
-            Modifiers: _pendingModifiers));
+            Modifiers: _pendingModifiers,
+            PostActionSync: _pendingPostActionSync,
+            PostActionAsync: _pendingPostActionAsync));
 
         _lastClauseTrigger = _pendingTrigger;
         _lastClauseGuard = _pendingGuard;
@@ -363,7 +397,9 @@ public sealed class HeroPlanBuilder
             Guard: _pendingGuard,
             PreActionSync: _pendingPreActionSync,
             PreActionAsync: _pendingPreActionAsync,
-            Modifiers: _pendingModifiers));
+            Modifiers: _pendingModifiers,
+            PostActionSync: _pendingPostActionSync,
+            PostActionAsync: _pendingPostActionAsync));
 
         _lastClauseTrigger = _pendingTrigger;
         _lastClauseGuard = _pendingGuard;

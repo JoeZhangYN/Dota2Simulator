@@ -1,8 +1,10 @@
+// Phase 16 C3: 火猫 Strategy 迁 HeroPlan — W CustomProbe (无影拳 ImageFinder + Mode 1 Press Q + 保持假腿 + Press A) + PostAsync (Active 后 Task.Run Delay 330 + 保持假腿), Q/E AfterEnterCD, D AfterCast, D2 Execute ToggleMode + TTS.
 #if DOTA2
 using System.Drawing;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Dota2Simulator.GameAutomation.Application;
+using Dota2Simulator.GameAutomation.Application.HeroPlans;
 using Dota2Simulator.GameAutomation.Domain.Actuation;
 using Dota2Simulator.GameAutomation.Domain.Heroes;
 using Dota2Simulator.GameAutomation.Domain.Loop;
@@ -10,94 +12,49 @@ using Dota2Simulator.Games;
 using Dota2Simulator.Games.Dota2;
 using Dota2Simulator.Vision;
 
-using Dota2Simulator.GameAutomation.Ports;
-
 namespace Dota2Simulator.GameAutomation.Heroes.Agility;
 
-/// <summary>火猫（敏捷）策略——迁移自 _main.根据当前英雄增强 的 case "火猫"。</summary>
 [HeroStrategy("火猫", HeroAttribute.Agility)]
 public sealed partial class 火猫Strategy : IHeroStrategy
 {
     /// <summary>1080p 增益状态栏区域——内联自 _main.buff状态技能栏。</summary>
     private static readonly Rectangle buff状态技能栏 = new(962, 826, 526, 80);
 
+    private HeroPlan? _plan;
 
+    public void OnActivate(HeroContext ctx) => GetPlan().Apply(ctx, _skill);
 
-    public void OnActivate(HeroContext ctx)
-    {
-        _main._聚合.Conditions[ConditionSlotKey.C1].Probe ??= 无影拳后续处理;
-        _main._聚合.Conditions[ConditionSlotKey.C2].Probe ??= 炎阳索去后摇;
-        _main._聚合.Conditions[ConditionSlotKey.C3].Probe ??= 烈火罩去后摇;
-        _main._聚合.Conditions[ConditionSlotKey.C4].Probe ??= 激活残焰去后摇;
-        _main._聚合.LegSwap.配置.修改配置(Keys.D, true);
-        _main._聚合.LegSwap.配置.修改配置(Keys.R, false);
-    }
+    public Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx) => GetPlan().DispatchAsync(trigger, ctx, _item);
 
-    public async Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)
-    {
-        VirtualKey key = trigger.Key;
-        await _item.根据按键判断技能释放前通用逻辑(new KeyEventArgs((Keys)key.ToNative())).ConfigureAwait(true);
-
-        if (key == VirtualKey.W)
+    private HeroPlan GetPlan() => _plan ??= HeroPlanBuilder.New()
+        .LegSwap(Keys.D, alwaysSwap: true)
+        .LegSwap(Keys.R, alwaysSwap: false)
+        .OnKey(Keys.W).PostAsync(async () => await Task.Run(() =>
         {
-            _main._聚合.Conditions[ConditionSlotKey.C1].Active = true;
-            await Task.Run(() =>
+            Common.Delay(330);
+            _item.要求保持假腿();
+        }).ConfigureAwait(false)).CustomProbe(async _h =>
+        {
+            bool b = ImageFinder.FindImageInRegionBool(Dota2_Pictrue.Buff.火猫_无影拳, in _h, buff状态技能栏);
+            if (b)
             {
-                Common.Delay(330);
+                if (_main._聚合.Skills.Mode(SlotKey.W) == 1)
+                {
+                    _input.Press(VirtualKey.From(Keys.Q));
+                }
                 _item.要求保持假腿();
-            }).ConfigureAwait(false);
-        }
-        else if (key == VirtualKey.Q)
-        {
-            _main._聚合.Conditions[ConditionSlotKey.C2].Active = true;
-        }
-        else if (key == VirtualKey.E)
-        {
-            _main._聚合.Conditions[ConditionSlotKey.C3].Active = true;
-        }
-        else if (key == VirtualKey.D)
-        {
-            _main._聚合.Conditions[ConditionSlotKey.C4].Active = true;
-        }
-        else if (key == VirtualKey.From(Keys.D2))
+                _input.Press(VirtualKey.From(Keys.A));
+            }
+            return await Task.FromResult(!b).ConfigureAwait(true);
+        })
+        .OnKey(Keys.Q).CastSkill(Keys.Q).AfterEnterCD()
+        .OnKey(Keys.E).CastSkill(Keys.E).AfterEnterCD()
+        .OnKey(Keys.D).CastSkill(Keys.D).AfterCast()
+        .OnKey(Keys.D2).Execute(() =>
         {
             _main._聚合.Skills.ToggleMode(SlotKey.W);
             Dota2Simulator.TTS.TTS.Speak(_main._聚合.Skills.Mode(SlotKey.W) == 0 ? "不接捆" : "接捆");
-        }
-    }
-
-    private async Task<bool> 无影拳后续处理(ImageHandle 句柄)
-    {
-        bool b = ImageFinder.FindImageInRegionBool(Dota2_Pictrue.Buff.火猫_无影拳, in 句柄, buff状态技能栏);
-
-        if (b)
-        {
-            if (_main._聚合.Skills.Mode(SlotKey.W) == 1)
-            {
-                _input.Press(VirtualKey.From(Keys.Q));
-            }
-
-            _item.要求保持假腿();
-
-            _input.Press(VirtualKey.From(Keys.A));
-        }
-
-        return await Task.FromResult(!b).ConfigureAwait(true);
-    }
-
-    private async Task<bool> 炎阳索去后摇(ImageHandle 句柄)
-    {
-        return await _skill.技能通用判断(Keys.Q, 0).ConfigureAwait(true);
-    }
-
-    private async Task<bool> 烈火罩去后摇(ImageHandle 句柄)
-    {
-        return await _skill.技能通用判断(Keys.E, 0).ConfigureAwait(true);
-    }
-
-    private async Task<bool> 激活残焰去后摇(ImageHandle 句柄)
-    {
-        return await _skill.技能通用判断(Keys.D, 1).ConfigureAwait(true);
-    }
+        })
+        .Done();
 }
 #endif

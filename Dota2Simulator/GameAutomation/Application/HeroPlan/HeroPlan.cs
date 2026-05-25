@@ -47,7 +47,9 @@ public readonly record struct HeroPlanClause(
     ConditionDelegateBitmap? CustomProbeFn = null,
     Action? PreActionSync = null,
     Func<Task>? PreActionAsync = null,
-    KeyModifiers Modifiers = KeyModifiers.None);
+    KeyModifiers Modifiers = KeyModifiers.None,
+    Action? PostActionSync = null,
+    Func<Task>? PostActionAsync = null);
 
 /// <summary>假腿配置条目 (按键 → alwaysSwap 标志, OnActivate 时一次性应用).</summary>
 public readonly record struct LegSwapEntry(Keys Key, bool AlwaysSwap);
@@ -244,6 +246,16 @@ public sealed class HeroPlan
                 else
                 {
                     ctx.Aggregate.Conditions[slot].Active = true;
+                }
+
+                // Phase 16 C3: PostAction (Active 设置后副作用 — 火猫 W: Task.Run(Delay+保持假腿)). async 优先.
+                if (_clauses[i].PostActionAsync is not null)
+                {
+                    await _clauses[i].PostActionAsync!().ConfigureAwait(true);
+                }
+                else
+                {
+                    _clauses[i].PostActionSync?.Invoke();
                 }
                 return;
             }
