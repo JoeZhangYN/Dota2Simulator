@@ -42,17 +42,15 @@ public sealed partial class 暗影萨满Strategy : IHeroStrategy
         }
         else if (key == VirtualKey.W)
         {
-#pragma warning disable CS0618 // V3 临时妥协调用 Find(ImageHandle, ...) 重载，V6 改 SG 生成 Template 同步删
-            if (_vision.Find(Dota2_Pictrue.物品.中立_祭礼长袍, ItemEngine.获取中立TP范围(_main._聚合.SkillCount), new MatchRate(0.9), Tolerance.Exact).Found)
+            if (_vision.Find(Dota2_Pictrue.物品.中立_祭礼长袍_Tpl, ItemEngine.获取中立TP范围(_main._聚合.SkillCount), new MatchRate(0.9), Tolerance.Exact).Found)
             {
                 _main._聚合.Attack.状态抗性倍数 *= 1.1;
             }
 
-            if (_vision.Find(Dota2_Pictrue.物品.中立_永恒遗物, ItemEngine.获取中立TP范围(_main._聚合.SkillCount), new MatchRate(0.9), Tolerance.Exact).Found)
+            if (_vision.Find(Dota2_Pictrue.物品.中立_永恒遗物_Tpl, ItemEngine.获取中立TP范围(_main._聚合.SkillCount), new MatchRate(0.9), Tolerance.Exact).Found)
             {
                 _main._聚合.Attack.状态抗性倍数 *= 1.2;
             }
-#pragma warning restore CS0618
 
             _main._聚合.Conditions[ConditionSlotKey.C2].Active = true;
         }

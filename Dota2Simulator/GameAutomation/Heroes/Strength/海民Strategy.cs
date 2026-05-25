@@ -68,18 +68,16 @@ public sealed partial class 海民Strategy : IHeroStrategy
         }
     }
 
-#pragma warning disable CS0618 // V3 临时妥协调用 Find(ImageHandle, ...) 重载，V6 改 SG 生成 Template 同步删
     private async Task<bool> 海民获取命石()
     {
         if (_main._聚合.Conditions.StoneChoice == 0)
         {
-            _main._聚合.Conditions.StoneChoice = _vision.Find(Dota2_Pictrue.命石.海民_酒友, 命石区域, new MatchRate(0.9), Tolerance.Exact).Found ? 2 : 1;
+            _main._聚合.Conditions.StoneChoice = _vision.Find(Dota2_Pictrue.命石.海民_酒友_Tpl, 命石区域, new MatchRate(0.9), Tolerance.Exact).Found ? 2 : 1;
         }
 
         _main._聚合.Conditions.StoneProbe = null;
         return await Task.FromResult(false).ConfigureAwait(true);
     }
-#pragma warning restore CS0618
 
     private async Task<bool> 冰片去后摇()
     {

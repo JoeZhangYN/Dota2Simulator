@@ -100,10 +100,8 @@ namespace Dota2Simulator.Games.Dota2.Silt
             {
                 var 描述 = PaddleOCR.获取图片文字(GlobalScreenCapture.GetCurrentHandle(), new Rectangle(730, 503, 71, 39)).Trim();
                 // _ui.Invoke(() => _ui.SetText(UiField.阵营, 描述));
-#pragma warning disable CS0618 // V4 临时妥协调用 Find(ImageHandle, ...) 重载，V6 改 SG 生成 Template 同步删
-                if (_vision.Find(Dota2_Pictrue.Silt.选择天赋, RPG选择技能范围, new MatchRate(0.9), Tolerance.Exact).Found
-                    && _vision.Find(Dota2_Pictrue.Silt.普通天赋, RPG第一技能金, new MatchRate(0.9), Tolerance.Exact).Found)
-#pragma warning restore CS0618
+                if (_vision.Find(Dota2_Pictrue.Silt.选择天赋_Tpl, RPG选择技能范围, new MatchRate(0.9), Tolerance.Exact).Found
+                    && _vision.Find(Dota2_Pictrue.Silt.普通天赋_Tpl, RPG第一技能金, new MatchRate(0.9), Tolerance.Exact).Found)
                 {
                     跳过重新选择();
                 }
@@ -138,9 +136,7 @@ namespace Dota2Simulator.Games.Dota2.Silt
 
         public void 自动屏蔽3个选项(in ImageHandle 句柄)
         {
-#pragma warning disable CS0618 // V4 临时妥协调用 Find(ImageHandle, ...) 重载，V6 改 SG 生成 Template 同步删
-            if (_vision.Find(Dota2_Pictrue.Silt.选择天赋, RPG选择技能范围, new MatchRate(0.9), Tolerance.Exact).Found)
-#pragma warning restore CS0618
+            if (_vision.Find(Dota2_Pictrue.Silt.选择天赋_Tpl, RPG选择技能范围, new MatchRate(0.9), Tolerance.Exact).Found)
             {
                 var p = Control.MousePosition;
                 // 第三个技能右上角颜色金
@@ -390,10 +386,8 @@ namespace Dota2Simulator.Games.Dota2.Silt
 
         public void 测试识别(in ImageHandle 句柄)
         {
-#pragma warning disable CS0618 // V4 临时妥协调用 FindAll(ImageHandle, ...) 重载，V6 改 SG 生成 Template 同步删
             // 用整屏 region 替代原全屏 FindAllImages（V5 强制裁剪：此处业务场景是 RPG 天赋扫描，整屏可接受）
-            var rustResults = _vision.FindAll(Dota2_Pictrue.Silt.钢毛后背, new ScreenRegion(0, 0, 1920, 1080), new MatchRate(0.9), Tolerance.Exact);
-#pragma warning restore CS0618
+            var rustResults = _vision.FindAll(Dota2_Pictrue.Silt.钢毛后背_Tpl, new ScreenRegion(0, 0, 1920, 1080), new MatchRate(0.9), Tolerance.Exact);
             var string1 = "";
             foreach (var point in rustResults)
             {

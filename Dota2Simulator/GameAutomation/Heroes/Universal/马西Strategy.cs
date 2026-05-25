@@ -47,13 +47,11 @@ public sealed partial class 马西Strategy : IHeroStrategy
         }
     }
 
-#pragma warning disable CS0618 // V3 临时妥协调用 Find(ImageHandle, ...) 重载，V6 改 SG 生成 Template 同步删
     private async Task<bool> 幽魂检测()
     {
-        return _vision.Find(Dota2_Pictrue.Buff.小精灵_幽魂, buff状态技能栏, new MatchRate(0.9), Tolerance.Exact).Found
+        return _vision.Find(Dota2_Pictrue.Buff.小精灵_幽魂_Tpl, buff状态技能栏, new MatchRate(0.9), Tolerance.Exact).Found
             ? await Task.FromResult(true).ConfigureAwait(true)
             : await Task.FromResult(false).ConfigureAwait(true);
     }
-#pragma warning restore CS0618
 }
 #endif

@@ -43,17 +43,16 @@ public sealed partial class 小精灵Strategy : IHeroStrategy
         .OnKey(Keys.D3).ToggleConditionSlot(ConditionSlotKey.C3, "开启续过载", "关闭续过载")
         .Done();
 
-#pragma warning disable CS0618 // V3 临时妥协调用 Find(ImageHandle, ...) 重载，V6 改 SG 生成 Template 同步删
     private async Task<bool> 幽魂检测()
     {
-        return _vision.Find(Dota2_Pictrue.Buff.小精灵_幽魂, buff状态技能栏, new MatchRate(0.9), Tolerance.Exact).Found
+        return _vision.Find(Dota2_Pictrue.Buff.小精灵_幽魂_Tpl, buff状态技能栏, new MatchRate(0.9), Tolerance.Exact).Found
             ? await Task.FromResult(true).ConfigureAwait(true)
             : await Task.FromResult(false).ConfigureAwait(true);
     }
 
     private async Task<bool> 循环续过载()
     {
-        bool guozai = _vision.Find(Dota2_Pictrue.Buff.小精灵_过载, buff状态技能栏, new MatchRate(0.9), Tolerance.Exact).Found;
+        bool guozai = _vision.Find(Dota2_Pictrue.Buff.小精灵_过载_Tpl, buff状态技能栏, new MatchRate(0.9), Tolerance.Exact).Found;
         if (guozai)
         {
             _main._聚合.Skills.SetStep(SlotKey.E, 3);
@@ -62,6 +61,5 @@ public sealed partial class 小精灵Strategy : IHeroStrategy
         await _skill.技能通用判断(Keys.E, 2).ConfigureAwait(true);
         return await Task.FromResult(_main._聚合.Conditions[ConditionSlotKey.C3].Active).ConfigureAwait(true);
     }
-#pragma warning restore CS0618
 }
 #endif

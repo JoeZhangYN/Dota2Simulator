@@ -132,9 +132,7 @@ public sealed partial class 双头龙Strategy : IHeroStrategy
             return await Task.FromResult(true).ConfigureAwait(true);
         }
 
-#pragma warning disable CS0618 // V3 临时妥协调用 Find(ImageHandle, ...) 重载，V6 改 SG 生成 Template 同步删
-        if (!_vision.Find(Dota2_Pictrue.物品.吹风, ItemEngine.获取物品范围(_main._聚合.SkillCount), new MatchRate(0.9), Tolerance.Exact).Found && _main._聚合.Skills.Time(SlotKey.Global) == -1)
-#pragma warning restore CS0618
+        if (!_vision.Find(Dota2_Pictrue.物品.吹风_Tpl, ItemEngine.获取物品范围(_main._聚合.SkillCount), new MatchRate(0.9), Tolerance.Exact).Found && _main._聚合.Skills.Time(SlotKey.Global) == -1)
         {
             _main._聚合.Skills.SetTime(SlotKey.Global, Common.获取当前时间毫秒());
         }
