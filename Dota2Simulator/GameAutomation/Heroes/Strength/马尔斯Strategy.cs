@@ -1,56 +1,26 @@
+// Phase 15 C2: 马尔斯 Strategy 迁 HeroPlan — Q/R CustomProbe (主动技能释放后续 lambda 内 Mode 检查 + Press), W 简单 AfterCast, D2 Execute (ToggleMode + TTS, 复用 Execute lambda 不专 DSL).
 #if DOTA2
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Dota2Simulator.GameAutomation.Application;
+using Dota2Simulator.GameAutomation.Application.HeroPlans;
 using Dota2Simulator.GameAutomation.Domain.Actuation;
 using Dota2Simulator.GameAutomation.Domain.Heroes;
 using Dota2Simulator.GameAutomation.Domain.Loop;
-using Dota2Simulator.Games.Dota2;
-using Dota2Simulator.Vision;
-
-using Dota2Simulator.GameAutomation.Ports;
 
 namespace Dota2Simulator.GameAutomation.Heroes.Strength;
 
 [HeroStrategy("马尔斯", HeroAttribute.Strength)]
 public sealed partial class 马尔斯Strategy : IHeroStrategy
 {
+    private HeroPlan? _plan;
 
+    public void OnActivate(HeroContext ctx) => GetPlan().Apply(ctx, _skill);
 
-    public void OnActivate(HeroContext ctx)
-    {
-        _main._聚合.Conditions[ConditionSlotKey.C1].Probe ??= 战神迅矛去后摇;
-        _main._聚合.Conditions[ConditionSlotKey.C2].Probe ??= 神之谴击去后摇;
-        _main._聚合.Conditions[ConditionSlotKey.C3].Probe ??= 热血竞技场去后摇;
-    }
+    public Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx) => GetPlan().DispatchAsync(trigger, ctx, _item);
 
-    public async Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)
-    {
-        VirtualKey key = trigger.Key;
-        await _item.根据按键判断技能释放前通用逻辑(new KeyEventArgs((Keys)key.ToNative())).ConfigureAwait(true);
-
-        if (key == VirtualKey.Q)
-        {
-            _main._聚合.Conditions[ConditionSlotKey.C1].Active = true;
-        }
-        else if (key == VirtualKey.W)
-        {
-            _main._聚合.Conditions[ConditionSlotKey.C2].Active = true;
-        }
-        else if (key == VirtualKey.R)
-        {
-            _main._聚合.Conditions[ConditionSlotKey.C3].Active = true;
-        }
-        else if (key == VirtualKey.From(Keys.D2))
-        {
-            _main._聚合.Skills.ToggleMode(SlotKey.Q);
-            TTS.TTS.Speak(_main._聚合.Skills.Mode(SlotKey.Q) == 1 ? "矛接大招" : "矛不接大招");
-        }
-    }
-
-    private async Task<bool> 战神迅矛去后摇(ImageHandle 句柄)
-    {
-        return await _skill.主动技能释放后续(Keys.Q, () =>
+    private HeroPlan GetPlan() => _plan ??= HeroPlanBuilder.New()
+        .OnKey(Keys.Q).CustomProbe(async _h => await _skill.主动技能释放后续(Keys.Q, () =>
         {
             if (_main._聚合.Skills.Mode(SlotKey.Q) == 1)
             {
@@ -60,25 +30,21 @@ public sealed partial class 马尔斯Strategy : IHeroStrategy
             {
                 _skill.通用技能后续动作();
             }
-        }).ConfigureAwait(true);
-    }
-
-    private async Task<bool> 神之谴击去后摇(ImageHandle 句柄)
-    {
-        return await _skill.技能通用判断(Keys.W, 1).ConfigureAwait(true);
-    }
-
-    private async Task<bool> 热血竞技场去后摇(ImageHandle 句柄)
-    {
-        return await _skill.主动技能释放后续(Keys.R, () =>
+        }).ConfigureAwait(true))
+        .OnKey(Keys.W).CastSkill(Keys.W).AfterCast()
+        .OnKey(Keys.R).CustomProbe(async 句柄 => await _skill.主动技能释放后续(Keys.R, () =>
         {
             if (_skill.判断技能状态(Keys.E, 句柄, SkillEngine.技能类型.状态))
             {
                 _input.Press(VirtualKey.From(Keys.E));
             }
-
             _skill.通用技能后续动作();
-        }).ConfigureAwait(true);
-    }
+        }).ConfigureAwait(true))
+        .OnKey(Keys.D2).Execute(() =>
+        {
+            _main._聚合.Skills.ToggleMode(SlotKey.Q);
+            Dota2Simulator.TTS.TTS.Speak(_main._聚合.Skills.Mode(SlotKey.Q) == 1 ? "矛接大招" : "矛不接大招");
+        })
+        .Done();
 }
 #endif
