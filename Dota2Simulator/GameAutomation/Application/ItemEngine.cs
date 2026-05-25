@@ -229,69 +229,6 @@ namespace Dota2Simulator.GameAutomation.Application
 
         #region 使用物品
 
-        #region Resource改版前
-
-#if false
-        /// <summary>
-        ///     visual studio 改版资源浏览器，直接Bitmap没了，变成byte[]
-        /// </summary>
-        /// <param name="bp"></param>
-        /// <param name="bts"></param>
-        /// <param name="size"></param>
-        /// <param name="mode"></param>
-        /// <param name="matchRate"></param>
-        /// <returns></returns>
-        private static bool 根据图片以及类别使用物品(Bitmap bp, in ImageHandle 句柄, int mode = 4, double matchRate = 0.8)
-        {
-            var p = ImageFinder.FindImageBool(bp, in 句柄, matchRate);
-            if ((p.X + p.Y <= 0) || (p.X == 245760) || (p.X == 143640)) return false;
-            根据物品位置按键(p, mode, KeyBoardSim.KeyPress);
-            return true;
-        }
-
-        /// <summary>
-        ///     用时4-5ms左右
-        /// </summary>
-        /// <param name="bp"></param>
-        /// <param name="bts"></param>
-        /// <param name="size"></param>
-        /// <param name="mode"></param>
-        /// <returns></returns>
-        private static bool 根据图片以及类别自我使用物品(Bitmap bp, in ImageHandle 句柄, int mode = 4)
-        {
-            var p = ImageFinder.FindImageBool(bp, in 句柄);
-            if ((p.X + p.Y <= 0) || (p.X == 245760) || (p.X == 143640)) return false;
-            根据物品位置按键(p, mode, KeyBoardSim.KeyPressAlt);
-            return true;
-        }
-
-        private static bool 根据图片以及类别队列使用物品(Bitmap bp, in ImageHandle 句柄, int mode = 4)
-        {
-            var p = ImageFinder.FindImageBool(bp, in 句柄);
-            if ((p.X + p.Y <= 0) || (p.X == 245760) || (p.X == 143640)) return false;
-            根据物品位置按键(p, mode, key => KeyBoardSim.KeyPressWhile(key, Keys.Shift));
-            return true;
-        }
-
-        private static bool 根据图片以及类别使用物品多次(Bitmap bp, ImageHandle 句柄, int times, int Common.Delay, int mode = 4)
-        {
-            var p = ImageFinder.FindImageBool(bp, in 句柄);
-            if ((p.X + p.Y <= 0) || (p.X == 245760) || (p.X == 143640)) return false;
-
-            for (var i = 0; i < times; i++)
-            {
-                根据物品位置按键(p, mode, KeyBoardSim.KeyPress);
-                if (i == times - 1) break;
-
-                Common.Delay(Common.Delay);
-            }
-
-            return true;
-        } 
-#endif
-
-        #endregion
-
         #region 去掉Resource 模块化物品
 
         // 4技能 最上侧 943 最右侧 1195 CD颜色 104 104 104 最下侧 986 最左侧 1136 长度 44 宽度 60

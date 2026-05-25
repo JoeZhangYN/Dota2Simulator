@@ -11,6 +11,7 @@
 using Collections.Pooled;
 using Dota2Simulator.GameAutomation.Domain;
 using Dota2Simulator.GameAutomation.Domain.Actuation;
+using Dota2Simulator.GameAutomation.Domain.Perception;
 using Dota2Simulator.GameAutomation.Ports;
 using Dota2Simulator.Games;
 using Dota2Simulator.Games.Dota2;
@@ -1635,7 +1636,7 @@ namespace Dota2Simulator.GameAutomation.Application
                 {
                     _ = _host!.获取图片_2();
 
-                    var color = GlobalScreenCapture.GetColor(x, y);
+                    var color = _vision.PixelAt(new ScreenPoint(x, y));
 
                     if (colors.Count == 0)
                     {

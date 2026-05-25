@@ -12,6 +12,7 @@ using Dota2Simulator.GameAutomation.Domain;
 using Dota2Simulator.GameAutomation.Domain.Actuation;
 using Dota2Simulator.GameAutomation.Domain.Combat;
 using Dota2Simulator.GameAutomation.Domain.Loop;
+using Dota2Simulator.GameAutomation.Domain.Perception;
 using Dota2Simulator.GameAutomation.Ports;
 using Dota2Simulator.Games;
 using Dota2Simulator.Games.Dota2;
@@ -101,7 +102,7 @@ namespace Dota2Simulator.GameAutomation.Application
         public Task<Color> 获取指定位置颜色(int x, int y)
         {
             _ = 获取图片_2();
-            return Task.FromResult(GlobalScreenCapture.GetColor(x, y));
+            return Task.FromResult(_vision.PixelAt(new ScreenPoint(x, y)));
         }
 
         public Color 获取指定位置颜色(int x, int y, in ImageHandle 句柄)
@@ -358,20 +359,15 @@ namespace Dota2Simulator.GameAutomation.Application
 
         #region 获取图片
 
-        private static void 执行屏幕捕捉捕捉(in Rectangle rectangle)
-        {
-            GlobalScreenCapture.CaptureScreen(rectangle);
-        }
-
         public bool 获取图片_1()
         {
-            执行屏幕捕捉捕捉(GameLayout.截图模式1Reg);
+            _vision.Capture(CaptureMode.HighQuality);
             return true;
         }
 
         public bool 获取图片_2()
         {
-            执行屏幕捕捉捕捉(GameLayout.截图模式2Reg);
+            _vision.Capture(CaptureMode.FullScreen);
             return true;
         }
 
