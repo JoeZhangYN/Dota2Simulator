@@ -1,62 +1,37 @@
+// Phase 14 C2: 小小 Strategy 迁 HeroPlan + CustomProbe DSL — Q 简单 AfterEnterCD, W 自定义 (Task.Run 循环 _skill.通用技能后续动作 3 次) + 2 LegSwap.
 #if DOTA2
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Dota2Simulator.GameAutomation.Application;
+using Dota2Simulator.GameAutomation.Application.HeroPlans;
 using Dota2Simulator.GameAutomation.Domain.Actuation;
 using Dota2Simulator.GameAutomation.Domain.Heroes;
 using Dota2Simulator.Games;
-using Dota2Simulator.Games.Dota2;
-using Dota2Simulator.Vision;
-
-using Dota2Simulator.GameAutomation.Ports;
 
 namespace Dota2Simulator.GameAutomation.Heroes.Strength;
 
 [HeroStrategy("小小", HeroAttribute.Strength)]
 public sealed partial class 小小Strategy : IHeroStrategy
 {
+    private HeroPlan? _plan;
 
+    public void OnActivate(HeroContext ctx) => GetPlan().Apply(ctx, _skill);
 
-    public void OnActivate(HeroContext ctx)
-    {
-        _main._聚合.Conditions[ConditionSlotKey.C1].Probe ??= 山崩去后摇;
-        _main._聚合.Conditions[ConditionSlotKey.C2].Probe ??= 投掷去后摇;
-        _main._聚合.LegSwap.配置.修改配置(Keys.E, false);
-        _main._聚合.LegSwap.配置.修改配置(Keys.R, false);
-    }
+    public Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx) => GetPlan().DispatchAsync(trigger, ctx, _item);
 
-    public async Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)
-    {
-        VirtualKey key = trigger.Key;
-        await _item.根据按键判断技能释放前通用逻辑(new KeyEventArgs((Keys)key.ToNative())).ConfigureAwait(true);
-
-        if (key == VirtualKey.Q)
-        {
-            _main._聚合.Conditions[ConditionSlotKey.C1].Active = true;
-        }
-        else if (key == VirtualKey.W)
-        {
-            _main._聚合.Conditions[ConditionSlotKey.C2].Active = true;
-        }
-    }
-
-    private async Task<bool> 山崩去后摇(ImageHandle 句柄)
-    {
-        return await _skill.技能通用判断(Keys.Q, 0).ConfigureAwait(true);
-    }
-
-    private async Task<bool> 投掷去后摇(ImageHandle 句柄)
-    {
-        return await Task.Run(() =>
+    private HeroPlan GetPlan() => _plan ??= HeroPlanBuilder.New()
+        .OnKey(Keys.Q).CastSkill(Keys.Q).AfterEnterCD()
+        .OnKey(Keys.W).CustomProbe(async _h => await Task.Run(() =>
         {
             for (int i = 0; i < 3; i++)
             {
                 Common.Delay(20);
                 _skill.通用技能后续动作();
             }
-
             return false;
-        }).ConfigureAwait(true);
-    }
+        }).ConfigureAwait(true))
+        .LegSwap(Keys.E, alwaysSwap: false)
+        .LegSwap(Keys.R, alwaysSwap: false)
+        .Done();
 }
 #endif

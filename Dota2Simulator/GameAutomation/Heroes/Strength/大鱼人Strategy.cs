@@ -1,91 +1,47 @@
+// Phase 14 C2: 大鱼人 Strategy 迁 HeroPlan + CustomProbe DSL — Q/W 都触发 W 释放 (踩, 动态 continueKey: HasShard ? A : R), R 简单 mode 1, E 跳刀接踩 自定义 (物品组合 + DOTA2释放CD就绪技能).
 #if DOTA2
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Dota2Simulator.GameAutomation.Application;
+using Dota2Simulator.GameAutomation.Application.HeroPlans;
 using Dota2Simulator.GameAutomation.Domain.Actuation;
 using Dota2Simulator.GameAutomation.Domain.Heroes;
 using Dota2Simulator.Games;
 using Dota2Simulator.Games.Dota2;
-using Dota2Simulator.Vision;
-
-using Dota2Simulator.GameAutomation.Ports;
 
 namespace Dota2Simulator.GameAutomation.Heroes.Strength;
 
 [HeroStrategy("大鱼人", HeroAttribute.Strength)]
 public sealed partial class 大鱼人Strategy : IHeroStrategy
 {
-    /// <summary>基准帧延迟（沿用 _main.等待延迟）。</summary>
     private const int 等待延迟 = 33;
 
+    private HeroPlan? _plan;
 
+    public void OnActivate(HeroContext ctx) => GetPlan().Apply(ctx, _skill);
 
-    public void OnActivate(HeroContext ctx)
-    {
-        _main._聚合.Conditions[ConditionSlotKey.C1].Probe ??= 踩去后摇;
-        _main._聚合.Conditions[ConditionSlotKey.C2].Probe ??= 踩去后摇;
-        _main._聚合.Conditions[ConditionSlotKey.C3].Probe ??= 雾霭去后摇;
-        _main._聚合.Conditions[ConditionSlotKey.C4].Probe ??= 跳刀接踩;
-        // _main._聚合.LegSwap.配置.修改配置(Keys.E, false);
-    }
+    public Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx) => GetPlan().DispatchAsync(trigger, ctx, _item);
 
-    public async Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)
-    {
-        VirtualKey key = trigger.Key;
-        await _item.根据按键判断技能释放前通用逻辑(new KeyEventArgs((Keys)key.ToNative())).ConfigureAwait(true);
-
-        if (key == VirtualKey.Q)
+    private HeroPlan GetPlan() => _plan ??= HeroPlanBuilder.New()
+        .OnKey(Keys.Q).CustomProbe(async _h => await _skill.技能通用判断(Keys.W, 1, 要接的按键: _main._聚合.HasShard ? Keys.A : Keys.R).ConfigureAwait(true))
+        .OnKey(Keys.W).CustomProbe(async _h => await _skill.技能通用判断(Keys.W, 1, 要接的按键: _main._聚合.HasShard ? Keys.A : Keys.R).ConfigureAwait(true))
+        .OnKey(Keys.R).CastSkill(Keys.R).AfterCast()
+        .OnKey(Keys.E).CustomProbe(async 句柄 =>
         {
-            _main._聚合.Conditions[ConditionSlotKey.C1].Active = true;
-        }
-        else if (key == VirtualKey.W)
-        {
-            _main._聚合.Conditions[ConditionSlotKey.C2].Active = true;
-        }
-        else if (key == VirtualKey.R)
-        {
-            _main._聚合.Conditions[ConditionSlotKey.C3].Active = true;
-        }
-        else if (key == VirtualKey.E)
-        {
-            _main._聚合.Conditions[ConditionSlotKey.C4].Active = true;
-        }
-    }
-
-    private async Task<bool> 跳刀接踩(ImageHandle 句柄)
-    {
-        if (_item.根据图片使用物品(Dota2_Pictrue.物品.魂戒) == 1)
-        {
-            Common.Delay(等待延迟);
-        }
-
-        if (_item.根据图片使用物品(Dota2_Pictrue.物品.跳刀)
-            + _item.根据图片使用物品(Dota2_Pictrue.物品.跳刀_敏捷跳刀)
-            + _item.根据图片使用物品(Dota2_Pictrue.物品.跳刀_智力跳刀)
-            + _item.根据图片使用物品(Dota2_Pictrue.物品.跳刀_力量跳刀) == 1
-           )
-        {
-            Common.Delay(等待延迟);
-        }
-
-        _ = _skill.DOTA2释放CD就绪技能(Keys.W, in 句柄);
-
-        return await Task.FromResult(false).ConfigureAwait(true);
-    }
-
-    private async Task<bool> 守卫冲刺去后摇(ImageHandle 句柄)
-    {
-        return await _skill.技能通用判断(Keys.Q, 0).ConfigureAwait(true);
-    }
-
-    private async Task<bool> 踩去后摇(ImageHandle 句柄)
-    {
-        return await _skill.技能通用判断(Keys.W, 1, 要接的按键: _main._聚合.HasShard ? Keys.A : Keys.R).ConfigureAwait(true);
-    }
-
-    private async Task<bool> 雾霭去后摇(ImageHandle 句柄)
-    {
-        return await _skill.技能通用判断(Keys.R, 1).ConfigureAwait(true);
-    }
+            if (_item.根据图片使用物品(Dota2_Pictrue.物品.魂戒) == 1)
+            {
+                Common.Delay(等待延迟);
+            }
+            if (_item.根据图片使用物品(Dota2_Pictrue.物品.跳刀)
+                + _item.根据图片使用物品(Dota2_Pictrue.物品.跳刀_敏捷跳刀)
+                + _item.根据图片使用物品(Dota2_Pictrue.物品.跳刀_智力跳刀)
+                + _item.根据图片使用物品(Dota2_Pictrue.物品.跳刀_力量跳刀) == 1)
+            {
+                Common.Delay(等待延迟);
+            }
+            _ = _skill.DOTA2释放CD就绪技能(Keys.W, in 句柄);
+            return await Task.FromResult(false).ConfigureAwait(true);
+        })
+        .Done();
 }
 #endif
