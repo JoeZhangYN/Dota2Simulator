@@ -66,7 +66,4 @@ public sealed class ProbeScreenVision : IScreenVision
     }
 #pragma warning restore CS0618
 
-#pragma warning disable CS0618 // 装饰器须实现接口已废弃方法
-    public ImageHandle GetCurrentFrame() => _inner.GetCurrentFrame();
-#pragma warning restore CS0618
 }

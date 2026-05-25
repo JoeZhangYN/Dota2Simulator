@@ -25,26 +25,15 @@ public interface IScreenVision
     Color PixelAt(ScreenPoint point);
 
     /// <summary>
-    /// Phase 18 V3 临时妥协：业务侧 92 Strategy 用 <c>Dota2_Pictrue.Buff.X</c> (ImageHandle 类型) 不便切 Template。
-    /// 与 <see cref="GetCurrentFrame"/> 同属 Vision 类型泄漏端口边界的临时形态，V6 委托链路重做 + SG 改造（生成 Template 同名静态属性）后统一删除。
+    /// Phase 18 V3/V4 引入：业务侧用 <c>Dota2_Pictrue.X.Y</c> (ImageHandle) 直接传入跳过 Template→ImageHandle 反查。
+    /// 端口仍泄漏 Vision 内部类型 ImageHandle 是技术债——SG 改造（同步生成 Template 同名静态属性）后切走，列入 Phase 19 候选。
     /// </summary>
-    [Obsolete("Phase 18 V6 真删；改用 Find(Template, ScreenRegion, MatchRate, Tolerance) 配合 SG 生成的 Template 静态属性。", error: false)]
+    [Obsolete("SG 改造同步生成 Template 静态属性后切走；改用 Find(Template, ScreenRegion, MatchRate, Tolerance)。", error: false)]
     FindResult Find(ImageHandle needle, ScreenRegion region, MatchRate rate, Tolerance tolerance);
 
     /// <summary>
-    /// Phase 18 V4 临时妥协：同 <see cref="Find(ImageHandle, ScreenRegion, MatchRate, Tolerance)"/>，用于 Silt BC RPG 模式 FindAll 场景。
-    /// V6 同 SG 改造后统一删除。
+    /// Phase 18 V4 引入：同 <see cref="Find(ImageHandle, ScreenRegion, MatchRate, Tolerance)"/>，用于 Silt BC RPG 模式 FindAll 场景。
     /// </summary>
-    [Obsolete("Phase 18 V6 真删；改用 FindAll(Template, ScreenRegion, MatchRate, Tolerance) 配合 SG 生成的 Template 静态属性。", error: false)]
+    [Obsolete("SG 改造同步生成 Template 静态属性后切走；改用 FindAll(Template, ScreenRegion, MatchRate, Tolerance)。", error: false)]
     IReadOnlyList<ScreenPoint> FindAll(ImageHandle needle, ScreenRegion region, MatchRate rate, Tolerance tolerance);
-
-    /// <summary>
-    /// 获取当前帧的 Vision 内部句柄，供 ConditionDelegateBitmap 委托链路使用。
-    /// </summary>
-    /// <remarks>
-    /// Phase 6 临时妥协：ConditionDelegateBitmap 委托签名当前接收 <see cref="Vision.ImageHandle"/>，
-    /// 让 Port 边界泄漏 Vision 内部类型。Phase 7+ 把委托签名改为接收 IScreenVision 自身后移除。
-    /// </remarks>
-    [Obsolete("Phase 7+ 改 ConditionDelegateBitmap 签名后移除；新代码应直接调 Capture / Find / FindInRegion。", error: false)]
-    ImageHandle GetCurrentFrame();
 }

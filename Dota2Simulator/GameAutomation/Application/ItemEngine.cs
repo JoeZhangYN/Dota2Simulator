@@ -9,6 +9,7 @@
 using Dota2Simulator.Vision;
 using Dota2Simulator.GameAutomation.Domain;
 using Dota2Simulator.GameAutomation.Domain.Actuation;
+using Dota2Simulator.GameAutomation.Domain.Perception;
 using Dota2Simulator.GameAutomation.Ports;
 using Dota2Simulator.Games;
 using Dota2Simulator.Games.Dota2;
@@ -494,7 +495,10 @@ namespace Dota2Simulator.GameAutomation.Application
 
         public Keys 根据图片获取物品按键(in ImageHandle 句柄)
         {
-            var 位置 = ImageFinder.FindImageInRegion(in 句柄, _vision.GetCurrentFrame(), 获取物品范围(_aggregate.SkillCount));
+#pragma warning disable CS0618 // V6d 临时妥协调用 Find(ImageHandle, ...) 重载，待 SG 改造生成 Template 静态属性后切走
+            var findResult = _vision.Find(句柄, 获取物品范围(_aggregate.SkillCount), new MatchRate(0.9), Tolerance.Exact);
+#pragma warning restore CS0618
+            Point? 位置 = findResult.Found ? new Point(findResult.Point.X, findResult.Point.Y) : null;
             return 根据位置获取按键(位置);
         }
 
@@ -530,7 +534,10 @@ namespace Dota2Simulator.GameAutomation.Application
 
         private int 执行物品操作(in ImageHandle 句柄, Action<Keys> 按键操作)
         {
-            Point? 位置 = ImageFinder.FindImageInRegion(in 句柄, _vision.GetCurrentFrame(), 获取物品范围(_aggregate.SkillCount));
+#pragma warning disable CS0618 // V6d 临时妥协调用 Find(ImageHandle, ...) 重载，待 SG 改造生成 Template 静态属性后切走
+            var findResult = _vision.Find(句柄, 获取物品范围(_aggregate.SkillCount), new MatchRate(0.9), Tolerance.Exact);
+#pragma warning restore CS0618
+            Point? 位置 = findResult.Found ? new Point(findResult.Point.X, findResult.Point.Y) : null;
             if (ImageManager.是否无效位置(位置))
             {
                 return 0;
@@ -719,12 +726,14 @@ namespace Dota2Simulator.GameAutomation.Application
             });
 
             // 默认物品4 1138,954,50,17
-            ImageManager.SaveImage(_vision.GetCurrentFrame(), "J:\\Desktop\\物品_1.bmp", new Rectangle(物品.物品最左侧x + 2, 物品.物品最上侧y + 11, 50, 17));
-            ImageManager.SaveImage(_vision.GetCurrentFrame(), "J:\\Desktop\\物品_2.bmp", new Rectangle(物品.物品最左侧x + 2 + 物品.物品间隔x, 物品.物品最上侧y + 11, 50, 17));
-            ImageManager.SaveImage(_vision.GetCurrentFrame(), "J:\\Desktop\\物品_3.bmp", new Rectangle(物品.物品最左侧x + 2 + 物品.物品间隔x * 2, 物品.物品最上侧y + 11, 50, 17));
-            ImageManager.SaveImage(_vision.GetCurrentFrame(), "J:\\Desktop\\物品_4.bmp", new Rectangle(物品.物品最左侧x + 2, 物品.物品最上侧y + 11 + 物品.物品间隔y, 50, 17));
-            ImageManager.SaveImage(_vision.GetCurrentFrame(), "J:\\Desktop\\物品_5.bmp", new Rectangle(物品.物品最左侧x + 2 + 物品.物品间隔x, 物品.物品最上侧y + 11 + 物品.物品间隔y, 50, 17));
-            ImageManager.SaveImage(_vision.GetCurrentFrame(), "J:\\Desktop\\物品_6.bmp", new Rectangle(物品.物品最左侧x + 2 + 物品.物品间隔x * 2, 物品.物品最上侧y + 11 + 物品.物品间隔y, 50, 17));
+            // V6d 注释: 保存当前物品截图调试 API. ImageManager.SaveImage 是 Vision BC 内部 API, 业务侧用 GlobalScreenCapture.GetCurrentHandle() 同层取帧 (端口已删 GetCurrentFrame)
+            ImageHandle frame = GlobalScreenCapture.GetCurrentHandle();
+            ImageManager.SaveImage(frame, "J:\\Desktop\\物品_1.bmp", new Rectangle(物品.物品最左侧x + 2, 物品.物品最上侧y + 11, 50, 17));
+            ImageManager.SaveImage(frame, "J:\\Desktop\\物品_2.bmp", new Rectangle(物品.物品最左侧x + 2 + 物品.物品间隔x, 物品.物品最上侧y + 11, 50, 17));
+            ImageManager.SaveImage(frame, "J:\\Desktop\\物品_3.bmp", new Rectangle(物品.物品最左侧x + 2 + 物品.物品间隔x * 2, 物品.物品最上侧y + 11, 50, 17));
+            ImageManager.SaveImage(frame, "J:\\Desktop\\物品_4.bmp", new Rectangle(物品.物品最左侧x + 2, 物品.物品最上侧y + 11 + 物品.物品间隔y, 50, 17));
+            ImageManager.SaveImage(frame, "J:\\Desktop\\物品_5.bmp", new Rectangle(物品.物品最左侧x + 2 + 物品.物品间隔x, 物品.物品最上侧y + 11 + 物品.物品间隔y, 50, 17));
+            ImageManager.SaveImage(frame, "J:\\Desktop\\物品_6.bmp", new Rectangle(物品.物品最左侧x + 2 + 物品.物品间隔x * 2, 物品.物品最上侧y + 11 + 物品.物品间隔y, 50, 17));
 
             //var a1 = 获取指定位置颜色(物品.物品锁闭x + i1, 物品.物品锁闭y).Result;
             //var a2 = 获取指定位置颜色(物品.物品锁闭x + 物品.物品间隔x + i1, 物品.物品锁闭y).Result;

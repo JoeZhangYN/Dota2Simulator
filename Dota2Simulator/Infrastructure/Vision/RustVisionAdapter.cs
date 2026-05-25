@@ -96,11 +96,4 @@ public sealed class RustVisionAdapter : IScreenVision
     }
 #pragma warning restore CS0618
 
-    /// <summary>
-    /// 获取三缓冲读缓冲区当前帧句柄，供 ConditionDelegateBitmap 委托链路使用。
-    /// Phase 6 临时方法 — Phase 7+ 改委托签名后移除。
-    /// </summary>
-#pragma warning disable CS0618 // 实现仍允许调本接口已废弃方法
-    public ImageHandle GetCurrentFrame() => GlobalScreenCapture.GetCurrentHandle();
-#pragma warning restore CS0618
 }
