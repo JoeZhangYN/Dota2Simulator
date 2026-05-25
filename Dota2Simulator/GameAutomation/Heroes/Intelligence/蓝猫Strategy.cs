@@ -46,7 +46,7 @@ public sealed partial class 蓝猫Strategy : IHeroStrategy
         }
     }
 
-    private async Task<bool> 拉接平A(ImageHandle 句柄)
+    private async Task<bool> 拉接平A()
     {
         return await Task.FromResult(true).ConfigureAwait(true);
     }
@@ -57,7 +57,7 @@ public sealed partial class 蓝猫Strategy : IHeroStrategy
         _input.Press(VirtualKey.From(Keys.A));
     }
 
-    private async Task<bool> 滚接平A(ImageHandle 句柄)
+    private async Task<bool> 滚接平A()
     {
         return await Task.FromResult(true).ConfigureAwait(true);
     }

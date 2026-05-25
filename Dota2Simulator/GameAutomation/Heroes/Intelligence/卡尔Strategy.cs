@@ -47,22 +47,22 @@ public sealed partial class 卡尔Strategy : IHeroStrategy
         }
     }
 
-    private static async Task<bool> 三冰对线(ImageHandle 句柄)
+    private static async Task<bool> 三冰对线()
     {
         return await Task.FromResult(false).ConfigureAwait(true);
     }
 
-    private static async Task<bool> 三雷对线(ImageHandle 句柄)
+    private static async Task<bool> 三雷对线()
     {
         return await Task.FromResult(false).ConfigureAwait(true);
     }
 
-    private static async Task<bool> 三雷幽灵(ImageHandle 句柄)
+    private static async Task<bool> 三雷幽灵()
     {
         return await Task.FromResult(true).ConfigureAwait(true);
     }
 
-    private static async Task<bool> 极冷吹风陨星锤雷暴(ImageHandle 句柄)
+    private static async Task<bool> 极冷吹风陨星锤雷暴()
     {
         return await Task.FromResult(true).ConfigureAwait(true);
     }

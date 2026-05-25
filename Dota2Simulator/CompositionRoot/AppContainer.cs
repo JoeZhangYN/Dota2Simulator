@@ -39,8 +39,8 @@ internal sealed class AppContainer
         Input = new ProbeInputExecutor(new HybridInputAdapter());
         Vision = new ProbeScreenVision(new RustVisionAdapter());
 
-        // C6 单阶段 HeroAggregate ctor 接 vision。
-        Aggregate = new HeroAggregate(Vision);
+        // Phase 18 V6a: 委托签名 () 无参后 HeroAggregate 不再依赖 vision，回到纯领域聚合形态。
+        Aggregate = new HeroAggregate();
 
         Registry = new HeroStrategyRegistry(Input, Vision);
         SessionState = new SessionState();

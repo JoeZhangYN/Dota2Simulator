@@ -50,14 +50,14 @@ public sealed partial class 术士Strategy : IHeroStrategy
         return Task.CompletedTask;
     }
 
-    private async Task<bool> 致命链接去后摇(ImageHandle 句柄)
+    private async Task<bool> 致命链接去后摇()
     {
         void 致命链接后()
         {
           _skill.通用技能后续动作(false);
         }
 
-        if (_skill.DOTA2判断技能是否CD(Keys.Q, in 句柄))
+        if (_skill.DOTA2判断技能是否CD(Keys.Q))
         {
           return await Task.FromResult(true).ConfigureAwait(true);
         }
@@ -66,14 +66,14 @@ public sealed partial class 术士Strategy : IHeroStrategy
         return await Task.FromResult(false).ConfigureAwait(true);
     }
 
-    private async Task<bool> 暗言术去后摇(ImageHandle 句柄)
+    private async Task<bool> 暗言术去后摇()
     {
         void 暗言术后()
         {
           _skill.通用技能后续动作(false);
         }
 
-        if (_skill.DOTA2判断技能是否CD(Keys.W, in 句柄))
+        if (_skill.DOTA2判断技能是否CD(Keys.W))
         {
           return await Task.FromResult(true).ConfigureAwait(true);
         }
@@ -82,14 +82,14 @@ public sealed partial class 术士Strategy : IHeroStrategy
         return await Task.FromResult(false).ConfigureAwait(true);
     }
 
-    private async Task<bool> 混乱之祭去后摇(ImageHandle 句柄)
+    private async Task<bool> 混乱之祭去后摇()
     {
         void 混乱之祭后()
         {
           _skill.通用技能后续动作(false);
         }
 
-        if (_skill.DOTA2判断技能是否CD(Keys.R, in 句柄))
+        if (_skill.DOTA2判断技能是否CD(Keys.R))
         {
           return await Task.FromResult(true).ConfigureAwait(true);
         }

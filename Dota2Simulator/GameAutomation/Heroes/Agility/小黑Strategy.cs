@@ -25,9 +25,10 @@ public sealed partial class 小黑Strategy : IHeroStrategy
     private HeroPlan GetPlan() => _plan ??= HeroPlanBuilder.New()
         .OnKey(Keys.F1).Execute(() =>
         {
-            _main._聚合.Skills.SetMode(SlotKey.E, ColorExtensions.ColorAEqualColorB(_main.获取指定位置颜色(738, 957, GlobalScreenCapture.GetCurrentHandle()),
+            ImageHandle 句柄 = GlobalScreenCapture.GetCurrentHandle();
+            _main._聚合.Skills.SetMode(SlotKey.E, ColorExtensions.ColorAEqualColorB(ImageManager.GetColor(in 句柄, 738, 957),
                 Color.FromArgb(246, 178, 60), 0) || ColorExtensions.ColorAEqualColorB(
-                _main.获取指定位置颜色(722, 957, GlobalScreenCapture.GetCurrentHandle()),
+                ImageManager.GetColor(in 句柄, 722, 957),
                 Color.FromArgb(246, 178, 60), 0)
                 ? 1
                 : 0);
@@ -51,7 +52,7 @@ public sealed partial class 小黑Strategy : IHeroStrategy
                 Dota2Simulator.TTS.TTS.Speak("关闭冰箭");
             }
         })
-        .OnKey(Keys.W).CustomProbe(async _h => await _skill.主动技能释放后续(Keys.W, () =>
+        .OnKey(Keys.W).CustomProbe(async () => await _skill.主动技能释放后续(Keys.W, () =>
         {
             _skill.通用技能后续动作();
             if (_main._聚合.Skills.Mode(SlotKey.Global) == 1)
@@ -59,7 +60,7 @@ public sealed partial class 小黑Strategy : IHeroStrategy
                 _main._聚合.LegSwap.需要切假腿 = false;
             }
         }).ConfigureAwait(true))
-        .OnKey(Keys.E).CustomProbe(async _h => await _skill.主动技能进入CD后续(Keys.E, () =>
+        .OnKey(Keys.E).CustomProbe(async () => await _skill.主动技能进入CD后续(Keys.E, () =>
         {
             Common.Delay(_main._聚合.Skills.Mode(SlotKey.E) == 1 ? 2600 : 1300);
             _input.Press(VirtualKey.From(Keys.S));
@@ -69,7 +70,7 @@ public sealed partial class 小黑Strategy : IHeroStrategy
                 _main._聚合.LegSwap.需要切假腿 = false;
             }
         }).ConfigureAwait(true))
-        .OnKey(Keys.F).WhenHasShard().CustomProbe(async _h => await _skill.主动技能进入CD后续(Keys.F, () =>
+        .OnKey(Keys.F).WhenHasShard().CustomProbe(async () => await _skill.主动技能进入CD后续(Keys.F, () =>
         {
             _skill.通用技能后续动作();
             if (_main._聚合.Skills.Mode(SlotKey.Global) == 1)

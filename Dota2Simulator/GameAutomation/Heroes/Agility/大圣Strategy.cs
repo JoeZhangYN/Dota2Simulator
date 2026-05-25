@@ -25,7 +25,7 @@ public sealed partial class 大圣Strategy : IHeroStrategy
         .OnKey(Keys.Q).CastSkill(Keys.Q).AfterCast()
         .OnKey(Keys.E).CastSkill(Keys.E).AfterEnterCD()
         .OnKey(Keys.R).CastSkill(Keys.R).AfterCast()
-        .OnKey(Keys.None).CustomProbe(async _h =>
+        .OnKey(Keys.None).CustomProbe(async () =>
         {
             await _skill.技能通用判断(Keys.W, 2).ConfigureAwait(true);
             return _main._聚合.Conditions[ConditionSlotKey.C4].Active;

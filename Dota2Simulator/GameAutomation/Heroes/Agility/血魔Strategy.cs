@@ -23,7 +23,7 @@ public sealed partial class 血魔Strategy : IHeroStrategy
 
     private HeroPlan GetPlan() => _plan ??= HeroPlanBuilder.New()
         .LegSwap(Keys.E, alwaysSwap: false)
-        .OnKey(Keys.W).CustomProbe(async _h => await _skill.主动技能释放后续(Keys.W, () =>
+        .OnKey(Keys.W).CustomProbe(async () => await _skill.主动技能释放后续(Keys.W, () =>
         {
             _input.MouseClick(MouseButton.Right);
             _input.Press(VirtualKey.From(Keys.A));
@@ -31,7 +31,7 @@ public sealed partial class 血魔Strategy : IHeroStrategy
             Common.Delay(2400);
             Point p = Control.MousePosition;
             _input.MouseMoveTo(new ScreenPoint(601, 988));
-            if (_skill.DOTA2释放CD就绪技能(Keys.Q, in _h))
+            if (_skill.DOTA2释放CD就绪技能(Keys.Q))
             {
                 _input.MouseMoveTo(new ScreenPoint(p.X, p.Y));
             }

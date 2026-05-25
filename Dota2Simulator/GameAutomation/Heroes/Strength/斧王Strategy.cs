@@ -67,7 +67,7 @@ public sealed partial class 斧王Strategy : IHeroStrategy
         }
     }
 
-    private async Task<bool> 吼去后摇(ImageHandle 句柄)
+    private async Task<bool> 吼去后摇()
     {
         return await _skill.主动技能释放后续(Keys.Q, () =>
         {
@@ -81,17 +81,17 @@ public sealed partial class 斧王Strategy : IHeroStrategy
         }).ConfigureAwait(true);
     }
 
-    private async Task<bool> 战斗饥渴去后摇(ImageHandle 句柄)
+    private async Task<bool> 战斗饥渴去后摇()
     {
         return await _skill.技能通用判断(Keys.W, 1).ConfigureAwait(true);
     }
 
-    private async Task<bool> 淘汰之刃去后摇(ImageHandle 句柄)
+    private async Task<bool> 淘汰之刃去后摇()
     {
         return await _skill.技能通用判断(Keys.R, 1).ConfigureAwait(true);
     }
 
-    private async Task<bool> 跳吼(ImageHandle 句柄)
+    private async Task<bool> 跳吼()
     {
         if (_item.根据图片使用物品(Dota2_Pictrue.物品.跳刀)
             + _item.根据图片使用物品(Dota2_Pictrue.物品.跳刀_力量跳刀)
@@ -101,7 +101,7 @@ public sealed partial class 斧王Strategy : IHeroStrategy
             Common.Delay(等待延迟);
         }
 
-        _ = _skill.DOTA2释放CD就绪技能(Keys.Q, in 句柄);
+        _ = _skill.DOTA2释放CD就绪技能(Keys.Q);
 
         return await Task.FromResult(false).ConfigureAwait(true);
     }

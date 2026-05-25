@@ -26,14 +26,14 @@ public sealed partial class 幽鬼Strategy : IHeroStrategy
         .LegSwap(Keys.E, alwaysSwap: false)
         .OnKey(Keys.F1).WhenHasShard().AdjustLegSwap(Keys.E, paramBool: true)
         .OnKey(Keys.Q).CastSkill(Keys.Q).AfterCast(continueAttack: false)
-        .OnKey(Keys.R).CustomProbe(async _h => await _skill.主动技能释放后续(Keys.R, () =>
+        .OnKey(Keys.R).CustomProbe(async () => await _skill.主动技能释放后续(Keys.R, () =>
         {
             if (_main._聚合.Skills.Mode(SlotKey.F) == 1)
             {
                 _input.Press(VirtualKey.From(Keys.D));
             }
         }).ConfigureAwait(true))
-        .OnKey(Keys.D).CustomProbe(async _h => await _skill.主动技能进入CD后续(Keys.D, () =>
+        .OnKey(Keys.D).CustomProbe(async () => await _skill.主动技能进入CD后续(Keys.D, () =>
         {
             if (_main._聚合.Skills.Mode(SlotKey.F) == 1)
             {

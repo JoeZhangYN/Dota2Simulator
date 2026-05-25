@@ -21,16 +21,16 @@ public sealed partial class 黑鸟Strategy : IHeroStrategy
     public Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx) => GetPlan().DispatchAsync(trigger, ctx, _item);
 
     private HeroPlan GetPlan() => _plan ??= HeroPlanBuilder.New()
-        .OnKey(Keys.D).Pre(() => _input.Press(VirtualKey.From(Keys.W))).CustomProbe(async 句柄 =>
+        .OnKey(Keys.D).Pre(() => _input.Press(VirtualKey.From(Keys.W))).CustomProbe(async () =>
         {
-            if (_skill.DOTA2判断技能是否CD(Keys.R, in 句柄))
+            if (_skill.DOTA2判断技能是否CD(Keys.R))
             {
                 return await Task.FromResult(true).ConfigureAwait(true);
             }
             _input.Press(VirtualKey.From(Keys.A));
             return await Task.FromResult(false).ConfigureAwait(true);
         })
-        .OnKey(Keys.R).CustomProbe(async _h =>
+        .OnKey(Keys.R).CustomProbe(async () =>
             _item.根据图片使用物品(Dota2_Pictrue.物品.跳刀) == 1
                 ? await Task.FromResult(false).ConfigureAwait(true)
                 : await Task.FromResult(true).ConfigureAwait(true))

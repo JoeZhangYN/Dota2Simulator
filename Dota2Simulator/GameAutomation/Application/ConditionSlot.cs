@@ -1,10 +1,14 @@
 using System.Threading.Tasks;
-using Dota2Simulator.Vision;
 
 namespace Dota2Simulator.GameAutomation.Application;
 
-/// <summary>条件委托：输入当前帧图像句柄，返回「条件是否保持触发」。</summary>
-public delegate Task<bool> ConditionDelegateBitmap(ImageHandle 句柄);
+/// <summary>
+/// 条件委托：返回「条件是否保持触发」。
+/// Phase 18 V6a：删除原 (ImageHandle 句柄) 参数 (Phase 6 临时妥协)。
+/// 委托方法都是 instance method, 直接走 this._vision.PixelAt / this._vision.Find 端口；
+/// 多数旧实现体内是「忽略 句柄 入参 + 重新调 GlobalScreenCapture.GetCurrentHandle()」, 入参冗余。
+/// </summary>
+public delegate Task<bool> ConditionDelegateBitmap();
 
 /// <summary>
 /// 一个条件槽：Active 触发标志 + 关联的图像委托 Probe。

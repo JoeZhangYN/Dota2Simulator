@@ -23,10 +23,10 @@ public sealed partial class 大鱼人Strategy : IHeroStrategy
     public Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx) => GetPlan().DispatchAsync(trigger, ctx, _item);
 
     private HeroPlan GetPlan() => _plan ??= HeroPlanBuilder.New()
-        .OnKey(Keys.Q).CustomProbe(async _h => await _skill.技能通用判断(Keys.W, 1, 要接的按键: _main._聚合.HasShard ? Keys.A : Keys.R).ConfigureAwait(true))
-        .OnKey(Keys.W).CustomProbe(async _h => await _skill.技能通用判断(Keys.W, 1, 要接的按键: _main._聚合.HasShard ? Keys.A : Keys.R).ConfigureAwait(true))
+        .OnKey(Keys.Q).CustomProbe(async () => await _skill.技能通用判断(Keys.W, 1, 要接的按键: _main._聚合.HasShard ? Keys.A : Keys.R).ConfigureAwait(true))
+        .OnKey(Keys.W).CustomProbe(async () => await _skill.技能通用判断(Keys.W, 1, 要接的按键: _main._聚合.HasShard ? Keys.A : Keys.R).ConfigureAwait(true))
         .OnKey(Keys.R).CastSkill(Keys.R).AfterCast()
-        .OnKey(Keys.E).CustomProbe(async 句柄 =>
+        .OnKey(Keys.E).CustomProbe(async () =>
         {
             if (_item.根据图片使用物品(Dota2_Pictrue.物品.魂戒) == 1)
             {
@@ -39,7 +39,7 @@ public sealed partial class 大鱼人Strategy : IHeroStrategy
             {
                 Common.Delay(等待延迟);
             }
-            _ = _skill.DOTA2释放CD就绪技能(Keys.W, in 句柄);
+            _ = _skill.DOTA2释放CD就绪技能(Keys.W);
             return await Task.FromResult(false).ConfigureAwait(true);
         })
         .Done();

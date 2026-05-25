@@ -20,10 +20,10 @@ public sealed partial class 哈斯卡Strategy : IHeroStrategy
 
     private HeroPlan GetPlan() => _plan ??= HeroPlanBuilder.New()
         .OnKey(Keys.Q).CastSkill(Keys.W).AfterCast()
-        .OnKey(Keys.R).CustomProbe(async 句柄 => await _skill.主动技能释放后续(Keys.R, () =>
+        .OnKey(Keys.R).CustomProbe(async () => await _skill.主动技能释放后续(Keys.R, () =>
         {
             _input.MouseClick(MouseButton.Right);
-            if (_skill.DOTA2释放CD就绪技能(Keys.Q, in 句柄))
+            if (_skill.DOTA2释放CD就绪技能(Keys.Q))
             {
                 return;
             }

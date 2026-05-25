@@ -23,7 +23,7 @@ public sealed partial class 火枪Strategy : IHeroStrategy
         .LegSwap(Keys.W, alwaysSwap: false)
         .OnEveryKey().AdjustLegSwapDynamic(Keys.D, ctx => ctx.Aggregate.HasShard)
         .OnKey(Keys.Q).CastSkill(Keys.Q).AfterCast()
-        .OnKey(Keys.E).CustomProbe(async _h => await _skill.主动技能进入CD后续(Keys.E, () =>
+        .OnKey(Keys.E).CustomProbe(async () => await _skill.主动技能进入CD后续(Keys.E, () =>
         {
             _ = _item.根据图片使用物品(Dota2_Pictrue.物品.疯狂面具);
             _skill.通用技能后续动作();

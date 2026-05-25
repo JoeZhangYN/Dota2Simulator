@@ -54,33 +54,33 @@ public sealed partial class 干扰者Strategy : IHeroStrategy
         }
     }
 
-    private async Task<bool> 风雷之击去后摇(ImageHandle 句柄)
+    private async Task<bool> 风雷之击去后摇()
     {
         return await _skill.技能通用判断(Keys.Q, 0).ConfigureAwait(true);
     }
 
-    private async Task<bool> 静态风暴去后摇(ImageHandle 句柄)
+    private async Task<bool> 静态风暴去后摇()
     {
         return await _skill.技能通用判断(Keys.R, 0).ConfigureAwait(true);
     }
 
-    private async Task<bool> 恶念瞥视去后摇(ImageHandle 句柄)
+    private async Task<bool> 恶念瞥视去后摇()
     {
         return await _skill.技能通用判断(Keys.W, 0, false).ConfigureAwait(true);
     }
 
-    private async Task<bool> 动能力场去后摇(ImageHandle 句柄)
+    private async Task<bool> 动能力场去后摇()
     {
         return await _skill.技能通用判断(Keys.E, 0, false).ConfigureAwait(true);
     }
 
-    private async Task<bool> 静态风暴动能立场风雷之击(ImageHandle 句柄)
+    private async Task<bool> 静态风暴动能立场风雷之击()
     {
-        return _skill.DOTA2释放CD就绪技能(Keys.R, in 句柄)
+        return _skill.DOTA2释放CD就绪技能(Keys.R)
             ? await Task.FromResult(true).ConfigureAwait(true)
-            : _skill.DOTA2释放CD就绪技能(Keys.E, in 句柄)
+            : _skill.DOTA2释放CD就绪技能(Keys.E)
                 ? await Task.FromResult(true).ConfigureAwait(true)
-                : _skill.DOTA2释放CD就绪技能(Keys.Q, in 句柄)
+                : _skill.DOTA2释放CD就绪技能(Keys.Q)
                     ? await Task.FromResult(true).ConfigureAwait(true)
                     : await Task.FromResult(false).ConfigureAwait(true);
     }

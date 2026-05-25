@@ -2,9 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Dota2Simulator.GameAutomation.Ports;
 using Dota2Simulator.Games;
-using Dota2Simulator.Vision;
 
 namespace Dota2Simulator.GameAutomation.Application;
 
@@ -21,14 +19,11 @@ public sealed class ConditionSlotSet
     private readonly ConditionSlot[] _slots;
 
     /// <summary>
-    /// Vision 端口（C6 单阶段 ctor 注入；删原双阶段 Init）。
-    /// HeroAggregate 不再是 Main._聚合 类型加载期 new 出来，由 AppContainer ctor 内 new HeroAggregate(Vision) 传入。
+    /// Phase 18 V6a：委托签名 () 无参后, 此聚合内不再调 _vision.GetCurrentFrame()。
+    /// 委托方法本身走 this._vision (在 Strategy 内) 取当前帧，ConditionSlotSet 退回纯状态容器形态。
     /// </summary>
-    private readonly IScreenVision _vision;
-
-    public ConditionSlotSet(IScreenVision vision)
+    public ConditionSlotSet()
     {
-        _vision = vision ?? throw new ArgumentNullException(nameof(vision));
         _slots = new ConditionSlot[槽数];
         for (int i = 0; i < 槽数; i++)
             _slots[i] = new ConditionSlot();
@@ -130,13 +125,10 @@ public sealed class ConditionSlotSet
     }
 
     /// <summary>条件成立且委托非空才执行委托——移植自 Main.cs 检查条件并执行委托。
-    /// C6 单阶段后：vision 保证 ctor 期注入，删 fallback。</summary>
+    /// Phase 18 V6a：委托签名 () 无参后，删 GetCurrentFrame() 调用；委托方法走 this._vision 直接取。</summary>
     private async Task<bool> 检查并执行(bool 条件, ConditionDelegateBitmap? 委托)
     {
         if (!条件 || 委托 is null) return 条件;
-#pragma warning disable CS0618 // GetCurrentFrame 标 [Obsolete] 是临时妥协，A5 这是唯一合法调用点
-        ImageHandle handle = _vision.GetCurrentFrame();
-#pragma warning restore CS0618
-        return await 委托(handle).ConfigureAwait(true);
+        return await 委托().ConfigureAwait(true);
     }
 }

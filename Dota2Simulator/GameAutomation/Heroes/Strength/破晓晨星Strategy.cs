@@ -32,7 +32,7 @@ public sealed partial class 破晓晨星Strategy : IHeroStrategy
         }
     }
 
-    private async Task<bool> 上界重锤去后摇(ImageHandle 句柄)
+    private async Task<bool> 上界重锤去后摇()
     {
         return await _skill.技能通用判断(Keys.W, 1).ConfigureAwait(true);
     }

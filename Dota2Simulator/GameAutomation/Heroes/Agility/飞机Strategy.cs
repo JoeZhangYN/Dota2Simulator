@@ -31,7 +31,7 @@ public sealed partial class 飞机Strategy : IHeroStrategy
         .OnKey(Keys.D3).ToggleConditionSlot(ConditionSlotKey.C5, "循环弹幕", "关闭弹幕")
         .Done();
 
-    private async Task<bool> 循环火箭弹幕(ImageHandle 句柄)
+    private async Task<bool> 循环火箭弹幕()
     {
         if (Common.获取当前时间毫秒() - _main._聚合.Skills.Time(SlotKey.Q) > 400)
             await _skill.主动技能已就绪后续(Keys.Q, () =>

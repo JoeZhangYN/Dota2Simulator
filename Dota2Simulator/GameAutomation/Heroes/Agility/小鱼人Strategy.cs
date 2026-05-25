@@ -28,7 +28,7 @@ public sealed partial class 小鱼人Strategy : IHeroStrategy
         .LegSwap(Keys.E, alwaysSwap: false)
         .OnKey(Keys.F1).WhenHasShard().AdjustLegSwap(Keys.D, paramBool: true)
         .OnKey(Keys.Q).CastSkill(Keys.Q).AfterEnterCD()
-        .OnKey(Keys.W).CustomProbe(async _h =>
+        .OnKey(Keys.W).CustomProbe(async () =>
         {
             _ = Task.Run(() =>
             {

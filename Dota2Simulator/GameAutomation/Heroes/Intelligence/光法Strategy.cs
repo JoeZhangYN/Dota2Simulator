@@ -26,7 +26,7 @@ public sealed partial class 光法Strategy : IHeroStrategy
 
     private HeroPlan GetPlan() => _plan ??= HeroPlanBuilder.New()
         .RepeatThreshold(100)
-        .OnKey(Keys.Q).CustomProbe(async _h =>
+        .OnKey(Keys.Q).CustomProbe(async () =>
         {
             int step = _main._聚合.Skills.Step(SlotKey.Q);
             if (step == 1)
@@ -54,7 +54,7 @@ public sealed partial class 光法Strategy : IHeroStrategy
         })
         .OnKey(Keys.W).CastSkill(Keys.D).AfterCast()
         .OnKey(Keys.E).CastSkill(Keys.E).AfterCast()
-        .OnKey(Keys.E, KeyModifiers.Alt).CustomProbe(async _h =>
+        .OnKey(Keys.E, KeyModifiers.Alt).CustomProbe(async () =>
         {
             await _skill.技能通用判断(Keys.E, 2).ConfigureAwait(true);
             return _main._聚合.Conditions[ConditionSlotKey.C4].Active;

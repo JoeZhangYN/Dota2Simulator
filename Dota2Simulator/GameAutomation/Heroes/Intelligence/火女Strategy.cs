@@ -42,14 +42,14 @@ public sealed partial class 火女Strategy : IHeroStrategy
         return Task.CompletedTask;
     }
 
-    private async Task<bool> 龙破斩去后摇(ImageHandle 句柄)
+    private async Task<bool> 龙破斩去后摇()
     {
         void 龙破斩后()
         {
             _input.Press(VirtualKey.From(Keys.A));
         }
 
-        if (_skill.DOTA2判断技能是否CD(Keys.Q, in 句柄))
+        if (_skill.DOTA2判断技能是否CD(Keys.Q))
         {
             return await Task.FromResult(true).ConfigureAwait(true);
         }
@@ -58,14 +58,14 @@ public sealed partial class 火女Strategy : IHeroStrategy
         return await Task.FromResult(false).ConfigureAwait(true);
     }
 
-    private async Task<bool> 光击阵去后摇(ImageHandle 句柄)
+    private async Task<bool> 光击阵去后摇()
     {
         void 光击阵后()
         {
             _input.Press(VirtualKey.From(Keys.A));
         }
 
-        if (_skill.DOTA2判断技能是否CD(Keys.W, in 句柄))
+        if (_skill.DOTA2判断技能是否CD(Keys.W))
         {
             return await Task.FromResult(true).ConfigureAwait(true);
         }
@@ -74,14 +74,14 @@ public sealed partial class 火女Strategy : IHeroStrategy
         return await Task.FromResult(false).ConfigureAwait(true);
     }
 
-    private async Task<bool> 神灭斩去后摇(ImageHandle 句柄)
+    private async Task<bool> 神灭斩去后摇()
     {
         void 神灭斩后()
         {
             _input.Press(VirtualKey.From(Keys.A));
         }
 
-        if (_skill.DOTA2判断技能是否CD(Keys.R, in 句柄))
+        if (_skill.DOTA2判断技能是否CD(Keys.R))
         {
             return await Task.FromResult(true).ConfigureAwait(true);
         }

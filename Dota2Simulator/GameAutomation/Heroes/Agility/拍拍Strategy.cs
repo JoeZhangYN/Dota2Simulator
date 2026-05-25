@@ -23,7 +23,7 @@ public sealed partial class 拍拍Strategy : IHeroStrategy
     private HeroPlan GetPlan() => _plan ??= HeroPlanBuilder.New()
         .OnKey(Keys.Q).CastSkill(Keys.Q).AfterEnterCD()
         .OnKey(Keys.W).CastSkill(Keys.W).AfterCast()
-        .OnKey(Keys.E).CustomProbe(async 句柄 =>
+        .OnKey(Keys.E).CustomProbe(async () =>
         {
             _ = Task.Run(() =>
             {
@@ -32,7 +32,7 @@ public sealed partial class 拍拍Strategy : IHeroStrategy
                     + _item.根据图片使用物品(Dota2_Pictrue.物品.跳刀_敏捷跳刀) == 1)
                 {
                     _input.Press(VirtualKey.From(Keys.A));
-                    _ = _skill.DOTA2释放CD就绪技能(Keys.Q, in 句柄);
+                    _ = _skill.DOTA2释放CD就绪技能(Keys.Q);
                 }
             });
             return await Task.FromResult(false).ConfigureAwait(true);

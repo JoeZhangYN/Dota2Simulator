@@ -56,7 +56,7 @@ public sealed partial class 海民Strategy : IHeroStrategy
         {
             if (_main._聚合.Conditions.StoneChoice == 1)
             {
-                _skill.DOTA2释放CD就绪技能(Keys.E, GlobalScreenCapture.GetCurrentHandle());
+                _skill.DOTA2释放CD就绪技能(Keys.E);
             }
 
             _main._聚合.Conditions[ConditionSlotKey.C3].Active = true;
@@ -69,7 +69,7 @@ public sealed partial class 海民Strategy : IHeroStrategy
     }
 
 #pragma warning disable CS0618 // V3 临时妥协调用 Find(ImageHandle, ...) 重载，V6 改 SG 生成 Template 同步删
-    private async Task<bool> 海民获取命石(ImageHandle 句柄)
+    private async Task<bool> 海民获取命石()
     {
         if (_main._聚合.Conditions.StoneChoice == 0)
         {
@@ -81,23 +81,23 @@ public sealed partial class 海民Strategy : IHeroStrategy
     }
 #pragma warning restore CS0618
 
-    private async Task<bool> 冰片去后摇(ImageHandle 句柄)
+    private async Task<bool> 冰片去后摇()
     {
         return await _skill.技能通用判断(Keys.Q, 1).ConfigureAwait(true);
     }
 
-    private async Task<bool> 摔角行家去后摇(ImageHandle 句柄)
+    private async Task<bool> 摔角行家去后摇()
     {
         return await _skill.技能通用判断(Keys.E, 0).ConfigureAwait(true);
     }
 
-    private async Task<bool> 酒友去后摇(ImageHandle 句柄)
+    private async Task<bool> 酒友去后摇()
     {
         return await _skill.技能通用判断(Keys.E, 1).ConfigureAwait(true);
     }
 
     // 基本完美了。。。
-    private async Task<bool> 海象神拳接雪球(ImageHandle 句柄)
+    private async Task<bool> 海象神拳接雪球()
     {
         return await _skill.法球技能进入CD后续(Keys.R, () =>
         {

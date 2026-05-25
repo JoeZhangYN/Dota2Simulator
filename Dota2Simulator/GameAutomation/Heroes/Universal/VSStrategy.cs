@@ -43,17 +43,17 @@ public sealed partial class VSStrategy : IHeroStrategy
         }
     }
 
-    private async Task<bool> 魔法箭去后摇(ImageHandle 句柄)
+    private async Task<bool> 魔法箭去后摇()
     {
         return await _skill.技能通用判断(Keys.Q, 1).ConfigureAwait(true);
     }
 
-    private async Task<bool> 恐怖波动去后摇(ImageHandle 句柄)
+    private async Task<bool> 恐怖波动去后摇()
     {
         return await _skill.技能通用判断(Keys.W, 1).ConfigureAwait(true);
     }
 
-    private async Task<bool> 移形换位去后摇(ImageHandle 句柄)
+    private async Task<bool> 移形换位去后摇()
     {
         return await _skill.技能通用判断(Keys.R, 1).ConfigureAwait(true);
     }

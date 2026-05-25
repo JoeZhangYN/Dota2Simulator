@@ -47,7 +47,7 @@ namespace Dota2Simulator.Games.Dota2.Silt
 
         private bool 已吃书;
 
-        public async Task<bool> 有书吃书(ImageHandle 句柄)
+        public async Task<bool> 有书吃书()
         {
             if (已吃书
                 && _item.根据图片使用物品(Dota2_Pictrue.物品.书) == 0)

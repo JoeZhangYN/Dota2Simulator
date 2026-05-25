@@ -47,7 +47,7 @@ public sealed partial class 神域Strategy : IHeroStrategy
         }
     }
 
-    private async Task<bool> 命运敕令去后摇(ImageHandle 句柄)
+    private async Task<bool> 命运敕令去后摇()
     {
         async Task 命运敕令后()
         {
@@ -56,7 +56,7 @@ public sealed partial class 神域Strategy : IHeroStrategy
             // _input.Press(VirtualKey.From(Keys.A));
         }
 
-        if (_skill.DOTA2判断技能是否CD(Keys.W, in 句柄))
+        if (_skill.DOTA2判断技能是否CD(Keys.W))
         {
             return await Task.FromResult(true).ConfigureAwait(true);
         }
@@ -65,7 +65,7 @@ public sealed partial class 神域Strategy : IHeroStrategy
         return await Task.FromResult(false).ConfigureAwait(true);
     }
 
-    private async Task<bool> 涤罪之焰去后摇(ImageHandle 句柄)
+    private async Task<bool> 涤罪之焰去后摇()
     {
         async Task 涤罪之焰后()
         {
@@ -73,7 +73,7 @@ public sealed partial class 神域Strategy : IHeroStrategy
             // RightClick();
         }
 
-        if (_skill.DOTA2判断技能是否CD(Keys.E, in 句柄))
+        if (_skill.DOTA2判断技能是否CD(Keys.E))
         {
             return await Task.FromResult(true).ConfigureAwait(true);
         }
@@ -82,7 +82,7 @@ public sealed partial class 神域Strategy : IHeroStrategy
         return await Task.FromResult(false).ConfigureAwait(true);
     }
 
-    private async Task<bool> 虚妄之诺去后摇(ImageHandle 句柄)
+    private async Task<bool> 虚妄之诺去后摇()
     {
         async Task 虚妄之诺后()
         {
@@ -90,7 +90,7 @@ public sealed partial class 神域Strategy : IHeroStrategy
             // _input.Press(VirtualKey.From(Keys.A));
         }
 
-        if (_skill.DOTA2判断技能是否CD(Keys.R, in 句柄))
+        if (_skill.DOTA2判断技能是否CD(Keys.R))
         {
             return await Task.FromResult(true).ConfigureAwait(true);
         }
@@ -99,7 +99,7 @@ public sealed partial class 神域Strategy : IHeroStrategy
         return await Task.FromResult(false).ConfigureAwait(true);
     }
 
-    private async Task<bool> 天命之雨去后摇(ImageHandle 句柄)
+    private async Task<bool> 天命之雨去后摇()
     {
         void 天命之雨后()
         {
@@ -107,7 +107,7 @@ public sealed partial class 神域Strategy : IHeroStrategy
             // _input.Press(VirtualKey.From(Keys.A));
         }
 
-        if (_skill.DOTA2判断技能是否CD(Keys.D, in 句柄))
+        if (_skill.DOTA2判断技能是否CD(Keys.D))
         {
             return await Task.FromResult(true).ConfigureAwait(true);
         }

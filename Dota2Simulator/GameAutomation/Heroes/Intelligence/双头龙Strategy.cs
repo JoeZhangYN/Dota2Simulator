@@ -52,7 +52,7 @@ public sealed partial class 双头龙Strategy : IHeroStrategy
         }
     }
 
-    private async Task<bool> 冰火交加去后摇(ImageHandle 句柄)
+    private async Task<bool> 冰火交加去后摇()
     {
         void 冰火交加后()
         {
@@ -67,7 +67,7 @@ public sealed partial class 双头龙Strategy : IHeroStrategy
             return await Task.FromResult(false).ConfigureAwait(true);
         }
 
-        if (_skill.DOTA2判断技能是否CD(Keys.Q, in 句柄))
+        if (_skill.DOTA2判断技能是否CD(Keys.Q))
         {
             return await Task.FromResult(true).ConfigureAwait(true);
         }
@@ -76,7 +76,7 @@ public sealed partial class 双头龙Strategy : IHeroStrategy
         return await Task.FromResult(false).ConfigureAwait(true);
     }
 
-    private async Task<bool> 冰封路径去后摇(ImageHandle 句柄)
+    private async Task<bool> 冰封路径去后摇()
     {
         void 冰封路径后()
         {
@@ -91,7 +91,7 @@ public sealed partial class 双头龙Strategy : IHeroStrategy
             return await Task.FromResult(false).ConfigureAwait(true);
         }
 
-        if (_skill.DOTA2判断技能是否CD(Keys.W, in 句柄))
+        if (_skill.DOTA2判断技能是否CD(Keys.W))
         {
             return await Task.FromResult(true).ConfigureAwait(true);
         }
@@ -100,7 +100,7 @@ public sealed partial class 双头龙Strategy : IHeroStrategy
         return await Task.FromResult(false).ConfigureAwait(true);
     }
 
-    private async Task<bool> 烈焰焚身去后摇(ImageHandle 句柄)
+    private async Task<bool> 烈焰焚身去后摇()
     {
         void 烈焰焚身后()
         {
@@ -115,7 +115,7 @@ public sealed partial class 双头龙Strategy : IHeroStrategy
             return await Task.FromResult(false).ConfigureAwait(true);
         }
 
-        if (_skill.DOTA2判断技能是否CD(Keys.R, in 句柄))
+        if (_skill.DOTA2判断技能是否CD(Keys.R))
         {
             return await Task.FromResult(true).ConfigureAwait(true);
         }
@@ -124,7 +124,7 @@ public sealed partial class 双头龙Strategy : IHeroStrategy
         return await Task.FromResult(false).ConfigureAwait(true);
     }
 
-    private async Task<bool> 吹风接冰封路径(ImageHandle 句柄)
+    private async Task<bool> 吹风接冰封路径()
     {
         if (_item.根据图片使用物品(Dota2_Pictrue.物品.吹风) == 1)
         {

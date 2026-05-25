@@ -67,7 +67,7 @@ public sealed partial class 猛犸Strategy : IHeroStrategy
         }
     }
 
-    private async Task<bool> 震荡波去后摇(ImageHandle 句柄)
+    private async Task<bool> 震荡波去后摇()
     {
         void 震荡波后()
         {
@@ -78,7 +78,7 @@ public sealed partial class 猛犸Strategy : IHeroStrategy
         return await Task.FromResult(false).ConfigureAwait(true);
     }
 
-    private async Task<bool> 授予力量去后摇(ImageHandle 句柄)
+    private async Task<bool> 授予力量去后摇()
     {
         void 授予力量后()
         {
@@ -89,7 +89,7 @@ public sealed partial class 猛犸Strategy : IHeroStrategy
         return await Task.FromResult(false).ConfigureAwait(true);
     }
 
-    private async Task<bool> 巨角冲撞去后摇(ImageHandle 句柄)
+    private async Task<bool> 巨角冲撞去后摇()
     {
         void 巨角冲撞后()
         {
@@ -100,7 +100,7 @@ public sealed partial class 猛犸Strategy : IHeroStrategy
         return await Task.FromResult(false).ConfigureAwait(true);
     }
 
-    private async Task<bool> 长角抛物去后摇(ImageHandle 句柄)
+    private async Task<bool> 长角抛物去后摇()
     {
         void 长角抛物后()
         {
@@ -111,7 +111,7 @@ public sealed partial class 猛犸Strategy : IHeroStrategy
         return await Task.FromResult(false).ConfigureAwait(true);
     }
 
-    private async Task<bool> 两级反转去后摇(ImageHandle 句柄)
+    private async Task<bool> 两级反转去后摇()
     {
         void 两级反转后()
         {

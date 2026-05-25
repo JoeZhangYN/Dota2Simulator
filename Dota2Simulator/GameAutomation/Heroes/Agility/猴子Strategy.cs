@@ -34,7 +34,7 @@ public sealed partial class 猴子Strategy : IHeroStrategy
 
         if (key == VirtualKey.Q)
         {
-            if (!_skill.DOTA2判断状态技能是否启动(Keys.E, GlobalScreenCapture.GetCurrentHandle()))
+            if (!_skill.DOTA2判断状态技能是否启动(Keys.E))
             {
                 _input.Press(VirtualKey.From(Keys.E));
             }
@@ -43,7 +43,7 @@ public sealed partial class 猴子Strategy : IHeroStrategy
         }
         else if (key == VirtualKey.W)
         {
-            if (!_skill.DOTA2判断状态技能是否启动(Keys.E, GlobalScreenCapture.GetCurrentHandle()))
+            if (!_skill.DOTA2判断状态技能是否启动(Keys.E))
             {
                 _input.Press(VirtualKey.From(Keys.E));
             }
@@ -52,19 +52,19 @@ public sealed partial class 猴子Strategy : IHeroStrategy
         }
         else if (key == VirtualKey.R)
         {
-            if (!_skill.DOTA2判断状态技能是否启动(Keys.E, GlobalScreenCapture.GetCurrentHandle()))
+            if (!_skill.DOTA2判断状态技能是否启动(Keys.E))
             {
                 _input.Press(VirtualKey.From(Keys.E));
             }
         }
     }
 
-    private async Task<bool> 灵魂之矛敏捷(ImageHandle 句柄)
+    private async Task<bool> 灵魂之矛敏捷()
     {
         return await _skill.技能通用判断(Keys.Q, 1).ConfigureAwait(true);
     }
 
-    private async Task<bool> 神行百变选择幻象(ImageHandle 句柄)
+    private async Task<bool> 神行百变选择幻象()
     {
         return await _skill.主动技能释放后续(Keys.W, () =>
         {

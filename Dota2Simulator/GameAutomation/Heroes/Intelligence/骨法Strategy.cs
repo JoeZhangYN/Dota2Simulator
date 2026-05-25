@@ -56,12 +56,12 @@ public sealed partial class 骨法Strategy : IHeroStrategy
         }
     }
 
-    private async Task<bool> 幽冥轰爆去后摇(ImageHandle 句柄)
+    private async Task<bool> 幽冥轰爆去后摇()
     {
         return await _skill.技能通用判断(Keys.Q, _main._聚合.Skills.Step(SlotKey.R) > 0 ? 10 : 0).ConfigureAwait(true);
     }
 
-    private async Task<bool> 衰老去后摇(ImageHandle 句柄)
+    private async Task<bool> 衰老去后摇()
     {
         return await _skill.主动技能进入CD后续(Keys.W, () =>
         {
@@ -75,14 +75,14 @@ public sealed partial class 骨法Strategy : IHeroStrategy
         }).ConfigureAwait(true);
     }
 
-    private async Task<bool> 幽冥守卫去后摇(ImageHandle 句柄)
+    private async Task<bool> 幽冥守卫去后摇()
     {
         return await _skill.技能通用判断(Keys.E, _main._聚合.Skills.Step(SlotKey.R) > 0 ? 10 : 0).ConfigureAwait(true);
     }
 
-    private async Task<bool> 生命吸取去后摇(ImageHandle 句柄)
+    private async Task<bool> 生命吸取去后摇()
     {
-        if (_skill.DOTA2判断技能是否CD(Keys.R, in 句柄))
+        if (_skill.DOTA2判断技能是否CD(Keys.R))
         {
             _main._聚合.Skills.SetStep(SlotKey.R, 0);
             return await Task.FromResult(true).ConfigureAwait(true);
@@ -111,7 +111,7 @@ public sealed partial class 骨法Strategy : IHeroStrategy
             }
             else
             {
-                if (!_skill.DOTA2判断是否持续施法(in 句柄))
+                if (!_skill.DOTA2判断是否持续施法())
                 {
                     _main._聚合.Skills.SetStep(SlotKey.R, 0);
                     _input.Press(VirtualKey.From(Keys.A));

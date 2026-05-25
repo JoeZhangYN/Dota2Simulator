@@ -20,7 +20,7 @@ public sealed partial class 马尔斯Strategy : IHeroStrategy
     public Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx) => GetPlan().DispatchAsync(trigger, ctx, _item);
 
     private HeroPlan GetPlan() => _plan ??= HeroPlanBuilder.New()
-        .OnKey(Keys.Q).CustomProbe(async _h => await _skill.主动技能释放后续(Keys.Q, () =>
+        .OnKey(Keys.Q).CustomProbe(async () => await _skill.主动技能释放后续(Keys.Q, () =>
         {
             if (_main._聚合.Skills.Mode(SlotKey.Q) == 1)
             {
@@ -32,9 +32,9 @@ public sealed partial class 马尔斯Strategy : IHeroStrategy
             }
         }).ConfigureAwait(true))
         .OnKey(Keys.W).CastSkill(Keys.W).AfterCast()
-        .OnKey(Keys.R).CustomProbe(async 句柄 => await _skill.主动技能释放后续(Keys.R, () =>
+        .OnKey(Keys.R).CustomProbe(async () => await _skill.主动技能释放后续(Keys.R, () =>
         {
-            if (_skill.判断技能状态(Keys.E, 句柄, SkillEngine.技能类型.状态))
+            if (_skill.判断技能状态(Keys.E, SkillEngine.技能类型.状态))
             {
                 _input.Press(VirtualKey.From(Keys.E));
             }

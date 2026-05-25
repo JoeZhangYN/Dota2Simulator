@@ -46,11 +46,11 @@ public sealed partial class 屠夫Strategy : IHeroStrategy
     }
 
     // 钩子出手后，就可以用W，但其他技能无法释放且物品会被锁闭，可以通过判断锁闭的状态
-    private async Task<bool> 钩子去僵直(ImageHandle 句柄)
+    private async Task<bool> 钩子去僵直()
     {
         return await _skill.主动技能释放后续(Keys.Q, () =>
         {
-            if (!_skill.DOTA2判断状态技能是否启动(Keys.W, in 句柄))
+            if (!_skill.DOTA2判断状态技能是否启动(Keys.W))
             {
                 _input.Press(VirtualKey.From(Keys.W));
             }
@@ -63,11 +63,11 @@ public sealed partial class 屠夫Strategy : IHeroStrategy
         }).ConfigureAwait(true);
     }
 
-    private async Task<bool> 肢解检测状态(ImageHandle 句柄)
+    private async Task<bool> 肢解检测状态()
     {
         return await _skill.主动技能释放后续(Keys.R, () =>
         {
-            if (!_skill.DOTA2判断状态技能是否启动(Keys.W, in 句柄))
+            if (!_skill.DOTA2判断状态技能是否启动(Keys.W))
             {
                 _input.Press(VirtualKey.From(Keys.W));
             }
@@ -80,9 +80,9 @@ public sealed partial class 屠夫Strategy : IHeroStrategy
     // 技能颜色虽然变了，但是CD状态的颜色没变，
     // 钩可以直接接咬，但期间物品还是锁闭的
     // 解决。
-    private async Task<bool> 快速接肢解(ImageHandle 句柄)
+    private async Task<bool> 快速接肢解()
     {
-        return await _item.所有物品可用后续(句柄, () =>
+        return await _item.所有物品可用后续(() =>
         {
             Common.Delay(33 * _item.根据图片使用物品(Dota2_Pictrue.物品.纷争));
             Common.Delay(33 * _item.根据图片使用物品(Dota2_Pictrue.物品.希瓦));

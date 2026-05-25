@@ -55,7 +55,7 @@ public sealed partial class 戴泽Strategy : IHeroStrategy
         return Task.CompletedTask;
     }
 
-    private async Task<bool> 剧毒之触去后摇(ImageHandle 句柄)
+    private async Task<bool> 剧毒之触去后摇()
     {
         void 剧毒之触后()
         {
@@ -70,7 +70,7 @@ public sealed partial class 戴泽Strategy : IHeroStrategy
           return await Task.FromResult(false).ConfigureAwait(true);
         }
 
-        if (_skill.DOTA2判断技能是否CD(Keys.Q, in 句柄))
+        if (_skill.DOTA2判断技能是否CD(Keys.Q))
         {
           return await Task.FromResult(true).ConfigureAwait(true);
         }
@@ -79,7 +79,7 @@ public sealed partial class 戴泽Strategy : IHeroStrategy
         return await Task.FromResult(false).ConfigureAwait(true);
     }
 
-    private async Task<bool> 薄葬去后摇(ImageHandle 句柄)
+    private async Task<bool> 薄葬去后摇()
     {
         void 薄葬后()
         {
@@ -94,7 +94,7 @@ public sealed partial class 戴泽Strategy : IHeroStrategy
           return await Task.FromResult(false).ConfigureAwait(true);
         }
 
-        if (_skill.DOTA2判断技能是否CD(Keys.W, in 句柄))
+        if (_skill.DOTA2判断技能是否CD(Keys.W))
         {
           return await Task.FromResult(true).ConfigureAwait(true);
         }
@@ -103,7 +103,7 @@ public sealed partial class 戴泽Strategy : IHeroStrategy
         return await Task.FromResult(false).ConfigureAwait(true);
     }
 
-    private async Task<bool> 暗影波去后摇(ImageHandle 句柄)
+    private async Task<bool> 暗影波去后摇()
     {
         void 暗影波后()
         {
@@ -118,7 +118,7 @@ public sealed partial class 戴泽Strategy : IHeroStrategy
           return await Task.FromResult(false).ConfigureAwait(true);
         }
 
-        if (_skill.DOTA2判断技能是否CD(Keys.E, in 句柄))
+        if (_skill.DOTA2判断技能是否CD(Keys.E))
         {
           return await Task.FromResult(true).ConfigureAwait(true);
         }
@@ -127,7 +127,7 @@ public sealed partial class 戴泽Strategy : IHeroStrategy
         return await Task.FromResult(false).ConfigureAwait(true);
     }
 
-    private async Task<bool> 邪能去后摇(ImageHandle 句柄)
+    private async Task<bool> 邪能去后摇()
     {
         void 邪能后()
         {
@@ -142,7 +142,7 @@ public sealed partial class 戴泽Strategy : IHeroStrategy
           return await Task.FromResult(false).ConfigureAwait(true);
         }
 
-        if (_skill.DOTA2判断技能是否CD(Keys.R, in 句柄))
+        if (_skill.DOTA2判断技能是否CD(Keys.R))
         {
           return await Task.FromResult(true).ConfigureAwait(true);
         }

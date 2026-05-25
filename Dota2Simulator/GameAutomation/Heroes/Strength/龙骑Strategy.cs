@@ -28,17 +28,17 @@ public sealed partial class 龙骑Strategy : IHeroStrategy
         .LegSwap(Keys.E, alwaysSwap: false)
         .OnKey(Keys.F1).WhenHasShard().AdjustLegSwap(Keys.D, paramBool: true)
         .OnKey(Keys.Q).CastSkill(Keys.Q).AfterCast()
-        .OnKey(Keys.W).CustomProbe(async _h => await _skill.主动技能进入CD后续(Keys.W, () =>
+        .OnKey(Keys.W).CustomProbe(async () => await _skill.主动技能进入CD后续(Keys.W, () =>
         {
             _input.Press(VirtualKey.From(Keys.A));
-            _ = _main._聚合.Skills.Mode(SlotKey.W) == 1 && _main._聚合.HasShard ? _skill.DOTA2释放CD就绪技能(Keys.D, in _h) : _skill.DOTA2释放CD就绪技能(Keys.Q, in _h);
+            _ = _main._聚合.Skills.Mode(SlotKey.W) == 1 && _main._聚合.HasShard ? _skill.DOTA2释放CD就绪技能(Keys.D) : _skill.DOTA2释放CD就绪技能(Keys.Q);
             _item.要求保持假腿();
         }).ConfigureAwait(true))
         .OnKey(Keys.R).CastSkill(Keys.R).AfterEnterCD()
-        .OnKey(Keys.D).WhenHasShard().CustomProbe(async _h => await _skill.技能通用判断(
+        .OnKey(Keys.D).WhenHasShard().CustomProbe(async () => await _skill.技能通用判断(
             Keys.D,
             0,
-            要接的按键: _main._聚合.Skills.Mode(SlotKey.D) == 1 && _skill.DOTA2判断技能是否CD(Keys.Q, in _h) ? Keys.Q : Keys.A).ConfigureAwait(true))
+            要接的按键: _main._聚合.Skills.Mode(SlotKey.D) == 1 && _skill.DOTA2判断技能是否CD(Keys.Q) ? Keys.Q : Keys.A).ConfigureAwait(true))
         .OnKey(Keys.D2).Execute(() =>
         {
             _main._聚合.Skills.ToggleMode(SlotKey.W);

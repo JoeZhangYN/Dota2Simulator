@@ -62,7 +62,7 @@ public sealed partial class 伐木机Strategy : IHeroStrategy
     }
 
 #pragma warning disable CS0618 // V3 临时妥协调用 Find(ImageHandle, ...) 重载，V6 改 SG 生成 Template 同步删
-    private async Task<bool> 伐木机获取命石(ImageHandle 句柄)
+    private async Task<bool> 伐木机获取命石()
     {
         if (_main._聚合.Conditions.StoneChoice == 0)
         {
@@ -82,27 +82,27 @@ public sealed partial class 伐木机Strategy : IHeroStrategy
     }
 #pragma warning restore CS0618
 
-    private async Task<bool> 死亡旋风去后摇(ImageHandle 句柄)
+    private async Task<bool> 死亡旋风去后摇()
     {
         return await _skill.技能通用判断(Keys.Q, 0).ConfigureAwait(true);
     }
 
-    private async Task<bool> 伐木聚链去后摇(ImageHandle 句柄)
+    private async Task<bool> 伐木聚链去后摇()
     {
         return await _skill.技能通用判断(Keys.W, 1).ConfigureAwait(true);
     }
 
-    private async Task<bool> 锯齿轮旋去后摇(ImageHandle 句柄)
+    private async Task<bool> 锯齿轮旋去后摇()
     {
         return await _skill.技能通用判断(Keys.D, 1).ConfigureAwait(true);
     }
 
-    private async Task<bool> 锯齿飞轮去后摇(ImageHandle 句柄)
+    private async Task<bool> 锯齿飞轮去后摇()
     {
         return await _skill.释放技能后替换图标技能后续(Keys.R, () => _main._聚合.Skills.Step(Domain.Loop.SlotKey.R), v => _main._聚合.Skills.SetStep(Domain.Loop.SlotKey.R, v)).ConfigureAwait(true);
     }
 
-    private async Task<bool> 喷火装置去后摇(ImageHandle 句柄)
+    private async Task<bool> 喷火装置去后摇()
     {
         return await _skill.技能通用判断(Keys.F, 0).ConfigureAwait(true);
     }

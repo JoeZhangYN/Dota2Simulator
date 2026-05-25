@@ -34,7 +34,7 @@ public sealed partial class 火猫Strategy : IHeroStrategy
         {
             Common.Delay(330);
             _item.要求保持假腿();
-        }).ConfigureAwait(false)).CustomProbe(async _h =>
+        }).ConfigureAwait(false)).CustomProbe(async () =>
         {
 #pragma warning disable CS0618 // V3 临时妥协调用 Find(ImageHandle, ...) 重载，V6 改 SG 生成 Template 同步删
             bool b = _vision.Find(Dota2_Pictrue.Buff.火猫_无影拳, buff状态技能栏, new MatchRate(0.9), Tolerance.Exact).Found;

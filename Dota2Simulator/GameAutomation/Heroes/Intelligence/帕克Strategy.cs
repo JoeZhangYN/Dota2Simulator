@@ -22,7 +22,7 @@ public sealed partial class 帕克Strategy : IHeroStrategy
     public Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx) => GetPlan().DispatchAsync(trigger, ctx, _item);
 
     private HeroPlan GetPlan() => _plan ??= HeroPlanBuilder.New()
-        .OnKey(Keys.Q).CustomProbe(async _h => await _skill.主动技能进入CD后续(Keys.Q, () =>
+        .OnKey(Keys.Q).CustomProbe(async () => await _skill.主动技能进入CD后续(Keys.Q, () =>
         {
             _main._聚合.Skills.SetStep(SlotKey.Q, 1);
             Common.Delay(3400);
@@ -35,7 +35,7 @@ public sealed partial class 帕克Strategy : IHeroStrategy
         .OnKey(Keys.W).CastSkill(Keys.W).AfterEnterCD()
         .OnKey(Keys.W, KeyModifiers.Control).Execute(() => _main._聚合.Conditions[ConditionSlotKey.C2].Active = true)
         .OnKey(Keys.R).CastSkill(Keys.R).AfterEnterCD()
-        .OnKey(Keys.D).CustomProbe(async _h => await _skill.主动技能进入CD后续(Keys.D, () =>
+        .OnKey(Keys.D).CustomProbe(async () => await _skill.主动技能进入CD后续(Keys.D, () =>
         {
             _input.Press(VirtualKey.From(Keys.F1));
             _input.Press(VirtualKey.From(Keys.F1));

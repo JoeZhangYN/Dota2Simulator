@@ -45,17 +45,17 @@ public sealed partial class 赏金Strategy : IHeroStrategy
         }
     }
 
-    private async Task<bool> 飞镖接平a(ImageHandle 句柄)
+    private async Task<bool> 飞镖接平a()
     {
         return await _skill.技能通用判断(Keys.Q, 1).ConfigureAwait(true);
     }
 
-    private async Task<bool> 标记去后摇(ImageHandle 句柄)
+    private async Task<bool> 标记去后摇()
     {
         return await _skill.技能通用判断(Keys.R, 1).ConfigureAwait(true);
     }
 
-    private async Task<bool> 循环标记(ImageHandle 句柄)
+    private async Task<bool> 循环标记()
     {
         await _skill.技能通用判断(Keys.R, 2).ConfigureAwait(true);
         return await Task.FromResult(_main._聚合.Conditions[ConditionSlotKey.C3].Active).ConfigureAwait(true);

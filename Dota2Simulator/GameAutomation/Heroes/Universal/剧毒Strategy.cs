@@ -60,23 +60,23 @@ public sealed partial class 剧毒Strategy : IHeroStrategy
         }
     }
 
-    private async Task<bool> 瘴气去后摇(ImageHandle 句柄)
+    private async Task<bool> 瘴气去后摇()
     {
         return await _skill.技能通用判断(Keys.Q, 1).ConfigureAwait(true);
     }
 
-    private async Task<bool> 蛇棒去后摇(ImageHandle 句柄)
+    private async Task<bool> 蛇棒去后摇()
     {
         _input.MouseClick(MouseButton.Right);
         return await Task.FromResult(false).ConfigureAwait(true);
     }
 
-    private async Task<bool> 恶性瘟疫去后摇(ImageHandle 句柄)
+    private async Task<bool> 恶性瘟疫去后摇()
     {
         return await _skill.技能通用判断(Keys.R, 1).ConfigureAwait(true);
     }
 
-    private async Task<bool> 循环蛇棒(ImageHandle 句柄)
+    private async Task<bool> 循环蛇棒()
     {
         return await _skill.技能通用判断(Keys.E, 2).ConfigureAwait(true);
     }

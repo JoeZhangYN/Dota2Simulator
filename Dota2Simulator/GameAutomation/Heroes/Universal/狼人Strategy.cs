@@ -50,7 +50,7 @@ public sealed partial class 狼人Strategy : IHeroStrategy
         }
     }
 
-    private async Task<bool> 招狼去后摇(ImageHandle 句柄)
+    private async Task<bool> 招狼去后摇()
     {
         void 招狼后()
         {
@@ -64,7 +64,7 @@ public sealed partial class 狼人Strategy : IHeroStrategy
             return await Task.FromResult(false).ConfigureAwait(true);
         }
 
-        if (_skill.DOTA2判断技能是否CD(Keys.Q, in 句柄))
+        if (_skill.DOTA2判断技能是否CD(Keys.Q))
         {
             return await Task.FromResult(true).ConfigureAwait(true);
         }
@@ -73,7 +73,7 @@ public sealed partial class 狼人Strategy : IHeroStrategy
         return await Task.FromResult(false).ConfigureAwait(true);
     }
 
-    private async Task<bool> 嚎叫去后摇(ImageHandle 句柄)
+    private async Task<bool> 嚎叫去后摇()
     {
         void 嚎叫后()
         {
@@ -87,7 +87,7 @@ public sealed partial class 狼人Strategy : IHeroStrategy
             return await Task.FromResult(false).ConfigureAwait(true);
         }
 
-        if (_skill.DOTA2判断技能是否CD(Keys.W, in 句柄))
+        if (_skill.DOTA2判断技能是否CD(Keys.W))
         {
             return await Task.FromResult(true).ConfigureAwait(true);
         }
@@ -96,7 +96,7 @@ public sealed partial class 狼人Strategy : IHeroStrategy
         return await Task.FromResult(false).ConfigureAwait(true);
     }
 
-    private async Task<bool> 撕咬去后摇(ImageHandle 句柄)
+    private async Task<bool> 撕咬去后摇()
     {
         void 撕咬后()
         {
@@ -110,7 +110,7 @@ public sealed partial class 狼人Strategy : IHeroStrategy
             return await Task.FromResult(false).ConfigureAwait(true);
         }
 
-        if (_skill.DOTA2判断技能是否CD(Keys.D, in 句柄))
+        if (_skill.DOTA2判断技能是否CD(Keys.D))
         {
             return await Task.FromResult(true).ConfigureAwait(true);
         }
@@ -119,7 +119,7 @@ public sealed partial class 狼人Strategy : IHeroStrategy
         return await Task.FromResult(false).ConfigureAwait(true);
     }
 
-    private async Task<bool> 变狼去后摇(ImageHandle 句柄)
+    private async Task<bool> 变狼去后摇()
     {
         if (Common.获取当前时间毫秒() - _main._聚合.Skills.Time(SlotKey.R) > 1200 && _main._聚合.Skills.Time(SlotKey.R) != -1 && _main._聚合.LegSwap.条件开启切假腿)
         {

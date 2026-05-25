@@ -62,30 +62,30 @@ public sealed partial class 天怒Strategy : IHeroStrategy
         }
     }
 
-    private async Task<bool> 循环奥数鹰隼(ImageHandle 句柄)
+    private async Task<bool> 循环奥数鹰隼()
     {
         await _skill.技能通用判断(Keys.Q, 2).ConfigureAwait(true);
         return await Task.FromResult(_main._聚合.Conditions[ConditionSlotKey.C1].Active).ConfigureAwait(true);
     }
 
-    private async Task<bool> 天怒秒人连招(ImageHandle 句柄)
+    private async Task<bool> 天怒秒人连招()
     {
         int 步骤 = _main._聚合.Skills.Step(SlotKey.Global);
 
         switch (步骤)
         {
             case < 2:
-                if (_skill.DOTA2释放CD就绪技能(Keys.W, in 句柄))
+                if (_skill.DOTA2释放CD就绪技能(Keys.W))
                 {
                     return await Task.FromResult(true).ConfigureAwait(true);
                 }
 
-                if (_skill.DOTA2释放CD就绪技能(Keys.E, in 句柄))
+                if (_skill.DOTA2释放CD就绪技能(Keys.E))
                 {
                     return await Task.FromResult(true).ConfigureAwait(true);
                 }
 
-                if (_skill.DOTA2释放CD就绪技能(Keys.Q, in 句柄))
+                if (_skill.DOTA2释放CD就绪技能(Keys.Q))
                 {
                     return await Task.FromResult(true).ConfigureAwait(true);
                 }
@@ -108,7 +108,7 @@ public sealed partial class 天怒Strategy : IHeroStrategy
                 return await Task.FromResult(true).ConfigureAwait(true);
             case < 3:
                 {
-                    if (_skill.DOTA2释放CD就绪技能(Keys.R, in 句柄))
+                    if (_skill.DOTA2释放CD就绪技能(Keys.R))
                     {
                         return await Task.FromResult(true).ConfigureAwait(true);
                     }
@@ -123,22 +123,22 @@ public sealed partial class 天怒Strategy : IHeroStrategy
         return await Task.FromResult(true).ConfigureAwait(true);
     }
 
-    private async Task<bool> 奥数鹰隼去后摇(ImageHandle 句柄)
+    private async Task<bool> 奥数鹰隼去后摇()
     {
         return await _skill.技能通用判断(Keys.Q, 0).ConfigureAwait(true);
     }
 
-    private async Task<bool> 上古封印去后摇(ImageHandle 句柄)
+    private async Task<bool> 上古封印去后摇()
     {
         return await _skill.技能通用判断(Keys.E, 0).ConfigureAwait(true);
     }
 
-    private async Task<bool> 神秘之耀去后摇(ImageHandle 句柄)
+    private async Task<bool> 神秘之耀去后摇()
     {
         return await _skill.技能通用判断(Keys.R, 1).ConfigureAwait(true);
     }
 
-    private async Task<bool> 震荡光弹去后摇(ImageHandle 句柄)
+    private async Task<bool> 震荡光弹去后摇()
     {
         return await _skill.技能通用判断(Keys.W, 0).ConfigureAwait(true);
     }

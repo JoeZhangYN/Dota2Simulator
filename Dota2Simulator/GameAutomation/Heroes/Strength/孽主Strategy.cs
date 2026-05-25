@@ -20,10 +20,10 @@ public sealed partial class 孽主Strategy : IHeroStrategy
 
     private HeroPlan GetPlan() => _plan ??= HeroPlanBuilder.New()
         .OnKey(Keys.Q).CastSkill(Keys.Q).AfterCast()
-        .OnKey(Keys.W).CustomProbe(async 句柄 => await _skill.主动技能释放后续(Keys.W, () =>
+        .OnKey(Keys.W).CustomProbe(async () => await _skill.主动技能释放后续(Keys.W, () =>
         {
             _input.MouseClick(MouseButton.Right);
-            if (_skill.DOTA2释放CD就绪技能(Keys.Q, in 句柄))
+            if (_skill.DOTA2释放CD就绪技能(Keys.Q))
             {
                 return;
             }

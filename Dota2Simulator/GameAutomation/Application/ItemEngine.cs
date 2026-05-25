@@ -67,8 +67,8 @@ namespace Dota2Simulator.GameAutomation.Application
         {
             _ = await _skill.设置当前技能数量().ConfigureAwait(true);
             _aggregate.LegSwap.存在假腿 = 获取当前假腿按键();
-            _aggregate.HasAghanim = 阿哈利姆神杖(_vision.GetCurrentFrame());
-            _aggregate.HasShard = 阿哈利姆魔晶(_vision.GetCurrentFrame());
+            _aggregate.HasAghanim = 阿哈利姆神杖();
+            _aggregate.HasShard = 阿哈利姆魔晶();
 
             switch (e.KeyCode)
             {
@@ -95,21 +95,21 @@ namespace Dota2Simulator.GameAutomation.Application
                 #region Silt
 #if Silt
                 case Keys.NumPad1:
-                    _silt!.跳过循环获取金碎片(_vision.GetCurrentFrame());
+                    _silt!.跳过循环获取金碎片(GlobalScreenCapture.GetCurrentHandle());
                     break;
                 case Keys.NumPad2:
-                    _silt!.自动屏蔽3个选项(_vision.GetCurrentFrame());
+                    _silt!.自动屏蔽3个选项(GlobalScreenCapture.GetCurrentHandle());
                     break;
                 case Keys.NumPad3:
                     break;
                 case Keys.NumPad4:
-                    _silt!.点击暴击(_vision.GetCurrentFrame());
+                    _silt!.点击暴击(GlobalScreenCapture.GetCurrentHandle());
                     break;
                 case Keys.NumPad5:
-                    _silt!.点击黑皇(_vision.GetCurrentFrame());
+                    _silt!.点击黑皇(GlobalScreenCapture.GetCurrentHandle());
                     break;
                 case Keys.NumPad6:
-                    _silt!.沙王自动选择(_vision.GetCurrentFrame());
+                    _silt!.沙王自动选择(GlobalScreenCapture.GetCurrentHandle());
                     break;
 #endif
                 #endregion
@@ -280,8 +280,9 @@ namespace Dota2Simulator.GameAutomation.Application
             public Rectangle 中立TP范围 { get; } = new Rectangle(最左侧x + 197, 968, 47, 101); // 6技能 1377,968,47,101 1180  197
         }
 
-        private static bool 判断物品状态(物品信息 物品, int 序号, in ImageHandle 句柄, Point 初始位置, Color 目标颜色, byte 颜色容差)
+        private static bool 判断物品状态(物品信息 物品, int 序号, Point 初始位置, Color 目标颜色, byte 颜色容差)
         {
+            ImageHandle 句柄 = GlobalScreenCapture.GetCurrentHandle();
             Point 位置 = new(初始位置.X - GameLayout.OffsetX, 初始位置.Y - GameLayout.OffsetY);
 
             int 内部序号 = 序号;
@@ -296,8 +297,9 @@ namespace Dota2Simulator.GameAutomation.Application
             return ColorExtensions.ColorAEqualColorB(ImageManager.GetColor(in 句柄, 位置), 目标颜色, 颜色容差);
         }
 
-        private static bool 判断物品状态(物品信息 物品, int 序号, in ImageHandle 句柄, Point 初始位置, Color[] 目标颜色, byte 颜色容差)
+        private static bool 判断物品状态(物品信息 物品, int 序号, Point 初始位置, Color[] 目标颜色, byte 颜色容差)
         {
+            ImageHandle 句柄 = GlobalScreenCapture.GetCurrentHandle();
             Point 位置 = new(初始位置.X - GameLayout.OffsetX, 初始位置.Y - GameLayout.OffsetY);
 
             int 内部序号 = 序号;
@@ -312,21 +314,21 @@ namespace Dota2Simulator.GameAutomation.Application
             Color 获取的颜色 = ImageManager.GetColor(in 句柄, 位置);
 
             bool b1 = ColorExtensions.ColorAEqualColorB(获取的颜色, 目标颜色[序号], 颜色容差);
-            // if (!b1) Logger.Info($"获取到物品锁闭,当前物品{序号}，目标{目标颜色[序号]} 获取{获取的颜色}"); 
+            // if (!b1) Logger.Info($"获取到物品锁闭,当前物品{序号}，目标{目标颜色[序号]} 获取{获取的颜色}");
             return b1;
         }
 
-        private bool DOTA2判断序号物品是否CD(int 序号, in ImageHandle 句柄)
+        private bool DOTA2判断序号物品是否CD(int 序号)
         {
             物品信息 物品 = 根据技能数量获取物品信息(_aggregate.SkillCount);
             Point 初始位置 = new(物品.物品CD右上角x, 物品.物品CD右上角y);
             Color 目标颜色 = 物品.物品CD颜色;
             byte 颜色容差 = 物品.物品CD颜色容差;
 
-            return 判断物品状态(物品, 序号, in 句柄, 初始位置, 目标颜色, 颜色容差);
+            return 判断物品状态(物品, 序号, 初始位置, 目标颜色, 颜色容差);
         }
 
-        private bool DOTA2判断任意物品是否锁闭(in ImageHandle 句柄)
+        private bool DOTA2判断任意物品是否锁闭()
         {
             物品信息 物品 = 根据技能数量获取物品信息(_aggregate.SkillCount);
             Point 初始位置 = new(物品.物品锁闭x, 物品.物品锁闭y);
@@ -335,7 +337,7 @@ namespace Dota2Simulator.GameAutomation.Application
 
             for (int i = 0; i < 6; i++)
             {
-                if (!判断物品状态(物品, i, in 句柄, 初始位置, 目标颜色, 颜色容差))
+                if (!判断物品状态(物品, i, 初始位置, 目标颜色, 颜色容差))
                 {
                     return true;
                 }
@@ -584,14 +586,14 @@ namespace Dota2Simulator.GameAutomation.Application
         private const int 技能A杖y = 959;
         private const int 技能魔晶y = 994;
 
-        private static bool 阿哈利姆神杖(in ImageHandle 句柄)
+        private static bool 阿哈利姆神杖()
         {
-            return 检查技能颜色(in 句柄, [技能4魔晶A杖x, 技能5魔晶A杖x, 技能6魔晶A杖x], 技能A杖y, Color.FromArgb(30, 187, 250));
+            return 检查技能颜色([技能4魔晶A杖x, 技能5魔晶A杖x, 技能6魔晶A杖x], 技能A杖y, Color.FromArgb(30, 187, 250));
         }
 
-        private static bool 阿哈利姆魔晶(in ImageHandle 句柄)
+        private static bool 阿哈利姆魔晶()
         {
-            return 检查技能颜色(in 句柄, [技能4魔晶A杖x, 技能5魔晶A杖x, 技能6魔晶A杖x], 技能魔晶y, Color.FromArgb(30, 187, 254));
+            return 检查技能颜色([技能4魔晶A杖x, 技能5魔晶A杖x, 技能6魔晶A杖x], 技能魔晶y, Color.FromArgb(30, 187, 254));
         }
 
         /// <summary>
@@ -603,8 +605,9 @@ namespace Dota2Simulator.GameAutomation.Application
         /// <param name="yCoord">y坐标</param>
         /// <param name="技能点颜色">技能点颜色</param>
         /// <returns>是否匹配</returns>
-        private static bool 检查技能颜色(in ImageHandle 句柄, int[] xCoords, int yCoord, in Color 技能点颜色)
+        private static bool 检查技能颜色(int[] xCoords, int yCoord, in Color 技能点颜色)
         {
+            ImageHandle 句柄 = GlobalScreenCapture.GetCurrentHandle();
             foreach (int xCoord in xCoords)
             {
                 var color = ImageManager.GetColor(in 句柄, xCoord - GameLayout.OffsetX, yCoord - GameLayout.OffsetY);
@@ -621,9 +624,9 @@ namespace Dota2Simulator.GameAutomation.Application
 
         #region 物品进入CD
 
-        private async Task<bool> 处理物品进入CD(int 序号, ImageHandle 句柄)
+        private async Task<bool> 处理物品进入CD(int 序号)
         {
-            if (DOTA2判断序号物品是否CD(序号, in 句柄))
+            if (DOTA2判断序号物品是否CD(序号))
             {
                 return await Task.FromResult(true).ConfigureAwait(true);
             }
@@ -637,34 +640,34 @@ namespace Dota2Simulator.GameAutomation.Application
             return await Task.FromResult(false).ConfigureAwait(true);
         }
 
-        private async Task<bool> 物品z进入CD(ImageHandle 句柄)
+        private async Task<bool> 物品z进入CD()
         {
-            return await 处理物品进入CD(0, 句柄).ConfigureAwait(true);
+            return await 处理物品进入CD(0).ConfigureAwait(true);
         }
 
-        private async Task<bool> 物品x进入CD(ImageHandle 句柄)
+        private async Task<bool> 物品x进入CD()
         {
-            return await 处理物品进入CD(1, 句柄).ConfigureAwait(true);
+            return await 处理物品进入CD(1).ConfigureAwait(true);
         }
 
-        private async Task<bool> 物品c进入CD(ImageHandle 句柄)
+        private async Task<bool> 物品c进入CD()
         {
-            return await 处理物品进入CD(2, 句柄).ConfigureAwait(true);
+            return await 处理物品进入CD(2).ConfigureAwait(true);
         }
 
-        private async Task<bool> 物品v进入CD(ImageHandle 句柄)
+        private async Task<bool> 物品v进入CD()
         {
-            return await 处理物品进入CD(3, 句柄).ConfigureAwait(true);
+            return await 处理物品进入CD(3).ConfigureAwait(true);
         }
 
-        private async Task<bool> 物品b进入CD(ImageHandle 句柄)
+        private async Task<bool> 物品b进入CD()
         {
-            return await 处理物品进入CD(4, 句柄).ConfigureAwait(true);
+            return await 处理物品进入CD(4).ConfigureAwait(true);
         }
 
-        private async Task<bool> 物品space进入CD(ImageHandle 句柄)
+        private async Task<bool> 物品space进入CD()
         {
-            return await 处理物品进入CD(5, 句柄).ConfigureAwait(true);
+            return await 处理物品进入CD(5).ConfigureAwait(true);
         }
 
         #endregion
@@ -683,9 +686,9 @@ namespace Dota2Simulator.GameAutomation.Application
         ///     <para>(如未被锁闭一直返回真)</para>
         ///     <para>解除锁闭处理逻辑后返回假</para>
         /// </returns>
-        public async Task<bool> 所有物品可用后续(ImageHandle 句柄, Action afterAction)
+        public async Task<bool> 所有物品可用后续(Action afterAction)
         {
-            if (DOTA2判断任意物品是否锁闭(in 句柄))
+            if (DOTA2判断任意物品是否锁闭())
             {
                 return await Task.FromResult(true).ConfigureAwait(true);
             }

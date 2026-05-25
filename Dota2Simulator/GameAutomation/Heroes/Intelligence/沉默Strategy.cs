@@ -39,7 +39,7 @@ public sealed partial class 沉默Strategy : IHeroStrategy
         return Task.CompletedTask;
     }
 
-    private async Task<bool> 大招前纷争(ImageHandle 句柄)
+    private async Task<bool> 大招前纷争()
     {
         Common.Delay(33 * (
             _item.根据图片使用物品(Dota2_Pictrue.物品.虚灵之刃)
@@ -53,9 +53,9 @@ public sealed partial class 沉默Strategy : IHeroStrategy
         return await Task.FromResult(false).ConfigureAwait(true);
     }
 
-    private async Task<bool> 奥数诅咒去后摇(ImageHandle 句柄)
+    private async Task<bool> 奥数诅咒去后摇()
     {
-        async void 奥数诅咒后(ImageHandle 句柄)
+        async void 奥数诅咒后()
         {
             _main._聚合.Skills.SetTime(SlotKey.Q, -1);
             // RightClick();
@@ -63,11 +63,11 @@ public sealed partial class 沉默Strategy : IHeroStrategy
             switch (_main._聚合.Skills.Mode(SlotKey.Q))
             {
                 case < 1:
-                    _ = await 大招前纷争(句柄).ConfigureAwait(true);
+                    _ = await 大招前纷争().ConfigureAwait(true);
                     _input.Press(VirtualKey.From(Keys.E));
                     break;
                 case 1:
-                    _ = await 大招前纷争(句柄).ConfigureAwait(true);
+                    _ = await 大招前纷争().ConfigureAwait(true);
                     Common.Delay(1300);
                     _input.Press(VirtualKey.From(Keys.E));
                     break;
@@ -80,20 +80,20 @@ public sealed partial class 沉默Strategy : IHeroStrategy
         // 超时则切回 总体释放时间
         if (Common.获取当前时间毫秒() - _main._聚合.Skills.Time(SlotKey.Q) > 1200 && _main._聚合.Skills.Time(SlotKey.Q) != -1)
         {
-            奥数诅咒后(句柄);
+            奥数诅咒后();
             return await Task.FromResult(false).ConfigureAwait(true);
         }
 
-        if (_skill.DOTA2判断技能是否CD(Keys.Q, in 句柄))
+        if (_skill.DOTA2判断技能是否CD(Keys.Q))
         {
             return await Task.FromResult(true).ConfigureAwait(true);
         }
 
-        奥数诅咒后(句柄);
+        奥数诅咒后();
         return await Task.FromResult(false).ConfigureAwait(true);
     }
 
-    private async Task<bool> 全领域沉默去后摇(ImageHandle 句柄)
+    private async Task<bool> 全领域沉默去后摇()
     {
         void 全领域沉默后()
         {
@@ -109,7 +109,7 @@ public sealed partial class 沉默Strategy : IHeroStrategy
             return await Task.FromResult(false).ConfigureAwait(true);
         }
 
-        if (_skill.DOTA2判断技能是否CD(Keys.R, in 句柄))
+        if (_skill.DOTA2判断技能是否CD(Keys.R))
         {
             return await Task.FromResult(true).ConfigureAwait(true);
         }

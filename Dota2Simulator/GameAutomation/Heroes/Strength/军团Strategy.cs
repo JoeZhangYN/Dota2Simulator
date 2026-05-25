@@ -60,7 +60,7 @@ public sealed partial class 军团Strategy : IHeroStrategy
         }
     }
 
-    private async Task<bool> 决斗(ImageHandle 句柄)
+    private async Task<bool> 决斗()
     {
         return await Task.Run(async () =>
         {
@@ -74,7 +74,7 @@ public sealed partial class 军团Strategy : IHeroStrategy
                         Common.Delay(33 * _item.根据图片使用物品(Dota2_Pictrue.物品.魂戒));
                         Common.Delay(33 * _item.根据图片使用物品(Dota2_Pictrue.物品.相位鞋));
 
-                        if (_skill.DOTA2判断技能是否CD(Keys.W, in 句柄))
+                        if (_skill.DOTA2判断技能是否CD(Keys.W))
                         {
                             _input.ComboAlt(VirtualKey.From(Keys.W));
                             return await Task.FromResult(true).ConfigureAwait(true);
@@ -118,7 +118,7 @@ public sealed partial class 军团Strategy : IHeroStrategy
                         // 触发激怒，让周围的小兵都攻击你
                         _input.Press(VirtualKey.From(Keys.A));
 
-                        if (_skill.DOTA2释放CD就绪技能(Keys.R, in 句柄))
+                        if (_skill.DOTA2释放CD就绪技能(Keys.R))
                         {
                             Common.Delay(60);
                             return await Task.FromResult(true).ConfigureAwait(true);
@@ -133,17 +133,17 @@ public sealed partial class 军团Strategy : IHeroStrategy
         }).ConfigureAwait(true);
     }
 
-    private async Task<bool> 压倒性优势去后摇(ImageHandle 句柄)
+    private async Task<bool> 压倒性优势去后摇()
     {
         return await _skill.技能通用判断(Keys.Q, 0).ConfigureAwait(true);
     }
 
-    private async Task<bool> 强攻去后摇(ImageHandle 句柄)
+    private async Task<bool> 强攻去后摇()
     {
         return await _skill.技能通用判断(Keys.W, 1).ConfigureAwait(true);
     }
 
-    private async Task<bool> 决斗去后摇(ImageHandle 句柄)
+    private async Task<bool> 决斗去后摇()
     {
         return await _skill.技能通用判断(Keys.R, 1, 要接的按键: Keys.Q).ConfigureAwait(true);
     }

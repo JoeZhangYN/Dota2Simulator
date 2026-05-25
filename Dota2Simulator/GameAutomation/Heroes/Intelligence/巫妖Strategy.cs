@@ -22,12 +22,12 @@ public sealed partial class 巫妖Strategy : IHeroStrategy
     public Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx) => GetPlan().DispatchAsync(trigger, ctx, _item);
 
     private HeroPlan GetPlan() => _plan ??= HeroPlanBuilder.New()
-        .OnKey(Keys.Q).CustomProbe(async _h => await _skill.技能通用判断(Keys.Q, _main._聚合.Skills.Step(SlotKey.E) > 0 ? 11 : 1).ConfigureAwait(true))
-        .OnKey(Keys.W).CustomProbe(async _h => await _skill.技能通用判断(Keys.W, _main._聚合.Skills.Step(SlotKey.E) > 0 ? 11 : 1, false).ConfigureAwait(true))
+        .OnKey(Keys.Q).CustomProbe(async () => await _skill.技能通用判断(Keys.Q, _main._聚合.Skills.Step(SlotKey.E) > 0 ? 11 : 1).ConfigureAwait(true))
+        .OnKey(Keys.W).CustomProbe(async () => await _skill.技能通用判断(Keys.W, _main._聚合.Skills.Step(SlotKey.E) > 0 ? 11 : 1, false).ConfigureAwait(true))
         .OnKey(Keys.W, KeyModifiers.Alt).Execute(() => _main._聚合.Conditions[ConditionSlotKey.C2].Active = true)
-        .OnKey(Keys.E).CustomProbe(async _h =>
+        .OnKey(Keys.E).CustomProbe(async () =>
         {
-            if (_skill.DOTA2判断技能是否CD(Keys.E, in _h))
+            if (_skill.DOTA2判断技能是否CD(Keys.E))
             {
                 _main._聚合.Skills.SetStep(SlotKey.E, 0);
                 return true;
@@ -49,7 +49,7 @@ public sealed partial class 巫妖Strategy : IHeroStrategy
             }
             else
             {
-                if (!_skill.DOTA2判断是否持续施法(in _h))
+                if (!_skill.DOTA2判断是否持续施法())
                 {
                     _main._聚合.Skills.SetStep(SlotKey.E, 0);
                     _input.Press(VirtualKey.From(Keys.A));
@@ -59,8 +59,8 @@ public sealed partial class 巫妖Strategy : IHeroStrategy
                 return true;
             }
         })
-        .OnKey(Keys.R).CustomProbe(async _h => await _skill.技能通用判断(Keys.R, _main._聚合.Skills.Step(SlotKey.E) > 0 ? 11 : 1).ConfigureAwait(true))
-        .OnKey(Keys.D).CustomProbe(async _h => await _skill.技能通用判断(Keys.D, _main._聚合.Skills.Step(SlotKey.E) > 0 ? 10 : 0).ConfigureAwait(true))
+        .OnKey(Keys.R).CustomProbe(async () => await _skill.技能通用判断(Keys.R, _main._聚合.Skills.Step(SlotKey.E) > 0 ? 11 : 1).ConfigureAwait(true))
+        .OnKey(Keys.D).CustomProbe(async () => await _skill.技能通用判断(Keys.D, _main._聚合.Skills.Step(SlotKey.E) > 0 ? 10 : 0).ConfigureAwait(true))
         .Done();
 }
 #endif

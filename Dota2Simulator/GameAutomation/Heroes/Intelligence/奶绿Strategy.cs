@@ -45,27 +45,27 @@ public sealed partial class 奶绿Strategy : IHeroStrategy
         }
     }
 
-    private async Task<bool> 弹无虚发去后摇(ImageHandle 句柄)
+    private async Task<bool> 弹无虚发去后摇()
     {
         return await _skill.技能通用判断(Keys.Q, 1).ConfigureAwait(true);
     }
 
-    private async Task<bool> 唤魂去后摇(ImageHandle 句柄)
+    private async Task<bool> 唤魂去后摇()
     {
         return await _skill.技能通用判断(Keys.W, 0).ConfigureAwait(true);
     }
 
-    private async Task<bool> 越界去后摇(ImageHandle 句柄)
+    private async Task<bool> 越界去后摇()
     {
         return await _skill.技能通用判断(Keys.R, 0, 判断成功后延时: 360).ConfigureAwait(true);
     }
 
-    private async Task<bool> 临别一枪去后摇(ImageHandle 句柄)
+    private async Task<bool> 临别一枪去后摇()
     {
         return await _skill.技能通用判断(Keys.D, 0).ConfigureAwait(true);
     }
 
-    private async Task<bool> 祭台去后摇(ImageHandle 句柄)
+    private async Task<bool> 祭台去后摇()
     {
         return await _skill.技能通用判断(Keys.F, 0).ConfigureAwait(true);
     }

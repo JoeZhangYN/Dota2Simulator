@@ -21,7 +21,7 @@ public sealed partial class 小小Strategy : IHeroStrategy
 
     private HeroPlan GetPlan() => _plan ??= HeroPlanBuilder.New()
         .OnKey(Keys.Q).CastSkill(Keys.Q).AfterEnterCD()
-        .OnKey(Keys.W).CustomProbe(async _h => await Task.Run(() =>
+        .OnKey(Keys.W).CustomProbe(async () => await Task.Run(() =>
         {
             for (int i = 0; i < 3; i++)
             {

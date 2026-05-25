@@ -106,7 +106,7 @@ public sealed partial class 暗影萨满Strategy : IHeroStrategy
     /// <summary>
     ///     前摇时间基本在
     /// </summary>
-    private async Task<bool> 苍穹振击取消后摇(ImageHandle 句柄)
+    private async Task<bool> 苍穹振击取消后摇()
     {
         void 苍穹振击后()
         {
@@ -121,7 +121,7 @@ public sealed partial class 暗影萨满Strategy : IHeroStrategy
             }
         }
 
-        if (_skill.DOTA2判断技能是否CD(Keys.Q, in 句柄))
+        if (_skill.DOTA2判断技能是否CD(Keys.Q))
         {
             return await Task.FromResult(true).ConfigureAwait(true);
         }
@@ -133,29 +133,29 @@ public sealed partial class 暗影萨满Strategy : IHeroStrategy
     /// <summary>
     ///     前摇时间基本再380-450 之间
     /// </summary>
-    private async Task<bool> 枷锁持续施法隐身(ImageHandle 句柄)
+    private async Task<bool> 枷锁持续施法隐身()
     {
-        void 枷锁后(in ImageHandle 句柄)
+        void 枷锁后()
         {
         }
 
-        if (_skill.DOTA2判断技能是否CD(Keys.E, in 句柄))
+        if (_skill.DOTA2判断技能是否CD(Keys.E))
         {
             return await Task.FromResult(true).ConfigureAwait(true);
         }
 
-        枷锁后(in 句柄);
+        枷锁后();
         return await Task.FromResult(false).ConfigureAwait(true);
     }
 
-    private async Task<bool> 释放群蛇守卫取消后摇(ImageHandle 句柄)
+    private async Task<bool> 释放群蛇守卫取消后摇()
     {
         void 群蛇守卫后()
         {
             _input.Press(VirtualKey.From(Keys.A));
         }
 
-        if (_skill.DOTA2判断技能是否CD(Keys.R, in 句柄))
+        if (_skill.DOTA2判断技能是否CD(Keys.R))
         {
             return await Task.FromResult(true).ConfigureAwait(true);
         }
@@ -164,9 +164,10 @@ public sealed partial class 暗影萨满Strategy : IHeroStrategy
         return await Task.FromResult(false).ConfigureAwait(true);
     }
 
-    private async Task<bool> 变羊取消后摇(ImageHandle 句柄)
+    private async Task<bool> 变羊取消后摇()
     {
-        void 萨满变羊后(ImageHandle 句柄)
+        ImageHandle 句柄 = GlobalScreenCapture.GetCurrentHandle();
+        void 萨满变羊后()
         {
             _main._聚合.Skills.SetTime(SlotKey.W, Common.获取当前时间毫秒());
 
@@ -176,19 +177,19 @@ public sealed partial class 暗影萨满Strategy : IHeroStrategy
 
                 Color 技能点颜色 = Color.FromArgb(203, 183, 124);
 
-                if (ColorExtensions.ColorAEqualColorB(_main.获取指定位置颜色(909, 1008, in 句柄), 技能点颜色, 0))
+                if (ColorExtensions.ColorAEqualColorB(ImageManager.GetColor(in 句柄, 909, 1008), 技能点颜色, 0))
                 {
                     time = 3400;
                 }
-                else if (ColorExtensions.ColorAEqualColorB(_main.获取指定位置颜色(897, 1008, in 句柄), 技能点颜色, 0))
+                else if (ColorExtensions.ColorAEqualColorB(ImageManager.GetColor(in 句柄, 897, 1008), 技能点颜色, 0))
                 {
                     time = 2650;
                 }
-                else if (ColorExtensions.ColorAEqualColorB(_main.获取指定位置颜色(885, 1008, in 句柄), 技能点颜色, 0))
+                else if (ColorExtensions.ColorAEqualColorB(ImageManager.GetColor(in 句柄, 885, 1008), 技能点颜色, 0))
                 {
                     time = 1900;
                 }
-                else if (ColorExtensions.ColorAEqualColorB(_main.获取指定位置颜色(875, 1008, in 句柄), 技能点颜色, 0))
+                else if (ColorExtensions.ColorAEqualColorB(ImageManager.GetColor(in 句柄, 875, 1008), 技能点颜色, 0))
                 {
                     time = 1150;
                 }
@@ -224,16 +225,16 @@ public sealed partial class 暗影萨满Strategy : IHeroStrategy
             });
         }
 
-        if (_skill.DOTA2判断技能是否CD(Keys.W, in 句柄))
+        if (_skill.DOTA2判断技能是否CD(Keys.W))
         {
             return await Task.FromResult(true).ConfigureAwait(true);
         }
 
-        萨满变羊后(句柄);
+        萨满变羊后();
         return await Task.FromResult(false).ConfigureAwait(true);
     }
 
-    private async Task<bool> 推推破林肯秒羊(ImageHandle 句柄)
+    private async Task<bool> 推推破林肯秒羊()
     {
         if (_item.根据图片使用物品(Dota2_Pictrue.物品.推推棒) == 1)
         {

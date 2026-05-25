@@ -311,7 +311,7 @@ namespace Dota2Simulator.GameAutomation.Application
         /// <returns></returns>
         public async Task<bool> 设置当前技能数量()
         {
-            int i = 获取当前技能数量(_vision.GetCurrentFrame());
+            int i = 获取当前技能数量();
             if (i != 0)
             {
                 // 技能数量改变后，技能判断色全部重置
@@ -325,7 +325,7 @@ namespace Dota2Simulator.GameAutomation.Application
                     重置所有技能判断();
 
                     // 获取当前技能颜色
-                    _ = DOTA2获取所有释放技能前颜色(_vision.GetCurrentFrame());
+                    _ = DOTA2获取所有释放技能前颜色();
                 }
             }
 
@@ -382,8 +382,9 @@ namespace Dota2Simulator.GameAutomation.Application
             }
         }
 
-        public int 获取当前技能数量(in ImageHandle 句柄)
+        public int 获取当前技能数量()
         {
+            ImageHandle 句柄 = GlobalScreenCapture.GetCurrentHandle();
             List<技能信息> 技能列表 = [技能4, 技能5, 技能6];
             List<int> 技能数量 = [4, 5, 6];
 
@@ -398,7 +399,7 @@ namespace Dota2Simulator.GameAutomation.Application
 
                 输出文字.AppendLine($"\r\n当前技能数量{期望数量}");
 
-                var 检测到的数量 = 快速检测技能数量(in 句柄, 当前技能, 期望数量 - 1, 输出文字);
+                var 检测到的数量 = 快速检测技能数量(当前技能, 期望数量 - 1, 输出文字);
 
                 if (检测到的数量 == 期望数量 - 1)
                 {
@@ -423,13 +424,13 @@ namespace Dota2Simulator.GameAutomation.Application
             return 0;
         }
 
-        private int 快速检测技能数量(in ImageHandle 句柄, 技能信息 技能, int 最大检测数量, StringBuilder 调试信息)
+        private int 快速检测技能数量(技能信息 技能, int 最大检测数量, StringBuilder 调试信息)
         {
             int count_技能 = 0;
 
             for (int i = 0; i < 最大检测数量; i++)
             {
-                var (成功, 单个调试信息) = 快速检测单个技能(in 句柄, 技能, i);
+                var (成功, 单个调试信息) = 快速检测单个技能(技能, i);
 
                 调试信息.Append(单个调试信息);
 
@@ -443,8 +444,9 @@ namespace Dota2Simulator.GameAutomation.Application
             return count_技能;
         }
 
-        private (bool 成功, string 调试信息) 快速检测单个技能(in ImageHandle 句柄, 技能信息 技能, int i)
+        private (bool 成功, string 调试信息) 快速检测单个技能(技能信息 技能, int i)
         {
+            ImageHandle 句柄 = GlobalScreenCapture.GetCurrentHandle();
             var 检测点数组 = 获取检测点配置(技能, i);
             var 调试信息 = new StringBuilder();
 
@@ -569,8 +571,9 @@ namespace Dota2Simulator.GameAutomation.Application
         /// <param name="技能数量">技能数量，默认值为4</param>
         /// <param name="类型">技能类型</param>
         /// <returns>如果技能在CD状态返回真，否则返回假</returns>
-        public bool 判断技能状态(Keys 技能位置, in ImageHandle 句柄, 技能类型 类型 = 技能类型.图标CD)
+        public bool 判断技能状态(Keys 技能位置, 技能类型 类型 = 技能类型.图标CD)
         {
+            ImageHandle 句柄 = GlobalScreenCapture.GetCurrentHandle();
             if (_aggregate.SkillCount == 4 && (技能位置 == Keys.D || 技能位置 == Keys.F))
             {
                 return false;
@@ -590,8 +593,9 @@ namespace Dota2Simulator.GameAutomation.Application
         /// <param name="技能数量">技能数量，默认值为4</param>
         /// <param name="类型">技能类型</param>
         /// <returns>指定位置的像素颜色</returns>
-        private static Color 获取技能判断颜色(Keys 技能位置, in ImageHandle 句柄, int 技能数量 = 4, 技能类型 类型 = 技能类型.释放变色)
+        private static Color 获取技能判断颜色(Keys 技能位置, int 技能数量 = 4, 技能类型 类型 = 技能类型.释放变色)
         {
+            ImageHandle 句柄 = GlobalScreenCapture.GetCurrentHandle();
             if (技能数量 == 4 && (技能位置 == Keys.D || 技能位置 == Keys.F))
             {
                 return Color.Empty;
@@ -611,9 +615,9 @@ namespace Dota2Simulator.GameAutomation.Application
         /// <param name="数组">包含长宽的字节数组</param>
         /// <param name="技能数量">技能数量，默认值为4</param>
         /// <returns>技能释放判断的像素颜色</returns>
-        public static Color 获取技能释放判断颜色(Keys 技能位置, in ImageHandle 句柄, int 技能数量 = 4)
+        public static Color 获取技能释放判断颜色(Keys 技能位置, int 技能数量 = 4)
         {
-            return 获取技能判断颜色(技能位置, in 句柄, 技能数量, 技能类型.释放变色);
+            return 获取技能判断颜色(技能位置, 技能数量, 技能类型.释放变色);
         }
 
         /// <summary>
@@ -623,9 +627,9 @@ namespace Dota2Simulator.GameAutomation.Application
         /// <param name="数组">包含长宽的字节数组</param>
         /// <param name="技能数量">技能数量，默认值为4</param>
         /// <returns>的像素颜色</returns>
-        public static Color 获取技能进入CD判断颜色(Keys 技能位置, in ImageHandle 句柄, int 技能数量 = 4)
+        public static Color 获取技能进入CD判断颜色(Keys 技能位置, int 技能数量 = 4)
         {
-            return 获取技能判断颜色(技能位置, in 句柄, 技能数量, 技能类型.图标CD);
+            return 获取技能判断颜色(技能位置, 技能数量, 技能类型.图标CD);
         }
 
         /// <summary>
@@ -635,9 +639,9 @@ namespace Dota2Simulator.GameAutomation.Application
         /// <param name="数组">包含长宽的字节数组</param>
         /// <param name="技能数量">技能数量，默认值为4</param>
         /// <returns>技能释放判断的像素颜色</returns>
-        public static Color 获取QWERDF颜色(Keys 技能位置, in ImageHandle 句柄, int 技能数量 = 4)
+        public static Color 获取QWERDF颜色(Keys 技能位置, int 技能数量 = 4)
         {
-            return 获取技能判断颜色(技能位置, in 句柄, 技能数量, 技能类型.QWERDF图标);
+            return 获取技能判断颜色(技能位置, 技能数量, 技能类型.QWERDF图标);
         }
 
         /// <summary>
@@ -647,9 +651,9 @@ namespace Dota2Simulator.GameAutomation.Application
         /// <param name="数组">包含长宽的字节数组</param>
         /// <param name="技能数量">技能数量，默认值为4</param>
         /// <returns>技能释放判断的像素颜色</returns>
-        public static Color 获取法球颜色(Keys 技能位置, in ImageHandle 句柄, int 技能数量 = 4)
+        public static Color 获取法球颜色(Keys 技能位置, int 技能数量 = 4)
         {
-            return 获取技能判断颜色(技能位置, in 句柄, 技能数量, 技能类型.法球);
+            return 获取技能判断颜色(技能位置, 技能数量, 技能类型.法球);
         }
 
         /// <summary>
@@ -659,9 +663,9 @@ namespace Dota2Simulator.GameAutomation.Application
         /// <param name="数组">包含长宽的字节数组</param>
         /// <param name="技能数量">技能数量，默认值为4</param>
         /// <returns>技能释放判断的像素颜色</returns>
-        public static Color 获取状态颜色(Keys 技能位置, in ImageHandle 句柄, int 技能数量 = 4)
+        public static Color 获取状态颜色(Keys 技能位置, int 技能数量 = 4)
         {
-            return 获取技能判断颜色(技能位置, in 句柄, 技能数量, 技能类型.状态);
+            return 获取技能判断颜色(技能位置, 技能数量, 技能类型.状态);
         }
 
         /// <summary>
@@ -671,9 +675,9 @@ namespace Dota2Simulator.GameAutomation.Application
         /// <param name="数组">包含长宽的字节数组</param>
         /// <param name="技能数量">技能数量，默认值为4</param>
         /// <returns>技能释放判断的像素颜色</returns>
-        public static Color 获取被动颜色(Keys 技能位置, in ImageHandle 句柄, int 技能数量 = 4)
+        public static Color 获取被动颜色(Keys 技能位置, int 技能数量 = 4)
         {
-            return 获取技能判断颜色(技能位置, in 句柄, 技能数量, 技能类型.被动技能存在);
+            return 获取技能判断颜色(技能位置, 技能数量, 技能类型.被动技能存在);
         }
 
         /// <summary>
@@ -684,14 +688,14 @@ namespace Dota2Simulator.GameAutomation.Application
         /// <param name="数组">包含长宽的字节数组</param>
         /// <param name="技能数量">技能数量</param>
         /// <returns>如果技能CD好了返回真，否则返回假</returns>
-        public bool DOTA2判断技能是否CD(Keys 技能位置, in ImageHandle 句柄)
+        public bool DOTA2判断技能是否CD(Keys 技能位置)
         {
-            return 判断技能状态(技能位置, in 句柄, 技能类型.图标CD);
+            return 判断技能状态(技能位置, 技能类型.图标CD);
         }
 
-        public bool DOTA2释放CD就绪技能(Keys 技能位置, in ImageHandle 句柄)
+        public bool DOTA2释放CD就绪技能(Keys 技能位置)
         {
-            if (判断技能状态(技能位置, in 句柄, 技能类型.图标CD))
+            if (判断技能状态(技能位置, 技能类型.图标CD))
             {
                 _input.Press(VirtualKey.From(技能位置));
                 return true;
@@ -708,9 +712,9 @@ namespace Dota2Simulator.GameAutomation.Application
         /// <param name="数组">包含长宽的字节数组</param>
         /// <param name="技能数量">技能数量</param>
         /// <returns>如果法球技能CD好了返回真，否则返回假</returns>
-        private bool DOTA2判断法球技能是否CD(Keys 技能位置, in ImageHandle 句柄)
+        private bool DOTA2判断法球技能是否CD(Keys 技能位置)
         {
-            return 判断技能状态(技能位置, in 句柄, 技能类型.法球);
+            return 判断技能状态(技能位置, 技能类型.法球);
         }
 
         /// <summary>
@@ -719,13 +723,14 @@ namespace Dota2Simulator.GameAutomation.Application
         /// <param name="技能位置">技能位置</param>
         /// <param name="数组">包含长宽的字节数组</param>
         /// <returns>如果状态技能未启动返回真，否则返回假</returns>
-        public bool DOTA2判断状态技能是否启动(Keys 技能位置, in ImageHandle 句柄)
+        public bool DOTA2判断状态技能是否启动(Keys 技能位置)
         {
-            return 判断技能状态(技能位置, in 句柄, 技能类型.状态);
+            return 判断技能状态(技能位置, 技能类型.状态);
         }
 
-        public bool DOTA2判断是否持续施法(in ImageHandle 句柄)
+        public bool DOTA2判断是否持续施法()
         {
+            ImageHandle 句柄 = GlobalScreenCapture.GetCurrentHandle();
             // 通过添加步骤来等待完全显示
             // 用于检测持续施法，施法中文字的施字颜色，10秒以内有效
             // Phase 11 P1: 去 static——原经 Common.HeroLoopHost!.获取指定位置颜色 service locator 等价 ImageManager.GetColor(in 句柄, x-OffsetX, y-OffsetY)
@@ -774,13 +779,13 @@ namespace Dota2Simulator.GameAutomation.Application
         /// <param name="数组"></param>
         /// <param name="技能数量"></param>
         /// <returns></returns>
-        public bool DOTA2获取单个释放技能前颜色(Keys 技能位置, in ImageHandle 句柄)
+        public bool DOTA2获取单个释放技能前颜色(Keys 技能位置)
         {
             重置指定技能判断(技能位置);
 
             // 获取当前技能颜色
-            Color 获取当前颜色 = 获取技能释放判断颜色(技能位置, in 句柄, _aggregate.SkillCount);
-            if (判断是否更新释放技能前颜色(技能位置, 获取技能信息(_aggregate.SkillCount), in 句柄))
+            Color 获取当前颜色 = 获取技能释放判断颜色(技能位置, _aggregate.SkillCount);
+            if (判断是否更新释放技能前颜色(技能位置, 获取技能信息(_aggregate.SkillCount)))
             {
                 更新释放前颜色(技能位置, 获取当前颜色);
             }
@@ -793,20 +798,20 @@ namespace Dota2Simulator.GameAutomation.Application
         /// </summary>
         /// <param name="数组"></param>
         /// <returns></returns>
-        public bool DOTA2获取所有释放技能前颜色(in ImageHandle 句柄)
+        public bool DOTA2获取所有释放技能前颜色()
         {
-            void 更新指定释放色(Keys 技能位置, in ImageHandle 句柄)
+            void 更新指定释放色(Keys 技能位置)
             {
-                更新释放前颜色(技能位置, 获取技能释放判断颜色(技能位置, in 句柄, _aggregate.SkillCount));
+                更新释放前颜色(技能位置, 获取技能释放判断颜色(技能位置, _aggregate.SkillCount));
             }
 
             技能信息 技能信息 = 获取技能信息(_aggregate.SkillCount);
 
             foreach (Keys 位置 in 技能信息.技能位置)
             {
-                if (判断是否更新释放技能前颜色(位置, 技能信息, in 句柄))
+                if (判断是否更新释放技能前颜色(位置, 技能信息))
                 {
-                    更新指定释放色(位置, in 句柄);
+                    更新指定释放色(位置);
                 }
             }
 
@@ -820,8 +825,9 @@ namespace Dota2Simulator.GameAutomation.Application
         /// <param name="技能信息"></param>
         /// <param name="数组"></param>
         /// <returns></returns>
-        private static bool 判断是否更新释放技能前颜色(Keys 技能位置, 技能信息 技能信息, in ImageHandle 句柄)
+        private static bool 判断是否更新释放技能前颜色(Keys 技能位置, 技能信息 技能信息)
         {
+            ImageHandle 句柄 = GlobalScreenCapture.GetCurrentHandle();
             int 偏移 = 获取技能位置偏移(技能位置, 技能信息);
 
             Point p_主动 = new(技能信息.技能CD图标x + 偏移 - GameLayout.OffsetX, 技能信息.技能CD图标y - GameLayout.OffsetY);
@@ -864,14 +870,14 @@ namespace Dota2Simulator.GameAutomation.Application
             }
         }
 
-        private bool DOTA2对比释放技能前后颜色(Keys 技能位置, in ImageHandle 句柄)
+        private bool DOTA2对比释放技能前后颜色(Keys 技能位置)
         {
             // 指向性技能CD栏基本全白
-            Color 技能CD颜色 = 获取技能进入CD判断颜色(技能位置, in 句柄, _aggregate.SkillCount);
+            Color 技能CD颜色 = 获取技能进入CD判断颜色(技能位置, _aggregate.SkillCount);
             if (!ColorExtensions.ColorAEqualColorB(技能CD颜色, Color.FromArgb(255, 255, 255), 10))
             {
                 // 获取当前技能颜色
-                Color 当前释放颜色 = 获取技能释放判断颜色(技能位置, in 句柄, _aggregate.SkillCount);
+                Color 当前释放颜色 = 获取技能释放判断颜色(技能位置, _aggregate.SkillCount);
 
                 return 处理技能释放(技能位置, 当前释放颜色);
             }
@@ -1368,7 +1374,7 @@ namespace Dota2Simulator.GameAutomation.Application
         /// <returns>技能未释放、释放中返回真，释放完毕执行逻辑返回假</returns>
         public async Task<bool> 主动技能释放后续(Keys skill, Action afterAction)
         {
-            if (DOTA2对比释放技能前后颜色(skill, _vision.GetCurrentFrame()))
+            if (DOTA2对比释放技能前后颜色(skill))
             {
                 return await Task.FromResult(true).ConfigureAwait(true);
             }
@@ -1388,7 +1394,7 @@ namespace Dota2Simulator.GameAutomation.Application
         /// <returns>主动技能CD就绪返回真，进入CD执行逻辑后返回假</returns>
         public async Task<bool> 主动技能进入CD后续(Keys skill, Action afterAction)
         {
-            if (DOTA2判断技能是否CD(skill, _vision.GetCurrentFrame()))
+            if (DOTA2判断技能是否CD(skill))
             {
                 return await Task.FromResult(true).ConfigureAwait(true);
             }
@@ -1418,7 +1424,7 @@ namespace Dota2Simulator.GameAutomation.Application
                 }
             }
 
-            if (!DOTA2判断技能是否CD(skill, _vision.GetCurrentFrame()))
+            if (!DOTA2判断技能是否CD(skill))
             {
                 return await Task.FromResult(true).ConfigureAwait(true);
             }
@@ -1439,7 +1445,7 @@ namespace Dota2Simulator.GameAutomation.Application
         /// <returns>法球技能CD就绪返回真，进入CD执行逻辑后返回假</returns>
         public async Task<bool> 法球技能进入CD后续(Keys skill, Action afterAction)
         {
-            if (DOTA2判断法球技能是否CD(skill, _vision.GetCurrentFrame()))
+            if (DOTA2判断法球技能是否CD(skill))
             {
                 return await Task.FromResult(true).ConfigureAwait(true);
             }
@@ -1459,7 +1465,7 @@ namespace Dota2Simulator.GameAutomation.Application
         /// <returns>状态技能未启动返回真，启动后逻辑后返回假</returns>
         public async Task<bool> 状态技能启动后续(Keys skill, Action afterAction)
         {
-            if (!DOTA2判断状态技能是否启动(skill, _vision.GetCurrentFrame()))
+            if (!DOTA2判断状态技能是否启动(skill))
             {
                 return await Task.FromResult(true).ConfigureAwait(true);
             }
@@ -1715,7 +1721,7 @@ namespace Dota2Simulator.GameAutomation.Application
                             new ParallelOptions { MaxDegreeOfParallelism = Environment.ProcessorCount },
                             config =>
                             {
-                                var color = 获取技能颜色(config.SkillKey, _vision.GetCurrentFrame(), config.SkillCount, config.ColorType);
+                                var color = 获取技能颜色(config.SkillKey, config.SkillCount, config.ColorType);
                                 lock (colorCache)
                                 {
                                     colorCache[config.Key] = color;
@@ -1808,16 +1814,16 @@ namespace Dota2Simulator.GameAutomation.Application
         }
 
         // 统一获取技能颜色的方法
-        private static Color 获取技能颜色(Keys skillKey, in ImageHandle 句柄, int skillCount, 技能类型 colorType)
+        private static Color 获取技能颜色(Keys skillKey, int skillCount, 技能类型 colorType)
         {
             return colorType switch
             {
-                技能类型.释放变色 => 获取技能释放判断颜色(skillKey, in 句柄, skillCount),
-                技能类型.图标CD => 获取技能进入CD判断颜色(skillKey, in 句柄, skillCount),
-                技能类型.QWERDF图标 => 获取QWERDF颜色(skillKey, in 句柄, skillCount),
-                技能类型.法球 => 获取法球颜色(skillKey, in 句柄, skillCount),
-                技能类型.状态 => 获取状态颜色(skillKey, in 句柄, skillCount),
-                技能类型.被动技能存在 => 获取被动颜色(skillKey, in 句柄, skillCount),
+                技能类型.释放变色 => 获取技能释放判断颜色(skillKey, skillCount),
+                技能类型.图标CD => 获取技能进入CD判断颜色(skillKey, skillCount),
+                技能类型.QWERDF图标 => 获取QWERDF颜色(skillKey, skillCount),
+                技能类型.法球 => 获取法球颜色(skillKey, skillCount),
+                技能类型.状态 => 获取状态颜色(skillKey, skillCount),
+                技能类型.被动技能存在 => 获取被动颜色(skillKey, skillCount),
                 _ => Color.Empty,
             };
         }

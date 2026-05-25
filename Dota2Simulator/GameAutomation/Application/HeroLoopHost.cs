@@ -105,11 +105,6 @@ namespace Dota2Simulator.GameAutomation.Application
             return Task.FromResult(_vision.PixelAt(new ScreenPoint(x, y)));
         }
 
-        public Color 获取指定位置颜色(int x, int y, in ImageHandle 句柄)
-        {
-            return ImageManager.GetColor(in 句柄, x - GameLayout.OffsetX, y - GameLayout.OffsetY);
-        }
-
         #endregion
 
         #region 续走A 走A去等待后摇
@@ -220,11 +215,11 @@ namespace Dota2Simulator.GameAutomation.Application
                     // 处理命石相关逻辑
                     if (_aggregate.Conditions.StoneProbe is not null)
                     {
-                        await _aggregate.Conditions.StoneProbe(GlobalScreenCapture.GetCurrentHandle()).ConfigureAwait(true);
+                        await _aggregate.Conditions.StoneProbe().ConfigureAwait(true);
                     }
 
                     // 获取技能颜色信息
-                    _skill.DOTA2获取所有释放技能前颜色(GlobalScreenCapture.GetCurrentHandle());
+                    _skill.DOTA2获取所有释放技能前颜色();
 
                     // 核心逻辑：处理条件更新，包括运行期外部修改
                     await _aggregate.Conditions.TickAsync().ConfigureAwait(true);

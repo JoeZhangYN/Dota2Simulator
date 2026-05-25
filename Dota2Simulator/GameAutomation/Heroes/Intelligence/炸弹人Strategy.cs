@@ -51,7 +51,7 @@ public sealed partial class 炸弹人Strategy : IHeroStrategy
         return Task.CompletedTask;
     }
 
-    private async Task<bool> 粘性炸弹去后摇(ImageHandle 句柄)
+    private async Task<bool> 粘性炸弹去后摇()
     {
         void 粘性炸弹后()
         {
@@ -59,7 +59,7 @@ public sealed partial class 炸弹人Strategy : IHeroStrategy
             _input.Press(VirtualKey.From(Keys.A));
         }
 
-        if (_skill.DOTA2判断技能是否CD(Keys.Q, in 句柄))
+        if (_skill.DOTA2判断技能是否CD(Keys.Q))
         {
             return await Task.FromResult(true).ConfigureAwait(true);
         }
@@ -68,7 +68,7 @@ public sealed partial class 炸弹人Strategy : IHeroStrategy
         return await Task.FromResult(false).ConfigureAwait(true);
     }
 
-    private async Task<bool> 活性电击去后摇(ImageHandle 句柄)
+    private async Task<bool> 活性电击去后摇()
     {
         void 活性电击后()
         {
@@ -76,7 +76,7 @@ public sealed partial class 炸弹人Strategy : IHeroStrategy
             _input.Press(VirtualKey.From(Keys.A));
         }
 
-        if (_skill.DOTA2判断技能是否CD(Keys.W, in 句柄))
+        if (_skill.DOTA2判断技能是否CD(Keys.W))
         {
             return await Task.FromResult(true).ConfigureAwait(true);
         }
@@ -85,7 +85,7 @@ public sealed partial class 炸弹人Strategy : IHeroStrategy
         return await Task.FromResult(false).ConfigureAwait(true);
     }
 
-    private async Task<bool> 爆破起飞去后摇(ImageHandle 句柄)
+    private async Task<bool> 爆破起飞去后摇()
     {
         void 爆破起飞后()
         {
@@ -105,7 +105,7 @@ public sealed partial class 炸弹人Strategy : IHeroStrategy
             }
         }
 
-        if (_skill.DOTA2判断技能是否CD(Keys.E, in 句柄))
+        if (_skill.DOTA2判断技能是否CD(Keys.E))
         {
             return await Task.FromResult(true).ConfigureAwait(true);
         }
@@ -115,7 +115,7 @@ public sealed partial class 炸弹人Strategy : IHeroStrategy
     }
 
     // todo 逻辑修改
-    private async Task<bool> 爆破后接3雷粘性炸弹(ImageHandle 句柄)
+    private async Task<bool> 爆破后接3雷粘性炸弹()
     {
         if (Common.获取当前时间毫秒() - _main._聚合.Skills.Time(SlotKey.R) >= 3000)
         {

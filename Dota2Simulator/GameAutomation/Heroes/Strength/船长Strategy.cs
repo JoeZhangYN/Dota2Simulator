@@ -55,7 +55,7 @@ public sealed partial class 船长Strategy : IHeroStrategy
         }
     }
 
-    private async Task<bool> 洪流接x回(ImageHandle 句柄)
+    private async Task<bool> 洪流接x回()
     {
         return await _skill.主动技能释放后续(Keys.Q, () =>
         {
@@ -73,7 +73,7 @@ public sealed partial class 船长Strategy : IHeroStrategy
         }).ConfigureAwait(true);
     }
 
-    private async Task<bool> x释放后相关逻辑(ImageHandle 句柄)
+    private async Task<bool> x释放后相关逻辑()
     {
         // 释放x后放船，x的时间3秒，船0.3秒，3.1秒延迟，控制还是得靠水起来
         return await _skill.主动技能释放后续(Keys.E, () =>
@@ -102,7 +102,7 @@ public sealed partial class 船长Strategy : IHeroStrategy
         }).ConfigureAwait(true);
     }
 
-    private async Task<bool> x2次释放后(ImageHandle 句柄)
+    private async Task<bool> x2次释放后()
     {
         return await _skill.主动技能进入CD后续(Keys.E, () =>
         {
@@ -117,7 +117,7 @@ public sealed partial class 船长Strategy : IHeroStrategy
         }).ConfigureAwait(true);
     }
 
-    private async Task<bool> 立即释放洪流(ImageHandle 句柄)
+    private async Task<bool> 立即释放洪流()
     {
         return await _skill.主动技能已就绪后续(Keys.Q, () => { _input.Press(VirtualKey.From(Keys.Q)); }).ConfigureAwait(true);
     }

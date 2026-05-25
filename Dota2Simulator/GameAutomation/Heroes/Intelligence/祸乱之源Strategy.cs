@@ -38,21 +38,22 @@ public sealed partial class 祸乱之源Strategy : IHeroStrategy
         }
         else if (key == VirtualKey.E)
         {
+          ImageHandle 句柄 = GlobalScreenCapture.GetCurrentHandle();
           Color 技能点颜色 = Color.FromArgb(203, 183, 124);
           _main._聚合.Skills.SetTime(SlotKey.Global, 0);
-          if (ColorExtensions.ColorAEqualColorB(_main.获取指定位置颜色(971, 1008, GlobalScreenCapture.GetCurrentHandle()), 技能点颜色, 0))
+          if (ColorExtensions.ColorAEqualColorB(ImageManager.GetColor(in 句柄, 971, 1008), 技能点颜色, 0))
             {
               _main._聚合.Skills.SetTime(SlotKey.Global, 7000);
             }
-          else if (ColorExtensions.ColorAEqualColorB(_main.获取指定位置颜色(964, 1008, GlobalScreenCapture.GetCurrentHandle()), 技能点颜色, 0))
+          else if (ColorExtensions.ColorAEqualColorB(ImageManager.GetColor(in 句柄, 964, 1008), 技能点颜色, 0))
             {
               _main._聚合.Skills.SetTime(SlotKey.Global, 6000);
             }
-          else if (ColorExtensions.ColorAEqualColorB(_main.获取指定位置颜色(947, 1008, GlobalScreenCapture.GetCurrentHandle()), 技能点颜色, 0))
+          else if (ColorExtensions.ColorAEqualColorB(ImageManager.GetColor(in 句柄, 947, 1008), 技能点颜色, 0))
             {
               _main._聚合.Skills.SetTime(SlotKey.Global, 5000);
             }
-          else if (ColorExtensions.ColorAEqualColorB(_main.获取指定位置颜色(935, 1008, GlobalScreenCapture.GetCurrentHandle()), 技能点颜色, 0))
+          else if (ColorExtensions.ColorAEqualColorB(ImageManager.GetColor(in 句柄, 935, 1008), 技能点颜色, 0))
             {
               _main._聚合.Skills.SetTime(SlotKey.Global, 4000);
             }
@@ -68,14 +69,14 @@ public sealed partial class 祸乱之源Strategy : IHeroStrategy
         return Task.CompletedTask;
     }
 
-    private async Task<bool> 虚弱去后摇(ImageHandle 句柄)
+    private async Task<bool> 虚弱去后摇()
     {
         void 虚弱后()
         {
           _skill.通用技能后续动作(false);
         }
 
-        if (_skill.DOTA2判断技能是否CD(Keys.Q, in 句柄))
+        if (_skill.DOTA2判断技能是否CD(Keys.Q))
         {
           return await Task.FromResult(true).ConfigureAwait(true);
         }
@@ -84,14 +85,14 @@ public sealed partial class 祸乱之源Strategy : IHeroStrategy
         return await Task.FromResult(false).ConfigureAwait(true);
     }
 
-    private async Task<bool> 噬脑去后摇(ImageHandle 句柄)
+    private async Task<bool> 噬脑去后摇()
     {
         void 噬脑后()
         {
           _skill.通用技能后续动作();
         }
 
-        if (_skill.DOTA2判断技能是否CD(Keys.W, in 句柄))
+        if (_skill.DOTA2判断技能是否CD(Keys.W))
         {
           return await Task.FromResult(true).ConfigureAwait(true);
         }
@@ -100,7 +101,7 @@ public sealed partial class 祸乱之源Strategy : IHeroStrategy
         return await Task.FromResult(false).ConfigureAwait(true);
     }
 
-    private static async Task<bool> 噩梦接平A锤(ImageHandle 句柄)
+    private static async Task<bool> 噩梦接平A锤()
     {
         return await Task.FromResult(false).ConfigureAwait(true);
     }

@@ -29,7 +29,7 @@ public sealed partial class 小骷髅Strategy : IHeroStrategy
     private HeroPlan GetPlan() => _plan ??= HeroPlanBuilder.New()
         .OnKey(Keys.F1).WhenHasShard().Execute(() => _main._聚合.LegSwap.配置.修改配置(Keys.D, true, "敏捷"))
         .OnKey(Keys.F1).WhenHasAghanim().AdjustLegSwap(Keys.F, paramBool: true)
-        .OnKey(Keys.Q).CustomProbe(async _h => await _skill.主动技能进入CD后续(Keys.Q, () =>
+        .OnKey(Keys.Q).CustomProbe(async () => await _skill.主动技能进入CD后续(Keys.Q, () =>
         {
             if (_main._聚合.Skills.Mode(SlotKey.Q) == 1)
             {
@@ -44,14 +44,14 @@ public sealed partial class 小骷髅Strategy : IHeroStrategy
             }
             _skill.通用技能后续动作();
         }).ConfigureAwait(true))
-        .OnKey(Keys.W).CustomProbe(async _h => await _skill.主动技能进入CD后续(Keys.W, () =>
+        .OnKey(Keys.W).CustomProbe(async () => await _skill.主动技能进入CD后续(Keys.W, () =>
         {
-            _ = _skill.DOTA2释放CD就绪技能(Keys.Q, in _h);
+            _ = _skill.DOTA2释放CD就绪技能(Keys.Q);
             _skill.通用技能后续动作();
         }).ConfigureAwait(true))
-        .OnKey(Keys.E).CustomProbe(async _h => await _skill.主动技能释放后续(Keys.E, () => _input.MouseClick(MouseButton.Right)).ConfigureAwait(true))
-        .OnKey(Keys.R).CustomProbe(async _h => await _skill.主动技能进入CD后续(Keys.R, () => _input.MouseClick(MouseButton.Right)).ConfigureAwait(true))
-        .OnKey(Keys.D).WhenHasShard().CustomProbe(async _h => await _skill.主动技能释放后续(Keys.F, () =>
+        .OnKey(Keys.E).CustomProbe(async () => await _skill.主动技能释放后续(Keys.E, () => _input.MouseClick(MouseButton.Right)).ConfigureAwait(true))
+        .OnKey(Keys.R).CustomProbe(async () => await _skill.主动技能进入CD后续(Keys.R, () => _input.MouseClick(MouseButton.Right)).ConfigureAwait(true))
+        .OnKey(Keys.D).WhenHasShard().CustomProbe(async () => await _skill.主动技能释放后续(Keys.F, () =>
         {
             if (_main._聚合.Skills.Mode(SlotKey.F) == 1)
             {

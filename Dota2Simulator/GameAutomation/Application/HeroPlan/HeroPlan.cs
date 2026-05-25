@@ -152,7 +152,7 @@ public sealed class HeroPlan
             {
                 int clauseIndex = i;  // 捕获给闭包, 避免循环变量陷阱.
                 HeroPlanClause capturedClause = clause;
-                ctx.Aggregate.Conditions[slotKey].Probe ??= async _ =>
+                ctx.Aggregate.Conditions[slotKey].Probe ??= async () =>
                 {
                     await skill.技能通用判断(
                         capturedClause.SkillKey,
@@ -165,7 +165,7 @@ public sealed class HeroPlan
             }
             else
             {
-                ctx.Aggregate.Conditions[slotKey].Probe ??= async _ =>
+                ctx.Aggregate.Conditions[slotKey].Probe ??= async () =>
                     await skill.技能通用判断(
                         clause.SkillKey,
                         (int)clause.Mode,

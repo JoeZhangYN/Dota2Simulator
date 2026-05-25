@@ -26,7 +26,7 @@ public sealed partial class 混沌Strategy : IHeroStrategy
         {
             _item.根据图片使用物品(Dota2_Pictrue.物品.紫苑);
             _item.根据图片使用物品(Dota2_Pictrue.物品.血棘);
-        }).CustomProbe(async _h => await _skill.技能通用判断(
+        }).CustomProbe(async () => await _skill.技能通用判断(
             Keys.Q,
             1,
             要接的按键: _main._聚合.Skills.Mode(SlotKey.Q) == 1 ? Keys.W : Keys.A).ConfigureAwait(true))
