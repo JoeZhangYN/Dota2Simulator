@@ -1,124 +1,43 @@
+// Phase 19D: 猛犸 Strategy 迁 HeroPlan — Q/W/E/R/D 5 CustomProbe (全部 wrap _skill.通用技能后续动作) + F/D2 Execute lambda (跳拱/指定地点 多步骤宏). Probe/Execute lambda 引用 _skill/_input/_main ⇒ instance _plan lazy-init.
 #if DOTA2
 using System.Drawing;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Dota2Simulator.GameAutomation.Application;
+using Dota2Simulator.GameAutomation.Application.HeroPlans;
 using Dota2Simulator.GameAutomation.Domain.Actuation;
 using Dota2Simulator.GameAutomation.Domain.Heroes;
 using Dota2Simulator.GameAutomation.Domain.Loop;
-using Dota2Simulator.Games;
-using Dota2Simulator.Games.Dota2;
-using Dota2Simulator.Vision;
-
-using Dota2Simulator.GameAutomation.Ports;
-
 using Dota2Simulator.GameAutomation.Domain.Perception;
+using Dota2Simulator.Games;
+
 namespace Dota2Simulator.GameAutomation.Heroes.Universal;
 
-/// <summary>猛犸（全才）策略——迁移自 _main.根据当前英雄增强 的 case "猛犸"。</summary>
 [HeroStrategy("猛犸", HeroAttribute.Universal)]
 public sealed partial class 猛犸Strategy : IHeroStrategy
 {
     private const int 等待延迟 = 33;
 
+    private HeroPlan? _plan;
 
+    public void OnActivate(HeroContext ctx) => GetPlan().Apply(ctx, _skill);
 
-    public void OnActivate(HeroContext ctx)
+    public Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx) => GetPlan().DispatchAsync(trigger, ctx, _item);
+
+    private HeroPlan GetPlan() => _plan ??= HeroPlanBuilder.New()
+        .OnKey(Keys.Q).CustomProbe(通用后续Probe)
+        .OnKey(Keys.W).CustomProbe(通用后续Probe)
+        .OnKey(Keys.E).CustomProbe(通用后续Probe)
+        .OnKey(Keys.R).CustomProbe(通用后续Probe)
+        .OnKey(Keys.D).CustomProbe(通用后续Probe)
+        .OnKey(Keys.F).Execute(() => Task.Run(跳拱指定地点))
+        .OnKey(Keys.D2).Execute(() => Task.Run(指定地点))
+        .Done();
+
+    /// <summary>原 5 个 helper (震荡波/授予力量/巨角冲撞/两级反转/长角抛物去后摇) 全调 _skill.通用技能后续动作() 后返 false. 合并单 Probe 复用.</summary>
+    private async Task<bool> 通用后续Probe()
     {
-        _main._聚合.Conditions[ConditionSlotKey.C1].Probe = 震荡波去后摇;
-        _main._聚合.Conditions[ConditionSlotKey.C2].Probe = 授予力量去后摇;
-        _main._聚合.Conditions[ConditionSlotKey.C3].Probe = 巨角冲撞去后摇;
-        _main._聚合.Conditions[ConditionSlotKey.C4].Probe = 两级反转去后摇;
-        _main._聚合.Conditions[ConditionSlotKey.C5].Probe = 长角抛物去后摇;
-    }
-
-    public async Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)
-    {
-        VirtualKey key = trigger.Key;
-        await _item.根据按键判断技能释放前通用逻辑(new KeyEventArgs((Keys)key.ToNative())).ConfigureAwait(true);
-
-        if (key == VirtualKey.Q)
-        {
-            _main._聚合.Conditions[ConditionSlotKey.C1].Active = true;
-        }
-        else if (key == VirtualKey.W)
-        {
-            _main._聚合.Conditions[ConditionSlotKey.C2].Active = true;
-        }
-        else if (key == VirtualKey.E)
-        {
-            _main._聚合.Conditions[ConditionSlotKey.C3].Active = true;
-        }
-        else if (key == VirtualKey.R)
-        {
-            _main._聚合.Conditions[ConditionSlotKey.C4].Active = true;
-        }
-        else if (key == VirtualKey.D)
-        {
-            _main._聚合.Conditions[ConditionSlotKey.C5].Active = true;
-        }
-        else if (key == VirtualKey.F)
-        {
-            await Task.Run(跳拱指定地点).ConfigureAwait(false);
-        }
-        else if (key == VirtualKey.From(Keys.D2))
-        {
-            await Task.Run(指定地点).ConfigureAwait(false);
-        }
-    }
-
-    private async Task<bool> 震荡波去后摇()
-    {
-        void 震荡波后()
-        {
-            _skill.通用技能后续动作();
-        }
-
-        震荡波后();
-        return await Task.FromResult(false).ConfigureAwait(true);
-    }
-
-    private async Task<bool> 授予力量去后摇()
-    {
-        void 授予力量后()
-        {
-            _skill.通用技能后续动作();
-        }
-
-        授予力量后();
-        return await Task.FromResult(false).ConfigureAwait(true);
-    }
-
-    private async Task<bool> 巨角冲撞去后摇()
-    {
-        void 巨角冲撞后()
-        {
-            _skill.通用技能后续动作();
-        }
-
-        巨角冲撞后();
-        return await Task.FromResult(false).ConfigureAwait(true);
-    }
-
-    private async Task<bool> 长角抛物去后摇()
-    {
-        void 长角抛物后()
-        {
-            _skill.通用技能后续动作();
-        }
-
-        长角抛物后();
-        return await Task.FromResult(false).ConfigureAwait(true);
-    }
-
-    private async Task<bool> 两级反转去后摇()
-    {
-        void 两级反转后()
-        {
-            _skill.通用技能后续动作();
-        }
-
-        两级反转后();
+        _skill.通用技能后续动作();
         return await Task.FromResult(false).ConfigureAwait(true);
     }
 

@@ -1,84 +1,42 @@
+// Phase 19D: 剧毒 Strategy 迁 HeroPlan — Q/R AfterCast + E CustomProbe (MouseClick Right + return false) + D3 ToggleSlot(E 循环蛇棒 mode 2) + S Execute (Session.IsPaused + 重置 5 Active).
 #if DOTA2
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Dota2Simulator.GameAutomation.Application;
+using Dota2Simulator.GameAutomation.Application.HeroPlans;
 using Dota2Simulator.GameAutomation.Domain.Actuation;
 using Dota2Simulator.GameAutomation.Domain.Heroes;
-using Dota2Simulator.Games.Dota2;
-using Dota2Simulator.Vision;
-
-using Dota2Simulator.GameAutomation.Ports;
 
 namespace Dota2Simulator.GameAutomation.Heroes.Universal;
 
-/// <summary>剧毒（全才）策略——迁移自 _main.根据当前英雄增强 的 case "剧毒"。</summary>
 [HeroStrategy("剧毒", HeroAttribute.Universal)]
 public sealed partial class 剧毒Strategy : IHeroStrategy
 {
+    private HeroPlan? _plan;
 
+    public void OnActivate(HeroContext ctx) => GetPlan().Apply(ctx, _skill);
 
-    public void OnActivate(HeroContext ctx)
-    {
-        _main._聚合.Conditions[ConditionSlotKey.C1].Probe ??= 瘴气去后摇;
-        _main._聚合.Conditions[ConditionSlotKey.C2].Probe ??= 蛇棒去后摇;
-        _main._聚合.Conditions[ConditionSlotKey.C3].Probe ??= 恶性瘟疫去后摇;
-        _main._聚合.Conditions[ConditionSlotKey.C4].Probe ??= 循环蛇棒;
-        _skill.重复按键执行间隔阈值 = 100;
-        _main._聚合.LegSwap.配置.修改配置(Keys.W, false);
-    }
+    public Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx) => GetPlan().DispatchAsync(trigger, ctx, _item);
 
-    public async Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)
-    {
-        VirtualKey key = trigger.Key;
-        await _item.根据按键判断技能释放前通用逻辑(new KeyEventArgs((Keys)key.ToNative())).ConfigureAwait(true);
-
-        if (key == VirtualKey.Q)
-        {
-            _main._聚合.Conditions[ConditionSlotKey.C1].Active = true;
-        }
-        else if (key == VirtualKey.E)
-        {
-            _main._聚合.Conditions[ConditionSlotKey.C2].Active = true;
-        }
-        else if (key == VirtualKey.R)
-        {
-            _main._聚合.Conditions[ConditionSlotKey.C3].Active = true;
-        }
-        else if (key == VirtualKey.From(Keys.D3))
-        {
-            _main._聚合.Conditions[ConditionSlotKey.C4].Active = !_main._聚合.Conditions[ConditionSlotKey.C4].Active;
-            Dota2Simulator.TTS.TTS.Speak(_main._聚合.Conditions[ConditionSlotKey.C4].Active ? "循环蛇棒" : "终止循环");
-        }
-        else if (key == VirtualKey.From(Keys.S))
+    private HeroPlan GetPlan() => _plan ??= HeroPlanBuilder.New()
+        .LegSwap(Keys.W, alwaysSwap: false)
+        .RepeatThreshold(100)
+        .OnKey(Keys.Q).CastSkill(Keys.Q).AfterCast()
+        .OnKey(Keys.E).CustomProbe(蛇棒去后摇)
+        .OnKey(Keys.R).CastSkill(Keys.R).AfterCast()
+        .OnKey(Keys.D3).ToggleSlot(Keys.E, "循环蛇棒", "终止循环")
+        .OnKey(Keys.S).Execute(() =>
         {
             _main.Session!.IsPaused = true;
-            _main._聚合.Conditions[ConditionSlotKey.C1].Active = false;
-            _main._聚合.Conditions[ConditionSlotKey.C2].Active = false;
-            _main._聚合.Conditions[ConditionSlotKey.C3].Active = false;
-            _main._聚合.Conditions[ConditionSlotKey.C4].Active = false;
-            _main._聚合.Conditions[ConditionSlotKey.C5].Active = false;
-        }
-    }
-
-    private async Task<bool> 瘴气去后摇()
-    {
-        return await _skill.技能通用判断(Keys.Q, 1).ConfigureAwait(true);
-    }
+            for (int i = 0; i < 5; i++)
+                _main._聚合.Conditions[(ConditionSlotKey)i].Active = false;
+        })
+        .Done();
 
     private async Task<bool> 蛇棒去后摇()
     {
         _input.MouseClick(MouseButton.Right);
         return await Task.FromResult(false).ConfigureAwait(true);
-    }
-
-    private async Task<bool> 恶性瘟疫去后摇()
-    {
-        return await _skill.技能通用判断(Keys.R, 1).ConfigureAwait(true);
-    }
-
-    private async Task<bool> 循环蛇棒()
-    {
-        return await _skill.技能通用判断(Keys.E, 2).ConfigureAwait(true);
     }
 }
 #endif
