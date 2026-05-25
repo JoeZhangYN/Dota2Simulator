@@ -18,9 +18,11 @@ public sealed class HeroPlanBuilder
 {
     private readonly ImmutableArray<HeroPlanClause>.Builder _clauses = ImmutableArray.CreateBuilder<HeroPlanClause>();
     private readonly ImmutableArray<LegSwapEntry>.Builder _legSwap = ImmutableArray.CreateBuilder<LegSwapEntry>();
+    private readonly ImmutableArray<SetupAction>.Builder _setups = ImmutableArray.CreateBuilder<SetupAction>();
 
     private Keys? _pendingTrigger;
     private Keys? _pendingSkill;
+    private AggGuard _pendingGuard = AggGuard.None;
 
     private HeroPlanBuilder() { }
 
@@ -31,9 +33,10 @@ public sealed class HeroPlanBuilder
     {
         if (_pendingTrigger is not null)
         {
-            throw new InvalidOperationException($"OnKey({triggerKey}): 上一个 OnKey({_pendingTrigger}) 未终结 (缺 CastSkill + AfterX).");
+            throw new InvalidOperationException($"OnKey({triggerKey}): 上一个 OnKey({_pendingTrigger}) 未终结 (缺 CastSkill + AfterX, 或 SetupAction).");
         }
         _pendingTrigger = triggerKey;
+        _pendingGuard = AggGuard.None;
         return this;
     }
 
@@ -45,6 +48,50 @@ public sealed class HeroPlanBuilder
             throw new InvalidOperationException("CastSkill: 需先调 OnKey.");
         }
         _pendingSkill = skillKey;
+        return this;
+    }
+
+    /// <summary>该 clause/setup 仅当 HeroAggregate.HasAghanim==true 才触发.</summary>
+    public HeroPlanBuilder WhenHasAghanim()
+    {
+        if (_pendingTrigger is null)
+        {
+            throw new InvalidOperationException("WhenHasAghanim: 需先调 OnKey.");
+        }
+        _pendingGuard = AggGuard.HasAghanim;
+        return this;
+    }
+
+    /// <summary>该 clause/setup 仅当 HeroAggregate.HasShard==true 才触发.</summary>
+    public HeroPlanBuilder WhenHasShard()
+    {
+        if (_pendingTrigger is null)
+        {
+            throw new InvalidOperationException("WhenHasShard: 需先调 OnKey.");
+        }
+        _pendingGuard = AggGuard.HasShard;
+        return this;
+    }
+
+    /// <summary>
+    /// 终结 OnKey 链为 SetupAction (不挂 Probe, 仅副作用) — 当前 Kind = AdjustLegSwap.
+    /// 例: <c>.OnKey(F1).WhenHasAghanim().AdjustLegSwap(F, true)</c> 表示按 F1 + 持神杖时改 LegSwap.修改配置(F, true).
+    /// </summary>
+    public HeroPlanBuilder AdjustLegSwap(Keys paramKey, bool paramBool)
+    {
+        if (_pendingTrigger is null)
+        {
+            throw new InvalidOperationException("AdjustLegSwap: 需先调 OnKey.");
+        }
+        _setups.Add(new SetupAction(
+            TriggerKey: Domain.Actuation.VirtualKey.From(_pendingTrigger.Value),
+            Guard: _pendingGuard,
+            Kind: SetupActionKind.AdjustLegSwap,
+            ParamKey: paramKey,
+            ParamBool: paramBool));
+        _pendingTrigger = null;
+        _pendingSkill = null;
+        _pendingGuard = AggGuard.None;
         return this;
     }
 
@@ -85,10 +132,12 @@ public sealed class HeroPlanBuilder
             Mode: CastMode.AfterEnterCD,  // sentinel — Apply 内按 SkillKey == Keys.None 跳过 Probe 注册.
             ContinueAttack: false,
             ContinueKey: Keys.None,
-            PostDelayMs: 0));
+            PostDelayMs: 0,
+            Guard: _pendingGuard));
 
         _pendingTrigger = null;
         _pendingSkill = null;
+        _pendingGuard = AggGuard.None;
         return this;
     }
 
@@ -109,10 +158,12 @@ public sealed class HeroPlanBuilder
             Mode: mode,
             ContinueAttack: continueAttack,
             ContinueKey: continueKey,
-            PostDelayMs: postDelayMs));
+            PostDelayMs: postDelayMs,
+            Guard: _pendingGuard));
 
         _pendingTrigger = null;
         _pendingSkill = null;
+        _pendingGuard = AggGuard.None;
         return this;
     }
 
@@ -131,7 +182,7 @@ public sealed class HeroPlanBuilder
             throw new InvalidOperationException(
                 $"Done: pending 状态未终结 (OnKey={_pendingTrigger?.ToString() ?? "null"}, CastSkill={_pendingSkill?.ToString() ?? "null"}).");
         }
-        return new HeroPlan(_clauses.ToImmutable(), _legSwap.ToImmutable());
+        return new HeroPlan(_clauses.ToImmutable(), _legSwap.ToImmutable(), _setups.ToImmutable());
     }
 }
 

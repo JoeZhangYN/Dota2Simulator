@@ -11,17 +11,47 @@ using Dota2Simulator.GameAutomation.Domain.Actuation;
 
 namespace Dota2Simulator.GameAutomation.Application.HeroPlans;
 
-/// <summary>单个技能行为子句 (按键 → 技能 + 释放模式 + 后续动作).</summary>
+/// <summary>聚合状态守卫 (按键触发时检查): 决定该 clause/setup 是否触发.</summary>
+public enum AggGuard
+{
+    /// <summary>无守卫, 无条件触发 (默认).</summary>
+    None,
+    /// <summary>仅当 HeroAggregate.HasAghanim == true 才触发.</summary>
+    HasAghanim,
+    /// <summary>仅当 HeroAggregate.HasShard == true 才触发.</summary>
+    HasShard,
+}
+
+/// <summary>单个技能行为子句 (按键 → 技能 + 释放模式 + 后续动作 + 可选 Guard).</summary>
 public readonly record struct HeroPlanClause(
     VirtualKey TriggerKey,
     Keys SkillKey,
     CastMode Mode,
     bool ContinueAttack,
     Keys ContinueKey,
-    int PostDelayMs);
+    int PostDelayMs,
+    AggGuard Guard);
 
-/// <summary>假腿配置条目 (按键 → alwaysSwap 标志).</summary>
+/// <summary>假腿配置条目 (按键 → alwaysSwap 标志, OnActivate 时一次性应用).</summary>
 public readonly record struct LegSwapEntry(Keys Key, bool AlwaysSwap);
+
+/// <summary>
+/// 按键触发 + Guard 的副作用 (运行期, 非 OnActivate 一次性) — 当前仅支持 AdjustLegSwap.
+/// 例: F1 键 + HasAghanim → LegSwap.修改配置(F, true) (TB 模板; 业务概念「神杖切假腿配置」).
+/// </summary>
+public readonly record struct SetupAction(
+    VirtualKey TriggerKey,
+    AggGuard Guard,
+    SetupActionKind Kind,
+    Keys ParamKey,
+    bool ParamBool);
+
+/// <summary>SetupAction 副作用种类.</summary>
+public enum SetupActionKind
+{
+    /// <summary>调 LegSwap.配置.修改配置(ParamKey, ParamBool).</summary>
+    AdjustLegSwap,
+}
 
 /// <summary>
 /// 英雄技能行为表 — 由 <see cref="HeroPlanBuilder"/> 终结返回, 不可变.
@@ -32,8 +62,12 @@ public sealed class HeroPlan
 {
     private readonly ImmutableArray<HeroPlanClause> _clauses;
     private readonly ImmutableArray<LegSwapEntry> _legSwap;
+    private readonly ImmutableArray<SetupAction> _setups;
 
-    internal HeroPlan(ImmutableArray<HeroPlanClause> clauses, ImmutableArray<LegSwapEntry> legSwap)
+    internal HeroPlan(
+        ImmutableArray<HeroPlanClause> clauses,
+        ImmutableArray<LegSwapEntry> legSwap,
+        ImmutableArray<SetupAction> setups)
     {
         if (clauses.Length > 9)
         {
@@ -42,6 +76,7 @@ public sealed class HeroPlan
         }
         _clauses = clauses;
         _legSwap = legSwap;
+        _setups = setups;
     }
 
     /// <summary>子句数 (用于诊断 / 测试).</summary>
@@ -94,9 +129,24 @@ public sealed class HeroPlan
         VirtualKey key = trigger.Key;
         await item.根据按键判断技能释放前通用逻辑(new KeyEventArgs((Keys)key.ToNative())).ConfigureAwait(true);
 
+        // 1. 先跑 SetupAction (按键 + Guard → 副作用, 如 F1+HasAghanim → LegSwap.修改配置).
+        foreach (SetupAction setup in _setups)
+        {
+            if (setup.TriggerKey == key && CheckGuard(setup.Guard, ctx))
+            {
+                switch (setup.Kind)
+                {
+                    case SetupActionKind.AdjustLegSwap:
+                        ctx.Aggregate.LegSwap.配置.修改配置(setup.ParamKey, setup.ParamBool);
+                        break;
+                }
+            }
+        }
+
+        // 2. 再跑 Clause 激活 (按键 → ConditionSlot.Active, 受 Guard 控制).
         for (int i = 0; i < _clauses.Length; i++)
         {
-            if (_clauses[i].TriggerKey == key)
+            if (_clauses[i].TriggerKey == key && CheckGuard(_clauses[i].Guard, ctx))
             {
                 ctx.Aggregate.Conditions[(ConditionSlotKey)i].Active = true;
                 return;
@@ -104,6 +154,14 @@ public sealed class HeroPlan
         }
         // 未命中: no-op (等价旧手写 if/else 链最后无 else 默认行为).
     }
+
+    private static bool CheckGuard(AggGuard guard, HeroContext ctx) => guard switch
+    {
+        AggGuard.None => true,
+        AggGuard.HasAghanim => ctx.Aggregate.HasAghanim,
+        AggGuard.HasShard => ctx.Aggregate.HasShard,
+        _ => true,
+    };
 }
 
 #endif
