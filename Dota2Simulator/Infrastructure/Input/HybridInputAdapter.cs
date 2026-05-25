@@ -49,6 +49,19 @@ public sealed class HybridInputAdapter : IInputExecutor
         }
     }
 
+    public void MouseClickViaEnigo(MouseButton button)
+    {
+        switch (button)
+        {
+            case MouseButton.Left: SimEnigo.MouseLeftClick(); break;
+            case MouseButton.Right: SimEnigo.MouseRightClick(); break;
+            case MouseButton.Middle:
+                throw new System.NotSupportedException("SimEnigo 后端未导出 MouseMiddleClick");
+            default:
+                throw new System.NotSupportedException($"未知 MouseButton: {button}");
+        }
+    }
+
     public void MouseDown(MouseButton button)
     {
         switch (button)

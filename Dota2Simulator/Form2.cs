@@ -210,11 +210,9 @@ namespace Dota2Simulator
 #endif
 
 #if HF2
-            // Phase 11 P14: Hf2Engine instance 装配 — 同 LOL 路径 (无 AppContainer).
+            // Phase 12 Chunk 1: Hf2Engine ctor 简化只接 IInputExecutor (vision/ui 未用 stub 残留已删).
             var hf2Input = new Input.Adapters.HybridInputAdapter();
-            var hf2Vision = new Vision.Adapters.RustVisionAdapter();
-            var hf2Ui = new Ui.Adapters.Form2UiInvoker(this);
-            _hf2Engine = new Games.HF2.Hf2Engine(hf2Input, hf2Vision, hf2Ui);
+            _hf2Engine = new Games.HF2.Hf2Engine(hf2Input);
 #endif
 
             StartListen();

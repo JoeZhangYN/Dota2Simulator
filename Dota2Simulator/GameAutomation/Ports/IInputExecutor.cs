@@ -40,6 +40,12 @@ public interface IInputExecutor
     /// <summary>点击鼠标按键。</summary>
     void MouseClick(MouseButton button);
 
+    /// <summary>
+    /// 经 SimEnigo 后端点击鼠标按键（simengio.dll）。
+    /// 仅供需要 Enigo 后端行为的业务使用（如绝地潜兵 2 战备菜单确认），不要与 <see cref="MouseClick"/> 混用——两者驱动栈不同。
+    /// </summary>
+    void MouseClickViaEnigo(MouseButton button);
+
     /// <summary>按下鼠标按键（不释放）。</summary>
     void MouseDown(MouseButton button);
 

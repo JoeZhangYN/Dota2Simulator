@@ -71,6 +71,12 @@ public sealed class ProbeInputExecutor : IInputExecutor
         _inner.MouseClick(button);
     }
 
+    public void MouseClickViaEnigo(MouseButton button)
+    {
+        if (RecordReplayProbe.Enabled) RecordReplayProbe.Record(Port, nameof(MouseClickViaEnigo), button.ToString());
+        _inner.MouseClickViaEnigo(button);
+    }
+
     public void MouseDown(MouseButton button)
     {
         if (RecordReplayProbe.Enabled) RecordReplayProbe.Record(Port, nameof(MouseDown), button.ToString());
