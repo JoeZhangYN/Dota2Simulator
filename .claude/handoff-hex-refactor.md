@@ -967,3 +967,135 @@ Phase 11.B 14 commit + Phase 11.B P15 handoff (1) + Phase 12 (7 commit) = **22 c
 e3ddfe6 (C1)  → 88c7623 (C2)  → 969710b (C3a) → 8455258 (C3b) →
 0895dd9 (C3c) → d89940a (C3d) → 0db701f (C3e) → <P12-handoff hash>
 ```
+
+## Phase 13 完整收尾 (2026-05-25 续, 3 commit on main)
+
+epic 主题: **HeroPlan DSL 横向铺英雄 + ToggleSlot / AlsoAdjustLegSwap 双 DSL 扩**.
+触发: 用户 2026-05-25 续 "继续抽象英雄逻辑", grill 三问对齐: 主轴=横向铺 14→N (扩 DSL + 迁更多英雄) / in-scope=1-2 commit 小步推进 / 否决项=空; 后续 grill 选 "1-3" (ToggleSlot / WhenNotHasX / AlsoAdjustLegSwap 渐进推进).
+
+### Phase 13 commit 表
+
+| Chunk | hash | 主题 | 净行 | 新增英雄 |
+|---|---|---|---|---|
+| C1 | `3c9543c` | hero-plan-batch (0 DSL 扩) 4 真简单 fit 英雄 | -184 | 斯温 / 尸王 / 宙斯 / 拉席克 |
+| C2 | `6383a95` | hero-plan-toggle-slot (DSL 扩 ToggleSlot) | -34 | 小仙女 / 小强 / 瘟疫法师 |
+| C3 | `bef3187` | hero-plan-also-adjust-legswap (DSL 扩 AlsoAdjustLegSwap) | -28 | 树精 |
+
+合计: **-246 业务行净**, 8 英雄新迁 HeroPlan DSL.
+
+### Phase 13 DSL 容量更新 (在 Phase 12 基础上)
+
+| 维度 | 选项 | 替换源 | 新增于 |
+|---|---|---|---|
+| CastMode | AfterEnterCD / AfterCast / WhenReady / AfterEnterCDLegOnly / AfterCastLegOnly | SkillEngine.技能通用判断 magic int 0/1/2/10/11 | Phase 12 |
+| AggGuard | None / HasAghanim / HasShard | 散于 OnKeyAsync 内 `if (HasX)` | Phase 12 |
+| SetupAction | AdjustLegSwap | F1+HasX 单独按键 LegSwap.修改配置 | Phase 12 |
+| LegSwapEntry | 按键 → alwaysSwap | OnActivate 内 LegSwap.配置.修改配置 多行 | Phase 12 |
+| NoProbe | sentinel (按键占槽不挂 Probe) | 影魔 R 边缘 | Phase 12 |
+| RepeatThreshold | int (毫秒) | OnActivate _skill.重复按键执行间隔阈值 | Phase 12 |
+| ConditionSlot | C1..C9 顺序自动累加 | 手写 ConditionSlotKey.C1..Cn | Phase 12 |
+| **ToggleSlot** | (skillKey, speakOn, speakOff) Active=!Active + TTS + 自循环 Probe | D3/D4 toggle ConditionSlot.Active=!Active + TTS Speak + Probe 自检 Active | **Phase 13 C2** |
+| **AlsoAdjustLegSwap** | (paramKey, paramBool) 链终结 clause 后追加共享 trigger+guard SetupAction | OnKeyAsync 内 `if (Guard) { LegSwap.修改配置; Active=true; }` | **Phase 13 C3** |
+
+### Phase 13 已迁英雄清单 (8 / 92, Phase 12 累计 22 / 92 = 23.9%)
+
+| 属性 | C1 (4) | C2 (3) | C3 (1) |
+|---|---|---|---|
+| 力量 (4) | 斯温 / 尸王 | — | 树精 |
+| 敏捷 (0) | — | — | — |
+| 智力 (4) | 宙斯 / 拉席克 | 小仙女 / 瘟疫法师 | — |
+| 全才 (1) | — | 小强 | — |
+
+注:
+- 智力 BC 突破 0 → 4 个 (Phase 12 0 迁).
+- 树精 D 键 `WhenHasAghanim` + `AlsoAdjustLegSwap` 是双效果链 (clause 释放技能 + setup 改 LegSwap), 同次按键两 effect.
+- 小仙女 / 小强 / 瘟疫法师 D3 toggle 形态 ConditionSlot.Active=!Active + TTS Speak, Probe 自循环 (mode=2 释放后返 Active 续判).
+
+### Phase 13 关键不变量 (新增)
+
+1. **HeroPlanClause record struct 默认参数兼容**: 新增 IsToggle/SpeakOn/SpeakOff 字段全 default, 存量 14 Phase 12 英雄 + Phase 13 C1 4 英雄 0 改动.
+2. **Toggle Probe 闭包变量陷阱规避**: HeroPlan.Apply 内 toggle 分支用 `int clauseIndex = i; HeroPlanClause capturedClause = clause;` 双重捕获, 避免循环变量被后续迭代覆盖.
+3. **AlsoAdjustLegSwap 时序保障**: DispatchAsync 内 SetupAction 在 Clause 之前跑 (Phase 12 设计), 自然保证 LegSwap 修改先于 Active 设置 (与 OnKeyAsync 原 `if (HasX) { LegSwap.修改; Active=true; }` 顺序等价).
+4. **TTS 直调 static**: HeroPlan.DispatchAsync toggle 分支调 `Dota2Simulator.TTS.TTS.Speak(...)` static, 与 SkillEngine / Phase 11 BC 内 TTS 调用模式一致 (handoff_notes #1 标 ITtsPort 抽提候选, 但当前实用).
+5. **接口契约破坏自检 PASS**: HeroPlanClause 全字段加默认值 (record struct positional ctor 向后兼容); HeroPlanBuilder 新方法 ToggleSlot / AlsoAdjustLegSwap 链式不破现有方法; IHeroStrategy / HeroStrategy attribute 字节零改.
+
+### Phase 13 architecture-sentinel verdict (未跑显式扫描, 主 lead 自审)
+
+- **依赖倒置**: ✅ HeroPlan toggle 模式调 TTS static 是已有模式延续, 0 新 service locator.
+- **结构化管道**: ✅ ToggleSlot / AlsoAdjustLegSwap 都是流式 DSL, 与 Phase 12 链一致 (OnKey → CastSkill → AfterX → AlsoX 顺序构造).
+- **类型不变量**: ✅ HeroPlanClause record struct + 默认参数兼容; IsToggle bool 边界明确 (true → toggle, false → 普通); ConditionSlot 顺序累加规则 0 改.
+- **高内聚低耦合**: ✅ Toggle 行为下沉到 HeroPlan 内部 (Apply Probe 闭包 + DispatchAsync toggle 分支), 业务 Strategy 0 写 if/else / TTS / 闭包. AlsoAdjustLegSwap 链复用 SetupAction 不引新概念.
+
+### Phase 13 handoff_notes (Phase 14+ 候选, 不污染当前 epic 完成状态)
+
+1. **CustomProbe escape-hatch (高优先, 解锁 30+ 部分 fit 英雄)**: 当前 DSL Probe 模板限定 `_skill.技能通用判断(SkillKey, Mode, ...)`. handoff_notes Phase 12 #1 估部分 fit 30+ 英雄需自定义 Probe (马西 ImageFinder 幽魂检测 / 小精灵 ImageFinder 过载 + Skills.SetStep / 大鱼人 跳刀接踩 / 巫医 主动技能释放后续 lambda / 哈斯卡 牺牲 lambda / 拍拍 跳拍 / 等). 建议 Builder 加 `.CustomProbe(Func<ImageHandle, Task<bool>>)` 链终结方法, HeroPlanClause 加 `Func<ImageHandle, Task<bool>>? CustomProbeFn` 字段 (改 record class 避免 Func boxing). 工作量中等, 收益最大.
+2. **WhenNotHasAghanim / WhenNotHasShard 反向 guard (低优先, 单独无效用)**: 马西 W 键 / 小精灵 W 键 用 `!HasAghanim` 反向 guard. 但这 2 英雄 Probe 都是自定义 ImageFinder, **单独扩 WhenNotHasX 无法独立解锁任何英雄**, 必须与 CustomProbe 一起扩才可生效. Phase 14 候选: 与 CustomProbe 同 chunk 扩.
+3. **ToggleSkillMode(skillKey, speakOn, speakOff) DSL (中优先, 解锁 5+ 英雄)**: handoff_notes Phase 12 #1 提的 toggle Skills.Mode 形态 (斧王 D4 吼接刃甲/吼不接刃甲 / 帕克 D2 / 火猫 D2 / 马尔斯 D2 / 混沌 D2). 与 ToggleSlot 不同点: toggle 的是 `Aggregate.Skills.Mode(SlotKey.X)` 整数 (0/1), 而非 ConditionSlot.Active. 加 `Builder.ToggleSkillMode(skillKey, speakOn, speakOff)` 一行解锁形态.
+4. **PreAction (键触发前副作用) DSL (中优先, 解锁 5+ 英雄)**: 大牛 W 键前 `_input.Press(A)` / 幻刺 W 键前 `_input.Press(A)` / 发条 W 键前 `_input.Press(A)` / 屠夫 R 键前 物品 / 莱恩 R 键前 await 大招前纷争. 加 `.OnKey(K).Pre(...).CastSkill...` 链, Builder 加 `Pre(Action / Func<Task>)` 链方法.
+5. **HeroStrategyBase 抽 + SG 改造 (handoff_notes Phase 12 #2, 高优先)**: 让 92 Strategy 0 写 OnActivate/OnKeyAsync 一行壳, 全 `Build(HeroPlanBuilder)` override. 现已迁的 22 Strategy 都是 `OnActivate => _plan.Apply / OnKeyAsync => _plan.DispatchAsync` 模板, 100% 同构, SG 完全可派生.
+6. **业务死代码清理 epic (独立 epic)**: Phase 13 sample 期发现剃刀 / 修补匠 / 紫猫 / 发条 / 钢背 / 冰女 / 大圣 等英雄 OnActivate Probe 全注释 / OnKeyAsync 仅 Active 但无 Probe 配合 = 空跑业务死代码. 与抽象 epic 解耦, 单独清理.
+
+### Phase 13 sample 数据 (用于 Phase 14 评估 fit 候选)
+
+Phase 13 sample 26 个未迁英雄实测形态分布 (handoff_notes Phase 12 #1 估算修正):
+
+| 类别 | 数量 | 英雄 |
+|---|---|---|
+| 真简单 fit (0 DSL 扩, 已迁 C1) | 4 | 斯温 / 尸王 / 宙斯 / 拉席克 |
+| Toggle 形态 fit (扩 ToggleSlot, 已迁 C2) | 3 | 小仙女 / 小强 / 瘟疫法师 |
+| AlsoAdjust 形态 fit (扩 AlsoAdjustLegSwap, 已迁 C3) | 1 | 树精 |
+| 需 CustomProbe (handoff #1) | 估 8-12 | 马西 / 小精灵 / 大鱼人 / 巫医 / 哈斯卡 / 拍拍 / 黑鸟 / ... |
+| 需 ToggleSkillMode (handoff #3) | 估 5-8 | 斧王 / 帕克 / 火猫 / 马尔斯 / 混沌 / ... |
+| 需 PreAction (handoff #4) | 估 5-8 | 大牛 / 幻刺 / 发条 / 莱恩 / 屠夫 / ... |
+| 业务死代码 (handoff #6) | 估 5-7 | 剃刀 / 修补匠 / 紫猫 / 发条 / 钢背 / 冰女 / 大圣 |
+| 复杂状态机 / 多步骤宏 / 物品组合 (不 fit) | 估 30+ | 卡尔 / 火枪 / 命运2 / 进化岛 / 巫妖 / 神域 / ... |
+
+### Phase 13 反预测与实测偏差
+
+1. **预测 sample 5-10 真简单 fit** → **实测 4 真简单 fit (sample 18 个未迁的有效率 22%)**. handoff_notes Phase 12 #1 估算偏高, 实际更稀缺. Phase 12 已挖完大部分.
+2. **预测 ToggleSlot 解锁 5-8 英雄** → **实测 3 英雄 (小仙女 / 小强 / 瘟疫法师 同质)**. 莱恩 D4/D5 / 飞机 D3 / 紫猫 D3 形态各异, 需更多 DSL 扩 (莱恩 R 键 PreAction / 飞机未读 / 紫猫死代码).
+3. **WhenNotHasX guard 单独无效用** (新洞察): 马西 / 小精灵 都同时需 CustomProbe, 单独扩 WhenNotHasX 0 解锁. 应与 CustomProbe 同 chunk 扩.
+4. **业务死代码识别新发现**: sample 期意外发现剃刀 / 修补匠 / 紫猫 / 发条 / 钢背 / 冰女 / 大圣 7 个英雄 OnActivate 全注释 = 空跑死代码 (与命石死代码同质, memory `project_eidolon-stone-deprecated.md` 模式延续).
+
+### 待用户冒烟 (Phase 13 收尾)
+
+继承 Phase 12 全部冒烟清单 + 新增 Phase 13 专项实测:
+
+1. **C1 4 英雄基本回归** (新增): 启动 + 切英雄 + Q/W/E/R/D 验证基本技能释放路径:
+   - 斯温 Q/E/R (E 神之力量 W 切假腿)
+   - 尸王 Q/W/E/R (E 触发 Keys.R 墓碑特殊键位映射)
+   - 宙斯 Q/W/E/R/D (D 雷云)
+   - 拉席克 Q/W/E/R/D (5 技能全释放)
+2. **C2 Toggle 实测** (关键, 新增): 验 toggle 形态:
+   - 小仙女 D3 → TTS "续暗影"/"不续暗影" 交替, C2 Active 翻转, Probe 自循环释放 W 直到再次 D3 关闭
+   - 小强 D3 → TTS "循环爆裂"/"终止循环" 交替, Probe 自循环释放 W
+   - 瘟疫法师 D3 → TTS "循环脉冲"/"终止循环" 交替, Probe 自循环释放 Q; F1+HasShard 触发 LegSwap(F,true); F+HasShard 触发 Active (无 Probe = NoProbe sentinel)
+3. **C3 AlsoAdjustLegSwap 实测** (新增): 树精 D 键+HasAghanim 触发:
+   - LegSwap.配置.修改配置(D, true) 修改假腿配置
+   - Conditions[C4].Active = true 释放丛林之眼
+   - 两效果同次按键完成
+
+### Phase 13 回滚锚点
+
+每 chunk 独立 commit, 倒序 revert:
+- 完整撤回 Phase 13: `git revert bef3187 6383a95 3c9543c` (3 commit 倒序, 回 Phase 12 终态).
+- 仅撤 C3 (保 C1+C2): `git revert bef3187` (1 commit, AlsoAdjustLegSwap DSL + 树精).
+- 仅撤 C2 (保 C1, 注意 C3 依赖 C2 的 _lastClauseTrigger 缓存机制): `git revert 6383a95` 后 C3 仍可用 (FinishClause 缓存独立, ToggleSlot 不缓存); 但 toggle DSL 撤后 3 英雄 fall back 不 fit.
+
+### 下次 session 起手指引 (Phase 14 候选)
+
+按 handoff_notes 优先级 (与 Phase 12 #2 HeroStrategyBase 决断挂钩):
+
+1. **优先级最高**: handoff_notes #1 CustomProbe escape-hatch (解锁 8-12 英雄). 扩 DSL 改 HeroPlanClause record class + Func<ImageHandle, Task<bool>>? CustomProbeFn 字段 + Builder.CustomProbe 链方法. 与 #2 WhenNotHasX 同 chunk 扩.
+2. **优先级高**: handoff_notes #5 HeroStrategyBase + SG 改造 (Phase 12 #2). 22 Strategy 都是同构 1 行 OnActivate / 1 行 OnKeyAsync, SG 可派生. 让加新英雄只写 Plan override 一行.
+3. **优先级中**: handoff_notes #3 ToggleSkillMode (5+ 英雄) + #4 PreAction (5+ 英雄). 两个 DSL 扩配合可覆盖斧王 / 帕克 / 火猫 / 马尔斯 / 混沌 / 大牛 / 幻刺 / 发条 / 莱恩 等.
+4. **维护性**: handoff_notes #6 业务死代码清理 (7+ 英雄). 与抽象 epic 解耦, 单独清理.
+
+### 主 lead cherry-pick 范围更新 (Phase 13)
+
+Phase 12 22 commit + Phase 13 (3 commit + 本 handoff) = **26 commit total** on main. cherry-pick 顺序:
+
+```
+... Phase 12 22 commit ...
+3c9543c (C1) → 6383a95 (C2) → bef3187 (C3) → <P13-handoff hash>
+```
