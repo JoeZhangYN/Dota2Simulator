@@ -63,11 +63,13 @@ public sealed class HeroPlan
     private readonly ImmutableArray<HeroPlanClause> _clauses;
     private readonly ImmutableArray<LegSwapEntry> _legSwap;
     private readonly ImmutableArray<SetupAction> _setups;
+    private readonly int? _repeatThreshold;
 
     internal HeroPlan(
         ImmutableArray<HeroPlanClause> clauses,
         ImmutableArray<LegSwapEntry> legSwap,
-        ImmutableArray<SetupAction> setups)
+        ImmutableArray<SetupAction> setups,
+        int? repeatThreshold)
     {
         if (clauses.Length > 9)
         {
@@ -77,6 +79,7 @@ public sealed class HeroPlan
         _clauses = clauses;
         _legSwap = legSwap;
         _setups = setups;
+        _repeatThreshold = repeatThreshold;
     }
 
     /// <summary>子句数 (用于诊断 / 测试).</summary>
@@ -114,6 +117,12 @@ public sealed class HeroPlan
         foreach (LegSwapEntry leg in _legSwap)
         {
             ctx.Aggregate.LegSwap.配置.修改配置(leg.Key, leg.AlwaysSwap);
+        }
+
+        // OnActivate 一次性 SkillEngine 配置: 沙王/天怒 等设按键重复执行间隔阈值的形态.
+        if (_repeatThreshold.HasValue)
+        {
+            skill.重复按键执行间隔阈值 = _repeatThreshold.Value;
         }
     }
 

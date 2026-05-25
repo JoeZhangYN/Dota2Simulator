@@ -23,6 +23,7 @@ public sealed class HeroPlanBuilder
     private Keys? _pendingTrigger;
     private Keys? _pendingSkill;
     private AggGuard _pendingGuard = AggGuard.None;
+    private int? _repeatThreshold;
 
     private HeroPlanBuilder() { }
 
@@ -174,6 +175,16 @@ public sealed class HeroPlanBuilder
         return this;
     }
 
+    /// <summary>
+    /// 设 SkillEngine 按键重复执行间隔阈值 (毫秒); Plan.Apply 时一次性写入 _skill.重复按键执行间隔阈值.
+    /// 用于沙王/天怒 等 OnActivate 设阈值的形态.
+    /// </summary>
+    public HeroPlanBuilder RepeatThreshold(int milliseconds)
+    {
+        _repeatThreshold = milliseconds;
+        return this;
+    }
+
     /// <summary>终结整个 Plan, 返回不可变 HeroPlan; 中间态 pending 未终止报错.</summary>
     public HeroPlan Done()
     {
@@ -182,7 +193,7 @@ public sealed class HeroPlanBuilder
             throw new InvalidOperationException(
                 $"Done: pending 状态未终结 (OnKey={_pendingTrigger?.ToString() ?? "null"}, CastSkill={_pendingSkill?.ToString() ?? "null"}).");
         }
-        return new HeroPlan(_clauses.ToImmutable(), _legSwap.ToImmutable(), _setups.ToImmutable());
+        return new HeroPlan(_clauses.ToImmutable(), _legSwap.ToImmutable(), _setups.ToImmutable(), _repeatThreshold);
     }
 }
 
