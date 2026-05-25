@@ -1,4 +1,4 @@
-// Phase 17: 飞机 Strategy 迁 HeroPlan — D3 ToggleConditionSlot(C5, 循环弹幕/关闭弹幕). 其他 Q/W/E/R 注释死代码, OnActivate 保留 C5 Probe (循环火箭弹幕) ??= 注册.
+// Phase 19C: 飞机 Strategy 重构 — RegisterProbe DSL 替代 Phase 17 OnActivate 手动 ??= 注册 C5 Probe.
 #if DOTA2
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -18,17 +18,13 @@ public sealed partial class 飞机Strategy : IHeroStrategy
 {
     private HeroPlan? _plan;
 
-    public void OnActivate(HeroContext ctx)
-    {
-        GetPlan().Apply(ctx, _skill);
-        // C5 Probe 单独注册 (DSL plan 只承载 D3 ToggleConditionSlot setup, 不占 clause 槽)
-        _main._聚合.Conditions[ConditionSlotKey.C5].Probe ??= 循环火箭弹幕;
-    }
+    public void OnActivate(HeroContext ctx) => GetPlan().Apply(ctx, _skill);
 
     public Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx) => GetPlan().DispatchAsync(trigger, ctx, _item);
 
     private HeroPlan GetPlan() => _plan ??= HeroPlanBuilder.New()
         .OnKey(Keys.D3).ToggleConditionSlot(ConditionSlotKey.C5, "循环弹幕", "关闭弹幕")
+        .RegisterProbe(ConditionSlotKey.C5, 循环火箭弹幕)
         .Done();
 
     private async Task<bool> 循环火箭弹幕()

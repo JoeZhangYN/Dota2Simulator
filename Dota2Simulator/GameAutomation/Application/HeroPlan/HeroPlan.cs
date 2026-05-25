@@ -21,6 +21,10 @@ public enum AggGuard
     HasAghanim,
     /// <summary>仅当 HeroAggregate.HasShard == true 才触发.</summary>
     HasShard,
+    /// <summary>Phase 19C: 反向 Guard — 仅当 HeroAggregate.HasAghanim == false 才触发.</summary>
+    NotHasAghanim,
+    /// <summary>Phase 19C: 反向 Guard — 仅当 HeroAggregate.HasShard == false 才触发.</summary>
+    NotHasShard,
 }
 
 /// <summary>
@@ -97,12 +101,14 @@ public sealed class HeroPlan
     private readonly ImmutableArray<HeroPlanClause> _clauses;
     private readonly ImmutableArray<LegSwapEntry> _legSwap;
     private readonly ImmutableArray<SetupAction> _setups;
+    private readonly ImmutableArray<(ConditionSlotKey Slot, ConditionDelegateBitmap Probe)> _registeredProbes;
     private readonly int? _repeatThreshold;
 
     internal HeroPlan(
         ImmutableArray<HeroPlanClause> clauses,
         ImmutableArray<LegSwapEntry> legSwap,
         ImmutableArray<SetupAction> setups,
+        ImmutableArray<(ConditionSlotKey, ConditionDelegateBitmap)> registeredProbes,
         int? repeatThreshold)
     {
         if (clauses.Length > 9)
@@ -113,6 +119,7 @@ public sealed class HeroPlan
         _clauses = clauses;
         _legSwap = legSwap;
         _setups = setups;
+        _registeredProbes = registeredProbes;
         _repeatThreshold = repeatThreshold;
     }
 
@@ -178,6 +185,12 @@ public sealed class HeroPlan
         foreach (LegSwapEntry leg in _legSwap)
         {
             ctx.Aggregate.LegSwap.配置.修改配置(leg.Key, leg.AlwaysSwap);
+        }
+
+        // Phase 19C: RegisterProbe DSL — 注册到指定 ConditionSlot, 不占 clause 顺序索引. 替代 OnKey(Keys.None).CustomProbe(...) placeholder hack.
+        foreach (var entry in _registeredProbes)
+        {
+            ctx.Aggregate.Conditions[entry.Slot].Probe ??= entry.Probe;
         }
 
         // OnActivate 一次性 SkillEngine 配置: 沙王/天怒 等设按键重复执行间隔阈值的形态.
@@ -281,6 +294,8 @@ public sealed class HeroPlan
         AggGuard.None => true,
         AggGuard.HasAghanim => ctx.Aggregate.HasAghanim,
         AggGuard.HasShard => ctx.Aggregate.HasShard,
+        AggGuard.NotHasAghanim => !ctx.Aggregate.HasAghanim,
+        AggGuard.NotHasShard => !ctx.Aggregate.HasShard,
         _ => true,
     };
 }

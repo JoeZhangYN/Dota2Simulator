@@ -21,6 +21,7 @@ public sealed class HeroPlanBuilder
     private readonly ImmutableArray<HeroPlanClause>.Builder _clauses = ImmutableArray.CreateBuilder<HeroPlanClause>();
     private readonly ImmutableArray<LegSwapEntry>.Builder _legSwap = ImmutableArray.CreateBuilder<LegSwapEntry>();
     private readonly ImmutableArray<SetupAction>.Builder _setups = ImmutableArray.CreateBuilder<SetupAction>();
+    private readonly ImmutableArray<(ConditionSlotKey, ConditionDelegateBitmap)>.Builder _registeredProbes = ImmutableArray.CreateBuilder<(ConditionSlotKey, ConditionDelegateBitmap)>();
 
     private Keys? _pendingTrigger;
     private Keys? _pendingSkill;
@@ -121,6 +122,28 @@ public sealed class HeroPlanBuilder
             throw new InvalidOperationException("WhenHasShard: 需先调 OnKey 或 OnEveryKey.");
         }
         _pendingGuard = AggGuard.HasShard;
+        return this;
+    }
+
+    /// <summary>Phase 19C: 反向 Guard — 该 clause/setup 仅当 HeroAggregate.HasAghanim==false 才触发. 用于小精灵/马西 反向语义.</summary>
+    public HeroPlanBuilder WhenNotHasAghanim()
+    {
+        if (_pendingTrigger is null && !_pendingIsOnEveryKey)
+        {
+            throw new InvalidOperationException("WhenNotHasAghanim: 需先调 OnKey 或 OnEveryKey.");
+        }
+        _pendingGuard = AggGuard.NotHasAghanim;
+        return this;
+    }
+
+    /// <summary>Phase 19C: 反向 Guard — 该 clause/setup 仅当 HeroAggregate.HasShard==false 才触发.</summary>
+    public HeroPlanBuilder WhenNotHasShard()
+    {
+        if (_pendingTrigger is null && !_pendingIsOnEveryKey)
+        {
+            throw new InvalidOperationException("WhenNotHasShard: 需先调 OnKey 或 OnEveryKey.");
+        }
+        _pendingGuard = AggGuard.NotHasShard;
         return this;
     }
 
@@ -465,6 +488,19 @@ public sealed class HeroPlanBuilder
     }
 
     /// <summary>
+    /// Phase 19C: 注册一个 Probe 到指定 ConditionSlot, 不占 clause 顺序索引.
+    /// 替代 Phase 17 引入的 <c>.OnKey(Keys.None).CustomProbe(probe)</c> placeholder hack.
+    /// 使用场景: D3 ToggleConditionSlot 引用的 C{n} 槽需要挂 Probe (大圣 C4 无限跳跃 / 莱恩 C5/C6 / 飞机 C5 / 小精灵 C2/C3 / 等),
+    /// 既往用 placeholder trigger=Keys.None 占 clause 槽, 现在直接 RegisterProbe(slot, probe) 显式注册.
+    /// </summary>
+    public HeroPlanBuilder RegisterProbe(ConditionSlotKey slot, ConditionDelegateBitmap probe)
+    {
+        if (probe is null) throw new ArgumentNullException(nameof(probe));
+        _registeredProbes.Add((slot, probe));
+        return this;
+    }
+
+    /// <summary>
     /// 设 SkillEngine 按键重复执行间隔阈值 (毫秒); Plan.Apply 时一次性写入 _skill.重复按键执行间隔阈值.
     /// 用于沙王/天怒 等 OnActivate 设阈值的形态.
     /// </summary>
@@ -482,7 +518,7 @@ public sealed class HeroPlanBuilder
             throw new InvalidOperationException(
                 $"Done: pending 状态未终结 (OnKey={_pendingTrigger?.ToString() ?? "null"}, CastSkill={_pendingSkill?.ToString() ?? "null"}, OnEveryKey={_pendingIsOnEveryKey}).");
         }
-        return new HeroPlan(_clauses.ToImmutable(), _legSwap.ToImmutable(), _setups.ToImmutable(), _repeatThreshold);
+        return new HeroPlan(_clauses.ToImmutable(), _legSwap.ToImmutable(), _setups.ToImmutable(), _registeredProbes.ToImmutable(), _repeatThreshold);
     }
 }
 

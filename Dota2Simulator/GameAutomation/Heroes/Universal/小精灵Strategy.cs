@@ -1,4 +1,4 @@
-// Phase 17: 小精灵 Strategy 迁 HeroPlan — D3 ToggleConditionSlot(C3, 开启续过载/关闭续过载). W (无 HasAghanim Guard) → Execute lambda hard-code C2 (反向 Guard 不在现有 DSL). OnActivate 保留 C2/C3 Probe ??= 注册.
+// Phase 19C: 小精灵 Strategy 重构 — 用 WhenNotHasAghanim 反向 Guard DSL 把 Phase 17 Execute lambda 内 if (!HasAghanim) 上移到 setup level; RegisterProbe DSL 替代 OnActivate 手动 ??= 注册.
 #if DOTA2
 using System.Drawing;
 using System.Threading.Tasks;
@@ -21,26 +21,16 @@ public sealed partial class 小精灵Strategy : IHeroStrategy
 
     private HeroPlan? _plan;
 
-    public void OnActivate(HeroContext ctx)
-    {
-        GetPlan().Apply(ctx, _skill);
-        _main._聚合.Conditions[ConditionSlotKey.C2].Probe ??= 幽魂检测;
-        _main._聚合.Conditions[ConditionSlotKey.C3].Probe ??= 循环续过载;
-        _skill.重复按键执行间隔阈值 = 150;
-    }
+    public void OnActivate(HeroContext ctx) => GetPlan().Apply(ctx, _skill);
 
     public Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx) => GetPlan().DispatchAsync(trigger, ctx, _item);
 
     private HeroPlan GetPlan() => _plan ??= HeroPlanBuilder.New()
-        .OnKey(Keys.W).Execute(() =>
-        {
-            // HasAghanim 守 (反向 Guard 现 DSL 不支持, hard-code Execute lambda 替代)
-            if (!_main._聚合.HasAghanim)
-            {
-                _main._聚合.Conditions[ConditionSlotKey.C2].Active = true;
-            }
-        })
+        .OnKey(Keys.W).WhenNotHasAghanim().Execute(() => _main._聚合.Conditions[ConditionSlotKey.C2].Active = true)
         .OnKey(Keys.D3).ToggleConditionSlot(ConditionSlotKey.C3, "开启续过载", "关闭续过载")
+        .RegisterProbe(ConditionSlotKey.C2, 幽魂检测)
+        .RegisterProbe(ConditionSlotKey.C3, 循环续过载)
+        .RepeatThreshold(150)
         .Done();
 
     private async Task<bool> 幽魂检测()
