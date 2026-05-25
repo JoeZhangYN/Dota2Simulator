@@ -1213,3 +1213,135 @@ Phase 13 26 commit + Phase 14 (2 commit + 本 handoff) = **29 commit total** on 
 ... Phase 13 26 commit ...
 6a714ea (C1) → 26cf828 (C2) → <P14-handoff hash>
 ```
+
+## Phase 15 完整收尾 (2026-05-25 续, 2 commit on main)
+
+epic 主题: **Pre/PreAsync/Execute DSL + 5 复杂形态英雄迁 (PreAction + ExecuteAction setup + 复用 Execute 表达 ToggleSkillMode)**.
+触发: 用户 2026-05-25 续 "继续", 按 Phase 14 handoff_notes Phase 15+ 候选 #1 (PreAction) 推进; C2 决策不专扩 ToggleSkillMode 而复用 Execute lambda.
+
+### Phase 15 commit 表
+
+| Chunk | hash | 主题 | 净行 | 新增英雄 |
+|---|---|---|---|---|
+| C1 | `a7350ac` | hero-plan-pre-execute (DSL 扩 Pre/PreAsync/Execute) | -58 | 大牛 / 幻刺 / 黑鸟 |
+| C2 | `5f0bfc8` | hero-plan-toggle-skill-mode-execute (0 DSL 扩, 复用 Execute lambda) | -69 | 马尔斯 / 混沌 |
+
+合计: **-127 业务行净**, 5 英雄新迁 HeroPlan DSL.
+
+### Phase 15 DSL 容量更新 (Phase 14 10 维基础上扩 3 维 → 13 维)
+
+| 维度 | 选项 | 替换源 | 新增于 |
+|---|---|---|---|
+| **PreActionSync** | (Action) clause Active 前 sync 副作用 | OnKeyAsync 内 `_input.Press(A)` 后 `Active=true` (大牛/幻刺/黑鸟) | **Phase 15 C1** |
+| **PreActionAsync** | (Func<Task>) clause Active 前 async 副作用 | OnKeyAsync 内 `await 大招前纷争()` 后 `Active=true` (莱恩 R, Phase 16 候选) | **Phase 15 C1** |
+| **ExecuteAction setup** | (Action) 终结 OnKey 链为不挂 ConditionSlot 的 lambda 副作用 | D2/D3/D4 keys 内 SetMode/TTS/物品使用 (幻刺/黑鸟/马尔斯/混沌) | **Phase 15 C1** |
+
+### Phase 15 设计决策: ToggleSkillMode 不专 DSL
+
+Phase 14 handoff_notes #2 提议 ToggleSkillMode 专 DSL (扩 SetupActionKind + ParamSlot/SpeakOn/SpeakOff 字段). 实际 Phase 15 C2 实施期决策 **不扩**, 直接复用 Execute lambda:
+
+```cs
+.OnKey(Keys.D2).Execute(() =>
+{
+    _main._聚合.Skills.ToggleMode(SlotKey.Q);
+    Dota2Simulator.TTS.TTS.Speak(_main._聚合.Skills.Mode(SlotKey.Q) == 1 ? "矛接大招" : "矛不接大招");
+})
+```
+
+理由: (a) ToggleSkillMode fit 英雄只 ~5 个 (帕克 modifier 不 fit / 火猫 PostAction 不 fit / 屠夫斧王 Probe 高复杂); (b) Execute lambda 内联可读, 不需 DSL 三字段 dispatch; (c) DSL 维度膨胀 vs 业务每英雄多 4 行 trade-off 偏向后者. 实际只马尔斯 / 混沌 2 个英雄涉及 ToggleMode 形态, 复用 Execute 即够.
+
+### Phase 15 已迁英雄清单 (5 / 92, 累计 33 / 92 = 35.9%)
+
+| 属性 | C1 (3) | C2 (2) |
+|---|---|---|
+| 力量 (3) | 大牛 | 马尔斯 / 混沌 |
+| 敏捷 (1) | 幻刺 | — |
+| 智力 (1) | 黑鸟 | — |
+| 全才 (0) | — | — |
+
+注:
+- 大牛 W = Pre(_input.Press(A)) + CustomProbe (释放技能后替换图标技能后续 lambda).
+- 幻刺 = AdjustLegSwap setup + 4 clause + W Pre + D2 Execute (Skills.SetMode + TTS).
+- 黑鸟 = OnKey 顺序重排 (D→C1 / R→C2 / E→C3 NoProbe / W→setup); D Pre + 2 CustomProbe + 1 NoProbe + 1 Execute, 一英雄用 5 DSL 形态.
+- 马尔斯 = Q/R CustomProbe (主动技能释放后续 lambda Mode 检查 + 判断技能状态 检测) + W AfterCast + D2 Execute (ToggleMode + TTS).
+- 混沌 = Q Pre(_item 紫苑/血棘) + CustomProbe (动态 continueKey) + W AfterCastLegOnly + R + D2 Execute (ToggleMode) + D3 Execute (切臂章 11 行同步化).
+
+### Phase 15 关键不变量 (新增)
+
+1. **HeroPlanClause 字段顺序兼容**: 加 PreActionSync/PreActionAsync 字段 (default null), 存量 28 个迁过英雄 0 改动.
+2. **Builder pending pre-action 生命周期**: `_pendingPreActionSync / _pendingPreActionAsync` 在 OnKey 时 default null, FinishClause/CustomProbe/NoProbe 注入 clause 并清空; ToggleSlot/AdjustLegSwap/Execute 仅清空 (不写入 clause/setup, 一致性).
+3. **DispatchAsync PreAction 优先级**: async > sync (PreActionAsync 存在则 await, 否则 PreActionSync?.Invoke). 与 SetupAction 跑序: setup 先, clause PreAction 后, clause Active 最后.
+4. **ExecuteAction setup 通用化**: SetupAction.CustomAction 是 `Action?` 不区分同步异步 (混沌 D3 切臂章 11 行 sync 化, 莱恩 R PreAsync 留 PostAsync 候选). 实际 D3/D4 SetupAction lambda 体内 await 不 work (Action 不 awaitable), 但 fire-and-forget Task 可以.
+5. **接口契约破坏自检 PASS**: HeroPlanClause / SetupAction 字段全部 default 兼容; HeroPlanBuilder 新方法都是新链方法不动现有 API.
+
+### Phase 15 architecture-sentinel verdict (主 lead 自审)
+
+- **依赖倒置**: ✅ Pre/Execute lambda 通过 Strategy instance 字段访问 ports, 与 CustomProbe 模板一致.
+- **结构化管道**: ✅ Pre/PreAsync 是 OnKey 链中间状态 (非终结), Execute 是 OnKey 链终结 (与 NoProbe/AdjustLegSwap 同级).
+- **类型不变量**: ✅ Action / Func<Task> 委托签名清晰; nullable 字段区分 sync/async 分支无歧义.
+- **高内聚低耦合**: ✅ PreAction 业务概念明确 (Active 前的副作用); Execute 是不挂 ConditionSlot 的 setup-only key. 不破坏 HeroPlan core 概念.
+
+### Phase 15 handoff_notes (Phase 16+ 候选)
+
+继承 Phase 14 handoff_notes #3-#6, 新增 Phase 15 新发现:
+
+1. **PostAction (Active 后 lambda) DSL (中优先, 解锁火猫等)**: 火猫 W: `Active = true; await Task.Run(() => { Delay(330); _item.要求保持假腿(); })`. 加 `.Post(Action)` / `.PostAsync(Func<Task>)` 中间状态, FinishClause 注入 clause.
+2. **KeyModifier 匹配 (中优先, 解锁帕克等)**: 帕克 OnKeyAsync 内 `if (e.KeyValue == Keys.W && Modifiers == Ctrl) → C2`. DSL 加 `.OnKey(Keys.W, KeyModifiers.Control)` 或 `.WithModifier(KeyModifiers.Control)`. KeyTrigger 已含 Modifiers 字段, Plan.DispatchAsync 内可判断.
+3. **ExecuteAsync setup (Func<Task>) (低优先)**: 混沌 D3 切臂章 async method 已同步化 inline 成功; 但莱恩 R 类 PreAsync (await 大招前纷争) 不 fit Execute. 加 `Builder.ExecuteAsync(Func<Task>)` 替代或独立 SetupActionKind.AsyncExecute.
+4. **OnEveryKey AdjustLegSwap (中优先, 解锁火枪/钢背)**: 火枪 OnKeyAsync 入口 `LegSwap.修改配置(D, HasShard)` 每次按键都跑. 加 `Builder.OnEveryKey(setupAction)` 全局 setup (Dispatch 内每键命中前调用).
+5. **Multi-AdjustLegSwap 同 trigger 不同 guard (低优先, 钢背)**: 钢背 F1 触发: `if (HasShard) LegSwap(D, true); if (HasAghanim) LegSwap(E, true)`. 现 DSL 同 trigger OnKey 二次 (`F1.WhenHasShard().AdjustLegSwap(D, true).OnKey(F1).WhenHasAghanim().AdjustLegSwap(E, true)`) 应该 work 但未实测.
+6. **SkillEngine.主动技能释放后续 lambda 内 ConditionSlot.SetActive 副作用 (低优先, 屠夫)**: 屠夫 钩子去僵直 Probe 内 `if (Mode==1) Conditions[C3].Active=true` 跨 clause 副作用. Plan 内复杂. CustomProbe 内访问 ctx.Aggregate.Conditions 行得通但破坏单 clause 边界.
+
+### Phase 15 sample 数据 (Phase 14 sample 之外新增 4 个英雄)
+
+| 英雄 | 形态 | 迁移状态 |
+|---|---|---|
+| 帕克 | E+Ctrl modifier → C2 + D2 ToggleSkillMode | **不 fit (需 KeyModifier DSL)** |
+| 火猫 | W PostAction (Active 后 Task.Run Delay + _item.要求保持假腿) + D2 ToggleSkillMode | **不 fit (需 PostAction DSL)** |
+| 屠夫 | Q/R CustomProbe (lambda 内副作用跨 clause SetActive) + D2 ToggleSkillMode | **暂不 fit (CustomProbe 内跨 clause 副作用边界破坏)** |
+| 斧王 | Q/W/R OnKeyAsync 内嵌 _item.使用(魂戒) + D4 ToggleSkillMode + D3 快速触发激怒 (键序列) | **不 fit (多多键 OnKey + 内嵌物品 + D3 键序列宏)** |
+
+### Phase 15 反预测与实测偏差
+
+1. **预测 ToggleSkillMode 专 DSL 解锁 5-8 英雄** → **实测仅 2 英雄 (马尔斯 / 混沌) 纯 fit**, 帕克/火猫/屠夫/斧王 同时有其他不 fit 形态. 决策不扩 ToggleSkillMode 改用 Execute lambda 实现, 收益 vs DSL 膨胀更稳健.
+2. **预测 PreAction 解锁 5-8 英雄** → **实测 3 英雄 (大牛 W / 幻刺 W / 黑鸟 D)**. 莱恩 R PreAsync 形态需 PreAsync 已设计但 莱恩整体太复杂 (D4/D5 toggle + S IsPaused) 未迁.
+3. **Execute lambda 内同步化 async 方法**: 混沌 D3 `切臂章` 原为 async 但内部 0 real await (末尾 `await Task.FromResult(false)` dummy), 直接同步化 11 行 inline 到 Execute lambda 成功, 行为等价.
+
+### 待用户冒烟 (Phase 15 收尾)
+
+继承 Phase 14 全部冒烟清单 + 新增 Phase 15 专项实测:
+
+1. **C1 Pre + Execute 基本回归** (新增): 切英雄 + 触发:
+   - 大牛 Q (回音践踏 postDelayMs:1300) / W (Press A + 灵体游魂 mode 变换) / R (裂地沟壑)
+   - 幻刺 F1+HasAgh (LegSwap D true) / Q (窒息短匕) / W (Press A + 幻影突袭) / E (魅影 no continueAttack) / D+HasAgh (刀阵旋风) / D2 (SetMode + 闪烁分身晕锤一次 TTS)
+   - 黑鸟 D (Press W + 神智之蚀 + R CD 检测) / R (跳刀 关接跳) / E (Active 占位 C3) / W (_item.使用 纷争 直副作用)
+2. **C2 Execute lambda ToggleMode 形态** (新增): 切英雄 + 触发:
+   - 马尔斯 Q (Mode==1 接 R / 否则 通用后续) / W (神之谴击) / R (E 状态检测 + Press E) / D2 (ToggleMode Q + 矛接大招/矛不接大招 TTS)
+   - 混沌 Q (Pre 紫苑/血棘 + 动态 continueKey Mode==1 ? W : A) / W (实相裂隙 AfterCastLegOnly) / R / D2 (ToggleMode Q + 接拉/接A TTS) / D3 (切臂章 11 行物品序列)
+3. **PreAction 时序实测**: 大牛 W 按下 → 先看到 `_input.Press(A)` 触发 → 再 Active=true 释放 W 灵体游魂. 顺序错则非按预期.
+4. **Execute setup 不挂 ConditionSlot 验证**: 黑鸟 W 按下后 ConditionSlot.C4/C5 不 Active (W 只调 _item.使用 纷争, 不释放技能).
+
+### Phase 15 回滚锚点
+
+- 完整撤回 Phase 15: `git revert 5f0bfc8 a7350ac` (2 commit 倒序, 回 Phase 14 终态).
+- 仅撤 C2 (保 C1 DSL + 3 英雄): `git revert 5f0bfc8` (马尔斯 / 混沌回滚, DSL Pre/Execute 保留).
+- 撤 C1 (DSL + 3 英雄) → C2 编译失败 (依赖 C1 的 DSL). 撤 C1 前先撤 C2.
+
+### 下次 session 起手指引 (Phase 16 候选)
+
+按 handoff_notes 优先级:
+
+1. **优先级高**: handoff_notes Phase 15 #1 PostAction DSL (解锁火猫等; 与 PreAction 对称设计). 在 Active 设置后调副作用.
+2. **优先级中**: handoff_notes Phase 15 #2 KeyModifier 匹配 (解锁帕克 / 血魔 Q+Alt 等).
+3. **优先级中**: handoff_notes Phase 15 #4 OnEveryKey AdjustLegSwap (解锁火枪 / 钢背).
+4. **HeroStrategyBase + SG 改造** (Phase 12 #2 / 13 #5 / 14 #6 持续高优先 — 33 Strategy 文件已 100% 同构 1 行 OnActivate + 1 行 OnKeyAsync 模板).
+5. **维护性**: 业务死代码清理 epic (剃刀/修补匠/紫猫/发条/钢背/冰女/大圣 等 8+ 英雄独立 epic).
+
+### 主 lead cherry-pick 范围更新 (Phase 15)
+
+Phase 14 29 commit + Phase 15 (2 commit + 本 handoff) = **32 commit total** on main. cherry-pick 顺序:
+
+```
+... Phase 14 29 commit ...
+a7350ac (C1) → 5f0bfc8 (C2) → <P15-handoff hash>
+```
