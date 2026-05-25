@@ -9,6 +9,7 @@ C# .NET 10 WinForms 游戏自动化框架，重写为六边形架构。
 - Phase 10A plan SSOT: `C:\Users\JoeZhang\.claude\plans\generated-glinting-knuth.md`
 - Phase 10B plan SSOT: `C:\Users\JoeZhang\.claude\plans\sturdy-bridging-rabin.md`
 - Phase 10C plan SSOT: `C:\Users\JoeZhang\.claude\plans\crystal-emitting-knuth.md`
+- Phase 18 plan SSOT: `C:\Users\JoeZhang\.claude\plans\precious-cuddling-lecun.md`
 
 ## 进度
 - [x] Phase 1-3（commit `11d51e8` → `3ea4129`）
@@ -20,6 +21,36 @@ C# .NET 10 WinForms 游戏自动化框架，重写为六边形架构。
 - [x] **Phase 10A SG 图片资源改造**—— 2026-05-23 完成（4 chunk，净 +108 行；plan SSOT `~/.claude/plans/generated-glinting-knuth.md`）
 - [x] **Phase 10B 6 SOFT_FAIL 消除**—— 2026-05-23 完成（5 chunk，B1-B5；plan SSOT `~/.claude/plans/sturdy-bridging-rabin.md`）
 - [x] **Phase 10C Strategy SG 92 样板消除**—— 2026-05-23 完成（5 chunk，S1-S5；plan SSOT `~/.claude/plans/crystal-emitting-knuth.md`，净 -1479 LOC）
+- [x] **Phase 18 Vision 端口全收口 + 候选区域强制裁剪**—— 2026-05-25 完成（7 chunk，V1-V6d；plan SSOT `~/.claude/plans/precious-cuddling-lecun.md`）
+
+## Phase 18 已完成（main 分支连续 commit，每 chunk 0 build 错误）
+
+**Epic 目标**：Vision 端口全收口 + 候选区域强制裁剪（用户铁律「候选裁剪 + GPU adapter 前置」落地，为 Phase 19 GPU adapter epic 铺路）
+
+**chunk 链**:
+- `3a687a5` V1 端口能力扩展：IScreenVision +Find(region) +FindAll(region) FindResult 主力路径
+- `ae21259` V2 Application 层收口：HeroLoopHost+SkillEngine 切 _vision +ItemEngine 死代码删 (-66 LOC)
+- `7d32245` V3 Strategy 层收口：8 Strategy 12 处 ImageFinder→_vision.Find +ScreenRegion implicit-from-Rectangle
+- `1430d4b` V4 Silt BC 收口：SiltEngine+DynamicSkillAutoSelector 切 _vision (穿透 +IScreenVision)
+- `cac7add` V5 1C 真删：删 IScreenVision Find/FindAll(无 region) + bool FindInRegion 三个旧重载 (-91 LOC)
+- `a5667ef` V6b+V6c 大批改造：35 Strategy + 3 Engine 方法签名删 ImageHandle 句柄 参数 (67 文件 / 396+ 398-)
+- `2869bcf` V6d 端口最终清理：删 IScreenVision.GetCurrentFrame [Obsolete] + ItemEngine 8 处 GetCurrentFrame 重定向
+
+**关键不变量**：
+1. 业务侧 0 `ImageFinder.* / GlobalScreenCapture.FindXxx` 直调（除 Vision/Advanced* 自用 + PaddleOCR API + ItemEngine 调试 SaveImage 用 GetCurrentHandle 同层取帧）
+2. IScreenVision 端口形态：`Capture / PixelAt / Find(Template,region,_,_) / FindAll(Template,region,_,_)` 4 核心 + `Find(ImageHandle,region,_,_) / FindAll(ImageHandle,region,_,_)` 2 个 [Obsolete-Phase19 SG 改造后删]
+3. ConditionDelegateBitmap() 无参委托（删 Phase 6 ImageHandle 句柄 临时妥协），委托方法走 this._vision 端口
+4. HeroAggregate 回到纯领域聚合（删 ctor IScreenVision 依赖，回 0 port 形态）
+5. ScreenRegion +implicit op from System.Drawing.Rectangle（业务侧 Rectangle 常量直接传入）
+
+**冒烟验证（等用户）**：
+- 启动应用 (管理员权限) + F9 切英雄遍历 V3 改造覆盖的 9 英雄（伐木机 / 光法 / 小精灵 / 马西 / 双头龙 / 海民 / 火猫 / 暗影萨满）观察技能/物品/命石识别正常
+- Silt BC：进游戏验证沙王/夜魔自动天赋选择正常
+- 全英雄主循环：F9 切英雄/技能键 (Q/W/E/R/D/F/Z/X/C/V/B) 委托链路新签名 () 无参形态行为等价
+
+**Phase 19 候选**（Vision 性能优化主菜）：
+1. SG 改造：让 SG 同步生成 `Dota2_Pictrue.X.Y_Tpl` Template 静态属性 → 业务切 Template 重载 → 删 IScreenVision.Find/FindAll(ImageHandle) [Obsolete]
+2. GpuFusedVisionAdapter：实现 IScreenVision（DXGI 截屏 ShaderResource flag + compute shader + 候选裁剪 + 异步回读 fence），约 3-5 人日
 
 ## Phase 6 + 6.5 已完成（main 分支连续 commit，每 chunk 0 build 错误）
 
