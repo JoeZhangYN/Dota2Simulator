@@ -46,7 +46,8 @@ public readonly record struct HeroPlanClause(
     string? SpeakOff = null,
     ConditionDelegateBitmap? CustomProbeFn = null,
     Action? PreActionSync = null,
-    Func<Task>? PreActionAsync = null);
+    Func<Task>? PreActionAsync = null,
+    KeyModifiers Modifiers = KeyModifiers.None);
 
 /// <summary>假腿配置条目 (按键 → alwaysSwap 标志, OnActivate 时一次性应用).</summary>
 public readonly record struct LegSwapEntry(Keys Key, bool AlwaysSwap);
@@ -67,7 +68,8 @@ public readonly record struct SetupAction(
     bool ParamBool,
     Action? CustomAction = null,
     Func<HeroContext, bool>? ParamBoolProvider = null,
-    bool IsOnEveryKey = false);
+    bool IsOnEveryKey = false,
+    KeyModifiers Modifiers = KeyModifiers.None);
 
 /// <summary>SetupAction 副作用种类.</summary>
 public enum SetupActionKind
@@ -192,10 +194,13 @@ public sealed class HeroPlan
 
         // 1. 先跑 SetupAction (按键 + Guard → 副作用, 如 F1+HasAghanim → LegSwap.修改配置 / D2 → SetMode + TTS).
         // Phase 16 C1b: IsOnEveryKey = true 时无 TriggerKey 匹配 (每键命中前都跑); ParamBoolProvider 非空时 AdjustLegSwap 第二参动态求值 (火枪 HasShard 形态).
+        // Phase 16 C2: setup.Modifiers 严格等值比对 (default None == 裸键, OnEveryKey 形态 Modifiers 必须 None 也匹配 default trigger.Modifiers).
         foreach (SetupAction setup in _setups)
         {
             bool matchKey = setup.IsOnEveryKey || setup.TriggerKey == key;
-            if (matchKey && CheckGuard(setup.Guard, ctx))
+            // OnEveryKey 形态忽略 Modifiers (每键都跑, 含修饰键场景); 否则 setup.Modifiers 与 trigger.Modifiers 严格等值.
+            bool matchMod = setup.IsOnEveryKey || setup.Modifiers == trigger.Modifiers;
+            if (matchKey && matchMod && CheckGuard(setup.Guard, ctx))
             {
                 switch (setup.Kind)
                 {
@@ -211,9 +216,10 @@ public sealed class HeroPlan
         }
 
         // 2. 再跑 Clause 激活 (按键 → ConditionSlot.Active, 受 Guard 控制).
+        // Phase 16 C2: clause.Modifiers 与 trigger.Modifiers 严格等值比对; default None == 裸键, 兼容现有 33 文件零 Modifiers 形态.
         for (int i = 0; i < _clauses.Length; i++)
         {
-            if (_clauses[i].TriggerKey == key && CheckGuard(_clauses[i].Guard, ctx))
+            if (_clauses[i].TriggerKey == key && _clauses[i].Modifiers == trigger.Modifiers && CheckGuard(_clauses[i].Guard, ctx))
             {
                 // PreAction (Active 设置前的副作用 — 例: _input.Press(A) 后再 Active 释放技能).
                 if (_clauses[i].PreActionAsync is not null)

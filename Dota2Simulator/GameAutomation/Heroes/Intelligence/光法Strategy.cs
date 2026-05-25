@@ -1,7 +1,10 @@
+// Phase 16 C2: 光法 Strategy 迁 HeroPlan — Q CustomProbe (减少蓄力 Step 状态机), W AfterCast, E AfterCast, E+Alt CustomProbe (循环查克拉 Mode 2 + 返 Active 自循环) → C4, D AfterCast (释放 W 致盲之光), F AfterCast (灵光接炎阳), D2 Execute toggle C4 Active + TTS, RepeatThreshold(100).
 #if DOTA2
+using System.Drawing;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Dota2Simulator.GameAutomation.Application;
+using Dota2Simulator.GameAutomation.Application.HeroPlans;
 using Dota2Simulator.GameAutomation.Domain.Actuation;
 using Dota2Simulator.GameAutomation.Domain.Heroes;
 using Dota2Simulator.GameAutomation.Domain.Loop;
@@ -9,129 +12,57 @@ using Dota2Simulator.Games;
 using Dota2Simulator.Games.Dota2;
 using Dota2Simulator.Vision;
 
-using Dota2Simulator.GameAutomation.Ports;
-
 namespace Dota2Simulator.GameAutomation.Heroes.Intelligence;
 
 [HeroStrategy("光法", HeroAttribute.Intelligence)]
 public sealed partial class 光法Strategy : IHeroStrategy
 {
+    private HeroPlan? _plan;
 
+    public void OnActivate(HeroContext ctx) => GetPlan().Apply(ctx, _skill);
 
-    public void OnActivate(HeroContext ctx)
-    {
-        _main._聚合.Conditions[ConditionSlotKey.C1].Probe ??= 减少300毫秒蓄力;
-        _main._聚合.Conditions[ConditionSlotKey.C2].Probe ??= 炎阳之缚去后摇;
-        _main._聚合.Conditions[ConditionSlotKey.C3].Probe ??= 查克拉魔法去后摇;
-        _main._聚合.Conditions[ConditionSlotKey.C4].Probe ??= 循环查克拉;
-        _main._聚合.Conditions[ConditionSlotKey.C5].Probe ??= 致盲之光去后摇;
-        _main._聚合.Conditions[ConditionSlotKey.C6].Probe ??= 灵光去后摇接炎阳;
-        _skill.重复按键执行间隔阈值 = 100;
-    }
+    public Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx) => GetPlan().DispatchAsync(trigger, ctx, _item);
 
-    public async Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)
-    {
-        VirtualKey key = trigger.Key;
-        KeyEventArgs e = new((Keys)key.ToNative() | ConvertModifiers(trigger.Modifiers));
-
-        await _item.根据按键判断技能释放前通用逻辑(e).ConfigureAwait(true);
-
-        if (e.KeyValue == (int)Keys.E && (int)e.Modifiers == (int)Keys.Alt)
+    private HeroPlan GetPlan() => _plan ??= HeroPlanBuilder.New()
+        .RepeatThreshold(100)
+        .OnKey(Keys.Q).CustomProbe(async _h =>
         {
-            _main._聚合.Conditions[ConditionSlotKey.C4].Active = true;
-        }
-
-        if (key == VirtualKey.Q)
-        {
-            _main._聚合.Conditions[ConditionSlotKey.C1].Active = true;
-        }
-        else if (key == VirtualKey.W)
-        {
-            _main._聚合.Conditions[ConditionSlotKey.C2].Active = true;
-        }
-        else if (key == VirtualKey.E)
-        {
-            _main._聚合.Conditions[ConditionSlotKey.C3].Active = true;
-        }
-        else if (key == VirtualKey.D)
-        {
-            _main._聚合.Conditions[ConditionSlotKey.C5].Active = true;
-        }
-        else if (key == VirtualKey.F)
-        {
-            _main._聚合.Conditions[ConditionSlotKey.C6].Active = true;
-        }
-        else if (key == VirtualKey.From(Keys.D2))
-        {
-            _main._聚合.Conditions[ConditionSlotKey.C4].Active = !_main._聚合.Conditions[ConditionSlotKey.C4].Active;
-            TTS.TTS.Speak(_main._聚合.Conditions[ConditionSlotKey.C4].Active ? "开启循环查克拉" : "关闭循环查克拉");
-        }
-    }
-
-    /// <summary>把领域中性的 <see cref="KeyModifiers"/> 转回 WinForms <see cref="Keys"/> 修饰键标志。</summary>
-    private static Keys ConvertModifiers(KeyModifiers modifiers)
-    {
-        Keys result = Keys.None;
-        if ((modifiers & KeyModifiers.Alt) != 0) result |= Keys.Alt;
-        if ((modifiers & KeyModifiers.Control) != 0) result |= Keys.Control;
-        if ((modifiers & KeyModifiers.Shift) != 0) result |= Keys.Shift;
-        return result;
-    }
-
-    private async Task<bool> 减少300毫秒蓄力(ImageHandle 句柄)
-    {
-        int 全局步骤 = _main._聚合.Skills.Step(SlotKey.Q);
-
-        switch (全局步骤)
-        {
-            case 1:
+            int step = _main._聚合.Skills.Step(SlotKey.Q);
+            if (step == 1)
+            {
                 return await _skill.主动技能进入CD后续(Keys.Q, () =>
                 {
                     _main._聚合.Skills.SetStep(SlotKey.Q, 0);
                     _main._聚合.LegSwap.配置.修改配置(Keys.Q, true);
                 }).ConfigureAwait(true);
-            default:
-                _main._聚合.Skills.SetStep(SlotKey.Q, 1);
-                if (ImageFinder.FindImageInRegionBool(Dota2_Pictrue.Buff.光法_大招, GlobalScreenCapture.GetCurrentHandle(), new System.Drawing.Rectangle(962, 826, 526, 80)))
-                {
-                    _main._聚合.LegSwap.配置.修改配置(Keys.Q, false);
-                    _input.MouseClick(MouseButton.Right);
-                }
-
-                _ = Task.Run(() =>
-                {
-                    Common.Delay(2700);
-                    _input.Press(VirtualKey.From(Keys.Q));
-                }).ConfigureAwait(false);
-
-                return await Task.FromResult(true).ConfigureAwait(true);
-        }
-    }
-
-    private async Task<bool> 炎阳之缚去后摇(ImageHandle 句柄)
-    {
-        return await _skill.技能通用判断(Keys.D, 1).ConfigureAwait(true);
-    }
-
-    private async Task<bool> 查克拉魔法去后摇(ImageHandle 句柄)
-    {
-        return await _skill.技能通用判断(Keys.E, 1).ConfigureAwait(true);
-    }
-
-    private async Task<bool> 致盲之光去后摇(ImageHandle 句柄)
-    {
-        return await _skill.技能通用判断(Keys.W, 1).ConfigureAwait(true);
-    }
-
-    private async Task<bool> 灵光去后摇接炎阳(ImageHandle 句柄)
-    {
-        return await _skill.技能通用判断(Keys.F, 1).ConfigureAwait(true);
-    }
-
-    private async Task<bool> 循环查克拉(ImageHandle 句柄)
-    {
-        await _skill.技能通用判断(Keys.E, 2).ConfigureAwait(true);
-        return await Task.FromResult(_main._聚合.Conditions[ConditionSlotKey.C4].Active).ConfigureAwait(true);
-    }
+            }
+            _main._聚合.Skills.SetStep(SlotKey.Q, 1);
+            if (ImageFinder.FindImageInRegionBool(Dota2_Pictrue.Buff.光法_大招, GlobalScreenCapture.GetCurrentHandle(), new Rectangle(962, 826, 526, 80)))
+            {
+                _main._聚合.LegSwap.配置.修改配置(Keys.Q, false);
+                _input.MouseClick(MouseButton.Right);
+            }
+            _ = Task.Run(() =>
+            {
+                Common.Delay(2700);
+                _input.Press(VirtualKey.From(Keys.Q));
+            }).ConfigureAwait(false);
+            return true;
+        })
+        .OnKey(Keys.W).CastSkill(Keys.D).AfterCast()
+        .OnKey(Keys.E).CastSkill(Keys.E).AfterCast()
+        .OnKey(Keys.E, KeyModifiers.Alt).CustomProbe(async _h =>
+        {
+            await _skill.技能通用判断(Keys.E, 2).ConfigureAwait(true);
+            return _main._聚合.Conditions[ConditionSlotKey.C4].Active;
+        })
+        .OnKey(Keys.D).CastSkill(Keys.W).AfterCast()
+        .OnKey(Keys.F).CastSkill(Keys.F).AfterCast()
+        .OnKey(Keys.D2).Execute(() =>
+        {
+            _main._聚合.Conditions[ConditionSlotKey.C4].Active = !_main._聚合.Conditions[ConditionSlotKey.C4].Active;
+            Dota2Simulator.TTS.TTS.Speak(_main._聚合.Conditions[ConditionSlotKey.C4].Active ? "开启循环查克拉" : "关闭循环查克拉");
+        })
+        .Done();
 }
 #endif

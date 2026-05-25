@@ -1,79 +1,28 @@
+// Phase 16 C2: 帕克 Strategy 迁 HeroPlan — Q CustomProbe (Step+Delay+Press D), W AfterEnterCD, W+Ctrl Execute 共享 C2 槽 (新月之痕), R AfterEnterCD → C3 (重排), D CustomProbe (Press F1×2) → C4 (重排), D2 Execute ToggleMode + TTS.
+// 注: 原 OnActivate C3 槽不挂 Probe (空 C3), 迁后 Probe 全按 clause index 紧凑顺序 (C1..C4 全有), C3 重新指 R 梦境缠绕 (原 C4) 不破坏 Probe 行为, 仅 ConditionSlot 索引重排.
 #if DOTA2
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Dota2Simulator.GameAutomation.Application;
+using Dota2Simulator.GameAutomation.Application.HeroPlans;
 using Dota2Simulator.GameAutomation.Domain.Actuation;
 using Dota2Simulator.GameAutomation.Domain.Heroes;
 using Dota2Simulator.GameAutomation.Domain.Loop;
 using Dota2Simulator.Games;
-using Dota2Simulator.Games.Dota2;
-using Dota2Simulator.Vision;
-
-using Dota2Simulator.GameAutomation.Ports;
 
 namespace Dota2Simulator.GameAutomation.Heroes.Intelligence;
 
 [HeroStrategy("帕克", HeroAttribute.Intelligence)]
 public sealed partial class 帕克Strategy : IHeroStrategy
 {
+    private HeroPlan? _plan;
 
+    public void OnActivate(HeroContext ctx) => GetPlan().Apply(ctx, _skill);
 
-    public void OnActivate(HeroContext ctx)
-    {
-        _main._聚合.Conditions[ConditionSlotKey.C1].Probe ??= 幻象法球去后摇;
-        _main._聚合.Conditions[ConditionSlotKey.C2].Probe ??= 新月之痕去后摇;
-        _main._聚合.Conditions[ConditionSlotKey.C4].Probe ??= 梦境缠绕去后摇;
-        _main._聚合.Conditions[ConditionSlotKey.C5].Probe ??= 灵动之翼定位;
-    }
+    public Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx) => GetPlan().DispatchAsync(trigger, ctx, _item);
 
-    public async Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)
-    {
-        VirtualKey key = trigger.Key;
-        KeyEventArgs e = new((Keys)key.ToNative() | ConvertModifiers(trigger.Modifiers));
-
-        await _item.根据按键判断技能释放前通用逻辑(e).ConfigureAwait(true);
-
-        if (e.KeyValue == (int)Keys.W && (int)e.Modifiers == (int)Keys.Control)
-        {
-            _main._聚合.Conditions[ConditionSlotKey.C2].Active = true;
-        }
-
-        if (key == VirtualKey.Q)
-        {
-            _main._聚合.Conditions[ConditionSlotKey.C1].Active = true;
-        }
-        else if (key == VirtualKey.W)
-        {
-            _main._聚合.Conditions[ConditionSlotKey.C2].Active = true;
-        }
-        else if (key == VirtualKey.R)
-        {
-            _main._聚合.Conditions[ConditionSlotKey.C4].Active = true;
-        }
-        else if (key == VirtualKey.D)
-        {
-            _main._聚合.Conditions[ConditionSlotKey.C5].Active = true;
-        }
-        else if (key == VirtualKey.From(Keys.D2))
-        {
-            _main._聚合.Skills.ToggleMode(SlotKey.D);
-            TTS.TTS.Speak(_main._聚合.Skills.Mode(SlotKey.D) == 1 ? "传" : "不传");
-        }
-    }
-
-    /// <summary>把领域中性的 <see cref="KeyModifiers"/> 转回 WinForms <see cref="Keys"/> 修饰键标志。</summary>
-    private static Keys ConvertModifiers(KeyModifiers modifiers)
-    {
-        Keys result = Keys.None;
-        if ((modifiers & KeyModifiers.Alt) != 0) result |= Keys.Alt;
-        if ((modifiers & KeyModifiers.Control) != 0) result |= Keys.Control;
-        if ((modifiers & KeyModifiers.Shift) != 0) result |= Keys.Shift;
-        return result;
-    }
-
-    private async Task<bool> 幻象法球去后摇(ImageHandle 句柄)
-    {
-        return await _skill.主动技能进入CD后续(Keys.Q, () =>
+    private HeroPlan GetPlan() => _plan ??= HeroPlanBuilder.New()
+        .OnKey(Keys.Q).CustomProbe(async _h => await _skill.主动技能进入CD后续(Keys.Q, () =>
         {
             _main._聚合.Skills.SetStep(SlotKey.Q, 1);
             Common.Delay(3400);
@@ -81,28 +30,21 @@ public sealed partial class 帕克Strategy : IHeroStrategy
             {
                 _input.Press(VirtualKey.From(Keys.D));
             }
-
             _main._聚合.Skills.SetStep(SlotKey.Q, 0);
-        }).ConfigureAwait(true);
-    }
-
-    private async Task<bool> 新月之痕去后摇(ImageHandle 句柄)
-    {
-        return await _skill.技能通用判断(Keys.W, 0).ConfigureAwait(true);
-    }
-
-    private async Task<bool> 梦境缠绕去后摇(ImageHandle 句柄)
-    {
-        return await _skill.技能通用判断(Keys.R, 0).ConfigureAwait(true);
-    }
-
-    private async Task<bool> 灵动之翼定位(ImageHandle 句柄)
-    {
-        return await _skill.主动技能进入CD后续(Keys.D, () =>
+        }).ConfigureAwait(true))
+        .OnKey(Keys.W).CastSkill(Keys.W).AfterEnterCD()
+        .OnKey(Keys.W, KeyModifiers.Control).Execute(() => _main._聚合.Conditions[ConditionSlotKey.C2].Active = true)
+        .OnKey(Keys.R).CastSkill(Keys.R).AfterEnterCD()
+        .OnKey(Keys.D).CustomProbe(async _h => await _skill.主动技能进入CD后续(Keys.D, () =>
         {
             _input.Press(VirtualKey.From(Keys.F1));
             _input.Press(VirtualKey.From(Keys.F1));
-        }).ConfigureAwait(true);
-    }
+        }).ConfigureAwait(true))
+        .OnKey(Keys.D2).Execute(() =>
+        {
+            _main._聚合.Skills.ToggleMode(SlotKey.D);
+            Dota2Simulator.TTS.TTS.Speak(_main._聚合.Skills.Mode(SlotKey.D) == 1 ? "传" : "不传");
+        })
+        .Done();
 }
 #endif

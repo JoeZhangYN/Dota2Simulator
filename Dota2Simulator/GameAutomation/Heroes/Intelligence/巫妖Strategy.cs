@@ -1,135 +1,66 @@
+// Phase 16 C2: 巫妖 Strategy 迁 HeroPlan — 5 全 CustomProbe (Step(E)>0 ? 11/10 : 1/0 动态 mode, Q/W/R Step 状态机 11/1 切换), E CustomProbe (阴邪凝视 Step 0/1/2 状态机), W+Alt Execute 共享 C2.
 #if DOTA2
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Dota2Simulator.GameAutomation.Application;
+using Dota2Simulator.GameAutomation.Application.HeroPlans;
 using Dota2Simulator.GameAutomation.Domain.Actuation;
 using Dota2Simulator.GameAutomation.Domain.Heroes;
 using Dota2Simulator.GameAutomation.Domain.Loop;
 using Dota2Simulator.Games;
 using Dota2Simulator.Games.Dota2;
-using Dota2Simulator.Vision;
-
-using Dota2Simulator.GameAutomation.Ports;
 
 namespace Dota2Simulator.GameAutomation.Heroes.Intelligence;
 
 [HeroStrategy("巫妖", HeroAttribute.Intelligence)]
 public sealed partial class 巫妖Strategy : IHeroStrategy
 {
+    private HeroPlan? _plan;
 
+    public void OnActivate(HeroContext ctx) => GetPlan().Apply(ctx, _skill);
 
-    public void OnActivate(HeroContext ctx)
-    {
-        _main._聚合.Conditions[ConditionSlotKey.C1].Probe ??= 寒霜爆发去后摇;
-        _main._聚合.Conditions[ConditionSlotKey.C2].Probe ??= 冰霜魔盾去后摇;
-        _main._聚合.Conditions[ConditionSlotKey.C3].Probe ??= 阴邪凝视去后摇;
-        _main._聚合.Conditions[ConditionSlotKey.C4].Probe ??= 连环霜冻去后摇;
-        _main._聚合.Conditions[ConditionSlotKey.C5].Probe ??= 寒冰尖柱去后摇;
-    }
+    public Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx) => GetPlan().DispatchAsync(trigger, ctx, _item);
 
-    public async Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)
-    {
-        VirtualKey key = trigger.Key;
-        KeyEventArgs e = new((Keys)key.ToNative() | ConvertModifiers(trigger.Modifiers));
-
-        await _item.根据按键判断技能释放前通用逻辑(e).ConfigureAwait(true);
-
-        if (e.KeyValue == (int)Keys.W && (int)e.Modifiers == (int)Keys.Alt)
+    private HeroPlan GetPlan() => _plan ??= HeroPlanBuilder.New()
+        .OnKey(Keys.Q).CustomProbe(async _h => await _skill.技能通用判断(Keys.Q, _main._聚合.Skills.Step(SlotKey.E) > 0 ? 11 : 1).ConfigureAwait(true))
+        .OnKey(Keys.W).CustomProbe(async _h => await _skill.技能通用判断(Keys.W, _main._聚合.Skills.Step(SlotKey.E) > 0 ? 11 : 1, false).ConfigureAwait(true))
+        .OnKey(Keys.W, KeyModifiers.Alt).Execute(() => _main._聚合.Conditions[ConditionSlotKey.C2].Active = true)
+        .OnKey(Keys.E).CustomProbe(async _h =>
         {
-            _main._聚合.Conditions[ConditionSlotKey.C2].Active = true;
-        }
-
-        if (key == VirtualKey.Q)
-        {
-            _main._聚合.Conditions[ConditionSlotKey.C1].Active = true;
-        }
-        else if (key == VirtualKey.W)
-        {
-            _main._聚合.Conditions[ConditionSlotKey.C2].Active = true;
-        }
-        else if (key == VirtualKey.E)
-        {
-            _main._聚合.Conditions[ConditionSlotKey.C3].Active = true;
-        }
-        else if (key == VirtualKey.R)
-        {
-            _main._聚合.Conditions[ConditionSlotKey.C4].Active = true;
-        }
-        else if (key == VirtualKey.D)
-        {
-            _main._聚合.Conditions[ConditionSlotKey.C5].Active = true;
-        }
-    }
-
-    /// <summary>把领域中性的 <see cref="KeyModifiers"/> 转回 WinForms <see cref="Keys"/> 修饰键标志。</summary>
-    private static Keys ConvertModifiers(KeyModifiers modifiers)
-    {
-        Keys result = Keys.None;
-        if ((modifiers & KeyModifiers.Alt) != 0) result |= Keys.Alt;
-        if ((modifiers & KeyModifiers.Control) != 0) result |= Keys.Control;
-        if ((modifiers & KeyModifiers.Shift) != 0) result |= Keys.Shift;
-        return result;
-    }
-
-    private async Task<bool> 寒霜爆发去后摇(ImageHandle 句柄)
-    {
-        return await _skill.技能通用判断(Keys.Q, _main._聚合.Skills.Step(SlotKey.E) > 0 ? 11 : 1).ConfigureAwait(true);
-    }
-
-    private async Task<bool> 冰霜魔盾去后摇(ImageHandle 句柄)
-    {
-        return await _skill.技能通用判断(Keys.W, _main._聚合.Skills.Step(SlotKey.E) > 0 ? 11 : 1, false).ConfigureAwait(true);
-    }
-
-    private async Task<bool> 阴邪凝视去后摇(ImageHandle 句柄)
-    {
-        if (_skill.DOTA2判断技能是否CD(Keys.E, in 句柄))
-        {
-            _main._聚合.Skills.SetStep(SlotKey.E, 0);
-            return await Task.FromResult(true).ConfigureAwait(true);
-        }
-
-        return await Task.Run(async () =>
-        {
-            if (_main._聚合.Skills.Step(SlotKey.E) == 0)
+            if (_skill.DOTA2判断技能是否CD(Keys.E, in _h))
+            {
+                _main._聚合.Skills.SetStep(SlotKey.E, 0);
+                return true;
+            }
+            int step = _main._聚合.Skills.Step(SlotKey.E);
+            if (step == 0)
             {
                 _main._聚合.Skills.SetStep(SlotKey.E, 1);
-                return await Task.FromResult(true).ConfigureAwait(true);
+                return true;
             }
-            else if (_main._聚合.Skills.Step(SlotKey.E) == 1)
+            else if (step == 1)
             {
                 _ = Task.Run(() =>
                 {
                     Common.Delay(200);
                     _main._聚合.Skills.SetStep(SlotKey.E, 2);
                 });
-                return await Task.FromResult(true).ConfigureAwait(true);
+                return true;
             }
             else
             {
-                if (!_skill.DOTA2判断是否持续施法(in 句柄))
+                if (!_skill.DOTA2判断是否持续施法(in _h))
                 {
                     _main._聚合.Skills.SetStep(SlotKey.E, 0);
                     _input.Press(VirtualKey.From(Keys.A));
                     _ = _item.根据图片使用物品(Dota2_Pictrue.物品.羊刀);
-                    return await Task.FromResult(false).ConfigureAwait(true);
+                    return false;
                 }
-                else
-                {
-                    return await Task.FromResult(true).ConfigureAwait(true);
-                }
+                return true;
             }
-        }).ConfigureAwait(false);
-    }
-
-    private async Task<bool> 连环霜冻去后摇(ImageHandle 句柄)
-    {
-        return await _skill.技能通用判断(Keys.R, _main._聚合.Skills.Step(SlotKey.E) > 0 ? 11 : 1).ConfigureAwait(true);
-    }
-
-    private async Task<bool> 寒冰尖柱去后摇(ImageHandle 句柄)
-    {
-        return await _skill.技能通用判断(Keys.D, _main._聚合.Skills.Step(SlotKey.E) > 0 ? 10 : 0).ConfigureAwait(true);
-    }
+        })
+        .OnKey(Keys.R).CustomProbe(async _h => await _skill.技能通用判断(Keys.R, _main._聚合.Skills.Step(SlotKey.E) > 0 ? 11 : 1).ConfigureAwait(true))
+        .OnKey(Keys.D).CustomProbe(async _h => await _skill.技能通用判断(Keys.D, _main._聚合.Skills.Step(SlotKey.E) > 0 ? 10 : 0).ConfigureAwait(true))
+        .Done();
 }
 #endif

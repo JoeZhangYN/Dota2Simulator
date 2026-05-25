@@ -1,96 +1,44 @@
+// Phase 16 C2: 血魔 Strategy 迁 HeroPlan — W CustomProbe (主动技能释放后续 lambda 血祭物品组合 + MousePosition 保留), R AfterCast, Q AfterEnterCD, Q+Alt Execute 共享 C3 (血怒).
 #if DOTA2
 using System.Drawing;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Dota2Simulator.GameAutomation.Application;
+using Dota2Simulator.GameAutomation.Application.HeroPlans;
 using Dota2Simulator.GameAutomation.Domain.Actuation;
 using Dota2Simulator.GameAutomation.Domain.Heroes;
-using Dota2Simulator.Games;
-using Dota2Simulator.Games.Dota2;
-using Dota2Simulator.Vision;
-
-using Dota2Simulator.GameAutomation.Ports;
-
 using Dota2Simulator.GameAutomation.Domain.Perception;
+using Dota2Simulator.Games;
+
 namespace Dota2Simulator.GameAutomation.Heroes.Agility;
 
-/// <summary>血魔（敏捷）策略——迁移自 _main.根据当前英雄增强 的 case "血魔"。</summary>
 [HeroStrategy("血魔", HeroAttribute.Agility)]
 public sealed partial class 血魔Strategy : IHeroStrategy
 {
+    private HeroPlan? _plan;
 
+    public void OnActivate(HeroContext ctx) => GetPlan().Apply(ctx, _skill);
 
-    public void OnActivate(HeroContext ctx)
-    {
-        _main._聚合.Conditions[ConditionSlotKey.C1].Probe ??= 血祭去后摇;
-        _main._聚合.Conditions[ConditionSlotKey.C2].Probe ??= 割裂去后摇;
-        _main._聚合.Conditions[ConditionSlotKey.C3].Probe ??= 血怒去后摇;
-        _main._聚合.LegSwap.配置.修改配置(Keys.E, false);
-    }
+    public Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx) => GetPlan().DispatchAsync(trigger, ctx, _item);
 
-    public async Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)
-    {
-        VirtualKey key = trigger.Key;
-        KeyEventArgs e = new((Keys)key.ToNative() | ConvertModifiers(trigger.Modifiers));
-
-        await _item.根据按键判断技能释放前通用逻辑(e).ConfigureAwait(true);
-
-        if (e.KeyValue == (int)Keys.Q && (int)e.Modifiers == (int)Keys.Alt)
-        {
-            _main._聚合.Conditions[ConditionSlotKey.C3].Active = true;
-        }
-
-        if (key == VirtualKey.W)
-        {
-            _main._聚合.Conditions[ConditionSlotKey.C1].Active = true;
-        }
-        else if (key == VirtualKey.R)
-        {
-            _main._聚合.Conditions[ConditionSlotKey.C2].Active = true;
-        }
-        else if (key == VirtualKey.Q)
-        {
-            _main._聚合.Conditions[ConditionSlotKey.C3].Active = true;
-        }
-    }
-
-    /// <summary>把领域中性的 <see cref="KeyModifiers"/> 转回 WinForms <see cref="Keys"/> 修饰键标志。</summary>
-    private static Keys ConvertModifiers(KeyModifiers modifiers)
-    {
-        Keys result = Keys.None;
-        if ((modifiers & KeyModifiers.Alt) != 0) result |= Keys.Alt;
-        if ((modifiers & KeyModifiers.Control) != 0) result |= Keys.Control;
-        if ((modifiers & KeyModifiers.Shift) != 0) result |= Keys.Shift;
-        return result;
-    }
-
-    private async Task<bool> 血祭去后摇(ImageHandle 句柄)
-    {
-        return await _skill.主动技能释放后续(Keys.W, () =>
+    private HeroPlan GetPlan() => _plan ??= HeroPlanBuilder.New()
+        .LegSwap(Keys.E, alwaysSwap: false)
+        .OnKey(Keys.W).CustomProbe(async _h => await _skill.主动技能释放后续(Keys.W, () =>
         {
             _input.MouseClick(MouseButton.Right);
             _input.Press(VirtualKey.From(Keys.A));
-
             _item.要求保持假腿();
-
             Common.Delay(2400);
             Point p = Control.MousePosition;
             _input.MouseMoveTo(new ScreenPoint(601, 988));
-            if (_skill.DOTA2释放CD就绪技能(Keys.Q, in 句柄))
+            if (_skill.DOTA2释放CD就绪技能(Keys.Q, in _h))
             {
                 _input.MouseMoveTo(new ScreenPoint(p.X, p.Y));
             }
-        }).ConfigureAwait(true);
-    }
-
-    private async Task<bool> 割裂去后摇(ImageHandle 句柄)
-    {
-        return await _skill.技能通用判断(Keys.R, 1).ConfigureAwait(true);
-    }
-
-    private async Task<bool> 血怒去后摇(ImageHandle 句柄)
-    {
-        return await _skill.技能通用判断(Keys.Q, 0).ConfigureAwait(true);
-    }
+        }).ConfigureAwait(true))
+        .OnKey(Keys.R).CastSkill(Keys.R).AfterCast()
+        .OnKey(Keys.Q).CastSkill(Keys.Q).AfterEnterCD()
+        .OnKey(Keys.Q, KeyModifiers.Alt).Execute(() => _main._聚合.Conditions[ConditionSlotKey.C3].Active = true)
+        .Done();
 }
 #endif

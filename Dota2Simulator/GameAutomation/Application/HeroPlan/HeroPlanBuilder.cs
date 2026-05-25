@@ -30,6 +30,9 @@ public sealed class HeroPlanBuilder
     private int? _repeatThreshold;
     // Phase 16 C1b: OnEveryKey 入口 sentinel — 与 _pendingTrigger 二选一; setup-only 形态 (不能跟 clause).
     private bool _pendingIsOnEveryKey;
+    // Phase 16 C2: KeyModifier 匹配 — OnKey(Keys, KeyModifiers) overload 写入此字段, 终结时注入 clause/setup.
+    private Domain.Actuation.KeyModifiers _pendingModifiers = Domain.Actuation.KeyModifiers.None;
+    private Domain.Actuation.KeyModifiers _lastClauseModifiers = Domain.Actuation.KeyModifiers.None;
 
     // 缓存最后一个 FinishClause 的 TriggerKey/Guard, 供 AlsoAdjustLegSwap 追加共享的 SetupAction.
     private Keys? _lastClauseTrigger;
@@ -47,6 +50,24 @@ public sealed class HeroPlanBuilder
             throw new InvalidOperationException($"OnKey({triggerKey}): 上一个 OnKey/OnEveryKey 未终结 (缺 CastSkill + AfterX, 或 SetupAction).");
         }
         _pendingTrigger = triggerKey;
+        _pendingModifiers = Domain.Actuation.KeyModifiers.None;
+        _pendingGuard = AggGuard.None;
+        return this;
+    }
+
+    /// <summary>
+    /// Phase 16 C2: OnKey + Modifier 形态 — 触发键 + 修饰键组合 (Alt/Control/Shift) 严格匹配.
+    /// 用于巫妖 W+Alt / 墨客 E+Alt / 帕克 W+Ctrl / 光法 E+Alt / 血魔 Q+Alt 形态.
+    /// 默认 None 等价无修饰 (与裸 <see cref="OnKey(Keys)"/> 完全等价).
+    /// </summary>
+    public HeroPlanBuilder OnKey(Keys triggerKey, Domain.Actuation.KeyModifiers modifiers)
+    {
+        if (_pendingTrigger is not null || _pendingIsOnEveryKey)
+        {
+            throw new InvalidOperationException($"OnKey({triggerKey}, {modifiers}): 上一个 OnKey/OnEveryKey 未终结.");
+        }
+        _pendingTrigger = triggerKey;
+        _pendingModifiers = modifiers;
         _pendingGuard = AggGuard.None;
         return this;
     }
@@ -142,13 +163,9 @@ public sealed class HeroPlanBuilder
             Kind: SetupActionKind.ExecuteAction,
             ParamKey: Keys.None,
             ParamBool: false,
-            CustomAction: action));
-
-        _pendingTrigger = null;
-        _pendingSkill = null;
-        _pendingGuard = AggGuard.None;
-        _pendingPreActionSync = null;
-        _pendingPreActionAsync = null;
+            CustomAction: action,
+            Modifiers: _pendingModifiers));
+        ResetPending();
         return this;
     }
 
@@ -168,7 +185,8 @@ public sealed class HeroPlanBuilder
             Kind: SetupActionKind.AdjustLegSwap,
             ParamKey: paramKey,
             ParamBool: paramBool,
-            IsOnEveryKey: _pendingIsOnEveryKey));
+            IsOnEveryKey: _pendingIsOnEveryKey,
+            Modifiers: _pendingModifiers));
         ResetPending();
         return this;
     }
@@ -192,7 +210,8 @@ public sealed class HeroPlanBuilder
             ParamKey: paramKey,
             ParamBool: false,  // sentinel, ignored when ParamBoolProvider 非空.
             ParamBoolProvider: paramBoolProvider,
-            IsOnEveryKey: _pendingIsOnEveryKey));
+            IsOnEveryKey: _pendingIsOnEveryKey,
+            Modifiers: _pendingModifiers));
         ResetPending();
         return this;
     }
@@ -205,6 +224,7 @@ public sealed class HeroPlanBuilder
         _pendingPreActionSync = null;
         _pendingPreActionAsync = null;
         _pendingIsOnEveryKey = false;
+        _pendingModifiers = Domain.Actuation.KeyModifiers.None;
     }
 
     /// <summary>终结子句, 释放模式 = AfterEnterCD (magic 0 — 主动技能进入 CD 后接).</summary>
@@ -249,13 +269,9 @@ public sealed class HeroPlanBuilder
             Guard: _pendingGuard,
             IsToggle: true,
             SpeakOn: speakOn,
-            SpeakOff: speakOff));
-
-        _pendingTrigger = null;
-        _pendingSkill = null;
-        _pendingGuard = AggGuard.None;
-        _pendingPreActionSync = null;
-        _pendingPreActionAsync = null;
+            SpeakOff: speakOff,
+            Modifiers: _pendingModifiers));
+        ResetPending();
         return this;
     }
 
@@ -286,15 +302,13 @@ public sealed class HeroPlanBuilder
             Guard: _pendingGuard,
             CustomProbeFn: probe,
             PreActionSync: _pendingPreActionSync,
-            PreActionAsync: _pendingPreActionAsync));
+            PreActionAsync: _pendingPreActionAsync,
+            Modifiers: _pendingModifiers));
 
         _lastClauseTrigger = _pendingTrigger;
         _lastClauseGuard = _pendingGuard;
-        _pendingTrigger = null;
-        _pendingSkill = null;
-        _pendingGuard = AggGuard.None;
-        _pendingPreActionSync = null;
-        _pendingPreActionAsync = null;
+        _lastClauseModifiers = _pendingModifiers;
+        ResetPending();
         return this;
     }
 
@@ -318,15 +332,13 @@ public sealed class HeroPlanBuilder
             PostDelayMs: 0,
             Guard: _pendingGuard,
             PreActionSync: _pendingPreActionSync,
-            PreActionAsync: _pendingPreActionAsync));
+            PreActionAsync: _pendingPreActionAsync,
+            Modifiers: _pendingModifiers));
 
         _lastClauseTrigger = _pendingTrigger;
         _lastClauseGuard = _pendingGuard;
-        _pendingTrigger = null;
-        _pendingSkill = null;
-        _pendingGuard = AggGuard.None;
-        _pendingPreActionSync = null;
-        _pendingPreActionAsync = null;
+        _lastClauseModifiers = _pendingModifiers;
+        ResetPending();
         return this;
     }
 
@@ -350,15 +362,13 @@ public sealed class HeroPlanBuilder
             PostDelayMs: postDelayMs,
             Guard: _pendingGuard,
             PreActionSync: _pendingPreActionSync,
-            PreActionAsync: _pendingPreActionAsync));
+            PreActionAsync: _pendingPreActionAsync,
+            Modifiers: _pendingModifiers));
 
         _lastClauseTrigger = _pendingTrigger;
         _lastClauseGuard = _pendingGuard;
-        _pendingTrigger = null;
-        _pendingSkill = null;
-        _pendingGuard = AggGuard.None;
-        _pendingPreActionSync = null;
-        _pendingPreActionAsync = null;
+        _lastClauseModifiers = _pendingModifiers;
+        ResetPending();
         return this;
     }
 
@@ -379,7 +389,8 @@ public sealed class HeroPlanBuilder
             Guard: _lastClauseGuard,
             Kind: SetupActionKind.AdjustLegSwap,
             ParamKey: paramKey,
-            ParamBool: paramBool));
+            ParamBool: paramBool,
+            Modifiers: _lastClauseModifiers));
         return this;
     }
 
