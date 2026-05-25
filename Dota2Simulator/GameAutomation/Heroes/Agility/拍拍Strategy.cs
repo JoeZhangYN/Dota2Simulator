@@ -1,13 +1,12 @@
+// Phase 14 C1: 拍拍 Strategy 迁 HeroPlan + CustomProbe DSL — Q/W/R 简单 mode 0/1/0, E 自定义 (跳拍 Task.Run + 物品组合 + DOTA2释放CD就绪技能 lambda).
 #if DOTA2
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Dota2Simulator.GameAutomation.Application;
+using Dota2Simulator.GameAutomation.Application.HeroPlans;
 using Dota2Simulator.GameAutomation.Domain.Actuation;
 using Dota2Simulator.GameAutomation.Domain.Heroes;
 using Dota2Simulator.Games.Dota2;
-using Dota2Simulator.Vision;
-
-using Dota2Simulator.GameAutomation.Ports;
 
 namespace Dota2Simulator.GameAutomation.Heroes.Agility;
 
@@ -15,71 +14,32 @@ namespace Dota2Simulator.GameAutomation.Heroes.Agility;
 [HeroStrategy("拍拍", HeroAttribute.Agility)]
 public sealed partial class 拍拍Strategy : IHeroStrategy
 {
+    private HeroPlan? _plan;
 
+    public void OnActivate(HeroContext ctx) => GetPlan().Apply(ctx, _skill);
 
-    public void OnActivate(HeroContext ctx)
-    {
-        _main._聚合.Conditions[ConditionSlotKey.C1].Probe ??= 震撼大地去后摇;
-        _main._聚合.Conditions[ConditionSlotKey.C2].Probe ??= 超强力量去后摇;
-        _main._聚合.Conditions[ConditionSlotKey.C3].Probe ??= 跳拍;
-        _main._聚合.Conditions[ConditionSlotKey.C4].Probe ??= 狂怒去后摇;
-        _main._聚合.LegSwap.配置.修改配置(Keys.E, false);
-        _main._聚合.LegSwap.配置.修改配置(Keys.R, false);
-    }
+    public Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx) => GetPlan().DispatchAsync(trigger, ctx, _item);
 
-    public async Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)
-    {
-        VirtualKey key = trigger.Key;
-        await _item.根据按键判断技能释放前通用逻辑(new KeyEventArgs((Keys)key.ToNative())).ConfigureAwait(true);
-
-        if (key == VirtualKey.Q)
+    private HeroPlan GetPlan() => _plan ??= HeroPlanBuilder.New()
+        .OnKey(Keys.Q).CastSkill(Keys.Q).AfterEnterCD()
+        .OnKey(Keys.W).CastSkill(Keys.W).AfterCast()
+        .OnKey(Keys.E).CustomProbe(async 句柄 =>
         {
-            _main._聚合.Conditions[ConditionSlotKey.C1].Active = true;
-        }
-        else if (key == VirtualKey.W)
-        {
-            _main._聚合.Conditions[ConditionSlotKey.C2].Active = true;
-        }
-        else if (key == VirtualKey.E)
-        {
-            _main._聚合.Conditions[ConditionSlotKey.C3].Active = true;
-        }
-        else if (key == VirtualKey.R)
-        {
-            _main._聚合.Conditions[ConditionSlotKey.C4].Active = true;
-        }
-    }
-
-    private async Task<bool> 超强力量去后摇(ImageHandle 句柄)
-    {
-        return await _skill.技能通用判断(Keys.W, 1).ConfigureAwait(true);
-    }
-
-    private async Task<bool> 震撼大地去后摇(ImageHandle 句柄)
-    {
-        return await _skill.技能通用判断(Keys.Q, 0).ConfigureAwait(true);
-    }
-
-    private async Task<bool> 狂怒去后摇(ImageHandle 句柄)
-    {
-        return await _skill.技能通用判断(Keys.R, 0).ConfigureAwait(true);
-    }
-
-    private async Task<bool> 跳拍(ImageHandle 句柄)
-    {
-        _ = Task.Run(() =>
-        {
-            if (_item.根据图片使用物品(Dota2_Pictrue.物品.跳刀)
-                + _item.根据图片使用物品(Dota2_Pictrue.物品.跳刀_力量跳刀)
-                + _item.根据图片使用物品(Dota2_Pictrue.物品.跳刀_敏捷跳刀) == 1)
+            _ = Task.Run(() =>
             {
-                _input.Press(VirtualKey.From(Keys.A));
-
-                _ = _skill.DOTA2释放CD就绪技能(Keys.Q, in 句柄);
-            }
-        });
-
-        return await Task.FromResult(false).ConfigureAwait(true);
-    }
+                if (_item.根据图片使用物品(Dota2_Pictrue.物品.跳刀)
+                    + _item.根据图片使用物品(Dota2_Pictrue.物品.跳刀_力量跳刀)
+                    + _item.根据图片使用物品(Dota2_Pictrue.物品.跳刀_敏捷跳刀) == 1)
+                {
+                    _input.Press(VirtualKey.From(Keys.A));
+                    _ = _skill.DOTA2释放CD就绪技能(Keys.Q, in 句柄);
+                }
+            });
+            return await Task.FromResult(false).ConfigureAwait(true);
+        })
+        .OnKey(Keys.R).CastSkill(Keys.R).AfterEnterCD()
+        .LegSwap(Keys.E, alwaysSwap: false)
+        .LegSwap(Keys.R, alwaysSwap: false)
+        .Done();
 }
 #endif

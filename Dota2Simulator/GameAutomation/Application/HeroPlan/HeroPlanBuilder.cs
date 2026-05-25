@@ -5,6 +5,7 @@
 using System;
 using System.Collections.Immutable;
 using System.Windows.Forms;
+using Dota2Simulator.GameAutomation.Application;  // ConditionDelegateBitmap
 
 namespace Dota2Simulator.GameAutomation.Application.HeroPlans;
 
@@ -144,6 +145,41 @@ public sealed class HeroPlanBuilder
             SpeakOn: speakOn,
             SpeakOff: speakOff));
 
+        _pendingTrigger = null;
+        _pendingSkill = null;
+        _pendingGuard = AggGuard.None;
+        return this;
+    }
+
+    /// <summary>
+    /// 终结子句为 CustomProbe escape-hatch: 用户提供自定义 <see cref="ConditionDelegateBitmap"/> Probe,
+    /// 完全跳过 _skill.技能通用判断 模板. 用于 ImageFinder 检测 / _skill.主动技能释放后续 lambda /
+    /// 物品组合 + DOTA2释放CD就绪技能 等无法表达为简单 mode + skillKey 的形态.
+    /// <para>CastSkill 步骤可跳过 (CustomProbe 内部决定释放什么技能).</para>
+    /// <para>注意: lambda 内若引用 Strategy 的 instance 字段 (_skill / _item / _input),
+    /// Strategy 内 <c>_plan</c> 必须改为 instance lazy-init 字段 (而非 static readonly),
+    /// 在 OnActivate 内首次构造.</para>
+    /// </summary>
+    public HeroPlanBuilder CustomProbe(ConditionDelegateBitmap probe)
+    {
+        if (_pendingTrigger is null)
+        {
+            throw new InvalidOperationException("CustomProbe: 需先调 OnKey.");
+        }
+        if (probe is null) throw new ArgumentNullException(nameof(probe));
+
+        _clauses.Add(new HeroPlanClause(
+            TriggerKey: Domain.Actuation.VirtualKey.From(_pendingTrigger.Value),
+            SkillKey: Keys.None,  // CustomProbe 无 mode 模板, SkillKey 由 lambda 内部决定.
+            Mode: CastMode.AfterEnterCD,
+            ContinueAttack: false,
+            ContinueKey: Keys.None,
+            PostDelayMs: 0,
+            Guard: _pendingGuard,
+            CustomProbeFn: probe));
+
+        _lastClauseTrigger = _pendingTrigger;
+        _lastClauseGuard = _pendingGuard;
         _pendingTrigger = null;
         _pendingSkill = null;
         _pendingGuard = AggGuard.None;

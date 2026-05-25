@@ -7,6 +7,7 @@ using System;
 using System.Collections.Immutable;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Dota2Simulator.GameAutomation.Application;  // ConditionDelegateBitmap
 using Dota2Simulator.GameAutomation.Domain.Actuation;
 
 namespace Dota2Simulator.GameAutomation.Application.HeroPlans;
@@ -29,6 +30,8 @@ public enum AggGuard
 /// <item>DispatchAsync 内 Active = !Active (而非 = true), 触发 TTS 播报 <see cref="SpeakOn"/>/<see cref="SpeakOff"/>;</item>
 /// <item>Apply 内 Probe 返回 Active (自循环), 而非 _skill.技能通用判断 直返 — 用于 D3/D4 toggle 循环技能形态 (小仙女/小强/瘟疫法师).</item>
 /// </list>
+/// <para>当 <see cref="CustomProbeFn"/> 非空时: Apply 内用之注册 ConditionSlot.Probe, 完全跳过 _skill.技能通用判断 模板.
+/// 用于 ImageFinder / _skill.主动技能释放后续 lambda / 物品 + DOTA2释放CD就绪技能 等自定义形态 (巫医/哈斯卡/拍拍).</para>
 /// </summary>
 public readonly record struct HeroPlanClause(
     VirtualKey TriggerKey,
@@ -40,7 +43,8 @@ public readonly record struct HeroPlanClause(
     AggGuard Guard,
     bool IsToggle = false,
     string? SpeakOn = null,
-    string? SpeakOff = null);
+    string? SpeakOff = null,
+    ConditionDelegateBitmap? CustomProbeFn = null);
 
 /// <summary>假腿配置条目 (按键 → alwaysSwap 标志, OnActivate 时一次性应用).</summary>
 public readonly record struct LegSwapEntry(Keys Key, bool AlwaysSwap);
@@ -112,6 +116,13 @@ public sealed class HeroPlan
             // NoProbe sentinel: 仅占槽, 不挂 Probe — 用于按键 Active 但无技能释放委托的边缘形态.
             if (clause.SkillKey == Keys.None)
             {
+                continue;
+            }
+
+            // CustomProbe escape-hatch: 用户自定义 Probe (ImageFinder / 主动技能释放后续 lambda / 物品组合等).
+            if (clause.CustomProbeFn is not null)
+            {
+                ctx.Aggregate.Conditions[slotKey].Probe ??= clause.CustomProbeFn;
                 continue;
             }
 

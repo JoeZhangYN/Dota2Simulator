@@ -1,61 +1,35 @@
+// Phase 14 C1: 哈斯卡 Strategy 迁 HeroPlan + CustomProbe DSL — Q→W 特殊键位映射 mode 1, R 自定义 Probe (主动技能释放后续 lambda + DOTA2释放CD就绪技能).
 #if DOTA2
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Dota2Simulator.GameAutomation.Application;
+using Dota2Simulator.GameAutomation.Application.HeroPlans;
 using Dota2Simulator.GameAutomation.Domain.Actuation;
 using Dota2Simulator.GameAutomation.Domain.Heroes;
-using Dota2Simulator.Games.Dota2;
-using Dota2Simulator.Vision;
-
-using Dota2Simulator.GameAutomation.Ports;
 
 namespace Dota2Simulator.GameAutomation.Heroes.Strength;
 
 [HeroStrategy("哈斯卡", HeroAttribute.Strength)]
 public sealed partial class 哈斯卡Strategy : IHeroStrategy
 {
+    private HeroPlan? _plan;
 
+    public void OnActivate(HeroContext ctx) => GetPlan().Apply(ctx, _skill);
 
-    public void OnActivate(HeroContext ctx)
-    {
-        _main._聚合.Conditions[ConditionSlotKey.C1].Probe ??= 心炎去后摇;
-        _main._聚合.Conditions[ConditionSlotKey.C2].Probe ??= 牺牲去后摇;
-        _main._聚合.LegSwap.配置.修改配置(Keys.E, false);
-    }
+    public Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx) => GetPlan().DispatchAsync(trigger, ctx, _item);
 
-    public async Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)
-    {
-        VirtualKey key = trigger.Key;
-        await _item.根据按键判断技能释放前通用逻辑(new KeyEventArgs((Keys)key.ToNative())).ConfigureAwait(true);
-
-        if (key == VirtualKey.Q)
-        {
-            _main._聚合.Conditions[ConditionSlotKey.C1].Active = true;
-        }
-        else if (key == VirtualKey.R)
-        {
-            _main._聚合.Conditions[ConditionSlotKey.C2].Active = true;
-        }
-    }
-
-    private async Task<bool> 心炎去后摇(ImageHandle 句柄)
-    {
-        return await _skill.技能通用判断(Keys.W, 1).ConfigureAwait(true);
-    }
-
-    private async Task<bool> 牺牲去后摇(ImageHandle 句柄)
-    {
-        return await _skill.主动技能释放后续(Keys.R, () =>
+    private HeroPlan GetPlan() => _plan ??= HeroPlanBuilder.New()
+        .OnKey(Keys.Q).CastSkill(Keys.W).AfterCast()
+        .OnKey(Keys.R).CustomProbe(async 句柄 => await _skill.主动技能释放后续(Keys.R, () =>
         {
             _input.MouseClick(MouseButton.Right);
-
             if (_skill.DOTA2释放CD就绪技能(Keys.Q, in 句柄))
             {
                 return;
             }
-
             _input.Press(VirtualKey.From(Keys.A));
-        }).ConfigureAwait(true);
-    }
+        }).ConfigureAwait(true))
+        .LegSwap(Keys.E, alwaysSwap: false)
+        .Done();
 }
 #endif
