@@ -150,6 +150,7 @@ public sealed class PictureManifestGenerator : IIncrementalGenerator
         sb.AppendLine("#if DOTA2");
         sb.AppendLine();
         sb.AppendLine("using Dota2Simulator.Vision;");
+        sb.AppendLine("using Dota2Simulator.GameAutomation.Domain.Perception;");
         sb.AppendLine();
         sb.AppendLine("namespace Dota2Simulator.Games.Dota2");
         sb.AppendLine("{");
@@ -188,10 +189,18 @@ public sealed class PictureManifestGenerator : IIncrementalGenerator
         sb.Append(pad).AppendLine("{");
         foreach (var e in entries)
         {
+            // Phase 19A: emit pair —— 旧 ImageHandle 属性 (调用方原路径) + 新 _Tpl Template 属性 (IScreenVision 主力路径).
+            //  Template 仅持 manifestKey 字符串, 与 ImageHandle 平行存在; IScreenVision adapter 实现内反查 ImageHandle.
             sb.Append(pad2)
               .Append("public static ImageHandle ")
               .Append(e.PropertyName)
               .Append(" => LazyImageLoader.GetImage(\"")
+              .Append(e.ManifestKey)
+              .AppendLine("\");");
+            sb.Append(pad2)
+              .Append("public static Template ")
+              .Append(e.PropertyName)
+              .Append("_Tpl => new Template(\"")
               .Append(e.ManifestKey)
               .AppendLine("\");");
         }
