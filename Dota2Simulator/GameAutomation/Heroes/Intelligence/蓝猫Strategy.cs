@@ -1,14 +1,12 @@
+// Phase 19D: 蓝猫 Strategy 迁 HeroPlan — Q Execute (残影接平A 多步骤宏) + W/R/D4 NoProbe (原 拉接平A/滚接平A return true dead, D4 无 Probe dead).
 #if DOTA2
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Dota2Simulator.GameAutomation.Application;
+using Dota2Simulator.GameAutomation.Application.HeroPlans;
 using Dota2Simulator.GameAutomation.Domain.Actuation;
 using Dota2Simulator.GameAutomation.Domain.Heroes;
 using Dota2Simulator.Games;
-using Dota2Simulator.Games.Dota2;
-using Dota2Simulator.Vision;
-
-using Dota2Simulator.GameAutomation.Ports;
 
 namespace Dota2Simulator.GameAutomation.Heroes.Intelligence;
 
@@ -17,49 +15,23 @@ public sealed partial class 蓝猫Strategy : IHeroStrategy
 {
     private const int 等待延迟 = 33;
 
+    private HeroPlan? _plan;
 
+    public void OnActivate(HeroContext ctx) => GetPlan().Apply(ctx, _skill);
 
-    public void OnActivate(HeroContext ctx)
-    {
-        _main._聚合.Conditions[ConditionSlotKey.C1].Probe ??= 拉接平A;
-        _main._聚合.Conditions[ConditionSlotKey.C2].Probe ??= 滚接平A;
-    }
+    public Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx) => GetPlan().DispatchAsync(trigger, ctx, _item);
 
-    public async Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)
-    {
-        VirtualKey key = trigger.Key;
-        if (key == VirtualKey.Q)
-        {
-            await Task.Run(残影接平A).ConfigureAwait(true);
-        }
-        else if (key == VirtualKey.W)
-        {
-            _main._聚合.Conditions[ConditionSlotKey.C1].Active = true;
-        }
-        else if (key == VirtualKey.R)
-        {
-            _main._聚合.Conditions[ConditionSlotKey.C2].Active = true;
-        }
-        else if (key == VirtualKey.From(Keys.D4))
-        {
-            _main._聚合.Conditions[ConditionSlotKey.C3].Active = true;
-        }
-    }
-
-    private async Task<bool> 拉接平A()
-    {
-        return await Task.FromResult(true).ConfigureAwait(true);
-    }
+    private HeroPlan GetPlan() => _plan ??= HeroPlanBuilder.New()
+        .OnKey(Keys.Q).Execute(() => Task.Run(残影接平A))
+        .OnKey(Keys.W).NoProbe()  // 占 C1 (原 拉接平A return true dead Probe)
+        .OnKey(Keys.R).NoProbe()  // 占 C2 (原 滚接平A return true dead Probe)
+        .OnKey(Keys.D4).NoProbe()  // 占 C3 (原 OnActivate 未注册 C3 Probe, 完全 dead)
+        .Done();
 
     private void 残影接平A()
     {
         Common.Delay(等待延迟);
         _input.Press(VirtualKey.From(Keys.A));
-    }
-
-    private async Task<bool> 滚接平A()
-    {
-        return await Task.FromResult(true).ConfigureAwait(true);
     }
 }
 #endif

@@ -1,144 +1,70 @@
+// Phase 19D: 蓝胖 Strategy 迁 HeroPlan — Q/W/E/F/D 5 CustomProbe (CD 检查 + 副作用同质模板) + D2 Execute (ToggleMode W + TTS). E 键 OnKeyAsync 不触发但 OnActivate 注册 C3 嗜血术 (dead Probe), 用 NoProbe 占 C3 维持顺序映射.
 #if DOTA2
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Dota2Simulator.GameAutomation.Application;
+using Dota2Simulator.GameAutomation.Application.HeroPlans;
 using Dota2Simulator.GameAutomation.Domain.Actuation;
 using Dota2Simulator.GameAutomation.Domain.Heroes;
 using Dota2Simulator.GameAutomation.Domain.Loop;
-using Dota2Simulator.Games.Dota2;
-using Dota2Simulator.Vision;
-
-using Dota2Simulator.GameAutomation.Ports;
 
 namespace Dota2Simulator.GameAutomation.Heroes.Intelligence;
 
 [HeroStrategy("蓝胖", HeroAttribute.Intelligence)]
 public sealed partial class 蓝胖Strategy : IHeroStrategy
 {
+    private HeroPlan? _plan;
 
+    public void OnActivate(HeroContext ctx) => GetPlan().Apply(ctx, _skill);
 
-    public void OnActivate(HeroContext ctx)
-    {
-        _main._聚合.Conditions[ConditionSlotKey.C1].Probe ??= 火焰轰爆去后摇;
-        _main._聚合.Conditions[ConditionSlotKey.C2].Probe ??= 引燃去后摇;
-        _main._聚合.Conditions[ConditionSlotKey.C3].Probe ??= 嗜血术去后摇;
-        _main._聚合.Conditions[ConditionSlotKey.C4].Probe ??= 烈火护盾去后摇;
-        _main._聚合.Conditions[ConditionSlotKey.C5].Probe ??= 未精通火焰轰爆去后摇;
-    }
+    public Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx) => GetPlan().DispatchAsync(trigger, ctx, _item);
 
-    public Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)
-    {
-        VirtualKey key = trigger.Key;
-        if (key == VirtualKey.Q)
-        {
-            _main._聚合.Conditions[ConditionSlotKey.C1].Active = true;
-        }
-        else if (key == VirtualKey.W)
-        {
-            _main._聚合.Conditions[ConditionSlotKey.C2].Active = true;
-        }
-        else if (key == VirtualKey.F)
-        {
-            _main._聚合.Conditions[ConditionSlotKey.C4].Active = true;
-        }
-        else if (key == VirtualKey.D)
-        {
-            _main._聚合.Conditions[ConditionSlotKey.C5].Active = true;
-        }
-        else if (key == VirtualKey.From(Keys.D2))
+    private HeroPlan GetPlan() => _plan ??= HeroPlanBuilder.New()
+        .OnKey(Keys.Q).CustomProbe(火焰轰爆去后摇)
+        .OnKey(Keys.W).CustomProbe(引燃去后摇)
+        .OnKey(Keys.E).NoProbe()  // 占 C3 (原 OnActivate 注册嗜血术 dead Probe, OnKeyAsync 不触发 E)
+        .OnKey(Keys.F).CustomProbe(烈火护盾去后摇)
+        .OnKey(Keys.D).CustomProbe(未精通火焰轰爆去后摇)
+        .OnKey(Keys.D2).Execute(() =>
         {
             _main._聚合.Skills.ToggleMode(SlotKey.W);
             TTS.TTS.Speak(_main._聚合.Skills.Mode(SlotKey.W) == 0 ? "引燃接轰爆" : "引燃不接轰爆");
-        }
-
-        return Task.CompletedTask;
-    }
+        })
+        .Done();
 
     private async Task<bool> 火焰轰爆去后摇()
     {
-        void 火焰轰爆后()
-        {
-            _input.MouseClick(MouseButton.Right);
-        }
-
         if (_skill.DOTA2判断技能是否CD(Keys.Q))
-        {
             return await Task.FromResult(true).ConfigureAwait(true);
-        }
-
-        火焰轰爆后();
+        _input.MouseClick(MouseButton.Right);
         return await Task.FromResult(false).ConfigureAwait(true);
     }
 
     private async Task<bool> 引燃去后摇()
     {
-        void 引燃后()
-        {
-            switch (_main._聚合.Skills.Mode(SlotKey.W))
-            {
-                case 1:
-                    _input.Press(VirtualKey.From(Keys.Q));
-                    break;
-                default:
-                    _input.MouseClick(MouseButton.Right);
-                    break;
-            }
-        }
-
         if (_skill.DOTA2判断技能是否CD(Keys.W))
-        {
             return await Task.FromResult(true).ConfigureAwait(true);
-        }
-
-        引燃后();
-        return await Task.FromResult(false).ConfigureAwait(true);
-    }
-
-    private async Task<bool> 嗜血术去后摇()
-    {
-        void 嗜血术后()
+        switch (_main._聚合.Skills.Mode(SlotKey.W))
         {
-            _input.MouseClick(MouseButton.Right);
+            case 1: _input.Press(VirtualKey.From(Keys.Q)); break;
+            default: _input.MouseClick(MouseButton.Right); break;
         }
-
-        if (_skill.DOTA2判断技能是否CD(Keys.E))
-        {
-            return await Task.FromResult(true).ConfigureAwait(true);
-        }
-
-        嗜血术后();
-        return await Task.FromResult(false).ConfigureAwait(true);
-    }
-
-    private async Task<bool> 未精通火焰轰爆去后摇()
-    {
-        void 未精通火焰轰爆后()
-        {
-            _input.MouseClick(MouseButton.Right);
-        }
-
-        if (_skill.DOTA2判断技能是否CD(Keys.D))
-        {
-            return await Task.FromResult(true).ConfigureAwait(true);
-        }
-
-        未精通火焰轰爆后();
         return await Task.FromResult(false).ConfigureAwait(true);
     }
 
     private async Task<bool> 烈火护盾去后摇()
     {
-        void 烈火护盾后()
-        {
-            _input.MouseClick(MouseButton.Right);
-        }
-
         if (_skill.DOTA2判断技能是否CD(Keys.F))
-        {
             return await Task.FromResult(true).ConfigureAwait(true);
-        }
+        _input.MouseClick(MouseButton.Right);
+        return await Task.FromResult(false).ConfigureAwait(true);
+    }
 
-        烈火护盾后();
+    private async Task<bool> 未精通火焰轰爆去后摇()
+    {
+        if (_skill.DOTA2判断技能是否CD(Keys.D))
+            return await Task.FromResult(true).ConfigureAwait(true);
+        _input.MouseClick(MouseButton.Right);
         return await Task.FromResult(false).ConfigureAwait(true);
     }
 }
