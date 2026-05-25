@@ -117,6 +117,36 @@ public sealed class HeroPlanBuilder
         => FinishClause(CastMode.AfterCastLegOnly, continueAttack, continueKey, postDelayMs);
 
     /// <summary>
+    /// 终结子句为 Toggle 形态: 触发键 = D3/D4 数字键 toggle ConditionSlot.Active = !Active + TTS 播报;
+    /// Probe 自循环 (释放 <paramref name="skillKey"/> 技能 mode=2 后返 Active, 直到再次按下 toggle 退出).
+    /// 用于小仙女 D3 (续暗影/不续暗影) / 小强 D3 (循环爆裂/终止循环) / 瘟疫法师 D3 (循环脉冲/终止循环) 等形态.
+    /// </summary>
+    public HeroPlanBuilder ToggleSlot(Keys skillKey, string speakOn, string speakOff)
+    {
+        if (_pendingTrigger is null)
+        {
+            throw new InvalidOperationException("ToggleSlot: 需先调 OnKey.");
+        }
+
+        _clauses.Add(new HeroPlanClause(
+            TriggerKey: Domain.Actuation.VirtualKey.From(_pendingTrigger.Value),
+            SkillKey: skillKey,
+            Mode: CastMode.WhenReady,
+            ContinueAttack: false,
+            ContinueKey: Keys.None,
+            PostDelayMs: 0,
+            Guard: _pendingGuard,
+            IsToggle: true,
+            SpeakOn: speakOn,
+            SpeakOff: speakOff));
+
+        _pendingTrigger = null;
+        _pendingSkill = null;
+        _pendingGuard = AggGuard.None;
+        return this;
+    }
+
+    /// <summary>
     /// 终结子句, 仅占 ConditionSlot 不挂 Probe — 用于「按键置位 Active 但不挂技能释放委托」的边缘形态
     /// (影魔 R 键 / 历史死代码占位); CastSkill 步骤可跳过.
     /// </summary>

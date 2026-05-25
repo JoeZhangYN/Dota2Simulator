@@ -1,88 +1,30 @@
+// Phase 13 C2: 瘟疫法师 Strategy 迁 HeroPlan + ToggleSlot DSL — Q/W/R 简单 mode 0 (no continueAttack), F+HasShard NoProbe, D3 toggle 循环死亡脉冲, F1+HasShard AdjustLegSwap, LegSwap E + RepeatThreshold(100).
 #if DOTA2
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Dota2Simulator.GameAutomation.Application;
+using Dota2Simulator.GameAutomation.Application.HeroPlans;
 using Dota2Simulator.GameAutomation.Domain.Actuation;
 using Dota2Simulator.GameAutomation.Domain.Heroes;
-using Dota2Simulator.Games.Dota2;
-using Dota2Simulator.Vision;
-
-using Dota2Simulator.GameAutomation.Ports;
 
 namespace Dota2Simulator.GameAutomation.Heroes.Intelligence;
 
 [HeroStrategy("瘟疫法师", HeroAttribute.Intelligence)]
 public sealed partial class 瘟疫法师Strategy : IHeroStrategy
 {
+    private static readonly HeroPlan _plan = HeroPlanBuilder.New()
+        .OnKey(Keys.Q).CastSkill(Keys.Q).AfterEnterCD(continueAttack: false)
+        .OnKey(Keys.W).CastSkill(Keys.W).AfterEnterCD(continueAttack: false)
+        .OnKey(Keys.R).CastSkill(Keys.R).AfterEnterCD()
+        .OnKey(Keys.F).WhenHasShard().NoProbe()
+        .OnKey(Keys.D3).ToggleSlot(skillKey: Keys.Q, speakOn: "循环脉冲", speakOff: "终止循环")
+        .OnKey(Keys.F1).WhenHasShard().AdjustLegSwap(Keys.F, true)
+        .LegSwap(Keys.E, alwaysSwap: false)
+        .RepeatThreshold(100)
+        .Done();
 
+    public void OnActivate(HeroContext ctx) => _plan.Apply(ctx, _skill);
 
-    public void OnActivate(HeroContext ctx)
-    {
-        _main._聚合.Conditions[ConditionSlotKey.C1].Probe ??= 死亡脉冲去后摇;
-        _main._聚合.Conditions[ConditionSlotKey.C2].Probe ??= 幽魂护罩去后摇;
-        _main._聚合.Conditions[ConditionSlotKey.C3].Probe ??= 死神镰刀去后摇;
-        _main._聚合.Conditions[ConditionSlotKey.C5].Probe ??= 循环死亡脉冲;
-        _skill.重复按键执行间隔阈值 = 100;
-        _main._聚合.LegSwap.配置.修改配置(Keys.E, false);
-    }
-
-    public async Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)
-    {
-        VirtualKey key = trigger.Key;
-        await _item.根据按键判断技能释放前通用逻辑(new KeyEventArgs((Keys)key.ToNative())).ConfigureAwait(true);
-
-        if (key == VirtualKey.From(Keys.F1))
-        {
-            if (_main._聚合.HasShard)
-            {
-                _main._聚合.LegSwap.配置.修改配置(Keys.F, true);
-            }
-        }
-        else if (key == VirtualKey.Q)
-        {
-            _main._聚合.Conditions[ConditionSlotKey.C1].Active = true;
-        }
-        else if (key == VirtualKey.W)
-        {
-            _main._聚合.Conditions[ConditionSlotKey.C2].Active = true;
-        }
-        else if (key == VirtualKey.R)
-        {
-            _main._聚合.Conditions[ConditionSlotKey.C3].Active = true;
-        }
-        else if (key == VirtualKey.F)
-        {
-            if (_main._聚合.HasShard)
-            {
-                _main._聚合.Conditions[ConditionSlotKey.C4].Active = true;
-            }
-        }
-        else if (key == VirtualKey.From(Keys.D3))
-        {
-            _main._聚合.Conditions[ConditionSlotKey.C5].Active = !_main._聚合.Conditions[ConditionSlotKey.C5].Active;
-            TTS.TTS.Speak(_main._聚合.Conditions[ConditionSlotKey.C5].Active ? "循环脉冲" : "终止循环");
-        }
-    }
-
-    private async Task<bool> 死亡脉冲去后摇(ImageHandle 句柄)
-    {
-        return await _skill.技能通用判断(Keys.Q, 0, 是否接按键: false).ConfigureAwait(true);
-    }
-
-    private async Task<bool> 幽魂护罩去后摇(ImageHandle 句柄)
-    {
-        return await _skill.技能通用判断(Keys.W, 0, 是否接按键: false).ConfigureAwait(true);
-    }
-
-    private async Task<bool> 死神镰刀去后摇(ImageHandle 句柄)
-    {
-        return await _skill.技能通用判断(Keys.R, 0).ConfigureAwait(true);
-    }
-
-    private async Task<bool> 循环死亡脉冲(ImageHandle 句柄)
-    {
-        await _skill.技能通用判断(Keys.Q, 2).ConfigureAwait(true);
-        return await Task.FromResult(_main._聚合.Conditions[ConditionSlotKey.C5].Active).ConfigureAwait(true);
-    }
+    public Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx) => _plan.DispatchAsync(trigger, ctx, _item);
 }
 #endif

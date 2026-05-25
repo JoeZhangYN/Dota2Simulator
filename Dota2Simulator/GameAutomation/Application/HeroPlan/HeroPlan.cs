@@ -22,7 +22,14 @@ public enum AggGuard
     HasShard,
 }
 
-/// <summary>单个技能行为子句 (按键 → 技能 + 释放模式 + 后续动作 + 可选 Guard).</summary>
+/// <summary>
+/// 单个技能行为子句 (按键 → 技能 + 释放模式 + 后续动作 + 可选 Guard).
+/// <para>当 <see cref="IsToggle"/> = true 时:</para>
+/// <list type="bullet">
+/// <item>DispatchAsync 内 Active = !Active (而非 = true), 触发 TTS 播报 <see cref="SpeakOn"/>/<see cref="SpeakOff"/>;</item>
+/// <item>Apply 内 Probe 返回 Active (自循环), 而非 _skill.技能通用判断 直返 — 用于 D3/D4 toggle 循环技能形态 (小仙女/小强/瘟疫法师).</item>
+/// </list>
+/// </summary>
 public readonly record struct HeroPlanClause(
     VirtualKey TriggerKey,
     Keys SkillKey,
@@ -30,7 +37,10 @@ public readonly record struct HeroPlanClause(
     bool ContinueAttack,
     Keys ContinueKey,
     int PostDelayMs,
-    AggGuard Guard);
+    AggGuard Guard,
+    bool IsToggle = false,
+    string? SpeakOn = null,
+    string? SpeakOff = null);
 
 /// <summary>假腿配置条目 (按键 → alwaysSwap 标志, OnActivate 时一次性应用).</summary>
 public readonly record struct LegSwapEntry(Keys Key, bool AlwaysSwap);
@@ -105,13 +115,33 @@ public sealed class HeroPlan
                 continue;
             }
 
-            ctx.Aggregate.Conditions[slotKey].Probe ??= async _ =>
-                await skill.技能通用判断(
-                    clause.SkillKey,
-                    (int)clause.Mode,
-                    clause.ContinueAttack,
-                    clause.ContinueKey,
-                    clause.PostDelayMs).ConfigureAwait(true);
+            // Toggle 形态 Probe 自循环: 释放技能后返 Active (再次按下 toggle 关闭循环);
+            // 非 toggle 形态 Probe 直返 _skill.技能通用判断 结果 (true 继续判断 / false 释放完成).
+            if (clause.IsToggle)
+            {
+                int clauseIndex = i;  // 捕获给闭包, 避免循环变量陷阱.
+                HeroPlanClause capturedClause = clause;
+                ctx.Aggregate.Conditions[slotKey].Probe ??= async _ =>
+                {
+                    await skill.技能通用判断(
+                        capturedClause.SkillKey,
+                        (int)capturedClause.Mode,
+                        capturedClause.ContinueAttack,
+                        capturedClause.ContinueKey,
+                        capturedClause.PostDelayMs).ConfigureAwait(true);
+                    return ctx.Aggregate.Conditions[(ConditionSlotKey)clauseIndex].Active;
+                };
+            }
+            else
+            {
+                ctx.Aggregate.Conditions[slotKey].Probe ??= async _ =>
+                    await skill.技能通用判断(
+                        clause.SkillKey,
+                        (int)clause.Mode,
+                        clause.ContinueAttack,
+                        clause.ContinueKey,
+                        clause.PostDelayMs).ConfigureAwait(true);
+            }
         }
 
         foreach (LegSwapEntry leg in _legSwap)
@@ -157,7 +187,20 @@ public sealed class HeroPlan
         {
             if (_clauses[i].TriggerKey == key && CheckGuard(_clauses[i].Guard, ctx))
             {
-                ctx.Aggregate.Conditions[(ConditionSlotKey)i].Active = true;
+                ConditionSlotKey slot = (ConditionSlotKey)i;
+                if (_clauses[i].IsToggle)
+                {
+                    bool newActive = !ctx.Aggregate.Conditions[slot].Active;
+                    ctx.Aggregate.Conditions[slot].Active = newActive;
+                    if (_clauses[i].SpeakOn is not null && _clauses[i].SpeakOff is not null)
+                    {
+                        Dota2Simulator.TTS.TTS.Speak(newActive ? _clauses[i].SpeakOn : _clauses[i].SpeakOff);
+                    }
+                }
+                else
+                {
+                    ctx.Aggregate.Conditions[slot].Active = true;
+                }
                 return;
             }
         }
