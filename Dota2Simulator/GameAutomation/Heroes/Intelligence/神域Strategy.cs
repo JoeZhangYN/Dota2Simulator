@@ -1,118 +1,63 @@
+// Phase 19D: 神域 Strategy 迁 HeroPlan — W/E/R/D 4 CustomProbe (3 异步 CD 检查 + Press A/MouseClick.Right 模板 + D 同步). W→C1 / E→C2 / R→C3 / D→C5 (跳 C4! 用 NoProbe 占 C4 维持顺序映射).
 #if DOTA2
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Dota2Simulator.GameAutomation.Application;
+using Dota2Simulator.GameAutomation.Application.HeroPlans;
 using Dota2Simulator.GameAutomation.Domain.Actuation;
 using Dota2Simulator.GameAutomation.Domain.Heroes;
-using Dota2Simulator.Games.Dota2;
-using Dota2Simulator.Vision;
-
-using Dota2Simulator.GameAutomation.Ports;
 
 namespace Dota2Simulator.GameAutomation.Heroes.Intelligence;
 
 [HeroStrategy("神域", HeroAttribute.Intelligence)]
 public sealed partial class 神域Strategy : IHeroStrategy
 {
+    private HeroPlan? _plan;
 
+    public void OnActivate(HeroContext ctx) => GetPlan().Apply(ctx, _skill);
 
-    public void OnActivate(HeroContext ctx)
-    {
-        _main._聚合.Conditions[ConditionSlotKey.C1].Probe ??= 命运敕令去后摇;
-        _main._聚合.Conditions[ConditionSlotKey.C2].Probe ??= 涤罪之焰去后摇;
-        _main._聚合.Conditions[ConditionSlotKey.C3].Probe ??= 虚妄之诺去后摇;
-        _main._聚合.Conditions[ConditionSlotKey.C5].Probe ??= 天命之雨去后摇;
-    }
+    public Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx) => GetPlan().DispatchAsync(trigger, ctx, _item);
 
-    public async Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)
-    {
-        VirtualKey key = trigger.Key;
-        await _item.根据按键判断技能释放前通用逻辑(new KeyEventArgs((Keys)key.ToNative())).ConfigureAwait(true);
-
-        if (key == VirtualKey.W)
-        {
-            _main._聚合.Conditions[ConditionSlotKey.C1].Active = true;
-        }
-        else if (key == VirtualKey.E)
-        {
-            _main._聚合.Conditions[ConditionSlotKey.C2].Active = true;
-        }
-        else if (key == VirtualKey.D)
-        {
-            _main._聚合.Conditions[ConditionSlotKey.C5].Active = true;
-        }
-        else if (key == VirtualKey.R)
-        {
-            _main._聚合.Conditions[ConditionSlotKey.C3].Active = true;
-        }
-    }
+    private HeroPlan GetPlan() => _plan ??= HeroPlanBuilder.New()
+        .OnKey(Keys.W).CustomProbe(命运敕令去后摇)
+        .OnKey(Keys.E).CustomProbe(涤罪之焰去后摇)
+        .OnKey(Keys.R).CustomProbe(虚妄之诺去后摇)
+        .OnKey(Keys.None).NoProbe()  // 占 C4 (原 OnKeyAsync 无 C4 触发, 业务侧 D→C5 跳 C4)
+        .OnKey(Keys.D).CustomProbe(天命之雨去后摇)
+        .Done();
 
     private async Task<bool> 命运敕令去后摇()
     {
-        async Task 命运敕令后()
-        {
-            await Task.Run(() => _input.MouseClick(MouseButton.Right)).ConfigureAwait(true);
-
-            // _input.Press(VirtualKey.From(Keys.A));
-        }
-
+        async Task 命运敕令后() => await Task.Run(() => _input.MouseClick(MouseButton.Right)).ConfigureAwait(true);
         if (_skill.DOTA2判断技能是否CD(Keys.W))
-        {
             return await Task.FromResult(true).ConfigureAwait(true);
-        }
-
         命运敕令后().Start();
         return await Task.FromResult(false).ConfigureAwait(true);
     }
 
     private async Task<bool> 涤罪之焰去后摇()
     {
-        async Task 涤罪之焰后()
-        {
-            await Task.Run(() => { _input.Press(VirtualKey.From(Keys.A)); }).ConfigureAwait(true);
-            // RightClick();
-        }
-
+        async Task 涤罪之焰后() => await Task.Run(() => _input.Press(VirtualKey.From(Keys.A))).ConfigureAwait(true);
         if (_skill.DOTA2判断技能是否CD(Keys.E))
-        {
             return await Task.FromResult(true).ConfigureAwait(true);
-        }
-
         涤罪之焰后().Start();
         return await Task.FromResult(false).ConfigureAwait(true);
     }
 
     private async Task<bool> 虚妄之诺去后摇()
     {
-        async Task 虚妄之诺后()
-        {
-            await Task.Run(() => { _input.Press(VirtualKey.From(Keys.A)); }).ConfigureAwait(true);
-            // _input.Press(VirtualKey.From(Keys.A));
-        }
-
+        async Task 虚妄之诺后() => await Task.Run(() => _input.Press(VirtualKey.From(Keys.A))).ConfigureAwait(true);
         if (_skill.DOTA2判断技能是否CD(Keys.R))
-        {
             return await Task.FromResult(true).ConfigureAwait(true);
-        }
-
         虚妄之诺后().Start();
         return await Task.FromResult(false).ConfigureAwait(true);
     }
 
     private async Task<bool> 天命之雨去后摇()
     {
-        void 天命之雨后()
-        {
-            _input.MouseClick(MouseButton.Right);
-            // _input.Press(VirtualKey.From(Keys.A));
-        }
-
         if (_skill.DOTA2判断技能是否CD(Keys.D))
-        {
             return await Task.FromResult(true).ConfigureAwait(true);
-        }
-
-        天命之雨后();
+        _input.MouseClick(MouseButton.Right);
         return await Task.FromResult(false).ConfigureAwait(true);
     }
 }

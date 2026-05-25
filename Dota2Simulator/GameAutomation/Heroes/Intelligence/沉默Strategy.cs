@@ -1,43 +1,30 @@
+// Phase 19D: 沉默 Strategy 迁 HeroPlan — Q/R 2 CustomProbe (奥数诅咒 Mode 切换复杂 + 全领域沉默 1200ms 超时同质模板). 大招前纷争 helper 保留作 Q Probe 内部调用.
 #if DOTA2
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Dota2Simulator.GameAutomation.Application;
+using Dota2Simulator.GameAutomation.Application.HeroPlans;
 using Dota2Simulator.GameAutomation.Domain.Actuation;
 using Dota2Simulator.GameAutomation.Domain.Heroes;
 using Dota2Simulator.GameAutomation.Domain.Loop;
 using Dota2Simulator.Games;
 using Dota2Simulator.Games.Dota2;
-using Dota2Simulator.Vision;
-
-using Dota2Simulator.GameAutomation.Ports;
 
 namespace Dota2Simulator.GameAutomation.Heroes.Intelligence;
 
 [HeroStrategy("沉默", HeroAttribute.Intelligence)]
 public sealed partial class 沉默Strategy : IHeroStrategy
 {
+    private HeroPlan? _plan;
 
+    public void OnActivate(HeroContext ctx) => GetPlan().Apply(ctx, _skill);
 
-    public void OnActivate(HeroContext ctx)
-    {
-        _main._聚合.Conditions[ConditionSlotKey.C1].Probe ??= 奥数诅咒去后摇;
-        _main._聚合.Conditions[ConditionSlotKey.C2].Probe ??= 全领域沉默去后摇;
-    }
+    public Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx) => GetPlan().DispatchAsync(trigger, ctx, _item);
 
-    public Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)
-    {
-        VirtualKey key = trigger.Key;
-        if (key == VirtualKey.Q)
-        {
-            _main._聚合.Conditions[ConditionSlotKey.C1].Active = true;
-        }
-        else if (key == VirtualKey.R)
-        {
-            _main._聚合.Conditions[ConditionSlotKey.C2].Active = true;
-        }
-
-        return Task.CompletedTask;
-    }
+    private HeroPlan GetPlan() => _plan ??= HeroPlanBuilder.New()
+        .OnKey(Keys.Q).CustomProbe(奥数诅咒去后摇)
+        .OnKey(Keys.R).CustomProbe(全领域沉默去后摇)
+        .Done();
 
     private async Task<bool> 大招前纷争()
     {
@@ -58,8 +45,6 @@ public sealed partial class 沉默Strategy : IHeroStrategy
         async void 奥数诅咒后()
         {
             _main._聚合.Skills.SetTime(SlotKey.Q, -1);
-            // RightClick();
-            // _input.Press(VirtualKey.From(Keys.A));
             switch (_main._聚合.Skills.Mode(SlotKey.Q))
             {
                 case < 1:
@@ -77,18 +62,13 @@ public sealed partial class 沉默Strategy : IHeroStrategy
             }
         }
 
-        // 超时则切回 总体释放时间
         if (Common.获取当前时间毫秒() - _main._聚合.Skills.Time(SlotKey.Q) > 1200 && _main._聚合.Skills.Time(SlotKey.Q) != -1)
         {
             奥数诅咒后();
             return await Task.FromResult(false).ConfigureAwait(true);
         }
-
         if (_skill.DOTA2判断技能是否CD(Keys.Q))
-        {
             return await Task.FromResult(true).ConfigureAwait(true);
-        }
-
         奥数诅咒后();
         return await Task.FromResult(false).ConfigureAwait(true);
     }
@@ -98,22 +78,16 @@ public sealed partial class 沉默Strategy : IHeroStrategy
         void 全领域沉默后()
         {
             _main._聚合.Skills.SetTime(SlotKey.R, -1);
-            // RightClick();
             _input.Press(VirtualKey.From(Keys.A));
         }
 
-        // 超时则切回 总体释放时间
         if (Common.获取当前时间毫秒() - _main._聚合.Skills.Time(SlotKey.R) > 1200 && _main._聚合.Skills.Time(SlotKey.R) != -1)
         {
             全领域沉默后();
             return await Task.FromResult(false).ConfigureAwait(true);
         }
-
         if (_skill.DOTA2判断技能是否CD(Keys.R))
-        {
             return await Task.FromResult(true).ConfigureAwait(true);
-        }
-
         全领域沉默后();
         return await Task.FromResult(false).ConfigureAwait(true);
     }
