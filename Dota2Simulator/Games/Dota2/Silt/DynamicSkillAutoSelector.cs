@@ -347,7 +347,7 @@ namespace Dota2Simulator.Games.Dota2.Silt
         public SelectionReport ExecuteSelection(
             in ImageHandle gameHandle,
             TalentSelectionConfig config,
-            IReadOnlyDictionary<string, ImageHandle> imageHandles,
+            IReadOnlyDictionary<string, Template> imageHandles,
             IScreenVision vision)
         {
             _detailedLogs.Clear();
@@ -404,7 +404,7 @@ namespace Dota2Simulator.Games.Dota2.Silt
         private List<SelectionResult> ProcessSkipFirstThenSelect(
             in ImageHandle gameHandle,
             TalentSelectionConfig config,
-            IReadOnlyDictionary<string, ImageHandle> imageHandles,
+            IReadOnlyDictionary<string, Template> imageHandles,
             IScreenVision vision)
         {
             var results = new List<SelectionResult>();
@@ -413,7 +413,7 @@ namespace Dota2Simulator.Games.Dota2.Silt
 
 
 #pragma warning disable CS0618 // V4 临时妥协调用 Find(ImageHandle, ...) 重载，V6 改 SG 生成 Template 同步删
-            var pointResult = vision.Find(Dota2_Pictrue.Silt.左上角选框, new Rectangle(380, 150, 600, 150), new MatchRate(0.9), Tolerance.Exact);
+            var pointResult = vision.Find(Dota2_Pictrue.Silt.左上角选框_Tpl, new Rectangle(380, 150, 600, 150), new MatchRate(0.9), Tolerance.Exact);
 #pragma warning restore CS0618
             Point? point = pointResult.Found ? new Point(pointResult.Point.X, pointResult.Point.Y) : null;
 
@@ -554,7 +554,7 @@ namespace Dota2Simulator.Games.Dota2.Silt
         private List<SelectionResult> ProcessSequential(
             in ImageHandle gameHandle,
             TalentSelectionConfig config,
-            IReadOnlyDictionary<string, ImageHandle> imageHandles,
+            IReadOnlyDictionary<string, Template> imageHandles,
             IScreenVision vision)
         {
             var results = new List<SelectionResult>();
@@ -593,7 +593,7 @@ namespace Dota2Simulator.Games.Dota2.Silt
         }
 
         private List<ImageSearchResult> FindAllImages(
-            IReadOnlyDictionary<string, ImageHandle> imageHandles,
+            IReadOnlyDictionary<string, Template> imageHandles,
             TalentSelectionConfig config,
             IScreenVision vision)
         {
@@ -1139,7 +1139,7 @@ namespace Dota2Simulator.Games.Dota2.Silt
         private SelectionMode _mode = SelectionMode.SkipFirstThenSelect;
         private readonly Dictionary<string, SkillBaseConfig> _skillConfigs = new();
         private readonly List<TalentRule> _rules = new();
-        private readonly Dictionary<string, ImageHandle> _imageHandles = new();
+        private readonly Dictionary<string, Template> _imageHandles = new();
         private int _calculationDuration;
         private int _calculationCount;
 
@@ -1169,7 +1169,7 @@ namespace Dota2Simulator.Games.Dota2.Silt
             return this;
         }
 
-        public TalentConfigBuilder AddImageHandle(string skillName, ImageHandle handle)
+        public TalentConfigBuilder AddImageHandle(string skillName, Template handle)
         {
             _imageHandles[skillName] = handle;
             return this;
@@ -1246,7 +1246,7 @@ namespace Dota2Simulator.Games.Dota2.Silt
             return this;
         }
 
-        public (TalentSelectionConfig config, FrozenDictionary<string, ImageHandle> imageHandles) Build()
+        public (TalentSelectionConfig config, FrozenDictionary<string, Template> imageHandles) Build()
         {
             var config = new TalentSelectionConfig
             {
@@ -1317,11 +1317,11 @@ namespace Dota2Simulator.Games.Dota2.Silt
                     config.MaxRange = 1000;
                 })
 
-                .AddImageHandle("先天", Dota2_Pictrue.Silt.先天)
-                .AddImageHandle("掘地穿刺", Dota2_Pictrue.Silt.掘地穿刺)
-                .AddImageHandle("沙尘暴", Dota2_Pictrue.Silt.沙尘暴)
-                .AddImageHandle("尾刺", Dota2_Pictrue.Silt.尾刺)
-                .AddImageHandle("地震", Dota2_Pictrue.Silt.地震)
+                .AddImageHandle("先天", Dota2_Pictrue.Silt.先天_Tpl)
+                .AddImageHandle("掘地穿刺", Dota2_Pictrue.Silt.掘地穿刺_Tpl)
+                .AddImageHandle("沙尘暴", Dota2_Pictrue.Silt.沙尘暴_Tpl)
+                .AddImageHandle("尾刺", Dota2_Pictrue.Silt.尾刺_Tpl)
+                .AddImageHandle("地震", Dota2_Pictrue.Silt.地震_Tpl)
 
                 // 使用优先级奖励
                 .AddRuleWithBonus("地震", "碎片胍街間隔", TalentValueType.间隔值,
@@ -1350,30 +1350,30 @@ namespace Dota2Simulator.Games.Dota2.Silt
                 {
                 })
 
-                //.AddImageHandle("神秘", Dota2_Pictrue.Silt.神秘)
-                //.AddImageHandle("壮实", Dota2_Pictrue.Silt.壮实)
-                //.AddImageHandle("警觉", Dota2_Pictrue.Silt.警觉)
-                //.AddImageHandle("坚强", Dota2_Pictrue.Silt.坚强)
-                //.AddImageHandle("迅速", Dota2_Pictrue.Silt.迅速)
-                //.AddImageHandle("犀利", Dota2_Pictrue.Silt.犀利)
-                //.AddImageHandle("高远", Dota2_Pictrue.Silt.高远)
-                //.AddImageHandle("贪婪", Dota2_Pictrue.Silt.贪婪)
-                //.AddImageHandle("吸血鬼", Dota2_Pictrue.Silt.吸血鬼)
-                //.AddImageHandle("永恒", Dota2_Pictrue.Silt.永恒)
-                //.AddImageHandle("巨神", Dota2_Pictrue.Silt.巨神)
-                //.AddImageHandle("粗暴", Dota2_Pictrue.Silt.粗暴)
+                //.AddImageHandle("神秘", Dota2_Pictrue.Silt.神秘_Tpl)
+                //.AddImageHandle("壮实", Dota2_Pictrue.Silt.壮实_Tpl)
+                //.AddImageHandle("警觉", Dota2_Pictrue.Silt.警觉_Tpl)
+                //.AddImageHandle("坚强", Dota2_Pictrue.Silt.坚强_Tpl)
+                //.AddImageHandle("迅速", Dota2_Pictrue.Silt.迅速_Tpl)
+                //.AddImageHandle("犀利", Dota2_Pictrue.Silt.犀利_Tpl)
+                //.AddImageHandle("高远", Dota2_Pictrue.Silt.高远_Tpl)
+                //.AddImageHandle("贪婪", Dota2_Pictrue.Silt.贪婪_Tpl)
+                //.AddImageHandle("吸血鬼", Dota2_Pictrue.Silt.吸血鬼_Tpl)
+                //.AddImageHandle("永恒", Dota2_Pictrue.Silt.永恒_Tpl)
+                //.AddImageHandle("巨神", Dota2_Pictrue.Silt.巨神_Tpl)
+                //.AddImageHandle("粗暴", Dota2_Pictrue.Silt.粗暴_Tpl)
 
-                //.AddImageHandle("狗头人酒杯", Dota2_Pictrue.Silt.狗头人酒杯)
-                //.AddImageHandle("毁灭灵球", Dota2_Pictrue.Silt.毁灭灵球)
-                //.AddImageHandle("玄奥手镯", Dota2_Pictrue.Silt.玄奥手镯)
-                //.AddImageHandle("撕裂之鞭", Dota2_Pictrue.Silt.撕裂之鞭)
-                //.AddImageHandle("勇气之光", Dota2_Pictrue.Silt.勇气之光)
+                //.AddImageHandle("狗头人酒杯", Dota2_Pictrue.Silt.狗头人酒杯_Tpl)
+                //.AddImageHandle("毁灭灵球", Dota2_Pictrue.Silt.毁灭灵球_Tpl)
+                //.AddImageHandle("玄奥手镯", Dota2_Pictrue.Silt.玄奥手镯_Tpl)
+                //.AddImageHandle("撕裂之鞭", Dota2_Pictrue.Silt.撕裂之鞭_Tpl)
+                //.AddImageHandle("勇气之光", Dota2_Pictrue.Silt.勇气之光_Tpl)
 
-                .AddImageHandle("长夜之治", Dota2_Pictrue.Silt.长夜之治)
-                .AddImageHandle("虚空", Dota2_Pictrue.Silt.虚空)
-                .AddImageHandle("伤残恐惧", Dota2_Pictrue.Silt.伤残恐惧)
-                .AddImageHandle("暗夜猎影", Dota2_Pictrue.Silt.暗夜猎影)
-                .AddImageHandle("黑暗飞升", Dota2_Pictrue.Silt.黑暗飞升)
+                .AddImageHandle("长夜之治", Dota2_Pictrue.Silt.长夜之治_Tpl)
+                .AddImageHandle("虚空", Dota2_Pictrue.Silt.虚空_Tpl)
+                .AddImageHandle("伤残恐惧", Dota2_Pictrue.Silt.伤残恐惧_Tpl)
+                .AddImageHandle("暗夜猎影", Dota2_Pictrue.Silt.暗夜猎影_Tpl)
+                .AddImageHandle("黑暗飞升", Dota2_Pictrue.Silt.黑暗飞升_Tpl)
 
                 // 使用优先级奖励
                 .AddRuleWithBonus("暗夜猎影", "移动速度提升", TalentValueType.基础值,
@@ -1406,7 +1406,7 @@ namespace Dota2Simulator.Games.Dota2.Silt
                     config.MinInterval = 0.05;
                 })
 
-                .AddImageHandle("钢毛后背", Dota2_Pictrue.Silt.钢毛后背)
+                .AddImageHandle("钢毛后背", Dota2_Pictrue.Silt.钢毛后背_Tpl)
 
                 .AddRuleWithBonus("钢毛后背", "每层效果", TalentValueType.增量,
                     minValue: 1.5, maxValue: 3, basePriority: 100,

@@ -63,37 +63,4 @@ public sealed class RustVisionAdapter : IScreenVision
         return result;
     }
 
-    /// <summary>
-    /// V3 临时妥协路径：业务直接传 ImageHandle，跳过 Template→ImageHandle 反查。V6 删。
-    /// </summary>
-#pragma warning disable CS0618 // 实现仍允许调本接口已废弃方法
-    public FindResult Find(ImageHandle needle, ScreenRegion region, MatchRate rate, Tolerance tolerance)
-    {
-        ImageHandle frame = GlobalScreenCapture.GetCurrentHandle();
-        if (!needle.IsValid || !frame.IsValid)
-            return FindResult.Miss;
-
-        Rectangle rect = new(region.X, region.Y, region.Width, region.Height);
-        Point? hit = ImageFinder.FindImageInRegion(in needle, in frame, rect, rate.Value);
-        if (hit is null)
-            return FindResult.Miss;
-        return FindResult.Hit(new ScreenPoint(hit.Value.X, hit.Value.Y));
-    }
-
-    /// <summary>V4 临时妥协：ImageHandle 版 region FindAll。V6 删。</summary>
-    public IReadOnlyList<ScreenPoint> FindAll(ImageHandle needle, ScreenRegion region, MatchRate rate, Tolerance tolerance)
-    {
-        ImageHandle frame = GlobalScreenCapture.GetCurrentHandle();
-        if (!needle.IsValid || !frame.IsValid)
-            return Array.Empty<ScreenPoint>();
-
-        Rectangle rect = new(region.X, region.Y, region.Width, region.Height);
-        List<Point> hits = ImageFinder.FindAllImagesInRegion(in needle, in frame, rect, rate.Value);
-        var result = new List<ScreenPoint>(hits.Count);
-        foreach (Point p in hits)
-            result.Add(new ScreenPoint(p.X, p.Y));
-        return result;
-    }
-#pragma warning restore CS0618
-
 }
