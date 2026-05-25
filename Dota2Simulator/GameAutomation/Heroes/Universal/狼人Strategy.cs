@@ -1,54 +1,31 @@
+// Phase 19D: 狼人 Strategy 迁 HeroPlan — 4 CustomProbe helper (招狼/嚎叫/撕咬 同质 400ms 时间检查 + 假腿模板 / 变狼 1200ms 时间检查 only). Probe lambda 内访问 _main / _skill / _input 须 instance _plan lazy-init.
 #if DOTA2
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Dota2Simulator.GameAutomation.Application;
+using Dota2Simulator.GameAutomation.Application.HeroPlans;
 using Dota2Simulator.GameAutomation.Domain.Actuation;
 using Dota2Simulator.GameAutomation.Domain.Heroes;
 using Dota2Simulator.GameAutomation.Domain.Loop;
 using Dota2Simulator.Games;
-using Dota2Simulator.Games.Dota2;
-using Dota2Simulator.Vision;
-
-using Dota2Simulator.GameAutomation.Ports;
 
 namespace Dota2Simulator.GameAutomation.Heroes.Universal;
 
-/// <summary>狼人（全才）策略——迁移自 _main.根据当前英雄增强 的 case "狼人"。</summary>
 [HeroStrategy("狼人", HeroAttribute.Universal)]
 public sealed partial class 狼人Strategy : IHeroStrategy
 {
+    private HeroPlan? _plan;
 
+    public void OnActivate(HeroContext ctx) => GetPlan().Apply(ctx, _skill);
 
-    public void OnActivate(HeroContext ctx)
-    {
-        _main._聚合.Conditions[ConditionSlotKey.C1].Probe ??= 招狼去后摇;
-        _main._聚合.Conditions[ConditionSlotKey.C2].Probe ??= 嚎叫去后摇;
-        _main._聚合.Conditions[ConditionSlotKey.C3].Probe ??= 撕咬去后摇;
-        _main._聚合.Conditions[ConditionSlotKey.C4].Probe ??= 变狼去后摇;
-    }
+    public Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx) => GetPlan().DispatchAsync(trigger, ctx, _item);
 
-    public async Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)
-    {
-        VirtualKey key = trigger.Key;
-        await _item.根据按键判断技能释放前通用逻辑(new KeyEventArgs((Keys)key.ToNative())).ConfigureAwait(true);
-
-        if (key == VirtualKey.Q)
-        {
-            _main._聚合.Conditions[ConditionSlotKey.C1].Active = true;
-        }
-        else if (key == VirtualKey.W)
-        {
-            _main._聚合.Conditions[ConditionSlotKey.C2].Active = true;
-        }
-        else if (key == VirtualKey.D)
-        {
-            _main._聚合.Conditions[ConditionSlotKey.C3].Active = true;
-        }
-        else if (key == VirtualKey.R)
-        {
-            _main._聚合.Conditions[ConditionSlotKey.C4].Active = true;
-        }
-    }
+    private HeroPlan GetPlan() => _plan ??= HeroPlanBuilder.New()
+        .OnKey(Keys.Q).CustomProbe(招狼去后摇)
+        .OnKey(Keys.W).CustomProbe(嚎叫去后摇)
+        .OnKey(Keys.D).CustomProbe(撕咬去后摇)
+        .OnKey(Keys.R).CustomProbe(变狼去后摇)
+        .Done();
 
     private async Task<bool> 招狼去后摇()
     {
