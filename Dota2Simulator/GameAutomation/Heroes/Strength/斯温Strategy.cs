@@ -1,61 +1,26 @@
+// Phase 13 C1: 斯温 Strategy 迁 HeroPlan — 3 helper 全 _skill.技能通用判断, 100% fit Plan.
 #if DOTA2
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Dota2Simulator.GameAutomation.Application;
+using Dota2Simulator.GameAutomation.Application.HeroPlans;
 using Dota2Simulator.GameAutomation.Domain.Actuation;
 using Dota2Simulator.GameAutomation.Domain.Heroes;
-using Dota2Simulator.Games.Dota2;
-using Dota2Simulator.Vision;
-
-using Dota2Simulator.GameAutomation.Ports;
 
 namespace Dota2Simulator.GameAutomation.Heroes.Strength;
 
 [HeroStrategy("斯温", HeroAttribute.Strength)]
 public sealed partial class 斯温Strategy : IHeroStrategy
 {
+    private static readonly HeroPlan _plan = HeroPlanBuilder.New()
+        .OnKey(Keys.Q).CastSkill(Keys.Q).AfterCast()
+        .OnKey(Keys.E).CastSkill(Keys.E).AfterEnterCD()
+        .OnKey(Keys.R).CastSkill(Keys.R).AfterEnterCD()
+        .LegSwap(Keys.W, alwaysSwap: false)
+        .Done();
 
+    public void OnActivate(HeroContext ctx) => _plan.Apply(ctx, _skill);
 
-    public void OnActivate(HeroContext ctx)
-    {
-        _main._聚合.Conditions[ConditionSlotKey.C1].Probe ??= 风暴之拳去后摇;
-        _main._聚合.Conditions[ConditionSlotKey.C2].Probe ??= 战吼去后摇;
-        _main._聚合.Conditions[ConditionSlotKey.C3].Probe ??= 神之力量去后摇;
-        _main._聚合.LegSwap.配置.修改配置(Keys.W, false);
-    }
-
-    public async Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)
-    {
-        VirtualKey key = trigger.Key;
-        await _item.根据按键判断技能释放前通用逻辑(new KeyEventArgs((Keys)key.ToNative())).ConfigureAwait(true);
-
-        if (key == VirtualKey.Q)
-        {
-            _main._聚合.Conditions[ConditionSlotKey.C1].Active = true;
-        }
-        else if (key == VirtualKey.E)
-        {
-            _main._聚合.Conditions[ConditionSlotKey.C2].Active = true;
-        }
-        else if (key == VirtualKey.R)
-        {
-            _main._聚合.Conditions[ConditionSlotKey.C3].Active = true;
-        }
-    }
-
-    private async Task<bool> 风暴之拳去后摇(ImageHandle 句柄)
-    {
-        return await _skill.技能通用判断(Keys.Q, 1).ConfigureAwait(true);
-    }
-
-    private async Task<bool> 战吼去后摇(ImageHandle 句柄)
-    {
-        return await _skill.技能通用判断(Keys.E, 0).ConfigureAwait(true);
-    }
-
-    private async Task<bool> 神之力量去后摇(ImageHandle 句柄)
-    {
-        return await _skill.技能通用判断(Keys.R, 0).ConfigureAwait(true);
-    }
+    public Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx) => _plan.DispatchAsync(trigger, ctx, _item);
 }
 #endif
