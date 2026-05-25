@@ -1484,3 +1484,123 @@ Phase 15 32 commit + Phase 16 (3 commit + 本 handoff) = **36 commit total** on 
 ... Phase 15 32 commit ...
 1bdc02c (C1) → 991aeee (C2) → 2738c65 (C3) → <P16-handoff hash>
 ```
+
+---
+
+## Phase 17 完整收尾 (2026-05-25 续, 1 commit on main, 异型 ToggleSlot 解锁)
+
+epic 主题: **单 chunk 异型 ToggleSlot DSL + 4 英雄新迁 + 光法重构 (从 Phase 16 hard-code Execute lambda 升级)**.
+
+触发: 用户 2026-05-25 续 "继续 Phase 17 异型 ToggleSlot", 按 Phase 16 handoff_notes #1 优先级.
+
+### Phase 17 commit 表
+
+| Chunk | hash | 主题 | 净行 | 新增英雄 |
+|---|---|---|---|---|
+| C1 | `e1f46f5` | hero-plan-toggle-condition-slot-dsl-4-heroes (DSL 扩 1 维 + 4 英雄 + 光法重构) | -137 | 莱恩 / 大圣 / 飞机 / 小精灵 + 光法 D2 重构 |
+
+合计: **-137 业务行净**, 4 英雄新迁 + 1 重构.
+
+### Phase 17 DSL 容量更新 (Phase 16 18 维基础上扩 1 维 → 19 维)
+
+| 维度 | 选项 | 替换源 | 新增于 |
+|---|---|---|---|
+| **ToggleConditionSlot** | (ConditionSlotKey, speakOn, speakOff) trigger key toggle 指定 ConditionSlot.Active + TTS | 光法 D2 / 大圣 D3 / 飞机 D3 / 小精灵 D3 / 莱恩 D4/D5 等 "数字键 toggle 别的 C 槽" 形态 | **Phase 17** |
+
+### Phase 17 设计决策 (3 处)
+
+1. **ToggleConditionSlot 是 setup 形态, 与 Phase 13 ToggleSlot 区分**: Phase 13 ToggleSlot 是 trigger key 自身占 clause 槽 + Probe 自循环 (skillKey mode 2). Phase 17 ToggleConditionSlot 不占 clause 槽, 仅 toggle 已存在的别的 ConditionSlot — 命名上区分概念边界.
+2. **CustomProbe placeholder (trigger=Keys.None) 模式**: 当 D3 ToggleConditionSlot 引用的 ConditionSlot 需要挂 Probe (e.g. 大圣 C4 大圣无限跳跃 / 莱恩 C5 羊刺刷新秒人) 时, 用 `.OnKey(Keys.None).CustomProbe(...)` 占槽 + 注册 Probe (trigger=Keys.None 永不命中). 或在 OnActivate 内 ??= 单独注册 Probe (飞机 / 小精灵 模式).
+3. **小精灵 W 反向 Guard inline**: 现 DSL 仅支持正向 Guard (WhenHasShard/HasAghanim). 小精灵 W 需 "非 HasAghanim 时设 C2 Active" 反向语义, 用 Execute lambda hard-code 替代 (不污染 DSL 加 WhenNotHasAghanim).
+
+### Phase 17 已迁英雄清单 (4 新 / 92, 累计 52 / 92 = 56.5%)
+
+| 属性 | C1 (4 + 1 重构) |
+|---|---|
+| 力量 (0) | — |
+| 敏捷 (3) | 大圣 / 飞机 |
+| 智力 (2) | 莱恩 + 光法重构 |
+| 全才 (1) | 小精灵 |
+
+Phase 16 累计 48 + Phase 17 累计 4 = 52 / 92 (光法重构不增计数).
+
+### Phase 17 关键不变量 (新增)
+
+1. **SetupAction 字段顺序兼容**: 新增 3 字段 (ParamConditionSlot / ParamStringOn / ParamStringOff) 全 default C1/null/null, 存量 setups 0 改动.
+2. **ToggleConditionSlot trigger 共享 setup 形态**: trigger key (D3) 可同时触发多个 setup (e.g. ToggleConditionSlot + AdjustLegSwap), foreach setups 内独立判断 Guard, 不冲突.
+3. **OnActivate Probe ??= 注册与 DSL Apply 共存**: 飞机 / 小精灵 模式 — Plan.Apply 仅承载 setup, OnActivate 手动 ??= 注册 C2/C3/C5 Probe. 大圣 / 莱恩 模式 — Plan 用 CustomProbe(trigger=None) placeholder 占槽 + 注册 Probe.
+4. **莱恩 S 键 Session.IsPaused 新形态**: Execute lambda 设 `_main.Session!.IsPaused = true` — 全新暂停整个 hero loop 形态, 不是 ConditionSlot toggle.
+
+### Phase 17 architecture-sentinel verdict (主 lead 自审)
+
+- **依赖倒置**: ✅ ToggleConditionSlot setup 通过 ctx.Aggregate.Conditions 访问 (与现有 AdjustLegSwap 模板一致, 都是通过 ctx 间接).
+- **结构化管道**: ✅ ToggleConditionSlot 是 setup 终结 (与 Execute / AdjustLegSwap 同级, foreach setups 内独立处理 Kind switch).
+- **类型不变量**: ✅ ConditionSlotKey 是已有 enum, 编译期保证 slot index 不越界 (C1..Space).
+- **高内聚低耦合**: ✅ DSL 仅扩 1 维 (ToggleConditionSlot), 复用 SetupAction record + DispatchAsync 现有 foreach + switch, 不破坏现有 19 维设计.
+
+### Phase 17 handoff_notes (Phase 18+ 候选)
+
+继承 Phase 16 handoff_notes #2-#5, 新增 Phase 17 实测发现:
+
+1. **WhenNotHasShard / WhenNotHasAghanim 反向 Guard (低优先)**: 小精灵 W 用 Execute lambda hard-code 反向 Guard. 现 DSL 仅正向 Guard (WhenHasShard / WhenHasAghanim). 反向 Guard 实测仅 1 英雄, ROI 低. 留待未来发现更多反向 Guard 形态再扩.
+2. **跨 clause Conditions[Cn] hard-code 索引**: 莱恩 莱恩羊接技能 Probe lambda 内 `Conditions[C6].Active` 读 (C6 由 D5 toggle 设). 这是 Phase 16 handoff_notes #6 已识别的跨 clause 副作用议题, 持续存在.
+3. **Pause Session DSL (低优先)**: 莱恩 S 键 `Session.IsPaused = true` 用 Execute lambda. 若发现更多英雄类似形态, 可扩 `.PauseSession()` 替代.
+4. **CustomProbe placeholder (trigger=Keys.None) 模式标准化**: 反复用于 Phase 17 多个英雄占槽注册 Probe + setup 引用. 长期可扩 `.RegisterProbe(ConditionSlotKey slot, ConditionDelegateBitmap probe)` 直接注册 Probe 不占 clause 顺序索引.
+5. **Phase 13 ToggleSlot 与 Phase 17 ToggleConditionSlot 概念重叠**: 两者都是 "trigger key + toggle Active + TTS" 形态, 但 Phase 13 占 clause + 自循环 Probe, Phase 17 占 setup + 引用 ConditionSlot. 未来可考虑统一为同一 DSL 概念家族 + 子选项区分.
+
+### Phase 17 sample 数据 (4 新英雄 + 1 重构, 已迁状态)
+
+| 英雄 | 形态 | 迁移状态 |
+|---|---|---|
+| 莱恩 | W CustomProbe (莱恩羊接技能 读 C6) + R PreAsync 大招前纷争 物品序列 + R CustomProbe + D2/D3 CustomProbe + D4 toggle C5 + D5 toggle C6 + S Execute Session.IsPaused | **已迁 (P17)** |
+| 大圣 | Q/E/R 标准 AfterCast/AfterEnterCD + D3 ToggleConditionSlot C4 + C4 CustomProbe placeholder (trigger=None) + RepeatThreshold + LegSwap | **已迁 (P17)** |
+| 飞机 | D3 ToggleConditionSlot C5; OnActivate 单独 ??= 注册 C5 Probe (循环火箭弹幕); 其他键全注释死代码 | **已迁 (P17)** |
+| 小精灵 | W Execute lambda hard-code C2 + HasAghanim 反向 Guard inline + D3 ToggleConditionSlot C3; OnActivate 单独 ??= C2/C3 Probe + RepeatThreshold | **已迁 (P17)** |
+| 光法 | Phase 16 C2 用的 D2 Execute lambda hard-code → ToggleConditionSlot(C4, "开启循环查克拉", "关闭循环查克拉"), 净 -3 行 | **已迁 (P16) + 重构 (P17)** |
+
+### Phase 17 反预测与实测偏差
+
+1. **handoff #1 预测 4-5 英雄, 实测 4 英雄新 + 1 重构 (光法)**: 与预期相符, 光法重构是 P16 hard-code Execute lambda 升级.
+2. **莱恩 S 键暂停 Session 新形态**: 不属于 ConditionSlot toggle, 也不是 LegSwap, 直接用 Execute lambda 设 Session.IsPaused=true. 实测发现的新副作用形态 (handoff_notes #3 候选).
+3. **placeholder trigger=Keys.None 反复使用**: 大圣 C4 + 莱恩 C2-C4 + 小精灵 (用 OnActivate ??=) — placeholder hack 在 Phase 17 普及, 反向激励 long-term `.RegisterProbe()` DSL.
+4. **Probe ??= 注册可与 Plan.Apply 共存**: 飞机 / 小精灵 模式实测验证 OnActivate 内手动 ??= 注册 Probe 与 Plan.Apply 自动 Probe 注册不冲突 (?? 短路保证)
+. 这给"Plan 仅承载 setup + Probe 单独注册"模式背书.
+
+### 待用户冒烟 (Phase 17 收尾)
+
+继承 Phase 16 全部冒烟清单 + 新增 Phase 17 专项实测:
+
+1. **莱恩全键路径** (最复杂, 8 键):
+   - W (莱恩羊接技能: 等 W CD 后按 E (C6 Active) 或 A (C6 Inactive)) / R (大招前纷争 物品序列后死亡一指 Probe) / E (无效空键) / D2 (推推破林肯秒羊) / D3 (羊刺刷新秒人 Step 状态机) / D4 (toggle C5 "开启刷新秒人 ↔ 关闭") / D5 (toggle C6 "开启羊接吸 ↔ 开启羊接A") / S (Session.IsPaused=true 暂停).
+2. **大圣** (4 键 + D3 toggle):
+   - Q (棒击大地 AfterCast) / E (乾坤之跃 AfterEnterCD) / R (猴子猴孙 AfterCast) / D3 (toggle C4 "开启无限跳跃 ↔ 关闭无限跳跃" - 跑大圣无限跳跃 Probe 自循环).
+3. **飞机** (仅 D3 toggle):
+   - D3 (toggle C5 "循环弹幕 ↔ 关闭弹幕" - 跑循环火箭弹幕 Probe 每 400ms 按 Q).
+4. **小精灵** (W + D3):
+   - W (HasAghanim 时不触发, 非 HasAghanim 设 C2 Active=true 跑幽魂检测 Probe) / D3 (toggle C3 "开启续过载 ↔ 关闭续过载" 跑循环续过载 Probe).
+5. **光法 D2 重构后回归** (Phase 16 已实测 D2 行为, P17 重构后应等价):
+   - D2 (toggle C4 "开启循环查克拉 ↔ 关闭循环查克拉" - 与 Phase 16 hard-code 行为等价).
+
+### Phase 17 回滚锚点
+
+- 完整撤回 Phase 17: `git revert e1f46f5` (1 commit, 回 Phase 16 终态).
+- 光法 D2 重构若回滚, 自动恢复 P16 Execute lambda hard-code 实现 (功能等价).
+- ToggleConditionSlot DSL 扩 (HeroPlan.cs / HeroPlanBuilder.cs 改动) 包含在 commit 内, 一并回滚.
+
+### 下次 session 起手指引 (Phase 18 候选)
+
+按 handoff_notes 优先级:
+
+1. **优先级高**: 业务死代码清理 epic (Phase 16 handoff_notes #5, Phase 17 handoff_notes #1) — 飞机 (4 Probe 注释)/钢背 (4 Probe 注释)/紫猫/发条/剃刀/修补匠/冰女/大圣等独立 epic.
+2. **优先级中**: `.RegisterProbe(ConditionSlotKey, probe)` 标准化 placeholder (Phase 17 handoff_notes #4) — 替代反复 `.OnKey(Keys.None).CustomProbe(...)` hack.
+3. **优先级中**: HeroStrategyBase + SG 改造 (Phase 16 handoff_notes #4 P3) — 持续可推迟.
+4. **持续候选**: 跨 clause 副作用 (handoff #6) / 反向 Guard (handoff Phase 17 #1) / Pause Session (handoff Phase 17 #3) — 都是低 ROI, 等待批量积累再扩.
+
+### 主 lead cherry-pick 范围更新 (Phase 17)
+
+Phase 16 36 commit + Phase 17 (1 commit + 本 handoff) = **38 commit total** on main. cherry-pick 顺序:
+
+```
+... Phase 16 36 commit ...
+e1f46f5 (C1) → <P17-handoff hash>
+```
