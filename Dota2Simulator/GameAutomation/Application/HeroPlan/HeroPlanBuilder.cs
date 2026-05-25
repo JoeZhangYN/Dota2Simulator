@@ -28,6 +28,8 @@ public sealed class HeroPlanBuilder
     private Action? _pendingPreActionSync;
     private Func<Task>? _pendingPreActionAsync;
     private int? _repeatThreshold;
+    // Phase 16 C1b: OnEveryKey 入口 sentinel — 与 _pendingTrigger 二选一; setup-only 形态 (不能跟 clause).
+    private bool _pendingIsOnEveryKey;
 
     // 缓存最后一个 FinishClause 的 TriggerKey/Guard, 供 AlsoAdjustLegSwap 追加共享的 SetupAction.
     private Keys? _lastClauseTrigger;
@@ -40,11 +42,27 @@ public sealed class HeroPlanBuilder
     /// <summary>开一个新子句: 声明触发按键 (Form2 Hook_KeyDown 收到的键).</summary>
     public HeroPlanBuilder OnKey(Keys triggerKey)
     {
-        if (_pendingTrigger is not null)
+        if (_pendingTrigger is not null || _pendingIsOnEveryKey)
         {
-            throw new InvalidOperationException($"OnKey({triggerKey}): 上一个 OnKey({_pendingTrigger}) 未终结 (缺 CastSkill + AfterX, 或 SetupAction).");
+            throw new InvalidOperationException($"OnKey({triggerKey}): 上一个 OnKey/OnEveryKey 未终结 (缺 CastSkill + AfterX, 或 SetupAction).");
         }
         _pendingTrigger = triggerKey;
+        _pendingGuard = AggGuard.None;
+        return this;
+    }
+
+    /// <summary>
+    /// Phase 16 C1b: OnEveryKey 入口 — 无 trigger key 的 setup-only 形态.
+    /// 后续必须接 <see cref="AdjustLegSwap"/> / <see cref="AdjustLegSwapDynamic"/> / <see cref="Execute"/> (setup), 不能接 <see cref="CastSkill"/> + AfterX 等 clause 终结.
+    /// 用途: 火枪 OnKeyAsync 入口每键无条件跑 `LegSwap.修改配置(D, HasShard)` — 动态第二参 + 无 trigger 匹配.
+    /// </summary>
+    public HeroPlanBuilder OnEveryKey()
+    {
+        if (_pendingTrigger is not null || _pendingIsOnEveryKey)
+        {
+            throw new InvalidOperationException($"OnEveryKey: 上一个 OnKey({_pendingTrigger?.ToString() ?? "OnEveryKey"}) 未终结.");
+        }
+        _pendingIsOnEveryKey = true;
         _pendingGuard = AggGuard.None;
         return this;
     }
@@ -63,9 +81,9 @@ public sealed class HeroPlanBuilder
     /// <summary>该 clause/setup 仅当 HeroAggregate.HasAghanim==true 才触发.</summary>
     public HeroPlanBuilder WhenHasAghanim()
     {
-        if (_pendingTrigger is null)
+        if (_pendingTrigger is null && !_pendingIsOnEveryKey)
         {
-            throw new InvalidOperationException("WhenHasAghanim: 需先调 OnKey.");
+            throw new InvalidOperationException("WhenHasAghanim: 需先调 OnKey 或 OnEveryKey.");
         }
         _pendingGuard = AggGuard.HasAghanim;
         return this;
@@ -74,9 +92,9 @@ public sealed class HeroPlanBuilder
     /// <summary>该 clause/setup 仅当 HeroAggregate.HasShard==true 才触发.</summary>
     public HeroPlanBuilder WhenHasShard()
     {
-        if (_pendingTrigger is null)
+        if (_pendingTrigger is null && !_pendingIsOnEveryKey)
         {
-            throw new InvalidOperationException("WhenHasShard: 需先调 OnKey.");
+            throw new InvalidOperationException("WhenHasShard: 需先调 OnKey 或 OnEveryKey.");
         }
         _pendingGuard = AggGuard.HasShard;
         return this;
@@ -135,27 +153,58 @@ public sealed class HeroPlanBuilder
     }
 
     /// <summary>
-    /// 终结 OnKey 链为 SetupAction (不挂 Probe, 仅副作用) — 当前 Kind = AdjustLegSwap.
+    /// 终结 OnKey/OnEveryKey 链为 SetupAction (不挂 Probe, 仅副作用) — 当前 Kind = AdjustLegSwap.
     /// 例: <c>.OnKey(F1).WhenHasAghanim().AdjustLegSwap(F, true)</c> 表示按 F1 + 持神杖时改 LegSwap.修改配置(F, true).
     /// </summary>
     public HeroPlanBuilder AdjustLegSwap(Keys paramKey, bool paramBool)
     {
-        if (_pendingTrigger is null)
+        if (_pendingTrigger is null && !_pendingIsOnEveryKey)
         {
-            throw new InvalidOperationException("AdjustLegSwap: 需先调 OnKey.");
+            throw new InvalidOperationException("AdjustLegSwap: 需先调 OnKey 或 OnEveryKey.");
         }
         _setups.Add(new SetupAction(
-            TriggerKey: Domain.Actuation.VirtualKey.From(_pendingTrigger.Value),
+            TriggerKey: _pendingIsOnEveryKey ? Domain.Actuation.VirtualKey.From(Keys.None) : Domain.Actuation.VirtualKey.From(_pendingTrigger!.Value),
             Guard: _pendingGuard,
             Kind: SetupActionKind.AdjustLegSwap,
             ParamKey: paramKey,
-            ParamBool: paramBool));
+            ParamBool: paramBool,
+            IsOnEveryKey: _pendingIsOnEveryKey));
+        ResetPending();
+        return this;
+    }
+
+    /// <summary>
+    /// Phase 16 C1b: 动态 ParamBool 版 AdjustLegSwap — 第二参为 ctx 谓词, 每次派发时调用求值.
+    /// 用于火枪 OnEveryKey + 动态 HasShard 第二参形态: <c>.OnEveryKey().AdjustLegSwapDynamic(D, ctx => ctx.Aggregate.HasShard)</c>.
+    /// </summary>
+    public HeroPlanBuilder AdjustLegSwapDynamic(Keys paramKey, Func<HeroContext, bool> paramBoolProvider)
+    {
+        if (_pendingTrigger is null && !_pendingIsOnEveryKey)
+        {
+            throw new InvalidOperationException("AdjustLegSwapDynamic: 需先调 OnKey 或 OnEveryKey.");
+        }
+        if (paramBoolProvider is null) throw new ArgumentNullException(nameof(paramBoolProvider));
+
+        _setups.Add(new SetupAction(
+            TriggerKey: _pendingIsOnEveryKey ? Domain.Actuation.VirtualKey.From(Keys.None) : Domain.Actuation.VirtualKey.From(_pendingTrigger!.Value),
+            Guard: _pendingGuard,
+            Kind: SetupActionKind.AdjustLegSwap,
+            ParamKey: paramKey,
+            ParamBool: false,  // sentinel, ignored when ParamBoolProvider 非空.
+            ParamBoolProvider: paramBoolProvider,
+            IsOnEveryKey: _pendingIsOnEveryKey));
+        ResetPending();
+        return this;
+    }
+
+    private void ResetPending()
+    {
         _pendingTrigger = null;
         _pendingSkill = null;
         _pendingGuard = AggGuard.None;
         _pendingPreActionSync = null;
         _pendingPreActionAsync = null;
-        return this;
+        _pendingIsOnEveryKey = false;
     }
 
     /// <summary>终结子句, 释放模式 = AfterEnterCD (magic 0 — 主动技能进入 CD 后接).</summary>
@@ -354,10 +403,10 @@ public sealed class HeroPlanBuilder
     /// <summary>终结整个 Plan, 返回不可变 HeroPlan; 中间态 pending 未终止报错.</summary>
     public HeroPlan Done()
     {
-        if (_pendingTrigger is not null || _pendingSkill is not null)
+        if (_pendingTrigger is not null || _pendingSkill is not null || _pendingIsOnEveryKey)
         {
             throw new InvalidOperationException(
-                $"Done: pending 状态未终结 (OnKey={_pendingTrigger?.ToString() ?? "null"}, CastSkill={_pendingSkill?.ToString() ?? "null"}).");
+                $"Done: pending 状态未终结 (OnKey={_pendingTrigger?.ToString() ?? "null"}, CastSkill={_pendingSkill?.ToString() ?? "null"}, OnEveryKey={_pendingIsOnEveryKey}).");
         }
         return new HeroPlan(_clauses.ToImmutable(), _legSwap.ToImmutable(), _setups.ToImmutable(), _repeatThreshold);
     }

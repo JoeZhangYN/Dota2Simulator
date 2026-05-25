@@ -56,6 +56,8 @@ public readonly record struct LegSwapEntry(Keys Key, bool AlwaysSwap);
 /// (1) <see cref="SetupActionKind.AdjustLegSwap"/>: 调 LegSwap.配置.修改配置(ParamKey, ParamBool).
 /// (2) <see cref="SetupActionKind.ExecuteAction"/>: 调 <see cref="CustomAction"/> lambda 任意副作用 (不挂 ConditionSlot).
 /// 例 (Execute): D2 键 → SetMode(W, 1) + TTS.Speak (幻刺); W 键 → _item.根据图片使用物品(纷争) (黑鸟).
+/// <para>Phase 16 C1b 扩: <see cref="ParamBoolProvider"/> 非空时 AdjustLegSwap 第二参为 ctx 谓词 (动态 HasShard);
+/// <see cref="IsOnEveryKey"/> = true 时 setup 在每键命中前都跑 (无 TriggerKey 匹配, 仅 Guard 过滤). 火枪 OnEveryKey + 动态 ParamBool 形态.</para>
 /// </summary>
 public readonly record struct SetupAction(
     VirtualKey TriggerKey,
@@ -63,7 +65,9 @@ public readonly record struct SetupAction(
     SetupActionKind Kind,
     Keys ParamKey,
     bool ParamBool,
-    Action? CustomAction = null);
+    Action? CustomAction = null,
+    Func<HeroContext, bool>? ParamBoolProvider = null,
+    bool IsOnEveryKey = false);
 
 /// <summary>SetupAction 副作用种类.</summary>
 public enum SetupActionKind
@@ -187,14 +191,17 @@ public sealed class HeroPlan
         await item.根据按键判断技能释放前通用逻辑(new KeyEventArgs((Keys)key.ToNative())).ConfigureAwait(true);
 
         // 1. 先跑 SetupAction (按键 + Guard → 副作用, 如 F1+HasAghanim → LegSwap.修改配置 / D2 → SetMode + TTS).
+        // Phase 16 C1b: IsOnEveryKey = true 时无 TriggerKey 匹配 (每键命中前都跑); ParamBoolProvider 非空时 AdjustLegSwap 第二参动态求值 (火枪 HasShard 形态).
         foreach (SetupAction setup in _setups)
         {
-            if (setup.TriggerKey == key && CheckGuard(setup.Guard, ctx))
+            bool matchKey = setup.IsOnEveryKey || setup.TriggerKey == key;
+            if (matchKey && CheckGuard(setup.Guard, ctx))
             {
                 switch (setup.Kind)
                 {
                     case SetupActionKind.AdjustLegSwap:
-                        ctx.Aggregate.LegSwap.配置.修改配置(setup.ParamKey, setup.ParamBool);
+                        bool boolVal = setup.ParamBoolProvider is not null ? setup.ParamBoolProvider(ctx) : setup.ParamBool;
+                        ctx.Aggregate.LegSwap.配置.修改配置(setup.ParamKey, boolVal);
                         break;
                     case SetupActionKind.ExecuteAction:
                         setup.CustomAction?.Invoke();

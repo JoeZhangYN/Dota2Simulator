@@ -1,77 +1,27 @@
+// Phase 16 C1a: 小松鼠 Strategy 迁 HeroPlan — F1+HasShard AdjustLegSwap(F,true), Q/W CustomProbe (主动技能释放后续 Mode 条件分支释放 Q/W/A), R NoProbe (原 一箭穿心 dummy false Probe), F+HasShard AfterCast, D2/D3 Execute ToggleMode+TTS.
 #if DOTA2
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Dota2Simulator.GameAutomation.Application;
+using Dota2Simulator.GameAutomation.Application.HeroPlans;
 using Dota2Simulator.GameAutomation.Domain.Actuation;
 using Dota2Simulator.GameAutomation.Domain.Heroes;
 using Dota2Simulator.GameAutomation.Domain.Loop;
-using Dota2Simulator.Games.Dota2;
-using Dota2Simulator.Vision;
-
-using Dota2Simulator.GameAutomation.Ports;
 
 namespace Dota2Simulator.GameAutomation.Heroes.Agility;
 
-/// <summary>小松鼠（敏捷）策略——迁移自 _main.根据当前英雄增强 的 case "小松鼠"。</summary>
 [HeroStrategy("小松鼠", HeroAttribute.Agility)]
 public sealed partial class 小松鼠Strategy : IHeroStrategy
 {
+    private HeroPlan? _plan;
 
+    public void OnActivate(HeroContext ctx) => GetPlan().Apply(ctx, _skill);
 
-    public void OnActivate(HeroContext ctx)
-    {
-        _main._聚合.Conditions[ConditionSlotKey.C1].Probe ??= 爆栗出击去后摇;
-        _main._聚合.Conditions[ConditionSlotKey.C2].Probe ??= 野地奇袭去后摇;
-        _main._聚合.Conditions[ConditionSlotKey.C3].Probe ??= 一箭穿心;
-        _main._聚合.Conditions[ConditionSlotKey.C4].Probe ??= 猎手旋标去后摇;
-    }
+    public Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx) => GetPlan().DispatchAsync(trigger, ctx, _item);
 
-    public async Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)
-    {
-        VirtualKey key = trigger.Key;
-        await _item.根据按键判断技能释放前通用逻辑(new KeyEventArgs((Keys)key.ToNative())).ConfigureAwait(true);
-
-        if (key == VirtualKey.From(Keys.F1))
-        {
-            if (_main._聚合.HasShard)
-            {
-                _main._聚合.LegSwap.配置.修改配置(Keys.F, true);
-            }
-        }
-        else if (key == VirtualKey.Q)
-        {
-            _main._聚合.Conditions[ConditionSlotKey.C1].Active = true;
-        }
-        else if (key == VirtualKey.W)
-        {
-            _main._聚合.Conditions[ConditionSlotKey.C2].Active = true;
-        }
-        else if (key == VirtualKey.R)
-        {
-            _main._聚合.Conditions[ConditionSlotKey.C3].Active = true;
-        }
-        else if (key == VirtualKey.F)
-        {
-            if (_main._聚合.HasShard)
-            {
-                _main._聚合.Conditions[ConditionSlotKey.C4].Active = true;
-            }
-        }
-        else if (key == VirtualKey.From(Keys.D2))
-        {
-            _main._聚合.Skills.ToggleMode(SlotKey.W);
-            Dota2Simulator.TTS.TTS.Speak(_main._聚合.Skills.Mode(SlotKey.W) == 0 ? "种树接平A" : "种树接捆");
-        }
-        else if (key == VirtualKey.From(Keys.D3))
-        {
-            _main._聚合.Skills.ToggleMode(SlotKey.E);
-            Dota2Simulator.TTS.TTS.Speak(_main._聚合.Skills.Mode(SlotKey.E) == 0 ? "捆接平A" : "捆接种树");
-        }
-    }
-
-    private async Task<bool> 爆栗出击去后摇(ImageHandle 句柄)
-    {
-        return await _skill.主动技能释放后续(Keys.Q, () =>
+    private HeroPlan GetPlan() => _plan ??= HeroPlanBuilder.New()
+        .OnKey(Keys.F1).WhenHasShard().AdjustLegSwap(Keys.F, paramBool: true)
+        .OnKey(Keys.Q).CustomProbe(async _h => await _skill.主动技能释放后续(Keys.Q, () =>
         {
             if (_main._聚合.Skills.Mode(SlotKey.W) == 1)
             {
@@ -81,12 +31,8 @@ public sealed partial class 小松鼠Strategy : IHeroStrategy
             {
                 _skill.通用技能后续动作();
             }
-        }).ConfigureAwait(true);
-    }
-
-    private async Task<bool> 野地奇袭去后摇(ImageHandle 句柄)
-    {
-        return await _skill.主动技能释放后续(Keys.W, () =>
+        }).ConfigureAwait(true))
+        .OnKey(Keys.W).CustomProbe(async _h => await _skill.主动技能释放后续(Keys.W, () =>
         {
             if (_main._聚合.Skills.Mode(SlotKey.E) == 1)
             {
@@ -96,17 +42,19 @@ public sealed partial class 小松鼠Strategy : IHeroStrategy
             {
                 _skill.通用技能后续动作();
             }
-        }).ConfigureAwait(true);
-    }
-
-    private async Task<bool> 一箭穿心(ImageHandle 句柄)
-    {
-        return await Task.FromResult(false).ConfigureAwait(true);
-    }
-
-    private async Task<bool> 猎手旋标去后摇(ImageHandle 句柄)
-    {
-        return await _skill.技能通用判断(Keys.F, 1).ConfigureAwait(true);
-    }
+        }).ConfigureAwait(true))
+        .OnKey(Keys.R).NoProbe()
+        .OnKey(Keys.F).WhenHasShard().CastSkill(Keys.F).AfterCast()
+        .OnKey(Keys.D2).Execute(() =>
+        {
+            _main._聚合.Skills.ToggleMode(SlotKey.W);
+            Dota2Simulator.TTS.TTS.Speak(_main._聚合.Skills.Mode(SlotKey.W) == 0 ? "种树接平A" : "种树接捆");
+        })
+        .OnKey(Keys.D3).Execute(() =>
+        {
+            _main._聚合.Skills.ToggleMode(SlotKey.E);
+            Dota2Simulator.TTS.TTS.Speak(_main._聚合.Skills.Mode(SlotKey.E) == 0 ? "捆接平A" : "捆接种树");
+        })
+        .Done();
 }
 #endif

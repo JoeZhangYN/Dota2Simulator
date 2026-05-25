@@ -1,74 +1,30 @@
+// Phase 16 C1a: 敌法 Strategy 迁 HeroPlan — F1+HasShard AdjustLegSwap(D,true), W CustomProbe (主动技能释放后续 lambda + 分身物品组合 + 分身一齐攻击 helper), E AfterEnterCDLegOnly, R AfterCast, D+HasShard AfterEnterCDLegOnly, D2 Execute (SetMode+TTS 一次性).
 #if DOTA2
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Dota2Simulator.GameAutomation.Application;
+using Dota2Simulator.GameAutomation.Application.HeroPlans;
 using Dota2Simulator.GameAutomation.Domain.Actuation;
 using Dota2Simulator.GameAutomation.Domain.Heroes;
 using Dota2Simulator.GameAutomation.Domain.Loop;
 using Dota2Simulator.Games;
 using Dota2Simulator.Games.Dota2;
-using Dota2Simulator.Vision;
-
-using Dota2Simulator.GameAutomation.Ports;
 
 namespace Dota2Simulator.GameAutomation.Heroes.Agility;
 
-/// <summary>敌法（敏捷）策略——迁移自 _main.根据当前英雄增强 的 case "敌法"。</summary>
 [HeroStrategy("敌法", HeroAttribute.Agility)]
 public sealed partial class 敌法Strategy : IHeroStrategy
 {
+    private HeroPlan? _plan;
 
+    public void OnActivate(HeroContext ctx) => GetPlan().Apply(ctx, _skill);
 
-    public void OnActivate(HeroContext ctx)
-    {
-        _main._聚合.Conditions[ConditionSlotKey.C1].Probe ??= 闪烁敏捷;
-        _main._聚合.Conditions[ConditionSlotKey.C2].Probe ??= 法术反制敏捷;
-        _main._聚合.Conditions[ConditionSlotKey.C3].Probe ??= 法力虚空取消后摇;
-        _main._聚合.Conditions[ConditionSlotKey.C4].Probe ??= 友军法术反制敏捷;
-        _main._聚合.LegSwap.配置.修改配置(Keys.Q, false);
-    }
+    public Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx) => GetPlan().DispatchAsync(trigger, ctx, _item);
 
-    public async Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)
-    {
-        VirtualKey key = trigger.Key;
-        await _item.根据按键判断技能释放前通用逻辑(new KeyEventArgs((Keys)key.ToNative())).ConfigureAwait(true);
-
-        if (key == VirtualKey.From(Keys.F1))
-        {
-            if (_main._聚合.HasShard)
-            {
-                _main._聚合.LegSwap.配置.修改配置(Keys.D, true);
-            }
-        }
-        else if (key == VirtualKey.W)
-        {
-            _main._聚合.Conditions[ConditionSlotKey.C1].Active = true;
-        }
-        else if (key == VirtualKey.E)
-        {
-            _main._聚合.Conditions[ConditionSlotKey.C2].Active = true;
-        }
-        else if (key == VirtualKey.R)
-        {
-            _main._聚合.Conditions[ConditionSlotKey.C3].Active = true;
-        }
-        else if (key == VirtualKey.D)
-        {
-            if (_main._聚合.HasShard)
-            {
-                _main._聚合.Conditions[ConditionSlotKey.C4].Active = true;
-            }
-        }
-        else if (key == VirtualKey.From(Keys.D2))
-        {
-            _main._聚合.Skills.SetMode(SlotKey.W, 1);
-            Dota2Simulator.TTS.TTS.Speak("闪烁分身晕锤一次");
-        }
-    }
-
-    private async Task<bool> 闪烁敏捷(ImageHandle 句柄)
-    {
-        return await _skill.主动技能释放后续(Keys.W, () =>
+    private HeroPlan GetPlan() => _plan ??= HeroPlanBuilder.New()
+        .LegSwap(Keys.Q, alwaysSwap: false)
+        .OnKey(Keys.F1).WhenHasShard().AdjustLegSwap(Keys.D, paramBool: true)
+        .OnKey(Keys.W).CustomProbe(async _h => await _skill.主动技能释放后续(Keys.W, () =>
         {
             if (_main._聚合.Skills.Mode(SlotKey.W) == 1)
             {
@@ -77,25 +33,17 @@ public sealed partial class 敌法Strategy : IHeroStrategy
                 _ = _item.根据图片使用物品(Dota2_Pictrue.物品.深渊之刃);
                 _main._聚合.Skills.SetMode(SlotKey.W, 0);
             }
-
             _skill.通用技能后续动作();
-        }).ConfigureAwait(true);
-    }
-
-    private async Task<bool> 法力虚空取消后摇(ImageHandle 句柄)
-    {
-        return await _skill.技能通用判断(Keys.R, 1).ConfigureAwait(true);
-    }
-
-    private async Task<bool> 法术反制敏捷(ImageHandle 句柄)
-    {
-        return await _skill.技能通用判断(Keys.E, 10).ConfigureAwait(true);
-    }
-
-    private async Task<bool> 友军法术反制敏捷(ImageHandle 句柄)
-    {
-        return await _skill.技能通用判断(Keys.D, 10).ConfigureAwait(true);
-    }
+        }).ConfigureAwait(true))
+        .OnKey(Keys.E).CastSkill(Keys.E).AfterEnterCDLegOnly()
+        .OnKey(Keys.R).CastSkill(Keys.R).AfterCast()
+        .OnKey(Keys.D).WhenHasShard().CastSkill(Keys.D).AfterEnterCDLegOnly()
+        .OnKey(Keys.D2).Execute(() =>
+        {
+            _main._聚合.Skills.SetMode(SlotKey.W, 1);
+            Dota2Simulator.TTS.TTS.Speak("闪烁分身晕锤一次");
+        })
+        .Done();
 
     /// <summary>因为有0.1秒的分裂时间，所以必须等待——复制自 _main.分身一齐攻击。</summary>
     private void 分身一齐攻击()
