@@ -1099,3 +1099,117 @@ Phase 12 22 commit + Phase 13 (3 commit + 本 handoff) = **26 commit total** on 
 ... Phase 12 22 commit ...
 3c9543c (C1) → 6383a95 (C2) → bef3187 (C3) → <P13-handoff hash>
 ```
+
+## Phase 14 完整收尾 (2026-05-25 续, 2 commit on main)
+
+epic 主题: **CustomProbe escape-hatch DSL + 6 混合形态英雄迁 (HeroPlan _plan instance lazy-init 模板首次落地)**.
+触发: 用户 2026-05-25 续 "继续", 按 Phase 13 handoff_notes Phase 14+ 候选优先级 #1 推进.
+
+### Phase 14 commit 表
+
+| Chunk | hash | 主题 | 净行 | 新增英雄 |
+|---|---|---|---|---|
+| C1 | `6a714ea` | hero-plan-custom-probe (DSL 扩 CustomProbe + _plan instance lazy-init 模板) | -50 | 巫医 / 哈斯卡 / 拍拍 |
+| C2 | `26cf828` | hero-plan-custom-probe-batch (0 DSL 扩, 复用 C1 模板) | -94 | 孽主 / 小小 / 大鱼人 |
+
+合计: **-144 业务行净**, 6 英雄新迁 HeroPlan DSL.
+
+### Phase 14 DSL 容量更新 (在 Phase 13 9 维基础上扩 1 维 → 10 维)
+
+| 维度 | 选项 | 替换源 | 新增于 |
+|---|---|---|---|
+| **CustomProbe** | (ConditionDelegateBitmap probe) escape-hatch | 自定义 Probe (ImageFinder / _skill.主动技能释放后续 lambda / _item 物品组合 / DOTA2释放CD就绪技能 / 动态 continueKey) | **Phase 14 C1** |
+
+### Phase 14 已迁英雄清单 (6 / 92, Phase 12+13+14 累计 28 / 92 = 30.4%)
+
+| 属性 | C1 (3) | C2 (3) |
+|---|---|---|
+| 力量 (4) | 哈斯卡 | 孽主 / 小小 / 大鱼人 |
+| 敏捷 (1) | 拍拍 | — |
+| 智力 (1) | 巫医 | — |
+| 全才 (0) | — | — |
+
+注:
+- **_plan 模板分叉**: Phase 12/13 模板用 `private static readonly HeroPlan _plan = ...Done()`; Phase 14 模板用 `private HeroPlan? _plan; private HeroPlan GetPlan() => _plan ??= ...Done()` (CustomProbe lambda 引用 instance 字段 ⇒ _plan 必须 instance lazy-init).
+- 哈斯卡 Q→W 特殊键位 (DSL TriggerKey != SkillKey 已支持).
+- 大鱼人 Q/W 都触发 W 释放 (动态 continueKey: HasShard ? A : R), CustomProbe lambda 内访问 `_main._聚合.HasShard`.
+
+### Phase 14 关键不变量 (新增)
+
+1. **HeroPlanClause record struct Func 字段安全**: 加 `ConditionDelegateBitmap? CustomProbeFn` 字段, struct 内含 reference type 字段不引装箱 (struct 自身在 ImmutableArray 内是值类型, Func 是 reference 不影响).
+2. **CustomProbe lambda 参数命名约定**: 用 `_h` 或 `句柄` 而非 `_` —— body 内若有 `_ = expr` discard 语法, lambda 参数 `_` 会与 discard 冲突 (CS0029 实测验证, 已记入 lessons-learned 候选).
+3. **_plan instance lazy-init 模板**: `private HeroPlan? _plan; private HeroPlan GetPlan() => _plan ??= ...Done();` — 多次 OnActivate 调用幂等 (HeroPlan 不可变 + Probe ??= 幂等).
+4. **HeroPlan.Apply Probe 优先级**: CustomProbeFn > NoProbe (SkillKey == None) > IsToggle > _skill.技能通用判断 默认. CustomProbe 完全跳过 mode 模板, 由 lambda 全控.
+5. **跨子命名空间 using**: HeroPlan / HeroPlanBuilder 在 `Application.HeroPlans`, 引用 `Application.ConditionDelegateBitmap` 需显式 `using Dota2Simulator.GameAutomation.Application;` (C# 子命名空间不自动包含父).
+
+### Phase 14 architecture-sentinel verdict (未跑显式扫描, 主 lead 自审)
+
+- **依赖倒置**: ✅ CustomProbe lambda 通过 Strategy instance 字段 (_skill / _item / _input) 访问 ports, 不引新 service locator.
+- **结构化管道**: ✅ CustomProbe 链方法保持 Builder 流式 DSL 语义 (OnKey → WhenHasX → CustomProbe).
+- **类型不变量**: ✅ ConditionDelegateBitmap 委托签名复用 (Phase 6 既有), HeroPlanClause record struct 默认参数兼容存量.
+- **高内聚低耦合**: ✅ CustomProbe 是 escape-hatch 而非主路径, 业务自决 (复杂 Probe 用 CustomProbe, 简单 Probe 仍用 _skill.技能通用判断 模板).
+
+### Phase 14 handoff_notes (Phase 15+ 候选)
+
+继承 Phase 13 handoff_notes #3-#6 (未做的部分), 新增:
+
+1. **PreAction (键触发前副作用) DSL (高优先, 解锁 5-8 英雄)**: 大牛 W (_input.Press(A)) / 幻刺 W (_input.Press(A)) / 黑鸟 D (_input.Press(W)) / 莱恩 R (await 大招前纷争) / 钢背 (诸多). 加 `Builder.Pre(Action / Func<Task>)` 或 `.OnKey(K).BeforeActivate(...)` 链方法, DispatchAsync 内 Active 前调 PreAction.
+2. **ToggleSkillMode(skillKey, speakOn, speakOff) DSL (中优先, 解锁 5+ 英雄)**: 屠夫 D2 / 斧王 D4 / 帕克 D2 / 火猫 D2 / 马尔斯 D2 / 混沌 D2 — toggle `Aggregate.Skills.Mode(SlotKey.X)` 整数 (0/1). 与 ToggleSlot 同 pattern, 但 toggle Skills.Mode 而非 ConditionSlot.Active.
+3. **OnEveryKeyAdjustLegSwap(K, fromAggField) DSL (中优先, 解锁火枪 / 钢背 / 等)**: OnKeyAsync 入口每次都调 `LegSwap.配置.修改配置(K, HasX)` 形态. 加 `Builder.OnEveryKey(setupAction)` 全局 SetupAction.
+4. **OnKey + 直接副作用 (Action 而非 Active) DSL**: 黑鸟 W 键直接 `_item.根据图片使用物品(纷争)` 不挂 ConditionSlot. 加 `Builder.OnKey(K).Execute(Action)` escape-hatch.
+5. **CustomProbe 内死代码占位识别**: Phase 14 sample 发现部分 helper (大鱼人 守卫冲刺去后摇) 仅声明无注册 = 死代码; 与 Phase 13 handoff #6 业务死代码清理 epic 合并候选.
+6. **HeroStrategyBase + SG 改造 (Phase 12 #2 / Phase 13 #5 高优先)**: 现已 28 Strategy 文件采 1 行 OnActivate / 1 行 OnKeyAsync 同构 (或 GetPlan 方法 instance 模板), SG 完全可派生 base class `protected abstract HeroPlan BuildPlan()`. 让加新英雄只写 BuildPlan override.
+
+### Phase 14 sample 数据 (Phase 13 sample 之外新增 5 个英雄)
+
+| 英雄 | 形态 | 不 fit 原因 |
+|---|---|---|
+| 黑鸟 | D 键 _input.Press(W) PreAction + W 键直接 _item 副作用 | 需 PreAction + Execute DSL |
+| 屠夫 | Q/R clause OK, D2 toggle Skills.Mode | 需 ToggleSkillMode DSL |
+| 火枪 | 4 clause OK, 但 OnKeyAsync 入口每次 LegSwap(D, HasShard) | 需 OnEveryKey DSL |
+| 飞机 | (未读) | (推迟评估) |
+| 大牛 | Q/R OK, W PreAction (_input.Press(A) 在 Active 前) | 需 PreAction DSL |
+
+### Phase 14 反预测与实测偏差
+
+1. **预测 CustomProbe 解锁 8-12 英雄** → **实测 6 英雄 (Phase 14 C1+C2 全部覆盖)**. 偏低原因: 多数 CustomProbe fit 英雄同时需 PreAction / ToggleSkillMode (混合形态), 单独 CustomProbe 无法解锁.
+2. **预测 lambda 参数 `_` discard 工作** → **实测 CS0029 与 body `_ = ...` 冲突**. 修改约定 `_h` / `句柄`, 已记入 commit message (待入项目级 lessons-learned).
+3. **预测 _plan static readonly 可保持** → **实测 CustomProbe lambda 引用 instance 字段, _plan 必须 instance lazy-init**. 模板分叉 (static for 简单 fit / instance for CustomProbe), 后续 HeroStrategyBase 改造可统一.
+
+### 待用户冒烟 (Phase 14 收尾)
+
+继承 Phase 13 全部冒烟清单 + 新增 Phase 14 专项实测:
+
+1. **C1 CustomProbe 基本回归** (新增): 切英雄 + 触发自定义 Probe 路径:
+   - 巫医 Q (麻痹药剂 接 E) / E (巫蛊咒术 + Press A + 灵龛物品) / R (死亡守卫 + 微光/隐刀)
+   - 哈斯卡 Q→W (心炎) / R (牺牲 lambda 内 MouseClick + Q CD检测 + Press A) / E (LegSwap 不参与 Active)
+   - 拍拍 Q/W/R (3 简单技能) / E (跳拍 Task.Run + 跳刀物品组合 + Q CD 释放)
+2. **C2 CustomProbe 基本回归** (新增): 切英雄 + 触发:
+   - 孽主 Q (火焰风暴) / W (怨念深渊 lambda 内 MouseClick + Q CD检测 + Press A)
+   - 小小 Q (山崩) / W (投掷 Task.Run 循环 3 次 _skill.通用技能后续动作)
+   - 大鱼人 Q/W (都释放 W 踩, HasShard 时 continueKey=A 不持神杖时=R, 实测两种状态切换) / R (雾霭) / E (跳刀接踩物品组合)
+3. **_plan instance lazy-init 实测**: 多次切英雄触发 OnActivate, 验证 _plan 只构造一次 (lazy-init); Probe ??= 幂等 (多次 Apply 不重复注册).
+
+### Phase 14 回滚锚点
+
+- 完整撤回 Phase 14: `git revert 26cf828 6a714ea` (2 commit 倒序, 回 Phase 13 终态).
+- 仅撤 C2 (保 C1): `git revert 26cf828` (3 英雄回滚但 DSL CustomProbe 保留).
+- 撤 C1 会同时撤掉 CustomProbe DSL ⇒ C2 编译失败 (依赖 CustomProbe). 撤 C1 必须先撤 C2.
+
+### 下次 session 起手指引 (Phase 15 候选)
+
+按 handoff_notes 优先级 (Phase 14 #1-#6 + Phase 13 残留):
+
+1. **优先级最高**: handoff_notes Phase 14 #1 PreAction DSL (解锁 5-8 英雄, 与 ToggleSkillMode 并列).
+2. **优先级高**: handoff_notes Phase 14 #2 ToggleSkillMode DSL + #3 OnEveryKeyAdjustLegSwap (合计解锁 10+ 英雄, 含屠夫 / 斧王 / 帕克 / 火猫 / 马尔斯 / 混沌 / 火枪 / 钢背 等).
+3. **优先级中**: handoff_notes Phase 14 #6 HeroStrategyBase + SG 改造 (28+ Strategy 100% 同构, SG 可派生 base class).
+4. **维护性**: Phase 13 handoff #6 业务死代码清理 epic (剃刀 / 修补匠 / 紫猫 / 发条 / 钢背 / 冰女 / 大圣 / 大鱼人 守卫冲刺去后摇 helper 等独立 epic).
+
+### 主 lead cherry-pick 范围更新 (Phase 14)
+
+Phase 13 26 commit + Phase 14 (2 commit + 本 handoff) = **29 commit total** on main. cherry-pick 顺序:
+
+```
+... Phase 13 26 commit ...
+6a714ea (C1) → 26cf828 (C2) → <P14-handoff hash>
+```
