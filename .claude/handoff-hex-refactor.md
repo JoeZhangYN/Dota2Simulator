@@ -841,3 +841,129 @@ e0e2c37 (P1) → c8165a2 (P2) → cb36e38 (P3) → 23f4b93 (P4) → 3c8a8cd (P5)
 2e10a72 (P6) → f189b79 (P7) → bec3121 (P9) → ae2c5b9 (P10) → aa81a62 (P11) →
 2dddc94 (P12) → aef6ee4 (P13) → 083a984 (P14) → <P15 hash>
 ```
+
+## Phase 12 完整收尾 (2026-05-25, 6 commit on main)
+
+epic 主题: **按业务概念抽象 + 链式 DSL + 即插即用** (用户铁律 5.b 落地).
+触发: 用户 2026-05-25 "继续抽象，不要只抽象共同段，应该按业务概念抽象，其他调用即插即用。不用再做适配。流程即是结构化管道。"
+
+### Phase 12 commit 表
+
+| Chunk | hash | 主题 | 净行 |
+|---|---|---|---|
+| C1 | `e3ddfe6` | Stratagem 业务概念 + Hf2Engine 链式 (HF2 7 helper → 7 行声明 + 1 行查表) | -120 |
+| C2 | `88c7623` | IGameEngine 三引擎统一 + Form2 dispatch 0 #if 收口 | -113 |
+| C3a | `969710b` | HeroPlan DSL 基础 (CastMode/HeroPlan/Builder) + 虚空/影魔 pilot | -109 |
+| C3b | `8455258` | 7 简单形态英雄链式 (人马/全能/土猫/巨魔/电棍/露娜/美杜莎) | -236 |
+| C3c | `0895dd9` | DSL 扩 AggGuard + AdjustLegSwap setup, 迁 TB/夜魔 | -148 |
+| C3d | `d89940a` | 骷髅王删命石死代码 + 小狗 | -67 |
+| C3e | `0db701f` | DSL 扩 RepeatThreshold, 迁沙王 | -5 |
+
+合计: **-798 业务行净**, 14 英雄迁 HeroPlan DSL.
+
+### Phase 12 业务概念抽象成果
+
+**3 个新业务概念落地** (取代散落的「共同代码段」):
+1. **Stratagem (HF2 战备指令)**: `Stratagem.Begin().Up().Right().Click()` Builder typestate 终结返回不可变 value object. 起手 Ctrl 内化, 业务定义即注册 (Stratagems.cs 7 个 static readonly). HF2 BC 0 SimEnigo.* 静态调 (走 IInputExecutor.PressViaEnigo / MouseClickViaEnigo).
+2. **IGameEngine (游戏引擎统一入站)**: DOTA2 GameSession / LOL LolEngine / HF2 Hf2Engine 三类实现同接口. Form2 单字段 `IGameEngine? _engine`, Hook_KeyDown 0 #if 单行调度. WinForms KeyEventArgs → KeyTrigger 转换内化到 GameSession (hex 内向依赖闭环, Form2 0 KeyTrigger/HeroId/KeyModifiers 类型耦合).
+3. **HeroPlan (英雄技能行为表)**: `HeroPlanBuilder.New().OnKey(K).CastSkill(K).AfterCast()...Done()` 流式 DSL. 取代 92 策略类 OnActivate (N 处 Probe ??= helper + LegSwap.修改配置) + OnKeyAsync (1 处 _item.根据按键判断 + N 处 if/else key 映射 ConditionSlot.Active) + N 个一行式 helper. 业务层 0 ConditionSlotKey 序号 / 0 magic int (CastMode enum 替 0/1/2/10/11) / 0 _main._聚合 路径.
+
+### Phase 12 DSL 最终容量
+
+| 维度 | 选项 | 替换源 |
+|---|---|---|
+| CastMode | AfterEnterCD / AfterCast / WhenReady / AfterEnterCDLegOnly / AfterCastLegOnly | SkillEngine.技能通用判断 magic int 0/1/2/10/11 |
+| AggGuard | None / HasAghanim / HasShard | 散于 OnKeyAsync 内 `if (_main._聚合.HasAghanim/HasShard)` |
+| SetupAction | AdjustLegSwap | `if (key == F1 && HasX) LegSwap.修改配置(K, true)` |
+| LegSwapEntry | 按键 → alwaysSwap | OnActivate 内 `LegSwap.配置.修改配置(K, b)` 多行 |
+| NoProbe | sentinel (按键占 ConditionSlot 不挂 Probe) | 「按键置位 Active 但无技能释放委托」边缘 (影魔 R) |
+| RepeatThreshold | int (毫秒) | OnActivate 内 `_skill.重复按键执行间隔阈值 = N` |
+| ConditionSlot | C1..C9 顺序自动累加 | 业务手写 ConditionSlotKey.C1..Cn |
+
+### Phase 12 已迁英雄清单 (14 / 92, 15.2%)
+
+| 属性 | 英雄 | 文件改动 |
+|---|---|---|
+| 敏捷 (5) | 虚空 / 影魔 / 巨魔 / 电棍 / 露娜 / 美杜莎 / TB | 60-116 行 → 21-32 行 |
+| 力量 (5) | 人马 / 全能 / 土猫 / 夜魔 / 骷髅王 / 小狗 | 50-92 行 → 26-28 行 |
+| 智力 (0) | — | (帕克/天怒/沉默/小仙女/火女 等评估为不 fit) |
+| 全才 (1) | 沙王 | 50 行 → 26 行 |
+
+注: 影魔 R 键用 NoProbe sentinel (Plan 内不挂 Probe, 保旧 case `Conditions[C5].Active=true` 但 Probe null 行为). 夜魔 / TB 用 WhenHasAghanim / WhenHasShard + AdjustLegSwap setup. 骷髅王 删命石死代码 (StoneProbe / StoneChoice guard 业务已废弃, 用户告知 2026-05-25). 沙王 用 RepeatThreshold(150) + 0 clause Plan.
+
+### Phase 12 关键不变量 (新增)
+
+1. **HF2 起手 Ctrl 编译期**: `Stratagem.Begin()` 内化 Ctrl 起点, 业务定义 0 字面 Ctrl. Builder typestate「序列 → 终止」单向 (Click/NoClick 终结后无 Up/Down 方法).
+2. **Form2 dispatch 0 业务 #if**: Hook_KeyDown / Tb_name_TextChanged 100% 0 #if 分支. Form2 剩余 4 处 #if 全部位于装配点 (AppContainer 字段 + LOL/HF2/DOTA2 ctor block), 是编译期单选装配的必要 #if 非业务 dispatch 分支.
+3. **HeroPlan 槽序号自动累加**: ConditionSlot.C1..C9 由 Builder 按 OnKey 顺序累加, 业务层 0 序号意识 (除非用 NoProbe sentinel 显式占位).
+4. **CastMode 5 元闭包**: SkillEngine.技能通用判断 magic int 0/1/2/10/11 映射 typed enum, 调用层 0 magic. Plan.Apply 内统一 `(int)mode` cast (枚举数值与 magic 1:1, 迁移期不漂移).
+5. **AggGuard 集中判定**: HasAghanim/HasShard 守卫从 14 处散落 (TB/夜魔/马西 等 OnKeyAsync if 块) → AggGuard enum + Builder.WhenHasX() 一次声明 (Plan.DispatchAsync 内 CheckGuard 统一 switch).
+6. **IGameEngine 单一调度路径**: 三 game 共享 `HandleKeyAsync(string, KeyEventArgs) + CancelAll()` 接口. AppContainer.GameEngine 属性别名指向 GameSession (DOTA2 build), LOL/HF2 build 直 new 对应实现. Form2 字段类型 `IGameEngine?` 编译期保证.
+7. **命石死代码语义**: ConditionSlotSet.StoneProbe / StoneChoice API 仍保留 (基础设施未删), 但业务层 0 写入. *Strategy.cs 命石分支 (骷髅王已清, 命运2/进化岛 形态不同未涉及) 全是 dead path, 迁 Plan 时按"删命石分支保剩余"处理.
+
+### Phase 12 architecture-sentinel verdict (未跑显式扫描, 主 lead 自审)
+
+- **依赖倒置**: ✅ HF2 全走 IInputExecutor (扩 MouseClickViaEnigo), 92 策略类业务概念抽象到 HeroPlan DSL, Form2 走 IGameEngine.
+- **结构化管道**: ✅ Stratagem Builder + HeroPlan Builder 都是流式 DSL, 顺序构造 → 不可变值对象 → 执行.
+- **类型不变量**: ✅ Stratagem「序列 → 终止」typestate, HeroPlanClause record struct, CastMode/AggGuard/SetupActionKind enum 替 magic. NoProbe sentinel 设计明确 (SkillKey == Keys.None).
+- **高内聚低耦合**: ✅ Stratagem 是 HF2 BC 内业务, HeroPlan 是 GameAutomation Application 层. 三个抽象互不耦合.
+
+### Phase 12 handoff_notes (Phase 13+ 候选, 不污染当前 epic 完成状态)
+
+1. **剩余 78 英雄分布**: 按 sample 估算
+   - 真简单 fit (待筛, 估 5-10 个): 未读到的力量/敏捷/智力英雄, 同模式简单 helper.
+   - 部分 fit (估 30 个): 需更多 DSL 扩展, 候选 API:
+     - `ToggleSlot(targetTriggerKey, speakOn, speakOff)`: 飞机 D3 / 小仙女 D3 / 天怒 D2 toggle 形态.
+     - `ToggleSkillMode(skillKey, speakOn, speakOff)`: 火猫 D2 / 帕克 D2 / 斧王 D4 / 马尔斯 D2 / 混沌 D2 (Skills.ToggleMode).
+     - `WhenNotHasAghanim` / `WhenNotHasShard`: 马西 反向 guard (但 Probe 是 ImageFinder 非 _skill, 仍需 CustomProbe).
+     - `OnEveryKeyAdjustLegSwap(K, fromAggField)`: 火枪 每次 OnKeyAsync 调 LegSwap.修改配置(D, HasShard).
+     - `CustomProbe(triggerKey, lambda)` escape-hatch: 马西 幽魂检测 (ImageFinder) / 黑鸟 关接陨星锤 (颜色判断 + 复杂 close).
+   - 不 fit (估 40+ 个): 复杂状态机 (狼人 Skills.Time 时间判断, 帕克 状态转换, 沉默 Skills.Time+Mode 切换, 天怒 多步骤连招), 物品组合 (巫医 / 帕克 Q / 火枪 瞄准 / 哈斯卡 / 孽主 / 神域 helper 全自定义), 多按键宏 (命运2 / 进化岛 / 大圣 / 紫猫 / 小黑), Modifier 检查 (血魔 Q+Alt / 帕克 W+Ctrl).
+2. **HeroStrategyBase 抽 + SG 改造**: 进一步内化即让业务 Strategy 0 写 OnActivate / OnKeyAsync — 加 abstract `protected override HeroPlan Build(HeroPlanBuilder)` 让 base 默认实现 OnActivate/OnKeyAsync 调用 Build. 需 SG 改 emit `: HeroStrategyBase` + ctor 调 base. 影响 92 文件 (即使不 fit Plan 的 Strategy 也要改 base 继承). 中等复杂度 SG 改造.
+3. **HeroPlan slot 显式指定**: VS 这类 "W → C3 (skip C2)" 边缘形态需 Builder 加 `.OnKey(K).MapToSlot(targetTriggerKey)` 或 `.SkipSlot()`. 影响 builder API.
+4. **ConditionSlotSet.StoneProbe / StoneChoice API 清除**: 命石业务 0 引用 (业务层) 后, ConditionSlotSet 字段也可删 (减 SOT 漂移). 需要 grep verify 0 usage 再删.
+5. **C8/C9 → Z/X/C/V/B/Space 字母槽扩展**: 当前 Builder 仅占 C1..C9, 帕克这类用 C4/C5 跳过 C3 的复杂形态需扩字母槽. 复杂度高 (槽索引算法改).
+6. **OnKey + 副作用收编**: 钢背/海民/小黑 等英雄 OnKeyAsync key 触发 + 物品/键盘组合副作用 (非 ConditionSlot.Active), 当前不 fit. 候选 API: `.OnKey(K).Execute(action: lambda)` escape-hatch.
+7. **SkillEngine FSM typestate (Chunk 4 future)**: 原 plan §D 已标. SkillEngine 1845 行隐式 FSM (释放前/释放中/已释放/未释放四象限 + 锁字典 + 释放时间字典 + Color 状态) 上移 typestate enum + 单 Dictionary 收编. 风险高, Phase 13+ 单独评估.
+
+### 待用户冒烟 (Phase 12 收尾)
+
+继承 Phase 11 全部冒烟清单 + 新增:
+
+1. **HF2 战备指令链式 (C1)**: HF2 build 启动, 按 NumPad1-6 触发 Stratagem.ExecuteAsync (内调 _input.PressViaEnigo / MouseClickViaEnigo). 与 Phase 11 P14 旧形态行为对比: 7 helper 复制粘贴 → 7 行声明 + 查表, 实际按键序列同 (Ctrl + 方向键 + 可选 Click).
+2. **IGameEngine 三引擎 (C2)**: DOTA2/LOL/HF2 三 build 启动, 按 tb_name 切英雄 + 触发按键, 验证 dispatch 走 IGameEngine.HandleKeyAsync 单一路径. 验 Tb_name_TextChanged 切英雄时 CancelAll 触发 (DOTA2 走 GameSession.CancelAll 内调 _host.取消所有功能).
+3. **HeroPlan DSL 14 英雄冒烟 (C3a-C3e)**: 至少抽 5 个代表 (虚空 / 影魔 / TB / 夜魔 / 沙王) DOTA2 build 启动, 切英雄 + 按 Q/W/E/R/D/F/R/F1, 验证:
+   - 虚空: 3 技能 (Q/W/R) 全后摇接平 A.
+   - 影魔: 4 技能 (Q/W/E/D) 不接 A, R 键置位 C5 (Probe null 无副作用).
+   - TB: F1+HasAghanim 切假腿 F=true; D+HasShard 激活 C4 (恶魔狂热); F+HasAghanim 激活 C5 (恐怖心潮).
+   - 夜魔: F1+HasShard 切假腿 E=true; E+HasShard 激活 C4 (暗夜猎影).
+   - 沙王: 按键重复执行间隔阈值 = 150 (无 Probe / 无 Active, 仅 OnActivate setup).
+   - 骷髅王: Q 激活 C1 (冥火爆击), W 键无副作用 (命石死代码已删).
+4. **Form2 dispatch 0 #if 实测 (C2)**: grep `#if (DOTA2\|LOL\|HF2)` 在 Form2.Hook_KeyDown / Tb_name_TextChanged 内 0 命中 (装配点 4 处 #if 保留).
+5. **三 build 不漂移**: dotnet build 默认 (DOTA2;TRACE;Silt) / LOL;TRACE / HF2;TRACE 全 0 错.
+
+### Phase 12 回滚锚点
+
+每 chunk 独立 commit, 倒序 revert:
+- 完整撤回 Phase 12: `git revert 0db701f d89940a 0895dd9 8455258 969710b 88c7623 e3ddfe6` (7 commit 倒序, 回 Phase 11.B 终态).
+- 单 chunk revert: `git revert <hash>` (C3e 仅退 RepeatThreshold DSL + 沙王 / C3d 仅退骷髅王命石清理+小狗 / 等等).
+- DSL 基础设施 + pilot revert (回 14 英雄前): `git revert 0db701f d89940a 0895dd9 8455258 969710b` (5 commit 倒序, 保留 C1 Stratagem + C2 IGameEngine).
+
+### 下次 session 起手指引 (Phase 13 候选)
+
+按 handoff_notes 优先级:
+
+1. **优先级高**: handoff_notes #2 (HeroStrategyBase 抽 + SG 改造) — 让业务 Strategy 0 写 OnActivate/OnKeyAsync, 92 文件全统一 base. 中等复杂度 SG 改造.
+2. **优先级中**: handoff_notes #1 部分 (扩 ToggleSlot / ToggleSkillMode / CustomProbe escape-hatch DSL API), 让 30+ 部分 fit 英雄迁 Plan.
+3. **优先级低**: handoff_notes #7 SkillEngine FSM typestate (1845 行核心路径重写, 风险高).
+4. **维护性**: handoff_notes #4 ConditionSlotSet.StoneProbe / StoneChoice 清除 (业务 0 引用后) — grep verify + 删 API.
+
+### 主 lead cherry-pick 范围更新 (Phase 12)
+
+Phase 11.B 14 commit + Phase 11.B P15 handoff (1) + Phase 12 (7 commit) = **22 commit total** on main. cherry-pick 顺序:
+
+```
+... Phase 11.B 14 commit + P15 ...
+e3ddfe6 (C1)  → 88c7623 (C2)  → 969710b (C3a) → 8455258 (C3b) →
+0895dd9 (C3c) → d89940a (C3d) → 0db701f (C3e) → <P12-handoff hash>
+```
