@@ -24,22 +24,6 @@ public sealed class ProbeScreenVision : IScreenVision
         _inner.Capture(mode);
     }
 
-    public FindResult Find(Template needle, MatchRate rate, Tolerance tolerance)
-    {
-        FindResult result = _inner.Find(needle, rate, tolerance);
-        if (RecordReplayProbe.Enabled)
-            RecordReplayProbe.Record(Port, nameof(Find), $"{needle}, {rate} => {result}");
-        return result;
-    }
-
-    public IReadOnlyList<ScreenPoint> FindAll(Template needle, MatchRate rate, Tolerance tolerance)
-    {
-        IReadOnlyList<ScreenPoint> result = _inner.FindAll(needle, rate, tolerance);
-        if (RecordReplayProbe.Enabled)
-            RecordReplayProbe.Record(Port, nameof(FindAll), $"{needle}, {rate} => {result.Count} 命中");
-        return result;
-    }
-
     public Color PixelAt(ScreenPoint point)
     {
         Color result = _inner.PixelAt(point);
@@ -47,16 +31,6 @@ public sealed class ProbeScreenVision : IScreenVision
             RecordReplayProbe.Record(Port, nameof(PixelAt), $"{point} => {result}");
         return result;
     }
-
-#pragma warning disable CS0618 // 装饰器须实现接口已废弃方法
-    public bool FindInRegion(Template needle, ScreenRegion region, MatchRate rate)
-    {
-        bool result = _inner.FindInRegion(needle, region, rate);
-        if (RecordReplayProbe.Enabled)
-            RecordReplayProbe.Record(Port, nameof(FindInRegion), $"{needle}, {region}, {rate} => {result}");
-        return result;
-    }
-#pragma warning restore CS0618
 
     public FindResult Find(Template needle, ScreenRegion region, MatchRate rate, Tolerance tolerance)
     {

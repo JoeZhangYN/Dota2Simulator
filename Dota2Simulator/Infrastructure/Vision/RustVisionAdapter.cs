@@ -20,64 +20,9 @@ public sealed class RustVisionAdapter : IScreenVision
     public void Capture(CaptureMode mode)
         => GlobalScreenCapture.CaptureScreen(mode.Region);
 
-    /// <summary>
-    /// 在当前帧中查找模板，返回首个命中（屏幕坐标）或 <see cref="FindResult.Miss"/>。
-    /// 容差为 0 时走精确匹配路径，与旧代码 <c>ImageFinder.FindImage</c> 逐字节一致。
-    /// </summary>
-    public FindResult Find(Template needle, MatchRate rate, Tolerance tolerance)
-    {
-        ImageHandle needleHandle = LazyImageLoader.GetImage(needle.Name);
-        ImageHandle frame = GlobalScreenCapture.GetCurrentHandle();
-        if (!needleHandle.IsValid || !frame.IsValid)
-            return FindResult.Miss;
-
-        Point? hit = tolerance.Value == 0
-            ? ImageFinder.FindImage(in needleHandle, in frame, rate.Value)
-            : ImageFinder.FindImageWithTolerance(in needleHandle, in frame, tolerance.Value, rate.Value);
-
-        if (hit is null)
-            return FindResult.Miss;
-
-        // ImageFinder 返回缓冲坐标；加坐标偏移换算为屏幕坐标（与 GlobalScreenCapture.FindImage 一致）。
-        (int offsetX, int offsetY) = GlobalScreenCapture.CoordinateOffset;
-        return FindResult.Hit(new ScreenPoint(hit.Value.X + offsetX, hit.Value.Y + offsetY));
-    }
-
-    /// <summary>
-    /// 在当前帧中查找模板的所有命中位置（屏幕坐标）。
-    /// 底层 <see cref="GlobalScreenCapture.FindAllImages"/> 不支持颜色容差，<paramref name="tolerance"/> 暂被忽略。
-    /// </summary>
-    public IReadOnlyList<ScreenPoint> FindAll(Template needle, MatchRate rate, Tolerance tolerance)
-    {
-        ImageHandle needleHandle = LazyImageLoader.GetImage(needle.Name);
-        if (!needleHandle.IsValid)
-            return Array.Empty<ScreenPoint>();
-
-        // FindAllImages 内部已加坐标偏移，返回的是屏幕坐标。
-        List<Point> hits = GlobalScreenCapture.FindAllImages(in needleHandle, rate.Value);
-        var result = new List<ScreenPoint>(hits.Count);
-        foreach (Point p in hits)
-            result.Add(new ScreenPoint(p.X, p.Y));
-        return result;
-    }
-
     /// <summary>读取当前帧指定屏幕坐标的颜色（内部按坐标偏移换算到缓冲坐标）。</summary>
     public Color PixelAt(ScreenPoint point)
         => GlobalScreenCapture.GetColor(point.X, point.Y);
-
-    /// <summary>区域内查找模板（屏幕坐标，1920×1080）。封装 ImageFinder.FindImageInRegionBool。</summary>
-#pragma warning disable CS0618 // 实现仍允许调本接口已废弃方法
-    public bool FindInRegion(Template needle, ScreenRegion region, MatchRate rate)
-    {
-        ImageHandle needleHandle = LazyImageLoader.GetImage(needle.Name);
-        ImageHandle frame = GlobalScreenCapture.GetCurrentHandle();
-        if (!needleHandle.IsValid || !frame.IsValid)
-            return false;
-
-        Rectangle rect = new(region.X, region.Y, region.Width, region.Height);
-        return ImageFinder.FindImageInRegionBool(in needleHandle, in frame, rect, rate.Value);
-    }
-#pragma warning restore CS0618
 
     /// <summary>
     /// V1 主力路径：在指定 region 查找模板，返回首个命中（屏幕坐标）或 Miss。
