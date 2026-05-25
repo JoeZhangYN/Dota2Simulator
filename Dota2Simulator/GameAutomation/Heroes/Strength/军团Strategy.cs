@@ -70,9 +70,9 @@ public sealed partial class 军团Strategy : IHeroStrategy
             {
                 case < 1:
                     {
-                        Common.Delay(33 * _item.根据图片使用物品(Dota2_Pictrue.物品.臂章));
-                        Common.Delay(33 * _item.根据图片使用物品(Dota2_Pictrue.物品.魂戒));
-                        Common.Delay(33 * _item.根据图片使用物品(Dota2_Pictrue.物品.相位鞋));
+                        Common.Delay(33 * _item.根据图片使用物品(Dota2_Pictrue.物品.臂章_Tpl));
+                        Common.Delay(33 * _item.根据图片使用物品(Dota2_Pictrue.物品.魂戒_Tpl));
+                        Common.Delay(33 * _item.根据图片使用物品(Dota2_Pictrue.物品.相位鞋_Tpl));
 
                         if (_skill.DOTA2判断技能是否CD(Keys.W))
                         {
@@ -80,7 +80,7 @@ public sealed partial class 军团Strategy : IHeroStrategy
                             return await Task.FromResult(true).ConfigureAwait(true);
                         }
 
-                        Common.Delay(33 * _item.根据图片使用物品(Dota2_Pictrue.物品.刃甲));
+                        Common.Delay(33 * _item.根据图片使用物品(Dota2_Pictrue.物品.刃甲_Tpl));
 
                         _main._聚合.Skills.SetStep(SlotKey.Global, 1);
                         return await Task.FromResult(true).ConfigureAwait(true);
@@ -89,10 +89,10 @@ public sealed partial class 军团Strategy : IHeroStrategy
                     {
                         Common.Delay(33 *
                               (
-                                  _item.根据图片使用物品(Dota2_Pictrue.物品.跳刀)
-                                  + _item.根据图片使用物品(Dota2_Pictrue.物品.跳刀_力量跳刀)
-                                  + _item.根据图片使用物品(Dota2_Pictrue.物品.跳刀_智力跳刀)
-                                  + _item.根据图片使用物品(Dota2_Pictrue.物品.跳刀_敏捷跳刀)
+                                  _item.根据图片使用物品(Dota2_Pictrue.物品.跳刀_Tpl)
+                                  + _item.根据图片使用物品(Dota2_Pictrue.物品.跳刀_力量跳刀_Tpl)
+                                  + _item.根据图片使用物品(Dota2_Pictrue.物品.跳刀_智力跳刀_Tpl)
+                                  + _item.根据图片使用物品(Dota2_Pictrue.物品.跳刀_敏捷跳刀_Tpl)
                               ));
 
                         _main._聚合.Skills.SetStep(SlotKey.Global, 2);
@@ -101,12 +101,12 @@ public sealed partial class 军团Strategy : IHeroStrategy
                     }
                 case < 3:
                     {
-                        Common.Delay(33 * _item.根据图片使用物品(Dota2_Pictrue.物品.紫苑));
-                        Common.Delay(33 * _item.根据图片使用物品(Dota2_Pictrue.物品.血棘));
-                        Common.Delay(33 * _item.根据图片使用物品(Dota2_Pictrue.物品.否决));
-                        Common.Delay(33 * _item.根据图片使用物品(Dota2_Pictrue.物品.散失));
-                        Common.Delay(33 * _item.根据图片使用物品(Dota2_Pictrue.物品.散魂));
-                        Common.Delay(33 * _item.根据图片使用物品(Dota2_Pictrue.物品.深渊之刃));
+                        Common.Delay(33 * _item.根据图片使用物品(Dota2_Pictrue.物品.紫苑_Tpl));
+                        Common.Delay(33 * _item.根据图片使用物品(Dota2_Pictrue.物品.血棘_Tpl));
+                        Common.Delay(33 * _item.根据图片使用物品(Dota2_Pictrue.物品.否决_Tpl));
+                        Common.Delay(33 * _item.根据图片使用物品(Dota2_Pictrue.物品.散失_Tpl));
+                        Common.Delay(33 * _item.根据图片使用物品(Dota2_Pictrue.物品.散魂_Tpl));
+                        Common.Delay(33 * _item.根据图片使用物品(Dota2_Pictrue.物品.深渊之刃_Tpl));
 
                         _main._聚合.Skills.SetStep(SlotKey.Global, 3);
 

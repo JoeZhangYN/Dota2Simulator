@@ -45,8 +45,8 @@ public sealed partial class 骨法Strategy : IHeroStrategy
         }
         else if (key == VirtualKey.R)
         {
-            _item.根据图片使用物品(Dota2_Pictrue.物品.希瓦);
-            _item.根据图片使用物品(Dota2_Pictrue.物品.纷争);
+            _item.根据图片使用物品(Dota2_Pictrue.物品.希瓦_Tpl);
+            _item.根据图片使用物品(Dota2_Pictrue.物品.纷争_Tpl);
             _main._聚合.Conditions[ConditionSlotKey.C4].Active = true;
         }
         else if (key == VirtualKey.From(Keys.D2))
@@ -66,11 +66,11 @@ public sealed partial class 骨法Strategy : IHeroStrategy
         return await _skill.主动技能进入CD后续(Keys.W, () =>
         {
             Common.Delay(33 * (
-                _item.根据图片使用物品(Dota2_Pictrue.物品.红杖)
-                + _item.根据图片使用物品(Dota2_Pictrue.物品.红杖2)
-                + _item.根据图片使用物品(Dota2_Pictrue.物品.红杖3)
-                + _item.根据图片使用物品(Dota2_Pictrue.物品.红杖4)
-                + _item.根据图片使用物品(Dota2_Pictrue.物品.红杖5)
+                _item.根据图片使用物品(Dota2_Pictrue.物品.红杖_Tpl)
+                + _item.根据图片使用物品(Dota2_Pictrue.物品.红杖2_Tpl)
+                + _item.根据图片使用物品(Dota2_Pictrue.物品.红杖3_Tpl)
+                + _item.根据图片使用物品(Dota2_Pictrue.物品.红杖4_Tpl)
+                + _item.根据图片使用物品(Dota2_Pictrue.物品.红杖5_Tpl)
             ));
         }).ConfigureAwait(true);
     }

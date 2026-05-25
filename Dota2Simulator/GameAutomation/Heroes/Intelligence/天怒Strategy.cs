@@ -90,18 +90,18 @@ public sealed partial class 天怒Strategy : IHeroStrategy
                     return await Task.FromResult(true).ConfigureAwait(true);
                 }
 
-                Common.Delay(0 * _item.根据图片使用物品(Dota2_Pictrue.物品.阿托斯之棍));
-                Common.Delay(33 * _item.根据图片使用物品(Dota2_Pictrue.物品.缚灵锁));
-                Common.Delay(33 * _item.根据图片使用物品(Dota2_Pictrue.物品.虚灵之刃));
+                Common.Delay(0 * _item.根据图片使用物品(Dota2_Pictrue.物品.阿托斯之棍_Tpl));
+                Common.Delay(33 * _item.根据图片使用物品(Dota2_Pictrue.物品.缚灵锁_Tpl));
+                Common.Delay(33 * _item.根据图片使用物品(Dota2_Pictrue.物品.虚灵之刃_Tpl));
 
                 Common.Delay(33 * (
-                    _item.根据图片使用物品(Dota2_Pictrue.物品.红杖)
-                    + _item.根据图片使用物品(Dota2_Pictrue.物品.红杖2)
-                    + _item.根据图片使用物品(Dota2_Pictrue.物品.红杖3)
-                    + _item.根据图片使用物品(Dota2_Pictrue.物品.红杖4)
-                    + _item.根据图片使用物品(Dota2_Pictrue.物品.红杖5)));
+                    _item.根据图片使用物品(Dota2_Pictrue.物品.红杖_Tpl)
+                    + _item.根据图片使用物品(Dota2_Pictrue.物品.红杖2_Tpl)
+                    + _item.根据图片使用物品(Dota2_Pictrue.物品.红杖3_Tpl)
+                    + _item.根据图片使用物品(Dota2_Pictrue.物品.红杖4_Tpl)
+                    + _item.根据图片使用物品(Dota2_Pictrue.物品.红杖5_Tpl)));
 
-                Common.Delay(33 * _item.根据图片使用物品(Dota2_Pictrue.物品.羊刀));
+                Common.Delay(33 * _item.根据图片使用物品(Dota2_Pictrue.物品.羊刀_Tpl));
 
                 _main._聚合.Skills.SetStep(SlotKey.Global, 2);
 

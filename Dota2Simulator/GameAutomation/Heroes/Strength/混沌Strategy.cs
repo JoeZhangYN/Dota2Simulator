@@ -24,8 +24,8 @@ public sealed partial class 混沌Strategy : IHeroStrategy
     private HeroPlan GetPlan() => _plan ??= HeroPlanBuilder.New()
         .OnKey(Keys.Q).Pre(() =>
         {
-            _item.根据图片使用物品(Dota2_Pictrue.物品.紫苑);
-            _item.根据图片使用物品(Dota2_Pictrue.物品.血棘);
+            _item.根据图片使用物品(Dota2_Pictrue.物品.紫苑_Tpl);
+            _item.根据图片使用物品(Dota2_Pictrue.物品.血棘_Tpl);
         }).CustomProbe(async () => await _skill.技能通用判断(
             Keys.Q,
             1,
@@ -39,15 +39,15 @@ public sealed partial class 混沌Strategy : IHeroStrategy
         })
         .OnKey(Keys.D3).Execute(() =>
         {
-            Keys k = _item.根据图片获取物品按键(Dota2_Pictrue.物品.臂章_开启);
+            Keys k = _item.根据图片获取物品按键(Dota2_Pictrue.物品.臂章_开启_Tpl);
             if (k != Keys.Escape)
             {
                 _input.Press(VirtualKey.From(k));
                 Common.Delay(15);
-                _ = _item.根据图片使用物品(Dota2_Pictrue.物品.魔棒);
-                _ = _item.根据图片自我使用物品(Dota2_Pictrue.物品.吊坠);
-                _ = _item.根据图片使用物品(Dota2_Pictrue.物品.仙草);
-                _ = _item.根据图片使用物品(Dota2_Pictrue.物品.假腿_力量腿);
+                _ = _item.根据图片使用物品(Dota2_Pictrue.物品.魔棒_Tpl);
+                _ = _item.根据图片自我使用物品(Dota2_Pictrue.物品.吊坠_Tpl);
+                _ = _item.根据图片使用物品(Dota2_Pictrue.物品.仙草_Tpl);
+                _ = _item.根据图片使用物品(Dota2_Pictrue.物品.假腿_力量腿_Tpl);
                 Common.Delay(15);
                 _input.Press(VirtualKey.From(k));
                 _main._聚合.LegSwap.条件假腿敏捷 = false;

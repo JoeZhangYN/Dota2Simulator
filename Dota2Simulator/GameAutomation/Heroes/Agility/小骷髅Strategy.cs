@@ -33,14 +33,14 @@ public sealed partial class 小骷髅Strategy : IHeroStrategy
         {
             if (_main._聚合.Skills.Mode(SlotKey.Q) == 1)
             {
-                Common.Delay(33 * _item.根据图片使用物品(Dota2_Pictrue.物品.散失));
-                Common.Delay(33 * _item.根据图片使用物品(Dota2_Pictrue.物品.散魂));
-                Common.Delay(33 * _item.根据图片使用物品(Dota2_Pictrue.物品.否决));
-                Common.Delay(33 * _item.根据图片使用物品(Dota2_Pictrue.物品.紫苑));
-                Common.Delay(33 * _item.根据图片使用物品(Dota2_Pictrue.物品.血棘));
-                Common.Delay(33 * _item.根据图片使用物品(Dota2_Pictrue.物品.羊刀));
-                Common.Delay(33 * _item.根据图片使用物品(Dota2_Pictrue.物品.阿托斯之棍));
-                Common.Delay(33 * _item.根据图片使用物品(Dota2_Pictrue.物品.缚灵锁));
+                Common.Delay(33 * _item.根据图片使用物品(Dota2_Pictrue.物品.散失_Tpl));
+                Common.Delay(33 * _item.根据图片使用物品(Dota2_Pictrue.物品.散魂_Tpl));
+                Common.Delay(33 * _item.根据图片使用物品(Dota2_Pictrue.物品.否决_Tpl));
+                Common.Delay(33 * _item.根据图片使用物品(Dota2_Pictrue.物品.紫苑_Tpl));
+                Common.Delay(33 * _item.根据图片使用物品(Dota2_Pictrue.物品.血棘_Tpl));
+                Common.Delay(33 * _item.根据图片使用物品(Dota2_Pictrue.物品.羊刀_Tpl));
+                Common.Delay(33 * _item.根据图片使用物品(Dota2_Pictrue.物品.阿托斯之棍_Tpl));
+                Common.Delay(33 * _item.根据图片使用物品(Dota2_Pictrue.物品.缚灵锁_Tpl));
             }
             _skill.通用技能后续动作();
         }).ConfigureAwait(true))

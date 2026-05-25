@@ -71,20 +71,20 @@ public sealed partial class 莱恩Strategy : IHeroStrategy
     private async Task<bool> 大招前纷争()
     {
         Common.Delay(33 * (
-            _item.根据图片使用物品(Dota2_Pictrue.物品.虚灵之刃)
-            + _item.根据图片使用物品(Dota2_Pictrue.物品.纷争)
-            + _item.根据图片使用物品(Dota2_Pictrue.物品.红杖)
-            + _item.根据图片使用物品(Dota2_Pictrue.物品.红杖2)
-            + _item.根据图片使用物品(Dota2_Pictrue.物品.红杖3)
-            + _item.根据图片使用物品(Dota2_Pictrue.物品.红杖4)
-            + _item.根据图片使用物品(Dota2_Pictrue.物品.红杖5)
+            _item.根据图片使用物品(Dota2_Pictrue.物品.虚灵之刃_Tpl)
+            + _item.根据图片使用物品(Dota2_Pictrue.物品.纷争_Tpl)
+            + _item.根据图片使用物品(Dota2_Pictrue.物品.红杖_Tpl)
+            + _item.根据图片使用物品(Dota2_Pictrue.物品.红杖2_Tpl)
+            + _item.根据图片使用物品(Dota2_Pictrue.物品.红杖3_Tpl)
+            + _item.根据图片使用物品(Dota2_Pictrue.物品.红杖4_Tpl)
+            + _item.根据图片使用物品(Dota2_Pictrue.物品.红杖5_Tpl)
         ));
         return await Task.FromResult(false).ConfigureAwait(true);
     }
 
     private async Task<bool> 推推破林肯秒羊()
     {
-        if (_item.根据图片使用物品(Dota2_Pictrue.物品.推推棒) == 1)
+        if (_item.根据图片使用物品(Dota2_Pictrue.物品.推推棒_Tpl) == 1)
         {
             Common.Delay(等待延迟);
             return await Task.FromResult(true).ConfigureAwait(true);
@@ -99,8 +99,8 @@ public sealed partial class 莱恩Strategy : IHeroStrategy
 
         if (步骤 == 1)
         {
-            if (_item.根据图片使用物品(Dota2_Pictrue.物品.奥术鞋) == 1) return await Task.FromResult(true).ConfigureAwait(true);
-            if (_item.根据图片使用物品(Dota2_Pictrue.物品.魂戒) == 1) return await Task.FromResult(true).ConfigureAwait(true);
+            if (_item.根据图片使用物品(Dota2_Pictrue.物品.奥术鞋_Tpl) == 1) return await Task.FromResult(true).ConfigureAwait(true);
+            if (_item.根据图片使用物品(Dota2_Pictrue.物品.魂戒_Tpl) == 1) return await Task.FromResult(true).ConfigureAwait(true);
             if (_skill.DOTA2判断技能是否CD(Keys.Q))
             {
                 _input.Press(VirtualKey.From(Keys.Q));
@@ -116,8 +116,8 @@ public sealed partial class 莱恩Strategy : IHeroStrategy
         }
         else if (步骤 == 0)
         {
-            if (_item.根据图片使用物品(Dota2_Pictrue.物品.跳刀) == 1) return await Task.FromResult(true).ConfigureAwait(true);
-            if (_item.根据图片使用物品(Dota2_Pictrue.物品.跳刀_智力跳刀) == 1) return await Task.FromResult(true).ConfigureAwait(true);
+            if (_item.根据图片使用物品(Dota2_Pictrue.物品.跳刀_Tpl) == 1) return await Task.FromResult(true).ConfigureAwait(true);
+            if (_item.根据图片使用物品(Dota2_Pictrue.物品.跳刀_智力跳刀_Tpl) == 1) return await Task.FromResult(true).ConfigureAwait(true);
             if (_skill.DOTA2判断技能是否CD(Keys.W))
             {
                 _input.Press(VirtualKey.From(Keys.W));
@@ -130,15 +130,15 @@ public sealed partial class 莱恩Strategy : IHeroStrategy
                 Common.Delay(60);
                 return await Task.FromResult(true).ConfigureAwait(true);
             }
-            if (_item.根据图片使用物品(Dota2_Pictrue.物品.奥术鞋) == 1) return await Task.FromResult(true).ConfigureAwait(true);
-            if (_item.根据图片使用物品(Dota2_Pictrue.物品.魂戒) == 1) return await Task.FromResult(true).ConfigureAwait(true);
+            if (_item.根据图片使用物品(Dota2_Pictrue.物品.奥术鞋_Tpl) == 1) return await Task.FromResult(true).ConfigureAwait(true);
+            if (_item.根据图片使用物品(Dota2_Pictrue.物品.魂戒_Tpl) == 1) return await Task.FromResult(true).ConfigureAwait(true);
             if (_skill.DOTA2判断技能是否CD(Keys.R))
             {
                 _input.Press(VirtualKey.From(Keys.R));
                 Common.Delay(60);
                 return await Task.FromResult(true).ConfigureAwait(true);
             }
-            if (_main._聚合.Conditions[ConditionSlotKey.C5].Active && _item.根据图片使用物品(Dota2_Pictrue.物品.刷新球) == 1)
+            if (_main._聚合.Conditions[ConditionSlotKey.C5].Active && _item.根据图片使用物品(Dota2_Pictrue.物品.刷新球_Tpl) == 1)
             {
                 _main._聚合.Skills.SetStep(SlotKey.Global, 1);
                 Common.Delay(120);

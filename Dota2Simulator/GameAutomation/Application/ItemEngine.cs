@@ -212,12 +212,12 @@ namespace Dota2Simulator.GameAutomation.Application
         {
             bool 切腿成功 = type switch
             {
-                "智力" => 根据图片使用物品(Dota2_Pictrue.物品.假腿_力量腿) == 1 ||
-                        根据图片多次使用物品(Dota2_Pictrue.物品.假腿_敏捷腿, 2, 33) == 1,
-                "敏捷" => 根据图片使用物品(Dota2_Pictrue.物品.假腿_智力腿) == 1 ||
-                        根据图片多次使用物品(Dota2_Pictrue.物品.假腿_力量腿, 2, 33) == 1,
-                "力量" => 根据图片使用物品(Dota2_Pictrue.物品.假腿_敏捷腿) == 1 ||
-                        根据图片多次使用物品(Dota2_Pictrue.物品.假腿_智力腿, 2, 33) == 1,
+                "智力" => 根据图片使用物品(Dota2_Pictrue.物品.假腿_力量腿_Tpl) == 1 ||
+                        根据图片多次使用物品(Dota2_Pictrue.物品.假腿_敏捷腿_Tpl, 2, 33) == 1,
+                "敏捷" => 根据图片使用物品(Dota2_Pictrue.物品.假腿_智力腿_Tpl) == 1 ||
+                        根据图片多次使用物品(Dota2_Pictrue.物品.假腿_力量腿_Tpl, 2, 33) == 1,
+                "力量" => 根据图片使用物品(Dota2_Pictrue.物品.假腿_敏捷腿_Tpl) == 1 ||
+                        根据图片多次使用物品(Dota2_Pictrue.物品.假腿_智力腿_Tpl, 2, 33) == 1,
                 _ => false
             };
 
@@ -399,30 +399,31 @@ namespace Dota2Simulator.GameAutomation.Application
 
         private bool 获取当前耗蓝物品并设置切假腿()
         {
-            ImageHandle[] 需切假腿物品句柄 =
+            // Phase 19A C3: ImageHandle[] → Template[] (走 IScreenVision 主力 Template 路径).
+            Template[] 需切假腿物品句柄 =
             [
-                Dota2_Pictrue.物品.黑皇杖,
-                Dota2_Pictrue.物品.疯狂面具,
-                Dota2_Pictrue.物品.虚空至宝_疯狂面具,
-                Dota2_Pictrue.物品.紫苑,
-                Dota2_Pictrue.物品.血棘,
-                Dota2_Pictrue.物品.深渊之刃,
-                Dota2_Pictrue.物品.雷神之锤,
-                Dota2_Pictrue.物品.虚空至宝_雷神之锤,
-                Dota2_Pictrue.物品.魂戒,
-                Dota2_Pictrue.物品.鱼叉,
-                Dota2_Pictrue.物品.散失,
-                Dota2_Pictrue.物品.散魂,
-                Dota2_Pictrue.物品.希瓦,
-                Dota2_Pictrue.物品.青莲宝珠,
-                Dota2_Pictrue.物品.飓风长戟,
-                Dota2_Pictrue.物品.红杖,
-                Dota2_Pictrue.物品.红杖2,
-                Dota2_Pictrue.物品.红杖3,
-                Dota2_Pictrue.物品.红杖4,
-                Dota2_Pictrue.物品.红杖5,
-                Dota2_Pictrue.物品.刷新球,
-                Dota2_Pictrue.物品.虚灵之刃
+                Dota2_Pictrue.物品.黑皇杖_Tpl,
+                Dota2_Pictrue.物品.疯狂面具_Tpl,
+                Dota2_Pictrue.物品.虚空至宝_疯狂面具_Tpl,
+                Dota2_Pictrue.物品.紫苑_Tpl,
+                Dota2_Pictrue.物品.血棘_Tpl,
+                Dota2_Pictrue.物品.深渊之刃_Tpl,
+                Dota2_Pictrue.物品.雷神之锤_Tpl,
+                Dota2_Pictrue.物品.虚空至宝_雷神之锤_Tpl,
+                Dota2_Pictrue.物品.魂戒_Tpl,
+                Dota2_Pictrue.物品.鱼叉_Tpl,
+                Dota2_Pictrue.物品.散失_Tpl,
+                Dota2_Pictrue.物品.散魂_Tpl,
+                Dota2_Pictrue.物品.希瓦_Tpl,
+                Dota2_Pictrue.物品.青莲宝珠_Tpl,
+                Dota2_Pictrue.物品.飓风长戟_Tpl,
+                Dota2_Pictrue.物品.红杖_Tpl,
+                Dota2_Pictrue.物品.红杖2_Tpl,
+                Dota2_Pictrue.物品.红杖3_Tpl,
+                Dota2_Pictrue.物品.红杖4_Tpl,
+                Dota2_Pictrue.物品.红杖5_Tpl,
+                Dota2_Pictrue.物品.刷新球_Tpl,
+                Dota2_Pictrue.物品.虚灵之刃_Tpl
             ];
 
             Dictionary<Keys, Action> 物品进入CD委托 = new()
@@ -435,12 +436,12 @@ namespace Dota2Simulator.GameAutomation.Application
                 { Keys.Space, () => _aggregate.Conditions[ConditionSlotKey.Space].Probe ??= 物品space进入CD }
             };
 
-            foreach (ImageHandle 匹配句柄 in 需切假腿物品句柄)
+            foreach (Template 匹配句柄 in 需切假腿物品句柄)
             {
                 Keys key = 根据图片获取物品按键(匹配句柄);
                 if (key != Keys.Escape && 物品进入CD委托.TryGetValue(key, out Action value))
                 {
-                    if (匹配句柄.Id == Dota2_Pictrue.物品.魂戒.Id)
+                    if (匹配句柄 == Dota2_Pictrue.物品.魂戒_Tpl)
                     {
                         _aggregate.LegSwap.配置.修改配置(key, true, "力量");
                     }
@@ -458,11 +459,11 @@ namespace Dota2Simulator.GameAutomation.Application
 
         private bool 获取当前假腿按键()
         {
-            ImageHandle[] 假腿句柄集合 =
+            Template[] 假腿句柄集合 =
             [
-                Dota2_Pictrue.物品.假腿_力量腿,
-                Dota2_Pictrue.物品.假腿_敏捷腿,
-                Dota2_Pictrue.物品.假腿_智力腿
+                Dota2_Pictrue.物品.假腿_力量腿_Tpl,
+                Dota2_Pictrue.物品.假腿_敏捷腿_Tpl,
+                Dota2_Pictrue.物品.假腿_智力腿_Tpl
             ];
 
             Dictionary<Keys, (Action 清空委托, Action 重置条件)> 清空物品进入CD委托和条件映射 = new()
@@ -475,7 +476,7 @@ namespace Dota2Simulator.GameAutomation.Application
                 { Keys.Space, (() => _aggregate.Conditions[ConditionSlotKey.Space].Probe = null, () => _aggregate.Conditions[ConditionSlotKey.Space].Active = false) }
             };
 
-            foreach (ImageHandle 假腿句柄 in 假腿句柄集合)
+            foreach (Template 假腿句柄 in 假腿句柄集合)
             {
                 Keys key = 根据图片获取物品按键(假腿句柄);
                 if (key != Keys.Escape)
@@ -493,31 +494,29 @@ namespace Dota2Simulator.GameAutomation.Application
             return _aggregate.LegSwap.假腿按键 != Keys.Escape;
         }
 
-        public Keys 根据图片获取物品按键(in ImageHandle 句柄)
+        public Keys 根据图片获取物品按键(Template 句柄)
         {
-#pragma warning disable CS0618 // V6d 临时妥协调用 Find(ImageHandle, ...) 重载，待 SG 改造生成 Template 静态属性后切走
             var findResult = _vision.Find(句柄, 获取物品范围(_aggregate.SkillCount), new MatchRate(0.9), Tolerance.Exact);
-#pragma warning restore CS0618
             Point? 位置 = findResult.Found ? new Point(findResult.Point.X, findResult.Point.Y) : null;
             return 根据位置获取按键(位置);
         }
 
-        public int 根据图片使用物品(in ImageHandle 句柄)
+        public int 根据图片使用物品(Template 句柄)
         {
             return 执行物品操作(句柄, (k) => _input.Press(VirtualKey.From(k)));
         }
 
-        public int 根据图片自我使用物品(in ImageHandle 句柄)
+        public int 根据图片自我使用物品(Template 句柄)
         {
             return 执行物品操作(句柄, (k) => _input.ComboAlt(VirtualKey.From(k)));
         }
 
-        public bool 根据图片队列使用物品(in ImageHandle 句柄)
+        public bool 根据图片队列使用物品(Template 句柄)
         {
             return 执行物品操作(句柄, (k) => _input.ComboWhile(VirtualKey.From(k), VirtualKey.From(Keys.Shift))) > 0;
         }
 
-        public int 根据图片多次使用物品(in ImageHandle 句柄, int times, int 延迟)
+        public int 根据图片多次使用物品(Template 句柄, int times, int 延迟)
         {
             return 执行物品操作(句柄, (k) =>
             {
@@ -532,11 +531,9 @@ namespace Dota2Simulator.GameAutomation.Application
             });
         }
 
-        private int 执行物品操作(in ImageHandle 句柄, Action<Keys> 按键操作)
+        private int 执行物品操作(Template 句柄, Action<Keys> 按键操作)
         {
-#pragma warning disable CS0618 // V6d 临时妥协调用 Find(ImageHandle, ...) 重载，待 SG 改造生成 Template 静态属性后切走
             var findResult = _vision.Find(句柄, 获取物品范围(_aggregate.SkillCount), new MatchRate(0.9), Tolerance.Exact);
-#pragma warning restore CS0618
             Point? 位置 = findResult.Found ? new Point(findResult.Point.X, findResult.Point.Y) : null;
             if (ImageManager.是否无效位置(位置))
             {

@@ -50,12 +50,12 @@ namespace Dota2Simulator.Games.Dota2.Silt
         public async Task<bool> 有书吃书()
         {
             if (已吃书
-                && _item.根据图片使用物品(Dota2_Pictrue.物品.书) == 0)
+                && _item.根据图片使用物品(Dota2_Pictrue.物品.书_Tpl) == 0)
             {
                 SimKeyBoard.KeyPress(Keys.D2);
                 已吃书 = false;
             }
-            else if (_item.根据图片使用物品(Dota2_Pictrue.物品.书) == 1)
+            else if (_item.根据图片使用物品(Dota2_Pictrue.物品.书_Tpl) == 1)
             {
                 Common.Delay(50);
                 已吃书 = true;

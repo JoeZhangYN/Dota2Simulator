@@ -30,7 +30,7 @@ public sealed partial class 术士Strategy : IHeroStrategy
         VirtualKey key = trigger.Key;
         if (key == VirtualKey.Q)
         {
-          _item.根据图片使用物品(Dota2_Pictrue.物品.纷争);
+          _item.根据图片使用物品(Dota2_Pictrue.物品.纷争_Tpl);
           _main._聚合.Conditions[ConditionSlotKey.C1].Active = true;
         }
         else if (key == VirtualKey.W)

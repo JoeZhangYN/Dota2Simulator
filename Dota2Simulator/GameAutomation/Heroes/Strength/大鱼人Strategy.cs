@@ -28,14 +28,14 @@ public sealed partial class 大鱼人Strategy : IHeroStrategy
         .OnKey(Keys.R).CastSkill(Keys.R).AfterCast()
         .OnKey(Keys.E).CustomProbe(async () =>
         {
-            if (_item.根据图片使用物品(Dota2_Pictrue.物品.魂戒) == 1)
+            if (_item.根据图片使用物品(Dota2_Pictrue.物品.魂戒_Tpl) == 1)
             {
                 Common.Delay(等待延迟);
             }
-            if (_item.根据图片使用物品(Dota2_Pictrue.物品.跳刀)
-                + _item.根据图片使用物品(Dota2_Pictrue.物品.跳刀_敏捷跳刀)
-                + _item.根据图片使用物品(Dota2_Pictrue.物品.跳刀_智力跳刀)
-                + _item.根据图片使用物品(Dota2_Pictrue.物品.跳刀_力量跳刀) == 1)
+            if (_item.根据图片使用物品(Dota2_Pictrue.物品.跳刀_Tpl)
+                + _item.根据图片使用物品(Dota2_Pictrue.物品.跳刀_敏捷跳刀_Tpl)
+                + _item.根据图片使用物品(Dota2_Pictrue.物品.跳刀_智力跳刀_Tpl)
+                + _item.根据图片使用物品(Dota2_Pictrue.物品.跳刀_力量跳刀_Tpl) == 1)
             {
                 Common.Delay(等待延迟);
             }

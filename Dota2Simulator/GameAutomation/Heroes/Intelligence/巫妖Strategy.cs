@@ -53,7 +53,7 @@ public sealed partial class 巫妖Strategy : IHeroStrategy
                 {
                     _main._聚合.Skills.SetStep(SlotKey.E, 0);
                     _input.Press(VirtualKey.From(Keys.A));
-                    _ = _item.根据图片使用物品(Dota2_Pictrue.物品.羊刀);
+                    _ = _item.根据图片使用物品(Dota2_Pictrue.物品.羊刀_Tpl);
                     return false;
                 }
                 return true;

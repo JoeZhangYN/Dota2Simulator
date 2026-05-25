@@ -72,8 +72,8 @@ public sealed partial class 屠夫Strategy : IHeroStrategy
                 _input.Press(VirtualKey.From(Keys.W));
             }
 
-            _ = _item.根据图片使用物品(Dota2_Pictrue.物品.纷争);
-            _ = _item.根据图片使用物品(Dota2_Pictrue.物品.希瓦);
+            _ = _item.根据图片使用物品(Dota2_Pictrue.物品.纷争_Tpl);
+            _ = _item.根据图片使用物品(Dota2_Pictrue.物品.希瓦_Tpl);
         }).ConfigureAwait(true);
     }
 
@@ -84,17 +84,17 @@ public sealed partial class 屠夫Strategy : IHeroStrategy
     {
         return await _item.所有物品可用后续(() =>
         {
-            Common.Delay(33 * _item.根据图片使用物品(Dota2_Pictrue.物品.纷争));
-            Common.Delay(33 * _item.根据图片使用物品(Dota2_Pictrue.物品.希瓦));
-            Common.Delay(33 * _item.根据图片使用物品(Dota2_Pictrue.物品.虚灵之刃));
-            Common.Delay(33 * _item.根据图片使用物品(Dota2_Pictrue.物品.否决));
+            Common.Delay(33 * _item.根据图片使用物品(Dota2_Pictrue.物品.纷争_Tpl));
+            Common.Delay(33 * _item.根据图片使用物品(Dota2_Pictrue.物品.希瓦_Tpl));
+            Common.Delay(33 * _item.根据图片使用物品(Dota2_Pictrue.物品.虚灵之刃_Tpl));
+            Common.Delay(33 * _item.根据图片使用物品(Dota2_Pictrue.物品.否决_Tpl));
 
             Common.Delay(33 *
-                  (_item.根据图片使用物品(Dota2_Pictrue.物品.红杖) +
-                   _item.根据图片使用物品(Dota2_Pictrue.物品.红杖2) +
-                   _item.根据图片使用物品(Dota2_Pictrue.物品.红杖3) +
-                   _item.根据图片使用物品(Dota2_Pictrue.物品.红杖4) +
-                   _item.根据图片使用物品(Dota2_Pictrue.物品.红杖5)));
+                  (_item.根据图片使用物品(Dota2_Pictrue.物品.红杖_Tpl) +
+                   _item.根据图片使用物品(Dota2_Pictrue.物品.红杖2_Tpl) +
+                   _item.根据图片使用物品(Dota2_Pictrue.物品.红杖3_Tpl) +
+                   _item.根据图片使用物品(Dota2_Pictrue.物品.红杖4_Tpl) +
+                   _item.根据图片使用物品(Dota2_Pictrue.物品.红杖5_Tpl)));
 
             _input.Press(VirtualKey.From(Keys.R));
         }).ConfigureAwait(true);

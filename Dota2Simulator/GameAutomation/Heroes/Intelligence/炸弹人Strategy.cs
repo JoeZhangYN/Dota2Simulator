@@ -39,7 +39,7 @@ public sealed partial class 炸弹人Strategy : IHeroStrategy
         }
         else if (key == VirtualKey.E)
         {
-            _item.根据图片使用物品(Dota2_Pictrue.物品.纷争);
+            _item.根据图片使用物品(Dota2_Pictrue.物品.纷争_Tpl);
             _main._聚合.Conditions[ConditionSlotKey.C3].Active = true;
         }
         else if (key == VirtualKey.From(Keys.D2))

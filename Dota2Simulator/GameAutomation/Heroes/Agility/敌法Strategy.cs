@@ -28,9 +28,9 @@ public sealed partial class 敌法Strategy : IHeroStrategy
         {
             if (_main._聚合.Skills.Mode(SlotKey.W) == 1)
             {
-                _ = _item.根据图片使用物品(Dota2_Pictrue.物品.幻影斧);
+                _ = _item.根据图片使用物品(Dota2_Pictrue.物品.幻影斧_Tpl);
                 分身一齐攻击();
-                _ = _item.根据图片使用物品(Dota2_Pictrue.物品.深渊之刃);
+                _ = _item.根据图片使用物品(Dota2_Pictrue.物品.深渊之刃_Tpl);
                 _main._聚合.Skills.SetMode(SlotKey.W, 0);
             }
             _skill.通用技能后续动作();

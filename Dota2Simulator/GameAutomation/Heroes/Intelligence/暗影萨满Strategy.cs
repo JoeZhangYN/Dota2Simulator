@@ -234,7 +234,7 @@ public sealed partial class 暗影萨满Strategy : IHeroStrategy
 
     private async Task<bool> 推推破林肯秒羊()
     {
-        if (_item.根据图片使用物品(Dota2_Pictrue.物品.推推棒) == 1)
+        if (_item.根据图片使用物品(Dota2_Pictrue.物品.推推棒_Tpl) == 1)
         {
             Common.Delay(等待延迟);
             return await Task.FromResult(true).ConfigureAwait(true);

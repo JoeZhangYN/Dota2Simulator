@@ -39,12 +39,12 @@ public sealed partial class 斧王Strategy : IHeroStrategy
 
         if (key == VirtualKey.Q)
         {
-            _item.根据图片使用物品(Dota2_Pictrue.物品.魂戒);
+            _item.根据图片使用物品(Dota2_Pictrue.物品.魂戒_Tpl);
             _main._聚合.Conditions[ConditionSlotKey.C1].Active = true;
         }
         else if (key == VirtualKey.W)
         {
-            _item.根据图片使用物品(Dota2_Pictrue.物品.魂戒);
+            _item.根据图片使用物品(Dota2_Pictrue.物品.魂戒_Tpl);
             _main._聚合.Conditions[ConditionSlotKey.C2].Active = true;
         }
         else if (key == VirtualKey.E)
@@ -53,7 +53,7 @@ public sealed partial class 斧王Strategy : IHeroStrategy
         }
         else if (key == VirtualKey.R)
         {
-            _item.根据图片使用物品(Dota2_Pictrue.物品.魂戒);
+            _item.根据图片使用物品(Dota2_Pictrue.物品.魂戒_Tpl);
             _main._聚合.Conditions[ConditionSlotKey.C3].Active = true;
         }
         else if (key == VirtualKey.From(Keys.D4))
@@ -73,7 +73,7 @@ public sealed partial class 斧王Strategy : IHeroStrategy
         {
             if (_main._聚合.Skills.Mode(SlotKey.Q) == 1)
             {
-                _ = _item.根据图片使用物品(Dota2_Pictrue.物品.刃甲);
+                _ = _item.根据图片使用物品(Dota2_Pictrue.物品.刃甲_Tpl);
             }
             // 触发激怒
             _input.Press(VirtualKey.From(Keys.A));
@@ -93,10 +93,10 @@ public sealed partial class 斧王Strategy : IHeroStrategy
 
     private async Task<bool> 跳吼()
     {
-        if (_item.根据图片使用物品(Dota2_Pictrue.物品.跳刀)
-            + _item.根据图片使用物品(Dota2_Pictrue.物品.跳刀_力量跳刀)
-            + _item.根据图片使用物品(Dota2_Pictrue.物品.跳刀_智力跳刀)
-            + _item.根据图片使用物品(Dota2_Pictrue.物品.跳刀_敏捷跳刀) == 1)
+        if (_item.根据图片使用物品(Dota2_Pictrue.物品.跳刀_Tpl)
+            + _item.根据图片使用物品(Dota2_Pictrue.物品.跳刀_力量跳刀_Tpl)
+            + _item.根据图片使用物品(Dota2_Pictrue.物品.跳刀_智力跳刀_Tpl)
+            + _item.根据图片使用物品(Dota2_Pictrue.物品.跳刀_敏捷跳刀_Tpl) == 1)
         {
             Common.Delay(等待延迟);
         }

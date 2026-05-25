@@ -37,13 +37,13 @@ public sealed partial class 幽鬼Strategy : IHeroStrategy
         {
             if (_main._聚合.Skills.Mode(SlotKey.F) == 1)
             {
-                if (_item.根据图片使用物品(Dota2_Pictrue.物品.幻影斧) == 1)
+                if (_item.根据图片使用物品(Dota2_Pictrue.物品.幻影斧_Tpl) == 1)
                 {
                     分身一齐攻击();
                 }
-                Common.Delay(33 * _item.根据图片使用物品(Dota2_Pictrue.物品.否决));
-                Common.Delay(33 * _item.根据图片使用物品(Dota2_Pictrue.物品.紫苑));
-                Common.Delay(33 * _item.根据图片使用物品(Dota2_Pictrue.物品.血棘));
+                Common.Delay(33 * _item.根据图片使用物品(Dota2_Pictrue.物品.否决_Tpl));
+                Common.Delay(33 * _item.根据图片使用物品(Dota2_Pictrue.物品.紫苑_Tpl));
+                Common.Delay(33 * _item.根据图片使用物品(Dota2_Pictrue.物品.血棘_Tpl));
             }
             _item.要求保持假腿();
             _input.Press(VirtualKey.From(Keys.A));

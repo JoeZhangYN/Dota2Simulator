@@ -25,14 +25,14 @@ public sealed partial class 巫医Strategy : IHeroStrategy
         .OnKey(Keys.E).CustomProbe(async () => await _skill.主动技能释放后续(Keys.E, () =>
         {
             _input.Press(VirtualKey.From(Keys.A));
-            _ = _item.根据图片使用物品(Dota2_Pictrue.物品.魂之灵龛);
-            _ = _item.根据图片使用物品(Dota2_Pictrue.物品.影之灵龛);
+            _ = _item.根据图片使用物品(Dota2_Pictrue.物品.魂之灵龛_Tpl);
+            _ = _item.根据图片使用物品(Dota2_Pictrue.物品.影之灵龛_Tpl);
         }).ConfigureAwait(true))
         .OnKey(Keys.R).CustomProbe(async () => await _skill.主动技能释放后续(Keys.R, () =>
         {
-            _ = _item.根据图片自我使用物品(Dota2_Pictrue.物品.微光披风);
-            _ = _item.根据图片使用物品(Dota2_Pictrue.物品.隐刀);
-            _ = _item.根据图片使用物品(Dota2_Pictrue.物品.大隐刀);
+            _ = _item.根据图片自我使用物品(Dota2_Pictrue.物品.微光披风_Tpl);
+            _ = _item.根据图片使用物品(Dota2_Pictrue.物品.隐刀_Tpl);
+            _ = _item.根据图片使用物品(Dota2_Pictrue.物品.大隐刀_Tpl);
         }).ConfigureAwait(true))
         .Done();
 }

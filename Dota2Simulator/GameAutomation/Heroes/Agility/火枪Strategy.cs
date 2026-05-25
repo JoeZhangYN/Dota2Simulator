@@ -25,7 +25,7 @@ public sealed partial class 火枪Strategy : IHeroStrategy
         .OnKey(Keys.Q).CastSkill(Keys.Q).AfterCast()
         .OnKey(Keys.E).CustomProbe(async () => await _skill.主动技能进入CD后续(Keys.E, () =>
         {
-            _ = _item.根据图片使用物品(Dota2_Pictrue.物品.疯狂面具);
+            _ = _item.根据图片使用物品(Dota2_Pictrue.物品.疯狂面具_Tpl);
             _skill.通用技能后续动作();
         }).ConfigureAwait(true))
         .OnKey(Keys.D).CastSkill(Keys.D).AfterCast()

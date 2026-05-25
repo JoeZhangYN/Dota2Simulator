@@ -31,11 +31,11 @@ public sealed partial class 黑鸟Strategy : IHeroStrategy
             return await Task.FromResult(false).ConfigureAwait(true);
         })
         .OnKey(Keys.R).CustomProbe(async () =>
-            _item.根据图片使用物品(Dota2_Pictrue.物品.跳刀) == 1
+            _item.根据图片使用物品(Dota2_Pictrue.物品.跳刀_Tpl) == 1
                 ? await Task.FromResult(false).ConfigureAwait(true)
                 : await Task.FromResult(true).ConfigureAwait(true))
         .OnKey(Keys.E).NoProbe()
-        .OnKey(Keys.W).Execute(() => _item.根据图片使用物品(Dota2_Pictrue.物品.纷争))
+        .OnKey(Keys.W).Execute(() => _item.根据图片使用物品(Dota2_Pictrue.物品.纷争_Tpl))
         .Done();
 }
 #endif

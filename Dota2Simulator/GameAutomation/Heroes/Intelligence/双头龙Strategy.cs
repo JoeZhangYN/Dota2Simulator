@@ -126,7 +126,7 @@ public sealed partial class 双头龙Strategy : IHeroStrategy
 
     private async Task<bool> 吹风接冰封路径()
     {
-        if (_item.根据图片使用物品(Dota2_Pictrue.物品.吹风) == 1)
+        if (_item.根据图片使用物品(Dota2_Pictrue.物品.吹风_Tpl) == 1)
         {
             Common.Delay(等待延迟);
             return await Task.FromResult(true).ConfigureAwait(true);
