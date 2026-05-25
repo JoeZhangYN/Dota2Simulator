@@ -6,6 +6,7 @@
 
 using System;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 using Dota2Simulator.GameAutomation.Domain.Actuation;
 using Dota2Simulator.GameAutomation.Domain.Heroes;
 using Dota2Simulator.GameAutomation.Ports;
@@ -15,13 +16,15 @@ using Dota2Simulator.Vision;
 namespace Dota2Simulator.GameAutomation.Application;
 
 /// <summary>
-/// 入站端口 <see cref="IGameSession"/> 的实现：单轨策略分发。
+/// 入站端口 <see cref="IGameSession"/> / <see cref="IGameEngine"/> 的实现：单轨策略分发。
 ///
 /// 策略路径：英雄已在 <see cref="HeroStrategyRegistry"/> 注册 → 走 IHeroStrategy。
 /// 未注册路径：no-op（旧 Common.HeroLoopHost!.根据当前英雄增强 switch 已于 Chunk 4.24 删除；
 /// 原 switch 对未知英雄名同样什么都不做，二者等价）。
+///
+/// Phase 12 Chunk 2: 同时实现 IGameEngine —— Form2 统一入站; HandleKeyAsync 内化 WinForms KeyEventArgs → KeyTrigger 领域类型转换 (消 Form2 内 ToKeyModifiers helper).
 /// </summary>
-public sealed class GameSession : IGameSession
+public sealed class GameSession : IGameSession, IGameEngine
 {
     private readonly HeroStrategyRegistry _registry;
     private readonly SessionState _sessionState;
@@ -100,6 +103,25 @@ public sealed class GameSession : IGameSession
     {
         _current = null;
         _host.取消所有功能();
+    }
+
+    /// <inheritdoc cref="IGameEngine.HandleKeyAsync"/>
+    public Task HandleKeyAsync(string heroName, KeyEventArgs e)
+    {
+        // HeroAttribute.Strength 此处是占位 —— fallback 路径只用 hero.Name (Phase 6+ 注释一致).
+        return DispatchAsync(
+            new HeroId(heroName, HeroAttribute.Strength),
+            new KeyTrigger(VirtualKey.From(e.KeyCode), ToKeyModifiers(e.Modifiers)));
+    }
+
+    /// <summary>把 WinForms 修饰键标志（Alt/Control/Shift）转为领域中性的 <see cref="KeyModifiers"/>。</summary>
+    private static KeyModifiers ToKeyModifiers(Keys modifiers)
+    {
+        KeyModifiers result = KeyModifiers.None;
+        if ((modifiers & Keys.Alt) != 0) result |= KeyModifiers.Alt;
+        if ((modifiers & Keys.Control) != 0) result |= KeyModifiers.Control;
+        if ((modifiers & Keys.Shift) != 0) result |= KeyModifiers.Shift;
+        return result;
     }
 }
 

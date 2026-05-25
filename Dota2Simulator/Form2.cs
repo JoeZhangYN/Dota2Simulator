@@ -1,11 +1,8 @@
 using Collections.Pooled;
+using Dota2Simulator.GameAutomation.Ports;
 using Dota2Simulator.Games;
 using Dota2Simulator.KeyboardMouse;
 using Dota2Simulator.Vision.Ocr;
-#if DOTA2
-using Dota2Simulator.GameAutomation.Domain.Actuation;
-using Dota2Simulator.GameAutomation.Domain.Heroes;
-#endif
 using System;
 using System.Diagnostics;
 using System.Drawing;
@@ -26,15 +23,11 @@ namespace Dota2Simulator
         #endregion
 #endif
 
-#if LOL
-        /// <summary>Phase 11 P12: LolEngine instance (Hook_KeyDown 时分发). 无参 ctor 内 new.</summary>
-        private Games.LOL.LolEngine? _lolEngine;
-#endif
-
-#if HF2
-        /// <summary>Phase 11 P14: Hf2Engine instance (Hook_KeyDown 时分发). 无参 ctor 内 new.</summary>
-        private Games.HF2.Hf2Engine? _hf2Engine;
-#endif
+        /// <summary>
+        /// Phase 12 Chunk 2: 三引擎统一字段 (DOTA2=GameSession / LOL=LolEngine / HF2=Hf2Engine).
+        /// ctor 内 #if 分支装配; Hook_KeyDown / Tb_name_TextChanged 0 #if 单行调度.
+        /// </summary>
+        private IGameEngine? _engine;
 
         #region 触发重载
 
@@ -65,35 +58,9 @@ namespace Dota2Simulator
 
             #endregion
 
-#if DOTA2
-            // 经入站端口 GameSession 分发（取代直调 Common.HeroLoopHost!.根据当前英雄增强）。
-            // HeroAttribute.Strength 此处是占位——fallback 路径只用 hero.Name。
-            // Phase 11 P5: GameSession 在 BindUi 内 new, 用 ! 断言 (BindUi 由 Form2 sub ctor 调, Hook_KeyDown 触发于 form 已展示后, GameSession 必非 null).
-            await _app!.GameSession!.DispatchAsync(
-                new HeroId(tb_name.Text.Trim(), HeroAttribute.Strength),
-                new KeyTrigger(VirtualKey.From(e.KeyCode), ToKeyModifiers(e.Modifiers)));
-#endif
-#if LOL
-            // Phase 11 P12: 走 instance 化 LolEngine (取代 Games.LOL.MainClass.X static 调).
-            await _lolEngine!.根据当前英雄增强(tb_name.Text.Trim(), e).ConfigureAwait(true);
-#endif
-#if HF2
-            // Phase 11 P14: 走 instance 化 Hf2Engine (取代 Games.HF2.MainClass.X static 调).
-            await _hf2Engine!.根据当前英雄增强(tb_name.Text.Trim(), e).ConfigureAwait(true);
-#endif
+            // Phase 12 Chunk 2: 三引擎统一入站 —— DOTA2/LOL/HF2 走同一 IGameEngine 接口, 0 #if 分支适配.
+            await _engine!.HandleKeyAsync(tb_name.Text.Trim(), e).ConfigureAwait(true);
         }
-
-#if DOTA2
-        /// <summary>把 WinForms 修饰键标志（Alt/Control/Shift）转为领域中性的 <see cref="KeyModifiers"/>。</summary>
-        private static KeyModifiers ToKeyModifiers(Keys modifiers)
-        {
-            KeyModifiers result = KeyModifiers.None;
-            if ((modifiers & Keys.Alt) != 0) result |= KeyModifiers.Alt;
-            if ((modifiers & Keys.Control) != 0) result |= KeyModifiers.Control;
-            if ((modifiers & Keys.Shift) != 0) result |= KeyModifiers.Shift;
-            return result;
-        }
-#endif
 
         #endregion
 
@@ -103,10 +70,8 @@ namespace Dota2Simulator
 
         private void Tb_name_TextChanged(object sender, EventArgs e)
         {
-#if DOTA2
-            // Phase 11 P5: 切 _app.HeroLoopHost! (BindUi 已在 sub ctor 完成).
-            _app!.HeroLoopHost!.取消所有功能();
-#endif
+            // Phase 12 Chunk 2: 三引擎统一 CancelAll —— DOTA2 走 GameSession.CancelAll (内调 _host.取消所有功能), LOL/HF2 stub no-op.
+            _engine?.CancelAll();
         }
 
         #endregion
@@ -201,18 +166,13 @@ namespace Dota2Simulator
             InitializeComponent();
 
 #if LOL
-            // Phase 11 P12: LolEngine instance 装配 — InitializeComponent 后 tb_* 可用, 但 LOL stub 暂未用 UI.
-            // 直接 new adapters (无 AppContainer DOTA2 装配链).
-            var lolInput = new Input.Adapters.HybridInputAdapter();
-            var lolVision = new Vision.Adapters.RustVisionAdapter();
-            var lolUi = new Ui.Adapters.Form2UiInvoker(this);
-            _lolEngine = new Games.LOL.LolEngine(lolInput, lolVision, lolUi);
+            // Phase 12 Chunk 2: LolEngine 装配 _engine (实现 IGameEngine). ctor 简化只接 IInputExecutor.
+            _engine = new Games.LOL.LolEngine(new Input.Adapters.HybridInputAdapter());
 #endif
 
 #if HF2
-            // Phase 12 Chunk 1: Hf2Engine ctor 简化只接 IInputExecutor (vision/ui 未用 stub 残留已删).
-            var hf2Input = new Input.Adapters.HybridInputAdapter();
-            _hf2Engine = new Games.HF2.Hf2Engine(hf2Input);
+            // Phase 12 Chunk 2: Hf2Engine 装配 _engine (实现 IGameEngine). ctor 简化只接 IInputExecutor.
+            _engine = new Games.HF2.Hf2Engine(new Input.Adapters.HybridInputAdapter());
 #endif
 
             StartListen();
@@ -229,6 +189,8 @@ namespace Dota2Simulator
             // D1: 此时 InitializeComponent 已跑过（无参 base ctor 内），tb_* 字段可用——
             // 把 this 注给 AppContainer，让 BindUi 构造 Form2UiInvoker + set Common.UiInvoker。
             _app.BindUi(this);
+            // Phase 12 Chunk 2: BindUi 后 GameSession 已 new, _engine 装配 IGameEngine (GameSession 实现).
+            _engine = _app.GameEngine;
             // Phase 11 P5: 原 StartListen 末调用迁此 (BindUi 后 HeroLoopHost 已 new), 初始化获取截图 避免一开始的黑色.
             _app.HeroLoopHost!.获取图片_2();
         }

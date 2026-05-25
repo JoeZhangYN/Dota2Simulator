@@ -13,7 +13,7 @@ using Dota2Simulator.GameAutomation.Ports;
 
 namespace Dota2Simulator.Games.HF2
 {
-    public sealed class Hf2Engine
+    public sealed class Hf2Engine : IGameEngine
     {
         private readonly IInputExecutor _input;
 
@@ -32,16 +32,18 @@ namespace Dota2Simulator.Games.HF2
             [Keys.NumPad6] = Stratagems.飞鹰_重填装,
         };
 
-        /// <summary>
-        /// HF2 build dispatch 入口 —— 查表命中即执行 Stratagem, 否则 no-op.
-        /// 名字保留 (Chunk 2 IGameEngine 统一 API 时再改 HandleKeyAsync).
-        /// </summary>
-        public Task 根据当前英雄增强(string name, KeyEventArgs e)
+        /// <summary>HF2 build dispatch 入口 —— 查表命中即执行 Stratagem, 否则 no-op.</summary>
+        public Task HandleKeyAsync(string heroName, KeyEventArgs e)
         {
-            _ = name;
+            _ = heroName;
             return _bindings.TryGetValue(e.KeyCode, out Stratagem s)
                 ? Task.Run(() => s.ExecuteAsync(_input))
                 : Task.CompletedTask;
+        }
+
+        public void CancelAll()
+        {
+            // HF2 stub: Stratagem 执行 fire-and-forget 短任务, 无长 loop 可取消.
         }
     }
 }

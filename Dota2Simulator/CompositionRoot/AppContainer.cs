@@ -24,6 +24,9 @@ internal sealed class AppContainer
     public HeroStrategyRegistry Registry { get; }
     /// <summary>Phase 11 P5: GameSession 推迟到 BindUi (ctor 接 HeroLoopHost). Form2 经 _app.GameSession! 访问.</summary>
     public GameSession? GameSession { get; private set; }
+
+    /// <summary>Phase 12 Chunk 2: IGameEngine 别名 —— Form2 统一字段 _engine 由此装配 (DOTA2 build 走 GameSession).</summary>
+    public IGameEngine? GameEngine => GameSession;
     public SessionState SessionState { get; }
     public HeroAggregate Aggregate { get; }
 
