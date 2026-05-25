@@ -44,27 +44,34 @@ public readonly record struct HeroPlanClause(
     bool IsToggle = false,
     string? SpeakOn = null,
     string? SpeakOff = null,
-    ConditionDelegateBitmap? CustomProbeFn = null);
+    ConditionDelegateBitmap? CustomProbeFn = null,
+    Action? PreActionSync = null,
+    Func<Task>? PreActionAsync = null);
 
 /// <summary>假腿配置条目 (按键 → alwaysSwap 标志, OnActivate 时一次性应用).</summary>
 public readonly record struct LegSwapEntry(Keys Key, bool AlwaysSwap);
 
 /// <summary>
-/// 按键触发 + Guard 的副作用 (运行期, 非 OnActivate 一次性) — 当前仅支持 AdjustLegSwap.
-/// 例: F1 键 + HasAghanim → LegSwap.修改配置(F, true) (TB 模板; 业务概念「神杖切假腿配置」).
+/// 按键触发 + Guard 的副作用 (运行期, 非 OnActivate 一次性) —— 支持:
+/// (1) <see cref="SetupActionKind.AdjustLegSwap"/>: 调 LegSwap.配置.修改配置(ParamKey, ParamBool).
+/// (2) <see cref="SetupActionKind.ExecuteAction"/>: 调 <see cref="CustomAction"/> lambda 任意副作用 (不挂 ConditionSlot).
+/// 例 (Execute): D2 键 → SetMode(W, 1) + TTS.Speak (幻刺); W 键 → _item.根据图片使用物品(纷争) (黑鸟).
 /// </summary>
 public readonly record struct SetupAction(
     VirtualKey TriggerKey,
     AggGuard Guard,
     SetupActionKind Kind,
     Keys ParamKey,
-    bool ParamBool);
+    bool ParamBool,
+    Action? CustomAction = null);
 
 /// <summary>SetupAction 副作用种类.</summary>
 public enum SetupActionKind
 {
     /// <summary>调 LegSwap.配置.修改配置(ParamKey, ParamBool).</summary>
     AdjustLegSwap,
+    /// <summary>调 <see cref="SetupAction.CustomAction"/> lambda — 任意副作用 (不挂 ConditionSlot).</summary>
+    ExecuteAction,
 }
 
 /// <summary>
@@ -179,7 +186,7 @@ public sealed class HeroPlan
         VirtualKey key = trigger.Key;
         await item.根据按键判断技能释放前通用逻辑(new KeyEventArgs((Keys)key.ToNative())).ConfigureAwait(true);
 
-        // 1. 先跑 SetupAction (按键 + Guard → 副作用, 如 F1+HasAghanim → LegSwap.修改配置).
+        // 1. 先跑 SetupAction (按键 + Guard → 副作用, 如 F1+HasAghanim → LegSwap.修改配置 / D2 → SetMode + TTS).
         foreach (SetupAction setup in _setups)
         {
             if (setup.TriggerKey == key && CheckGuard(setup.Guard, ctx))
@@ -188,6 +195,9 @@ public sealed class HeroPlan
                 {
                     case SetupActionKind.AdjustLegSwap:
                         ctx.Aggregate.LegSwap.配置.修改配置(setup.ParamKey, setup.ParamBool);
+                        break;
+                    case SetupActionKind.ExecuteAction:
+                        setup.CustomAction?.Invoke();
                         break;
                 }
             }
@@ -198,6 +208,16 @@ public sealed class HeroPlan
         {
             if (_clauses[i].TriggerKey == key && CheckGuard(_clauses[i].Guard, ctx))
             {
+                // PreAction (Active 设置前的副作用 — 例: _input.Press(A) 后再 Active 释放技能).
+                if (_clauses[i].PreActionAsync is not null)
+                {
+                    await _clauses[i].PreActionAsync!().ConfigureAwait(true);
+                }
+                else
+                {
+                    _clauses[i].PreActionSync?.Invoke();
+                }
+
                 ConditionSlotKey slot = (ConditionSlotKey)i;
                 if (_clauses[i].IsToggle)
                 {

@@ -4,6 +4,7 @@
 
 using System;
 using System.Collections.Immutable;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using Dota2Simulator.GameAutomation.Application;  // ConditionDelegateBitmap
 
@@ -24,6 +25,8 @@ public sealed class HeroPlanBuilder
     private Keys? _pendingTrigger;
     private Keys? _pendingSkill;
     private AggGuard _pendingGuard = AggGuard.None;
+    private Action? _pendingPreActionSync;
+    private Func<Task>? _pendingPreActionAsync;
     private int? _repeatThreshold;
 
     // 缓存最后一个 FinishClause 的 TriggerKey/Guard, 供 AlsoAdjustLegSwap 追加共享的 SetupAction.
@@ -80,6 +83,58 @@ public sealed class HeroPlanBuilder
     }
 
     /// <summary>
+    /// 在 OnKey 链中间插入 PreAction (clause Active 设置前调用), 同步形态.
+    /// 例: <c>.OnKey(W).Pre(() => _input.Press(VirtualKey.From(Keys.A))).CastSkill(W).AfterEnterCD()</c>
+    /// 表示按 W 时, 先 Press A (PreAction) 再激活 C2 释放 W 技能 (大牛/幻刺/黑鸟 模板).
+    /// </summary>
+    public HeroPlanBuilder Pre(Action action)
+    {
+        if (_pendingTrigger is null) throw new InvalidOperationException("Pre: 需先调 OnKey.");
+        if (action is null) throw new ArgumentNullException(nameof(action));
+        _pendingPreActionSync = action;
+        return this;
+    }
+
+    /// <summary>
+    /// 在 OnKey 链中间插入 PreAction (clause Active 设置前 await), 异步形态.
+    /// 例: <c>.OnKey(R).PreAsync(async () => await 大招前纷争()).CastSkill(R).AfterCast()</c>
+    /// 表示按 R 时, 先 await 大招前纷争 物品组合, 再激活 clause (莱恩模板).
+    /// </summary>
+    public HeroPlanBuilder PreAsync(Func<Task> asyncAction)
+    {
+        if (_pendingTrigger is null) throw new InvalidOperationException("PreAsync: 需先调 OnKey.");
+        if (asyncAction is null) throw new ArgumentNullException(nameof(asyncAction));
+        _pendingPreActionAsync = asyncAction;
+        return this;
+    }
+
+    /// <summary>
+    /// 终结 OnKey 链为 ExecuteAction SetupAction — 任意 lambda 副作用 (不挂 ConditionSlot, 不挂 Probe).
+    /// 例: <c>.OnKey(D2).Execute(() => { _aggregate.Skills.SetMode(W, 1); TTS.Speak("..."); })</c>
+    /// 用于 D2 SetMode + TTS 形态 (幻刺) / W 直接 _item 副作用 (黑鸟).
+    /// </summary>
+    public HeroPlanBuilder Execute(Action action)
+    {
+        if (_pendingTrigger is null) throw new InvalidOperationException("Execute: 需先调 OnKey.");
+        if (action is null) throw new ArgumentNullException(nameof(action));
+
+        _setups.Add(new SetupAction(
+            TriggerKey: Domain.Actuation.VirtualKey.From(_pendingTrigger.Value),
+            Guard: _pendingGuard,
+            Kind: SetupActionKind.ExecuteAction,
+            ParamKey: Keys.None,
+            ParamBool: false,
+            CustomAction: action));
+
+        _pendingTrigger = null;
+        _pendingSkill = null;
+        _pendingGuard = AggGuard.None;
+        _pendingPreActionSync = null;
+        _pendingPreActionAsync = null;
+        return this;
+    }
+
+    /// <summary>
     /// 终结 OnKey 链为 SetupAction (不挂 Probe, 仅副作用) — 当前 Kind = AdjustLegSwap.
     /// 例: <c>.OnKey(F1).WhenHasAghanim().AdjustLegSwap(F, true)</c> 表示按 F1 + 持神杖时改 LegSwap.修改配置(F, true).
     /// </summary>
@@ -98,6 +153,8 @@ public sealed class HeroPlanBuilder
         _pendingTrigger = null;
         _pendingSkill = null;
         _pendingGuard = AggGuard.None;
+        _pendingPreActionSync = null;
+        _pendingPreActionAsync = null;
         return this;
     }
 
@@ -148,6 +205,8 @@ public sealed class HeroPlanBuilder
         _pendingTrigger = null;
         _pendingSkill = null;
         _pendingGuard = AggGuard.None;
+        _pendingPreActionSync = null;
+        _pendingPreActionAsync = null;
         return this;
     }
 
@@ -176,13 +235,17 @@ public sealed class HeroPlanBuilder
             ContinueKey: Keys.None,
             PostDelayMs: 0,
             Guard: _pendingGuard,
-            CustomProbeFn: probe));
+            CustomProbeFn: probe,
+            PreActionSync: _pendingPreActionSync,
+            PreActionAsync: _pendingPreActionAsync));
 
         _lastClauseTrigger = _pendingTrigger;
         _lastClauseGuard = _pendingGuard;
         _pendingTrigger = null;
         _pendingSkill = null;
         _pendingGuard = AggGuard.None;
+        _pendingPreActionSync = null;
+        _pendingPreActionAsync = null;
         return this;
     }
 
@@ -204,13 +267,17 @@ public sealed class HeroPlanBuilder
             ContinueAttack: false,
             ContinueKey: Keys.None,
             PostDelayMs: 0,
-            Guard: _pendingGuard));
+            Guard: _pendingGuard,
+            PreActionSync: _pendingPreActionSync,
+            PreActionAsync: _pendingPreActionAsync));
 
         _lastClauseTrigger = _pendingTrigger;
         _lastClauseGuard = _pendingGuard;
         _pendingTrigger = null;
         _pendingSkill = null;
         _pendingGuard = AggGuard.None;
+        _pendingPreActionSync = null;
+        _pendingPreActionAsync = null;
         return this;
     }
 
@@ -232,13 +299,17 @@ public sealed class HeroPlanBuilder
             ContinueAttack: continueAttack,
             ContinueKey: continueKey,
             PostDelayMs: postDelayMs,
-            Guard: _pendingGuard));
+            Guard: _pendingGuard,
+            PreActionSync: _pendingPreActionSync,
+            PreActionAsync: _pendingPreActionAsync));
 
         _lastClauseTrigger = _pendingTrigger;
         _lastClauseGuard = _pendingGuard;
         _pendingTrigger = null;
         _pendingSkill = null;
         _pendingGuard = AggGuard.None;
+        _pendingPreActionSync = null;
+        _pendingPreActionAsync = null;
         return this;
     }
 

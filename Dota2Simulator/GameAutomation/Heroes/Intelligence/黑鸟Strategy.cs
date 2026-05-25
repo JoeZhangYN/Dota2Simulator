@@ -1,114 +1,41 @@
+// Phase 15 C1: 黑鸟 Strategy 迁 HeroPlan + Pre/CustomProbe/Execute/NoProbe — D Pre(Press W) + CustomProbe 神智之蚀, R CustomProbe 关接跳, E NoProbe, W Execute (直接 _item.使用 纷争).
+// OnKey 顺序按 Probe 注册重排 (D→C1, R→C2, E→C3, W→setup; 原 OnActivate 仅 C1/C2 Probe, W 直 _item 副作用, E 无 Probe 死代码占位).
 #if DOTA2
-using System.Drawing;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Dota2Simulator.GameAutomation.Application;
+using Dota2Simulator.GameAutomation.Application.HeroPlans;
 using Dota2Simulator.GameAutomation.Domain.Actuation;
 using Dota2Simulator.GameAutomation.Domain.Heroes;
-using Dota2Simulator.GameAutomation.Domain.Loop;
-using Dota2Simulator.Games;
 using Dota2Simulator.Games.Dota2;
-using Dota2Simulator.Vision;
-
-using Dota2Simulator.GameAutomation.Ports;
 
 namespace Dota2Simulator.GameAutomation.Heroes.Intelligence;
 
 [HeroStrategy("黑鸟", HeroAttribute.Intelligence)]
 public sealed partial class 黑鸟Strategy : IHeroStrategy
 {
+    private HeroPlan? _plan;
 
+    public void OnActivate(HeroContext ctx) => GetPlan().Apply(ctx, _skill);
 
-    public void OnActivate(HeroContext ctx)
-    {
-        _main._聚合.Conditions[ConditionSlotKey.C1].Probe ??= 神智之蚀去后摇;
-        _main._聚合.Conditions[ConditionSlotKey.C2].Probe ??= 关接跳;
-    }
+    public Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx) => GetPlan().DispatchAsync(trigger, ctx, _item);
 
-    public Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)
-    {
-        VirtualKey key = trigger.Key;
-        if (key == VirtualKey.D)
+    private HeroPlan GetPlan() => _plan ??= HeroPlanBuilder.New()
+        .OnKey(Keys.D).Pre(() => _input.Press(VirtualKey.From(Keys.W))).CustomProbe(async 句柄 =>
         {
-            _input.Press(VirtualKey.From(Keys.W));
-            _main._聚合.Conditions[ConditionSlotKey.C1].Active = true;
-        }
-        else if (key == VirtualKey.W)
-        {
-            _item.根据图片使用物品(Dota2_Pictrue.物品.纷争);
-        }
-        else if (key == VirtualKey.E)
-        {
-            _main._聚合.Conditions[ConditionSlotKey.C3].Active = true;
-        }
-        else if (key == VirtualKey.R)
-        {
-            _main._聚合.Conditions[ConditionSlotKey.C2].Active = true;
-        }
-
-        return Task.CompletedTask;
-    }
-
-    // todo 逻辑修改
-    private async Task<bool> 关接陨星锤(ImageHandle 句柄)
-    {
-        int time = 0;
-
-        Color 技能点颜色 = Color.FromArgb(203, 183, 124);
-
-        if (ColorExtensions.ColorAEqualColorB(_main.获取指定位置颜色(909, 1008, in 句柄), 技能点颜色, 0))
-        {
-            time = 4000;
-        }
-        else if (ColorExtensions.ColorAEqualColorB(_main.获取指定位置颜色(897, 1008, in 句柄), 技能点颜色, 0))
-        {
-            time = 3250;
-        }
-
-        void 关后(int time, in ImageHandle 句柄)
-        {
-            Common.Delay(110);
-            _main._聚合.Skills.SetTime(SlotKey.W, Common.获取当前时间毫秒());
-            _input.MouseClick(MouseButton.Right);
-            Common.Delay(150);
-            _input.Press(VirtualKey.From(Keys.S));
-            Common.Delay(time - 3000, _main._聚合.Skills.Time(SlotKey.W));
-            if (!_main.Session!.IsPaused)
+            if (_skill.DOTA2判断技能是否CD(Keys.R, in 句柄))
             {
-                _ = _item.根据图片使用物品(Dota2_Pictrue.物品.陨星锤);
+                return await Task.FromResult(true).ConfigureAwait(true);
             }
-        }
-
-        if (_skill.DOTA2判断技能是否CD(Keys.W, in 句柄))
-        {
-            return await Task.FromResult(true).ConfigureAwait(true);
-        }
-
-        关后(time, in 句柄);
-        return await Task.FromResult(false).ConfigureAwait(true);
-    }
-
-    private async Task<bool> 神智之蚀去后摇(ImageHandle 句柄)
-    {
-        void 神智之蚀后()
-        {
             _input.Press(VirtualKey.From(Keys.A));
-        }
-
-        if (_skill.DOTA2判断技能是否CD(Keys.R, in 句柄))
-        {
-            return await Task.FromResult(true).ConfigureAwait(true);
-        }
-
-        神智之蚀后();
-        return await Task.FromResult(false).ConfigureAwait(true);
-    }
-
-    private async Task<bool> 关接跳(ImageHandle 句柄)
-    {
-        return _item.根据图片使用物品(Dota2_Pictrue.物品.跳刀) == 1
-            ? await Task.FromResult(false).ConfigureAwait(true)
-            : await Task.FromResult(true).ConfigureAwait(true);
-    }
+            return await Task.FromResult(false).ConfigureAwait(true);
+        })
+        .OnKey(Keys.R).CustomProbe(async _h =>
+            _item.根据图片使用物品(Dota2_Pictrue.物品.跳刀) == 1
+                ? await Task.FromResult(false).ConfigureAwait(true)
+                : await Task.FromResult(true).ConfigureAwait(true))
+        .OnKey(Keys.E).NoProbe()
+        .OnKey(Keys.W).Execute(() => _item.根据图片使用物品(Dota2_Pictrue.物品.纷争))
+        .Done();
 }
 #endif
