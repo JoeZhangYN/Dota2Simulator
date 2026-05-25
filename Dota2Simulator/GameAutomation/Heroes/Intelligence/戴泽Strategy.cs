@@ -1,153 +1,55 @@
+// Phase 19D: 戴泽 Strategy 迁 HeroPlan — Q/W/E/R 4 Pre(SetTime) + CustomProbe (1200ms 超时 + CD 检查 + 通用后续 同质). OnActivate 内 基础攻击前摇/间隔 设置仍保留 (聚合属性, 与 Plan 无关).
 #if DOTA2
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Dota2Simulator.GameAutomation.Application;
+using Dota2Simulator.GameAutomation.Application.HeroPlans;
 using Dota2Simulator.GameAutomation.Domain.Actuation;
 using Dota2Simulator.GameAutomation.Domain.Heroes;
 using Dota2Simulator.GameAutomation.Domain.Loop;
 using Dota2Simulator.Games;
-using Dota2Simulator.Games.Dota2;
-using Dota2Simulator.Vision;
-
-using Dota2Simulator.GameAutomation.Ports;
 
 namespace Dota2Simulator.GameAutomation.Heroes.Intelligence;
 
 [HeroStrategy("戴泽", HeroAttribute.Intelligence)]
 public sealed partial class 戴泽Strategy : IHeroStrategy
 {
-
+    private HeroPlan? _plan;
 
     public void OnActivate(HeroContext ctx)
     {
-        _main._聚合.Conditions[ConditionSlotKey.C1].Probe ??= 剧毒之触去后摇;
-        _main._聚合.Conditions[ConditionSlotKey.C2].Probe ??= 薄葬去后摇;
-        _main._聚合.Conditions[ConditionSlotKey.C3].Probe ??= 暗影波去后摇;
-        _main._聚合.Conditions[ConditionSlotKey.C4].Probe ??= 邪能去后摇;
+        GetPlan().Apply(ctx, _skill);
         _main._聚合.Attack.基础攻击前摇 = 0.3;
         _main._聚合.Attack.基础攻击间隔 = 1.7;
     }
 
-    public Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)
+    public Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx) => GetPlan().DispatchAsync(trigger, ctx, _item);
+
+    private HeroPlan GetPlan() => _plan ??= HeroPlanBuilder.New()
+        .OnKey(Keys.Q).Pre(() => _main._聚合.Skills.SetTime(SlotKey.Q, Common.获取当前时间毫秒())).CustomProbe(剧毒之触去后摇)
+        .OnKey(Keys.W).Pre(() => _main._聚合.Skills.SetTime(SlotKey.W, Common.获取当前时间毫秒())).CustomProbe(薄葬去后摇)
+        .OnKey(Keys.E).Pre(() => _main._聚合.Skills.SetTime(SlotKey.E, Common.获取当前时间毫秒())).CustomProbe(暗影波去后摇)
+        .OnKey(Keys.R).Pre(() => _main._聚合.Skills.SetTime(SlotKey.R, Common.获取当前时间毫秒())).CustomProbe(邪能去后摇)
+        .Done();
+
+    private async Task<bool> 剧毒之触去后摇() => await 同质后摇(SlotKey.Q, Keys.Q).ConfigureAwait(true);
+    private async Task<bool> 薄葬去后摇() => await 同质后摇(SlotKey.W, Keys.W).ConfigureAwait(true);
+    private async Task<bool> 暗影波去后摇() => await 同质后摇(SlotKey.E, Keys.E).ConfigureAwait(true);
+    private async Task<bool> 邪能去后摇() => await 同质后摇(SlotKey.R, Keys.R).ConfigureAwait(true);
+
+    /// <summary>4 个原 helper 同质: 1200ms 超时 / CD 检查 / SetTime(-1) + 通用技能后续动作.</summary>
+    private async Task<bool> 同质后摇(SlotKey slot, Keys key)
     {
-        VirtualKey key = trigger.Key;
-        if (key == VirtualKey.Q)
+        if (Common.获取当前时间毫秒() - _main._聚合.Skills.Time(slot) > 1200 && _main._聚合.Skills.Time(slot) != -1)
         {
-          _main._聚合.Skills.SetTime(SlotKey.Q, Common.获取当前时间毫秒());
-          _main._聚合.Conditions[ConditionSlotKey.C1].Active = true;
+            _main._聚合.Skills.SetTime(slot, -1);
+            _skill.通用技能后续动作();
+            return await Task.FromResult(false).ConfigureAwait(true);
         }
-        else if (key == VirtualKey.W)
-        {
-          _main._聚合.Skills.SetTime(SlotKey.W, Common.获取当前时间毫秒());
-          _main._聚合.Conditions[ConditionSlotKey.C2].Active = true;
-        }
-        else if (key == VirtualKey.E)
-        {
-          _main._聚合.Skills.SetTime(SlotKey.E, Common.获取当前时间毫秒());
-          _main._聚合.Conditions[ConditionSlotKey.C3].Active = true;
-        }
-        else if (key == VirtualKey.R)
-        {
-          _main._聚合.Skills.SetTime(SlotKey.R, Common.获取当前时间毫秒());
-          _main._聚合.Conditions[ConditionSlotKey.C4].Active = true;
-        }
-
-        return Task.CompletedTask;
-    }
-
-    private async Task<bool> 剧毒之触去后摇()
-    {
-        void 剧毒之触后()
-        {
-          _main._聚合.Skills.SetTime(SlotKey.Q, -1);
-          _skill.通用技能后续动作();
-        }
-
-        // 超时则切回 总体释放时间
-        if (Common.获取当前时间毫秒() - _main._聚合.Skills.Time(SlotKey.Q) > 1200 && _main._聚合.Skills.Time(SlotKey.Q) != -1)
-        {
-          剧毒之触后();
-          return await Task.FromResult(false).ConfigureAwait(true);
-        }
-
-        if (_skill.DOTA2判断技能是否CD(Keys.Q))
-        {
-          return await Task.FromResult(true).ConfigureAwait(true);
-        }
-
-        剧毒之触后();
-        return await Task.FromResult(false).ConfigureAwait(true);
-    }
-
-    private async Task<bool> 薄葬去后摇()
-    {
-        void 薄葬后()
-        {
-          _main._聚合.Skills.SetTime(SlotKey.W, -1);
-          _skill.通用技能后续动作();
-        }
-
-        // 超时则切回 总体释放时间
-        if (Common.获取当前时间毫秒() - _main._聚合.Skills.Time(SlotKey.W) > 1200 && _main._聚合.Skills.Time(SlotKey.W) != -1)
-        {
-          薄葬后();
-          return await Task.FromResult(false).ConfigureAwait(true);
-        }
-
-        if (_skill.DOTA2判断技能是否CD(Keys.W))
-        {
-          return await Task.FromResult(true).ConfigureAwait(true);
-        }
-
-        薄葬后();
-        return await Task.FromResult(false).ConfigureAwait(true);
-    }
-
-    private async Task<bool> 暗影波去后摇()
-    {
-        void 暗影波后()
-        {
-          _main._聚合.Skills.SetTime(SlotKey.E, -1);
-          _skill.通用技能后续动作();
-        }
-
-        // 超时则切回 总体释放时间
-        if (Common.获取当前时间毫秒() - _main._聚合.Skills.Time(SlotKey.E) > 1200 && _main._聚合.Skills.Time(SlotKey.E) != -1)
-        {
-          暗影波后();
-          return await Task.FromResult(false).ConfigureAwait(true);
-        }
-
-        if (_skill.DOTA2判断技能是否CD(Keys.E))
-        {
-          return await Task.FromResult(true).ConfigureAwait(true);
-        }
-
-        暗影波后();
-        return await Task.FromResult(false).ConfigureAwait(true);
-    }
-
-    private async Task<bool> 邪能去后摇()
-    {
-        void 邪能后()
-        {
-          _main._聚合.Skills.SetTime(SlotKey.R, -1);
-          _skill.通用技能后续动作();
-        }
-
-        // 超时则切回 总体释放时间
-        if (Common.获取当前时间毫秒() - _main._聚合.Skills.Time(SlotKey.R) > 1200 && _main._聚合.Skills.Time(SlotKey.R) != -1)
-        {
-          邪能后();
-          return await Task.FromResult(false).ConfigureAwait(true);
-        }
-
-        if (_skill.DOTA2判断技能是否CD(Keys.R))
-        {
-          return await Task.FromResult(true).ConfigureAwait(true);
-        }
-
-        邪能后();
+        if (_skill.DOTA2判断技能是否CD(key))
+            return await Task.FromResult(true).ConfigureAwait(true);
+        _main._聚合.Skills.SetTime(slot, -1);
+        _skill.通用技能后续动作();
         return await Task.FromResult(false).ConfigureAwait(true);
     }
 }
