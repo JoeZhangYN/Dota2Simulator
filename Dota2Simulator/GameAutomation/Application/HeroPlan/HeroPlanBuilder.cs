@@ -25,6 +25,10 @@ public sealed class HeroPlanBuilder
     private AggGuard _pendingGuard = AggGuard.None;
     private int? _repeatThreshold;
 
+    // 缓存最后一个 FinishClause 的 TriggerKey/Guard, 供 AlsoAdjustLegSwap 追加共享的 SetupAction.
+    private Keys? _lastClauseTrigger;
+    private AggGuard _lastClauseGuard = AggGuard.None;
+
     private HeroPlanBuilder() { }
 
     public static HeroPlanBuilder New() => new();
@@ -166,6 +170,8 @@ public sealed class HeroPlanBuilder
             PostDelayMs: 0,
             Guard: _pendingGuard));
 
+        _lastClauseTrigger = _pendingTrigger;
+        _lastClauseGuard = _pendingGuard;
         _pendingTrigger = null;
         _pendingSkill = null;
         _pendingGuard = AggGuard.None;
@@ -192,9 +198,32 @@ public sealed class HeroPlanBuilder
             PostDelayMs: postDelayMs,
             Guard: _pendingGuard));
 
+        _lastClauseTrigger = _pendingTrigger;
+        _lastClauseGuard = _pendingGuard;
         _pendingTrigger = null;
         _pendingSkill = null;
         _pendingGuard = AggGuard.None;
+        return this;
+    }
+
+    /// <summary>
+    /// 在刚终结的 clause 上追加一个共享 TriggerKey+Guard 的 AdjustLegSwap SetupAction —— 同一次按键触发两个效果:
+    /// (1) clause 激活 ConditionSlot.Active (释放技能), (2) SetupAction 修改 LegSwap 配置.
+    /// 用于树精 D 键+HasAghanim 同时 LegSwap(D,true) + Active 形态.
+    /// </summary>
+    public HeroPlanBuilder AlsoAdjustLegSwap(Keys paramKey, bool paramBool)
+    {
+        if (_lastClauseTrigger is null)
+        {
+            throw new InvalidOperationException("AlsoAdjustLegSwap: 需先终结一个 clause (AfterEnterCD / AfterCast / WhenReady / NoProbe).");
+        }
+
+        _setups.Add(new SetupAction(
+            TriggerKey: Domain.Actuation.VirtualKey.From(_lastClauseTrigger.Value),
+            Guard: _lastClauseGuard,
+            Kind: SetupActionKind.AdjustLegSwap,
+            ParamKey: paramKey,
+            ParamBool: paramBool));
         return this;
     }
 
