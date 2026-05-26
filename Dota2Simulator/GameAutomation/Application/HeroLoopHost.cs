@@ -337,6 +337,9 @@ namespace Dota2Simulator.GameAutomation.Application
             // Phase 26 D1: 跨 hero 切换清空延迟队列, 防上一 hero 入队的命令在新 hero 触发 (e.g. 上一 hero 入队的跳刀命令, 切英雄后 buff 结束误执行).
             _aggregate.Deferred.Clear();
 
+            // Phase 27A retry 2 S1: 跨 hero 切换清空 StepMachine 残留 (CurrentStep/Probes/Locals), 防上一 hero machine 状态污染新 hero.
+            _aggregate.StepMachines.Reset();
+
             _aggregate.HasAghanim = false;
             _aggregate.HasShard = false;
 

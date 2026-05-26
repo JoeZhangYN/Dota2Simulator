@@ -52,6 +52,9 @@ namespace Dota2Simulator.GameAutomation.Application
             _ackProbe = ackProbe;
         }
 
+        /// <summary>Phase 27A retry 2 S1: StepMachineRunner 通过 ItemEngine 复用注入的 IInputExecutor (避免 Runner ctor 第 6 参数; Application BC 内部 internal, 业务零感知).</summary>
+        internal IInputExecutor Input => _input;
+
         /// <summary>Phase 11 P3: 由 AppContainer.BindUi 在 HeroLoopHost new 后调用回填. setter 路径一次性装配.</summary>
         internal void BindHost(HeroLoopHost host) => _host = host;
 

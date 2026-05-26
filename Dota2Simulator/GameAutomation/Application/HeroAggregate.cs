@@ -2,6 +2,7 @@
 using Dota2Simulator.GameAutomation.Domain;
 using Dota2Simulator.GameAutomation.Domain.Combat;
 using Dota2Simulator.GameAutomation.Domain.Loop;
+using Dota2Simulator.GameAutomation.Domain.StepMachine;
 
 namespace Dota2Simulator.GameAutomation.Application;
 
@@ -33,6 +34,9 @@ public sealed class HeroAggregate
 
     /// <summary>Phase 26 D1: 延迟命令队列子聚合 — 命令入队条件满足才出队执行, 防"窗口期错失" (吹风/无敌期间命令丢失, buff 结束瞬间秒接).</summary>
     public DeferredQueue Deferred { get; } = new();
+
+    /// <summary>Phase 27A retry 2 S1: StepMachine 子聚合 — 第 7 子聚合 (同 Refractory/LegSwap/Stone/Conditions/Skills/Attack 模式). 持 CurrentStep / Probes / Locals / Locks 4 ConcurrentDictionary.</summary>
+    public StepMachineState StepMachines { get; } = new();
 
     /// <summary>Phase 8 C3: 当前英雄技能数量（4/5/6）——取代 Skill._技能数量 static。</summary>
     public int SkillCount { get; set; }
