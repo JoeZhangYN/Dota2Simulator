@@ -39,8 +39,8 @@ public sealed partial class 巫妖Strategy : IHeroStrategy
                         _main._聚合.Skills.SetStep(SlotKey.E, 1);
                         return false;
                     },
-                    ifSteps: new StepCommand[] { new SetStep(0) },
-                    elseSteps: new StepCommand[] { new SetStep(1) })
+                    IfSteps: new StepCommand[] { new SetStep(0) },
+                    ElseSteps: new StepCommand[] { new SetStep(1) })
             ).End()
             .Step(1).Do(
                 new Delay(200),                                                                                        // 替代原 _=Task.Run(()=>Common.Delay(200)) fire-and-forget.
@@ -53,11 +53,11 @@ public sealed partial class 巫妖Strategy : IHeroStrategy
                         if (_skill.DOTA2判断是否持续施法()) return true;
                         _main._聚合.Skills.SetStep(SlotKey.E, 0);  // 横向耦合读侧 bridge.
                         走A();
-                        _ = _item.根据图片使用物品(Dota2_Pictrue.物品.羊刀_Tpl);
+                        _item.根据图片使用物品(Dota2_Pictrue.物品.羊刀_Tpl);
                         return false;
                     },
-                    ifSteps: Array.Empty<StepCommand>(),
-                    elseSteps: new StepCommand[] { new SetStep(0) })
+                    IfSteps: Array.Empty<StepCommand>(),
+                    ElseSteps: new StepCommand[] { new SetStep(0) })
             ).End()
         )
         .OnKey(Keys.R).CustomProbe(async () => await _skill.技能通用判断(Keys.R, _main._聚合.Skills.Step(SlotKey.E) > 0 ? 11 : 1).ConfigureAwait(true))

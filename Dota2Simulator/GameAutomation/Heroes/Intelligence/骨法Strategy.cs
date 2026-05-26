@@ -46,8 +46,8 @@ public sealed partial class 骨法Strategy : IHeroStrategy
                         _main._聚合.Skills.SetStep(SlotKey.R, 1);
                         return false;
                     },
-                    ifSteps: new StepCommand[] { new SetStep(0) },
-                    elseSteps: new StepCommand[] { new SetStep(1) })
+                    IfSteps: new StepCommand[] { new SetStep(0) },
+                    ElseSteps: new StepCommand[] { new SetStep(1) })
             ).End()
             .Step(1).Do(
                 new Delay(200),                                                                                        // 替代原 _=Task.Run(()=>Common.Delay(200)) fire-and-forget.
@@ -62,8 +62,8 @@ public sealed partial class 骨法Strategy : IHeroStrategy
                         走A();
                         return false;
                     },
-                    ifSteps: Array.Empty<StepCommand>(),
-                    elseSteps: new StepCommand[] { new SetStep(0) })
+                    IfSteps: Array.Empty<StepCommand>(),
+                    ElseSteps: new StepCommand[] { new SetStep(0) })
             ).End()
         )
         .OnKey(Keys.D2).Execute(() =>
