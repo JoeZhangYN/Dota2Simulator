@@ -281,10 +281,10 @@ namespace Dota2Simulator.GameAutomation.Application
             public Rectangle 中立TP范围 { get; } = new Rectangle(最左侧x + 197, 968, 47, 101); // 6技能 1377,968,47,101 1180  197
         }
 
-        private static bool 判断物品状态(物品信息 物品, int 序号, Point 初始位置, Color 目标颜色, byte 颜色容差)
+        // Phase 25A C4: static → instance 化 (调 _vision.PixelAt 端口); 调用方 329/341 同类 instance method 上下文 不变.
+        private bool 判断物品状态(物品信息 物品, int 序号, Point 初始位置, Color 目标颜色, byte 颜色容差)
         {
-            ImageHandle 句柄 = GlobalScreenCapture.GetCurrentHandle();
-            Point 位置 = new(初始位置.X - GameLayout.OffsetX, 初始位置.Y - GameLayout.OffsetY);
+            Point 位置 = new(初始位置.X, 初始位置.Y);
 
             int 内部序号 = 序号;
             if (序号 >= 3)
@@ -295,13 +295,13 @@ namespace Dota2Simulator.GameAutomation.Application
 
             位置.X += 内部序号 * 物品.物品间隔x;
 
-            return ColorExtensions.ColorAEqualColorB(ImageManager.GetColor(in 句柄, 位置), 目标颜色, 颜色容差);
+            // PixelAt 接桌面坐标 (初始位置 已是桌面坐标, 不再 -OffsetX/Y).
+            return ColorExtensions.ColorAEqualColorB(_vision.PixelAt(new ScreenPoint(位置.X, 位置.Y)), 目标颜色, 颜色容差);
         }
 
-        private static bool 判断物品状态(物品信息 物品, int 序号, Point 初始位置, Color[] 目标颜色, byte 颜色容差)
+        private bool 判断物品状态(物品信息 物品, int 序号, Point 初始位置, Color[] 目标颜色, byte 颜色容差)
         {
-            ImageHandle 句柄 = GlobalScreenCapture.GetCurrentHandle();
-            Point 位置 = new(初始位置.X - GameLayout.OffsetX, 初始位置.Y - GameLayout.OffsetY);
+            Point 位置 = new(初始位置.X, 初始位置.Y);
 
             int 内部序号 = 序号;
             if (序号 >= 3)
@@ -312,7 +312,7 @@ namespace Dota2Simulator.GameAutomation.Application
 
             位置.X += 内部序号 * 物品.物品间隔x;
 
-            Color 获取的颜色 = ImageManager.GetColor(in 句柄, 位置);
+            Color 获取的颜色 = _vision.PixelAt(new ScreenPoint(位置.X, 位置.Y));
 
             bool b1 = ColorExtensions.ColorAEqualColorB(获取的颜色, 目标颜色[序号], 颜色容差);
             // if (!b1) Logger.Info($"获取到物品锁闭,当前物品{序号}，目标{目标颜色[序号]} 获取{获取的颜色}");
@@ -604,12 +604,13 @@ namespace Dota2Simulator.GameAutomation.Application
         private const int 技能A杖y = 959;
         private const int 技能魔晶y = 994;
 
-        private static bool 阿哈利姆神杖()
+        // Phase 25A C4: static → instance (调 instance 化的 检查技能颜色).
+        private bool 阿哈利姆神杖()
         {
             return 检查技能颜色([技能4魔晶A杖x, 技能5魔晶A杖x, 技能6魔晶A杖x], 技能A杖y, Color.FromArgb(30, 187, 250));
         }
 
-        private static bool 阿哈利姆魔晶()
+        private bool 阿哈利姆魔晶()
         {
             return 检查技能颜色([技能4魔晶A杖x, 技能5魔晶A杖x, 技能6魔晶A杖x], 技能魔晶y, Color.FromArgb(30, 187, 254));
         }
@@ -623,19 +624,22 @@ namespace Dota2Simulator.GameAutomation.Application
         /// <param name="yCoord">y坐标</param>
         /// <param name="技能点颜色">技能点颜色</param>
         /// <returns>是否匹配</returns>
-        private static bool 检查技能颜色(int[] xCoords, int yCoord, in Color 技能点颜色)
+        // Phase 25A C4: static → instance + WithFrame typestate (foreach 多次同帧取色; xCoord 原 buffer 坐标 -OffsetX, 改桌面坐标 +0).
+        private bool 检查技能颜色(int[] xCoords, int yCoord, in Color 技能点颜色)
         {
-            ImageHandle 句柄 = GlobalScreenCapture.GetCurrentHandle();
-            foreach (int xCoord in xCoords)
+            Color 颜色匹配色 = 技能点颜色;  // in 参数无法被闭包捕获, 拷贝到局部变量
+            return _vision.WithFrame(frame =>
             {
-                var color = ImageManager.GetColor(in 句柄, xCoord - GameLayout.OffsetX, yCoord - GameLayout.OffsetY);
-                if (ColorExtensions.ColorAEqualColorB(color, 技能点颜色, 1))
+                foreach (int xCoord in xCoords)
                 {
-                    return true;
+                    var color = frame.PixelAt(new ScreenPoint(xCoord, yCoord));
+                    if (ColorExtensions.ColorAEqualColorB(color, 颜色匹配色, 1))
+                    {
+                        return true;
+                    }
                 }
-            }
-
-            return false;
+                return false;
+            });
         }
 
         #endregion

@@ -92,7 +92,12 @@ public sealed partial class 暗影萨满Strategy : IHeroStrategy
 
     private async Task<bool> 变羊取消后摇()
     {
-        ImageHandle 句柄 = GlobalScreenCapture.GetCurrentHandle();
+        // Phase 25A C4: 切 WithFrame typestate (4 档同帧多次取色). 注意 ImageManager.GetColor 用的 (909/897/885/875) 是桌面坐标 (无 -OffsetX), PixelAt 直接传等价.
+        var (c909, c897, c885, c875) = _vision.WithFrame(frame => (
+            frame.PixelAt(new ScreenPoint(909, 1008)),
+            frame.PixelAt(new ScreenPoint(897, 1008)),
+            frame.PixelAt(new ScreenPoint(885, 1008)),
+            frame.PixelAt(new ScreenPoint(875, 1008))));
         void 萨满变羊后()
         {
             _main._聚合.Skills.SetTime(SlotKey.W, Common.获取当前时间毫秒());
@@ -100,10 +105,10 @@ public sealed partial class 暗影萨满Strategy : IHeroStrategy
             {
                 int time = 1250;
                 Color 技能点颜色 = Color.FromArgb(203, 183, 124);
-                if (ColorExtensions.ColorAEqualColorB(ImageManager.GetColor(in 句柄, 909, 1008), 技能点颜色, 0)) time = 3400;
-                else if (ColorExtensions.ColorAEqualColorB(ImageManager.GetColor(in 句柄, 897, 1008), 技能点颜色, 0)) time = 2650;
-                else if (ColorExtensions.ColorAEqualColorB(ImageManager.GetColor(in 句柄, 885, 1008), 技能点颜色, 0)) time = 1900;
-                else if (ColorExtensions.ColorAEqualColorB(ImageManager.GetColor(in 句柄, 875, 1008), 技能点颜色, 0)) time = 1150;
+                if (ColorExtensions.ColorAEqualColorB(c909, 技能点颜色, 0)) time = 3400;
+                else if (ColorExtensions.ColorAEqualColorB(c897, 技能点颜色, 0)) time = 2650;
+                else if (ColorExtensions.ColorAEqualColorB(c885, 技能点颜色, 0)) time = 1900;
+                else if (ColorExtensions.ColorAEqualColorB(c875, 技能点颜色, 0)) time = 1150;
                 time = Convert.ToInt32(_main._聚合.Attack.状态抗性倍数 * time);
                 TTS.TTS.Speak(string.Concat("延时", time.ToString(CultureInfo.InvariantCulture)));
                 走A();

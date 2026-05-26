@@ -384,7 +384,7 @@ namespace Dota2Simulator.GameAutomation.Application
 
         public int 获取当前技能数量()
         {
-            ImageHandle 句柄 = GlobalScreenCapture.GetCurrentHandle();
+            // Phase 25A C4: 删死代码 `var 句柄 = GetCurrentHandle()` — 该 method 内 句柄 未被使用 (传给 `快速检测技能数量` 也无 句柄 参数, 间接 method 自取).
             List<技能信息> 技能列表 = [技能4, 技能5, 技能6];
             List<int> 技能数量 = [4, 5, 6];
 
@@ -446,30 +446,33 @@ namespace Dota2Simulator.GameAutomation.Application
 
         private (bool 成功, string 调试信息) 快速检测单个技能(技能信息 技能, int i)
         {
-            ImageHandle 句柄 = GlobalScreenCapture.GetCurrentHandle();
             var 检测点数组 = 获取检测点配置(技能, i);
             var 调试信息 = new StringBuilder();
 
             // 获取所有颜色和检测结果
             var 检测结果 = new (string 名称, Point 位置, Color 颜色, bool[] 匹配结果)[检测点数组.Length];
-            bool 整体有匹配 = false;
-
-            for (int idx = 0; idx < 检测点数组.Length; idx++)
+            // Phase 25A C4: WithFrame typestate scope — 多次同帧 PixelAt 取色; 检测点位置 buffer 坐标 +OffsetX/Y 还原桌面坐标 (PixelAt 内部 GetColor 再减回 offset, 等价).
+            bool 整体有匹配 = _vision.WithFrame(frame =>
             {
-                var 点 = 检测点数组[idx];
-                var 实际颜色 = ImageManager.GetColor(in 句柄, 点.位置);
-                var 匹配结果 = new bool[点.颜色检查.Length];
-
-                for (int colorIdx = 0; colorIdx < 点.颜色检查.Length; colorIdx++)
+                bool match = false;
+                for (int idx = 0; idx < 检测点数组.Length; idx++)
                 {
-                    var (期望颜色, 容差) = 点.颜色检查.Span[colorIdx];
-                    匹配结果[colorIdx] = ColorExtensions.ColorAEqualColorB(实际颜色, 期望颜色, (byte)容差);
-                }
+                    var 点 = 检测点数组[idx];
+                    var 实际颜色 = frame.PixelAt(new ScreenPoint(点.位置.X + GameLayout.OffsetX, 点.位置.Y + GameLayout.OffsetY));
+                    var 匹配结果 = new bool[点.颜色检查.Length];
 
-                bool 当前点有匹配 = 匹配结果.Any(match => match);
-                检测结果[idx] = (点.名称, 点.位置, 实际颜色, 匹配结果);
-                整体有匹配 |= 当前点有匹配;
-            }
+                    for (int colorIdx = 0; colorIdx < 点.颜色检查.Length; colorIdx++)
+                    {
+                        var (期望颜色, 容差) = 点.颜色检查.Span[colorIdx];
+                        匹配结果[colorIdx] = ColorExtensions.ColorAEqualColorB(实际颜色, 期望颜色, (byte)容差);
+                    }
+
+                    bool 当前点有匹配 = 匹配结果.Any(m => m);
+                    检测结果[idx] = (点.名称, 点.位置, 实际颜色, 匹配结果);
+                    match |= 当前点有匹配;
+                }
+                return match;
+            });
 
             // 根据原逻辑构建调试信息
             if (整体有匹配)
@@ -573,7 +576,6 @@ namespace Dota2Simulator.GameAutomation.Application
         /// <returns>如果技能在CD状态返回真，否则返回假</returns>
         public bool 判断技能状态(Keys 技能位置, 技能类型 类型 = 技能类型.图标CD)
         {
-            ImageHandle 句柄 = GlobalScreenCapture.GetCurrentHandle();
             if (_aggregate.SkillCount == 4 && (技能位置 == Keys.D || 技能位置 == Keys.F))
             {
                 return false;
@@ -582,7 +584,8 @@ namespace Dota2Simulator.GameAutomation.Application
             技能信息 技能信息 = 获取技能信息(_aggregate.SkillCount);
             int offsetX = 获取技能位置偏移(技能位置, 技能信息);
             (int x, int y, Color 颜色, byte 颜色容差) = 获取技能位置信息(技能信息, offsetX, 类型);
-            return ColorExtensions.ColorAEqualColorB(颜色, ImageManager.GetColor(in 句柄, x, y), 颜色容差);
+            // Phase 25A C4: 单次取色切 PixelAt; (x,y) buffer 坐标 +OffsetX/Y 还原桌面坐标.
+            return ColorExtensions.ColorAEqualColorB(颜色, _vision.PixelAt(new ScreenPoint(x + GameLayout.OffsetX, y + GameLayout.OffsetY)), 颜色容差);
         }
 
         /// <summary>
@@ -593,9 +596,9 @@ namespace Dota2Simulator.GameAutomation.Application
         /// <param name="技能数量">技能数量，默认值为4</param>
         /// <param name="类型">技能类型</param>
         /// <returns>指定位置的像素颜色</returns>
-        private static Color 获取技能判断颜色(Keys 技能位置, int 技能数量 = 4, 技能类型 类型 = 技能类型.释放变色)
+        // Phase 25A C4: static → instance 化 (调 _vision.PixelAt 端口); 调用方 7 facade + 1817 helper 同步 instance 化.
+        private Color 获取技能判断颜色(Keys 技能位置, int 技能数量 = 4, 技能类型 类型 = 技能类型.释放变色)
         {
-            ImageHandle 句柄 = GlobalScreenCapture.GetCurrentHandle();
             if (技能数量 == 4 && (技能位置 == Keys.D || 技能位置 == Keys.F))
             {
                 return Color.Empty;
@@ -605,7 +608,8 @@ namespace Dota2Simulator.GameAutomation.Application
             int offsetX = 获取技能位置偏移(技能位置, 技能信息);
             (int x, int y, Color _, byte _) = 获取技能位置信息(技能信息, offsetX, 类型);
 
-            return ImageManager.GetColor(in 句柄, x, y);
+            // buffer 坐标 +OffsetX/Y 还原桌面坐标; PixelAt adapter 内部 GetColor 再减回 offset, 等价.
+            return _vision.PixelAt(new ScreenPoint(x + GameLayout.OffsetX, y + GameLayout.OffsetY));
         }
 
         /// <summary>
@@ -615,7 +619,7 @@ namespace Dota2Simulator.GameAutomation.Application
         /// <param name="数组">包含长宽的字节数组</param>
         /// <param name="技能数量">技能数量，默认值为4</param>
         /// <returns>技能释放判断的像素颜色</returns>
-        public static Color 获取技能释放判断颜色(Keys 技能位置, int 技能数量 = 4)
+        public Color 获取技能释放判断颜色(Keys 技能位置, int 技能数量 = 4)
         {
             return 获取技能判断颜色(技能位置, 技能数量, 技能类型.释放变色);
         }
@@ -627,7 +631,7 @@ namespace Dota2Simulator.GameAutomation.Application
         /// <param name="数组">包含长宽的字节数组</param>
         /// <param name="技能数量">技能数量，默认值为4</param>
         /// <returns>的像素颜色</returns>
-        public static Color 获取技能进入CD判断颜色(Keys 技能位置, int 技能数量 = 4)
+        public Color 获取技能进入CD判断颜色(Keys 技能位置, int 技能数量 = 4)
         {
             return 获取技能判断颜色(技能位置, 技能数量, 技能类型.图标CD);
         }
@@ -639,7 +643,7 @@ namespace Dota2Simulator.GameAutomation.Application
         /// <param name="数组">包含长宽的字节数组</param>
         /// <param name="技能数量">技能数量，默认值为4</param>
         /// <returns>技能释放判断的像素颜色</returns>
-        public static Color 获取QWERDF颜色(Keys 技能位置, int 技能数量 = 4)
+        public Color 获取QWERDF颜色(Keys 技能位置, int 技能数量 = 4)
         {
             return 获取技能判断颜色(技能位置, 技能数量, 技能类型.QWERDF图标);
         }
@@ -651,7 +655,7 @@ namespace Dota2Simulator.GameAutomation.Application
         /// <param name="数组">包含长宽的字节数组</param>
         /// <param name="技能数量">技能数量，默认值为4</param>
         /// <returns>技能释放判断的像素颜色</returns>
-        public static Color 获取法球颜色(Keys 技能位置, int 技能数量 = 4)
+        public Color 获取法球颜色(Keys 技能位置, int 技能数量 = 4)
         {
             return 获取技能判断颜色(技能位置, 技能数量, 技能类型.法球);
         }
@@ -663,7 +667,7 @@ namespace Dota2Simulator.GameAutomation.Application
         /// <param name="数组">包含长宽的字节数组</param>
         /// <param name="技能数量">技能数量，默认值为4</param>
         /// <returns>技能释放判断的像素颜色</returns>
-        public static Color 获取状态颜色(Keys 技能位置, int 技能数量 = 4)
+        public Color 获取状态颜色(Keys 技能位置, int 技能数量 = 4)
         {
             return 获取技能判断颜色(技能位置, 技能数量, 技能类型.状态);
         }
@@ -675,7 +679,7 @@ namespace Dota2Simulator.GameAutomation.Application
         /// <param name="数组">包含长宽的字节数组</param>
         /// <param name="技能数量">技能数量，默认值为4</param>
         /// <returns>技能释放判断的像素颜色</returns>
-        public static Color 获取被动颜色(Keys 技能位置, int 技能数量 = 4)
+        public Color 获取被动颜色(Keys 技能位置, int 技能数量 = 4)
         {
             return 获取技能判断颜色(技能位置, 技能数量, 技能类型.被动技能存在);
         }
@@ -730,11 +734,8 @@ namespace Dota2Simulator.GameAutomation.Application
 
         public bool DOTA2判断是否持续施法()
         {
-            ImageHandle 句柄 = GlobalScreenCapture.GetCurrentHandle();
-            // 通过添加步骤来等待完全显示
-            // 用于检测持续施法，施法中文字的施字颜色，10秒以内有效
-            // Phase 11 P1: 去 static——原经 Common.HeroLoopHost!.获取指定位置颜色 service locator 等价 ImageManager.GetColor(in 句柄, x-OffsetX, y-OffsetY)
-            return ColorExtensions.ColorAEqualColorB(ImageManager.GetColor(in 句柄, 953 - GameLayout.OffsetX, 764 - GameLayout.OffsetY), Color.FromArgb(254, 254, 254), 2);
+            // Phase 25A C4: 切 PixelAt 端口; 原 buffer 坐标 (953-OffsetX, 764-OffsetY) 改桌面坐标 (953, 764) 传 PixelAt, adapter 内 GetColor 再减 offset, 等价.
+            return ColorExtensions.ColorAEqualColorB(_vision.PixelAt(new ScreenPoint(953, 764)), Color.FromArgb(254, 254, 254), 2);
         }
 
         private static void 记录技能释放信息(Keys s1, string s, bool b1, bool b2, Color c1, Color c2, Color c3)
@@ -825,14 +826,13 @@ namespace Dota2Simulator.GameAutomation.Application
         /// <param name="技能信息"></param>
         /// <param name="数组"></param>
         /// <returns></returns>
-        private static bool 判断是否更新释放技能前颜色(Keys 技能位置, 技能信息 技能信息)
+        // Phase 25A C4: static → instance 化 (调 _vision.PixelAt 端口).
+        private bool 判断是否更新释放技能前颜色(Keys 技能位置, 技能信息 技能信息)
         {
-            ImageHandle 句柄 = GlobalScreenCapture.GetCurrentHandle();
             int 偏移 = 获取技能位置偏移(技能位置, 技能信息);
 
-            Point p_主动 = new(技能信息.技能CD图标x + 偏移 - GameLayout.OffsetX, 技能信息.技能CD图标y - GameLayout.OffsetY);
-
-            Color 获取的颜色_主动 = ImageManager.GetColor(in 句柄, p_主动);
+            // 桌面坐标 (无 -OffsetX/Y), PixelAt adapter 内 GetColor 再减 offset, 等价原 buffer 坐标读.
+            Color 获取的颜色_主动 = _vision.PixelAt(new ScreenPoint(技能信息.技能CD图标x + 偏移, 技能信息.技能CD图标y));
 
             // 主动释放CD技能
             bool colorMatch_已学主动 = ColorExtensions.ColorAEqualColorB(获取的颜色_主动, 技能信息.技能CD颜色, 技能信息.技能CD颜色容差);
@@ -1813,8 +1813,8 @@ namespace Dota2Simulator.GameAutomation.Application
             return configs;
         }
 
-        // 统一获取技能颜色的方法
-        private static Color 获取技能颜色(Keys skillKey, int skillCount, 技能类型 colorType)
+        // 统一获取技能颜色的方法 — Phase 25A C4: static → instance 化 (调 instance 化的 7 facade).
+        private Color 获取技能颜色(Keys skillKey, int skillCount, 技能类型 colorType)
         {
             return colorType switch
             {

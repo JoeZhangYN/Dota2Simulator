@@ -8,6 +8,7 @@ using Dota2Simulator.GameAutomation.Application.HeroPlans;
 using Dota2Simulator.GameAutomation.Domain.Actuation;
 using Dota2Simulator.GameAutomation.Domain.Heroes;
 using Dota2Simulator.GameAutomation.Domain.Loop;
+using Dota2Simulator.GameAutomation.Domain.Perception;
 using Dota2Simulator.Games;
 using Dota2Simulator.Vision;
 
@@ -19,13 +20,14 @@ public sealed partial class 小黑Strategy : IHeroStrategy
     protected override HeroPlan BuildPlan() => HeroPlanBuilder.New()
         .OnKey(Keys.F1).Execute(() =>
         {
-            ImageHandle 句柄 = GlobalScreenCapture.GetCurrentHandle();
-            _main._聚合.Skills.SetMode(SlotKey.E, ColorExtensions.ColorAEqualColorB(ImageManager.GetColor(in 句柄, 738, 957),
-                Color.FromArgb(246, 178, 60), 0) || ColorExtensions.ColorAEqualColorB(
-                ImageManager.GetColor(in 句柄, 722, 957),
-                Color.FromArgb(246, 178, 60), 0)
-                ? 1
-                : 0);
+            // Phase 25A C4: 切 WithFrame typestate (2 模式同帧取色判定).
+            var (c738, c722) = _vision.WithFrame(frame => (
+                frame.PixelAt(new ScreenPoint(738, 957)),
+                frame.PixelAt(new ScreenPoint(722, 957))));
+            _main._聚合.Skills.SetMode(SlotKey.E,
+                ColorExtensions.ColorAEqualColorB(c738, Color.FromArgb(246, 178, 60), 0)
+                || ColorExtensions.ColorAEqualColorB(c722, Color.FromArgb(246, 178, 60), 0)
+                    ? 1 : 0);
         })
         .OnKey(Keys.F1).WhenHasShard().AdjustLegSwap(Keys.F, paramBool: true)
         .OnKey(Keys.D).Execute(() =>

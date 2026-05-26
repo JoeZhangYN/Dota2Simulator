@@ -8,6 +8,7 @@ using Dota2Simulator.GameAutomation.Application.HeroPlans;
 using Dota2Simulator.GameAutomation.Domain.Actuation;
 using Dota2Simulator.GameAutomation.Domain.Heroes;
 using Dota2Simulator.GameAutomation.Domain.Loop;
+using Dota2Simulator.GameAutomation.Domain.Perception;
 using Dota2Simulator.Games.Dota2;
 using Dota2Simulator.Vision;
 
@@ -21,17 +22,22 @@ public sealed partial class 祸乱之源Strategy : IHeroStrategy
         .OnKey(Keys.W).CustomProbe(噬脑去后摇)
         .OnKey(Keys.E).Execute(() =>
         {
-            // 噩梦键: 颜色检测 4 档 → SetTime(Global) → Active C3
-            ImageHandle 句柄 = GlobalScreenCapture.GetCurrentHandle();
+            // 噩梦键: 颜色检测 4 档 → SetTime(Global) → Active C3.
+            // Phase 25A C4: 切 WithFrame typestate (4 档同帧多次取色); GameLayout.OffsetX/Y=0, buffer ≡ 桌面坐标 PixelAt 直接传等价.
             Color 技能点颜色 = Color.FromArgb(203, 183, 124);
             _main._聚合.Skills.SetTime(SlotKey.Global, 0);
-            if (ColorExtensions.ColorAEqualColorB(ImageManager.GetColor(in 句柄, 971, 1008), 技能点颜色, 0))
+            var (c971, c964, c947, c935) = _vision.WithFrame(frame => (
+                frame.PixelAt(new ScreenPoint(971, 1008)),
+                frame.PixelAt(new ScreenPoint(964, 1008)),
+                frame.PixelAt(new ScreenPoint(947, 1008)),
+                frame.PixelAt(new ScreenPoint(935, 1008))));
+            if (ColorExtensions.ColorAEqualColorB(c971, 技能点颜色, 0))
                 _main._聚合.Skills.SetTime(SlotKey.Global, 7000);
-            else if (ColorExtensions.ColorAEqualColorB(ImageManager.GetColor(in 句柄, 964, 1008), 技能点颜色, 0))
+            else if (ColorExtensions.ColorAEqualColorB(c964, 技能点颜色, 0))
                 _main._聚合.Skills.SetTime(SlotKey.Global, 6000);
-            else if (ColorExtensions.ColorAEqualColorB(ImageManager.GetColor(in 句柄, 947, 1008), 技能点颜色, 0))
+            else if (ColorExtensions.ColorAEqualColorB(c947, 技能点颜色, 0))
                 _main._聚合.Skills.SetTime(SlotKey.Global, 5000);
-            else if (ColorExtensions.ColorAEqualColorB(ImageManager.GetColor(in 句柄, 935, 1008), 技能点颜色, 0))
+            else if (ColorExtensions.ColorAEqualColorB(c935, 技能点颜色, 0))
                 _main._聚合.Skills.SetTime(SlotKey.Global, 4000);
             _main._聚合.Conditions[ConditionSlotKey.C3].Active = true;
         })
