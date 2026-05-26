@@ -12,15 +12,11 @@ namespace Dota2Simulator.GameAutomation.Heroes.Agility;
 [HeroStrategy("赏金", HeroAttribute.Agility)]
 public sealed partial class 赏金Strategy : IHeroStrategy
 {
-    private static readonly HeroPlan _plan = HeroPlanBuilder.New()
+    protected override HeroPlan BuildPlan() => HeroPlanBuilder.New()
         .LegSwap(Keys.W, alwaysSwap: false)
         .OnKey(Keys.Q).CastSkill(Keys.Q).AfterCast()
         .OnKey(Keys.R).CastSkill(Keys.R).AfterCast()
         .OnKey(Keys.D2).ToggleSlot(Keys.R, "循环标记", "不循环标记")
         .Done();
-
-    public override void OnActivate(HeroContext ctx) => _plan.Apply(ctx, _skill);
-
-    public override Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx) => _plan.DispatchAsync(trigger, ctx, _item);
 }
 #endif

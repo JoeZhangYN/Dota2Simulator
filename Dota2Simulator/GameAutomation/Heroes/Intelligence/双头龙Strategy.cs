@@ -18,13 +18,7 @@ public sealed partial class 双头龙Strategy : IHeroStrategy
 {
     private const int 等待延迟 = 33;
 
-    private HeroPlan? _plan;
-
-    public override void OnActivate(HeroContext ctx) => GetPlan().Apply(ctx, _skill);
-
-    public override Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx) => GetPlan().DispatchAsync(trigger, ctx, _item);
-
-    private HeroPlan GetPlan() => _plan ??= HeroPlanBuilder.New()
+    protected override HeroPlan BuildPlan() => HeroPlanBuilder.New()
         .OnKey(Keys.Q).CustomProbe(冰火交加去后摇)
         .OnKey(Keys.W).CustomProbe(冰封路径去后摇)
         .OnKey(Keys.R).CustomProbe(烈焰焚身去后摇)

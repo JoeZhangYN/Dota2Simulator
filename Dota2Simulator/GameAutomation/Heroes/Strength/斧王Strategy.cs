@@ -18,8 +18,7 @@ public sealed partial class 斧王Strategy : IHeroStrategy
 {
     private const int 等待延迟 = 33;
 
-    private HeroPlan? _plan;
-    private HeroPlan GetPlan() => _plan ??= HeroPlanBuilder.New()
+    protected override HeroPlan BuildPlan() => HeroPlanBuilder.New()
         .LegSwap(Keys.E, alwaysSwap: false)
         .OnKey(Keys.Q).Pre(() => _item.根据图片使用物品(Dota2_Pictrue.物品.魂戒_Tpl)).CustomProbe(吼去后摇)  // C1
         .OnKey(Keys.W).Pre(() => _item.根据图片使用物品(Dota2_Pictrue.物品.魂戒_Tpl)).CastSkill(Keys.W).AfterCast()  // C2: 战斗饥渴 (mode 1)
@@ -32,8 +31,6 @@ public sealed partial class 斧王Strategy : IHeroStrategy
         })
         .OnKey(Keys.D3).Execute(快速触发激怒)
         .Done();
-
-    protected override HeroPlan BuildPlan() => GetPlan();
 
     private async Task<bool> 吼去后摇()
     {

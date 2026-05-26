@@ -18,13 +18,7 @@ namespace Dota2Simulator.GameAutomation.Heroes.Intelligence;
 [HeroStrategy("光法", HeroAttribute.Intelligence)]
 public sealed partial class 光法Strategy : IHeroStrategy
 {
-    private HeroPlan? _plan;
-
-    public override void OnActivate(HeroContext ctx) => GetPlan().Apply(ctx, _skill);
-
-    public override Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx) => GetPlan().DispatchAsync(trigger, ctx, _item);
-
-    private HeroPlan GetPlan() => _plan ??= HeroPlanBuilder.New()
+    protected override HeroPlan BuildPlan() => HeroPlanBuilder.New()
         .RepeatThreshold(100)
         .OnKey(Keys.Q).CustomProbe(async () =>
         {

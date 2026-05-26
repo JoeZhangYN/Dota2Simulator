@@ -12,13 +12,9 @@ namespace Dota2Simulator.GameAutomation.Heroes.Universal;
 [HeroStrategy("小强", HeroAttribute.Universal)]
 public sealed partial class 小强Strategy : IHeroStrategy
 {
-    private static readonly HeroPlan _plan = HeroPlanBuilder.New()
+    protected override HeroPlan BuildPlan() => HeroPlanBuilder.New()
         .OnKey(Keys.D3).ToggleSlot(skillKey: Keys.W, speakOn: "循环爆裂", speakOff: "终止循环")
         .RepeatThreshold(150)
         .Done();
-
-    public override void OnActivate(HeroContext ctx) => _plan.Apply(ctx, _skill);
-
-    public override Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx) => _plan.DispatchAsync(trigger, ctx, _item);
 }
 #endif

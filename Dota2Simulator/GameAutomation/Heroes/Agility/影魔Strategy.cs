@@ -14,7 +14,7 @@ namespace Dota2Simulator.GameAutomation.Heroes.Agility;
 [HeroStrategy("影魔", HeroAttribute.Agility)]
 public sealed partial class 影魔Strategy : IHeroStrategy
 {
-    private static readonly HeroPlan _plan = HeroPlanBuilder.New()
+    protected override HeroPlan BuildPlan() => HeroPlanBuilder.New()
         .OnKey(Keys.Q).CastSkill(Keys.Q).AfterCast(continueAttack: false)
         .OnKey(Keys.W).CastSkill(Keys.W).AfterCast(continueAttack: false)
         .OnKey(Keys.E).CastSkill(Keys.E).AfterCast(continueAttack: false)
@@ -23,9 +23,5 @@ public sealed partial class 影魔Strategy : IHeroStrategy
         .OnKey(Keys.R).NoProbe()
         .LegSwap(Keys.F, alwaysSwap: false)
         .Done();
-
-    public override void OnActivate(HeroContext ctx) => _plan.Apply(ctx, _skill);
-
-    public override Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx) => _plan.DispatchAsync(trigger, ctx, _item);
 }
 #endif

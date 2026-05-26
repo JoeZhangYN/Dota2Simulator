@@ -14,13 +14,7 @@ namespace Dota2Simulator.GameAutomation.Heroes.Universal;
 [HeroStrategy("狼人", HeroAttribute.Universal)]
 public sealed partial class 狼人Strategy : IHeroStrategy
 {
-    private HeroPlan? _plan;
-
-    public override void OnActivate(HeroContext ctx) => GetPlan().Apply(ctx, _skill);
-
-    public override Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx) => GetPlan().DispatchAsync(trigger, ctx, _item);
-
-    private HeroPlan GetPlan() => _plan ??= HeroPlanBuilder.New()
+    protected override HeroPlan BuildPlan() => HeroPlanBuilder.New()
         .OnKey(Keys.Q).CustomProbe(招狼去后摇)
         .OnKey(Keys.W).CustomProbe(嚎叫去后摇)
         .OnKey(Keys.D).CustomProbe(撕咬去后摇)

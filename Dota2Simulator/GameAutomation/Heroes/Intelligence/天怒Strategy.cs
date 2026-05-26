@@ -17,8 +17,7 @@ namespace Dota2Simulator.GameAutomation.Heroes.Intelligence;
 [HeroStrategy("天怒", HeroAttribute.Intelligence)]
 public sealed partial class 天怒Strategy : IHeroStrategy
 {
-    private HeroPlan? _plan;
-    private HeroPlan GetPlan() => _plan ??= HeroPlanBuilder.New()
+    protected override HeroPlan BuildPlan() => HeroPlanBuilder.New()
         .OnKey(Keys.D2).ToggleSlot(Keys.Q, "循环鹰隼", "不循环鹰隼")  // C1: toggle 循环奥数鹰隼 (Probe 自循环 mode 2 of Q)
         .OnKey(Keys.D3).Pre(() => _main._聚合.Skills.SetStep(SlotKey.Global, 1)).CustomProbe(天怒秒人连招)  // C2: 秒人连招 Step 状态机
         .OnKey(Keys.Q).CastSkill(Keys.Q).AfterEnterCD()  // C3: 奥数鹰隼
@@ -27,8 +26,6 @@ public sealed partial class 天怒Strategy : IHeroStrategy
         .OnKey(Keys.W).CastSkill(Keys.W).AfterEnterCD()  // C6: 震荡光弹
         .RepeatThreshold(100)
         .Done();
-
-    protected override HeroPlan BuildPlan() => GetPlan();
 
     private async Task<bool> 天怒秒人连招()
     {

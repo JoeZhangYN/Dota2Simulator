@@ -18,14 +18,10 @@ namespace Dota2Simulator.GameAutomation.Heroes.Strength;
 [HeroStrategy("骷髅王", HeroAttribute.Strength)]
 public sealed partial class 骷髅王Strategy : IHeroStrategy
 {
-    private static readonly HeroPlan _plan = HeroPlanBuilder.New()
+    protected override HeroPlan BuildPlan() => HeroPlanBuilder.New()
         .OnKey(Keys.Q).CastSkill(Keys.Q).AfterCast(continueAttack: true)
         .LegSwap(Keys.W, alwaysSwap: false)
         .LegSwap(Keys.E, alwaysSwap: false)
         .Done();
-
-    public override void OnActivate(HeroContext ctx) => _plan.Apply(ctx, _skill);
-
-    public override Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx) => _plan.DispatchAsync(trigger, ctx, _item);
 }
 #endif

@@ -18,13 +18,7 @@ public sealed partial class 猛犸Strategy : IHeroStrategy
 {
     private const int 等待延迟 = 33;
 
-    private HeroPlan? _plan;
-
-    public override void OnActivate(HeroContext ctx) => GetPlan().Apply(ctx, _skill);
-
-    public override Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx) => GetPlan().DispatchAsync(trigger, ctx, _item);
-
-    private HeroPlan GetPlan() => _plan ??= HeroPlanBuilder.New()
+    protected override HeroPlan BuildPlan() => HeroPlanBuilder.New()
         .OnKey(Keys.Q).CustomProbe(通用后续Probe)
         .OnKey(Keys.W).CustomProbe(通用后续Probe)
         .OnKey(Keys.E).CustomProbe(通用后续Probe)

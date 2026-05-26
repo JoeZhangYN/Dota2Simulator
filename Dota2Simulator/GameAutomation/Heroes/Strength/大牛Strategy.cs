@@ -13,13 +13,7 @@ namespace Dota2Simulator.GameAutomation.Heroes.Strength;
 [HeroStrategy("大牛", HeroAttribute.Strength)]
 public sealed partial class 大牛Strategy : IHeroStrategy
 {
-    private HeroPlan? _plan;
-
-    public override void OnActivate(HeroContext ctx) => GetPlan().Apply(ctx, _skill);
-
-    public override Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx) => GetPlan().DispatchAsync(trigger, ctx, _item);
-
-    private HeroPlan GetPlan() => _plan ??= HeroPlanBuilder.New()
+    protected override HeroPlan BuildPlan() => HeroPlanBuilder.New()
         .OnKey(Keys.Q).CastSkill(Keys.Q).AfterCast(postDelayMs: 1300)
         .OnKey(Keys.W).Pre(() => _input.Press(VirtualKey.From(Keys.A))).CustomProbe(async () =>
             await _skill.释放技能后替换图标技能后续(

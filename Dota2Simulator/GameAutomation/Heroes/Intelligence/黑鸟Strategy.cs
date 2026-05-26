@@ -14,13 +14,7 @@ namespace Dota2Simulator.GameAutomation.Heroes.Intelligence;
 [HeroStrategy("黑鸟", HeroAttribute.Intelligence)]
 public sealed partial class 黑鸟Strategy : IHeroStrategy
 {
-    private HeroPlan? _plan;
-
-    public override void OnActivate(HeroContext ctx) => GetPlan().Apply(ctx, _skill);
-
-    public override Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx) => GetPlan().DispatchAsync(trigger, ctx, _item);
-
-    private HeroPlan GetPlan() => _plan ??= HeroPlanBuilder.New()
+    protected override HeroPlan BuildPlan() => HeroPlanBuilder.New()
         .OnKey(Keys.D).Pre(() => _input.Press(VirtualKey.From(Keys.W))).CustomProbe(async () =>
         {
             if (_skill.DOTA2判断技能是否CD(Keys.R))

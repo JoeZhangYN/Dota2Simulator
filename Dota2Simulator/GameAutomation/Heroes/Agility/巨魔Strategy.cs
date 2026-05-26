@@ -13,15 +13,11 @@ namespace Dota2Simulator.GameAutomation.Heroes.Agility;
 [HeroStrategy("巨魔", HeroAttribute.Agility)]
 public sealed partial class 巨魔Strategy : IHeroStrategy
 {
-    private static readonly HeroPlan _plan = HeroPlanBuilder.New()
+    protected override HeroPlan BuildPlan() => HeroPlanBuilder.New()
         .OnKey(Keys.W).CastSkill(Keys.W).AfterCast(continueAttack: true)
         .OnKey(Keys.E).CastSkill(Keys.E).AfterEnterCD(continueAttack: true)
         .OnKey(Keys.R).CastSkill(Keys.R).AfterEnterCD(continueAttack: true)
         .LegSwap(Keys.Q, alwaysSwap: false)
         .Done();
-
-    public override void OnActivate(HeroContext ctx) => _plan.Apply(ctx, _skill);
-
-    public override Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx) => _plan.DispatchAsync(trigger, ctx, _item);
 }
 #endif

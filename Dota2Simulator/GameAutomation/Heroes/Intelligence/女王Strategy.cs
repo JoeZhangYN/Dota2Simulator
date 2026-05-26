@@ -13,13 +13,7 @@ namespace Dota2Simulator.GameAutomation.Heroes.Intelligence;
 [HeroStrategy("女王", HeroAttribute.Intelligence)]
 public sealed partial class 女王Strategy : IHeroStrategy
 {
-    private HeroPlan? _plan;
-
-    public override void OnActivate(HeroContext ctx) => GetPlan().Apply(ctx, _skill);
-
-    public override Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx) => GetPlan().DispatchAsync(trigger, ctx, _item);
-
-    private HeroPlan GetPlan() => _plan ??= HeroPlanBuilder.New()
+    protected override HeroPlan BuildPlan() => HeroPlanBuilder.New()
         .OnKey(Keys.Q).CustomProbe(暗影突袭去后摇)
         .OnKey(Keys.W).CustomProbe(闪烁去后摇)
         .OnKey(Keys.E).CustomProbe(痛苦尖叫去后摇)

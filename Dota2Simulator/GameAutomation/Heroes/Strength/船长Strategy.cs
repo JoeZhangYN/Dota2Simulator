@@ -18,8 +18,7 @@ public sealed partial class 船长Strategy : IHeroStrategy
 {
     private static readonly Lock _全局模式e_lock = new();
 
-    private HeroPlan? _plan;
-    private HeroPlan GetPlan() => _plan ??= HeroPlanBuilder.New()
+    protected override HeroPlan BuildPlan() => HeroPlanBuilder.New()
         .OnKey(Keys.Q).CustomProbe(洪流接x回)
         .OnKey(Keys.E).CustomProbe(x释放后相关逻辑)
         .OnKey(Keys.D2).Execute(() =>
@@ -30,8 +29,6 @@ public sealed partial class 船长Strategy : IHeroStrategy
         .RegisterProbe(ConditionSlotKey.C3, x2次释放后)
         .RegisterProbe(ConditionSlotKey.C4, 立即释放洪流)
         .Done();
-
-    protected override HeroPlan BuildPlan() => GetPlan();
 
     public override async Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)
     {

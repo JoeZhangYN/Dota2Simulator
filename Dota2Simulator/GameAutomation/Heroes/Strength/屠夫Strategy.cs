@@ -15,8 +15,7 @@ namespace Dota2Simulator.GameAutomation.Heroes.Strength;
 [HeroStrategy("屠夫", HeroAttribute.Strength)]
 public sealed partial class 屠夫Strategy : IHeroStrategy
 {
-    private HeroPlan? _plan;
-    private HeroPlan GetPlan() => _plan ??= HeroPlanBuilder.New()
+    protected override HeroPlan BuildPlan() => HeroPlanBuilder.New()
         .OnKey(Keys.Q).CustomProbe(钩子去僵直)  // C1: 钩子 (Mode==1 时跨 clause 设 C3.Active=true)
         .OnKey(Keys.R).CustomProbe(肢解检测状态)  // C2: 肢解
         .OnKey(Keys.D2).Execute(() =>
@@ -26,8 +25,6 @@ public sealed partial class 屠夫Strategy : IHeroStrategy
         })
         .RegisterProbe(ConditionSlotKey.C3, 快速接肢解)  // C3: 快速接肢解 (由 C1 Probe 跨 clause 驱动)
         .Done();
-
-    protected override HeroPlan BuildPlan() => GetPlan();
 
     private async Task<bool> 钩子去僵直()
     {

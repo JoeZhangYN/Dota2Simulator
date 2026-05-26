@@ -18,15 +18,12 @@ namespace Dota2Simulator.GameAutomation.Heroes.Universal;
 [HeroStrategy("测试", HeroAttribute.Universal, RequiresUi = true)]
 public sealed partial class 测试Strategy : IHeroStrategy
 {
-    private HeroPlan? _plan;
-    private HeroPlan GetPlan() => _plan ??= HeroPlanBuilder.New()
+    protected override HeroPlan BuildPlan() => HeroPlanBuilder.New()
         .OnKey(Keys.D1).Execute(() => Task.Run(测试其他功能))
         .OnKey(Keys.D2).Execute(() => Task.Run(() => _skill.捕捉颜色().Start()))
         .OnKey(Keys.D3).Execute(D3键映射执行)
         .OnKey(Keys.D4).Execute(() => Task.Run(() => _skill.测试方法(802, 946)))
         .Done();
-
-    protected override HeroPlan BuildPlan() => GetPlan();
 
     private void D3键映射执行()
     {

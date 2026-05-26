@@ -18,13 +18,10 @@ public sealed partial class 马西Strategy : IHeroStrategy
 {
     private static readonly Rectangle buff状态技能栏 = new(962, 826, 526, 80);
 
-    private HeroPlan? _plan;
-    private HeroPlan GetPlan() => _plan ??= HeroPlanBuilder.New()
+    protected override HeroPlan BuildPlan() => HeroPlanBuilder.New()
         .OnKey(Keys.W).WhenNotHasAghanim().Execute(() => _main._聚合.Conditions[ConditionSlotKey.C2].Active = true)
         .RegisterProbe(ConditionSlotKey.C2, 幽魂检测)
         .Done();
-
-    protected override HeroPlan BuildPlan() => GetPlan();
 
     private async Task<bool> 幽魂检测()
     {

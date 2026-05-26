@@ -15,13 +15,7 @@ namespace Dota2Simulator.GameAutomation.Heroes.Intelligence;
 [HeroStrategy("炸弹人", HeroAttribute.Intelligence)]
 public sealed partial class 炸弹人Strategy : IHeroStrategy
 {
-    private HeroPlan? _plan;
-
-    public override void OnActivate(HeroContext ctx) => GetPlan().Apply(ctx, _skill);
-
-    public override Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx) => GetPlan().DispatchAsync(trigger, ctx, _item);
-
-    private HeroPlan GetPlan() => _plan ??= HeroPlanBuilder.New()
+    protected override HeroPlan BuildPlan() => HeroPlanBuilder.New()
         .OnKey(Keys.Q).CustomProbe(粘性炸弹去后摇)
         .OnKey(Keys.W).CustomProbe(活性电击去后摇)
         .OnKey(Keys.E).Pre(() => _item.根据图片使用物品(Dota2_Pictrue.物品.纷争_Tpl)).CustomProbe(爆破起飞去后摇)

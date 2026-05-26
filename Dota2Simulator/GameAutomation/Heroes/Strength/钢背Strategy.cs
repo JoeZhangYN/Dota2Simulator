@@ -12,7 +12,7 @@ namespace Dota2Simulator.GameAutomation.Heroes.Strength;
 [HeroStrategy("钢背", HeroAttribute.Strength)]
 public sealed partial class 钢背Strategy : IHeroStrategy
 {
-    private static readonly HeroPlan _plan = HeroPlanBuilder.New()
+    protected override HeroPlan BuildPlan() => HeroPlanBuilder.New()
         .LegSwap(Keys.E, alwaysSwap: false)
         .OnKey(Keys.F1).WhenHasShard().AdjustLegSwap(Keys.D, paramBool: true)
         .OnKey(Keys.F1).WhenHasAghanim().AdjustLegSwap(Keys.E, paramBool: true)
@@ -21,9 +21,5 @@ public sealed partial class 钢背Strategy : IHeroStrategy
         .OnKey(Keys.E).WhenHasAghanim().NoProbe()
         .OnKey(Keys.W).NoProbe()
         .Done();
-
-    public override void OnActivate(HeroContext ctx) => _plan.Apply(ctx, _skill);
-
-    public override Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx) => _plan.DispatchAsync(trigger, ctx, _item);
 }
 #endif

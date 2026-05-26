@@ -13,14 +13,11 @@ namespace Dota2Simulator.GameAutomation.Heroes.Universal;
 [HeroStrategy("进化岛", HeroAttribute.Universal)]
 public sealed partial class 进化岛Strategy : IHeroStrategy
 {
-    private HeroPlan? _plan;
-    private HeroPlan GetPlan() => _plan ??= HeroPlanBuilder.New()
+    protected override HeroPlan BuildPlan() => HeroPlanBuilder.New()
         .OnKey(Keys.D).Execute(() => Task.Run(延迟后PressA))
         .OnKey(Keys.T).Execute(() => Task.Run(延迟后PressA))
         .OnKey(Keys.F3).Execute(() => Task.Run(延迟后PressA))
         .Done();
-
-    protected override HeroPlan BuildPlan() => GetPlan();
 
     private void 延迟后PressA()
     {

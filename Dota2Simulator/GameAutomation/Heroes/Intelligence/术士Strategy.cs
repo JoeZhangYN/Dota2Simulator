@@ -15,13 +15,7 @@ namespace Dota2Simulator.GameAutomation.Heroes.Intelligence;
 [HeroStrategy("术士", HeroAttribute.Intelligence)]
 public sealed partial class 术士Strategy : IHeroStrategy
 {
-    private HeroPlan? _plan;
-
-    public override void OnActivate(HeroContext ctx) => GetPlan().Apply(ctx, _skill);
-
-    public override Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx) => GetPlan().DispatchAsync(trigger, ctx, _item);
-
-    private HeroPlan GetPlan() => _plan ??= HeroPlanBuilder.New()
+    protected override HeroPlan BuildPlan() => HeroPlanBuilder.New()
         .OnKey(Keys.Q).Pre(() => _item.根据图片使用物品(Dota2_Pictrue.物品.纷争_Tpl)).CustomProbe(致命链接去后摇)
         .OnKey(Keys.W).CustomProbe(暗言术去后摇)
         .OnKey(Keys.E).Execute(() => _main._聚合.Skills.SetTime(SlotKey.E, Common.获取当前时间毫秒()))

@@ -13,13 +13,7 @@ namespace Dota2Simulator.GameAutomation.Heroes.Agility;
 [HeroStrategy("火枪", HeroAttribute.Agility)]
 public sealed partial class 火枪Strategy : IHeroStrategy
 {
-    private HeroPlan? _plan;
-
-    public override void OnActivate(HeroContext ctx) => GetPlan().Apply(ctx, _skill);
-
-    public override Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx) => GetPlan().DispatchAsync(trigger, ctx, _item);
-
-    private HeroPlan GetPlan() => _plan ??= HeroPlanBuilder.New()
+    protected override HeroPlan BuildPlan() => HeroPlanBuilder.New()
         .LegSwap(Keys.W, alwaysSwap: false)
         .OnEveryKey().AdjustLegSwapDynamic(Keys.D, ctx => ctx.Aggregate.HasShard)
         .OnKey(Keys.Q).CastSkill(Keys.Q).AfterCast()

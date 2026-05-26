@@ -15,8 +15,7 @@ namespace Dota2Simulator.GameAutomation.Heroes.Strength;
 [HeroStrategy("军团", HeroAttribute.Strength)]
 public sealed partial class 军团Strategy : IHeroStrategy
 {
-    private HeroPlan? _plan;
-    private HeroPlan GetPlan() => _plan ??= HeroPlanBuilder.New()
+    protected override HeroPlan BuildPlan() => HeroPlanBuilder.New()
         .LegSwap(Keys.E, alwaysSwap: false)
         .OnKey(Keys.Q).CastSkill(Keys.Q).AfterEnterCD()  // C1: 压倒性优势
         .OnKey(Keys.W).CastSkill(Keys.W).AfterCast()  // C2: 强攻
@@ -32,8 +31,6 @@ public sealed partial class 军团Strategy : IHeroStrategy
             TTS.TTS.Speak(_main._聚合.Skills.Mode(SlotKey.Global) == 1 ? "跳刀决斗" : "直接决斗");
         })
         .Done();
-
-    protected override HeroPlan BuildPlan() => GetPlan();
 
     public override void OnActivate(HeroContext ctx)
     {

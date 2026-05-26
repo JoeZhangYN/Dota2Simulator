@@ -13,13 +13,7 @@ namespace Dota2Simulator.GameAutomation.Heroes.Strength;
 [HeroStrategy("马尔斯", HeroAttribute.Strength)]
 public sealed partial class 马尔斯Strategy : IHeroStrategy
 {
-    private HeroPlan? _plan;
-
-    public override void OnActivate(HeroContext ctx) => GetPlan().Apply(ctx, _skill);
-
-    public override Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx) => GetPlan().DispatchAsync(trigger, ctx, _item);
-
-    private HeroPlan GetPlan() => _plan ??= HeroPlanBuilder.New()
+    protected override HeroPlan BuildPlan() => HeroPlanBuilder.New()
         .OnKey(Keys.Q).CustomProbe(async () => await _skill.主动技能释放后续(Keys.Q, () =>
         {
             if (_main._聚合.Skills.Mode(SlotKey.Q) == 1)

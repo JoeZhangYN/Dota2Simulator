@@ -19,8 +19,7 @@ public sealed partial class 伐木机Strategy : IHeroStrategy
 {
     private static readonly Rectangle 命石区域 = new(738, 945, 70, 26);
 
-    private HeroPlan? _plan;
-    private HeroPlan GetPlan() => _plan ??= HeroPlanBuilder.New()
+    protected override HeroPlan BuildPlan() => HeroPlanBuilder.New()
         .OnKey(Keys.Q).CastSkill(Keys.Q).AfterEnterCD()  // C1: 死亡旋风
         .OnKey(Keys.W).CastSkill(Keys.W).AfterCast()  // C2: 伐木聚链
         .OnKey(Keys.D).CastSkill(Keys.D).AfterCast()  // C3: 锯齿轮旋 (业务侧 D 键 StoneChoice==2 Guard, override OnKeyAsync 短路)
@@ -28,8 +27,6 @@ public sealed partial class 伐木机Strategy : IHeroStrategy
         .OnKey(Keys.R).CustomProbe(锯齿飞轮去后摇)  // C5: 锯齿飞轮 (释放技能后替换图标技能后续 lambda)
         .RegisterStoneProbe(伐木机获取命石)  // Phase 19G-4 RegisterStoneProbe DSL
         .Done();
-
-    protected override HeroPlan BuildPlan() => GetPlan();
 
     public override async Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)
     {

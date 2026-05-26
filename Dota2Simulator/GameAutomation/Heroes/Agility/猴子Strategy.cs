@@ -13,15 +13,12 @@ namespace Dota2Simulator.GameAutomation.Heroes.Agility;
 [HeroStrategy("猴子", HeroAttribute.Agility)]
 public sealed partial class 猴子Strategy : IHeroStrategy
 {
-    private HeroPlan? _plan;
-    private HeroPlan GetPlan() => _plan ??= HeroPlanBuilder.New()
+    protected override HeroPlan BuildPlan() => HeroPlanBuilder.New()
         .LegSwap(Keys.E, alwaysSwap: false)
         .LegSwap(Keys.R, alwaysSwap: false)
         .OnKey(Keys.Q).CastSkill(Keys.Q).AfterCast()  // C1: 灵魂之矛敏捷
         .OnKey(Keys.W).CustomProbe(神行百变选择幻象)  // C2: 神行百变
         .Done();
-
-    protected override HeroPlan BuildPlan() => GetPlan();
 
     public override void OnActivate(HeroContext ctx)
     {

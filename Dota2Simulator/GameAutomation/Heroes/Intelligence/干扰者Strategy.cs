@@ -13,13 +13,7 @@ namespace Dota2Simulator.GameAutomation.Heroes.Intelligence;
 [HeroStrategy("干扰者", HeroAttribute.Intelligence)]
 public sealed partial class 干扰者Strategy : IHeroStrategy
 {
-    private HeroPlan? _plan;
-
-    public override void OnActivate(HeroContext ctx) => GetPlan().Apply(ctx, _skill);
-
-    public override Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx) => GetPlan().DispatchAsync(trigger, ctx, _item);
-
-    private HeroPlan GetPlan() => _plan ??= HeroPlanBuilder.New()
+    protected override HeroPlan BuildPlan() => HeroPlanBuilder.New()
         .OnKey(Keys.Q).CastSkill(Keys.Q).AfterEnterCD()
         .OnKey(Keys.W).CastSkill(Keys.W).AfterEnterCD(continueAttack: false)
         .OnKey(Keys.E).CastSkill(Keys.E).AfterEnterCD(continueAttack: false)

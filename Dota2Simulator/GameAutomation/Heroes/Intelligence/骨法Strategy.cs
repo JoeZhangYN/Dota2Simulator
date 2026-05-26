@@ -15,8 +15,7 @@ namespace Dota2Simulator.GameAutomation.Heroes.Intelligence;
 [HeroStrategy("骨法", HeroAttribute.Intelligence)]
 public sealed partial class 骨法Strategy : IHeroStrategy
 {
-    private HeroPlan? _plan;
-    private HeroPlan GetPlan() => _plan ??= HeroPlanBuilder.New()
+    protected override HeroPlan BuildPlan() => HeroPlanBuilder.New()
         .OnKey(Keys.Q).CustomProbe(幽冥轰爆去后摇)  // C1: 动态 mode (Step(R)>0 ? 10 : 0)
         .OnKey(Keys.W).CustomProbe(衰老去后摇)  // C2: 主动技能进入CD后续 + 5 红杖
         .OnKey(Keys.E).CustomProbe(幽冥守卫去后摇)  // C3: 动态 mode
@@ -31,8 +30,6 @@ public sealed partial class 骨法Strategy : IHeroStrategy
             TTS.TTS.Speak(_main._聚合.Skills.Mode(SlotKey.R) == 1 ? "吸取接衰老" : "吸取不接衰老");
         })
         .Done();
-
-    protected override HeroPlan BuildPlan() => GetPlan();
 
     private async Task<bool> 幽冥轰爆去后摇()
         => await _skill.技能通用判断(Keys.Q, _main._聚合.Skills.Step(SlotKey.R) > 0 ? 10 : 0).ConfigureAwait(true);

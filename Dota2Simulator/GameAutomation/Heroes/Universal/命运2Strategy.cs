@@ -14,14 +14,11 @@ namespace Dota2Simulator.GameAutomation.Heroes.Universal;
 [HeroStrategy("命运2", HeroAttribute.Universal)]
 public sealed partial class 命运2Strategy : IHeroStrategy
 {
-    private HeroPlan? _plan;
-    private HeroPlan GetPlan() => _plan ??= HeroPlanBuilder.New()
+    protected override HeroPlan BuildPlan() => HeroPlanBuilder.New()
         .OnKey(Keys.V).Execute(() => Task.Run(命运2冰好耶))
         .OnKey(Keys.B).Execute(() => Task.Run(命运2冰好耶1))
         .OnKey(Keys.Q).Execute(() => _input.MouseMoveTo(new ScreenPoint(1920, 1080)))
         .Done();
-
-    protected override HeroPlan BuildPlan() => GetPlan();
 
     private void 命运2按键(Keys Key)
     {

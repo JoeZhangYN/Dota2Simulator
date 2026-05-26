@@ -13,18 +13,14 @@ namespace Dota2Simulator.GameAutomation.Heroes.Strength;
 [HeroStrategy("龙骑", HeroAttribute.Strength)]
 public sealed partial class 龙骑Strategy : IHeroStrategy
 {
-    private HeroPlan? _plan;
-
     public override void OnActivate(HeroContext ctx)
     {
-        GetPlan().Apply(ctx, _skill);
+        base.OnActivate(ctx);
         _main._聚合.Attack.基础攻击前摇 = 0.5;
         _main._聚合.Attack.基础攻击间隔 = 1.6;
     }
 
-    public override Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx) => GetPlan().DispatchAsync(trigger, ctx, _item);
-
-    private HeroPlan GetPlan() => _plan ??= HeroPlanBuilder.New()
+    protected override HeroPlan BuildPlan() => HeroPlanBuilder.New()
         .LegSwap(Keys.E, alwaysSwap: false)
         .OnKey(Keys.F1).WhenHasShard().AdjustLegSwap(Keys.D, paramBool: true)
         .OnKey(Keys.Q).CastSkill(Keys.Q).AfterCast()

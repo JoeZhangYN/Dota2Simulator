@@ -13,12 +13,8 @@ namespace Dota2Simulator.GameAutomation.Heroes.Universal;
 [HeroStrategy("沙王", HeroAttribute.Universal)]
 public sealed partial class 沙王Strategy : IHeroStrategy
 {
-    private static readonly HeroPlan _plan = HeroPlanBuilder.New()
+    protected override HeroPlan BuildPlan() => HeroPlanBuilder.New()
         .RepeatThreshold(150)
         .Done();
-
-    public override void OnActivate(HeroContext ctx) => _plan.Apply(ctx, _skill);
-
-    public override Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx) => _plan.DispatchAsync(trigger, ctx, _item);
 }
 #endif

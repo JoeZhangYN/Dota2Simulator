@@ -12,13 +12,7 @@ namespace Dota2Simulator.GameAutomation.Heroes.Intelligence;
 [HeroStrategy("神域", HeroAttribute.Intelligence)]
 public sealed partial class 神域Strategy : IHeroStrategy
 {
-    private HeroPlan? _plan;
-
-    public override void OnActivate(HeroContext ctx) => GetPlan().Apply(ctx, _skill);
-
-    public override Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx) => GetPlan().DispatchAsync(trigger, ctx, _item);
-
-    private HeroPlan GetPlan() => _plan ??= HeroPlanBuilder.New()
+    protected override HeroPlan BuildPlan() => HeroPlanBuilder.New()
         .OnKey(Keys.W).CustomProbe(命运敕令去后摇)
         .OnKey(Keys.E).CustomProbe(涤罪之焰去后摇)
         .OnKey(Keys.R).CustomProbe(虚妄之诺去后摇)

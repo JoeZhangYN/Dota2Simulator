@@ -21,13 +21,7 @@ public sealed partial class 火猫Strategy : IHeroStrategy
     /// <summary>1080p 增益状态栏区域——内联自 _main.buff状态技能栏。</summary>
     private static readonly Rectangle buff状态技能栏 = new(962, 826, 526, 80);
 
-    private HeroPlan? _plan;
-
-    public override void OnActivate(HeroContext ctx) => GetPlan().Apply(ctx, _skill);
-
-    public override Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx) => GetPlan().DispatchAsync(trigger, ctx, _item);
-
-    private HeroPlan GetPlan() => _plan ??= HeroPlanBuilder.New()
+    protected override HeroPlan BuildPlan() => HeroPlanBuilder.New()
         .LegSwap(Keys.D, alwaysSwap: true)
         .LegSwap(Keys.R, alwaysSwap: false)
         .OnKey(Keys.W).PostAsync(async () => await Task.Run(() =>

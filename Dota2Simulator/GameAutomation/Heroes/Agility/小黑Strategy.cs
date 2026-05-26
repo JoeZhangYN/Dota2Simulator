@@ -16,13 +16,7 @@ namespace Dota2Simulator.GameAutomation.Heroes.Agility;
 [HeroStrategy("小黑", HeroAttribute.Agility)]
 public sealed partial class 小黑Strategy : IHeroStrategy
 {
-    private HeroPlan? _plan;
-
-    public override void OnActivate(HeroContext ctx) => GetPlan().Apply(ctx, _skill);
-
-    public override Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx) => GetPlan().DispatchAsync(trigger, ctx, _item);
-
-    private HeroPlan GetPlan() => _plan ??= HeroPlanBuilder.New()
+    protected override HeroPlan BuildPlan() => HeroPlanBuilder.New()
         .OnKey(Keys.F1).Execute(() =>
         {
             ImageHandle 句柄 = GlobalScreenCapture.GetCurrentHandle();

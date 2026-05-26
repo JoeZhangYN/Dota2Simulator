@@ -12,15 +12,10 @@ namespace Dota2Simulator.GameAutomation.Heroes.Strength;
 [HeroStrategy("发条", HeroAttribute.Strength)]
 public sealed partial class 发条Strategy : IHeroStrategy
 {
-    private HeroPlan? _plan;
-    private HeroPlan GetPlan() => _plan ??= HeroPlanBuilder.New()
+    protected override HeroPlan BuildPlan() => HeroPlanBuilder.New()
         .OnKey(Keys.Q).NoProbe()
         .OnKey(Keys.W).Pre(() => _input.Press(VirtualKey.From(Keys.A))).NoProbe()  // 回收时按 W 先 Press A
         .OnKey(Keys.R).NoProbe()
         .Done();
-
-    public override void OnActivate(HeroContext ctx) => GetPlan().Apply(ctx, _skill);
-
-    public override Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx) => GetPlan().DispatchAsync(trigger, ctx, _item);
 }
 #endif

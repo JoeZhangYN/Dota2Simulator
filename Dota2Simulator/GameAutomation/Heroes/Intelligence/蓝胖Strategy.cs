@@ -13,13 +13,7 @@ namespace Dota2Simulator.GameAutomation.Heroes.Intelligence;
 [HeroStrategy("蓝胖", HeroAttribute.Intelligence)]
 public sealed partial class 蓝胖Strategy : IHeroStrategy
 {
-    private HeroPlan? _plan;
-
-    public override void OnActivate(HeroContext ctx) => GetPlan().Apply(ctx, _skill);
-
-    public override Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx) => GetPlan().DispatchAsync(trigger, ctx, _item);
-
-    private HeroPlan GetPlan() => _plan ??= HeroPlanBuilder.New()
+    protected override HeroPlan BuildPlan() => HeroPlanBuilder.New()
         .OnKey(Keys.Q).CustomProbe(火焰轰爆去后摇)
         .OnKey(Keys.W).CustomProbe(引燃去后摇)
         .OnKey(Keys.E).NoProbe()  // 占 C3 (原 OnActivate 注册嗜血术 dead Probe, OnKeyAsync 不触发 E)

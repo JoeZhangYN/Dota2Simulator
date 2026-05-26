@@ -12,13 +12,7 @@ namespace Dota2Simulator.GameAutomation.Heroes.Universal;
 [HeroStrategy("剧毒", HeroAttribute.Universal)]
 public sealed partial class 剧毒Strategy : IHeroStrategy
 {
-    private HeroPlan? _plan;
-
-    public override void OnActivate(HeroContext ctx) => GetPlan().Apply(ctx, _skill);
-
-    public override Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx) => GetPlan().DispatchAsync(trigger, ctx, _item);
-
-    private HeroPlan GetPlan() => _plan ??= HeroPlanBuilder.New()
+    protected override HeroPlan BuildPlan() => HeroPlanBuilder.New()
         .LegSwap(Keys.W, alwaysSwap: false)
         .RepeatThreshold(100)
         .OnKey(Keys.Q).CastSkill(Keys.Q).AfterCast()

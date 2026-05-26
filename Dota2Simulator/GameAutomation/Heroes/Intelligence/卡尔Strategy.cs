@@ -12,15 +12,11 @@ namespace Dota2Simulator.GameAutomation.Heroes.Intelligence;
 [HeroStrategy("卡尔", HeroAttribute.Intelligence)]
 public sealed partial class 卡尔Strategy : IHeroStrategy
 {
-    private static readonly HeroPlan _plan = HeroPlanBuilder.New()
+    protected override HeroPlan BuildPlan() => HeroPlanBuilder.New()
         .OnKey(Keys.D1).NoProbe()
         .OnKey(Keys.D2).NoProbe()
         .OnKey(Keys.D3).NoProbe()
         .OnKey(Keys.D4).NoProbe()
         .Done();
-
-    public override void OnActivate(HeroContext ctx) => _plan.Apply(ctx, _skill);
-
-    public override Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx) => _plan.DispatchAsync(trigger, ctx, _item);
 }
 #endif

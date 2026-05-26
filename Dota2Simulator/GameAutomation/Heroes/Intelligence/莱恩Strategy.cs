@@ -18,13 +18,7 @@ public sealed partial class 莱恩Strategy : IHeroStrategy
 {
     private const int 等待延迟 = 33;
 
-    private HeroPlan? _plan;
-
-    public override void OnActivate(HeroContext ctx) => GetPlan().Apply(ctx, _skill);
-
-    public override Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx) => GetPlan().DispatchAsync(trigger, ctx, _item);
-
-    private HeroPlan GetPlan() => _plan ??= HeroPlanBuilder.New()
+    protected override HeroPlan BuildPlan() => HeroPlanBuilder.New()
         .OnKey(Keys.W).CustomProbe(async () => await 莱恩羊接技能().ConfigureAwait(true))
         .OnKey(Keys.R).PreAsync(async () => await 大招前纷争().ConfigureAwait(true))
             .CustomProbe(async () => await 死亡一指去后摇().ConfigureAwait(true))

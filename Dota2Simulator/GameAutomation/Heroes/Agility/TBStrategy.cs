@@ -8,11 +8,9 @@
 //
 // Plan OnKey 顺序映射 C1..C6: Q→C1, W→C2, E→C3, D→C4, F→C5, R→C6 (与原 OnActivate 注册顺序 1:1).
 #if DOTA2
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using Dota2Simulator.GameAutomation.Application;
 using Dota2Simulator.GameAutomation.Application.HeroPlans;
-using Dota2Simulator.GameAutomation.Domain.Actuation;
 using Dota2Simulator.GameAutomation.Domain.Heroes;
 
 namespace Dota2Simulator.GameAutomation.Heroes.Agility;
@@ -21,7 +19,7 @@ namespace Dota2Simulator.GameAutomation.Heroes.Agility;
 [HeroStrategy("TB", HeroAttribute.Agility)]
 public sealed partial class TBStrategy : IHeroStrategy
 {
-    private static readonly HeroPlan _plan = HeroPlanBuilder.New()
+    protected override HeroPlan BuildPlan() => HeroPlanBuilder.New()
         .OnKey(Keys.F1).WhenHasAghanim().AdjustLegSwap(Keys.F, true)
         .OnKey(Keys.Q).CastSkill(Keys.Q).AfterCast(continueAttack: true)
         .OnKey(Keys.W).CastSkill(Keys.W).AfterCast(continueAttack: true)
@@ -31,9 +29,5 @@ public sealed partial class TBStrategy : IHeroStrategy
         .OnKey(Keys.R).CastSkill(Keys.R).AfterCast(continueAttack: true)
         .LegSwap(Keys.W, alwaysSwap: false)
         .Done();
-
-    public override void OnActivate(HeroContext ctx) => _plan.Apply(ctx, _skill);
-
-    public override Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx) => _plan.DispatchAsync(trigger, ctx, _item);
 }
 #endif

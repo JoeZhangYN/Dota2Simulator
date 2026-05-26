@@ -20,8 +20,7 @@ public sealed partial class 海民Strategy : IHeroStrategy
 {
     private static readonly Rectangle 命石区域 = new(738, 945, 70, 26);
 
-    private HeroPlan? _plan;
-    private HeroPlan GetPlan() => _plan ??= HeroPlanBuilder.New()
+    protected override HeroPlan BuildPlan() => HeroPlanBuilder.New()
         .OnKey(Keys.Q).CastSkill(Keys.Q).AfterCast()  // C1: 冰片 (mode 1)
         .RegisterProbe(ConditionSlotKey.C2, 摔角行家去后摇)  // C2: 摔角行家 (E StoneChoice==1 触发)
         .RegisterProbe(ConditionSlotKey.C3, 海象神拳接雪球)  // C3: 海象神拳接雪球 (F 触发)
@@ -33,8 +32,6 @@ public sealed partial class 海民Strategy : IHeroStrategy
             TTS.TTS.Speak("确定指定地点");
         })
         .Done();
-
-    protected override HeroPlan BuildPlan() => GetPlan();
 
     public override async Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)
     {

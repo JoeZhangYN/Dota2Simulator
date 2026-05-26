@@ -19,13 +19,7 @@ public sealed partial class 小精灵Strategy : IHeroStrategy
 {
     private static readonly Rectangle buff状态技能栏 = new(962, 826, 526, 80);
 
-    private HeroPlan? _plan;
-
-    public override void OnActivate(HeroContext ctx) => GetPlan().Apply(ctx, _skill);
-
-    public override Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx) => GetPlan().DispatchAsync(trigger, ctx, _item);
-
-    private HeroPlan GetPlan() => _plan ??= HeroPlanBuilder.New()
+    protected override HeroPlan BuildPlan() => HeroPlanBuilder.New()
         .OnKey(Keys.W).WhenNotHasAghanim().Execute(() => _main._聚合.Conditions[ConditionSlotKey.C2].Active = true)
         .OnKey(Keys.D3).ToggleConditionSlot(ConditionSlotKey.C3, "开启续过载", "关闭续过载")
         .RegisterProbe(ConditionSlotKey.C2, 幽魂检测)

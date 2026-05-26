@@ -22,8 +22,7 @@ public sealed partial class 暗影萨满Strategy : IHeroStrategy
 {
     private const int 等待延迟 = 33;
 
-    private HeroPlan? _plan;
-    private HeroPlan GetPlan() => _plan ??= HeroPlanBuilder.New()
+    protected override HeroPlan BuildPlan() => HeroPlanBuilder.New()
         .OnKey(Keys.Q).CustomProbe(苍穹振击取消后摇)  // C1
         .OnKey(Keys.W).Pre(W键中立物品setup).CustomProbe(变羊取消后摇)  // C2
         .OnKey(Keys.R).CustomProbe(释放群蛇守卫取消后摇)  // C3
@@ -38,8 +37,6 @@ public sealed partial class 暗影萨满Strategy : IHeroStrategy
             TTS.TTS.Speak(_main._聚合.Skills.Mode(SlotKey.Q) == 0 ? "羊" : "电羊");
         })
         .Done();
-
-    protected override HeroPlan BuildPlan() => GetPlan();
 
     private void W键中立物品setup()
     {

@@ -13,15 +13,11 @@ namespace Dota2Simulator.GameAutomation.Heroes.Agility;
 [HeroStrategy("美杜莎", HeroAttribute.Agility)]
 public sealed partial class 美杜莎Strategy : IHeroStrategy
 {
-    private static readonly HeroPlan _plan = HeroPlanBuilder.New()
+    protected override HeroPlan BuildPlan() => HeroPlanBuilder.New()
         .OnKey(Keys.W).CastSkill(Keys.W).AfterCast(continueAttack: true)
         .OnKey(Keys.E).CastSkill(Keys.E).AfterCast(continueAttack: true)
         .OnKey(Keys.R).CastSkill(Keys.R).AfterCast(continueAttack: true)
         .LegSwap(Keys.Q, alwaysSwap: false)
         .Done();
-
-    public override void OnActivate(HeroContext ctx) => _plan.Apply(ctx, _skill);
-
-    public override Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx) => _plan.DispatchAsync(trigger, ctx, _item);
 }
 #endif

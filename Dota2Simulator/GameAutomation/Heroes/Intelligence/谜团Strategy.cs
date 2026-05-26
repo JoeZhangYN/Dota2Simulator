@@ -15,12 +15,9 @@ public sealed partial class 谜团Strategy : IHeroStrategy
 {
     private const int 等待延迟 = 33;
 
-    private HeroPlan? _plan;
-    private HeroPlan GetPlan() => _plan ??= HeroPlanBuilder.New()
+    protected override HeroPlan BuildPlan() => HeroPlanBuilder.New()
         .OnKey(Keys.F).Execute(() => Task.Run(刷新接凋零黑洞))
         .Done();
-
-    protected override HeroPlan BuildPlan() => GetPlan();
 
     private void 刷新接凋零黑洞()
     {

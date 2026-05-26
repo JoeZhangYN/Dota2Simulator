@@ -12,7 +12,7 @@ namespace Dota2Simulator.GameAutomation.Heroes.Intelligence;
 [HeroStrategy("瘟疫法师", HeroAttribute.Intelligence)]
 public sealed partial class 瘟疫法师Strategy : IHeroStrategy
 {
-    private static readonly HeroPlan _plan = HeroPlanBuilder.New()
+    protected override HeroPlan BuildPlan() => HeroPlanBuilder.New()
         .OnKey(Keys.Q).CastSkill(Keys.Q).AfterEnterCD(continueAttack: false)
         .OnKey(Keys.W).CastSkill(Keys.W).AfterEnterCD(continueAttack: false)
         .OnKey(Keys.R).CastSkill(Keys.R).AfterEnterCD()
@@ -22,9 +22,5 @@ public sealed partial class 瘟疫法师Strategy : IHeroStrategy
         .LegSwap(Keys.E, alwaysSwap: false)
         .RepeatThreshold(100)
         .Done();
-
-    public override void OnActivate(HeroContext ctx) => _plan.Apply(ctx, _skill);
-
-    public override Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx) => _plan.DispatchAsync(trigger, ctx, _item);
 }
 #endif

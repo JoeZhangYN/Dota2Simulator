@@ -21,7 +21,7 @@ namespace Dota2Simulator.GameAutomation.Heroes.Strength;
 [HeroStrategy("夜魔", HeroAttribute.Strength)]
 public sealed partial class 夜魔Strategy : IHeroStrategy
 {
-    private static readonly HeroPlan _plan = HeroPlanBuilder.New()
+    protected override HeroPlan BuildPlan() => HeroPlanBuilder.New()
         // F1 + HasShard → 改 LegSwap.E = true (神杖切假腿配置).
         .OnKey(Keys.F1).WhenHasShard().AdjustLegSwap(Keys.E, true)
         // 4 个 OnKey-CastSkill clause; Plan 按 OnKey 顺序占 C1..C4.
@@ -31,9 +31,5 @@ public sealed partial class 夜魔Strategy : IHeroStrategy
         .OnKey(Keys.E).WhenHasShard().CastSkill(Keys.E).AfterEnterCD(continueAttack: true)
         .LegSwap(Keys.E, alwaysSwap: false)
         .Done();
-
-    public override void OnActivate(HeroContext ctx) => _plan.Apply(ctx, _skill);
-
-    public override Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx) => _plan.DispatchAsync(trigger, ctx, _item);
 }
 #endif

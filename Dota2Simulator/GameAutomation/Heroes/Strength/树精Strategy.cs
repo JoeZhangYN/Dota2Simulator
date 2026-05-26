@@ -12,16 +12,12 @@ namespace Dota2Simulator.GameAutomation.Heroes.Strength;
 [HeroStrategy("树精", HeroAttribute.Strength)]
 public sealed partial class 树精Strategy : IHeroStrategy
 {
-    private static readonly HeroPlan _plan = HeroPlanBuilder.New()
+    protected override HeroPlan BuildPlan() => HeroPlanBuilder.New()
         .OnKey(Keys.Q).CastSkill(Keys.Q).AfterCast()
         .OnKey(Keys.W).CastSkill(Keys.W).AfterCast()
         .OnKey(Keys.E).CastSkill(Keys.E).AfterCast()
         .OnKey(Keys.D).WhenHasAghanim().CastSkill(Keys.D).AfterCast().AlsoAdjustLegSwap(Keys.D, true)
         .OnKey(Keys.R).CastSkill(Keys.R).AfterCast()
         .Done();
-
-    public override void OnActivate(HeroContext ctx) => _plan.Apply(ctx, _skill);
-
-    public override Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx) => _plan.DispatchAsync(trigger, ctx, _item);
 }
 #endif
