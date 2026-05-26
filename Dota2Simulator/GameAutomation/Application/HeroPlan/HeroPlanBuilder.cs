@@ -22,6 +22,7 @@ public sealed class HeroPlanBuilder
     private readonly ImmutableArray<LegSwapEntry>.Builder _legSwap = ImmutableArray.CreateBuilder<LegSwapEntry>();
     private readonly ImmutableArray<SetupAction>.Builder _setups = ImmutableArray.CreateBuilder<SetupAction>();
     private readonly ImmutableArray<(ConditionSlotKey, ConditionDelegateBitmap)>.Builder _registeredProbes = ImmutableArray.CreateBuilder<(ConditionSlotKey, ConditionDelegateBitmap)>();
+    private ConditionDelegateBitmap? _stoneProbe;
 
     private Keys? _pendingTrigger;
     private Keys? _pendingSkill;
@@ -501,6 +502,18 @@ public sealed class HeroPlanBuilder
     }
 
     /// <summary>
+    /// Phase 19G-4: 注册命石 Probe 到 <see cref="ConditionSlotSet.StoneProbe"/> 单字段.
+    /// 与 ConditionSlot Probe 不同 — StoneProbe 是命石业务专用单字段 (海民 / 伐木机 / 骷髅王 命石选择检测),
+    /// 业务侧 Probe 内通常设 StoneChoice + 自清 (StoneProbe = null) 后返回 false 一次性执行.
+    /// </summary>
+    public HeroPlanBuilder RegisterStoneProbe(ConditionDelegateBitmap probe)
+    {
+        if (probe is null) throw new ArgumentNullException(nameof(probe));
+        _stoneProbe = probe;
+        return this;
+    }
+
+    /// <summary>
     /// 设 SkillEngine 按键重复执行间隔阈值 (毫秒); Plan.Apply 时一次性写入 _skill.重复按键执行间隔阈值.
     /// 用于沙王/天怒 等 OnActivate 设阈值的形态.
     /// </summary>
@@ -518,7 +531,7 @@ public sealed class HeroPlanBuilder
             throw new InvalidOperationException(
                 $"Done: pending 状态未终结 (OnKey={_pendingTrigger?.ToString() ?? "null"}, CastSkill={_pendingSkill?.ToString() ?? "null"}, OnEveryKey={_pendingIsOnEveryKey}).");
         }
-        return new HeroPlan(_clauses.ToImmutable(), _legSwap.ToImmutable(), _setups.ToImmutable(), _registeredProbes.ToImmutable(), _repeatThreshold);
+        return new HeroPlan(_clauses.ToImmutable(), _legSwap.ToImmutable(), _setups.ToImmutable(), _registeredProbes.ToImmutable(), _stoneProbe, _repeatThreshold);
     }
 }
 

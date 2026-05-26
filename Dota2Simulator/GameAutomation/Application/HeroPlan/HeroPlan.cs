@@ -102,6 +102,7 @@ public sealed class HeroPlan
     private readonly ImmutableArray<LegSwapEntry> _legSwap;
     private readonly ImmutableArray<SetupAction> _setups;
     private readonly ImmutableArray<(ConditionSlotKey Slot, ConditionDelegateBitmap Probe)> _registeredProbes;
+    private readonly ConditionDelegateBitmap? _stoneProbe;
     private readonly int? _repeatThreshold;
 
     internal HeroPlan(
@@ -109,6 +110,7 @@ public sealed class HeroPlan
         ImmutableArray<LegSwapEntry> legSwap,
         ImmutableArray<SetupAction> setups,
         ImmutableArray<(ConditionSlotKey, ConditionDelegateBitmap)> registeredProbes,
+        ConditionDelegateBitmap? stoneProbe,
         int? repeatThreshold)
     {
         if (clauses.Length > 9)
@@ -120,6 +122,7 @@ public sealed class HeroPlan
         _legSwap = legSwap;
         _setups = setups;
         _registeredProbes = registeredProbes;
+        _stoneProbe = stoneProbe;
         _repeatThreshold = repeatThreshold;
     }
 
@@ -191,6 +194,12 @@ public sealed class HeroPlan
         foreach (var entry in _registeredProbes)
         {
             ctx.Aggregate.Conditions[entry.Slot].Probe ??= entry.Probe;
+        }
+
+        // Phase 19G-4: StoneProbe DSL — 命石 Probe 单字段注册 (与 ConditionSlot Probe 双轨, 海民/伐木机/骷髅王 命石业务).
+        if (_stoneProbe is not null)
+        {
+            ctx.Aggregate.Conditions.StoneProbe ??= _stoneProbe;
         }
 
         // OnActivate 一次性 SkillEngine 配置: 沙王/天怒 等设按键重复执行间隔阈值的形态.
