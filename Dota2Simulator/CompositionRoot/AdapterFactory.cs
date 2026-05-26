@@ -7,6 +7,9 @@ using Dota2Simulator.GameAutomation.Ports;
 using Dota2Simulator.Input.Adapters;
 using Dota2Simulator.Ui.Adapters;
 using Dota2Simulator.Vision.Adapters;
+#if GpuVision
+using Dota2Simulator.Infrastructure.Vision.GpuVision;
+#endif
 
 namespace Dota2Simulator.CompositionRoot;
 

@@ -288,10 +288,50 @@ void CSMain(uint3 dtid : SV_DispatchThreadID)
     }
 
     /// <summary>
-    /// 上传当前帧大图到 GPU. 同分辨率连续调用复用 texture; 分辨率变化销毁重建.
-    ///
-    /// Phase 24A C5 集成时若 DxgiCaptureSession 已产 GPU texture, 主 lead 可加 overload
-    /// 接 Texture2D 直接复用 SRV (跳过本方法 CPU bytes 上传).
+    /// Phase 24A C5: 端到端 GPU 零回传路径 — 直接 CopyResource DXGI 帧到内部带 SRV 的 _mainTex.
+    /// DXGI Acquire 出的 Texture2D 无 ShaderResource bind, 必须 CopyResource 到 SRV-bind texture 才能喂 compute shader.
+    /// 同分辨率连续调用复用 _mainTex, 分辨率变化销毁重建.
+    /// </summary>
+    public void UploadMainTexture(Texture2D source)
+    {
+        if (_disposed) throw new ObjectDisposedException(nameof(GpuVisionContext));
+        if (source is null) throw new ArgumentNullException(nameof(source));
+
+        var desc = source.Description;
+        int width = desc.Width;
+        int height = desc.Height;
+
+        EnsureMainTexture(width, height);
+        _ctx.CopyResource(source, _mainTex);
+    }
+
+    private void EnsureMainTexture(int width, int height)
+    {
+        if (_mainTex != null && _mainW == width && _mainH == height) return;
+
+        _mainSrv?.Dispose();
+        _mainTex?.Dispose();
+        _mainTex = new Texture2D(_device, new Texture2DDescription
+        {
+            Width = width,
+            Height = height,
+            MipLevels = 1,
+            ArraySize = 1,
+            Format = Format.B8G8R8A8_UNorm,
+            SampleDescription = new SampleDescription(1, 0),
+            Usage = ResourceUsage.Default,
+            BindFlags = BindFlags.ShaderResource,
+            CpuAccessFlags = CpuAccessFlags.None,
+            OptionFlags = ResourceOptionFlags.None
+        });
+        _mainSrv = new ShaderResourceView(_device, _mainTex);
+        _mainW = width;
+        _mainH = height;
+    }
+
+    /// <summary>
+    /// CPU bytes 路径 (兼容路径, Phase 24A C5 集成主推 Texture2D overload 零回传).
+    /// 同分辨率连续调用复用 texture; 分辨率变化销毁重建.
     /// </summary>
     public unsafe void UploadMainTexture(byte[] bgra, int width, int height)
     {
