@@ -369,5 +369,6 @@ FodyWeavers.xsd
 .claude/.gate-state/
 .claude/.hooks-log/
 .claude/.state/
-.claude/dream/_feedback/
+.claude/dream/
 .claude/worktrees/
+Dota2Simulator/.claude/
