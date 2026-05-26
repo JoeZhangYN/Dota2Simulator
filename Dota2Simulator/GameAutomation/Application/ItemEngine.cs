@@ -153,6 +153,7 @@ namespace Dota2Simulator.GameAutomation.Application
 
         private async Task 根据配置技能释放前切假腿(KeyEventArgs e, 技能切假腿配置 配置)
         {
+            if (_aggregate.Refractory.IsRefractory("LegSwap")) return;
             if (配置.切假腿配置.TryGetValue(e.KeyCode, out (bool 是否激活, string 假腿类型) 配置值) && 配置值.是否激活)
             {
                 await 技能释放前切假腿(配置值.假腿类型).ConfigureAwait(true);
@@ -161,6 +162,7 @@ namespace Dota2Simulator.GameAutomation.Application
 
         public async Task 技能释放前切假腿(string 类型)
         {
+            if (_aggregate.Refractory.IsRefractory("LegSwap")) return;
             if (_aggregate.LegSwap.条件开启切假腿 && _aggregate.LegSwap.条件保持假腿 && _aggregate.LegSwap.存在假腿)
             {
                 _aggregate.LegSwap.条件保持假腿 = false;
@@ -171,6 +173,7 @@ namespace Dota2Simulator.GameAutomation.Application
 
         public void 要求保持假腿()
         {
+            if (_aggregate.Refractory.IsRefractory("LegSwap")) return;
             _aggregate.LegSwap.条件保持假腿 = _aggregate.LegSwap.条件开启切假腿;
             _aggregate.LegSwap.需要切假腿 = true;
         }
@@ -210,6 +213,10 @@ namespace Dota2Simulator.GameAutomation.Application
         /// <returns></returns>
         public async Task<bool> 切假腿类型(string type)
         {
+            // Phase 26 A2: atomic 按键段 + 图标变色 grace = ~200ms 不应期, 防中间态被 probe 误判二次触发循环.
+            // 33ms × 2 = 根据图片多次使用物品(_, 2, 33) 最坏路径 atomic 段; +~130ms grace = 图标变色完成 + probe 下一帧再读.
+            _aggregate.Refractory.SetRefractory("LegSwap", 200);
+
             bool 切腿成功 = type switch
             {
                 "智力" => 根据图片使用物品(Dota2_Pictrue.物品.假腿_力量腿_Tpl) == 1 ||

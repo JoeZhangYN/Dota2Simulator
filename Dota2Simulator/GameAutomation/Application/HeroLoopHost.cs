@@ -308,6 +308,9 @@ namespace Dota2Simulator.GameAutomation.Application
             _aggregate.LegSwap.切假腿中 = false;
             _aggregate.LegSwap.需要切假腿 = false;
 
+            // Phase 26 A2: 跨 hero 切换清除不应期残留, 防上一 hero LegSwap 不应期影响新 hero 决策.
+            _aggregate.Refractory.Reset();
+
             _aggregate.HasAghanim = false;
             _aggregate.HasShard = false;
 
