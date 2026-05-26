@@ -59,6 +59,27 @@
 
 ---
 
+## 2026-05-26 (Phase 27C lite mode 协议)
+
+### L4: lite 模式判据 — 规模驱动 spawn 决策, 非默认全 5 步骤
+
+**场景**: Phase 27C 横向耦合读侧迁 (2 hero 6 处迁, +12/-27 净减 15 行) 与 Phase 27B 船长 .StepMachine 迁 (1 hero 全聚合迁, 5 步骤含 plan-reviewer R1-A 检出方案 H 错误) 对照.
+
+**意外**: 27B 完整 5 步骤含 plan-reviewer 二审 REJECT 10 项必修 (避免 S2 撞 BLOCKED + retry budget 浪费, 协议价值远超 spawn 开销); 27C 同走 5 步骤会触 spawn 开销摊销失衡 (2 hero × 3 行调用站迁不值多 4 个 agent spawn).
+
+**为何**: epic 规模 < 3 hero / < 20 行 LOC + 0 新增原语 + 0 新增 INV + 无 plan-required-gate 触发条件 (无 pub API 变更 / 无跨边界 / 无类型不变量调整) → lite 模式直 grep verify + Edit + commit + 主 lead 手写 handoff 累加段 (而非 spawn handoff-archiver 走完整 step 5). 后置 handoff-archiver 二审一次性补 lessons + 验证未验证锚点 (本条 L4 即此路径产出).
+
+**如何避免** (lite vs 完整判据):
+
+- **规模 ≥ 3 hero 或 ≥ 1 新原语 或 ≥ 1 新 INV 或触 plan-required-gate** → 走**完整 5 步骤** (sot-annotator → plan → plan-reviewer → 实施 → handoff-archiver), 不省 plan-reviewer 二审 (27B 实证 1 个 Grep 检 plan 错值远超开销).
+- **规模 < 3 hero / < 20 行 LOC / 0 新原语 / 0 新 INV / 不触 gate** → **lite 模式**, 主 lead 直跑 grep verify + Edit + commit + 手写 handoff 累加段, 后置 handoff-archiver 二审 (规模门槛过低时 spawn 开销摊不平).
+- **handoff-archiver 二审无论 lite / 完整都跑**: handoff 累加段需 agent 验证未验证锚点 + 派生 lessons (主 lead 手写易漏); 不省 archiver, 只省其前 4 步.
+- **多 epic 串行连发场景** (本次 session 27B + 27B+ item3 + 27C-A + 27C-B 累计 8 commit) lite 模式特别适用: 单次主对话内多个小 epic, 用完整 5 步骤 spawn 每个会 token / context 摊销失衡, lite 直跑可保持单一主对话 context 流.
+
+**SSOT 参考**: `.claude/handoff-hex-refactor.md` §"Phase 27B+ deferred 项闭环 + Phase 27C 横向耦合读侧迁" (主 lead 手写累加段) + 后置 handoff-archiver 二审报告 (pass_with_caveats 1 软补丁即本条 L4).
+
+---
+
 ## 通用 SG 注意 (横切多 epic)
 
 - SG `AdditionalText` 仅返 `SourceText` (源代码文本); 处理二进制 (bmp/png) 必须 `File.ReadAllBytes` (触 RS1035, 但本场景必须豁免).
