@@ -33,6 +33,7 @@ C# .NET 10 WinForms 游戏自动化框架，重写为六边形架构。
 - [x] **Phase 19G-2 HeroStrategyBase + SG 改造** —— 2026-05-26 完成（1 commit `0090309`, 94 files; abstract HeroStrategyBase + 6 protected ports + virtual BuildPlan + virtual OnActivate/OnKeyAsync; SG emit `: HeroStrategyBase` + ctor `: base(...)` + override Hero; 92 业务 Strategy +override 关键字消 CS0114; 后续 Phase 真删 OnActivate/OnKeyAsync body 改 BuildPlan() 一行表达式）
 - [x] **Phase 19G-3 复杂 fit 度低 8 英雄迁** —— 2026-05-26 完成（1 commit `bed000b`; 谜团/VS/命运2/破晓晨星/天怒/船长/军团/屠夫 迁; 累计 75+8=83/92=90.2%; 剩 9 hero 留 Phase 20+ handoff_notes 形态分析）
 - [x] **Phase 19G-4 RegisterStoneProbe DSL + 最终 9 英雄迁** —— 2026-05-26 完成（1 commit `18b39bd`, **92/92 = 100% 全迁**; DSL 21→22 维 RegisterStoneProbe; 进化岛/测试/马西/伐木机/海民/斧王/猴子/暗影萨满/骨法 迁; 新模式 RegisterStoneProbe + 动态 CastMode escape-hatch + 双路由 dispatch + 条件 PreAction with Guard）
+- [x] **Phase 20 后续收尾** —— 2026-05-26 完成（5 commit `ff897a0` → `86d4c6d`, 含 worktree 清理 + 4 epic 子阶段）；详 Phase 20 段
 
 ## Phase 18 已完成（main 分支连续 commit，每 chunk 0 build 错误）
 
@@ -2104,10 +2105,95 @@ epic 主题: **剩 17 复杂 fit 度低英雄继续迁** (Stop hook 反馈严格
 - 2 worktree destructive cleanup: pid 16540 (当前 Claude session 进程) hold all worktree lock, `git worktree remove --force` 失败. 必须**主 main session** (退出当前 worktree 后) 执行. 不是"未做", 是 session lifecycle 限制.
 
 **Phase 20+ 候选** (基于 DSL 22 维新引入特性):
-- HeroStrategyBase 75 已迁 Strategy 真删 OnActivate/OnKeyAsync 样板 → `protected override HeroPlan BuildPlan() => ...` 一行表达式 (净省 ~3-5 行/文件 = 225-375 行); 现 SG + base + override 已就位
-- LolEngine / Hf2Engine 真业务实现 (3 ports ctor + AdapterFactory 装配链已就位, body 仍 stub)
-- GpuFusedVisionAdapter (Phase 18 候选裁剪 + 19A Template 纯化前置已完成)
-- HeroIdentity epic (F1 HUD OCR 提取真根因解 tb_name 约定耦合)
-- ItemEngine `Conditions.StoneProbe` API 可考虑迁移到 ConditionSlotSet 内 `[ConditionSlotKey.Stone]` 槽统一索引 (与 RegisterProbe 模式对齐, ROI 中)
+- ~~HeroStrategyBase 75 已迁 Strategy 真删 OnActivate/OnKeyAsync 样板~~ ✅ **Phase 20B 完成**
+- ~~ItemEngine `Conditions.StoneProbe` API 槽统一~~ ✅ **Phase 20D 完成 (拆 StoneState 子聚合)**
+- LolEngine / Hf2Engine 真业务实现 (3 ports ctor + AdapterFactory 装配链已就位, body 仍 stub) — **需用户业务输入** (LOL/HF2 游戏英雄/技能/物品逻辑)
+- GpuFusedVisionAdapter (Phase 18 候选裁剪 + 19A Template 纯化前置已完成) — 3-5 人日 epic
+- HeroIdentity epic (F1 HUD OCR 提取真根因解 tb_name 约定耦合) — 单独 plan
+- 6 hero `override OnKeyAsync` 自定义 body 抽 DSL (猴子/船长/伐木机/海民/VS/谜团等) — hero-specific short-circuit + 通用前置, ROI 低保留
 
 **Phase 19 全 epic 总 commit**: 33 commit on main + 3 handoff = 36 commit (Phase 19A 4 + 19B 1 + 19C 1 + 19D 18 + 19E 1 + 19F-2 1 + 19G-1 1 + 19G-2 1 + 19G-3 1 + 19G-4 1 + 3 handoff commit + 本 final handoff).
+
+---
+
+## Phase 20 后续收尾 (2026-05-26) — Stop hook 反馈"继续迁移并业务级即插即用抽象 完成所有剩余 handoff 代办" 严格解读
+
+epic 主题: **Phase 19G-2 推迟项严格收尾 (75 Strategy 真删 OnActivate/OnKeyAsync 样板) + 业务级抽象审计 (DSL 22 → 25 维) + Phase 19G-4 handoff_notes Stone API 架构纯洁化 + 主 main session worktree destructive cleanup**.
+
+### Phase 20 起手运维 — 2 worktree destructive cleanup
+
+主 main session 进入后清:
+- `git worktree remove --force` 失败 (Windows MAX_PATH `Filename too long`) → 配 `git config core.longpaths true` + PowerShell `\\?\` 长路径前缀 `Remove-Item -LiteralPath` 强删残留物理目录
+- 2 worktree (`agent-a035fef7f15f26d74` + `agent-ad835dad09ccee42d`) 全清; dangling 分支 `worktree-agent-*` 删
+- Phase 19F + 19F-2 持续推迟项 100% 收尾
+
+### Phase 20A — HeroStrategyBase Lazy plan cache (1 commit `ff897a0`)
+
+base 类引 `_cachedPlan ??= BuildPlan()` lazy 字段 + `protected Plan` 访问器, 替原 `OnActivate/OnKeyAsync` 默认实现内 `BuildPlan().X` 每帧重建. WinForms message pump 单线程, `??=` 模式无锁开销.
+
+### Phase 20B — 91 Strategy 真删样板 OnActivate/OnKeyAsync (1 commit `8840364`, 90 文件改)
+
+Phase 19G-2 持续推迟项严格收尾. **三批 perl 批改 (UTF-8 byte-safe, 不损中文文件名)**:
+
+| 批次 | 模式 | hero 数 | 删 |
+|---|---|---|---|
+| Batch 1 (A 型纯模板) | `static readonly _plan = HeroPlanBuilder.New()` + 2 override 一行 | 29 | 改 BuildPlan, 删 2 override |
+| Batch 2 (B 型纯模板) | `_plan? field + GetPlan helper + 2 override 一行` | 51 | 删 field/helper/2 override, 折叠成 BuildPlan |
+| Batch 3 (B 型 OnActivate 自定义) | + override OnActivate body | 4 (小骷髅/小鱼人/戴泽/龙骑) | 删 field/helper/OnKeyAsync; OnActivate 内 `GetPlan().Apply` → `base.OnActivate(ctx)` |
+| Batch 4 (Phase 19G-3+4 BuildPlan + 桥) | `BuildPlan() => GetPlan()` 间接调用 | 16 | 删 field/helper, 直接 `BuildPlan() => HeroPlanBuilder.New()` (base _cachedPlan 接管) |
+| Edit fix | 发条 异常布局 (Batch 4 误命中 stale GetPlan 调用) | 1 | Edit 手修 删 stale OnActivate/OnKeyAsync override |
+
+终态: **92/92 Strategy 全 `protected override HeroPlan BuildPlan() => HeroPlanBuilder.New()...Done()` 一行表达式形态** (16 自定义保留 OnKeyAsync 但 _plan/GetPlan 全消). 净 -428 行 / +94 行 = **-334 行净减** (超 Phase 19G-2 预算下限).
+
+### Phase 20C — 业务级即插即用抽象 DSL +3 维 (1 commit `a3047c3`, 8 文件)
+
+Stop hook 反馈"不仅限于公共重复函数, 而是业务级即插即用抽象"严格解读 — 扫 92 Strategy 发现 **6 hero override OnActivate body 含 3 个共性副作用形态**, 抽 DSL **22 → 25 维**:
+
+| 新抽象 | 受益 hero | 替换形态 |
+|---|---|---|
+| `AttackTiming(preDelay, interval)` | 4 (小骷髅 0.4/1.7 / 小鱼人 0.5/1.7 / 戴泽 0.3/1.7 / 龙骑 0.5/1.6) | `_main._聚合.Attack.基础攻击前摇 = X; .基础攻击间隔 = Y` |
+| `LegSwap(Keys, bool, string)` 三参重载 | 1 (猴子 W "力量") | `_main._聚合.LegSwap.配置.修改配置(W, true, "力量")` |
+| `InitSkillStep(SlotKey, int)` | 1 (军团 Global -1) | `_main._聚合.Skills.SetStep(SlotKey.Global, -1)` |
+
+结果: **0 hero override void OnActivate 自定义 body** (grep verify ✅). LegSwapEntry record +Attribute? 字段; HeroPlan 内 _attackTiming nullable tuple + _initSkillSteps ImmutableArray.
+
+### Phase 20D — StoneState 子聚合拆分 (1 commit `86d4c6d`, 8 文件)
+
+Phase 19G-4 handoff_notes 严格解读 + 重新评估 (vs 槽统一方案):
+- ConditionSlot vs Stone **语义差异**: event-driven (Active flag → TickAsync 并行) vs polling (HeroLoopHost 显式调一次, Probe 自清). 槽统一会破 slot 语义 → 改更纯洁方案
+- 拆 `StoneState` 子聚合 (同 LegSwapState / AttackProfile 模式), 消除 ConditionSlotSet 的 special-case 字段
+
+终态:
+- 新建 `GameAutomation/Application/StoneState.cs` (29 行): Probe / Choice / Reset; 业务模板 polling 注释清楚
+- HeroAggregate +Stone 子聚合属性 (与 LegSwap 同模式)
+- ConditionSlotSet **回归纯 event-driven slot 容器** (删 StoneProbe / StoneChoice 双字段 + Reset 内 stone 段)
+- HeroLoopHost 主循环 + Reset 路径 + HeroPlan.Apply: `Conditions.StoneProbe` → `Stone.Probe`
+- 3 业务 hero (伐木机 / 海民 / 骷髅王注释) 全 grep 替换
+- DSL `RegisterStoneProbe` 业务侧 API 不变 (后端调 Stone.Probe)
+
+### Phase 20 累计
+
+**累计统计 (final after Phase 20)**:
+- **HeroPlan 已迁: 92 / 92 = 100%** (维持 Phase 19G-4)
+- **DSL 容量: 25 维** (Phase 19G-4 22 + Phase 20C 3 新抽象)
+- **HeroStrategy 单一形态**: 92/92 `protected override HeroPlan BuildPlan() =>` 一行表达式 + 16 自定义 hero 保留 override OnKeyAsync (业务 short-circuit) + 0 override OnActivate
+- **HeroAggregate 子聚合**: Skills / Conditions / Attack / LegSwap / Stone (Phase 20D 新增) — 共 5 子聚合, ConditionSlotSet 0 special-case
+- **架构纯洁化**: HeroStrategyBase Lazy cache + ConditionSlotSet 单一语义 + Stone 自治子聚合
+
+**三档 build verify (Phase 20 终态)**:
+- DOTA2 (Silt;TRACE;DOTA2): 0 错 244 warn (Phase 20A 起 302 → 244, 净降 -58 unused field/method)
+- LOL;TRACE: 0 错 140 warn (Phase 20D -1)
+- HF2;TRACE: 0 错 145 warn (Phase 20D -1)
+
+**Phase 20 commit 链 (主 main session)**:
+1. `ff897a0` 20A herostrategybase-lazy-plan-cache (8/+8/-2)
+2. `8840364` 20B hero-strategy-base-buildplan-onetag 91 Strategy (94/+94/-522 = -428 净)
+3. `a3047c3` 20C dsl-business-abstraction-3-new 25 维 DSL (8/+71/-46 = +25 净)
+4. `86d4c6d` 20D stone-substate-split (8/+50/-24 = +26 净)
+5. (本 handoff commit) 20F 文档更新
+
+**Phase 21+ 候选** (主 main session 之外的剩余):
+- LolEngine / Hf2Engine 真业务实现 — 需用户业务输入 (LOL/HF2 游戏英雄/技能/物品逻辑)
+- GpuFusedVisionAdapter — 3-5 人日 epic
+- HeroIdentity epic — 单独 plan
+- 6 hero `override OnKeyAsync` 抽 DSL — hero-specific short-circuit, ROI 低 (保留 override 形态)
