@@ -2196,4 +2196,55 @@ Phase 19G-4 handoff_notes 严格解读 + 重新评估 (vs 槽统一方案):
 - LolEngine / Hf2Engine 真业务实现 — 需用户业务输入 (LOL/HF2 游戏英雄/技能/物品逻辑)
 - GpuFusedVisionAdapter — 3-5 人日 epic
 - HeroIdentity epic — 单独 plan
-- 6 hero `override OnKeyAsync` 抽 DSL — hero-specific short-circuit, ROI 低 (保留 override 形态)
+- ~~6 hero `override OnKeyAsync` 抽 DSL~~ ✅ **Phase 21A 完成 (3 hero 收, 2 hero 业务复杂保留)**
+
+---
+
+## Phase 21A DSL Specialized Guard 收 3 hero OnKeyAsync (2026-05-26)
+
+epic 主题: **Phase 20 之后 Stop hook 反馈"按推荐继续" — 用户 4 候选选 1+3+4, 21A 是 #4 (override OnKeyAsync 抽 DSL 深化), ROI 中低但可自主完成**.
+
+### Phase 21A commit (1 commit `cfc7019`, 5 文件)
+
+| Chunk | hash | 主题 | 净行 |
+|---|---|---|---|
+| C1 | `cfc7019` | dsl-specialized-guard + 收 3 hero override OnKeyAsync (5 → 2) | +40 |
+
+**扫 5 个 override OnKeyAsync 找抽象点** (Phase 20B grep verify 后 5 hero 残留: 猴子/船长/伐木机/海民/VS):
+
+| 形态 | hero | 抽象 |
+|---|---|---|
+| W 键 hard-code 设 C2 | VS | 已有 `.Execute()` setup DSL 即可 (无新维度) |
+| E 键 + Step(E)==1 跳过 | 船长 | +`WhenStepNotEq` specialized Guard |
+| D 键 + Stone.Choice != 2 跳过 | 伐木机 | +`WhenStoneChoiceEq` specialized Guard |
+| 通用前置 + 多路由 switch (bypass base) | 猴子 / 海民 | 业务复杂保留 override |
+
+### Phase 21A 实施
+
+- **HeroPlanClause** +`Func<HeroContext, bool>? GuardPredicate` 字段 (与 enum Guard 互斥, predicate 非 null 优先)
+- **HeroPlanBuilder** +`_pendingGuardPredicate` field + 4 specialized Guard methods (WhenStepEq / WhenStepNotEq / WhenStoneChoiceEq / WhenStoneChoiceNotEq) + ResetPending/OnKey 清字段 (defensive)
+- **HeroPlan.DispatchAsync** +`CheckGuardCombined(enum, predicate, ctx)` — predicate 优先, 否则回退 enum Guard 路径
+- **FinishClause / CustomProbe** 终结路径都注入 GuardPredicate
+
+业务侧:
+- VSStrategy 删 override OnKeyAsync, +`.OnKey(W).Execute(()=>SetActive C2)` setup
+- 船长Strategy 删 override OnKeyAsync, E clause +`.WhenStepNotEq(SlotKey.E, 1)`
+- 伐木机Strategy 删 override OnKeyAsync, D clause +`.WhenStoneChoiceEq(2)`
+
+### Phase 21A 终态
+
+- 92 Strategy 全 BuildPlan 单一形态: **0 override OnActivate + 2 override OnKeyAsync** (= 猴子/海民, 业务特殊)
+- DSL 容量: **25 → 29 维** (+4 specialized Guard methods); 通用谓词机制铺路未来扩任意状态 Guard
+- 三档 build verify PASS: DOTA2 247 warn (+3 新 DSL infra) / LOL 140 / HF2 145
+
+### Phase 21B / 21C deferred (2026-05-26)
+
+- **Phase 21B HeroIdentity epic**: 用户暂不能提供 HUD 英雄名区域 1920×1080 Rectangle. PaddleOCRSharp 已就位 (Form2 + Silt 已用 `PaddleOCR.获取图片文字(handle, region)`), 一旦坐标提供即可起手 OCR + 多帧投票稳态固化 + gate. 需 grill "看别人状态时返回上一稳态快照" 业务需求.
+- **Phase 21C LolEngine/Hf2Engine 业务**: 用户暂不能提供 LOL/HF2 业务详情 (英雄/技能/物品逻辑). 3 ports 装配链已就位 (Phase 19G-1 AdapterFactory), body 仍 stub. 待 grill.
+
+### Phase 22+ 候选 (Phase 21A 之后剩余)
+
+- HeroIdentity epic (需 HUD 区域 + 业务需求)
+- LolEngine/Hf2Engine 业务 (需用户业务输入)
+- GpuFusedVisionAdapter (3-5 人日 GPU epic, 候选裁剪 + 19A Template 纯化前置已完成)
+- 猴子 / 海民 override OnKeyAsync 抽 DSL (通用前置 helper + 多路由 switch ROI 低, 保留形态)
