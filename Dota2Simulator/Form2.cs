@@ -166,13 +166,13 @@ namespace Dota2Simulator
             InitializeComponent();
 
 #if LOL
-            // Phase 12 Chunk 2: LolEngine 装配 _engine (实现 IGameEngine). ctor 简化只接 IInputExecutor.
-            _engine = new Games.LOL.LolEngine(new Input.Adapters.HybridInputAdapter());
+            // Phase 19G-1: LolEngine 装配经 AdapterFactory 共享 SSOT (与 DOTA2 AppContainer 对称).
+            _engine = new Games.LOL.LolEngine(CompositionRoot.AdapterFactory.CreateInput(), CompositionRoot.AdapterFactory.CreateVision(), CompositionRoot.AdapterFactory.CreateUi(this));
 #endif
 
 #if HF2
-            // Phase 12 Chunk 2: Hf2Engine 装配 _engine (实现 IGameEngine). ctor 简化只接 IInputExecutor.
-            _engine = new Games.HF2.Hf2Engine(new Input.Adapters.HybridInputAdapter());
+            // Phase 19G-1: Hf2Engine 装配经 AdapterFactory 共享 SSOT.
+            _engine = new Games.HF2.Hf2Engine(CompositionRoot.AdapterFactory.CreateInput(), CompositionRoot.AdapterFactory.CreateVision(), CompositionRoot.AdapterFactory.CreateUi(this));
 #endif
 
             StartListen();

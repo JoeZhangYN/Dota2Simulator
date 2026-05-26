@@ -35,9 +35,9 @@ internal sealed class AppContainer
 
     public AppContainer()
     {
-        // ports 装饰链：HybridInputAdapter / RustVisionAdapter → ProbeXxx 录像装饰
-        Input = new ProbeInputExecutor(new HybridInputAdapter());
-        Vision = new ProbeScreenVision(new RustVisionAdapter());
+        // Phase 19G-1: adapter 装饰链通过 AdapterFactory 共享 (DOTA2 / LOL / HF2 三 build 装配链 SSOT)
+        Input = AdapterFactory.CreateInput();
+        Vision = AdapterFactory.CreateVision();
 
         // Phase 18 V6a: 委托签名 () 无参后 HeroAggregate 不再依赖 vision，回到纯领域聚合形态。
         Aggregate = new HeroAggregate();
@@ -53,7 +53,8 @@ internal sealed class AppContainer
     /// </summary>
     public void BindUi(Form2 form)
     {
-        Ui = new Form2UiInvoker(form);
+        // Phase 19G-1: Ui adapter 经 AdapterFactory 装配 (与 LOL/HF2 build 共享)
+        Ui = AdapterFactory.CreateUi(form);
         // SkillEngine 先 new（ItemEngine ctor 接 SkillEngine；HeroLoopHost ctor 接两者）。
         var skill = new SkillEngine(Input, Vision, Ui, Aggregate);
         // Phase 11 P3: ItemEngine ctor 扩 SessionState (Esc 暂停经 _session.IsPaused 直调).
