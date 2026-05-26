@@ -53,10 +53,11 @@ public sealed partial class 屠夫Strategy : IHeroStrategy
     {
         return await _item.所有物品可用后续(() =>
         {
-            Common.Delay(33 * _item.根据图片使用物品(Dota2_Pictrue.物品.纷争_Tpl));
-            Common.Delay(33 * _item.根据图片使用物品(Dota2_Pictrue.物品.希瓦_Tpl));
-            Common.Delay(33 * _item.根据图片使用物品(Dota2_Pictrue.物品.虚灵之刃_Tpl));
-            Common.Delay(33 * _item.根据图片使用物品(Dota2_Pictrue.物品.否决_Tpl));
+            _item.批量使用物品(
+                Dota2_Pictrue.物品.纷争_Tpl,
+                Dota2_Pictrue.物品.希瓦_Tpl,
+                Dota2_Pictrue.物品.虚灵之刃_Tpl,
+                Dota2_Pictrue.物品.否决_Tpl);
             Common.Delay(33 * (
                 _item.根据图片使用物品(Dota2_Pictrue.物品.红杖_Tpl) +
                 _item.根据图片使用物品(Dota2_Pictrue.物品.红杖2_Tpl) +

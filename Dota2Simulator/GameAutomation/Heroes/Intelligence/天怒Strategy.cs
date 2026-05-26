@@ -36,9 +36,10 @@ public sealed partial class 天怒Strategy : IHeroStrategy
                 if (_skill.DOTA2释放CD就绪技能(Keys.W)) return await Task.FromResult(true).ConfigureAwait(true);
                 if (_skill.DOTA2释放CD就绪技能(Keys.E)) return await Task.FromResult(true).ConfigureAwait(true);
                 if (_skill.DOTA2释放CD就绪技能(Keys.Q)) return await Task.FromResult(true).ConfigureAwait(true);
-                Common.Delay(0 * _item.根据图片使用物品(Dota2_Pictrue.物品.阿托斯之棍_Tpl));
-                Common.Delay(33 * _item.根据图片使用物品(Dota2_Pictrue.物品.缚灵锁_Tpl));
-                Common.Delay(33 * _item.根据图片使用物品(Dota2_Pictrue.物品.虚灵之刃_Tpl));
+                _ = _item.根据图片使用物品(Dota2_Pictrue.物品.阿托斯之棍_Tpl);  // 业务原 Common.Delay(0 * ...) 0 延迟, 等价无延迟单次释放
+                _item.批量使用物品(
+                    Dota2_Pictrue.物品.缚灵锁_Tpl,
+                    Dota2_Pictrue.物品.虚灵之刃_Tpl);
                 Common.Delay(33 * (
                     _item.根据图片使用物品(Dota2_Pictrue.物品.红杖_Tpl)
                     + _item.根据图片使用物品(Dota2_Pictrue.物品.红杖2_Tpl)

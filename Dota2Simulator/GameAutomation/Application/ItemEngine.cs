@@ -506,6 +506,20 @@ namespace Dota2Simulator.GameAutomation.Application
             return 执行物品操作(句柄, (k) => _input.Press(VirtualKey.From(k)));
         }
 
+        /// <summary>
+        /// Phase 22B (2026-05-26): 批量物品组合释放 — 替代 28 处业务侧手写 N 个 <c>Common.Delay(33 * _item.根据图片使用物品(X_Tpl))</c> 同构.
+        /// 内部按 templates 顺序 loop 调 <see cref="根据图片使用物品"/> + <c>Common.Delay(33 * count)</c>; 0 命中物品 0 延迟; 等价业务原语义.
+        /// 业务侧形态: <c>_item.批量使用物品(Dota2_Pictrue.物品.散失_Tpl, 物品.散魂_Tpl, 物品.否决_Tpl, ...);</c> 一行表达式.
+        /// </summary>
+        public void 批量使用物品(params Template[] templates)
+        {
+            if (templates is null) return;
+            foreach (Template tpl in templates)
+            {
+                Common.Delay(33 * 根据图片使用物品(tpl));
+            }
+        }
+
         public int 根据图片自我使用物品(Template 句柄)
         {
             return 执行物品操作(句柄, (k) => _input.ComboAlt(VirtualKey.From(k)));

@@ -41,9 +41,10 @@ public sealed partial class 军团Strategy : IHeroStrategy
             switch (步骤)
             {
                 case < 1:
-                    Common.Delay(33 * _item.根据图片使用物品(Dota2_Pictrue.物品.臂章_Tpl));
-                    Common.Delay(33 * _item.根据图片使用物品(Dota2_Pictrue.物品.魂戒_Tpl));
-                    Common.Delay(33 * _item.根据图片使用物品(Dota2_Pictrue.物品.相位鞋_Tpl));
+                    _item.批量使用物品(
+                        Dota2_Pictrue.物品.臂章_Tpl,
+                        Dota2_Pictrue.物品.魂戒_Tpl,
+                        Dota2_Pictrue.物品.相位鞋_Tpl);
                     if (_skill.DOTA2判断技能是否CD(Keys.W))
                     {
                         _input.ComboAlt(VirtualKey.From(Keys.W));
@@ -53,6 +54,7 @@ public sealed partial class 军团Strategy : IHeroStrategy
                     _main._聚合.Skills.SetStep(SlotKey.Global, 1);
                     return await Task.FromResult(true).ConfigureAwait(true);
                 case < 2 when 步骤 == 1:
+                    // 4 跳刀变体 *并行* 求和单次 Delay (业务原 Common.Delay(33 * (a+b+c+d)) 累加单延迟, 与批量逐项不同) — 保留原表达式.
                     Common.Delay(33 * (
                         _item.根据图片使用物品(Dota2_Pictrue.物品.跳刀_Tpl)
                         + _item.根据图片使用物品(Dota2_Pictrue.物品.跳刀_力量跳刀_Tpl)
@@ -61,12 +63,13 @@ public sealed partial class 军团Strategy : IHeroStrategy
                     _main._聚合.Skills.SetStep(SlotKey.Global, 2);
                     return await Task.FromResult(true).ConfigureAwait(true);
                 case < 3:
-                    Common.Delay(33 * _item.根据图片使用物品(Dota2_Pictrue.物品.紫苑_Tpl));
-                    Common.Delay(33 * _item.根据图片使用物品(Dota2_Pictrue.物品.血棘_Tpl));
-                    Common.Delay(33 * _item.根据图片使用物品(Dota2_Pictrue.物品.否决_Tpl));
-                    Common.Delay(33 * _item.根据图片使用物品(Dota2_Pictrue.物品.散失_Tpl));
-                    Common.Delay(33 * _item.根据图片使用物品(Dota2_Pictrue.物品.散魂_Tpl));
-                    Common.Delay(33 * _item.根据图片使用物品(Dota2_Pictrue.物品.深渊之刃_Tpl));
+                    _item.批量使用物品(
+                        Dota2_Pictrue.物品.紫苑_Tpl,
+                        Dota2_Pictrue.物品.血棘_Tpl,
+                        Dota2_Pictrue.物品.否决_Tpl,
+                        Dota2_Pictrue.物品.散失_Tpl,
+                        Dota2_Pictrue.物品.散魂_Tpl,
+                        Dota2_Pictrue.物品.深渊之刃_Tpl);
                     _main._聚合.Skills.SetStep(SlotKey.Global, 3);
                     return await Task.FromResult(true).ConfigureAwait(true);
                 case < 4:
