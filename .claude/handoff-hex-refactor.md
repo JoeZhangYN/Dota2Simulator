@@ -2323,3 +2323,90 @@ HeroStrategyBase 加 2 protected helper:
 - HeroIdentity epic (需 HUD 区域 + 业务需求, 21B deferred)
 - LolEngine/Hf2Engine 业务 (需用户业务输入, 21C deferred)
 - GpuFusedVisionAdapter (3-5 人日 GPU epic)
+
+---
+
+## Phase 23 handoff 漂移点收尾 (2026-05-26) — Stop hook 反馈 "继续检查除了需要真实逻辑的未完成的部分"
+
+epic 主题: **handoff 与代码漂移点 (文档说"完成"但代码内还活着) 严格清零**.
+
+触发: 用户起手 `cat .claude/handoff-hex-refactor.md 继续检查除了需要真实逻辑的未完成的部分`. 通读 2326 行 handoff + 代码层 grep 交叉校验, 发现 4 项 handoff 未列出的真遗留 + 数项 handoff 已列出的 Phase 23+ 候选.
+
+### Phase 23 commit 链 (4 commit on main)
+
+| commit | 子段 | 主题 | 净行 |
+|---|---|---|---|
+| `76c7d88` | B#1 | dead-code-purge 删 _Legacy/ + Other/ + 4 TODO-dead .cs + 清 csproj 死规则 | -4067 |
+| `3560591` | B#3 | herolloophost-vision-port HeroLoopHost.切假腿处理 ImageFinder 直调改 _vision.Find Template 端口 | +4/-4 |
+| `b71c341` | B#2 | triple-buffer-dispose-fix TripleBufferSystem.Dispose 释放 3 buffer 修资源 leak (~24 MB/Cleanup) | +9/-4 |
+| (本 commit) | B#4 | handoff Phase 23 全段文档化 + §52 GetCurrentHandle 白名单明确 | 仅文档 |
+
+### Phase 23 B#1 — dead-code 物理删 (handoff §231 Phase 8 遗留收尾)
+
+handoff §231 Phase 8 段早写 "实际删除死代码 (_Legacy/ + Other/ + 4 个标 TODO-dead 文件)" 但 Phase 8-22 一直推迟. 本段严格收尾:
+
+- 4 个独立 .cs (RandomGenerator / Vision/ImageProcessor / Vision/Matching/AdvancedGlobalScreenUsage / AdvancedImageFinder) — 头标 `// TODO-dead-Phase7-remove`, grep 0 外部引用
+- _Legacy/ 整目录 21 .cs (KeyboardMouse PressKey 多后端 + DriverStageHelper + PictureProcessing 旧引擎) — csproj `<Compile Remove="_Legacy\**" />` 早已排除编译
+- Other/ 整目录 14 native (Depends_x64.exe / kmclass* / WinIo32-64 dll-sys / WinRing0* / README.md) — csproj 0 CopyToOutputDirectory 引用 + DllImport 仅在 _Legacy/ 内
+- csproj 清 6 行死规则 (`_Legacy\**` × 3 + `inference_c\**` × 3, inference_c 目录早已不存在)
+
+三档 build verify: DOTA2 246 / LOL 137 / HF2 142 (各 -3 warn, 4 个独立 .cs 删除带走对应 warn).
+
+### Phase 23 B#3 — HeroLoopHost.切假腿处理 §52 不变量真违规修复
+
+唯一真违规点 (handoff Phase 18 §52 不变量 "业务侧 0 ImageFinder.* / GlobalScreenCapture.FindXxx 直调"):
+
+- HeroLoopHost.cs:256-263 `ImageHandle 句柄 = ...` + `ImageFinder.FindImageInRegionBool(句柄, GlobalScreenCapture.GetCurrentHandle(), Rect)` → 端口路径
+- 切 `Template template = ..._Tpl` (复用 Phase 19A SG emit _Tpl 属性) + `_vision.Find(template, Rect, new MatchRate(0.9), Tolerance.Exact).Found`
+- Rectangle → ScreenRegion implicit op (Phase 18 V3 引入) 透传 ItemEngine.获取物品范围
+- 阈值 0.9 与全代码库 _vision.Find 调用模式一致 (双头龙/马西/小精灵/ItemEngine 多处验证)
+
+### Phase 23 B#2 — TripleBufferSystem.Dispose 真 bug 修复 (资源 leak)
+
+`Vision/Cache/TripleBufferSystem.cs:174-180` Dispose body 全注释, 注释明示 "代码错误,并未实现dispose方法".
+
+根因 + 修复:
+- 旧版 `_X.Handle?.Dispose()` 编不过 (ImageHandle 是 readonly struct 值类型, ?. 仅适用 nullable/reference)
+- 正确释放: `ImageManager.ReleaseImage(in handle)` → 移除注册表 + DynamicImageBuffer.ReleaseSpace(offset)
+- BufferInfo.Handle 是 auto-property (rvalue) 不能直传 `in` 参数, 用局部 ImageHandle 临时变量中转
+
+热路径触发场景 (`GlobalScreenCapture.cs:88-90`):
+- 截图区域尺寸变化时 → CaptureScreen 内自动 Cleanup() → Dispose() → Initialize() 新 buffer
+- 未修前每次尺寸切换 leak 3 × 1920×1080×4 = ~24 MB
+- 调用栈: `GlobalScreenCapture.Cleanup()` line 333 `_tripleBuffer?.Dispose()` (唯一调用点, 现已生效)
+
+### Phase 23 B#4 — Phase 18 §52 不变量 GetCurrentHandle 白名单明确
+
+**Stop hook 反馈触发的最初判断 over-claim**: 起手以为 14 处 `GlobalScreenCapture.GetCurrentHandle()` 直调是 §52 违规, 实际审计后发现:
+
+§52 原文: **"业务侧 0 `ImageFinder.* / GlobalScreenCapture.FindXxx` 直调"** — 严格只点名 `FindXxx` 和 `ImageFinder`, 不含 `GetCurrentHandle`. 14 处直调点全是 "同层取像素 / 同层透传" 5 类合法模式:
+
+| 模式 | 处数 | 例 | 合法性 |
+|---|---|---|---|
+| `GetCurrentHandle() + ImageManager.GetColor(in handle, x, y)` 单点取色 | SkillEngine 6 + ItemEngine 3 (286/303/628) + 小黑/暗影萨满/祸乱之源 Strategy 3 = **12** | `Color c = ImageManager.GetColor(in 句柄, 738, 957)` | Vision BC 同层内部协议 (vs FindXxx 真模板匹配), §52 不禁止 |
+| `GetCurrentHandle() + PaddleOCR API` | Silt/Main.cs 1 | `PaddleOCR.获取图片文字(GlobalScreenCapture.GetCurrentHandle(), Rect)` | §52 显式豁免 ("PaddleOCR API") |
+| `GetCurrentHandle() + ImageManager.SaveImage` 调试 | ItemEngine 740-741 1 | `ImageManager.SaveImage(in frame, path)` | §52 显式豁免 ("ItemEngine 调试 SaveImage 同层取帧") |
+| `GetCurrentHandle() + _silt!.X(handle)` Silt API 透传 | ItemEngine 99/102/107/110/113 = **5** | `_silt!.跳过循环获取金碎片(GlobalScreenCapture.GetCurrentHandle())` | Silt API 历史接口接 ImageHandle 参数; Phase 24+ 候选: Silt API instance 化后改 IScreenVision 注入消透传 |
+| `GetCurrentHandle() + ImageManager.ReleaseImage` 释放最后帧 | HeroLoopHost.CleanupImageSystem 378-380 1 | `ImageManager.ReleaseImage(GlobalScreenCapture.GetCurrentHandle())` | Vision BC 内部协议 cleanup 同层操作 |
+
+**结论: 14 处 GetCurrentHandle 全合法, 0 §52 真违规**.
+
+### Phase 23 累计
+
+- **死代码净减**: -4067 行 (B#1)
+- **真违规修复**: 1 处 (B#3 HeroLoopHost)
+- **真 bug 修复**: 1 处资源 leak (B#2 TripleBufferSystem.Dispose, ~24 MB/Cleanup)
+- **不变量文档化**: §52 GetCurrentHandle 14 处白名单明确 (B#4)
+- **3 档 build verify**: DOTA2 246 / LOL 137 / HF2 142 全 0 错
+
+### Phase 24+ 候选 (Phase 23 派生)
+
+- **hex 纯净度延伸 (低-中 ROI)**: 业务侧 12 处 `ImageManager.GetColor(GetCurrentHandle(), x, y)` → `_vision.PixelAt(new ScreenPoint(x, y))` 端口收口; 风险评估: 性能等价 (同层 buffer 读) + 多线程时序不变 (PixelAt adapter 内走相同 buffer)
+- **Silt API ImageHandle 透传去除 (中 ROI, 与 Phase 11 Silt instance 化 epic 合并)**: 5 处 `_silt!.X(GlobalScreenCapture.GetCurrentHandle())` → Silt instance 化后 ctor 接 IScreenVision, 方法签名去 ImageHandle 参数
+- 继承 Phase 22 后剩余候选 (HeroIdentity 21B / LolEngine-Hf2Engine 21C / GpuFusedVisionAdapter / 猴子海民 override OnKeyAsync)
+
+### Phase 23 反预测与实测偏差
+
+- **预测**: 14 处 GetCurrentHandle 直调是 §52 真违规需大改 → **实测**: §52 文字严格只禁 `FindXxx` 和 `ImageFinder.*`, 14 处全合法 (B#4 over-claim 自纠)
+- **预测**: TripleBufferSystem.Dispose 注释 "代码错误" 是字面意思 → **实测**: 真根因是 ImageHandle 值类型 + auto-property rvalue 双重限制, 修复需局部变量中转
+- **预测**: B#1 dead-code 删除会带来 build warn 增加 → **实测**: 反而减少 3 warn (4 个独立 .cs 自带 warn 随删除消失)
