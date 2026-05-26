@@ -26,6 +26,8 @@ public enum SkillAfterMode
     Cast,
     /// <summary>主动技能 CD 就绪后跑 customAction — 等价 <c>await _skill.主动技能已就绪后续(skillKey, customAction)</c>.</summary>
     WhenReady,
+    /// <summary>Phase 26 F1: 主动技能释放后替换图标 — 等价 <c>await _skill.释放技能后替换图标技能后续(skillKey, () =&gt; Skills.Step(slot), v =&gt; Skills.SetStep(slot, v))</c> (大牛 W / 伐木机 R 形态).</summary>
+    CastReplaceIcon,
 }
 
 /// <summary>聚合状态守卫 (按键触发时检查): 决定该 clause/setup 是否触发.</summary>
@@ -74,7 +76,9 @@ public readonly record struct HeroPlanClause(
     Func<HeroContext, bool>? GuardPredicate = null,
     // Phase 22A: 主动技能 X 后续 DSL — AfterMode != None 时优先级最高 (Apply 内自动包装 SkillEngine 调用为 Probe).
     SkillAfterMode AfterMode = SkillAfterMode.None,
-    Action? AfterCustomAction = null);
+    Action? AfterCustomAction = null,
+    // Phase 26 F1: ReplaceIcon DSL — AfterMode = CastReplaceIcon 时存 step SlotKey, Apply 内 wrap 为 SkillEngine.释放技能后替换图标技能后续 调用 (大牛 W / 伐木机 R 形态).
+    Domain.Loop.SlotKey? AfterReplaceIconStepSlot = null);
 
 /// <summary>
 /// 假腿配置条目 (按键 → alwaysSwap 标志, OnActivate 时一次性应用).
@@ -200,6 +204,20 @@ public sealed class HeroPlan
                     _ => throw new InvalidOperationException($"未处理的 SkillAfterMode: {clause.AfterMode}"),
                 };
                 ctx.Aggregate.Conditions[slotKey].Probe ??= probe;
+                continue;
+            }
+
+            // Phase 26 F1: AfterCastReplaceIcon DSL — 业务侧 0 lambda, DSL 包装 SkillEngine.释放技能后替换图标技能后续 调用为 Probe.
+            if (clause.AfterMode == SkillAfterMode.CastReplaceIcon && clause.AfterReplaceIconStepSlot.HasValue)
+            {
+                Keys sk = clause.SkillKey;
+                Domain.Loop.SlotKey stepSlot = clause.AfterReplaceIconStepSlot.Value;
+                ConditionDelegateBitmap replaceIconProbe = async () =>
+                    await skill.释放技能后替换图标技能后续(
+                        sk,
+                        () => ctx.Aggregate.Skills.Step(stepSlot),
+                        v => ctx.Aggregate.Skills.SetStep(stepSlot, v)).ConfigureAwait(true);
+                ctx.Aggregate.Conditions[slotKey].Probe ??= replaceIconProbe;
                 continue;
             }
 

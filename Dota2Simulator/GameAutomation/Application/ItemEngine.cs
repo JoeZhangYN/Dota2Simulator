@@ -527,6 +527,22 @@ namespace Dota2Simulator.GameAutomation.Application
             }
         }
 
+        /// <summary>
+        /// Phase 26 F1 (2026-05-26): Burst 模式 — 所有物品 use 先调用累加 hit 数, 然后单次 delay = 33ms × sum.
+        /// 与 <see cref="批量使用物品"/> 区别: Serial 每命中 delay 33ms (按键间隔); Burst 全按完单次 delay (按键近同帧, 用户体验"瞬发").
+        /// 用于 G1 业务 6 hero (莱恩/沉默/屠夫/骨法/军团/天怒) 替原 <c>Common.Delay(33 * (use(A) + use(B) + use(C)))</c> inline 累加同构.
+        /// </summary>
+        public void 批量使用物品并行(params Template[] templates)
+        {
+            if (templates is null) return;
+            int sum = 0;
+            foreach (Template tpl in templates)
+            {
+                sum += 根据图片使用物品(tpl);
+            }
+            Common.Delay(33 * sum);
+        }
+
         public int 根据图片自我使用物品(Template 句柄)
         {
             return 执行物品操作(句柄, (k) => _input.ComboAlt(VirtualKey.From(k)));

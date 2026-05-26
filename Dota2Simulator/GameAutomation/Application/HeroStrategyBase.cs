@@ -73,6 +73,12 @@ public abstract class HeroStrategyBase : IHeroStrategy
     protected void 走A() => _input.Press(Domain.Actuation.VirtualKey.From(System.Windows.Forms.Keys.A));
 
     /// <summary>
+    /// Phase 26 F1 (2026-05-26): 切假腿保持快捷 helper — 替业务 lambda 内 <c>_item.要求保持假腿()</c> 9 处同构.
+    /// 用法: <c>.OnKey(Keys.Q).CastSkill(Keys.Q).AfterCastDo(() => KeepLeg())</c>.
+    /// </summary>
+    protected void KeepLeg() => _item.要求保持假腿();
+
+    /// <summary>
     /// Phase 25A C1: 条件 Press 前置 helper — 返回一个 Action，当 stateSkill 状态技能未启动时按 keyToPress.
     /// 用法: <c>.OnKey(Keys.Q).Pre(PressIfStateOff(Keys.E, Keys.E)).CastSkill(Keys.Q).AfterCast()</c>
     /// 替代猴子 Q/W/R 共用 <c>if (!_skill.DOTA2判断状态技能是否启动(E)) Press(E)</c> 3 行同构 Pre lambda.

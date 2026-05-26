@@ -442,6 +442,45 @@ public sealed class HeroPlanBuilder
     public HeroPlanBuilder WhenReadyDo(Action customAction)
         => FinishClauseAfter(SkillAfterMode.WhenReady, customAction);
 
+    /// <summary>
+    /// Phase 26 F1 (2026-05-26): 终结子句为 "主动技能释放后替换图标技能后续" — 替原 CustomProbe(async () => await _skill.释放技能后替换图标技能后续(skillKey, ()=>Step(slot), v=>SetStep(slot,v)).ConfigureAwait(true)) 4 层壳模板.
+    /// 业务侧 0 lambda; DSL 内部按 stepSlot 自动 wire Skills.Step/SetStep accessor. 用于大牛 W + 伐木机 R 两 hero ReplaceIcon 形态.
+    /// </summary>
+    public HeroPlanBuilder AfterCastReplaceIcon(Domain.Loop.SlotKey stepSlot)
+    {
+        if (_pendingTrigger is null)
+        {
+            throw new InvalidOperationException("AfterCastReplaceIcon: 需先调 OnKey.");
+        }
+        if (_pendingSkill is null)
+        {
+            throw new InvalidOperationException($"AfterCastReplaceIcon: 需先调 CastSkill (OnKey={_pendingTrigger}).");
+        }
+
+        _clauses.Add(new HeroPlanClause(
+            TriggerKey: Domain.Actuation.VirtualKey.From(_pendingTrigger.Value),
+            SkillKey: _pendingSkill.Value,
+            Mode: CastMode.AfterCast,  // 占位, Apply 走 AfterMode=CastReplaceIcon 路径不消费 Mode.
+            ContinueAttack: false,
+            ContinueKey: Keys.None,
+            PostDelayMs: 0,
+            Guard: _pendingGuard,
+            PreActionSync: _pendingPreActionSync,
+            PreActionAsync: _pendingPreActionAsync,
+            Modifiers: _pendingModifiers,
+            PostActionSync: _pendingPostActionSync,
+            PostActionAsync: _pendingPostActionAsync,
+            GuardPredicate: _pendingGuardPredicate,
+            AfterMode: SkillAfterMode.CastReplaceIcon,
+            AfterReplaceIconStepSlot: stepSlot));
+
+        _lastClauseTrigger = _pendingTrigger;
+        _lastClauseGuard = _pendingGuard;
+        _lastClauseModifiers = _pendingModifiers;
+        ResetPending();
+        return this;
+    }
+
     private HeroPlanBuilder FinishClauseAfter(SkillAfterMode mode, Action customAction)
     {
         if (_pendingTrigger is null)
