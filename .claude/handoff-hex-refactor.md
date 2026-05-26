@@ -2836,26 +2836,28 @@ epic 主题: **DSL 修旧 bug + 扩 typestate + Vision 端口扩 WithFrame types
 A 不应期 (3 chunk):
   A1 RefractoryState 子聚合 (✅ commit a3f4b20, 2026-05-26)
   A2 ItemEngine 切假腿走 Refractory ★ 用户冒烟核心 (✅ commit 0d89b7e, 2026-05-26)
-  A3 DSL .WithRefractory(name, ms) modifier emit
+  A3 DSL .WithRefractory(name, ms) modifier emit (⏭ 推迟 Phase 27+, 0 消费者 — 违反铁律 1(b) 不为抽象而抽象)
 
 B CommandAcked (3 chunk):
-  B1 ICommandAckProbe + PixelDiffAckProbe 实现 (ROI 技能 50x50 / 物品 62x45)
-  B2 SkillEngine/ItemEngine 切 Acked 判定 ★ 用户冒烟核心 (灰图标累积)
-  B3 DSL .RequireAck() modifier emit
+  B1 ICommandAckProbe + PixelDiffAckProbe 实现 (5 sample points: 4 corner + 1 center) (✅ commit a2b4081, 2026-05-26)
+  B2 ItemEngine 切 Acked 判定 ★ 用户冒烟核心 (灰图标累积) (✅ commit cb4ae51, 2026-05-26)
+  B3 DSL .RequireAck() modifier emit (✅ commit cb4ae51, 2026-05-26)
 
 D DeferredQueue (3 chunk):
-  D1 DeferredQueue 子聚合 (HeroLoopHost 持有 ImmutableQueue<DeferredCommand>)
-  D2 BuffObservable/StunObservable + state-change-driven flush ★ 用户冒烟核心 (吹风秒接)
-  D3 DSL .QueueWhen(condition) modifier emit
+  D1 DeferredQueue 子聚合 (HeroAggregate 持 ConcurrentQueue) (✅ commit a2b4081, 2026-05-26)
+  D2 ControlObservable + state-change-driven flush ★ 用户冒烟核心 (吹风秒接) (✅ commit cb4ae51, 2026-05-26, framework 完整 / probe stub 推迟 Phase 27+)
+  D3 DSL .QueueWhen(condition) modifier emit (✅ commit cb4ae51, 2026-05-26)
 
 E ItemMetadata (2 chunk):
-  E1 ItemDescriptor + ItemCatalog SSOT (守报 IsInsertable=false)
-  E2 ItemEngine 双发送路径 ★ 用户冒烟核心 (物品分类)
+  E1 ItemDescriptor + ItemCatalog SSOT (守报 IsInsertable=false; BKB/林肯 enable / 跳刀 Blocked 初版) (✅ commit a2b4081, 2026-05-26)
+  E2 ItemEngine 双发送路径 ★ 用户冒烟核心 (物品分类) (✅ commit cb4ae51, 2026-05-26)
 
 F-G DSL 表达层附线 (3 chunk):
-  F1 物品 DSL 4 维 emit (.UseItemsSerial/.UseItemsBurst/.AfterCastReplaceIcon) + HeroStrategyBase KeepLeg helper
-  G1 6 hero Burst inline 替 (莱恩/沉默/屠夫/骨法/军团/天怒)
-  G2 KeepLeg 8 hero + ReplaceIcon 2 hero
+  F1 物品 DSL helpers (HeroStrategyBase.KeepLeg() + ItemEngine.批量使用物品并行 + HeroPlanBuilder.AfterCastReplaceIcon) (✅ commit 0721d3e, 2026-05-26)
+  G1 6 hero Burst inline 替 (莱恩/沉默/屠夫/骨法/军团/天怒) (✅ commit e364c49, 2026-05-26)
+  G2 KeepLeg 9 处 8 hero + ReplaceIcon 2 hero (✅ commit e364c49, 2026-05-26)
+
+✅ **Phase 26 epic 完结** (13/14 chunk 完成 + A3 推迟 Phase 27+, 7 commit 主干: a3f4b20 / 0d89b7e / a2b4081 / 0721d3e / cb4ae51 / e364c49 + handoff 813b1b1 / e2d751f)
 ```
 
 ### Phase 26 A1 完成 (✅ 2026-05-26, commit `a3f4b20`)
@@ -2902,14 +2904,43 @@ F-G DSL 表达层附线 (3 chunk):
 | 29+ | Observation Space (战场感知) | 敌人位置 / 距离 / 速度 / Buff 识别 / Channel 状态 / Cooldown 表 (吹风天火 / 吹风推波陨石 等连招的前置依赖) |
 | 30+ | Trajectory Recorder + Reward Hooks | RL/GA 训练数据采集 (用户校准: "跨 AI 利好不是直接目的" — 推迟) |
 
-### Phase 26 待续 (下次 session 起手)
+### Phase 26 14 chunk 全完成 (待用户冒烟整轮)
 
-- 当前已完成: A1 (commit `a3f4b20`) + A2 (commit `0d89b7e`)
-- 下一 chunk: **A3 DSL `.WithRefractory(name, ms)` modifier emit**
-  - HeroStrategyBase / SetupAction DSL 扩展, 让 Strategy 显式声明不应期, 不需手改 Engine
-  - SG (HeroStrategyGenerator) emit chained `.WithRefractory("LegSwap", 200)` → 调用 `_aggregate.Refractory.SetRefractory`
-  - 设计反问: A2 已在 ItemEngine.切假腿类型 硬编码 SetRefractory, A3 是否真有 Strategy 想自定义 ms? → 若用户用 200ms 都不需调, A3 可推迟 Phase 27+ 节省 1 chunk
-- 然后接 B 段 CommandAcked (3 chunk): B1 PixelDiffAckProbe 实现 + B2 SkillEngine/ItemEngine 切 Acked 判定 ★ 用户冒烟核心 (灰图标累积)
+13/14 chunk 主干 commit + 4 档 build 全 PASS (DOTA2+Silt / +GpuVision / LOL / HF2). A3 推迟 Phase 27+ (over-engineering, 0 消费者 — handoff 设计反问已记录用户未反对). 详 14 chunk 拓扑表标 ✅.
+
+### Phase 26 用户冒烟剧本 (★ 3 核心 + 整轮回归)
+
+**A2 ★ 切假腿不应期 (Refractory 根治中间态循环)**:
+- 切智力↔敏捷↔力量 三态环反复 10 次, 每次仅按 1 次切换键
+- Expected: 0 中间态循环 (不再出现按 1 次没动 + 按 2 次直接跳过目标态), 最终态正确
+- Reproducer: 按 NumPad7 切换假腿方向, 反复 10 次连切
+- 失败应对: duration 不够 (200ms 假设不成立) → ItemEngine.切假腿类型 改 SetRefractory(_, 300ms) 重测
+
+**B2 ★ 物品按键 Ack 检测 (灰图标累积根治)**:
+- 被控制 (stun/silence) 时连按 Z/X/C/V/B/Space 物品键
+- Expected: 第 1 次按下后 200ms 内 ROI 像素无变化 → 触发 500ms Refractory short-circuit, 不再累积按键
+- 失败应对: WaitForAck 阈值 (DiffThreshold=30) 太严 → PixelDiffAckProbe.DiffThreshold 调 20 重测
+
+**E2 ★ Blocked 物品入队 (物品分类发送)**:
+- 当前 ControlObservable.ProbeIsControlled() 永返 false (D2 stub) — Blocked 物品 (跳刀) 始终走直发, 不进 DeferredQueue
+- 等 Phase 27+ SME 填具体 Debuff 检测才能 verify "stun 中按跳刀入队 → 解控自动按出"
+- 当前 E2 framework verify: ItemCatalog.TryGet("跳刀") 返 IsInsertable=false; 双发送路径代码挂载到位; 不阻断当前 Phase 26 收尾
+
+**整轮回归** (继承 Phase 25A 冒烟):
+- 启动程序 (admin) + 类型加载顺序无 NRE
+- 抽样 4 属性英雄全技能键 (大牛 / 影魔 / 卡尔 / 猛犸 等)
+- 物品使用 (假腿切换 / 神杖魔晶判断 / 6 Burst hero 红杖组合)
+- ReplaceIcon DSL (伐木机 R 锯齿飞轮 / 大牛 W 走 A + 沟壑)
+- KeepLeg DSL (8 hero 假腿保持持续生效)
+
+### Phase 26 handoff_notes (Phase 27+ 候选, 不污染当前 epic 完结状态)
+
+1. **A3 DSL `.WithRefractory(name, ms)` modifier** (推迟 Phase 27+): 等第二个 Refractory 消费者出现 (SkillCD / BuffWindow / ChannelLock 等) 再 emit DSL
+2. **D2 ControlObservable 真实 probe** (推迟 Phase 27+): 需 SME 提供 Debuff 状态栏 (435, 826, 526, 80) 内 stun/silence/吹风/无敌 图标颜色特征. 升级路径: `ControlObservable.ProbeIsControlled()` 内调 `_vision.WithFrame(frame => /* 检测 */)`, 不需碰 HeroLoopHost / ItemEngine / DeferredQueue
+3. **ItemCatalog 守报扩展** (Phase 27+): 当前仅 BKB / 林肯 enable Insertable; 跳刀 enable Blocked. 用户冒烟通过后逐批 enable 其他主动物品 (紫苑/血棘/纷争/散失/疯狂面具 等)
+4. **B3 DSL `.RequireAck()` / D3 DSL `.QueueWhen()` 消费路径扩展** (Phase 27+): 当前 clause 字段已 emit, 但 Apply 路径 0 实际消费. 业务 SME 接入: SkillEngine wrap 或 Apply 内 QueueWhen 非空时 DeferredQueue.Enqueue 路径
+5. **PixelDiffAckProbe 阈值调优** (Phase 27+): 当前 DiffThreshold=30 (RGB 单通道 ~12% 显著变化). 冒烟反馈调整 — 物品图标 CD 蒙层 / 灰边框 实测显著值
+6. **SkillEngine Ack 整合** (Phase 27+): SkillEngine 内部已有 Ack 语义 (DOTA2对比释放技能前后颜色 / DOTA2判断技能是否CD), 与 B1 ICommandAckProbe 重复. 整合后端口收口 — 但 SkillEngine 路径风险高, 推迟到稳定后
 
 ### Phase 26 14 场景 backlog (Phase 27+ 准备消化)
 
