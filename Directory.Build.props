@@ -4,4 +4,9 @@
   <PropertyGroup>
     <WarningsAsErrors>$(WarningsAsErrors);DS0001;DS0002;DS0003</WarningsAsErrors>
   </PropertyGroup>
+  <!-- Phase 27A retry 2 S5 (2026-05-26): VSTHRD110 / CA1849 升级 WarningsAsErrors — 阻断 4 hero Task.Run fire-and-forget 回归;
+       .editorconfig 限定路径 (仅 4 hero, 船长Strategy.cs 排除推 27B+); 路径过滤+严重度配合让全仓 build 通过仅 4 hero error. -->
+  <PropertyGroup Condition="'$(MSBuildProjectName)' == 'Dota2Simulator'">
+    <WarningsAsErrors>$(WarningsAsErrors);VSTHRD110;CA1849</WarningsAsErrors>
+  </PropertyGroup>
 </Project>

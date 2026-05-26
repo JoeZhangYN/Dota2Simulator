@@ -1,0 +1,19 @@
+# Phase 27A retry 2 S5 (2026-05-26): VSTHRD110 Task.Run fire-and-forget 防回归 — 仅作用于 4 已迁 hero (S3 巫妖/骨法 + S4 军团 + S5 天怒).
+# 船长Strategy.cs 排除 (推 27B+); 全仓 wide deprecation 留后续 epic.
+# 关联 plan SSOT: Phase 27A retry 2 §7.2 INV7 lint 启用; Directory.Build.props 同步加 WarningsAsErrors 让 Roslyn build-time 阻断.
+
+[**/Heroes/Intelligence/巫妖Strategy.cs]
+dotnet_diagnostic.VSTHRD110.severity = error
+dotnet_diagnostic.CA1849.severity = warning
+
+[**/Heroes/Intelligence/骨法Strategy.cs]
+dotnet_diagnostic.VSTHRD110.severity = error
+dotnet_diagnostic.CA1849.severity = warning
+
+[**/Heroes/Intelligence/天怒Strategy.cs]
+dotnet_diagnostic.VSTHRD110.severity = error
+dotnet_diagnostic.CA1849.severity = warning
+
+[**/Heroes/Strength/军团Strategy.cs]
+dotnet_diagnostic.VSTHRD110.severity = error
+dotnet_diagnostic.CA1849.severity = warning
