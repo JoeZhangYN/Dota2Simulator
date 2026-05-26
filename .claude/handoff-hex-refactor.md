@@ -35,6 +35,8 @@ C# .NET 10 WinForms 游戏自动化框架，重写为六边形架构。
 - [x] **Phase 19G-4 RegisterStoneProbe DSL + 最终 9 英雄迁** —— 2026-05-26 完成（1 commit `18b39bd`, **92/92 = 100% 全迁**; DSL 21→22 维 RegisterStoneProbe; 进化岛/测试/马西/伐木机/海民/斧王/猴子/暗影萨满/骨法 迁; 新模式 RegisterStoneProbe + 动态 CastMode escape-hatch + 双路由 dispatch + 条件 PreAction with Guard）
 - [x] **Phase 20 后续收尾** —— 2026-05-26 完成（5 commit `ff897a0` → `86d4c6d`, 含 worktree 清理 + 4 epic 子阶段）；详 Phase 20 段
 - [x] **Phase 25A 抽象升级三连** —— 2026-05-26 完成（5 commit `008db40` → `5c1de4f`, DSL SetupAction 修旧 bug + WithFrame typestate + 12 业务侧端口收口 + 3 Roslyn Analyzer 拆桥; plan SSOT `~/.claude/plans/cheerful-rolling-harp.md`）
+- [x] **Phase 26 异步控制语义底层** —— 2026-05-26 完成（14/14 chunk, 7 commit 主干 `a3f4b20` → `08a5893`; Refractory 不应期 + CommandAcked 双 signature + DeferredQueue + ItemMetadata + DSL 表达层 5 modifier; plan SSOT `~/.claude/plans/serene-coalescing-moth.md`）
+- [x] **Phase 27A retry 2 StepMachine DSL 4 hero 迁** —— 2026-05-26 完成（7 commit `83a9155` → `5863da8`, S1-S5 + 2 fix; Domain 19 原语 v2 + Runner ctor 5 参数固定 + sub-builder 8 维 + wiring 三件套 (StepMachineRefId+DispatchAsync hook+Task.Run wrap) + 4 hero (巫妖/骨法/军团/天怒) 迁 .StepMachine + 4 hero VSTHRD110=error lint; 船长推 Phase 27B+ SkillEngine helper async polling 范式不兼容; failed attempt tag `wave3-attempt-1-failed` 保留实证）
 
 ## Phase 18 已完成（main 分支连续 commit，每 chunk 0 build 错误）
 
@@ -2956,3 +2958,164 @@ F-G DSL 表达层附线 (3 chunk):
 - 多 hero / Planner: 场景 16-18
 - 战场预测: 场景 19
 - 现 19 场景仅 1-5 在 Phase 26 (本 epic) scope
+
+## Phase 27A retry 2 StepMachine DSL 4 hero 迁 (2026-05-26, 7 commit on main)
+
+**plan SSOT**: `~/.claude/plans/<plan-name>.md` retry 2 (经 3 轮 grill + 2 轮 plan-reviewer + 1 retry budget)
+
+**起源**: Phase 26 推迟项之一 "StepMachine DSL (原 25D) + 5 hero 迁"; retry 0 原 5 hero (船长 + 巫妖 + 骨法 + 军团 + 天怒); attempt 1 Wave 3 全失败 (5 commit reset, tag `wave3-attempt-1-failed` 保留); retry 2 缩 scope 4 hero (船长推 Phase 27B+, SkillEngine helper async polling 范式不兼容 .StepMachine sync RegisterProbe).
+
+### Phase 27A retry 2 commit 链 (7 commit on main, 9ad9c5a..5863da8)
+
+```
+5863da8 Phase27A-retry2-S5-fix  删 Directory.Build.props WarningsAsErrors 误伤修正
+06a76cb Phase27A-retry2-S5      天怒 D3 迁 .StepMachine + 4 hero VSTHRD110=error lint
+92d0277 Phase27A-retry2-S4      军团 F 决斗迁 .StepMachine (UseItem+PressAlt+ParallelBatch+fallback)
+8c5fe86 Phase27A-retry2-S3-fix  修 5 build error (Conditional PascalCase + lambda _ discard 冲突)
+004fc84 Phase27A-retry2-S3      巫妖+骨法 迁 .StepMachine (fire-and-forget 删 + Delay 显式)
+95915b8 Phase27A-retry2-S2      wiring 三件套 + sub-builder 8 维
+83a9155 Phase27A-retry2-S1      Domain/StepMachine 19 原语 v2 + Runner ctor 一次性定 + 子聚合
+```
+
+### Phase 27A retry 2 chunk 拓扑 (全串行, S1 → S2 → S3 → S4 → S5)
+
+```
+S1 Domain 层基建 (83a9155):
+   - StepMachine/StepCommand v2 含 19 原语 (含 attempt 1 实证收编 UseItem/PressAlt)
+   - StepMachineRunner ctor 5 参数一次性固定: (StepMachineState + HeroAggregate + ItemEngine + SkillEngine + ImageHandle)
+   - 子聚合 (StepMachineState Dictionary<string, StepMachine>)
+   - S2-S5 严禁改 Runner ctor (attempt 1 S4 自扩 ctor 破 S5 build 教训反预测)
+
+S2 Wiring 三件套 (95915b8):
+   - HeroPlanClause record struct +1 字段 StepMachineRefId: string?
+   - HeroPlanBuilder.StepMachine(name, sub => ...) → sub-builder 8 维 (Initial/Step/OnEntry/OnExit/Local/Probe/WithLockMode/WithTickAlignment) + lastIdx-with 模式 _clauses[lastIdx] = _clauses[lastIdx] with { StepMachineRefId = name }
+   - HeroPlan.DispatchAsync L454-478 wiring hook + Task.Run wrap fire-and-forget (业务零感知)
+   - 4 阶段静态 sanity verify PASS
+
+S3 巫妖+骨法 (004fc84 + 8c5fe86 fix):
+   - 巫妖 E mode toggle: 删 fire-and-forget Task.Run; Delay 原语显式
+   - 骨法 R Pre burst + Mode toggle: 同上
+   - fix: Conditional positional 字段名 IfSteps/ElseSteps PascalCase (CS1739); lambda 参数 `_` 与 statement `_ = expr` discard 命名冲突 → 改 lambda 参数名 `handle`
+
+S4 军团 F 决斗 (92d0277):
+   - .StepMachine 迁 UseItem + PressAlt + ParallelBatch + fallback reset
+
+S5 天怒 D3 (06a76cb + 5863da8 fix):
+   - .StepMachine 迁 WaitForProbeTrue 顺序门控 + ActivateClause + ResetMachine; Conditions[C1].Active 直写改 ActivateClause("C1")
+   - lint 启用 4 hero VSTHRD110=error (.editorconfig 路径过滤命中 4 次)
+   - fix: 删 Directory.Build.props 全局 WarningsAsErrors (误伤 Vision/Benchmark 非 4 hero 路径)
+```
+
+### Phase 27A retry 2 关键不变量 (13 不变量, 主 lead build verify PASS)
+
+- **INV2 Task.Run 零回归 (4 hero)**: 4 hero 文件 grep `Task\.Run\(async` = **0 PASS**
+- **INV3 hardcode Delay 零回归 (4 hero)**: 4 hero 文件 grep `Common\.Delay\(\d{3,}\)` = **0 PASS** (Delay 原语显式)
+- **INV4 StepCommand switch exhaustive**: CS8509 0 warning PASS
+- **INV5 sub-builder 破坏点文档化**: .claude/CLAUDE.md 第 45-50 行 + S2 commit `95915b8` body 加 "Phase 27A 显式破坏点" 段
+- **INV6 SG 0 改**: HeroStrategyGenerator.cs sha256 自 Phase 27A 起点 `9ad9c5a` 至 `5863da8` 不变
+- **INV7 lint VSTHRD110=error**: .editorconfig 4 hero 路径过滤命中 **4 次 PASS**
+- **INV8 SlotKey.Global 直写 0 (4 hero)**: PASS (军团 Skills.Step 子维迁 StepMachines.CurrentStep, mode 子维保留)
+- ~~INV9~~ **删除** (船长 _全局模式e_lock 推 Phase 27B+, 不在 27A scope)
+- **INV10 Conditions[name].Active 直写 0 (4 hero)**: 天怒 `Conditions[C1].Active = true` 改 `ActivateClause("C1")` PASS
+- **INV11 业务零感知 Runner**: 全 Heroes/ `new StepMachineRunner` = **0 PASS** (S2 wiring hook 自动)
+- **INV12 业务侧只读不写状态机**: 4 hero predicate 内 0 `StepMachines.SetStep` 直写; **Pre bridge 是 escape hatch documented** (军团 + 天怒 Pre 内桥接复位是合理设计, plan §7.3 escape hatch 应扩 "Pre/setup 内桥接 OK, predicate 内写 SetStep 禁")
+- **INV13 wiring 路径活**: S2 sanity test 4 阶段静态 verify PASS; build verify S3/S4/S5 完后 0 error 实证 wiring 接通
+
+### Phase 27A retry 2 attempt 1 全失败教训 (恢复 tag `wave3-attempt-1-failed`)
+
+Wave 3 attempt 1 5 commit 已 reset, tag 保留实证. **4 大缺陷归档**:
+
+1. **StepMachineRunner wiring 路径完全缺失** — Plan.Apply 只写 InitialStep, OnKey→Runner 无路径; attempt 1 业务侧 `new StepMachineRunner(...)` 自管引发 INV11 破坏 + 跨 chunk 副作用扩散
+2. **5 hero 模型范式分类错** — 船长 SkillEngine helper polling (`_skill.主动技能释放后续/进入CD后续/已就绪后续`) ≠ event-driven, 与 .StepMachine sync RegisterProbe 不兼容; spike 3/5 反例剧本 FAIL 实证
+3. **R1 反预测 mitigation soft hint, subagent 自扩 S1** — S4 加 UseItem/PressAlt 改 Runner ctor 破 S5 build; retry 2 改硬约束 "Runner ctor 5 参数 S1 一次性定, S2-S5 严禁改"
+4. **Wave 3 4 chunk 并发跨 chunk 隐性副作用** — S4 ctor 改破 S5 build; retry 2 改全串行 S1→S2→S3→S4→S5, 每 chunk 主 lead 单次 build verify
+
+### Phase 27A retry 2 关键改进
+
+1. **scope 缩 4 hero** (船长推 Phase 27B+)
+2. **wiring 三件套核心修复**:
+   - HeroPlanClause record struct +1 字段 `StepMachineRefId: string?` (Phase 26 lastIdx-with 模式同构)
+   - HeroPlanBuilder.StepMachine() 内 `_clauses[lastIdx] = _clauses[lastIdx] with { StepMachineRefId = name }`
+   - HeroPlan.DispatchAsync L454-478 wiring hook + Task.Run wrap fire-and-forget (业务零感知)
+3. **19 原语 v2 一次性整全** (含 Wave 3 attempt 实证收编 UseItem/PressAlt)
+4. **Runner ctor 5 参数固定** (StepMachineState + HeroAggregate + ItemEngine + SkillEngine + ImageHandle), S2-S5 严禁改
+5. **BLOCKED file hard signal 协议** (subagent 发现 plan 假设破裂创建 `.claude/BLOCKED_<chunk>_<symptom>.md` 0 改动退出, 防自扩)
+6. **Wave 全串行** (S1 → S2 → S3 → S4 → S5), 每 chunk 主 lead 单次 build verify
+
+### Phase 27A retry 2 架构性教训 (实施实证)
+
+- **lastIdx-with 锚点 bug** (S3 attempt 1 commit `3747c2c` 实证): `.StepMachine(name)` 必须紧贴 `.OnKey().NoProbe()` 后, 否则 lastIdx 指向错的 clause (e.g. CustomProbe 走 `_clauses.Add` 影响 lastIdx, Execute 走 `_setups.Add` 不影响)
+- **Conditional record class PascalCase** (S3 教训): positional 字段名 `IfSteps`/`ElseSteps` 命名参数必须 PascalCase, camelCase `ifSteps`/`elseSteps` 报 CS1739
+- **lambda `_` 与 discard 冲突** (S3 教训): lambda 参数 `_` (ImageHandle) 与 statement `_ = expr` discard 命名冲突, 改 lambda 参数名 `handle` 或 statement 不带 discard
+- **Directory.Build.props WarningsAsErrors 全局误伤** (S5 fix 实证): per-file `severity = error` 已足够 (Roslyn 标准), 重复加 `WarningsAsErrors` 会把全项目同 diagnostic 升级 error 误伤 Vision/Benchmark 等非 4 hero 路径
+- **InterpretPress sync-over-async 妥协** (S1 实施): InterpretPress 用 `Task.Delay(holdMs).GetAwaiter().GetResult()` 同步等待 (Press HoldMs 是少数 case, signature 妥协 — InterpretPress 返 bool 非 Task<bool>). 性能影响有限, 留 Phase 27B+ Runner async iterator 重审
+
+### Phase 27A retry 2 待用户冒烟剧本 (4 hero 实际游戏剧本)
+
+1. **巫妖 E mode 切换 (fire-and-forget 删验证)**:
+   - F9 切巫妖 + 反复按 E 键 10 次, mode toggle 应稳定切换
+   - Expected: 0 fire-and-forget Task.Run 残留 (历史 inline Task.Run wrap 全部走 wiring hook), Delay 原语显式可观测
+   - 失败应对: Runner 内 mode 子维同步丢 → 检查 INV8 SlotKey.Global 直写 0 是否被 S3 漏迁
+
+2. **骨法 R Pre burst + Mode toggle**:
+   - F9 切骨法 + R 键; 验证 Pre 段 burst 序列正常完成后 mode toggle 接 R 持续输出态
+   - Expected: Pre 段同步; mode 段经 .StepMachine 驱动; 0 inline Task.Run
+   - 失败应对: 若 Pre 段桥接复位失效 → 检查 INV12 escape hatch (Pre 内桥接 OK) 是否被误读
+
+3. **军团 F 决斗 4 跳刀 + R fallback**:
+   - F9 切军团 + F 决斗键; 验证 ParallelBatch (UseItem+PressAlt) 连续 4 跳刀 + 失败 fallback 调 R 大
+   - Expected: ParallelBatch 并发执行, fallback reset machine 回 InitialStep
+   - 失败应对: ParallelBatch 子原语未触发 → 检查 S1 19 原语是否含 ParallelBatch (attempt 1 S4 自扩, retry 2 S1 一次性整全)
+
+4. **天怒 D3 顺序就绪 + R 失败激活 C1**:
+   - F9 切天怒 + D 键触发 D3 顺序门控; R 键失败时验证 ActivateClause("C1") 接管
+   - Expected: WaitForProbeTrue 顺序门控正确; ActivateClause 取代 Conditions[C1].Active 直写; ResetMachine 回 InitialStep
+   - 失败应对: C1 未激活 → 检查 INV10 Conditions[name].Active 直写 0 是否被 S5 漏迁
+
+**整轮回归** (继承 Phase 26 冒烟):
+- 启动程序 (admin) + 类型加载顺序无 NRE
+- 抽样 4 属性英雄全技能键 (大牛 / 影魔 / 卡尔 / 猛犸 等)
+- 物品使用 (假腿切换 / 神杖魔晶判断 / 6 Burst hero 红杖组合)
+- ReplaceIcon DSL (伐木机 R 锯齿飞轮 / 大牛 W 走 A + 沟壑)
+- KeepLeg DSL (8 hero 假腿保持持续生效)
+- **4 hero StepMachine 路径**: 巫妖 E / 骨法 R / 军团 F / 天怒 D3 (本 epic 新增)
+
+### Phase 27A retry 2 回滚锚点
+
+- **完整撤回 Phase 27A retry 2**: `git revert 5863da8 06a76cb 92d0277 8c5fe86 004fc84 95915b8 83a9155` 逆序 7 commit
+- **回 Phase 26 完结状态**: `git reset --hard 9ad9c5a` (Phase 26 handoff 最后一笔 commit, 即 Phase 27A retry 2 起点)
+- **软撤回 S5 lint (保留代码但禁用 lint)**: .editorconfig 4 hero VSTHRD110=error → warning (注: Directory.Build.props 全局 WarningsAsErrors 已 S5-fix 删, 不再需要软撤)
+- **单 chunk revert**: S1 `83a9155` / S2 `95915b8` / S3 `004fc84` + fix `8c5fe86` / S4 `92d0277` / S5 `06a76cb` + fix `5863da8` 任一
+- **attempt 1 failed tag** (保留实证, 禁删): `wave3-attempt-1-failed` (5 commit: 6127c07 S1 / 65d82af S2 / 3747c2c S3 / 248fd5b S4 / 349e8d9 S5; 4 大缺陷归档详见 attempt 1 全失败教训段)
+
+### Phase 27A retry 2 handoff_notes (5 deferred 项 — Phase 27B+ / 后续 epic)
+
+1. **船长迁 .StepMachine** (Phase 27B+ 独立 epic, 重 grill 必走): SkillEngine helper async polling 范式 (`_skill.主动技能释放后续/进入CD后续/已就绪后续`) 需新原语 (e.g. `AwaitSkillHelper(Func<Task<bool>>)`) + Runner async polling 支持; spike 3/5 反例剧本 FAIL 实证. 不与本 epic .StepMachine sync RegisterProbe 同源.
+2. **横向耦合迁** (Phase 27B/C/D 评估): 4 hero 内 Q/W/R/D mode 仍读 `Skills.Step(SlotKey.X)`, 业务侧 wet bridge 同步写回 Skills.SetStep 桥接 (S3/S4/S5 都有 escape hatch). 读侧迁 StepMachines.GetStep 留后续 epic 评估
+3. **walk SkillEngine/ItemEngine 框架内 Task.Run** (后续 epic): VSTHRD110 lint 仅作用 4 hero 路径; SkillEngine.cs:1586/1609 + ItemEngine.cs:731 + 18 未迁 hero 框架内 Task.Run 留后续 epic
+4. **HeroPlanBuilder ≥ 1000 行预警** (Phase 27B+ 监控): Phase 27A 加 .StepMachine 后未越线, 但 27B+ 加 AwaitSkillHelper 等 fluent 可能触界, R5 风险后续监控. 触界即拆 builder partial class 或 sub-builder 第二层
+5. **plan §7.3 escape hatch documented 扩** (后续 plan 修订): Pre/setup 内桥接 OK 应明示 (军团 + 天怒 实证), 防 Phase 27B+ 误读 INV12 严格 "业务侧只读"
+
+### Phase 27A retry 2 下次 session 起手指引 (Phase 27B 候选)
+
+**Phase 27B SkillEngine helper async polling adapter epic** (船长迁 .StepMachine 主线):
+
+grill 三问预案 (动手前必走):
+
+1. **完成形态**: 船长 4 技能键 + 假腿切换 + 命石 在 .StepMachine 范式下 0 fire-and-forget + 0 Common.Delay hardcode + 0 SkillEngine helper async polling 直调; 主 lead build 4 档全 PASS; 实际游戏剧本 5 分钟无 NRE/卡死
+2. **in-scope 边界**: 仅船长 1 hero; 仅 .StepMachine 路径 (Q/W/E/R + EQ/QE/QW/QR 组合); 不涉及 Combo Scheduler J 段 (Phase 27 候选另一独立 epic); 不动 SkillEngine 内部实现 (仅扩 Runner 原语 AwaitSkillHelper)
+3. **已否决方向**: (a) 不重做 Phase 27A 4 hero (已稳定不动); (b) 不并发跨 hero 验证 (attempt 1 教训); (c) 不在 Runner 内 inline polling 实现 (复杂度下沉到 SkillEngine 已有 helper, Runner 仅调度)
+
+**候选其他 27B+ epic** (用户决策选一):
+- Combo Scheduler J 段 (Phase 26 推迟项, 10 场景: 火女吹风接光击阵 / 萨尔 D 动态延迟 等)
+- Backoff 熔断 (Phase 26 推迟项, 5 次失败 alert+TTS+跳主循环)
+- 用户冒烟反馈消化 (Phase 26 PixelDiffAckProbe 阈值调优 + D2 ControlObservable 真实 probe + ItemCatalog 守报扩展)
+
+### Phase 27A retry 2 完结状态
+
+- **7 commit 主干** (S1 `83a9155` / S2 `95915b8` / S3 `004fc84` + fix `8c5fe86` / S4 `92d0277` / S5 `06a76cb` + fix `5863da8`), 0 项主对话内可立即推进的剩余工作
+- **5 deferred 项** 全依赖外部输入 (新 epic grill / 用户冒烟 / 业务决策), 不在主 lead 单独可推进范围
+- **13 不变量** 全 verify (INV9 删除合理; INV12 escape hatch documented)
+- **failed attempt 实证保留** tag `wave3-attempt-1-failed` (4 大缺陷归档 → retry 2 关键改进 6 项闭环)
+- **build verify final**: HEAD `5863da8` main 分支 DOTA2+Silt 0 错 / LOL 0 错 / HF2 0 错 (baseline 一致, 详 S5 commit body)
+- **项目无 dist 同步链** (消费方业务项目, 非元工具仓), step 8 archiver 跳同步链步
