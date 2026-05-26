@@ -37,6 +37,7 @@ C# .NET 10 WinForms 游戏自动化框架，重写为六边形架构。
 - [x] **Phase 25A 抽象升级三连** —— 2026-05-26 完成（5 commit `008db40` → `5c1de4f`, DSL SetupAction 修旧 bug + WithFrame typestate + 12 业务侧端口收口 + 3 Roslyn Analyzer 拆桥; plan SSOT `~/.claude/plans/cheerful-rolling-harp.md`）
 - [x] **Phase 26 异步控制语义底层** —— 2026-05-26 完成（14/14 chunk, 7 commit 主干 `a3f4b20` → `08a5893`; Refractory 不应期 + CommandAcked 双 signature + DeferredQueue + ItemMetadata + DSL 表达层 5 modifier; plan SSOT `~/.claude/plans/serene-coalescing-moth.md`）
 - [x] **Phase 27A retry 2 StepMachine DSL 4 hero 迁** —— 2026-05-26 完成（7 commit `83a9155` → `5863da8`, S1-S5 + 2 fix; Domain 19 原语 v2 + Runner ctor 5 参数固定 + sub-builder 8 维 + wiring 三件套 (StepMachineRefId+DispatchAsync hook+Task.Run wrap) + 4 hero (巫妖/骨法/军团/天怒) 迁 .StepMachine + 4 hero VSTHRD110=error lint; 船长推 Phase 27B+ SkillEngine helper async polling 范式不兼容; failed attempt tag `wave3-attempt-1-failed` 保留实证）
+- [x] **Phase 27B SkillEngine helper async polling adapter (船长 .StepMachine 迁移)** —— 2026-05-26 完成（3 commit `5e289a7` → `0d875be`, S1-S3 全串行 + S4 用户冒烟 deferred; Domain +20 原语 AwaitSkillHelper + Runner +InterpretAwaitSkillHelper case + 船长Strategy.cs 102→73 行净减 29 行 (4 method 删 + lock 删 + BuildPlan 链全数迁 .StepMachine "captain-Q"+"captain-E" + C3/C4 RegisterProbe 内嵌 async lambda + D2 重决断采简化方案不扩 DSL 维度) + 5 hero VSTHRD110=error lint; plan SSOT `.claude/plans/phase-27b-captain-stepmachine-plan.md` 经 plan-reviewer R1-A REJECT 10 项必修 + 二审 PASS WITH CAVEATS 主 lead 3 处补丁; SOT SSOT `.claude/sot/phase-27b-captain-stepmachine.md` 同源修订）
 
 ## Phase 18 已完成（main 分支连续 commit，每 chunk 0 build 错误）
 
@@ -3119,3 +3120,153 @@ grill 三问预案 (动手前必走):
 - **failed attempt 实证保留** tag `wave3-attempt-1-failed` (4 大缺陷归档 → retry 2 关键改进 6 项闭环)
 - **build verify final**: HEAD `5863da8` main 分支 DOTA2+Silt 0 错 / LOL 0 错 / HF2 0 错 (baseline 一致, 详 S5 commit body)
 - **项目无 dist 同步链** (消费方业务项目, 非元工具仓), step 8 archiver 跳同步链步
+
+## Phase 27B SkillEngine helper async polling adapter (船长 .StepMachine 迁移) (2026-05-26, 3 commit on main)
+
+**plan SSOT**: `.claude/plans/phase-27b-captain-stepmachine-plan.md` (经 plan-reviewer R1-A REJECT 10 项必修 + 3 项建议补 + 二审 PASS WITH CAVEATS 主 lead 3 处补丁)
+**SOT SSOT**: `.claude/sot/phase-27b-captain-stepmachine.md` (Row 7-8 + INV14/INV15 同源修订, references 加 ConditionSlot.cs:11 verify ground truth)
+
+**起源**: Phase 27A retry 2 推迟项 #1 "船长迁 .StepMachine" (SkillEngine helper async polling 范式 `_skill.主动技能释放后续/进入CD后续/已就绪后续` 与 .StepMachine sync RegisterProbe 不兼容, 27A retry 2 attempt 1 spike 3/5 反例剧本 FAIL 实证). 27B 用 adapter 原语 `AwaitSkillHelper(Func<Task<bool>> Probe, int? TimeoutMs)` 把 helper 复杂度下沉, Runner 仅 `await Probe()` 调度 — 不动 SkillEngine 内部实现.
+
+### Phase 27B commit 链 (3 commit on main, 298fafe..0d875be)
+
+```
+0d875be Phase27B-S3        .editorconfig 船长 VSTHRD110=error + build PASS (lint 启用 5 hero 累计)
+fcfdc28 Phase27B-S2        船长Strategy 迁 .StepMachine (captain-Q + captain-E) + C3/C4 RegisterProbe 内嵌 async lambda + 4 method 删 + lock 删
+5e289a7 Phase27B-S1        StepCommand +AwaitSkillHelper + Runner +InterpretAwaitSkillHelper (第 20 原语)
+```
+
+### Phase 27B chunk 拓扑 (全串行, S1 → S2 → S3 + S4 用户冒烟 deferred)
+
+```
+S1 Domain/Runner 基建 (5e289a7):
+   - StepCommand.cs +1 record AwaitSkillHelper(Func<Task<bool>> Probe, int? TimeoutMs = null) (第 20 原语)
+   - StepMachineRunner.cs InterpretAsync switch +1 case (Delay 之后, throw 之前)
+   - StepMachineRunner.cs +1 private static async Task<bool> InterpretAwaitSkillHelper(AwaitSkillHelper a) — TimeoutMs null = 无限等; >0 = Task.WhenAny race
+   - Runner ctor 5 参数严格不动 (27A INV S2-S5 严禁改 ctor 沿用)
+   - sub-builder 8 维严格不破 (本 epic 0 新增 DSL 维度)
+
+S2 船长Strategy.cs BuildPlan 迁 (fcfdc28):
+   - 删 _全局模式e_lock static field (INV17; HeroLoopHost.cs:44 同名 instance field 不动)
+   - 删 4 helper method (洪流接x回 / x释放后相关逻辑 / x2次释放后 / 立即释放洪流)
+   - .OnKey(Q) 链 .CustomProbe(洪流接x回) → .NoProbe().StepMachine("captain-Q", sub => sub.Initial(0).Step(0).Do(AwaitSkillHelper(() => _skill.主动技能释放后续(Q, callback))).End())
+   - .OnKey(E).WhenStepNotEq(SlotKey.E,1) 链同上 → .StepMachine("captain-E", ...)
+   - .RegisterProbe(C3, x2次释放后) → .RegisterProbe(C3, async () => await _skill.主动技能进入CD后续(E, callback).ConfigureAwait(true)) — D2 重决断采简化方案, ConditionDelegateBitmap = async delegate Task<bool>() 真实签名直接接 async lambda (verify SOT references ConditionSlot.cs:11), 不扩 DSL 维度 (作废原方案 H RegisterProbeAsync 兄弟 method)
+   - .RegisterProbe(C4, 立即释放洪流) → 同上结构
+   - 删 step 2 sot-annotator 全部 7 处注释 (落地后清理)
+   - 船长Strategy.cs 102 → 73 行 (净减 29 行)
+
+S3 .editorconfig + build PASS (0d875be):
+   - .editorconfig 加 `[**/Heroes/Strength/船长Strategy.cs]` VSTHRD110=error + CA1849=warning (累计 5 hero lint 启用)
+   - .editorconfig header 加 Phase 27B S3 标注
+   - build PASS (0 error 266 warning baseline 持平 = 27A 4 hero 不退化)
+
+S4 用户冒烟 (deferred, plan §"用户冒烟"段):
+   - 用户独立执行 4 剧本 (船长 Q 单点连按 / 船长 E 单点连按 / 50 次 Q+E 高频切换 race 实证 / D2 跳船宏); 主 lead 单跑 build PASS
+```
+
+### Phase 27B 关键不变量 (18 不变量 = 27A 13 + 27B 新增 5, 主 lead build verify PASS)
+
+继承 27A 13 不变量 (船长加入清单):
+
+- **INV2 Task.Run 零回归 (5 hero)**: 船长Strategy.cs `Task\.Run\(async` × **0 PASS**
+- **INV3 hardcode Common.Delay(\d{3,}) 零回归 (5 hero 顶层)**: 船长Strategy.cs **BuildPlan 顶层链 / 顶层 method 内 (lambda 外)** × **0 PASS**; lambda 内 `Common.Delay(1350)` × 1 (line 32, captain-Q callback closure) + `Common.Delay(2000)` × 1 (line 67, RegisterProbe C3 async lambda closure) — D1 inner-callback + D2 RegisterProbe async lambda 例外 documented (INV18)
+- **INV4 StepCommand switch exhaustive**: CS8509 0 warning PASS (20 case + 1 throw)
+- **INV5 sub-builder 8 维不破**: StepMachineSubBuilder method count = 8 (0 method 增删), 27B 0 新增 DSL 维度 (D2 重决断后无方案 H)
+- **INV6 SG 0 改**: HeroStrategyGenerator.cs 自 27A 起点 `9ad9c5a` sha256 至 27B 末 `0d875be` 不变
+- **INV7 lint VSTHRD110=error 命中船长 (5 hero)**: .editorconfig 5 hero 过滤路径命中 **5 次 PASS**
+- **INV8 SlotKey.Global 直写 0 (5 hero)**: PASS (船长无 Global 写)
+- ~~INV9~~ **27B 落地删除** (船长 _全局模式e_lock static field 删 — INV17 实施落地)
+- **INV10 Conditions[name].Active 直写 0 (5 hero 顶层)**: 船长Strategy.cs **BuildPlan 顶层链 / 顶层 method 内 (lambda 外)** × **0 PASS**; inner callback closure 内 4 处保留 (line 28/33 captain-Q callback, line 53/56 captain-E callback) — D1 callback 内例外 documented (INV18)
+- **INV11 业务零感知 Runner (5 hero)**: 全 Heroes/ `new StepMachineRunner` = **0 PASS**
+- **INV12 业务侧只读不写状态机**: 船长 BuildPlan 内无 Pre 段桥接 (与军团 / 天怒 不同); .StepMachine 闭包 Step(0).Do(...) sequence 是 setup 段非 predicate 段, 属合法
+- **INV13 wiring 路径活**: build verify HEAD `0d875be` PASS (S1 → S2 → S3 全链接通)
+
+**Phase 27B 新增不变量** (5 项, v2 措辞精确化适配 D1/D2 决断):
+
+- **INV14 SkillEngine helper 直调零回归 (船长 顶层)**: 船长Strategy.cs `_skill\.(主动技能释放后续|主动技能进入CD后续|主动技能已就绪后续)` 在 **BuildPlan 顶层链 / 顶层 method 内 (RegisterProbe/AwaitSkillHelper lambda 外)** × **0 PASS**. RegisterProbe async lambda 内 (Row 7-8 D2 决断) + AwaitSkillHelper.Probe lambda 内 (Row 4-5 D1 决断) 调用都不计 — Probe 自包含 + RegisterProbe 内嵌 async 均为正确路径.
+- **INV15 AwaitSkillHelper Probe 自包含**: AwaitSkillHelper.Probe : Func<Task<bool>> 业务侧直接传 `() => _skill.主动技能X后续(key, () => { ... })` lambda; Runner 内 `await a.Probe()` **不调** _skillEngine 字段 (InterpretAwaitSkillHelper 是 `private static` PASS). 仅 Row 4-5 BuildPlan .StepMachine 内使用; Row 7-8 RegisterProbe 路径不经 AwaitSkillHelper (D2 重决断). Runner ctor 5 参数不动 (skillEngine 已注入但 AwaitSkillHelper case 不用 — 留 ctor 兼容 27A 4 hero, R6 mitigation).
+- **INV16 跨 clause 副作用迁原语 (顶层)**: 船长 BuildPlan 顶层链无 `Conditions[Cn].Active = true/false` 直写 (PASS); inner callback closure 内 4 处保留属 escape hatch documented (INV18). 与天怒 D3 ActivateClause 原语路径不同 — 船长 D1 决断采 callback inline 不拆 6 原语 (拆需破 Conditional.Cond 签名 + 19+1 原语稳定).
+- **INV17 _全局模式e_lock 删除**: 船长Strategy.cs `_全局模式e_lock` grep × **0 PASS** (整段删 + 4 helper method 删); StepMachine 单 machine 顺序语义天然替代. HeroLoopHost.cs:44 同名 instance field 不动 (instance scope ≠ 船长 static, 非同源).
+- **INV18 escape hatch documented 扩**: plan §6 + SOT §不变量段明示 — (a) D1 决断: AwaitSkillHelper.Probe lambda 内 inner callback closure 是 SkillEngine helper afterAction 闭包, 不经 Runner 调度, callback 内 Common.Delay / Conditions[Cn].Active = / Press(...) 是合法 escape hatch (拆 6 原语需破 19+1 原语稳定); (b) D2 决断: RegisterProbe async lambda 是 ConditionDelegateBitmap = async delegate Task<bool>() 真实签名直接接 (verify ConditionSlot.cs:11), 不需 RegisterProbeAsync 兄弟 method (方案 H 作废).
+
+### Phase 27B 关键决断 (plan-reviewer 二审协议落实)
+
+1. **D1 偏离 1** (接 plan 推荐): Row 5 E clause 单 AwaitSkillHelper + integral inline callback, 不拆 6 原语 (Conditional + Press + SetStep + ActivateClause + DynamicDelay). 拆 6 原语需扩 Conditional.Cond 签名访问 _hero.Aggregate.Skills, 破 INV4 + 19+1 原语稳定; INV3/INV10/INV16 措辞加 "顶层 / lambda 外" 限定 + §INV18 escape hatch documented 落实.
+2. **D2 偏离 2 / Row 7-8** (作废原方案 H + 重决断): 原 plan 推扩 `HeroPlanBuilder.RegisterProbeAsync(ConditionSlotKey, Func<Task<bool>>)` 兄弟 method (跨 4 文件 ~30 行). plan-reviewer R1-A 1 个 Grep 实测 `ConditionSlot.cs:11` 签名 `public delegate Task<bool> ConditionDelegateBitmap()` 本就 async — 方案 H 不需要存在. **新决断**: C3 / C4 保留 `.RegisterProbe` 原 DSL, lambda 内嵌 async 包 SkillEngine helper. 落点 1 行 × 2, epic 0 新增 DSL 维度.
+3. **D3 偏离 3 / R8-B** (接 plan 推荐): S4 冒烟 5 分钟 ≥ 50 次 Q+E 高频切换实证 race 后决断; INV17 (lock 删除) 27B 落地; 若实证 race 退回 lock instance field 推 27C 独立 epic (plan §3 R8-B 兜底回退路径 documented).
+
+### Phase 27B 待用户冒烟剧本 (S4 deferred)
+
+1. **船长 Q 单点连按 (captain-Q machine)**:
+   - F9 切船长 + Q 键连按 10 次; 验证 AwaitSkillHelper 等待 helper 完成 + callback 内 Skills.SetTime/Step 桥接 + E 跟手命中
+   - Expected: 0 fire-and-forget; helper polling 完成后 callback 闭包同步执行; Skills 状态正确推进
+   - 失败应对: AwaitSkillHelper 超时 / Probe 返 false 持续 → 检查 SkillEngine.主动技能释放后续 Q 路径是否被 helper 阻塞
+
+2. **船长 E 单点连按 (captain-E machine)**:
+   - F9 切船长 + E 键; 验证 WhenStepNotEq(SlotKey.E,1) Guard + AwaitSkillHelper + callback 内 R fallback + Skills.SetStep(E,1) + Conditions[C3].Active
+   - Expected: Step(E)==1 时短路; helper 完成后 Press(R) if Skills.Step(R)==1; 状态抗性倍数 × 3000 - 1670 Common.Delay 正确生效
+   - 失败应对: Guard 失效 (E 重复触发) → 检查 WhenStepNotEq DSL; R fallback 失效 → 检查 callback 闭包内 Step 读取
+
+3. **50 次 Q+E 高频切换 (R8-B race 实证)**:
+   - F9 切船长 + Q E Q E Q E ... 高频切换 50 次 (5 分钟); 验证 lock 删除后跨 machine 并发是否触发 NRE / 状态错乱
+   - Expected: 0 race; HeroPlan.DispatchAsync L466 Task.Run fire-and-forget 跨 machine 并发理论可能但 Skills/Conditions 写入由 HeroLoopHost.cs:44 instance lock 兜底
+   - 失败应对: 实证 race → 退回保留船长 _全局模式e_lock instance field 推 27C 独立 epic; INV17 标 falsified
+
+4. **D2 跳船宏 (Execute 不动路径)**:
+   - F9 切船长 + D2 键; 验证 Execute 链 `Skills.SetStep(R,1) + Press(E)` 0 改动等价
+   - Expected: D2 行为与 27A retry 2 baseline 一致
+
+**整轮回归** (继承 Phase 27A retry 2 冒烟):
+- 启动程序 (admin) + 类型加载顺序无 NRE
+- 抽样 4 属性英雄全技能键 (大牛 / 影魔 / 卡尔 / 猛犸 等)
+- 物品使用 / ReplaceIcon DSL / KeepLeg DSL 继承不退化
+- **5 hero StepMachine 路径**: 巫妖 E / 骨法 R / 军团 F / 天怒 D3 (27A) + 船长 Q/E/D2 (本 epic 新增)
+
+### Phase 27B 回滚锚点
+
+- **完整撤回 Phase 27B**: `git revert 0d875be fcfdc28 5e289a7` 逆序 3 commit
+- **回 Phase 27A retry 2 完结状态**: `git reset --hard 298fafe` (Phase 27A retry 2 handoff commit, 即 Phase 27B 起点)
+- **软撤回 S3 lint (保留代码但禁 lint)**: .editorconfig 删 `[**/Heroes/Strength/船长Strategy.cs]` 段或 severity → warning
+- **单 chunk revert**: S1 `5e289a7` (Domain/Runner) — 若撤 S1 须先撤 S2/S3; S2 `fcfdc28` (船长 BuildPlan) — 若撤 S2 须先撤 S3; S3 `0d875be` (.editorconfig) 可独立撤
+
+### Phase 27B handoff_notes (5 deferred 项 — Phase 27C+ / 后续 epic)
+
+1. **plan §6 偏离 1 + Row 4-5 注释 "sync invoke afterAction" 措辞不精确** (S2 实施 agent 实证): SkillEngine helper 内部 `_ = Task.Run(afterAction)` fire-and-forget 非 sync invoke (afterAction 闭包真实由 helper Task.Run 异步触发). 不影响 S2 落点正确性 — callback inline 仍是正确路径; helper 返回 false 时 callback 已被 Task.Run 触发不可撤. R11 NRE 风险路径略不同: callback 在 wrapper Task 内抛 → 不影响 helper 返 false (路径仍 short-circuit). 推 27C 修订 plan + SOT 措辞 (低优先, 不阻断 27B 闭环)
+
+2. **csproj 实际仅 Debug/Release 双档, 非 plan §"4 档 build" 措辞** (沿用 27A 遗留): DOTA2;Silt 同时定义在 DefineConstants, build 实际仅 Debug/Release × {DOTA2+Silt | LOL | HF2} 排列, 非 4 档独立 csproj. Phase 27A retry 2 沿用 "4 档 build" 措辞实为遗留, 27B 沿用. 推 27C 修订 plan / handoff 措辞精确化
+
+3. **R8-B 跨 machine race condition** 用户冒烟剧本 50 次 Q+E 高频切换待执行 (S4 deferred): 若实证 race → 退回保留 lock instance field 推 27C 独立 epic; plan §3 R8-B 兜底回退路径 documented. 不实证则 INV17 (lock 删除) 标 verified 闭环
+
+4. **横向耦合迁** (Phase 27C/D 评估, 沿用 27A 推迟项): 5 hero 现读 `Skills.Step(SlotKey.X)`, 业务侧 wet bridge 同步写回 Skills.SetStep 桥接 (Phase 27A 巫妖/骨法/军团/天怒 + 27B 船长 callback 闭包均有). 读侧迁 StepMachines.GetStep 留后续 epic 评估
+
+5. **HeroPlanBuilder ≥ 1000 行预警** (R5 风险持续监控): Phase 27B 未加新 fluent method (D2 重决断后 RegisterProbeAsync 兄弟 method 作废), 仅 .editorconfig +3 行 + 船长Strategy.cs 净减 29 行. 但 27C+ 加 AwaitSkillHelper 兄弟原语 / 横向耦合迁 / Combo Scheduler J 段可能触界. 触界即拆 builder partial class 或 sub-builder 第二层
+
+### Phase 27B 下次 session 起手指引
+
+**优先**: (a) 用户冒烟反馈消化 — S4 4 剧本结果 (尤其 R8-B race 实证 + inner callback NRE 检测); (b) 若 R8-B race 实证 → 27C 独立 epic 退回 lock instance field
+
+**Phase 27C 候选** (用户决策选一):
+- 横向耦合迁 (5 hero Skills.Step 读侧迁 StepMachines.GetStep, 推迟项最大块, plan-reviewer 必走)
+- D2 ControlObservable 真实 probe (handoff §3091 #2, Phase 27A 推迟项)
+- ItemCatalog 守报扩展 (Phase 26 推迟项)
+- SkillEngine Ack 整合 (Phase 26 推迟项)
+- Combo Scheduler J 段 (Phase 26 推迟项, 10 场景)
+- Backoff 熔断 (Phase 26 推迟项, 5 次失败 alert+TTS+跳主循环)
+
+### Phase 27B 元层 retrospective (plan-reviewer 二审协议价值实证)
+
+1. **plan-reviewer 二审协议价值实证**: 1 个 Grep 检出 plan + SOT 上游事实错误 (ConditionDelegateBitmap 误认 sync 实际 async signature `delegate Task<bool>()`). 避免 S2 subagent 实施时撞 BLOCKED + retry budget 浪费. 二审 REJECT 10 项必修 + 3 项建议补 (plan agent 修订) → 二审 PASS WITH CAVEATS (主 lead 3 处补丁) → S2 一次性 PASS 0 retry.
+
+2. **修订纪律永久化** (跨 epic 复用价值最大): "凡 plan / SOT 引用现存 type / delegate / method signature, 必先 Read / Grep verify 真实代码; 不凭训练印象 / 不凭 .claude/CLAUDE.md 顶层 doc 描述 / 不凭上游 SOT 切片描述 (上游 SOT 也可能错)". 触违铁律 5(b) Zoom-out 先于局部修改 + grill-me §动手前 fact 必查. 应反馈到 step 2 sot-annotator agent + step 3 plan agent prompt 规约层 (lessons-learned.md L3 落条).
+
+3. **epic surface 远小于初判**: plan v1 推 27B 需扩 RegisterProbeAsync 兄弟 method (跨 4 文件 ~30 行 LOC); plan v2 撤回方案 H 后落点缩到船长Strategy.cs 1 文件 1 行 × 2 (-30 行 LOC). attempt 1 wave 3 反例风险更低 (0 新增 DSL 维度), retry budget 0 消耗. 反例: 初判过设计 (RegisterProbeAsync 看似优雅但是冗余兄弟方法) → upstream verify 1 个 Grep 即可作废.
+
+### Phase 27B 完结状态
+
+- **3 commit 主干** (S1 `5e289a7` / S2 `fcfdc28` / S3 `0d875be`), 0 项主对话内可立即推进的剩余工作
+- **5 deferred 项** 全依赖外部输入 (用户冒烟反馈 / 新 epic grill / 业务决策), 不在主 lead 单独可推进范围
+- **18 不变量** 全 verify (INV9 27B 落地删除 INV17; INV3/INV10/INV14/INV16 顶层 vs lambda 内措辞精确化; INV18 escape hatch documented 扩 D1 callback + D2 RegisterProbe async lambda 例外)
+- **build verify final**: HEAD `0d875be` main 分支 build PASS (0 error, 266 warning baseline 持平 = 27A 4 hero 不退化)
+- **项目无 dist 同步链** (消费方业务项目, 非元工具仓), step 8 archiver 跳同步链步
+- **用户 grill 接受所有 plan 决断** (D1/D2/D3 + 3 caveats 补丁), S4 用户冒烟剧本 deferred 用户独立执行

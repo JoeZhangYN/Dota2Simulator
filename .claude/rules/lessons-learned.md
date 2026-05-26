@@ -39,6 +39,26 @@
 
 ---
 
+## 2026-05-26 (Phase 27B plan-reviewer 二审协议范例)
+
+### L3: plan / SOT 引用现存 signature 必先 verify 真实代码
+
+**场景**: Phase 27B 船长 .StepMachine 迁移 epic, step 2 sot-annotator + step 3 plan agent 串行环节均推 "方案 H 扩 `HeroPlanBuilder.RegisterProbeAsync(ConditionSlotKey, Func<Task<bool>>)` 兄弟 method" (跨 4 文件 ~30 行 LOC), 因假定 `ConditionDelegateBitmap` 是 sync `delegate bool()` 不能接 async lambda.
+
+**意外**: plan-reviewer R1-A 二审 1 个 Grep 实测 `Application/ConditionSlot.cs:11` 签名 `public delegate Task<bool> ConditionDelegateBitmap()` — **本就是 async**, RegisterProbe 直接接 async lambda. 方案 H 不需要存在.
+
+**为何**: step 2 sot-annotator 描述上游 SOT 不验证现存 type/delegate 真实签名; step 3 plan agent 信任 SOT 切片描述继续推方案 H; 串行环节均未 Read / Grep ConditionSlot.cs:11 verify, 仅靠 plan-reviewer 1 个 Grep 检出. 触违全局铁律 5(b) Zoom-out 先于局部修改 + grill-me §动手前 fact 必查.
+
+**如何避免**:
+- **修订纪律永久化** (跨 epic 复用价值最大): 凡 plan / SOT 引用现存 type / delegate / method signature, **必先 Read / Grep verify 真实代码**; 不凭训练印象 / 不凭 `.claude/CLAUDE.md` 顶层 doc 描述 / 不凭上游 SOT 切片描述 (上游 SOT 也可能错).
+- **plan-reviewer 二审协议价值实证**: 1 个 Grep 检出 plan + SOT 上游事实错误, 避免 S2 subagent 实施时撞 BLOCKED + retry budget 浪费. 二审 REJECT 10 项必修 + 3 项建议补 (plan agent 修订) → 二审 PASS WITH CAVEATS (主 lead 3 处补丁) → S2 一次性 PASS 0 retry. 协议本身价值远超 plan-reviewer subagent spawn 开销.
+- **epic surface 初判易过设计**: 27B plan v1 推扩兄弟 method (跨 4 文件 ~30 行) → v2 撤回方案 H 后落点缩到船长Strategy.cs 1 文件 1 行 × 2 (-30 行 LOC). 反例: "看似优雅但冗余的兄弟方法" → upstream verify 1 个 Grep 即可作废.
+- **反馈到 step 2 sot-annotator agent + step 3 plan agent prompt 规约层**: 引用现存 signature 必先 grep 真实代码, 不凭描述.
+
+**SSOT 参考**: `.claude/handoff-hex-refactor.md` §"Phase 27B 元层 retrospective" + `.claude/plans/phase-27b-captain-stepmachine-plan.md` §6 偏离 2 (整段重写) + `.claude/sot/phase-27b-captain-stepmachine.md` frontmatter `references` 加 `ConditionSlot.cs:11` verify ground truth.
+
+---
+
 ## 通用 SG 注意 (横切多 epic)
 
 - SG `AdditionalText` 仅返 `SourceText` (源代码文本); 处理二进制 (bmp/png) 必须 `File.ReadAllBytes` (触 RS1035, 但本场景必须豁免).
