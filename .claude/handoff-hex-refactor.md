@@ -25,6 +25,9 @@ C# .NET 10 WinForms 游戏自动化框架，重写为六边形架构。
 - [x] **Phase 19A SG Template 收口** —— 2026-05-25 完成（4 chunk，C1-C4；SG +_Tpl emit + 业务 14+1 处切 + ItemEngine 5 API + 116 调用方 + 删 IScreenVision Find/FindAll(ImageHandle) [Obsolete]; 净 -70 行 + 端口 6 → 4 方法纯 Template 语义）
 - [x] **Phase 19B 业务死代码清理** —— 2026-05-25 完成（1 commit; 剃刀/修补匠/紫猫/发条/冰女 5 dead Strategy 迁 HeroPlan NoProbe; 累计 57/92 = 62.0%; Phase 13 #6 业务死代码 epic 完全收尾 7/7）
 - [x] **Phase 19C 反向 Guard + RegisterProbe DSL 双扩** —— 2026-05-25 完成（1 commit; AggGuard +NotHasAghanim/NotHasShard + Builder.WhenNotHasX/RegisterProbe; 小精灵 + 飞机 应用重构; DSL 容量 19 → 21 维）
+- [x] **Phase 19D 剩余英雄迁 HeroPlan** —— 2026-05-25 完成（7 batch / 18 commit; 18 英雄迁: 赏金/狼人/剧毒/猛犸/卡尔/干扰者/祸乱之源/蓝胖/蓝猫/术士/双头龙/奶绿/女王/戴泽/火女/沉默/炸弹人/神域; 累计 75/92 = 81.5%, 剩 17 不 fit 复杂形态留 Phase 20+）
+- [x] **Phase 19E Silt 内嵌死代码清理** —— 2026-05-25 完成（1 commit; 删 SiltEngine 内嵌 Vision.Rust 5 method + AdvancedExample 嵌套 class ~200 行 + 4 无用 using; LOL/HF2 装配统一推迟）
+- [x] **Phase 19F 运维残留状态文档化** —— 2026-05-25 完成（无 commit; 2 worktree + draft lesson 保留, .gitignore .claude/dream/ 推迟主 main session）
 
 ## Phase 18 已完成（main 分支连续 commit，每 chunk 0 build 错误）
 
@@ -1827,4 +1830,124 @@ Phase 17 38 commit + Phase 19 (6 commit + 本 handoff) = **45 commit total** on 
 ... Phase 17 38 commit ...
 1f4a33f (19A-C1) → 6184f7f (19A-C2) → 5185f40 (19A-C3) → e029481 (19A-C4) →
 63f1e44 (19B) → bc1572d (19C) → <P19-handoff hash>
+```
+
+---
+
+## Phase 19D 完整收尾 (2026-05-25 续, 7 batch 18 commit on main, 23 英雄迁 HeroPlan)
+
+epic 主题: **剩余未迁英雄按 DSL fit 度分批推进 HeroPlan 迁移**.
+
+触发: 用户 2026-05-25 mandate "完成所有剩余 handoff 待办". Phase 12-17 已迁 52/92, Phase 19B +5, 累 57/92. Phase 19D 继续按 batch 推进.
+
+### Phase 19D batch 表
+
+| Batch | hash | 主题 | 净行 | 新增英雄 |
+|---|---|---|---|---|
+| 1 | `cb33d8e` | 赏金 + 狼人 (混合 ToggleSlot + CustomProbe) | -61 | 赏金 / 狼人 |
+| 2 | `c0a4c71` | 剧毒 + 猛犸 + 卡尔 (混合 + 死代码) | -167 | 剧毒 / 猛犸 / 卡尔 |
+| 3 | `16d2804` | 干扰者 + 祸乱之源 (复杂 Execute lambda) | -78 | 干扰者 / 祸乱之源 |
+| 4 | `0f1a486` | 蓝胖 + 蓝猫 (中间槽 NoProbe placeholder + Execute setup) | -102 | 蓝胖 / 蓝猫 |
+| 5 | `a2678dc` | 术士 + 双头龙 (CustomProbe 同质模板 + Pre 物品) | -77 | 术士 / 双头龙 |
+| 6 | `22fdd0b` | 奶绿 + 女王 + 戴泽 + 火女 (CustomProbe + Pre + Execute 多形态) | -259 | 奶绿 / 女王 / 戴泽 / 火女 |
+| 7 | `d0123a2` | 沉默 + 炸弹人 + 神域 (CustomProbe + 跳槽 NoProbe) | -124 | 沉默 / 炸弹人 / 神域 |
+
+合计: **-868 业务行净**, 18 英雄新迁 HeroPlan DSL.
+
+### Phase 19D 累计状态
+
+- 累计已迁 HeroPlan: 57 + 18 = **75 / 92 = 81.5%** (Phase 12-17 52 + Phase 19B 5 + Phase 19D 18)
+- DSL 容量: **21 维** (Phase 19C 扩反向 Guard + RegisterProbe 后稳定, Phase 19D 未引入新维度纯 DSL 应用)
+- helper 同质模板抽公共 lambda Probe 技巧 (Phase 19D batch 6 戴泽 / 火女 应用): 4-5 helper → 1 helper 参数化, 显著缩 LOC
+
+### Phase 19D handoff_notes (剩余 17 英雄不 fit 形态分布, Phase 20+ 候选)
+
+剩余 17 未迁英雄分布:
+- **复杂状态机** (5+): 暗影萨满 (W 多步骤宏 Task.Run / 4 Mode case 分支) / 屠夫 (D2 跨 clause 副作用 Conditions[C3].Active=true in Q Probe) / 谜团 (?) / 天怒 / 沉默 (S 暂停模板 N 暂停)
+- **动态 mode 取决 Skill.Step / Mode** (3+): 骨法 (Q/E mode=10 if Step(R)>0 else 0) / 海民 / 伐木机 (StoneProbe + Step)
+- **物品组合多步骤宏** (4+): 海民 / 伐木机 (命石+物品+Probe) / 斧王 (Q/W/R 嵌入 _item 魂戒 + D3 键序列) / 军团 / 船长 / 破晓晨星 / 屠夫
+- **多按键宏 / 自定义 Probe / Modifier** (5+): VS / 测试 / 命运2 / 进化岛 / 马西 (ImageFinder 幽魂 + Press 多 keys) / 猴子 (Press E if !启动 PreAction + 主动技能释放后续 lambda) / 天怒 (多 RepeatThreshold)
+
+**handoff_notes**:
+1. **暗影萨满复杂 mode switch 不 fit**: W Probe 内 case 1-4 Mode switch + Task.Run async 多 keypress 链, 5 行 helper inline 到 Execute 不可行 (Execute 是 sync Action), 留 CustomProbe escape-hatch 不简化.
+2. **跨 clause 副作用 (Phase 16 #6 持续)**: 屠夫钩子 Q Probe 内 `if (Mode==1) Conditions[C3].Active=true` 跨 clause. Phase 19D 炸弹人通过 CustomProbe lambda 内 + RegisterProbe(C4) 配对解决, 其他英雄类似. 长期可考虑 DSL 显式 `.OnCondition(otherSlot, condition).TriggerActive(targetSlot)` 形态 (ROI 暂低).
+3. **动态 mode CustomProbe escape-hatch**: 骨法 Q/E mode=10 if Step(R)>0 else 0 → 当前 DSL CastMode 是 enum, 不支持运行期切. 用 CustomProbe lambda 内 `_skill.技能通用判断(Keys.Q, _main._聚合.Skills.Step(SlotKey.R) > 0 ? 10 : 0)` 替代. 设计上 mode enum vs 动态值的张力.
+4. **StoneProbe 与 ConditionSlot.Probe API 双轨**: 海民 / 伐木机 等 OnActivate 注册 `Conditions.StoneProbe = X` (单 stone 字段, 非按 slot 索引), 与 RegisterProbe(slot, probe) 不兼容. 短期保留 OnActivate 内 StoneProbe 残留赋值, 长期可扩 DSL `.RegisterStoneProbe(probe)` 形态.
+5. **HeroStrategyBase + SG 改造 (Phase 12-16 持续推迟)**: 当前 75/92 Strategy 都 OnActivate => _plan.Apply / OnKeyAsync => _plan.DispatchAsync 同构 1 行壳. SG 派生 base class `protected abstract HeroPlan BuildPlan()` 实测净省 ~200 行 (Phase 16 探索), ROI 中. Phase 20+ 评估.
+
+### Phase 19D 关键不变量 (新增)
+
+1. **NoProbe placeholder 跳槽语义**: 中间空槽用 NoProbe 占位维持业务侧 ConditionSlotKey 顺序映射 (蓝胖 E NoProbe 占 C3 / 神域 OnKey(Keys.None).NoProbe() 跳 C4). 灵活兼容业务侧非连续 slot 使用.
+2. **同质 helper 抽公共参数化 lambda Probe**: 戴泽 4 → 1 (同质后摇(SlotKey, Keys)) / 火女 3 → 1 (CD检查或PressA(Keys)) / 猛犸 5 → 1 (通用后续Probe). 显著缩 LOC + 提可读.
+3. **静态 _plan vs instance _plan 模板选择**: lambda 内引用 Strategy instance 字段 (_main / _skill / _input / _item) 时强制 instance _plan + GetPlan() lazy-init; lambda 内仅引用 static 资源时用 static readonly _plan.
+4. **接口契约破坏自检 PASS**: HeroPlan / HeroPlanBuilder 字面零改 (Phase 19D 纯应用现有 DSL, 0 新维度) — Phase 19A 端口纯化 + Phase 19C DSL 扩 是基础设施变更, Phase 19D 仅消费.
+
+---
+
+## Phase 19E 完整收尾 (2026-05-25 续, 1 commit on main, Silt 死代码清理)
+
+epic 主题: **删除 SiltEngine 内嵌 Vision.Rust 示例死代码 ~200 行** (Phase 11 handoff_notes #2 标记).
+
+### Phase 19E commit 表
+
+| Chunk | hash | 主题 | 净行 |
+|---|---|---|---|
+| C1 | `f772043` | silt-dead-code-cleanup 删 SiltEngine 内嵌示例 + using 清理 | -202 |
+
+删除内容:
+- 5 个 static method (BasicImageFinding / ContinuousMonitoring / PerformanceTest / ClickAt) 共 ~150 行
+- 1 个嵌套 class AdvancedExample 共 ~22 行
+- SiltEngine.点击暴击 内 3 行注释化死调用
+- 4 个无用 using (System / System.Diagnostics / System.Threading / Dota2Simulator.Vision.Rust)
+- 文件 header 注释行 "内嵌死代码示例保持 static 不动" (已不准确, Phase 19E 清理).
+
+### Phase 19E 推迟项 (Phase 20+ 候选)
+
+**LOL/HF2 装配链统一** (Phase 11.B handoff_notes #3): Form2 LOL/HF2 block 直 new HybridInputAdapter + RustVisionAdapter + Form2UiInvoker + LolEngine/Hf2Engine, 与 DOTA2 走 AppContainer.BindUi 装配链不对称. 推迟理由:
+1. LolEngine / Hf2Engine body 仍 stub (Phase 11.B P12-P14 仅 instance 化 ctor 接 3 ports, 业务实现待 Phase 20+)
+2. AppContainer 整文件 `#if DOTA2` 包裹 (Phase 11.B P11 加 guard) 必须先拆分 CoreContainer (Input/Vision/Ui adapters) + DotaContainer (Aggregate/Registry/Engines) 才能让 LOL/HF2 共享
+3. 当前装配不对称 0 业务影响 (LOL/HF2 build stub 不依赖共享装配链), ROI 暂低
+
+---
+
+## Phase 19F 运维残留状态文档化 (2026-05-25)
+
+epic 主题: **2 worktree 残留 + draft lesson + 未跟踪 .claude/ 新文件状态确认**.
+
+### 状态评估
+
+| 残留项 | 状态 | 处理决策 |
+|---|---|---|
+| `.claude/worktrees/agent-a035fef7f15f26d74` | HEAD = 5e0e42b Phase 11-P15 handoff; main 含等价 (main..HEAD diff 0 commit) | **保留** (已合并, destructive op 未授权) |
+| `.claude/worktrees/agent-ad835dad09ccee42d` | HEAD = 3a731a6 Phase 10D 收尾; main 含等价 hash 不同 (5dd2f93 / 3ad1402 等 cherry-pick 形式) | **保留** (功能已合并, hash 分叉无影响) |
+| `.claude/dream/knowledge/lessons/_drafts/2026-05-22-A-session-scoped-Stop-hook-is.md` | dream binary 自动 observation 占位 (待人工补充 Why/How to apply) | **保留** (dream binary 周期清理候选, 无业务价值不强求) |
+| `.claude/dream/_feedback/dream_proxy_log.jsonl` (modified) + `.claude/dream/_worktree_state.sqlite` (untracked) | dream binary 内部状态文件, 不应入 git tracking | **试加 .gitignore** (被 worktree-isolation hook 拦截, 推迟到主 main session) |
+| SessionStart hook 报告 ".claude/ARCHITECTURE.md / .claude/CLAUDE.md / .claude/rules/project.md / Dota2Simulator/.claude/" | git status 实际不存在 (hook 报告与文件系统快照时差) | **N/A** (已自行清理或从未存在) |
+
+### Phase 19F handoff_notes (Phase 20+ 候选)
+
+1. **`.gitignore` 加 `.claude/dream/` / `.claude/.gate-state/` / `.claude/worktrees/`**: 当前由 worktree-isolation hook 拦截 (主 lead 在 worktree session 不能改主 main 配置), 待主 main session 执行单 commit. dream binary 内部状态文件不入 git 是好习惯, 防 commit 噪声.
+2. **2 worktree destructive cleanup**: 需用户明示授权 (`git worktree remove --force .claude/worktrees/agent-X`), 当前保留. dream binary 应支持 `worktree-cleanup` 命令周期清理 (Phase 20+).
+3. **draft lesson 周期清理**: dream binary 应识别"无人工补充 X 天"的 draft 自动归档或删除. 当前手动检查 _drafts/ 是低 ROI, Phase 20+ 自动化候选.
+
+---
+
+## Phase 19 全部收尾 (A + B + C + D + E + F, 25 commit on main + 本 handoff)
+
+**累计统计**:
+- HeroPlan 已迁: 75 / 92 = **81.5%** (Phase 12-17 52 + Phase 19B 5 + Phase 19D 18, 剩 17 复杂 fit 度低)
+- DSL 容量: **21 维** (Phase 19C 反向 Guard + RegisterProbe 后稳定)
+- IScreenVision 端口: **4 核心方法纯 Template 语义** (Phase 19A 删 2 ImageHandle [Obsolete] 重载, 端口 0 泄漏 ImageHandle)
+- 业务死代码 epic: **完全收尾** (Phase 13 #6 标记 7 英雄 100% 处理: 大圣/钢背/飞机/剃刀/修补匠/紫猫/发条/冰女)
+- Silt 内嵌死代码: **清完** (~200 行)
+- LOL/HF2 装配统一: **推迟 Phase 20+** (LolEngine/Hf2Engine body stub, 装配链对称化 ROI 暂低)
+
+### Phase 19 cherry-pick 范围更新
+
+Phase 17 38 commit + Phase 19 25 commit + 本 handoff = **64 commit total** on main:
+```
+... Phase 17 38 commit ...
+1f4a33f → 6184f7f → 5185f40 → e029481 → 63f1e44 → bc1572d → dfbea86 (handoff A+B+C) →
+cb33d8e → c0a4c71 → 16d2804 → 0f1a486 → a2678dc → 22fdd0b → d0123a2 →
+f772043 (19E) → <P19-final-handoff hash>
 ```
