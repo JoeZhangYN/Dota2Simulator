@@ -88,7 +88,7 @@ public sealed class StepMachineRunner
     public async Task<bool> InterpretAsync(StepCommand cmd, string machineName)
         => cmd switch
         {
-            Press p => InterpretPress(p),
+            Press p => await InterpretPress(p).ConfigureAwait(false),
             PressAlt pa => InterpretPressAlt(pa),
             WaitForColor w => await InterpretWaitForColor(w).ConfigureAwait(false),
             WaitForRefractoryExpire r => await InterpretWaitForRefractoryExpire(r).ConfigureAwait(false),
@@ -111,13 +111,13 @@ public sealed class StepMachineRunner
             _ => throw new InvalidOperationException($"Unknown StepCommand: {cmd.GetType().Name}")
         };
 
-    private bool InterpretPress(Press p)
+    private async Task<bool> InterpretPress(Press p)
     {
         VirtualKey vk = VirtualKey.From(p.Key);
         if (p.HoldMs is int holdMs && holdMs > 0)
         {
             _itemEngine.Input.KeyDown(vk);
-            Task.Delay(holdMs).GetAwaiter().GetResult();
+            await Task.Delay(holdMs).ConfigureAwait(false);
             _itemEngine.Input.KeyUp(vk);
         }
         else
