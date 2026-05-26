@@ -102,7 +102,12 @@ public readonly record struct SetupAction(
     KeyModifiers Modifiers = KeyModifiers.None,
     ConditionSlotKey ParamConditionSlot = ConditionSlotKey.C1,
     string? ParamStringOn = null,
-    string? ParamStringOff = null);
+    string? ParamStringOff = null,
+    // Phase 25A C1: SetupAction PreAction 注入 (海民 F: WhenStoneChoiceEq(1).Pre(释放 E).SetActive(C3) 形态; async 优先).
+    Action? PreActionSync = null,
+    Func<Task>? PreActionAsync = null,
+    // Phase 25A C1: SetupAction 通用谓词 Guard — 与 enum Guard 互斥 (predicate 非空优先). 修旧 bug: 终结方法之前丢弃 _pendingGuardPredicate (海民 E WhenStoneChoiceEq.SetActive 形态需要).
+    Func<HeroContext, bool>? GuardPredicate = null);
 
 /// <summary>SetupAction 副作用种类.</summary>
 public enum SetupActionKind
@@ -295,8 +300,19 @@ public sealed class HeroPlan
             bool matchKey = setup.IsOnEveryKey || setup.TriggerKey == key;
             // OnEveryKey 形态忽略 Modifiers (每键都跑, 含修饰键场景); 否则 setup.Modifiers 与 trigger.Modifiers 严格等值.
             bool matchMod = setup.IsOnEveryKey || setup.Modifiers == trigger.Modifiers;
-            if (matchKey && matchMod && CheckGuard(setup.Guard, ctx))
+            // Phase 25A C1: 用 CheckGuardCombined 让 SetupAction 也支持 specialized GuardPredicate (海民 E WhenStoneChoiceEq.SetActive 形态生效).
+            if (matchKey && matchMod && CheckGuardCombined(setup.Guard, setup.GuardPredicate, ctx))
             {
+                // Phase 25A C1: SetupAction PreAction (海民 F: WhenStoneChoiceEq(1).Pre(释放 E).SetActive(C3) 形态). async 优先.
+                if (setup.PreActionAsync is not null)
+                {
+                    await setup.PreActionAsync!().ConfigureAwait(true);
+                }
+                else
+                {
+                    setup.PreActionSync?.Invoke();
+                }
+
                 switch (setup.Kind)
                 {
                     case SetupActionKind.AdjustLegSwap:

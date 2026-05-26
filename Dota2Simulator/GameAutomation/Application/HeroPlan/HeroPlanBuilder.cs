@@ -274,7 +274,10 @@ public sealed class HeroPlanBuilder
             ParamKey: Keys.None,
             ParamBool: false,
             CustomAction: action,
-            Modifiers: _pendingModifiers));
+            Modifiers: _pendingModifiers,
+            PreActionSync: _pendingPreActionSync,
+            PreActionAsync: _pendingPreActionAsync,
+            GuardPredicate: _pendingGuardPredicate));
         ResetPending();
         return this;
     }
@@ -295,7 +298,10 @@ public sealed class HeroPlanBuilder
             ParamKey: Keys.None,
             ParamBool: false,
             Modifiers: _pendingModifiers,
-            ParamConditionSlot: slot));
+            ParamConditionSlot: slot,
+            PreActionSync: _pendingPreActionSync,
+            PreActionAsync: _pendingPreActionAsync,
+            GuardPredicate: _pendingGuardPredicate));
         ResetPending();
         return this;
     }
@@ -317,7 +323,10 @@ public sealed class HeroPlanBuilder
             ParamKey: paramKey,
             ParamBool: paramBool,
             IsOnEveryKey: _pendingIsOnEveryKey,
-            Modifiers: _pendingModifiers));
+            Modifiers: _pendingModifiers,
+            PreActionSync: _pendingPreActionSync,
+            PreActionAsync: _pendingPreActionAsync,
+            GuardPredicate: _pendingGuardPredicate));
         ResetPending();
         return this;
     }
@@ -344,7 +353,10 @@ public sealed class HeroPlanBuilder
             ParamConditionSlot: slot,
             ParamStringOn: speakOn,
             ParamStringOff: speakOff,
-            Modifiers: _pendingModifiers));
+            Modifiers: _pendingModifiers,
+            PreActionSync: _pendingPreActionSync,
+            PreActionAsync: _pendingPreActionAsync,
+            GuardPredicate: _pendingGuardPredicate));
         ResetPending();
         return this;
     }
@@ -369,7 +381,10 @@ public sealed class HeroPlanBuilder
             ParamBool: false,  // sentinel, ignored when ParamBoolProvider 非空.
             ParamBoolProvider: paramBoolProvider,
             IsOnEveryKey: _pendingIsOnEveryKey,
-            Modifiers: _pendingModifiers));
+            Modifiers: _pendingModifiers,
+            PreActionSync: _pendingPreActionSync,
+            PreActionAsync: _pendingPreActionAsync,
+            GuardPredicate: _pendingGuardPredicate));
         ResetPending();
         return this;
     }

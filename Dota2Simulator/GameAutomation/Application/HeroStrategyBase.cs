@@ -71,6 +71,18 @@ public abstract class HeroStrategyBase : IHeroStrategy
 
     /// <summary>Phase 22D: 走 A 专用简写 — 替原 <c>_input.Press(VirtualKey.From(Keys.A))</c> 40 处同构.</summary>
     protected void 走A() => _input.Press(Domain.Actuation.VirtualKey.From(System.Windows.Forms.Keys.A));
+
+    /// <summary>
+    /// Phase 25A C1: 条件 Press 前置 helper — 返回一个 Action，当 stateSkill 状态技能未启动时按 keyToPress.
+    /// 用法: <c>.OnKey(Keys.Q).Pre(PressIfStateOff(Keys.E, Keys.E)).CastSkill(Keys.Q).AfterCast()</c>
+    /// 替代猴子 Q/W/R 共用 <c>if (!_skill.DOTA2判断状态技能是否启动(E)) Press(E)</c> 3 行同构 Pre lambda.
+    /// </summary>
+    protected System.Action PressIfStateOff(System.Windows.Forms.Keys stateSkill, System.Windows.Forms.Keys keyToPress)
+        => () =>
+        {
+            if (!_skill.DOTA2判断状态技能是否启动(stateSkill))
+                Press(keyToPress);
+        };
 }
 
 #endif
