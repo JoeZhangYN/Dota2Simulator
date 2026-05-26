@@ -14,6 +14,7 @@ references:
 revision_notes:
   - 用户重决断 D2 (作废原 方案 H 扩 RegisterProbeAsync): C3 / C4 都保留 `.RegisterProbe` 原 DSL, lambda 内嵌 async 包 AwaitSkillHelper. 落点 1 行 × 2.
   - 元层教训: step 2 sot-annotator + step 3 plan agent 串行环节均未 Read ConditionSlot.cs:11 verify, 仅靠 plan-reviewer 1 个 Grep 检出. 触违铁律 5(b) Zoom-out + grill-me §动手前 fact 必查. 修订纪律: 凡引用现存 type/delegate/method signature 必先 Read/Grep verify, 不凭训练印象 / 不凭 SOT 切片描述 (上游 SOT 也可能错).
+  - 措辞精确化 (2026-05-26 lite 修订, handoff §3318-3319): (a) "sync invoke afterAction" → "fire-and-forget `_ = Task.Run(afterAction)`" — S2 实施期 SkillEngine.cs:1382/1402/1433/1453/1473 五个 X后续 helper 实证均为 Task.Run 包装 (非 sync invoke); 落点正确性不影响 ("不经 Runner 调度" 含义保留). (b) "build verify 4 档 DOTA2/Silt/LOL/HF2" → "build verify (Debug/Release 2 档, DOTA2+Silt 激活)" — csproj 实际仅 Debug/Release 两档, 两档都 `DefineConstants=DOTA2;TRACE;Silt`; LOL/HF2 不在编译矩阵里, 留 27A retry 2 attempt 1 沿用措辞遗留.
 ---
 
 # Phase 27B 船长 .StepMachine 迁移 — chunk 实施 plan
@@ -104,7 +105,7 @@ revision_notes:
   )
   ```
 - 涉及原语: NoProbe + StepMachine + AwaitSkillHelper (内嵌单原语)
-- ⚠️ inner callback 真相 (R3-A blocker 必明示): 上述 inner action callback 内 `Press(Keys.E)` 是 `HeroStrategyBase` instance method (走 `_input.Press`), **不是** Press StepCommand record. `Common.Delay(1350, ...)` 是静态调用, **不是** Delay 原语 record. 该 callback 由 `SkillEngine.主动技能释放后续(Keys, Action afterAction)` 内部 sync invoke afterAction (afterAction 签名是 `Action`, 非 `Task`), **不经 Runner 调度**.
+- ⚠️ inner callback 真相 (R3-A blocker 必明示): 上述 inner action callback 内 `Press(Keys.E)` 是 `HeroStrategyBase` instance method (走 `_input.Press`), **不是** Press StepCommand record. `Common.Delay(1350, ...)` 是静态调用, **不是** Delay 原语 record. 该 callback 由 `SkillEngine.主动技能释放后续(Keys, Action afterAction)` 内部 `_ = Task.Run(afterAction).ConfigureAwait(true)` fire-and-forget 包装 (SkillEngine.cs:1382, afterAction 签名是 `Action`, 非 `Task`), **不经 Runner 调度**.
 - ⚠️ 关键决断: `Delay(1350)` hardcode 不迁 Delay 原语 — 该 Delay 在 inner action callback 内, 不是 Runner 调度的 StepCommand 序列. INV3 hardcode Delay 零回归范围 = 业务侧 Strategy.cs **顶层 method** (不含 SkillEngine helper inner action callback closure). 同理 `Common.Delay(1350)` + `Press(E)` + `Conditions[C4].Active = false` + `Skills.SetTime` 都保留 inline. plan §2 INV3 措辞精确化.
 - 验证: grep `_skill\.主动技能释放后续` 在 船长Strategy.cs **顶层 method** × 0 (helper 调用迁到 AwaitSkillHelper.Probe lambda 内); grep `private async Task<bool> 洪流接x回` × 0 (method 删)
 
@@ -226,10 +227,10 @@ revision_notes:
 | INV6 | SG 0 改 | Get-FileHash HeroStrategyGenerator.cs 自 5863da8 不变 |
 | INV7 | lint VSTHRD110=error 命中船长 | .editorconfig 加船长路径 (Row 10) + build verify |
 | INV8 | SlotKey.Global 直写 0 | grep `SlotKey\.Global` 在 船长Strategy.cs × 0 |
-| INV10 | Conditions[name].Active 直写 0 | grep `Conditions\[ConditionSlotKey\.(C3\|C4)\]\.Active\s*=` 在 船长Strategy.cs **BuildPlan 顶层链 / 顶层 method 内 (BuildPlan 链外)** × 0; inner action callback closure 内保留 (D1 决断: callback 由 SkillEngine sync invoke, 不经 Runner) |
+| INV10 | Conditions[name].Active 直写 0 | grep `Conditions\[ConditionSlotKey\.(C3\|C4)\]\.Active\s*=` 在 船长Strategy.cs **BuildPlan 顶层链 / 顶层 method 内 (BuildPlan 链外)** × 0; inner action callback closure 内保留 (D1 决断: callback 由 SkillEngine `_ = Task.Run(afterAction)` fire-and-forget 包装, 不经 Runner) |
 | INV11 | 业务零感知 Runner | grep `new StepMachineRunner` 在 Heroes/ × 0 |
 | INV12 | 业务侧只读不写状态机 | grep `_main\._聚合\.StepMachines\.SetStep` 在 船长Strategy.cs × 0 |
-| INV13 | wiring 路径活 | build verify 4 档 0 error |
+| INV13 | wiring 路径活 | build verify (Debug/Release 2 档, DOTA2+Silt 激活) 0 error |
 | INV14 | SkillEngine helper 直调零回归 (船长) | grep `_skill\.(主动技能释放后续\|主动技能进入CD后续\|主动技能已就绪后续)` 在 船长Strategy.cs **BuildPlan 顶层链 / 顶层 method 内 (RegisterProbe/AwaitSkillHelper lambda 外)** × 0. AwaitSkillHelper.Probe lambda 内调用 + RegisterProbe(C3/C4) async lambda 内调用 都不计 (Probe 自包含 + RegisterProbe 内嵌 async, 均为 D2 决断正确路径) |
 | INV15 | AwaitSkillHelper Probe 自包含 | grep `_skillEngine` 在 InterpretAwaitSkillHelper × 0 (verify static method 无 instance 依赖) |
 | INV16 | 跨 clause 副作用走原语 (BuildPlan 顶层链不直写) | 船长**BuildPlan 顶层链 / 顶层 method 内 (lambda 外)** `Conditions[X].Active =` × 0. inner action callback closure 内保留 (Row 4-5 决断). 命名精确化为 "BuildPlan 顶层链不直写; callback 内例外" |
@@ -295,7 +296,7 @@ INV9 删 (Phase 27A 已 documented); INV1 SOT 切片未列.
 
 ### dogfood 验证 (S3 chunk 执行, plan agent 不真改业务代码不真 build)
 
-- build verify 4 档 DOTA2/Silt/LOL/HF2 全 0 error 0 warning
+- build verify (Debug/Release 2 档, DOTA2+Silt 激活) 全 0 error 0 warning (LOL/HF2 不在 csproj 编译矩阵, 切 DefineConstants build 留 S4 用户冒烟)
 - grep verify (主 lead S3 chunk 内执行):
   - INV2 `Task\.Run` 在 船长Strategy.cs × 0
   - INV3 `Common\.Delay\(\d{3,}` 在 船长Strategy.cs **顶层 method 内 (BuildPlan 顶层链外, RegisterProbe/AwaitSkillHelper lambda 外)** × 0 (plan-reviewer 二审 INFO-2 措辞精确化: lambda 内 inner callback 合法命中不计为 false alarm)
@@ -325,7 +326,7 @@ files = [
   "Dota2Simulator/GameAutomation/Application/StepMachine/StepMachineRunner.cs",
 ]
 expected_loc = "+15 / -10"
-反预测 = "build verify 4 档全 PASS; 4 hero 行为 0 变化"
+反预测 = "build verify (Debug/Release 2 档, DOTA2+Silt 激活) 全 PASS; 4 hero 行为 0 变化"
 反预测_failure_signal = "S1 commit build 任一档 error / CS8509 复现 / 4 hero 任一 strategy 编译破坏"
 blocks = []
 blocked_by = []
@@ -339,7 +340,7 @@ files = [
   "Dota2Simulator/GameAutomation/Heroes/Strength/船长Strategy.cs",
 ]
 expected_loc = "+25 / -65 (净减 ~40 行; D2 重决断后落点缩减: C3/C4 仅 lambda 改写 1 行 × 2, 无 captain-E Step(1) 整合)"
-反预测 = "build verify 4 档全 PASS; grep INV2/INV3/INV10/INV14/INV17 全 0 (顶层 / lambda 外); RegisterProbe 仍命中 C3/C4 × 各 1"
+反预测 = "build verify (Debug/Release 2 档, DOTA2+Silt 激活) 全 PASS; grep INV2/INV3/INV10/INV14/INV17 全 0 (顶层 / lambda 外); RegisterProbe 仍命中 C3/C4 × 各 1"
 反预测_failure_signal = "R9a Row 5 inner callback 拆 6 原语决断回退 / R9c Runner ctor 漂移 / build error / VSTHRD002 命中 RegisterProbe lambda (sync-over-async 反例) — 均创建 BLOCKED file"
 blocks = []
 blocked_by = ["S1"]
@@ -386,12 +387,12 @@ commit_subject = "Phase27B-S4 整轮回归 PASS (27A 4 hero + Phase 26 抽样 0 
 **Wave 1 (单 chunk S1)**:
 - S1: spawn general-purpose model=opus[1m] prompt=<self-contained brief 含 §1 Row 1-2 落点 + §2 INV4/INV5/INV15 + §3 R6 风险 + 反预测>
 
-**Wave 1 收口条件**: S1 PASS (build verify 4 档 0 error + grep verify INV4 switch 20+1 case) → S2
+**Wave 1 收口条件**: S1 PASS (build verify 2 档 0 error + grep verify INV4 switch 20+1 case) → S2
 
 **Wave 2 (单 chunk S2)** [blocked_by=[S1]]:
 - S2: spawn general-purpose model=opus[1m] prompt=<self-contained brief 含: (a) §1 Row 3-9 落点 — Row 7-8 D2 重决断后**仅 lambda 改写 1 行 × 2**, 保留 RegisterProbe DSL 0 改动 (ConditionDelegateBitmap = async delegate Task<bool>() 已 verify, 详 frontmatter `references` + §6 偏离 2); (b) §2 INV2/INV3/INV10/INV14/INV16/INV17 措辞精确化 (BuildPlan 顶层链 / 顶层 method 内 lambda 外零回归; inner action callback closure + RegisterProbe async lambda 内例外); (c) §3 R7/R9/R10/R11 风险; (d) **明示禁项**: subagent 不许自扩 HeroPlanBuilder DSL 维度 / 不许把 C3 C4 整合到 captain-E machine Step(1) / 不许拆 Row 5 inner callback 为 6 原语 — 任一念头触发立即创建 BLOCKED file 0 改动退出; (e) 反预测>
 
-**Wave 2 收口条件**: S2 PASS (build verify 4 档 + grep verify 5 INV) → S3
+**Wave 2 收口条件**: S2 PASS (build verify 2 档 + grep verify 5 INV) → S3
 
 **Wave 3 (单 chunk S3)** [blocked_by=[S2]]:
 - S3: spawn general-purpose model=opus[1m] prompt=<self-contained brief 含 §1 Row 10 落点 + §2 INV7 + S3 用户冒烟剧本 5 分钟 + R8-B race 测试场景 + 反预测>
@@ -427,7 +428,7 @@ commit_subject = "Phase27B-S4 整轮回归 PASS (27A 4 hero + Phase 26 抽样 0 
 
 - SOT 切片原文 (§落点 1NF 第 5 行): `AwaitSkillHelper + Conditional + Press + SetStep + ActivateClause + DynamicDelay + ActivateClause`
 - plan §1 Row 5 决断: 单 `AwaitSkillHelper(() => _skill.主动技能释放后续(E, () => { ... 全数 inline ... }))` 不拆原语
-- 偏离理由: inner action callback 由 SkillEngine helper sync invoke afterAction (afterAction 签名 `Action`, 非 `Task`), **不经 Runner 调度**. callback 内 `Press(...)` 是 HeroStrategyBase instance method 不是 Press StepCommand record; `Common.Delay(...)` 是静态调用不是 Delay 原语 record. 拆 6 原语需扩 Conditional.Cond 签名访问 _hero.Aggregate.Skills (现 Func<ImageHandle, bool>) — 破 INV4 + 19+1 原语稳定
+- 偏离理由: inner action callback 由 SkillEngine helper `_ = Task.Run(afterAction)` fire-and-forget 包装 (SkillEngine.cs:1382/1402/1433/1453/1473 五个 X后续 helper 同模式, afterAction 签名 `Action` 非 `Task`), **不经 Runner 调度**. callback 内 `Press(...)` 是 HeroStrategyBase instance method 不是 Press StepCommand record; `Common.Delay(...)` 是静态调用不是 Delay 原语 record. 拆 6 原语需扩 Conditional.Cond 签名访问 _hero.Aggregate.Skills (现 Func<ImageHandle, bool>) — 破 INV4 + 19+1 原语稳定
 - 影响: INV3 / INV10 / INV16 措辞精确化为 "BuildPlan 顶层链 / 顶层 method 内 (lambda 外) 零回归; inner action callback closure 内保留"
 - **plan-reviewer R3 必审** (R10 触发条件)
 
@@ -464,7 +465,7 @@ commit_subject = "Phase27B-S4 整轮回归 PASS (27A 4 hero + Phase 26 抽样 0 
 | 漂移点 | 位置 | 说明 |
 |---|---|---|
 | HeroPlan.DispatchAsync wiring hook 内 fire-and-forget Task.Run | HeroPlan.cs L466 | 27A 既成事实, 27B 不改; INV2 措辞精确化为业务侧零回归 |
-| inner action callback closure 同步执行 vs Runner 异步调度 | SkillEngine.主动技能释放后续 内部 | 两套范式真实存在; plan §6 偏离 1 重要 documented |
+| inner action callback closure 经 `_ = Task.Run(afterAction)` fire-and-forget 包装 vs Runner 异步调度 | SkillEngine.主动技能释放后续 内部 (SkillEngine.cs:1382 等 5 helper 同模式) | 两套范式真实存在 (均 fire-and-forget, 但执行入口不同); plan §6 偏离 1 重要 documented |
 | RegisterProbe 既有 async delegate 签名 vs 原 plan 推断 sync 误述 | ConditionSlot.cs:11 (真) vs 原 plan §1 Row 7-8 (误) | sot-annotator + plan agent 未 verify 触违铁律 5(b), plan-reviewer R1-A 检出修订; epic 0 新增 DSL |
 | _全局模式e_lock instance vs static | HeroLoopHost.cs L44 (instance) vs 船长Strategy.cs L21 (static) | 同名巧合, 不同实例; 27B 仅删船长 static 不动 HeroLoopHost |
 
@@ -509,5 +510,5 @@ commit_subject = "Phase27B-S4 整轮回归 PASS (27A 4 hero + Phase 26 抽样 0 
 | BuildPlan .OnKey().PreAsync(...) 桥接 (船长当前无, 军团 + 天怒 有) | 合法 (Pre 段) | Pre 段在 clause Active 设置前 await, 桥接业务侧旧路径 |
 | .StepMachine Step(n).Do(...) 序列内 SetStep / ActivateClause 原语 | 合法 (原语接受) | 业务侧通过原语 (而非直接 _state.SetStep) 修改状态, 经 Runner 受控调度 |
 | 业务 method body 内 _main._聚合.StepMachines.SetStep(...) 直接调用 (predicate 段) | 违规 (INV12) | predicate 内不允许写状态机, 应通过 ActivateClause / SetStep 原语在 .StepMachine 闭包内定义 |
-| (新增 D1) AwaitSkillHelper.Probe lambda 内 inner action callback closure 内副作用 (Conditions[X].Active = / SetStep / SetTime / Common.Delay / Press) | 合法 (helper 内部 closure 段) | SkillEngine.主动技能释放后续 await 完成后 sync invoke afterAction(), callback 在 helper 内部同步执行, 不走 Runner 调度 → 不破 INV12 业务侧只读 (业务侧定义 callback, 但运行时执行入口在 SkillEngine 内). plan §6 偏离 1 documented |
+| (新增 D1) AwaitSkillHelper.Probe lambda 内 inner action callback closure 内副作用 (Conditions[X].Active = / SetStep / SetTime / Common.Delay / Press) | 合法 (helper 内部 closure 段) | SkillEngine.主动技能释放后续 await 完成后 `_ = Task.Run(afterAction).ConfigureAwait(true)` fire-and-forget 包装 callback (SkillEngine.cs:1382), 不走 Runner 调度 → 不破 INV12 业务侧只读 (业务侧定义 callback, 但运行时执行入口在 SkillEngine 内通过 Task.Run 异步触发). plan §6 偏离 1 documented |
 | (新增 D2) `.RegisterProbe(slot, async () => await _skill.XX(K, () => {...}))` 内嵌 async lambda + inner action callback | 合法 (RegisterProbe async lambda 段 + 内嵌 helper closure 段) | `ConditionDelegateBitmap` 真实签名 `delegate Task<bool>()` 直接接 async lambda; lambda 内嵌 `_skill.主动技能X后续` helper 调用 + inner action callback 同 D1 例外. INV14 (SkillEngine helper 直调零回归) 措辞精确化为 "BuildPlan 顶层链 / 顶层 method 内 (lambda 外) 零回归; RegisterProbe async lambda 内 + AwaitSkillHelper.Probe lambda 内例外". plan §6 偏离 2 documented |
