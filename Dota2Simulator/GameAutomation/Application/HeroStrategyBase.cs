@@ -60,8 +60,9 @@ public abstract class HeroStrategyBase : IHeroStrategy
     /// <summary>HeroPlan 主路径默认实现 — 业务覆盖 BuildPlan 即可消费; 未迁 hero 可 override.</summary>
     public virtual void OnActivate(HeroContext ctx) => Plan.Apply(ctx, _skill);
 
-    /// <summary>HeroPlan 主路径默认实现 — 业务覆盖 BuildPlan 即可消费; 未迁 hero 可 override.</summary>
-    public virtual Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx) => Plan.DispatchAsync(trigger, ctx, _item);
+    /// <summary>HeroPlan 主路径默认实现 — 业务覆盖 BuildPlan 即可消费; 未迁 hero 可 override.
+    /// Phase 27A retry 2 S2 (2026-05-26): +skill +handle 透传, Plan.DispatchAsync 内 wiring hook 触发 StepMachineRunner; 业务侧 Strategy 不感知 Runner.</summary>
+    public virtual Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx) => Plan.DispatchAsync(trigger, ctx, _item, _skill, _main.CurrentHandle);
 
     /// <summary>
     /// Phase 22D (2026-05-26): WinForms Keys → VirtualKey 自动 wrap, 替原业务 <c>_input.Press(VirtualKey.From(Keys.X))</c> 冗长形态.

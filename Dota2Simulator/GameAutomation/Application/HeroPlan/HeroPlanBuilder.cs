@@ -26,6 +26,8 @@ public sealed class HeroPlanBuilder
     // Phase 20C: 业务级即插即用抽象 — 替代 OnActivate 自定义 body 形态.
     private (double PreDelay, double Interval)? _attackTiming;
     private readonly ImmutableArray<(Domain.Loop.SlotKey, int)>.Builder _initSkillSteps = ImmutableArray.CreateBuilder<(Domain.Loop.SlotKey, int)>();
+    // Phase 27A retry 2 S2: StepMachine 子定义注册表 — 名称 → 定义. Done() 时 ToImmutableDictionary 传 HeroPlan ctor.
+    private readonly System.Collections.Generic.Dictionary<string, Domain.StepMachine.StepMachineDefinition> _stepMachineDefinitions = new(System.StringComparer.Ordinal);
 
     private Keys? _pendingTrigger;
     private Keys? _pendingSkill;
@@ -315,6 +317,32 @@ public sealed class HeroPlanBuilder
             return this;
         }
         throw new InvalidOperationException("WithRefractory: 需先终结一个 clause 或 setup.");
+    }
+
+    /// <summary>
+    /// Phase 27A retry 2 S2 (2026-05-26): 注册 StepMachine 子定义 + 把当前最后一个 clause 的 StepMachineRefId 设为 name.
+    /// **显式破坏 Phase 26 之前的"单 fluent type 不变量"** — 业务侧调链入 <see cref="StepMachineSubBuilder"/> sub 域, 通过闭包结束返主 builder.
+    /// 关联 plan SSOT: Phase 27A retry 2 §7 SSOT 漂移点 + §7.2 DSL 维度增删表 (拆桥矩阵).
+    /// lastIdx-with 模式同 Phase 26 .WithRefractory L300-L317 沿用.
+    /// </summary>
+    public HeroPlanBuilder StepMachine(string name, Action<StepMachineSubBuilder> configure)
+    {
+        if (string.IsNullOrEmpty(name)) throw new ArgumentException("StepMachine name 不能为空", nameof(name));
+        if (configure is null) throw new ArgumentNullException(nameof(configure));
+
+        var sub = new StepMachineSubBuilder(name);
+        configure(sub);
+        Domain.StepMachine.StepMachineDefinition def = sub.Build();
+        _stepMachineDefinitions[name] = def;
+
+        // lastIdx-with 模式 — 同 Phase 26 .WithRefractory L308 沿用. clause 命中后由 DispatchAsync wiring hook 触发 Runner.
+        if (_clauses.Count > 0)
+        {
+            int lastIdx = _clauses.Count - 1;
+            _clauses[lastIdx] = _clauses[lastIdx] with { StepMachineRefId = name };
+        }
+
+        return this;
     }
 
     /// <summary>
@@ -813,7 +841,19 @@ public sealed class HeroPlanBuilder
             throw new InvalidOperationException(
                 $"Done: pending 状态未终结 (OnKey={_pendingTrigger?.ToString() ?? "null"}, CastSkill={_pendingSkill?.ToString() ?? "null"}, OnEveryKey={_pendingIsOnEveryKey}).");
         }
-        return new HeroPlan(_clauses.ToImmutable(), _legSwap.ToImmutable(), _setups.ToImmutable(), _registeredProbes.ToImmutable(), _stoneProbe, _repeatThreshold, _attackTiming, _initSkillSteps.ToImmutable());
+        return new HeroPlan(
+            _clauses.ToImmutable(),
+            _legSwap.ToImmutable(),
+            _setups.ToImmutable(),
+            _registeredProbes.ToImmutable(),
+            _stoneProbe,
+            _repeatThreshold,
+            _attackTiming,
+            _initSkillSteps.ToImmutable(),
+            // Phase 27A retry 2 S2: StepMachine 子定义快照 (空时传 Empty, 与 HeroPlan ctor 默认值等价).
+            _stepMachineDefinitions.Count == 0
+                ? ImmutableDictionary<string, Domain.StepMachine.StepMachineDefinition>.Empty
+                : _stepMachineDefinitions.ToImmutableDictionary(StringComparer.Ordinal));
     }
 }
 

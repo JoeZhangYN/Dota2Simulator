@@ -8,7 +8,10 @@ using System.Collections.Immutable;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Dota2Simulator.GameAutomation.Application;  // ConditionDelegateBitmap
+using Dota2Simulator.GameAutomation.Application.StepMachine;  // Phase 27A retry 2 S2: StepMachineRunner
 using Dota2Simulator.GameAutomation.Domain.Actuation;
+using Dota2Simulator.GameAutomation.Domain.StepMachine;  // Phase 27A retry 2 S2: StepMachineDefinition
+using Dota2Simulator.Vision;  // Phase 27A retry 2 S2: ImageHandle
 
 namespace Dota2Simulator.GameAutomation.Application.HeroPlans;
 
@@ -85,7 +88,9 @@ public readonly record struct HeroPlanClause(
     Func<HeroContext, bool>? QueueWhen = null,
     // Phase 26 A3: 不应期 DSL — RefractoryName 非空时 DispatchAsync 路径: clause 触发前 check IsRefractory(name) → 真则短路; 命中后 SetRefractory(name, ms).
     string? RefractoryName = null,
-    int RefractoryMs = 0);
+    int RefractoryMs = 0,
+    // Phase 27A retry 2 S2 (2026-05-26): StepMachine wiring 核心 — 非空时 DispatchAsync 命中后调 Runner.ExecuteAsync(StepMachineDefinitions[refId]), Task.Run wrap fire-and-forget (业务 Strategy 不感知).
+    string? StepMachineRefId = null);
 
 /// <summary>
 /// 假腿配置条目 (按键 → alwaysSwap 标志, OnActivate 时一次性应用).
@@ -152,6 +157,8 @@ public sealed class HeroPlan
     // Phase 20C: OnActivate 一次性聚合配置 — 替代 4 hero override OnActivate 设 Attack.基础攻击前摇/间隔; 1 hero (军团) InitSkillStep(Global, -1).
     private readonly (double PreDelay, double Interval)? _attackTiming;
     private readonly ImmutableArray<(Domain.Loop.SlotKey Slot, int Value)> _initSkillSteps;
+    // Phase 27A retry 2 S2: StepMachine 子定义注册表 (name → definition). Apply 时一次性注册 InitialStep, DispatchAsync 命中含 StepMachineRefId 的 clause 时触发 Runner.
+    private readonly ImmutableDictionary<string, StepMachineDefinition> _stepMachineDefinitions;
 
     internal HeroPlan(
         ImmutableArray<HeroPlanClause> clauses,
@@ -161,7 +168,8 @@ public sealed class HeroPlan
         ConditionDelegateBitmap? stoneProbe,
         int? repeatThreshold,
         (double PreDelay, double Interval)? attackTiming,
-        ImmutableArray<(Domain.Loop.SlotKey, int)> initSkillSteps)
+        ImmutableArray<(Domain.Loop.SlotKey, int)> initSkillSteps,
+        ImmutableDictionary<string, StepMachineDefinition>? stepMachineDefinitions = null)
     {
         if (clauses.Length > 9)
         {
@@ -176,7 +184,11 @@ public sealed class HeroPlan
         _repeatThreshold = repeatThreshold;
         _attackTiming = attackTiming;
         _initSkillSteps = initSkillSteps;
+        _stepMachineDefinitions = stepMachineDefinitions ?? ImmutableDictionary<string, StepMachineDefinition>.Empty;
     }
+
+    /// <summary>Phase 27A retry 2 S2: StepMachine 子定义快照 (诊断 / sanity test 用; 不可变).</summary>
+    public ImmutableDictionary<string, StepMachineDefinition> StepMachineDefinitions => _stepMachineDefinitions;
 
     /// <summary>子句数 (用于诊断 / 测试).</summary>
     public int ClauseCount => _clauses.Length;
@@ -306,13 +318,21 @@ public sealed class HeroPlan
         {
             ctx.Aggregate.Skills.SetStep(slot, value);
         }
+
+        // Phase 27A retry 2 S2: 一次性注册每 StepMachine 的 InitialStep 到 StepMachineState 子聚合.
+        // 跨 hero 切换 HeroLoopHost.Reset 已 Clear; 本次 Apply 重置回各 machine 的初态.
+        foreach (var kvp in _stepMachineDefinitions)
+        {
+            ctx.Aggregate.StepMachines.SetStep(kvp.Key, kvp.Value.InitialStep);
+        }
     }
 
     /// <summary>
     /// 按键派发 — 先调 ItemEngine 通用逻辑 (假腿切换 / 技能数量同步等), 再按 TriggerKey 命中 clause 激活对应 ConditionSlot.
     /// 取代手写 OnKeyAsync 中 1 处 _item.根据按键判断技能释放前通用逻辑 + N 处 if/else (VirtualKey → ConditionSlotKey 映射).
+    /// Phase 27A retry 2 S2 (2026-05-26): +skill + handle 参数 — 命中含 StepMachineRefId 的 clause 时构造 StepMachineRunner 并 Task.Run wrap fire-and-forget.
     /// </summary>
-    public async Task DispatchAsync(KeyTrigger trigger, HeroContext ctx, ItemEngine item)
+    public async Task DispatchAsync(KeyTrigger trigger, HeroContext ctx, ItemEngine item, SkillEngine? skill = null, ImageHandle handle = default)
     {
         if (ctx is null) throw new ArgumentNullException(nameof(ctx));
         if (item is null) throw new ArgumentNullException(nameof(item));
@@ -429,6 +449,32 @@ public sealed class HeroPlan
                 if (_clauses[i].RefractoryName is not null && _clauses[i].RefractoryMs > 0)
                 {
                     ctx.Aggregate.Refractory.SetRefractory(_clauses[i].RefractoryName!, _clauses[i].RefractoryMs);
+                }
+
+                // Phase 27A retry 2 S2: StepMachine wiring hook — clause.StepMachineRefId 命中时调 Runner.ExecuteAsync, fire-and-forget wrap (业务 Strategy 不感知).
+                // skill 为 null (业务未传) → 跳过 (向后兼容旧业务路径); definition 未找到 → 跳过 (defensive).
+                if (_clauses[i].StepMachineRefId is { } refId
+                    && skill is not null
+                    && _stepMachineDefinitions.TryGetValue(refId, out StepMachineDefinition def))
+                {
+                    StepMachineRunner runner = new(
+                        ctx.Aggregate.StepMachines,
+                        ctx.Aggregate,
+                        item,
+                        skill,
+                        handle);
+                    _ = Task.Run(async () =>
+                    {
+                        try
+                        {
+                            await runner.ExecuteAsync(def).ConfigureAwait(false);
+                        }
+                        catch (Exception ex)
+                        {
+                            // fire-and-forget 兜底; 主循环不应被 step machine 异常打断.
+                            Dota2Simulator.Games.Common.Main_Logger.Error($"StepMachineRunner '{refId}' 异常: {ex.Message}");
+                        }
+                    });
                 }
                 return;
             }

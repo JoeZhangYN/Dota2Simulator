@@ -76,6 +76,12 @@ namespace Dota2Simulator.GameAutomation.Application
         /// <summary>Phase 26 D2: Control Observable 暴露 — ItemEngine E2 双发送路径根据 CurrentState 决定直发 vs 入 DeferredQueue.</summary>
         public ControlObservable ControlObservable => _controlObservable;
 
+        /// <summary>
+        /// Phase 27A retry 2 S2: 当前帧 ImageHandle 出口 — HeroStrategyBase.OnKeyAsync 拿来传 Plan.DispatchAsync, 用于 StepMachineRunner 内 probe lambda 求值.
+        /// 复用 HeroLoopHost 文件级 DS0003 白名单 (PathHelper.cs:25), 不引新违规.
+        /// </summary>
+        internal ImageHandle CurrentHandle => GlobalScreenCapture.GetCurrentHandle();
+
         public HeroLoopHost(
             IInputExecutor input,
             IScreenVision vision,
