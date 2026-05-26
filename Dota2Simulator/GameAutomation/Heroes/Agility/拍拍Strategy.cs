@@ -25,7 +25,7 @@ public sealed partial class 拍拍Strategy : IHeroStrategy
                     + _item.根据图片使用物品(Dota2_Pictrue.物品.跳刀_力量跳刀_Tpl)
                     + _item.根据图片使用物品(Dota2_Pictrue.物品.跳刀_敏捷跳刀_Tpl) == 1)
                 {
-                    _input.Press(VirtualKey.From(Keys.A));
+                    走A();
                     _ = _skill.DOTA2释放CD就绪技能(Keys.Q);
                 }
             });

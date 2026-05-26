@@ -62,6 +62,15 @@ public abstract class HeroStrategyBase : IHeroStrategy
 
     /// <summary>HeroPlan 主路径默认实现 — 业务覆盖 BuildPlan 即可消费; 未迁 hero 可 override.</summary>
     public virtual Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx) => Plan.DispatchAsync(trigger, ctx, _item);
+
+    /// <summary>
+    /// Phase 22D (2026-05-26): WinForms Keys → VirtualKey 自动 wrap, 替原业务 <c>_input.Press(VirtualKey.From(Keys.X))</c> 冗长形态.
+    /// 不改 IInputExecutor 端口契约 (保持 VirtualKey 强类型 + Adapter 实现纯洁), 仅在 base 内 ergonomic helper.
+    /// </summary>
+    protected void Press(System.Windows.Forms.Keys k) => _input.Press(Domain.Actuation.VirtualKey.From(k));
+
+    /// <summary>Phase 22D: 走 A 专用简写 — 替原 <c>_input.Press(VirtualKey.From(Keys.A))</c> 40 处同构.</summary>
+    protected void 走A() => _input.Press(Domain.Actuation.VirtualKey.From(System.Windows.Forms.Keys.A));
 }
 
 #endif

@@ -14,7 +14,7 @@ public sealed partial class 发条Strategy : IHeroStrategy
 {
     protected override HeroPlan BuildPlan() => HeroPlanBuilder.New()
         .OnKey(Keys.Q).NoProbe()
-        .OnKey(Keys.W).Pre(() => _input.Press(VirtualKey.From(Keys.A))).NoProbe()  // 回收时按 W 先 Press A
+        .OnKey(Keys.W).Pre(() => 走A()).NoProbe()  // 回收时按 W 先 Press A
         .OnKey(Keys.R).NoProbe()
         .Done();
 }

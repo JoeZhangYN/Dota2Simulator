@@ -18,7 +18,7 @@ public sealed partial class 马尔斯Strategy : IHeroStrategy
         {
             if (_main._聚合.Skills.Mode(SlotKey.Q) == 1)
             {
-                _input.Press(VirtualKey.From(Keys.R));
+                Press(Keys.R);
             }
             else
             {
@@ -30,7 +30,7 @@ public sealed partial class 马尔斯Strategy : IHeroStrategy
         {
             if (_skill.判断技能状态(Keys.E, SkillEngine.技能类型.状态))
             {
-                _input.Press(VirtualKey.From(Keys.E));
+                Press(Keys.E);
             }
             _skill.通用技能后续动作();
         })

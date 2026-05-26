@@ -73,7 +73,7 @@ public sealed partial class 军团Strategy : IHeroStrategy
                     _main._聚合.Skills.SetStep(SlotKey.Global, 3);
                     return await Task.FromResult(true).ConfigureAwait(true);
                 case < 4:
-                    _input.Press(VirtualKey.From(Keys.A));
+                    走A();
                     if (_skill.DOTA2释放CD就绪技能(Keys.R))
                     {
                         Common.Delay(60);

@@ -15,7 +15,7 @@ public sealed partial class 大牛Strategy : IHeroStrategy
 {
     protected override HeroPlan BuildPlan() => HeroPlanBuilder.New()
         .OnKey(Keys.Q).CastSkill(Keys.Q).AfterCast(postDelayMs: 1300)
-        .OnKey(Keys.W).Pre(() => _input.Press(VirtualKey.From(Keys.A))).CustomProbe(async () =>
+        .OnKey(Keys.W).Pre(() => 走A()).CustomProbe(async () =>
             await _skill.释放技能后替换图标技能后续(
                 Keys.W,
                 () => _main._聚合.Skills.Step(SlotKey.W),

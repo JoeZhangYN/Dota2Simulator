@@ -20,7 +20,7 @@ public sealed partial class 血魔Strategy : IHeroStrategy
         .OnKey(Keys.W).CastSkill(Keys.W).AfterCastDo(() =>
         {
             _input.MouseClick(MouseButton.Right);
-            _input.Press(VirtualKey.From(Keys.A));
+            走A();
             _item.要求保持假腿();
             Common.Delay(2400);
             Point p = Control.MousePosition;

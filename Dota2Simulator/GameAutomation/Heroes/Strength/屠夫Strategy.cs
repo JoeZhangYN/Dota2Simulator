@@ -31,8 +31,8 @@ public sealed partial class 屠夫Strategy : IHeroStrategy
         return await _skill.主动技能释放后续(Keys.Q, () =>
         {
             if (!_skill.DOTA2判断状态技能是否启动(Keys.W))
-                _input.Press(VirtualKey.From(Keys.W));
-            _input.Press(VirtualKey.From(Keys.A));
+                Press(Keys.W);
+            走A();
             if (_main._聚合.Skills.Mode(SlotKey.Q) == 1)
                 _main._聚合.Conditions[ConditionSlotKey.C3].Active = true;
         }).ConfigureAwait(true);
@@ -43,7 +43,7 @@ public sealed partial class 屠夫Strategy : IHeroStrategy
         return await _skill.主动技能释放后续(Keys.R, () =>
         {
             if (!_skill.DOTA2判断状态技能是否启动(Keys.W))
-                _input.Press(VirtualKey.From(Keys.W));
+                Press(Keys.W);
             _ = _item.根据图片使用物品(Dota2_Pictrue.物品.纷争_Tpl);
             _ = _item.根据图片使用物品(Dota2_Pictrue.物品.希瓦_Tpl);
         }).ConfigureAwait(true);
@@ -64,7 +64,7 @@ public sealed partial class 屠夫Strategy : IHeroStrategy
                 _item.根据图片使用物品(Dota2_Pictrue.物品.红杖3_Tpl) +
                 _item.根据图片使用物品(Dota2_Pictrue.物品.红杖4_Tpl) +
                 _item.根据图片使用物品(Dota2_Pictrue.物品.红杖5_Tpl)));
-            _input.Press(VirtualKey.From(Keys.R));
+            Press(Keys.R);
         }).ConfigureAwait(true);
     }
 }

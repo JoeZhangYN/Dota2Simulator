@@ -31,7 +31,7 @@ public sealed partial class 神域Strategy : IHeroStrategy
 
     private async Task<bool> 涤罪之焰去后摇()
     {
-        async Task 涤罪之焰后() => await Task.Run(() => _input.Press(VirtualKey.From(Keys.A))).ConfigureAwait(true);
+        async Task 涤罪之焰后() => await Task.Run(() => 走A()).ConfigureAwait(true);
         if (_skill.DOTA2判断技能是否CD(Keys.E))
             return await Task.FromResult(true).ConfigureAwait(true);
         涤罪之焰后().Start();
@@ -40,7 +40,7 @@ public sealed partial class 神域Strategy : IHeroStrategy
 
     private async Task<bool> 虚妄之诺去后摇()
     {
-        async Task 虚妄之诺后() => await Task.Run(() => _input.Press(VirtualKey.From(Keys.A))).ConfigureAwait(true);
+        async Task 虚妄之诺后() => await Task.Run(() => 走A()).ConfigureAwait(true);
         if (_skill.DOTA2判断技能是否CD(Keys.R))
             return await Task.FromResult(true).ConfigureAwait(true);
         虚妄之诺后().Start();

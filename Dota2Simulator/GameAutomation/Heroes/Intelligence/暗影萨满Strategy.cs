@@ -64,8 +64,8 @@ public sealed partial class 暗影萨满Strategy : IHeroStrategy
         {
             switch (_main._聚合.Skills.Mode(SlotKey.Q))
             {
-                case 1: _input.Press(VirtualKey.From(Keys.W)); break;
-                default: _input.Press(VirtualKey.From(Keys.A)); break;
+                case 1: Press(Keys.W); break;
+                default: 走A(); break;
             }
         }
         if (_skill.DOTA2判断技能是否CD(Keys.Q))
@@ -83,7 +83,7 @@ public sealed partial class 暗影萨满Strategy : IHeroStrategy
 
     private async Task<bool> 释放群蛇守卫取消后摇()
     {
-        void 群蛇守卫后() => _input.Press(VirtualKey.From(Keys.A));
+        void 群蛇守卫后() => 走A();
         if (_skill.DOTA2判断技能是否CD(Keys.R))
             return await Task.FromResult(true).ConfigureAwait(true);
         群蛇守卫后();
@@ -106,27 +106,27 @@ public sealed partial class 暗影萨满Strategy : IHeroStrategy
                 else if (ColorExtensions.ColorAEqualColorB(ImageManager.GetColor(in 句柄, 875, 1008), 技能点颜色, 0)) time = 1150;
                 time = Convert.ToInt32(_main._聚合.Attack.状态抗性倍数 * time);
                 TTS.TTS.Speak(string.Concat("延时", time.ToString(CultureInfo.InvariantCulture)));
-                _input.Press(VirtualKey.From(Keys.A));
+                走A();
                 switch (_main._聚合.Skills.Mode(SlotKey.W))
                 {
                     case 1:
                         Common.Delay(time - 435, _main._聚合.Skills.Time(SlotKey.W));
-                        _input.Press(VirtualKey.From(Keys.E));
+                        Press(Keys.E);
                         break;
                     case 2:
-                        _input.Press(VirtualKey.From(Keys.Q));
+                        Press(Keys.Q);
                         break;
                     case 3:
-                        _input.Press(VirtualKey.From(Keys.Q));
+                        Press(Keys.Q);
                         Common.Delay(time - 435, _main._聚合.Skills.Time(SlotKey.W));
-                        _input.Press(VirtualKey.From(Keys.E));
+                        Press(Keys.E);
                         break;
                     case 4:
-                        _input.Press(VirtualKey.From(Keys.R));
+                        Press(Keys.R);
                         Common.Delay(400);
-                        _input.Press(VirtualKey.From(Keys.Q));
+                        Press(Keys.Q);
                         Common.Delay(time - 435, _main._聚合.Skills.Time(SlotKey.W));
-                        _input.Press(VirtualKey.From(Keys.E));
+                        Press(Keys.E);
                         break;
                 }
             });
@@ -144,7 +144,7 @@ public sealed partial class 暗影萨满Strategy : IHeroStrategy
             Common.Delay(等待延迟);
             return await Task.FromResult(true).ConfigureAwait(true);
         }
-        _input.Press(VirtualKey.From(Keys.W));
+        Press(Keys.W);
         return await Task.FromResult(false).ConfigureAwait(true);
     }
 }

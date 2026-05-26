@@ -47,7 +47,7 @@ public sealed partial class 小骷髅Strategy : IHeroStrategy
             if (_main._聚合.Skills.Mode(SlotKey.F) == 1)
             {
                 Common.Delay(0);
-                _input.Press(VirtualKey.From(Keys.R));
+                Press(Keys.R);
             }
         })
         .OnKey(Keys.F).WhenHasAghanim().CastSkill(Keys.F).AfterEnterCD()

@@ -26,7 +26,7 @@ public sealed partial class 狼人Strategy : IHeroStrategy
         void 招狼后()
         {
             _main._聚合.Skills.SetTime(SlotKey.Q, -1);
-            _input.Press(VirtualKey.From(Keys.A));
+            走A();
         }
 
         if (Common.获取当前时间毫秒() - _main._聚合.Skills.Time(SlotKey.Q) > 400 && _main._聚合.Skills.Time(SlotKey.Q) != -1 && _main._聚合.LegSwap.条件开启切假腿)
@@ -49,7 +49,7 @@ public sealed partial class 狼人Strategy : IHeroStrategy
         void 嚎叫后()
         {
             _main._聚合.Skills.SetTime(SlotKey.W, -1);
-            _input.Press(VirtualKey.From(Keys.A));
+            走A();
         }
 
         if (Common.获取当前时间毫秒() - _main._聚合.Skills.Time(SlotKey.W) > 400 && _main._聚合.Skills.Time(SlotKey.W) != -1 && _main._聚合.LegSwap.条件开启切假腿)
@@ -72,7 +72,7 @@ public sealed partial class 狼人Strategy : IHeroStrategy
         void 撕咬后()
         {
             _main._聚合.Skills.SetTime(SlotKey.D, -1);
-            _input.Press(VirtualKey.From(Keys.A));
+            走A();
         }
 
         if (Common.获取当前时间毫秒() - _main._聚合.Skills.Time(SlotKey.D) > 400 && _main._聚合.Skills.Time(SlotKey.D) != -1 && _main._聚合.LegSwap.条件开启切假腿)

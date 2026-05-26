@@ -31,7 +31,7 @@ public sealed partial class 炸弹人Strategy : IHeroStrategy
     {
         if (_skill.DOTA2判断技能是否CD(Keys.Q))
             return await Task.FromResult(true).ConfigureAwait(true);
-        _input.Press(VirtualKey.From(Keys.A));
+        走A();
         return await Task.FromResult(false).ConfigureAwait(true);
     }
 
@@ -39,7 +39,7 @@ public sealed partial class 炸弹人Strategy : IHeroStrategy
     {
         if (_skill.DOTA2判断技能是否CD(Keys.W))
             return await Task.FromResult(true).ConfigureAwait(true);
-        _input.Press(VirtualKey.From(Keys.A));
+        走A();
         return await Task.FromResult(false).ConfigureAwait(true);
     }
 
@@ -47,7 +47,7 @@ public sealed partial class 炸弹人Strategy : IHeroStrategy
     {
         void 爆破起飞后()
         {
-            _input.Press(VirtualKey.From(Keys.A));
+            走A();
             Common.Delay(750);
             switch (_main._聚合.Skills.Mode(SlotKey.E))
             {

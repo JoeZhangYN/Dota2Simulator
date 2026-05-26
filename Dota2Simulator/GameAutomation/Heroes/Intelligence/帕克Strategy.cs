@@ -22,7 +22,7 @@ public sealed partial class 帕克Strategy : IHeroStrategy
             Common.Delay(3400);
             if (_main._聚合.Skills.Mode(SlotKey.D) == 1)
             {
-                _input.Press(VirtualKey.From(Keys.D));
+                Press(Keys.D);
             }
             _main._聚合.Skills.SetStep(SlotKey.Q, 0);
         })
@@ -31,8 +31,8 @@ public sealed partial class 帕克Strategy : IHeroStrategy
         .OnKey(Keys.R).CastSkill(Keys.R).AfterEnterCD()
         .OnKey(Keys.D).CastSkill(Keys.D).AfterEnterCDDo(() =>
         {
-            _input.Press(VirtualKey.From(Keys.F1));
-            _input.Press(VirtualKey.From(Keys.F1));
+            Press(Keys.F1);
+            Press(Keys.F1);
         })
         .OnKey(Keys.D2).Execute(() =>
         {

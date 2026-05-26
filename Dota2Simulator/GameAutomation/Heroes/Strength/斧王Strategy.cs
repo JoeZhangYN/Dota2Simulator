@@ -38,8 +38,8 @@ public sealed partial class 斧王Strategy : IHeroStrategy
         {
             if (_main._聚合.Skills.Mode(SlotKey.Q) == 1)
                 _ = _item.根据图片使用物品(Dota2_Pictrue.物品.刃甲_Tpl);
-            _input.Press(VirtualKey.From(Keys.A));
-            _input.Press(VirtualKey.From(Keys.W));
+            走A();
+            Press(Keys.W);
         }).ConfigureAwait(true);
     }
 
@@ -60,7 +60,7 @@ public sealed partial class 斧王Strategy : IHeroStrategy
         for (int i = 0; i < 10; i++)
         {
             _input.MouseMoveTo(new ScreenPoint(575 + 515 + 61 * i, 20));
-            _input.Press(VirtualKey.From(Keys.A));
+            走A();
             Common.Delay(2);
         }
         _input.MouseMoveTo(new ScreenPoint(原始位置.X, 原始位置.Y));

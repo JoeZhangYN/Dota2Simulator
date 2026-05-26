@@ -38,15 +38,15 @@ public sealed partial class 猛犸Strategy : IHeroStrategy
     // todo 逻辑优化 有鱼叉
     private void 跳拱指定地点()
     {
-        _input.Press(VirtualKey.From(Keys.Space));
+        Press(Keys.Space);
         Common.Delay(等待延迟);
-        _input.Press(VirtualKey.From(Keys.D9));
+        Press(Keys.D9);
         Point target = _main._聚合.Skills.Target(SlotKey.Global);
         _input.MouseMoveTo(new ScreenPoint(target.X, target.Y));
         Common.Delay(等待延迟);
-        _input.Press(VirtualKey.From(Keys.E));
+        Press(Keys.E);
         Common.Delay(等待延迟);
-        _input.Press(VirtualKey.From(Keys.D9));
+        Press(Keys.D9);
     }
 
     private void 指定地点()
@@ -56,7 +56,7 @@ public sealed partial class 猛犸Strategy : IHeroStrategy
         Common.Delay(等待延迟);
         _input.KeyDown(VirtualKey.From(Keys.Control));
         Common.Delay(等待延迟);
-        _input.Press(VirtualKey.From(Keys.D9));
+        Press(Keys.D9);
         Common.Delay(等待延迟);
         _input.KeyUp(VirtualKey.From(Keys.Control));
     }

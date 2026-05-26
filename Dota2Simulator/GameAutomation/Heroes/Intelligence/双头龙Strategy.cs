@@ -105,7 +105,7 @@ public sealed partial class 双头龙Strategy : IHeroStrategy
             return await Task.FromResult(true).ConfigureAwait(true);
         }
 
-        _input.Press(VirtualKey.From(Keys.W));
+        Press(Keys.W);
         _main._聚合.Skills.SetTime(SlotKey.Global, -1);
         return await Task.FromResult(false).ConfigureAwait(true);
     }

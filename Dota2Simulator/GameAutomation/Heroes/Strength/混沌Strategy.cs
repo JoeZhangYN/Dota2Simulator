@@ -36,14 +36,14 @@ public sealed partial class 混沌Strategy : IHeroStrategy
             Keys k = _item.根据图片获取物品按键(Dota2_Pictrue.物品.臂章_开启_Tpl);
             if (k != Keys.Escape)
             {
-                _input.Press(VirtualKey.From(k));
+                Press(k);
                 Common.Delay(15);
                 _ = _item.根据图片使用物品(Dota2_Pictrue.物品.魔棒_Tpl);
                 _ = _item.根据图片自我使用物品(Dota2_Pictrue.物品.吊坠_Tpl);
                 _ = _item.根据图片使用物品(Dota2_Pictrue.物品.仙草_Tpl);
                 _ = _item.根据图片使用物品(Dota2_Pictrue.物品.假腿_力量腿_Tpl);
                 Common.Delay(15);
-                _input.Press(VirtualKey.From(k));
+                Press(k);
                 _main._聚合.LegSwap.条件假腿敏捷 = false;
                 _item.要求保持假腿();
             }

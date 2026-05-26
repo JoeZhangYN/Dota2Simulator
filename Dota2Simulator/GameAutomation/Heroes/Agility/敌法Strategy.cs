@@ -44,7 +44,7 @@ public sealed partial class 敌法Strategy : IHeroStrategy
     {
         Common.Delay(140);
         _input.KeyDown(VirtualKey.From(Keys.Control));
-        _input.Press(VirtualKey.From(Keys.A));
+        走A();
         _input.KeyUp(VirtualKey.From(Keys.Control));
     }
 }

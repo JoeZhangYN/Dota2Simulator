@@ -26,7 +26,7 @@ public sealed partial class 女王Strategy : IHeroStrategy
         if (_skill.DOTA2判断技能是否CD(Keys.Q))
             return await Task.FromResult(true).ConfigureAwait(true);
         _main._聚合.Skills.SetTime(SlotKey.Q, -1);
-        _input.Press(VirtualKey.From(Keys.A));
+        走A();
         return await Task.FromResult(false).ConfigureAwait(true);
     }
 
@@ -44,7 +44,7 @@ public sealed partial class 女王Strategy : IHeroStrategy
         if (_skill.DOTA2判断技能是否CD(Keys.E))
             return await Task.FromResult(true).ConfigureAwait(true);
         _main._聚合.Skills.SetTime(SlotKey.E, -1);
-        _input.Press(VirtualKey.From(Keys.A));
+        走A();
         return await Task.FromResult(false).ConfigureAwait(true);
     }
 
@@ -53,7 +53,7 @@ public sealed partial class 女王Strategy : IHeroStrategy
         if (_skill.DOTA2判断技能是否CD(Keys.R))
             return await Task.FromResult(true).ConfigureAwait(true);
         _main._聚合.Skills.SetTime(SlotKey.R, -1);
-        _input.Press(VirtualKey.From(Keys.A));
+        走A();
         return await Task.FromResult(false).ConfigureAwait(true);
     }
 }

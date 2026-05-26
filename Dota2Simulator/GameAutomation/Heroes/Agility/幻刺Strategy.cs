@@ -16,7 +16,7 @@ public sealed partial class 幻刺Strategy : IHeroStrategy
     protected override HeroPlan BuildPlan() => HeroPlanBuilder.New()
         .OnKey(Keys.F1).WhenHasAghanim().AdjustLegSwap(Keys.D, true)
         .OnKey(Keys.Q).CastSkill(Keys.Q).AfterCast()
-        .OnKey(Keys.W).Pre(() => _input.Press(VirtualKey.From(Keys.A))).CastSkill(Keys.W).AfterEnterCD()
+        .OnKey(Keys.W).Pre(() => 走A()).CastSkill(Keys.W).AfterEnterCD()
         .OnKey(Keys.E).CastSkill(Keys.E).AfterEnterCD(continueAttack: false)
         .OnKey(Keys.D).WhenHasAghanim().CastSkill(Keys.D).AfterEnterCD()
         .OnKey(Keys.D2).Execute(() =>

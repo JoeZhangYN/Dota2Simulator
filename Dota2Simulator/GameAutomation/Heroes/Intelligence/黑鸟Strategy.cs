@@ -15,13 +15,13 @@ namespace Dota2Simulator.GameAutomation.Heroes.Intelligence;
 public sealed partial class 黑鸟Strategy : IHeroStrategy
 {
     protected override HeroPlan BuildPlan() => HeroPlanBuilder.New()
-        .OnKey(Keys.D).Pre(() => _input.Press(VirtualKey.From(Keys.W))).CustomProbe(async () =>
+        .OnKey(Keys.D).Pre(() => Press(Keys.W)).CustomProbe(async () =>
         {
             if (_skill.DOTA2判断技能是否CD(Keys.R))
             {
                 return await Task.FromResult(true).ConfigureAwait(true);
             }
-            _input.Press(VirtualKey.From(Keys.A));
+            走A();
             return await Task.FromResult(false).ConfigureAwait(true);
         })
         .OnKey(Keys.R).CustomProbe(async () =>

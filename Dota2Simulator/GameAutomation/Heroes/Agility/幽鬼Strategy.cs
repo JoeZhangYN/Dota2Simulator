@@ -24,7 +24,7 @@ public sealed partial class 幽鬼Strategy : IHeroStrategy
         {
             if (_main._聚合.Skills.Mode(SlotKey.F) == 1)
             {
-                _input.Press(VirtualKey.From(Keys.D));
+                Press(Keys.D);
             }
         })
         .OnKey(Keys.D).CastSkill(Keys.D).AfterEnterCDDo(() =>
@@ -41,7 +41,7 @@ public sealed partial class 幽鬼Strategy : IHeroStrategy
                     Dota2_Pictrue.物品.血棘_Tpl);
             }
             _item.要求保持假腿();
-            _input.Press(VirtualKey.From(Keys.A));
+            走A();
         })
         .OnKey(Keys.E).CastSkill(Keys.E).AfterEnterCD()
         .OnKey(Keys.D2).Execute(() =>
@@ -56,7 +56,7 @@ public sealed partial class 幽鬼Strategy : IHeroStrategy
     {
         Common.Delay(140);
         _input.KeyDown(VirtualKey.From(Keys.Control));
-        _input.Press(VirtualKey.From(Keys.A));
+        走A();
         _input.KeyUp(VirtualKey.From(Keys.Control));
     }
 }

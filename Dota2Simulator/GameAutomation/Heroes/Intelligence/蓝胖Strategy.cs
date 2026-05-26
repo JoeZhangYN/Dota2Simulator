@@ -40,7 +40,7 @@ public sealed partial class 蓝胖Strategy : IHeroStrategy
             return await Task.FromResult(true).ConfigureAwait(true);
         switch (_main._聚合.Skills.Mode(SlotKey.W))
         {
-            case 1: _input.Press(VirtualKey.From(Keys.Q)); break;
+            case 1: Press(Keys.Q); break;
             default: _input.MouseClick(MouseButton.Right); break;
         }
         return await Task.FromResult(false).ConfigureAwait(true);

@@ -21,7 +21,7 @@ public sealed partial class 哈斯卡Strategy : IHeroStrategy
             {
                 return;
             }
-            _input.Press(VirtualKey.From(Keys.A));
+            走A();
         })
         .LegSwap(Keys.E, alwaysSwap: false)
         .Done();

@@ -21,7 +21,7 @@ public sealed partial class 孽主Strategy : IHeroStrategy
             {
                 return;
             }
-            _input.Press(VirtualKey.From(Keys.A));
+            走A();
         })
         .Done();
 }

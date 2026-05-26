@@ -25,7 +25,7 @@ public sealed partial class 蓝猫Strategy : IHeroStrategy
     private void 残影接平A()
     {
         Common.Delay(等待延迟);
-        _input.Press(VirtualKey.From(Keys.A));
+        走A();
     }
 }
 #endif

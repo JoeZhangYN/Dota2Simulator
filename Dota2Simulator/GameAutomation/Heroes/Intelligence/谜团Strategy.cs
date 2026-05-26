@@ -21,13 +21,13 @@ public sealed partial class 谜团Strategy : IHeroStrategy
 
     private void 刷新接凋零黑洞()
     {
-        _input.Press(VirtualKey.From(Keys.X));
+        Press(Keys.X);
         for (int i = 0; i < 2; i++)
         {
             Common.Delay(等待延迟);
-            _input.Press(VirtualKey.From(Keys.Z));
-            _input.Press(VirtualKey.From(Keys.V));
-            _input.Press(VirtualKey.From(Keys.R));
+            Press(Keys.Z);
+            Press(Keys.V);
+            Press(Keys.R);
         }
     }
 }

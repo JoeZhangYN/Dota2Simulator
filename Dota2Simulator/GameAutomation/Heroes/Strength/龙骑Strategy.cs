@@ -20,7 +20,7 @@ public sealed partial class 龙骑Strategy : IHeroStrategy
         .OnKey(Keys.Q).CastSkill(Keys.Q).AfterCast()
         .OnKey(Keys.W).CastSkill(Keys.W).AfterEnterCDDo(() =>
         {
-            _input.Press(VirtualKey.From(Keys.A));
+            走A();
             _ = _main._聚合.Skills.Mode(SlotKey.W) == 1 && _main._聚合.HasShard ? _skill.DOTA2释放CD就绪技能(Keys.D) : _skill.DOTA2释放CD就绪技能(Keys.Q);
             _item.要求保持假腿();
         })

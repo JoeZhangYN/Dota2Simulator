@@ -25,7 +25,7 @@ public sealed partial class 船长Strategy : IHeroStrategy
         .OnKey(Keys.D2).Execute(() =>
         {
             _main._聚合.Skills.SetStep(SlotKey.R, 1);
-            _input.Press(VirtualKey.From(Keys.E));
+            Press(Keys.E);
         })
         .RegisterProbe(ConditionSlotKey.C3, x2次释放后)
         .RegisterProbe(ConditionSlotKey.C4, 立即释放洪流)
@@ -41,7 +41,7 @@ public sealed partial class 船长Strategy : IHeroStrategy
             {
                 Common.Delay(1350, _main._聚合.Skills.Time(SlotKey.Q));
                 _main._聚合.Conditions[ConditionSlotKey.C4].Active = false;
-                _input.Press(VirtualKey.From(Keys.E));
+                Press(Keys.E);
             }
         }).ConfigureAwait(true);
     }
@@ -55,7 +55,7 @@ public sealed partial class 船长Strategy : IHeroStrategy
             _main._聚合.Skills.SetTime(SlotKey.E, Common.获取当前时间毫秒());
             if (_main._聚合.Skills.Step(SlotKey.R) == 1)
             {
-                _input.Press(VirtualKey.From(Keys.R));
+                Press(Keys.R);
                 _main._聚合.Skills.SetStep(SlotKey.R, 0);
             }
             lock (_全局模式e_lock)
@@ -83,7 +83,7 @@ public sealed partial class 船长Strategy : IHeroStrategy
 
     private async Task<bool> 立即释放洪流()
     {
-        return await _skill.主动技能已就绪后续(Keys.Q, () => _input.Press(VirtualKey.From(Keys.Q))).ConfigureAwait(true);
+        return await _skill.主动技能已就绪后续(Keys.Q, () => Press(Keys.Q)).ConfigureAwait(true);
     }
 }
 #endif

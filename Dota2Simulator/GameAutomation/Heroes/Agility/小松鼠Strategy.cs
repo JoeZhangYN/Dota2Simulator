@@ -19,7 +19,7 @@ public sealed partial class 小松鼠Strategy : IHeroStrategy
         {
             if (_main._聚合.Skills.Mode(SlotKey.W) == 1)
             {
-                _input.Press(VirtualKey.From(Keys.W));
+                Press(Keys.W);
             }
             else
             {
@@ -30,7 +30,7 @@ public sealed partial class 小松鼠Strategy : IHeroStrategy
         {
             if (_main._聚合.Skills.Mode(SlotKey.E) == 1)
             {
-                _input.Press(VirtualKey.From(Keys.Q));
+                Press(Keys.Q);
             }
             else
             {

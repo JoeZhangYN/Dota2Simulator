@@ -63,7 +63,7 @@ public sealed partial class 骨法Strategy : IHeroStrategy
             if (_main._聚合.Skills.Step(SlotKey.R) == 0)
             {
                 if (_main._聚合.Skills.Mode(SlotKey.R) == 1)
-                    _input.Press(VirtualKey.From(Keys.W));
+                    Press(Keys.W);
                 _main._聚合.Skills.SetStep(SlotKey.R, 1);
                 return await Task.FromResult(true).ConfigureAwait(true);
             }
@@ -81,7 +81,7 @@ public sealed partial class 骨法Strategy : IHeroStrategy
                 if (!_skill.DOTA2判断是否持续施法())
                 {
                     _main._聚合.Skills.SetStep(SlotKey.R, 0);
-                    _input.Press(VirtualKey.From(Keys.A));
+                    走A();
                     return await Task.FromResult(false).ConfigureAwait(true);
                 }
                 return await Task.FromResult(true).ConfigureAwait(true);

@@ -26,7 +26,7 @@ public sealed partial class 飞机Strategy : IHeroStrategy
         if (Common.获取当前时间毫秒() - _main._聚合.Skills.Time(SlotKey.Q) > 400)
             await _skill.主动技能已就绪后续(Keys.Q, () =>
             {
-                _input.Press(VirtualKey.From(Keys.Q));
+                Press(Keys.Q);
                 _main._聚合.Skills.SetTime(SlotKey.Q, Common.获取当前时间毫秒());
             }).ConfigureAwait(true);
 

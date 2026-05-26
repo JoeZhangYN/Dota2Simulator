@@ -23,7 +23,7 @@ public sealed partial class 火女Strategy : IHeroStrategy
     {
         if (_skill.DOTA2判断技能是否CD(skillKey))
             return await Task.FromResult(true).ConfigureAwait(true);
-        _input.Press(VirtualKey.From(Keys.A));
+        走A();
         return await Task.FromResult(false).ConfigureAwait(true);
     }
 }

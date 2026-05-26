@@ -18,7 +18,7 @@ public sealed partial class 巫医Strategy : IHeroStrategy
         .OnKey(Keys.Q).CastSkill(Keys.Q).AfterCast(continueKey: Keys.E)
         .OnKey(Keys.E).CastSkill(Keys.E).AfterCastDo(() =>
         {
-            _input.Press(VirtualKey.From(Keys.A));
+            走A();
             _ = _item.根据图片使用物品(Dota2_Pictrue.物品.魂之灵龛_Tpl);
             _ = _item.根据图片使用物品(Dota2_Pictrue.物品.影之灵龛_Tpl);
         })

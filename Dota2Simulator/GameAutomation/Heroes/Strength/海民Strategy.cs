@@ -83,7 +83,7 @@ public sealed partial class 海民Strategy : IHeroStrategy
             {
                 Common.Delay(33);
                 _input.MouseMoveTo(new ScreenPoint(p.X, p.Y - 60 * i));
-                _input.Press(VirtualKey.From(Keys.W));
+                Press(Keys.W);
             }
             _ = Task.Run(() =>
             {
@@ -98,7 +98,7 @@ public sealed partial class 海民Strategy : IHeroStrategy
                 Common.Delay(100);
                 _input.KeyUp(VirtualKey.From(Keys.D));
                 Common.Delay(600);
-                _input.Press(VirtualKey.From(Keys.W));
+                Press(Keys.W);
             });
         }).ConfigureAwait(true);
     }

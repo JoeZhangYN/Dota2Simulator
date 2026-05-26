@@ -40,7 +40,7 @@ public sealed partial class 光法Strategy : IHeroStrategy
             _ = Task.Run(() =>
             {
                 Common.Delay(2700);
-                _input.Press(VirtualKey.From(Keys.Q));
+                Press(Keys.Q);
             }).ConfigureAwait(false);
             return true;
         })

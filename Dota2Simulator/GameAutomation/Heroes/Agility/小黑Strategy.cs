@@ -57,7 +57,7 @@ public sealed partial class 小黑Strategy : IHeroStrategy
         .OnKey(Keys.E).CastSkill(Keys.E).AfterEnterCDDo(() =>
         {
             Common.Delay(_main._聚合.Skills.Mode(SlotKey.E) == 1 ? 2600 : 1300);
-            _input.Press(VirtualKey.From(Keys.S));
+            Press(Keys.S);
             _skill.通用技能后续动作();
             if (_main._聚合.Skills.Mode(SlotKey.Global) == 1)
             {

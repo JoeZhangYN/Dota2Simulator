@@ -40,7 +40,7 @@ public sealed partial class 测试Strategy : IHeroStrategy
         {
             if (text.Contains(kvp.Key))
             {
-                _input.Press(VirtualKey.From(kvp.Value));
+                Press(kvp.Value);
                 break;
             }
         }

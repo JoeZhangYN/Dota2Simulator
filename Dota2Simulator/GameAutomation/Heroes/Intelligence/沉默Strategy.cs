@@ -43,15 +43,15 @@ public sealed partial class 沉默Strategy : IHeroStrategy
             {
                 case < 1:
                     _ = await 大招前纷争().ConfigureAwait(true);
-                    _input.Press(VirtualKey.From(Keys.E));
+                    Press(Keys.E);
                     break;
                 case 1:
                     _ = await 大招前纷争().ConfigureAwait(true);
                     Common.Delay(1300);
-                    _input.Press(VirtualKey.From(Keys.E));
+                    Press(Keys.E);
                     break;
                 case 2:
-                    _input.Press(VirtualKey.From(Keys.A));
+                    走A();
                     break;
             }
         }
@@ -72,7 +72,7 @@ public sealed partial class 沉默Strategy : IHeroStrategy
         void 全领域沉默后()
         {
             _main._聚合.Skills.SetTime(SlotKey.R, -1);
-            _input.Press(VirtualKey.From(Keys.A));
+            走A();
         }
 
         if (Common.获取当前时间毫秒() - _main._聚合.Skills.Time(SlotKey.R) > 1200 && _main._聚合.Skills.Time(SlotKey.R) != -1)

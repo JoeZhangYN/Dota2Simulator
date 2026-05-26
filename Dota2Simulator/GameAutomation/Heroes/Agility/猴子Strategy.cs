@@ -30,7 +30,7 @@ public sealed partial class 猴子Strategy : IHeroStrategy
         if (key == VirtualKey.Q || key == VirtualKey.W || key == VirtualKey.R)
         {
             if (!_skill.DOTA2判断状态技能是否启动(Keys.E))
-                _input.Press(VirtualKey.From(Keys.E));
+                Press(Keys.E);
         }
 
         if (key == VirtualKey.Q)
@@ -45,10 +45,10 @@ public sealed partial class 猴子Strategy : IHeroStrategy
         return await _skill.主动技能释放后续(Keys.W, () =>
         {
             Common.Delay(1000);
-            _input.Press(VirtualKey.From(Keys.D1));
+            Press(Keys.D1);
             Common.Delay(33);
             _input.MouseClick(MouseButton.Right);
-            _input.Press(VirtualKey.From(Keys.F1));
+            Press(Keys.F1);
             _item.要求保持假腿();
         }).ConfigureAwait(true);
     }

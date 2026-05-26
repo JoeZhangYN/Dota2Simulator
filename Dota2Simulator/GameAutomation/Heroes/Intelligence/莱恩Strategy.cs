@@ -35,11 +35,11 @@ public sealed partial class 莱恩Strategy : IHeroStrategy
         {
             if (_main._聚合.Conditions[ConditionSlotKey.C6].Active)
             {
-                _input.Press(VirtualKey.From(Keys.E));
+                Press(Keys.E);
             }
             else
             {
-                _input.Press(VirtualKey.From(Keys.A));
+                走A();
             }
         }
 
@@ -58,7 +58,7 @@ public sealed partial class 莱恩Strategy : IHeroStrategy
         {
             return await Task.FromResult(true).ConfigureAwait(true);
         }
-        _input.Press(VirtualKey.From(Keys.A));
+        走A();
         return await Task.FromResult(false).ConfigureAwait(true);
     }
 
@@ -83,7 +83,7 @@ public sealed partial class 莱恩Strategy : IHeroStrategy
             Common.Delay(等待延迟);
             return await Task.FromResult(true).ConfigureAwait(true);
         }
-        _input.Press(VirtualKey.From(Keys.W));
+        Press(Keys.W);
         return await Task.FromResult(false).ConfigureAwait(true);
     }
 
@@ -97,13 +97,13 @@ public sealed partial class 莱恩Strategy : IHeroStrategy
             if (_item.根据图片使用物品(Dota2_Pictrue.物品.魂戒_Tpl) == 1) return await Task.FromResult(true).ConfigureAwait(true);
             if (_skill.DOTA2判断技能是否CD(Keys.Q))
             {
-                _input.Press(VirtualKey.From(Keys.Q));
+                Press(Keys.Q);
                 Common.Delay(60);
                 return await Task.FromResult(true).ConfigureAwait(true);
             }
             if (_skill.DOTA2判断技能是否CD(Keys.R))
             {
-                _input.Press(VirtualKey.From(Keys.R));
+                Press(Keys.R);
                 Common.Delay(60);
                 return await Task.FromResult(true).ConfigureAwait(true);
             }
@@ -114,13 +114,13 @@ public sealed partial class 莱恩Strategy : IHeroStrategy
             if (_item.根据图片使用物品(Dota2_Pictrue.物品.跳刀_智力跳刀_Tpl) == 1) return await Task.FromResult(true).ConfigureAwait(true);
             if (_skill.DOTA2判断技能是否CD(Keys.W))
             {
-                _input.Press(VirtualKey.From(Keys.W));
+                Press(Keys.W);
                 Common.Delay(等待延迟);
                 return await Task.FromResult(true).ConfigureAwait(true);
             }
             if (_skill.DOTA2判断技能是否CD(Keys.Q))
             {
-                _input.Press(VirtualKey.From(Keys.Q));
+                Press(Keys.Q);
                 Common.Delay(60);
                 return await Task.FromResult(true).ConfigureAwait(true);
             }
@@ -128,7 +128,7 @@ public sealed partial class 莱恩Strategy : IHeroStrategy
             if (_item.根据图片使用物品(Dota2_Pictrue.物品.魂戒_Tpl) == 1) return await Task.FromResult(true).ConfigureAwait(true);
             if (_skill.DOTA2判断技能是否CD(Keys.R))
             {
-                _input.Press(VirtualKey.From(Keys.R));
+                Press(Keys.R);
                 Common.Delay(60);
                 return await Task.FromResult(true).ConfigureAwait(true);
             }

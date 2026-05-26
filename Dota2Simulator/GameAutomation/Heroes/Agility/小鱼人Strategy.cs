@@ -39,7 +39,7 @@ public sealed partial class 小鱼人Strategy : IHeroStrategy
             Common.Delay(33);
             _input.KeyUp(VirtualKey.From(Keys.L));
             Common.Delay(110);
-            _input.Press(VirtualKey.From(Keys.W));
+            Press(Keys.W);
         })
         .Done();
 }
