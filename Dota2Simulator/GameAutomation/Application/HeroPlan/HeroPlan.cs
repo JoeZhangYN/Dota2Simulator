@@ -55,8 +55,11 @@ public readonly record struct HeroPlanClause(
     Action? PostActionSync = null,
     Func<Task>? PostActionAsync = null);
 
-/// <summary>假腿配置条目 (按键 → alwaysSwap 标志, OnActivate 时一次性应用).</summary>
-public readonly record struct LegSwapEntry(Keys Key, bool AlwaysSwap);
+/// <summary>
+/// 假腿配置条目 (按键 → alwaysSwap 标志, OnActivate 时一次性应用).
+/// Phase 20C: 加 <see cref="Attribute"/> 可选第三参 — null 时走 LegSwapState.修改配置 默认 "智力"; 非 null 时显式覆盖 (猴子 "力量").
+/// </summary>
+public readonly record struct LegSwapEntry(Keys Key, bool AlwaysSwap, string? Attribute = null);
 
 /// <summary>
 /// 按键触发 + Guard 的副作用 (运行期, 非 OnActivate 一次性) —— 支持:
@@ -104,6 +107,9 @@ public sealed class HeroPlan
     private readonly ImmutableArray<(ConditionSlotKey Slot, ConditionDelegateBitmap Probe)> _registeredProbes;
     private readonly ConditionDelegateBitmap? _stoneProbe;
     private readonly int? _repeatThreshold;
+    // Phase 20C: OnActivate 一次性聚合配置 — 替代 4 hero override OnActivate 设 Attack.基础攻击前摇/间隔; 1 hero (军团) InitSkillStep(Global, -1).
+    private readonly (double PreDelay, double Interval)? _attackTiming;
+    private readonly ImmutableArray<(Domain.Loop.SlotKey Slot, int Value)> _initSkillSteps;
 
     internal HeroPlan(
         ImmutableArray<HeroPlanClause> clauses,
@@ -111,7 +117,9 @@ public sealed class HeroPlan
         ImmutableArray<SetupAction> setups,
         ImmutableArray<(ConditionSlotKey, ConditionDelegateBitmap)> registeredProbes,
         ConditionDelegateBitmap? stoneProbe,
-        int? repeatThreshold)
+        int? repeatThreshold,
+        (double PreDelay, double Interval)? attackTiming,
+        ImmutableArray<(Domain.Loop.SlotKey, int)> initSkillSteps)
     {
         if (clauses.Length > 9)
         {
@@ -124,6 +132,8 @@ public sealed class HeroPlan
         _registeredProbes = registeredProbes;
         _stoneProbe = stoneProbe;
         _repeatThreshold = repeatThreshold;
+        _attackTiming = attackTiming;
+        _initSkillSteps = initSkillSteps;
     }
 
     /// <summary>子句数 (用于诊断 / 测试).</summary>
@@ -187,7 +197,10 @@ public sealed class HeroPlan
 
         foreach (LegSwapEntry leg in _legSwap)
         {
-            ctx.Aggregate.LegSwap.配置.修改配置(leg.Key, leg.AlwaysSwap);
+            if (leg.Attribute is null)
+                ctx.Aggregate.LegSwap.配置.修改配置(leg.Key, leg.AlwaysSwap);
+            else
+                ctx.Aggregate.LegSwap.配置.修改配置(leg.Key, leg.AlwaysSwap, leg.Attribute);
         }
 
         // Phase 19C: RegisterProbe DSL — 注册到指定 ConditionSlot, 不占 clause 顺序索引. 替代 OnKey(Keys.None).CustomProbe(...) placeholder hack.
@@ -206,6 +219,19 @@ public sealed class HeroPlan
         if (_repeatThreshold.HasValue)
         {
             skill.重复按键执行间隔阈值 = _repeatThreshold.Value;
+        }
+
+        // Phase 20C: OnActivate 一次性 Attack 计时配置 (4 hero: 小骷髅 / 小鱼人 / 戴泽 / 龙骑 等手动设基础攻击前摇/间隔的形态).
+        if (_attackTiming.HasValue)
+        {
+            ctx.Aggregate.Attack.基础攻击前摇 = _attackTiming.Value.PreDelay;
+            ctx.Aggregate.Attack.基础攻击间隔 = _attackTiming.Value.Interval;
+        }
+
+        // Phase 20C: OnActivate 一次性 SkillSlot Step 初始化 (军团 SlotKey.Global = -1; 业务需 Step 状态机起始值的形态).
+        foreach (var (slot, value) in _initSkillSteps)
+        {
+            ctx.Aggregate.Skills.SetStep(slot, value);
         }
     }
 

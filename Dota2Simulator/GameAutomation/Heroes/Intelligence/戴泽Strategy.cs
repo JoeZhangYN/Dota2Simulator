@@ -14,14 +14,8 @@ namespace Dota2Simulator.GameAutomation.Heroes.Intelligence;
 [HeroStrategy("戴泽", HeroAttribute.Intelligence)]
 public sealed partial class 戴泽Strategy : IHeroStrategy
 {
-    public override void OnActivate(HeroContext ctx)
-    {
-        base.OnActivate(ctx);
-        _main._聚合.Attack.基础攻击前摇 = 0.3;
-        _main._聚合.Attack.基础攻击间隔 = 1.7;
-    }
-
     protected override HeroPlan BuildPlan() => HeroPlanBuilder.New()
+        .AttackTiming(preDelay: 0.3, interval: 1.7)
         .OnKey(Keys.Q).Pre(() => _main._聚合.Skills.SetTime(SlotKey.Q, Common.获取当前时间毫秒())).CustomProbe(剧毒之触去后摇)
         .OnKey(Keys.W).Pre(() => _main._聚合.Skills.SetTime(SlotKey.W, Common.获取当前时间毫秒())).CustomProbe(薄葬去后摇)
         .OnKey(Keys.E).Pre(() => _main._聚合.Skills.SetTime(SlotKey.E, Common.获取当前时间毫秒())).CustomProbe(暗影波去后摇)

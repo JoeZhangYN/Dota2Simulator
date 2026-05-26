@@ -13,14 +13,8 @@ namespace Dota2Simulator.GameAutomation.Heroes.Agility;
 [HeroStrategy("小鱼人", HeroAttribute.Agility)]
 public sealed partial class 小鱼人Strategy : IHeroStrategy
 {
-    public override void OnActivate(HeroContext ctx)
-    {
-        base.OnActivate(ctx);
-        _main._聚合.Attack.基础攻击间隔 = 1.7;
-        _main._聚合.Attack.基础攻击前摇 = 0.5;
-    }
-
     protected override HeroPlan BuildPlan() => HeroPlanBuilder.New()
+        .AttackTiming(preDelay: 0.5, interval: 1.7)
         .LegSwap(Keys.E, alwaysSwap: false)
         .OnKey(Keys.F1).WhenHasShard().AdjustLegSwap(Keys.D, paramBool: true)
         .OnKey(Keys.Q).CastSkill(Keys.Q).AfterEnterCD()

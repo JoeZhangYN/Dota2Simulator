@@ -16,16 +16,10 @@ public sealed partial class 猴子Strategy : IHeroStrategy
     protected override HeroPlan BuildPlan() => HeroPlanBuilder.New()
         .LegSwap(Keys.E, alwaysSwap: false)
         .LegSwap(Keys.R, alwaysSwap: false)
+        .LegSwap(Keys.W, alwaysSwap: true, "力量")  // Phase 20C: DSL 三参 LegSwap, 替原 override OnActivate 内 修改配置 第三参
         .OnKey(Keys.Q).CastSkill(Keys.Q).AfterCast()  // C1: 灵魂之矛敏捷
         .OnKey(Keys.W).CustomProbe(神行百变选择幻象)  // C2: 神行百变
         .Done();
-
-    public override void OnActivate(HeroContext ctx)
-    {
-        base.OnActivate(ctx);
-        // W 第三参 "力量" 单独设 (DSL LegSwap 仅 2 参)
-        _main._聚合.LegSwap.配置.修改配置(Keys.W, true, "力量");
-    }
 
     public override async Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)
     {

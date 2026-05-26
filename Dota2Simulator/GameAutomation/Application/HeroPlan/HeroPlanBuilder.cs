@@ -23,6 +23,9 @@ public sealed class HeroPlanBuilder
     private readonly ImmutableArray<SetupAction>.Builder _setups = ImmutableArray.CreateBuilder<SetupAction>();
     private readonly ImmutableArray<(ConditionSlotKey, ConditionDelegateBitmap)>.Builder _registeredProbes = ImmutableArray.CreateBuilder<(ConditionSlotKey, ConditionDelegateBitmap)>();
     private ConditionDelegateBitmap? _stoneProbe;
+    // Phase 20C: 业务级即插即用抽象 — 替代 OnActivate 自定义 body 形态.
+    private (double PreDelay, double Interval)? _attackTiming;
+    private readonly ImmutableArray<(Domain.Loop.SlotKey, int)>.Builder _initSkillSteps = ImmutableArray.CreateBuilder<(Domain.Loop.SlotKey, int)>();
 
     private Keys? _pendingTrigger;
     private Keys? _pendingSkill;
@@ -489,6 +492,17 @@ public sealed class HeroPlanBuilder
     }
 
     /// <summary>
+    /// Phase 20C: LegSwap 三参重载 — 显式指定假腿类型 (LegSwapState.修改配置 默认 "智力", 三参重载支持 "力量" / "敏捷").
+    /// 用于猴子 W 力量假腿等非默认形态.
+    /// </summary>
+    public HeroPlanBuilder LegSwap(Keys key, bool alwaysSwap, string attribute)
+    {
+        if (attribute is null) throw new ArgumentNullException(nameof(attribute));
+        _legSwap.Add(new LegSwapEntry(key, alwaysSwap, attribute));
+        return this;
+    }
+
+    /// <summary>
     /// Phase 19C: 注册一个 Probe 到指定 ConditionSlot, 不占 clause 顺序索引.
     /// 替代 Phase 17 引入的 <c>.OnKey(Keys.None).CustomProbe(probe)</c> placeholder hack.
     /// 使用场景: D3 ToggleConditionSlot 引用的 C{n} 槽需要挂 Probe (大圣 C4 无限跳跃 / 莱恩 C5/C6 / 飞机 C5 / 小精灵 C2/C3 / 等),
@@ -523,6 +537,26 @@ public sealed class HeroPlanBuilder
         return this;
     }
 
+    /// <summary>
+    /// Phase 20C: OnActivate 一次性 Attack 计时配置 — 替代 4 hero (小骷髅 0.4/1.7 / 小鱼人 0.5/1.7 / 戴泽 0.3/1.7 / 龙骑 0.5/1.6 等) override OnActivate 内手动设 _main._聚合.Attack.基础攻击前摇/间隔 的形态.
+    /// Plan.Apply 时一次性写入 ctx.Aggregate.Attack.基础攻击前摇/间隔.
+    /// </summary>
+    public HeroPlanBuilder AttackTiming(double preDelay, double interval)
+    {
+        _attackTiming = (preDelay, interval);
+        return this;
+    }
+
+    /// <summary>
+    /// Phase 20C: OnActivate 一次性 SkillSlot Step 初始化 — 替代 1 hero (军团 SlotKey.Global = -1) override OnActivate 内 Skills.SetStep 的形态.
+    /// 多次调用累加 (不同 slot 不同初值); Plan.Apply 时按声明顺序一次性写入 ctx.Aggregate.Skills.SetStep.
+    /// </summary>
+    public HeroPlanBuilder InitSkillStep(Domain.Loop.SlotKey slot, int value)
+    {
+        _initSkillSteps.Add((slot, value));
+        return this;
+    }
+
     /// <summary>终结整个 Plan, 返回不可变 HeroPlan; 中间态 pending 未终止报错.</summary>
     public HeroPlan Done()
     {
@@ -531,7 +565,7 @@ public sealed class HeroPlanBuilder
             throw new InvalidOperationException(
                 $"Done: pending 状态未终结 (OnKey={_pendingTrigger?.ToString() ?? "null"}, CastSkill={_pendingSkill?.ToString() ?? "null"}, OnEveryKey={_pendingIsOnEveryKey}).");
         }
-        return new HeroPlan(_clauses.ToImmutable(), _legSwap.ToImmutable(), _setups.ToImmutable(), _registeredProbes.ToImmutable(), _stoneProbe, _repeatThreshold);
+        return new HeroPlan(_clauses.ToImmutable(), _legSwap.ToImmutable(), _setups.ToImmutable(), _registeredProbes.ToImmutable(), _stoneProbe, _repeatThreshold, _attackTiming, _initSkillSteps.ToImmutable());
     }
 }
 

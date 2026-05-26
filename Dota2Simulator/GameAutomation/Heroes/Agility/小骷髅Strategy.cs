@@ -15,14 +15,8 @@ namespace Dota2Simulator.GameAutomation.Heroes.Agility;
 [HeroStrategy("小骷髅", HeroAttribute.Agility)]
 public sealed partial class 小骷髅Strategy : IHeroStrategy
 {
-    public override void OnActivate(HeroContext ctx)
-    {
-        base.OnActivate(ctx);
-        _main._聚合.Attack.基础攻击前摇 = 0.4;
-        _main._聚合.Attack.基础攻击间隔 = 1.7;
-    }
-
     protected override HeroPlan BuildPlan() => HeroPlanBuilder.New()
+        .AttackTiming(preDelay: 0.4, interval: 1.7)
         .OnKey(Keys.F1).WhenHasShard().Execute(() => _main._聚合.LegSwap.配置.修改配置(Keys.D, true, "敏捷"))
         .OnKey(Keys.F1).WhenHasAghanim().AdjustLegSwap(Keys.F, paramBool: true)
         .OnKey(Keys.Q).CustomProbe(async () => await _skill.主动技能进入CD后续(Keys.Q, () =>
