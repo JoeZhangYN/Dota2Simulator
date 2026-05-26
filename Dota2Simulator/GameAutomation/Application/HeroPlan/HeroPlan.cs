@@ -82,7 +82,10 @@ public readonly record struct HeroPlanClause(
     // Phase 26 B3: 强制 CommandAcked — clause 命中后需 Ack 才推进; 当前为标记字段, 业务消费者 (Engine wrap) 决定语义. 默认 false 向后兼容.
     bool RequireAck = false,
     // Phase 26 D3: 延迟入队 condition — 非 null 时 clause 命中后不直发, 而是 DeferredQueue.Enqueue, ControlObservable 状态变化 + condition 满足时由 FlushAsync 出队执行.
-    Func<HeroContext, bool>? QueueWhen = null);
+    Func<HeroContext, bool>? QueueWhen = null,
+    // Phase 26 A3: 不应期 DSL — RefractoryName 非空时 DispatchAsync 路径: clause 触发前 check IsRefractory(name) → 真则短路; 命中后 SetRefractory(name, ms).
+    string? RefractoryName = null,
+    int RefractoryMs = 0);
 
 /// <summary>
 /// 假腿配置条目 (按键 → alwaysSwap 标志, OnActivate 时一次性应用).
@@ -115,7 +118,10 @@ public readonly record struct SetupAction(
     Action? PreActionSync = null,
     Func<Task>? PreActionAsync = null,
     // Phase 25A C1: SetupAction 通用谓词 Guard — 与 enum Guard 互斥 (predicate 非空优先). 修旧 bug: 终结方法之前丢弃 _pendingGuardPredicate (海民 E WhenStoneChoiceEq.SetActive 形态需要).
-    Func<HeroContext, bool>? GuardPredicate = null);
+    Func<HeroContext, bool>? GuardPredicate = null,
+    // Phase 26 A3: 不应期 DSL (与 HeroPlanClause 对称) — RefractoryName 非空时 DispatchAsync 路径: setup 触发前 check IsRefractory(name) 短路; 命中后 SetRefractory(name, ms).
+    string? RefractoryName = null,
+    int RefractoryMs = 0);
 
 /// <summary>SetupAction 副作用种类.</summary>
 public enum SetupActionKind
@@ -325,6 +331,12 @@ public sealed class HeroPlan
             // Phase 25A C1: 用 CheckGuardCombined 让 SetupAction 也支持 specialized GuardPredicate (海民 E WhenStoneChoiceEq.SetActive 形态生效).
             if (matchKey && matchMod && CheckGuardCombined(setup.Guard, setup.GuardPredicate, ctx))
             {
+                // Phase 26 A3: setup 不应期短路 — RefractoryName 非空时 check IsRefractory 真则 skip 整 setup.
+                if (setup.RefractoryName is not null && ctx.Aggregate.Refractory.IsRefractory(setup.RefractoryName))
+                {
+                    continue;
+                }
+
                 // Phase 25A C1: SetupAction PreAction (海民 F: WhenStoneChoiceEq(1).Pre(释放 E).SetActive(C3) 形态). async 优先.
                 if (setup.PreActionAsync is not null)
                 {
@@ -357,6 +369,12 @@ public sealed class HeroPlan
                         ctx.Aggregate.Conditions[setup.ParamConditionSlot].Active = true;
                         break;
                 }
+
+                // Phase 26 A3: setup 命中后 SetRefractory — 防短期内同 setup 重入.
+                if (setup.RefractoryName is not null && setup.RefractoryMs > 0)
+                {
+                    ctx.Aggregate.Refractory.SetRefractory(setup.RefractoryName, setup.RefractoryMs);
+                }
             }
         }
 
@@ -366,6 +384,12 @@ public sealed class HeroPlan
         {
             if (_clauses[i].TriggerKey == key && _clauses[i].Modifiers == trigger.Modifiers && CheckGuardCombined(_clauses[i].Guard, _clauses[i].GuardPredicate, ctx))
             {
+                // Phase 26 A3: clause 不应期短路 — RefractoryName 非空时 check IsRefractory 真则 skip 整 clause.
+                if (_clauses[i].RefractoryName is not null && ctx.Aggregate.Refractory.IsRefractory(_clauses[i].RefractoryName!))
+                {
+                    return;
+                }
+
                 // PreAction (Active 设置前的副作用 — 例: _input.Press(A) 后再 Active 释放技能).
                 if (_clauses[i].PreActionAsync is not null)
                 {
@@ -399,6 +423,12 @@ public sealed class HeroPlan
                 else
                 {
                     _clauses[i].PostActionSync?.Invoke();
+                }
+
+                // Phase 26 A3: clause 命中后 SetRefractory — 防短期内同 clause 重入.
+                if (_clauses[i].RefractoryName is not null && _clauses[i].RefractoryMs > 0)
+                {
+                    ctx.Aggregate.Refractory.SetRefractory(_clauses[i].RefractoryName!, _clauses[i].RefractoryMs);
                 }
                 return;
             }

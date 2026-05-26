@@ -291,6 +291,33 @@ public sealed class HeroPlanBuilder
     }
 
     /// <summary>
+    /// Phase 26 A3 (2026-05-26): clause / setup 不应期声明 — chain 修饰刚终结的 clause 或 setup.
+    /// DispatchAsync 路径: 命中前 check <c>IsRefractory(name)</c> → 真则短路; 命中后 <c>SetRefractory(name, ms)</c>.
+    /// 用于 Strategy 显式声明不应期 (如未来 SkillCD / BuffWindow / ChannelLock 共享 Refractory 模型), 不需手改 Engine.
+    /// 例: <c>.OnKey(R).CastSkill(R).AfterCast().WithRefractory("天怒大招", 400)</c> — 天怒大招按下后 400ms 内同键再按短路.
+    /// 优先修饰最后入队的 clause; 若 0 clause 但有 setup, 修饰最后 setup.
+    /// </summary>
+    public HeroPlanBuilder WithRefractory(string name, int ms)
+    {
+        if (string.IsNullOrEmpty(name)) throw new ArgumentException("WithRefractory: name 不能为空.", nameof(name));
+        if (ms <= 0) throw new ArgumentOutOfRangeException(nameof(ms), "WithRefractory: ms 必须 > 0.");
+
+        if (_clauses.Count > 0)
+        {
+            int lastIdx = _clauses.Count - 1;
+            _clauses[lastIdx] = _clauses[lastIdx] with { RefractoryName = name, RefractoryMs = ms };
+            return this;
+        }
+        if (_setups.Count > 0)
+        {
+            int lastIdx = _setups.Count - 1;
+            _setups[lastIdx] = _setups[lastIdx] with { RefractoryName = name, RefractoryMs = ms };
+            return this;
+        }
+        throw new InvalidOperationException("WithRefractory: 需先终结一个 clause 或 setup.");
+    }
+
+    /// <summary>
     /// 终结 OnKey 链为 ExecuteAction SetupAction — 任意 lambda 副作用 (不挂 ConditionSlot, 不挂 Probe).
     /// 例: <c>.OnKey(D2).Execute(() => { _aggregate.Skills.SetMode(W, 1); TTS.Speak("..."); })</c>
     /// 用于 D2 SetMode + TTS 形态 (幻刺) / W 直接 _item 副作用 (黑鸟).
