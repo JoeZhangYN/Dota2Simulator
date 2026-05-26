@@ -19,22 +19,15 @@ public sealed partial class 伐木机Strategy : IHeroStrategy
 {
     private static readonly Rectangle 命石区域 = new(738, 945, 70, 26);
 
+    // Phase 21A: D 键 short-circuit (Stone.Choice != 2 跳过) 改用 WhenStoneChoiceEq DSL Guard, 删 override OnKeyAsync.
     protected override HeroPlan BuildPlan() => HeroPlanBuilder.New()
         .OnKey(Keys.Q).CastSkill(Keys.Q).AfterEnterCD()  // C1: 死亡旋风
         .OnKey(Keys.W).CastSkill(Keys.W).AfterCast()  // C2: 伐木聚链
-        .OnKey(Keys.D).CastSkill(Keys.D).AfterCast()  // C3: 锯齿轮旋 (业务侧 D 键 StoneChoice==2 Guard, override OnKeyAsync 短路)
+        .OnKey(Keys.D).WhenStoneChoiceEq(2).CastSkill(Keys.D).AfterCast()  // C3: 锯齿轮旋 (Phase 21A: WhenStoneChoiceEq Guard 替原 override 短路)
         .OnKey(Keys.F).CastSkill(Keys.F).AfterEnterCD()  // C4: 喷火装置
         .OnKey(Keys.R).CustomProbe(锯齿飞轮去后摇)  // C5: 锯齿飞轮 (释放技能后替换图标技能后续 lambda)
         .RegisterStoneProbe(伐木机获取命石)  // Phase 19G-4 RegisterStoneProbe DSL
         .Done();
-
-    public override async Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)
-    {
-        // D 键短路 - 仅 StoneChoice==2 时才走 base BuildPlan dispatch (设 C3 Active).
-        if (trigger.Key == VirtualKey.D && _main._聚合.Stone.Choice != 2)
-            return;
-        await base.OnKeyAsync(trigger, ctx).ConfigureAwait(true);
-    }
 
     private async Task<bool> 伐木机获取命石()
     {

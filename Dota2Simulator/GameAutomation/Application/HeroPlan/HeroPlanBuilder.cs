@@ -30,6 +30,8 @@ public sealed class HeroPlanBuilder
     private Keys? _pendingTrigger;
     private Keys? _pendingSkill;
     private AggGuard _pendingGuard = AggGuard.None;
+    // Phase 21A: 通用谓词 Guard — 与 _pendingGuard enum 互斥 (predicate 非 null 优先). 用于 SkillStep / StoneChoice 等多值状态的 specialized Guard.
+    private Func<HeroContext, bool>? _pendingGuardPredicate;
     private Action? _pendingPreActionSync;
     private Func<Task>? _pendingPreActionAsync;
     private int? _repeatThreshold;
@@ -60,6 +62,7 @@ public sealed class HeroPlanBuilder
         _pendingTrigger = triggerKey;
         _pendingModifiers = Domain.Actuation.KeyModifiers.None;
         _pendingGuard = AggGuard.None;
+        _pendingGuardPredicate = null;  // Phase 21A defensive reset
         return this;
     }
 
@@ -77,6 +80,7 @@ public sealed class HeroPlanBuilder
         _pendingTrigger = triggerKey;
         _pendingModifiers = modifiers;
         _pendingGuard = AggGuard.None;
+        _pendingGuardPredicate = null;  // Phase 21A defensive reset
         return this;
     }
 
@@ -93,6 +97,7 @@ public sealed class HeroPlanBuilder
         }
         _pendingIsOnEveryKey = true;
         _pendingGuard = AggGuard.None;
+        _pendingGuardPredicate = null;  // Phase 21A defensive reset
         return this;
     }
 
@@ -148,6 +153,56 @@ public sealed class HeroPlanBuilder
             throw new InvalidOperationException("WhenNotHasShard: 需先调 OnKey 或 OnEveryKey.");
         }
         _pendingGuard = AggGuard.NotHasShard;
+        return this;
+    }
+
+    /// <summary>
+    /// Phase 21A: specialized Guard — 该 clause 仅当指定 SkillSlot.Step == 指定值时触发.
+    /// 替原 override OnKeyAsync 短路形态 (船长 E 键 Step(E)==1 跳过 dispatch).
+    /// </summary>
+    public HeroPlanBuilder WhenStepEq(Domain.Loop.SlotKey slot, int value)
+    {
+        if (_pendingTrigger is null && !_pendingIsOnEveryKey)
+        {
+            throw new InvalidOperationException("WhenStepEq: 需先调 OnKey 或 OnEveryKey.");
+        }
+        _pendingGuardPredicate = (HeroContext ctx) => ctx.Aggregate.Skills.Step(slot) == value;
+        return this;
+    }
+
+    /// <summary>Phase 21A: specialized Guard — 反向 — 该 clause 仅当指定 SkillSlot.Step != 指定值时触发.</summary>
+    public HeroPlanBuilder WhenStepNotEq(Domain.Loop.SlotKey slot, int value)
+    {
+        if (_pendingTrigger is null && !_pendingIsOnEveryKey)
+        {
+            throw new InvalidOperationException("WhenStepNotEq: 需先调 OnKey 或 OnEveryKey.");
+        }
+        _pendingGuardPredicate = ctx => ctx.Aggregate.Skills.Step(slot) != value;
+        return this;
+    }
+
+    /// <summary>
+    /// Phase 21A: specialized Guard — 该 clause 仅当 StoneState.Choice == 指定值时触发.
+    /// 替原 override OnKeyAsync 短路形态 (伐木机 D 键 Stone.Choice != 2 跳过 dispatch).
+    /// </summary>
+    public HeroPlanBuilder WhenStoneChoiceEq(int value)
+    {
+        if (_pendingTrigger is null && !_pendingIsOnEveryKey)
+        {
+            throw new InvalidOperationException("WhenStoneChoiceEq: 需先调 OnKey 或 OnEveryKey.");
+        }
+        _pendingGuardPredicate = ctx => ctx.Aggregate.Stone.Choice == value;
+        return this;
+    }
+
+    /// <summary>Phase 21A: specialized Guard — 反向 — 该 clause 仅当 StoneState.Choice != 指定值时触发.</summary>
+    public HeroPlanBuilder WhenStoneChoiceNotEq(int value)
+    {
+        if (_pendingTrigger is null && !_pendingIsOnEveryKey)
+        {
+            throw new InvalidOperationException("WhenStoneChoiceNotEq: 需先调 OnKey 或 OnEveryKey.");
+        }
+        _pendingGuardPredicate = ctx => ctx.Aggregate.Stone.Choice != value;
         return this;
     }
 
@@ -303,6 +358,7 @@ public sealed class HeroPlanBuilder
         _pendingTrigger = null;
         _pendingSkill = null;
         _pendingGuard = AggGuard.None;
+        _pendingGuardPredicate = null;  // Phase 21A
         _pendingPreActionSync = null;
         _pendingPreActionAsync = null;
         _pendingIsOnEveryKey = false;
@@ -389,7 +445,8 @@ public sealed class HeroPlanBuilder
             PreActionAsync: _pendingPreActionAsync,
             Modifiers: _pendingModifiers,
             PostActionSync: _pendingPostActionSync,
-            PostActionAsync: _pendingPostActionAsync));
+            PostActionAsync: _pendingPostActionAsync,
+            GuardPredicate: _pendingGuardPredicate));
 
         _lastClauseTrigger = _pendingTrigger;
         _lastClauseGuard = _pendingGuard;
@@ -453,7 +510,8 @@ public sealed class HeroPlanBuilder
             PreActionAsync: _pendingPreActionAsync,
             Modifiers: _pendingModifiers,
             PostActionSync: _pendingPostActionSync,
-            PostActionAsync: _pendingPostActionAsync));
+            PostActionAsync: _pendingPostActionAsync,
+            GuardPredicate: _pendingGuardPredicate));
 
         _lastClauseTrigger = _pendingTrigger;
         _lastClauseGuard = _pendingGuard;

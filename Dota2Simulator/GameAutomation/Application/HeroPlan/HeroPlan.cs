@@ -53,7 +53,9 @@ public readonly record struct HeroPlanClause(
     Func<Task>? PreActionAsync = null,
     KeyModifiers Modifiers = KeyModifiers.None,
     Action? PostActionSync = null,
-    Func<Task>? PostActionAsync = null);
+    Func<Task>? PostActionAsync = null,
+    // Phase 21A: 通用谓词 Guard — 与 enum Guard 互斥 (非 null 时优先). 用于 SkillStep / StoneChoice 等多值状态的 specialized Guard.
+    Func<HeroContext, bool>? GuardPredicate = null);
 
 /// <summary>
 /// 假腿配置条目 (按键 → alwaysSwap 标志, OnActivate 时一次性应用).
@@ -283,7 +285,7 @@ public sealed class HeroPlan
         // Phase 16 C2: clause.Modifiers 与 trigger.Modifiers 严格等值比对; default None == 裸键, 兼容现有 33 文件零 Modifiers 形态.
         for (int i = 0; i < _clauses.Length; i++)
         {
-            if (_clauses[i].TriggerKey == key && _clauses[i].Modifiers == trigger.Modifiers && CheckGuard(_clauses[i].Guard, ctx))
+            if (_clauses[i].TriggerKey == key && _clauses[i].Modifiers == trigger.Modifiers && CheckGuardCombined(_clauses[i].Guard, _clauses[i].GuardPredicate, ctx))
             {
                 // PreAction (Active 设置前的副作用 — 例: _input.Press(A) 后再 Active 释放技能).
                 if (_clauses[i].PreActionAsync is not null)
@@ -334,6 +336,13 @@ public sealed class HeroPlan
         AggGuard.NotHasShard => !ctx.Aggregate.HasShard,
         _ => true,
     };
+
+    /// <summary>
+    /// Phase 21A: 综合 Guard 检查 — predicate 非空时优先调用 (specialized Guard 如 WhenStepEq/WhenStoneChoiceEq);
+    /// predicate 为 null 时回退 enum Guard. 二者互斥, builder 终结 clause 时保证只一个非默认值.
+    /// </summary>
+    private static bool CheckGuardCombined(AggGuard guard, Func<HeroContext, bool>? predicate, HeroContext ctx)
+        => predicate is not null ? predicate(ctx) : CheckGuard(guard, ctx);
 }
 
 #endif

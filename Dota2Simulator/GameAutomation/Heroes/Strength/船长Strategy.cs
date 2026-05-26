@@ -18,9 +18,10 @@ public sealed partial class 船长Strategy : IHeroStrategy
 {
     private static readonly Lock _全局模式e_lock = new();
 
+    // Phase 21A: E 键 short-circuit (Step(E)==1 跳过) 改用 WhenStepNotEq DSL Guard, 删 override OnKeyAsync.
     protected override HeroPlan BuildPlan() => HeroPlanBuilder.New()
         .OnKey(Keys.Q).CustomProbe(洪流接x回)
-        .OnKey(Keys.E).CustomProbe(x释放后相关逻辑)
+        .OnKey(Keys.E).WhenStepNotEq(SlotKey.E, 1).CustomProbe(x释放后相关逻辑)
         .OnKey(Keys.D2).Execute(() =>
         {
             _main._聚合.Skills.SetStep(SlotKey.R, 1);
@@ -29,14 +30,6 @@ public sealed partial class 船长Strategy : IHeroStrategy
         .RegisterProbe(ConditionSlotKey.C3, x2次释放后)
         .RegisterProbe(ConditionSlotKey.C4, 立即释放洪流)
         .Done();
-
-    public override async Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)
-    {
-        // E 键步骤 1 时跳过 (业务特有 short-circuit, 未走 BuildPlan dispatch).
-        if (trigger.Key == VirtualKey.E && _main._聚合.Skills.Step(SlotKey.E) == 1)
-            return;
-        await base.OnKeyAsync(trigger, ctx).ConfigureAwait(true);
-    }
 
     private async Task<bool> 洪流接x回()
     {
