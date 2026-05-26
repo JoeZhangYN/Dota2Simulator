@@ -28,6 +28,9 @@ public sealed class HeroAggregate
     /// <summary>Phase 20D: 命石子聚合 — 拆出 ConditionSlotSet 内 special-case StoneProbe/StoneChoice 双字段 (polling 语义, 与 event-driven ConditionSlot 区分).</summary>
     public StoneState Stone { get; } = new();
 
+    /// <summary>Phase 26 A1: 不应期子聚合 — 命名不应期 SSOT, 防"按键 atomic 段 + grace period" 期间其他 probe 误触 (切假腿中间态循环根治).</summary>
+    public RefractoryState Refractory { get; } = new();
+
     /// <summary>Phase 8 C3: 当前英雄技能数量（4/5/6）——取代 Skill._技能数量 static。</summary>
     public int SkillCount { get; set; }
 
