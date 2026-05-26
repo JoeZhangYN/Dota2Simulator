@@ -69,6 +69,13 @@ namespace Dota2Simulator.GameAutomation.Application
         internal void BindSilt(Dota2Simulator.Games.Dota2.Silt.SiltEngine silt) => _silt = silt;
 #endif
 
+        // Phase 26 D2: Control Observable — 主循环每帧 Tick 检测控制状态变化, true→false 边缘 fire flush DeferredQueue.
+        // 当前 ControlObservable 内 probe 是 stub (永返 false), 具体 Debuff ROI 检测推迟 Phase 27+; framework 完整.
+        private readonly ControlObservable _controlObservable;
+
+        /// <summary>Phase 26 D2: Control Observable 暴露 — ItemEngine E2 双发送路径根据 CurrentState 决定直发 vs 入 DeferredQueue.</summary>
+        public ControlObservable ControlObservable => _controlObservable;
+
         public HeroLoopHost(
             IInputExecutor input,
             IScreenVision vision,
@@ -85,6 +92,19 @@ namespace Dota2Simulator.GameAutomation.Application
             _session = session;
             _skill = skill;
             _item = item;
+
+            // Phase 26 D2: 订阅 ControlObservable.OnStateChanged — 控制状态 true→false 边缘 (hero 解控瞬间) 调 DeferredQueue.FlushAsync.
+            _controlObservable = new ControlObservable(vision);
+            _controlObservable.OnStateChanged += (before, after) =>
+            {
+                if (before && !after) // 解控边缘 — fire-and-forget flush 不阻塞主循环.
+                {
+                    _ = Task.Run(async () =>
+                    {
+                        await _aggregate.Deferred.FlushAsync(_ => !_controlObservable.CurrentState).ConfigureAwait(false);
+                    });
+                }
+            };
 
             按键匹配条件更新 = new Dictionary<Keys, Action>
             {
@@ -211,6 +231,9 @@ namespace Dota2Simulator.GameAutomation.Application
 
                     // 获取图片数据
                     _循环内获取图片();
+
+                    // Phase 26 D2: 每帧 Tick ControlObservable — 检测控制状态变化, true→false 边缘触发 DeferredQueue.FlushAsync (吹风秒接).
+                    _controlObservable.Tick();
 
                     // 处理命石相关逻辑 (Phase 20D: 迁 Conditions.StoneProbe → Stone.Probe 子聚合)
                     if (_aggregate.Stone.Probe is not null)

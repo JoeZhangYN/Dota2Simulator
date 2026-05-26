@@ -38,7 +38,10 @@ namespace Dota2Simulator.GameAutomation.Application
         private Dota2Simulator.Games.Dota2.Silt.SiltEngine? _silt;
 #endif
 
-        public ItemEngine(IInputExecutor input, IScreenVision vision, IUiInvoker ui, HeroAggregate aggregate, SkillEngine skill, SessionState session)
+        // Phase 26 B2: 命令确认探针 — optional (null 时退化为旧 fire-and-forget 路径). 注入路径: AppContainer wire PixelDiffAckProbe(vision).
+        private readonly ICommandAckProbe? _ackProbe;
+
+        public ItemEngine(IInputExecutor input, IScreenVision vision, IUiInvoker ui, HeroAggregate aggregate, SkillEngine skill, SessionState session, ICommandAckProbe? ackProbe = null)
         {
             _input = input;
             _vision = vision;
@@ -46,6 +49,7 @@ namespace Dota2Simulator.GameAutomation.Application
             _aggregate = aggregate;
             _skill = skill;
             _session = session;
+            _ackProbe = ackProbe;
         }
 
         /// <summary>Phase 11 P3: 由 AppContainer.BindUi 在 HeroLoopHost new 后调用回填. setter 路径一次性装配.</summary>
@@ -510,6 +514,27 @@ namespace Dota2Simulator.GameAutomation.Application
 
         public int 根据图片使用物品(Template 句柄)
         {
+            // Phase 26 E2 双发送路径: lookup ItemCatalog, Blocked 物品 + 当前被控时 → 入 DeferredQueue (等解控 flush 重放); 否则 → 直 Press (Insertable / 未知物品 / Blocked 但未被控).
+            Dota2Simulator.GameAutomation.Domain.Items.ItemDescriptor? desc = Dota2Simulator.GameAutomation.Domain.Items.ItemCatalog.TryGet(句柄.Name);
+            bool isBlockedItem = desc is not null && !desc.IsInsertable;
+            bool isControlled = _host?.ControlObservable.CurrentState ?? false;
+
+            if (isBlockedItem && isControlled)
+            {
+                // Blocked + 被控 → 入队, 解控边缘由 HeroLoopHost FlushAsync 自动按出.
+                Template captured = 句柄;
+                Dota2Simulator.GameAutomation.Domain.DeferredCommand cmd = new(
+                    Name: $"Item:{captured.Name}",
+                    Action: () =>
+                    {
+                        执行物品操作(captured, k => _input.Press(VirtualKey.From(k)));
+                        return Task.CompletedTask;
+                    },
+                    EnqueueTimeMs: Common.获取当前时间毫秒());
+                _aggregate.Deferred.Enqueue(cmd);
+                return 0;
+            }
+
             return 执行物品操作(句柄, (k) => _input.Press(VirtualKey.From(k)));
         }
 
@@ -578,12 +603,39 @@ namespace Dota2Simulator.GameAutomation.Application
             }
 
             Keys k = 根据位置获取按键(位置);
-            if (k != Keys.Escape)
+            if (k == Keys.Escape) return 0;
+
+            // Phase 26 B2: 物品按键不应期短路 — 上次 Ack Failed 触发 500ms Refractory 防"灰图标累积按键".
+            string refractoryKey = $"Item:{k}";
+            if (_aggregate.Refractory.IsRefractory(refractoryKey)) return 0;
+
+            // Phase 26 B2: Press 前 Capture ROI signature (物品图标 62×45 桌面坐标), 用于 fire-and-forget Ack 检测.
+            AckSignature? sig = null;
+            if (_ackProbe is not null)
             {
-                按键操作(k);
-                return 1;
+                ScreenRegion itemRoi = new(位置!.Value.X + GameLayout.OffsetX, 位置.Value.Y + GameLayout.OffsetY, 62, 45);
+                sig = _ackProbe.Capture(itemRoi);
             }
-            return 0;
+
+            按键操作(k);
+
+            // Phase 26 B2: fire-and-forget Ack 检测 — budget 200ms 内 ROI 像素无显著变化即 Failed → 500ms Refractory 防累积按键.
+            if (sig.HasValue && _ackProbe is not null)
+            {
+                AckSignature before = sig.Value;
+                ICommandAckProbe probe = _ackProbe;
+                RefractoryState refractory = _aggregate.Refractory;
+                _ = Task.Run(async () =>
+                {
+                    AckResult result = await probe.WaitForAckAsync(before, 200).ConfigureAwait(false);
+                    if (result == AckResult.Failed)
+                    {
+                        refractory.SetRefractory(refractoryKey, 500);
+                    }
+                });
+            }
+
+            return 1;
         }
 
         private Keys 根据位置获取按键(Point? 位置)

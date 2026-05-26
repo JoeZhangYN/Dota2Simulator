@@ -78,7 +78,11 @@ public readonly record struct HeroPlanClause(
     SkillAfterMode AfterMode = SkillAfterMode.None,
     Action? AfterCustomAction = null,
     // Phase 26 F1: ReplaceIcon DSL — AfterMode = CastReplaceIcon 时存 step SlotKey, Apply 内 wrap 为 SkillEngine.释放技能后替换图标技能后续 调用 (大牛 W / 伐木机 R 形态).
-    Domain.Loop.SlotKey? AfterReplaceIconStepSlot = null);
+    Domain.Loop.SlotKey? AfterReplaceIconStepSlot = null,
+    // Phase 26 B3: 强制 CommandAcked — clause 命中后需 Ack 才推进; 当前为标记字段, 业务消费者 (Engine wrap) 决定语义. 默认 false 向后兼容.
+    bool RequireAck = false,
+    // Phase 26 D3: 延迟入队 condition — 非 null 时 clause 命中后不直发, 而是 DeferredQueue.Enqueue, ControlObservable 状态变化 + condition 满足时由 FlushAsync 出队执行.
+    Func<HeroContext, bool>? QueueWhen = null);
 
 /// <summary>
 /// 假腿配置条目 (按键 → alwaysSwap 标志, OnActivate 时一次性应用).

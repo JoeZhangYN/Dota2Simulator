@@ -258,6 +258,39 @@ public sealed class HeroPlanBuilder
     }
 
     /// <summary>
+    /// Phase 26 B3 (2026-05-26): clause 强制 CommandAcked — chain 直接修饰刚终结的 clause (与 AlsoAdjustLegSwap 同形态).
+    /// 业务消费者 (Engine wrap) 决定 Ack 语义; B2 已实现 ItemEngine 物品按键 fire-and-forget Ack, B3 chain 在 DSL 层声明意图供未来 Engine 路径扩展消费.
+    /// 例: <c>.OnKey(R).CastSkill(R).AfterCast().RequireAck()</c>
+    /// </summary>
+    public HeroPlanBuilder RequireAck()
+    {
+        if (_clauses.Count == 0)
+        {
+            throw new InvalidOperationException("RequireAck: 需先终结一个 clause (.AfterCast/.AfterEnterCD/.WhenReady/.AfterEnterCDDo/.AfterCastDo/.WhenReadyDo/.AfterCastReplaceIcon).");
+        }
+        int lastIdx = _clauses.Count - 1;
+        _clauses[lastIdx] = _clauses[lastIdx] with { RequireAck = true };
+        return this;
+    }
+
+    /// <summary>
+    /// Phase 26 D3 (2026-05-26): clause 延迟入队 — chain 直接修饰刚终结的 clause. 业务消费者 (Engine 路径 / Apply 路径扩展) 决定入队语义.
+    /// 用于"吹风秒接跳刀"形态: <c>.OnKey(W).CastSkill(跳刀).AfterEnterCD().QueueWhen(ctx => !ctx.Aggregate.SomeBuff.IsControlled)</c>
+    /// (当前 Apply 路径默认行为 = 直发; QueueWhen 字段写入 clause 后由后续 Engine 路径扩展消费).
+    /// </summary>
+    public HeroPlanBuilder QueueWhen(Func<HeroContext, bool> condition)
+    {
+        if (_clauses.Count == 0)
+        {
+            throw new InvalidOperationException("QueueWhen: 需先终结一个 clause.");
+        }
+        if (condition is null) throw new ArgumentNullException(nameof(condition));
+        int lastIdx = _clauses.Count - 1;
+        _clauses[lastIdx] = _clauses[lastIdx] with { QueueWhen = condition };
+        return this;
+    }
+
+    /// <summary>
     /// 终结 OnKey 链为 ExecuteAction SetupAction — 任意 lambda 副作用 (不挂 ConditionSlot, 不挂 Probe).
     /// 例: <c>.OnKey(D2).Execute(() => { _aggregate.Skills.SetMode(W, 1); TTS.Speak("..."); })</c>
     /// 用于 D2 SetMode + TTS 形态 (幻刺) / W 直接 _item 副作用 (黑鸟).

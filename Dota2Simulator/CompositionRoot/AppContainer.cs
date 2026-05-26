@@ -57,8 +57,11 @@ internal sealed class AppContainer
         Ui = AdapterFactory.CreateUi(form);
         // SkillEngine 先 new（ItemEngine ctor 接 SkillEngine；HeroLoopHost ctor 接两者）。
         var skill = new SkillEngine(Input, Vision, Ui, Aggregate);
+        // Phase 26 B2: PixelDiffAckProbe — 物品按键 fire-and-forget Ack 检测 (灰图标累积按键根治). ItemEngine ctor 末参注入.
+        var ackProbe = new Dota2Simulator.Infrastructure.Vision.PixelDiffAckProbe(Vision);
         // Phase 11 P3: ItemEngine ctor 扩 SessionState (Esc 暂停经 _session.IsPaused 直调).
-        var item = new ItemEngine(Input, Vision, Ui, Aggregate, skill, SessionState);
+        // Phase 26 B2: ctor 末扩 ICommandAckProbe (optional, null 退化旧行为).
+        var item = new ItemEngine(Input, Vision, Ui, Aggregate, skill, SessionState, ackProbe);
         // Phase 11 P2: setter 注入消反向 service locator——SkillEngine 内 2 处 Common.ItemEngine!.要求保持假腿() 改 _item!.要求保持假腿().
         skill.BindItem(item);
         HeroLoopHost = new HeroLoopHost(Input, Vision, Ui, Aggregate, SessionState, skill, item);
