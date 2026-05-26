@@ -2835,7 +2835,7 @@ epic 主题: **DSL 修旧 bug + 扩 typestate + Vision 端口扩 WithFrame types
 ```
 A 不应期 (3 chunk):
   A1 RefractoryState 子聚合 (✅ commit a3f4b20, 2026-05-26)
-  A2 ItemEngine 切假腿走 Refractory ★ 用户冒烟核心
+  A2 ItemEngine 切假腿走 Refractory ★ 用户冒烟核心 (✅ commit 0d89b7e, 2026-05-26)
   A3 DSL .WithRefractory(name, ms) modifier emit
 
 B CommandAcked (3 chunk):
@@ -2865,6 +2865,30 @@ F-G DSL 表达层附线 (3 chunk):
 - 类型新增 0 caller 业务零改
 - Build verify: DOTA2+Silt 0 错 248 warn (baseline 一致) / LOL 0 错 137 warn / HF2 0 错 142 warn / GpuVision PowerShell CLI `;` 解析问题留 IDE 验证 (A1 是 #if DOTA2 内类型新增, 对 GpuVision 行为无影响)
 
+### Phase 26 A2 完成 (✅ 2026-05-26, commit `0d89b7e`)
+
+- `Dota2Simulator/GameAutomation/Application/ItemEngine.cs` +7 行:
+  - `切假腿类型(string type)` 函数开头 `_aggregate.Refractory.SetRefractory("LegSwap", 200)` — atomic 33ms×2 + ~130ms grace (图标变色 + probe 下一帧再读)
+  - `根据配置技能释放前切假腿(...)` 入口 `if (IsRefractory("LegSwap")) return;` — hot path 入口短路
+  - `技能释放前切假腿(string 类型)` 入口 `if (IsRefractory("LegSwap")) return;` — 中游短路防重入调 `切假腿类型`
+  - `要求保持假腿()` 入口 `if (IsRefractory("LegSwap")) return;` — flag setter 短路 (Refractory 段内 flag 状态由 atomic 段维护, 段后下一帧主循环重决策不会真正丢信号)
+- `Dota2Simulator/GameAutomation/Application/HeroLoopHost.cs` +3 行:
+  - `取消所有功能()` LegSwap 5 flag reset 后追加 `_aggregate.Refractory.Reset()` — 跨 hero 切换清残留
+- Build verify 4 档全 PASS (基线一致): DOTA2+Silt 0err 248warn / DOTA2+Silt+GpuVision 0err 271warn (用 `%3B` URL encode 绕 PowerShell `;` 解析) / LOL 0err / HF2 0err
+- 200ms duration 推导: `根据图片多次使用物品(_, 2, 33)` 最坏路径 atomic 段 66ms + grace ~134ms (图标变色 + probe 下一帧)
+- 设计判断 (handoff_notes):
+  - 短路 `要求保持假腿` 影响范围: 用户主动 NumPad7/8 切假腿状态 + `处理物品进入CD` 60ms 后 fire-and-forget — 这些都是设 flag, 短路丢的是"该次按键引发的 flag 更新", 下一次按键主循环重新走 `根据按键判断技能释放前通用逻辑` 会重触发, 不持久丢失
+  - Refractory 段内若用户连按敏捷腿切换键, 后按吞掉 — 符合预期 (atomic 段是物理设备约束)
+
+### Phase 26 A2 待用户冒烟 (★ 核心剧本)
+
+切智力↔敏捷↔力量 三态环反复 10 次, 验证:
+1. 0 中间态循环 (智力假腿稳态时按敏捷腿切换键, 不再被 atomic 段内 probe 误判为"仍在智力" 触发二次按键经 Str 中间态循环)
+2. 最终态正确 (每次按敏捷腿切换键, 真到敏捷; 按力量腿切换键真到力量; 不出现"按 1 次没动 + 按 2 次直接跳过目标态" 反例)
+3. 切英雄后第一次切假腿正常 (Refractory.Reset 跨 hero 清残留 verify)
+
+预期反例: 若 200ms 不够 (图标变色 + probe 延迟超 130ms grace) → 仍有中间态循环 → 调 duration ↑ 300ms 重测.
+
 ### Phase 26 推迟到 Phase 27+ (用户 grill 6-19 场景 + scope 收紧)
 
 | Phase 候选 | 内容 | 用户原文场景 |
@@ -2880,12 +2904,12 @@ F-G DSL 表达层附线 (3 chunk):
 
 ### Phase 26 待续 (下次 session 起手)
 
-- 当前已完成: A1 (commit `a3f4b20`)
-- 下一 chunk: **A2 ItemEngine 切假腿走 Refractory** (★ 用户冒烟核心, 改 ItemEngine 切假腿 hot path)
-- 关键设计:
-  - `切假腿类型(type)` 临界段开始时 `_aggregate.Refractory.SetRefractory("LegSwap", ~200)` (atomic 33ms×2 + ~130ms grace)
-  - `要求保持假腿 / 技能释放前切假腿 / 根据配置技能释放前切假腿` 入口 check `IsRefractory("LegSwap")` 短路
-- 用户冒烟剧本: 切智力↔敏捷↔力量 三态环反复 10 次, 验证 0 中间态循环 + 最终态正确
+- 当前已完成: A1 (commit `a3f4b20`) + A2 (commit `0d89b7e`)
+- 下一 chunk: **A3 DSL `.WithRefractory(name, ms)` modifier emit**
+  - HeroStrategyBase / SetupAction DSL 扩展, 让 Strategy 显式声明不应期, 不需手改 Engine
+  - SG (HeroStrategyGenerator) emit chained `.WithRefractory("LegSwap", 200)` → 调用 `_aggregate.Refractory.SetRefractory`
+  - 设计反问: A2 已在 ItemEngine.切假腿类型 硬编码 SetRefractory, A3 是否真有 Strategy 想自定义 ms? → 若用户用 200ms 都不需调, A3 可推迟 Phase 27+ 节省 1 chunk
+- 然后接 B 段 CommandAcked (3 chunk): B1 PixelDiffAckProbe 实现 + B2 SkillEngine/ItemEngine 切 Acked 判定 ★ 用户冒烟核心 (灰图标累积)
 
 ### Phase 26 14 场景 backlog (Phase 27+ 准备消化)
 
