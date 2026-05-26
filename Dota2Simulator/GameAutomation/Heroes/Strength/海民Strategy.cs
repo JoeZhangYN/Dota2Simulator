@@ -41,7 +41,7 @@ public sealed partial class 海民Strategy : IHeroStrategy
         if (key == VirtualKey.E)
         {
             // E 键双路由: StoneChoice==1 设 C2 Active / StoneChoice==2 设 C4 Active.
-            switch (_main._聚合.Conditions.StoneChoice)
+            switch (_main._聚合.Stone.Choice)
             {
                 case 1: _main._聚合.Conditions[ConditionSlotKey.C2].Active = true; break;
                 case 2: _main._聚合.Conditions[ConditionSlotKey.C4].Active = true; break;
@@ -50,7 +50,7 @@ public sealed partial class 海民Strategy : IHeroStrategy
         else if (key == VirtualKey.F)
         {
             // F 键 PreAction: StoneChoice==1 时触发 E 技能 + Active C3.
-            if (_main._聚合.Conditions.StoneChoice == 1)
+            if (_main._聚合.Stone.Choice == 1)
                 _skill.DOTA2释放CD就绪技能(Keys.E);
             _main._聚合.Conditions[ConditionSlotKey.C3].Active = true;
         }
@@ -63,11 +63,11 @@ public sealed partial class 海民Strategy : IHeroStrategy
 
     private async Task<bool> 海民获取命石()
     {
-        if (_main._聚合.Conditions.StoneChoice == 0)
+        if (_main._聚合.Stone.Choice == 0)
         {
-            _main._聚合.Conditions.StoneChoice = _vision.Find(Dota2_Pictrue.命石.海民_酒友_Tpl, 命石区域, new MatchRate(0.9), Tolerance.Exact).Found ? 2 : 1;
+            _main._聚合.Stone.Choice = _vision.Find(Dota2_Pictrue.命石.海民_酒友_Tpl, 命石区域, new MatchRate(0.9), Tolerance.Exact).Found ? 2 : 1;
         }
-        _main._聚合.Conditions.StoneProbe = null;
+        _main._聚合.Stone.Probe = null;
         return await Task.FromResult(false).ConfigureAwait(true);
     }
 

@@ -32,22 +32,14 @@ public sealed class ConditionSlotSet
     /// <summary>按槽位访问条件槽（ConditionSlot 是引用类型，读写其 Active/Probe 即原地生效）。</summary>
     public ConditionSlot this[ConditionSlotKey key] => _slots[(int)key];
 
-    /// <summary>命石委托（原 _命石根据图片委托）。</summary>
-    public ConditionDelegateBitmap? StoneProbe { get; set; }
-
-    /// <summary>命石选择（原 _命石选择）。</summary>
-    public int StoneChoice { get; set; }
-
     /// <summary>把指定条件槽置为激活（原 _条件X = true）。</summary>
     public void Activate(ConditionSlotKey key) => _slots[(int)key].Active = true;
 
-    /// <summary>复位所有条件槽 + 命石（原 取消所有功能 中的条件清零段）。</summary>
+    /// <summary>复位所有条件槽（原 取消所有功能 中的条件清零段）. Phase 20D 后命石复位迁 <see cref="StoneState.Reset"/>, 由 HeroAggregate / 切英雄路径调用.</summary>
     public void Reset()
     {
         foreach (ConditionSlot slot in _slots)
             slot.Clear();
-        StoneProbe = null;
-        StoneChoice = 0;
     }
 
     /// <summary>

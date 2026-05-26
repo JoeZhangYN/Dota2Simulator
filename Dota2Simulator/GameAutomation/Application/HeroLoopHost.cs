@@ -212,10 +212,10 @@ namespace Dota2Simulator.GameAutomation.Application
                     // 获取图片数据
                     _循环内获取图片();
 
-                    // 处理命石相关逻辑
-                    if (_aggregate.Conditions.StoneProbe is not null)
+                    // 处理命石相关逻辑 (Phase 20D: 迁 Conditions.StoneProbe → Stone.Probe 子聚合)
+                    if (_aggregate.Stone.Probe is not null)
                     {
-                        await _aggregate.Conditions.StoneProbe().ConfigureAwait(true);
+                        await _aggregate.Stone.Probe().ConfigureAwait(true);
                     }
 
                     // 获取技能颜色信息
@@ -298,6 +298,7 @@ namespace Dota2Simulator.GameAutomation.Application
             _session.IsPaused = false;
 
             _aggregate.Conditions.Reset();
+            _aggregate.Stone.Reset();  // Phase 20D: Stone 复位独立 (从 Conditions.Reset 内移出, 子聚合自治).
 
             _ = _item.重置耗蓝物品委托和条件();
 

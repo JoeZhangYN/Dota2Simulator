@@ -31,24 +31,24 @@ public sealed partial class 伐木机Strategy : IHeroStrategy
     public override async Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)
     {
         // D 键短路 - 仅 StoneChoice==2 时才走 base BuildPlan dispatch (设 C3 Active).
-        if (trigger.Key == VirtualKey.D && _main._聚合.Conditions.StoneChoice != 2)
+        if (trigger.Key == VirtualKey.D && _main._聚合.Stone.Choice != 2)
             return;
         await base.OnKeyAsync(trigger, ctx).ConfigureAwait(true);
     }
 
     private async Task<bool> 伐木机获取命石()
     {
-        if (_main._聚合.Conditions.StoneChoice == 0)
+        if (_main._聚合.Stone.Choice == 0)
         {
             if (_vision.Find(Dota2_Pictrue.命石.伐木机_碎木击_Tpl, 命石区域, new MatchRate(0.9), Tolerance.Exact).Found)
-                _main._聚合.Conditions.StoneChoice = 1;
+                _main._聚合.Stone.Choice = 1;
             else if (_vision.Find(Dota2_Pictrue.命石.伐木机_锯齿轮旋_Tpl, 命石区域, new MatchRate(0.9), Tolerance.Exact).Found)
             {
-                _main._聚合.Conditions.StoneChoice = 2;
+                _main._聚合.Stone.Choice = 2;
                 _main._聚合.LegSwap.配置.修改配置(Keys.D, true);
             }
         }
-        _main._聚合.Conditions.StoneProbe = null;
+        _main._聚合.Stone.Probe = null;
         return await Task.FromResult(false).ConfigureAwait(true);
     }
 

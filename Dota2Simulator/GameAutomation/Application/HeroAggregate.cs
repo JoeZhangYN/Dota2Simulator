@@ -25,6 +25,9 @@ public sealed class HeroAggregate
     /// <summary>Phase 8 C1: 切假腿子聚合（原 Item.cs 8 个 static 字段：配置 + 假腿按键 + 6 bool flag）。</summary>
     public LegSwapState LegSwap { get; } = new();
 
+    /// <summary>Phase 20D: 命石子聚合 — 拆出 ConditionSlotSet 内 special-case StoneProbe/StoneChoice 双字段 (polling 语义, 与 event-driven ConditionSlot 区分).</summary>
+    public StoneState Stone { get; } = new();
+
     /// <summary>Phase 8 C3: 当前英雄技能数量（4/5/6）——取代 Skill._技能数量 static。</summary>
     public int SkillCount { get; set; }
 

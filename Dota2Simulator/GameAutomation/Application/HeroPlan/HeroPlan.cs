@@ -210,9 +210,10 @@ public sealed class HeroPlan
         }
 
         // Phase 19G-4: StoneProbe DSL — 命石 Probe 单字段注册 (与 ConditionSlot Probe 双轨, 海民/伐木机/骷髅王 命石业务).
+        // Phase 20D: 迁 ctx.Aggregate.Conditions.StoneProbe → ctx.Aggregate.Stone.Probe (子聚合自治).
         if (_stoneProbe is not null)
         {
-            ctx.Aggregate.Conditions.StoneProbe ??= _stoneProbe;
+            ctx.Aggregate.Stone.Probe ??= _stoneProbe;
         }
 
         // OnActivate 一次性 SkillEngine 配置: 沙王/天怒 等设按键重复执行间隔阈值的形态.
