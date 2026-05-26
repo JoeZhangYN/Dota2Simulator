@@ -18,7 +18,15 @@ internal static class AdapterFactory
 {
     public static IInputExecutor CreateInput() => new ProbeInputExecutor(new HybridInputAdapter());
 
-    public static IScreenVision CreateVision() => new ProbeScreenVision(new RustVisionAdapter());
+    public static IScreenVision CreateVision() =>
+#if GpuVision
+        // Phase 24A C1: csproj DefineConstants `GpuVision` 装配开关 → GPU adapter.
+        // C1 GpuFusedVisionAdapter 4 方法 throw NotImplementedException, 仅证明装配闭环;
+        // 真业务实现 epic Phase 24 C2-C4 逐步落地 (compute shader / DXGI dup / fence).
+        new ProbeScreenVision(new GpuFusedVisionAdapter());
+#else
+        new ProbeScreenVision(new RustVisionAdapter());
+#endif
 
     public static IUiInvoker CreateUi(Form2 form) => new Form2UiInvoker(form);
 }
