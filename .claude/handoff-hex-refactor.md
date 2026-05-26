@@ -2410,3 +2410,186 @@ handoff §231 Phase 8 段早写 "实际删除死代码 (_Legacy/ + Other/ + 4 �
 - **预测**: 14 处 GetCurrentHandle 直调是 §52 真违规需大改 → **实测**: §52 文字严格只禁 `FindXxx` 和 `ImageFinder.*`, 14 处全合法 (B#4 over-claim 自纠)
 - **预测**: TripleBufferSystem.Dispose 注释 "代码错误" 是字面意思 → **实测**: 真根因是 ImageHandle 值类型 + auto-property rvalue 双重限制, 修复需局部变量中转
 - **预测**: B#1 dead-code 删除会带来 build warn 增加 → **实测**: 反而减少 3 warn (4 个独立 .cs 自带 warn 随删除消失)
+
+---
+
+## Phase 24A GpuFusedVisionAdapter epic 端到端落地 (2026-05-26) — Phase 23 派生候选 GPU adapter epic 完成 (除 C4 fence deferred)
+
+epic 主题: **IScreenVision 端口 GPU 端实现 (DXGI Desktop Duplication + compute shader 模板匹配 + region 化裁剪) + 装配开关并存 RustVisionAdapter**.
+
+触发: Phase 23 派生 Phase 24+ 候选 #3 `GpuFusedVisionAdapter` 纯技术 epic, 用户授权"按推荐继续" + 后续"C2-C4 不阻塞并行继续".
+
+### Phase 24A 用户 grill 三问对齐 (动手前)
+
+1. **与 RustVisionAdapter 关系**: 并存 + 装配开关 (默认 Rust, csproj DefineConstants `GpuVision` 切 Gpu)
+2. **DXGI 范围**: 纳入 in-scope (端到端 GPU 零回传)
+3. **候选裁剪策略**: 复用 IScreenVision.Find(region) 参数 (P0); PreloadHints 反向 cache 留 Phase 25+
+
+### Phase 24A commit 链 (4 commit on main)
+
+| commit | 子段 | 主题 | 净行 |
+|---|---|---|---|
+| `499e1e8` | C1 | gpu-vision-adapter-shell GpuFusedVisionAdapter 骨架 + csproj GpuVision 装配开关 (4 方法 throw NotImplementedException 占位) | +57 |
+| `f70843d` | C2+C3 | gpu-device + GpuVisionContext + DxgiCaptureSession 双 subagent 真并行落地 (落点 1NF 独立) | +760 |
+| `1650b48` | C5 | gpu-vision-integration GpuFusedVisionAdapter 4 API 真实现 + 端到端 wire + 子目录迁移 + namespace 统一 | +176/-48 |
+| `b62c004` | C6 | dxgi-single-source DXGI 单源消双截屏 + GDI 路径 GpuVision build 退役 (用户反问 "CPU 不能也切换到 DXGI" 触发) | +148/-44 |
+
+### Phase 24A C1 — 装配开关 + 骨架 (`499e1e8`)
+
+- 新建 `Infrastructure/Vision/GpuFusedVisionAdapter.cs` (后 C5 迁子目录), 4 IScreenVision 方法 throw NotImplementedException 占位
+- AdapterFactory.CreateVision() #if GpuVision 切换分支
+- 关闭开关时类型本身 #if GpuVision 包裹不存在 → 0 编译负担
+- 4 build verify (默认 + GpuVision + LOL + HF2) PASS
+
+### Phase 24A C2+C3 — GpuDevice + GpuVisionContext + DxgiCaptureSession 双 subagent 并行 (`f70843d`)
+
+落点 1NF 独立 (不同 .cs 新建文件), 主 lead 前置创建共享 GpuDevice.cs (D3D11 Device + DeviceContext + Hardware/Warp fallback) 让 C2/C3 subagent 只读消费.
+
+**C2 GpuVisionContext (520 行)** — subagent A 实施:
+- 从 `Vision/Benchmark/GpuTemplateMatchProbe.GpuProbeContext` 派生 production
+- ctor 接 GpuDevice 注入, 内部建 ComputeShader (cs_5_0 内联编译) / CBuffer / ResultBuffer / UAV / Staging
+- public API: `UploadMainTexture(byte[], w, h)` / `FindInRegion(template, ...)` / `FindAllInRegion(...)` / Dispose
+- HLSL region 化: cbuffer +RegionX/Y/W/H, CSMain 起始坐标 = (gx+RegionX, gy+RegionY) 绝对桌面坐标
+- 上界 rx > RegionW-TplWidth 限制; Dispatch(ceil(region.W/8), ceil(region.H/8), 1) 真正局部扫描
+- FindAll InterlockedAdd 设计: Result[1+MaxHits]=64, 槽 0 atomic counter, 槽 1..N scan index; 超出截断
+- Template name → CachedTemplate (Texture2D + SRV) 缓存, 首次见上传, 复用 SRV
+- 同步路径 Map staging 当即回读 (C4 fence 异步 deferred)
+
+**C3 DxgiCaptureSession (167 行)** — subagent B 实施:
+- ctor 接 GpuDevice 共享 D3D11 Device (zero-copy 必要)
+- QueryInterface chain: D3D11.Device → DXGI.Device → Adapter → Output → Output1 → OutputDuplication
+- public API: `TryAcquireFrame(out Texture2D?, timeoutMs=50)` / `ReleaseFrame()` / `DesktopWidth/Height`
+- 错误链路: DXGI_ERROR_WAIT_TIMEOUT (0x887A0027) 返 false 非异常; DXGI_ERROR_ACCESS_LOST (0x887A0026) 抛 InvalidOperationException 供 C5 ReInit; SharpDXException 透传
+- ctor 期失败按构造逆序释放 COM 对象 + 透传原异常 (避免 COM ref leak)
+- 锁主显示器 (output 0) hard-code; 多 monitor 留 Phase 25+
+
+**双 subagent 并行实际收益**:
+- C2: 31 tool uses / 6.6 min / 520 行
+- C3: 20 tool uses / 5.4 min / 167 行
+- 真 1NF 落点不交叉 (不同新建 .cs + 共享 GpuDevice.cs 只读消费), 主 lead 仅做共享前置 dep 准备 + 合并 commit
+
+### Phase 24A C5 — 集成 GpuFusedVisionAdapter 真实现 + 端到端 wire (`1650b48`)
+
+- 物理迁: `Infrastructure/Vision/GpuFusedVisionAdapter.cs` → `Infrastructure/Vision/GpuVision/GpuFusedVisionAdapter.cs`
+- namespace 统一: `Dota2Simulator.Vision.Adapters` → `Dota2Simulator.Infrastructure.Vision.GpuVision` (与 C2/C3 一致)
+- GpuVisionContext +`UploadMainTexture(Texture2D source)` overload — CopyResource DXGI 帧到 SRV-bind _mainTex (零回传 sink)
+- GpuFusedVisionAdapter ctor 无参 — 内部 new GpuDevice + new DxgiCaptureSession + new GpuVisionContext, ctor 失败逆序释放
+- 4 IScreenVision API 真实现 (C5 conservative 双截屏方案):
+  - Capture: GlobalScreenCapture.CaptureScreen (GDI) + DxgiCaptureSession.TryAcquireFrame → _context.UploadMainTexture → ReleaseFrame
+  - PixelAt: GlobalScreenCapture.GetColor (GDI fallback)
+  - Find/FindAll: LazyImageLoader.GetImage → ImageManager.GetImageData byte[] → GpuVisionContext.FindInRegion/FindAllInRegion → FindResult
+- `_hasUploadedFrame` 标志: DXGI 0 帧 / 首次 Capture 前 Find 调用早退 Miss
+- AdapterFactory.CreateVision() #if GpuVision 内 using `Dota2Simulator.Infrastructure.Vision.GpuVision`
+
+### Phase 24A C6 — DXGI 单源消双截屏 (`b62c004`)
+
+**用户反问 "双截屏? CPU 不能也切换到 DXGI?" 触发** — C5 conservative 双截屏 (GDI + DXGI 各一次) 浪费, C6 改造为 DXGI 单源:
+
+- GlobalScreenCapture +`WriteBgraFrameAndCommit(byte[], w, h, offsetX, offsetY)` — 替代 ModifyGraphics.CaptureScreenToHandle 的 internal API, 自动 Initialize / 尺寸偏移变化 Reinit, _tripleBuffer.BeginCapture → GetWriteBuffer → ImageManager.GetImageData ptr + Marshal.Copy + CommitCapture
+- GpuFusedVisionAdapter 重写 Capture: 删 GlobalScreenCapture.CaptureScreen GDI 调用, 改一次 DXGI Acquire + 双 sink CopyResource
+  - sink1: `_context.UploadMainTexture(frame)` — SRV-bind `_mainTex` (compute, 零回传)
+  - sink2: `_ctx.CopyResource(frame, _stagingTex)` (staging texture CPU-readable) → Map → stride-aware 裁剪 `mode.Region` → `_regionBgraCache` byte[] (同尺寸复用, 避免 GC pressure) → `WriteBgraFrameAndCommit` → `_tripleBuffer`
+- 业务侧 12 处 `GlobalScreenCapture.GetCurrentHandle` 透明拿 DXGI 数据 (无业务侧改动)
+- PixelAt 读 `_tripleBuffer` = DXGI 帧裁剪后数据
+
+### Phase 24A 端到端 GpuVision 路径 (C6 后终态)
+
+1. 截屏: DXGI Acquire 1 次 (取代 GDI)
+2. compute shader: zero-copy GPU texture SRV (C2 region 化 HLSL, region 限制 Dispatch)
+3. 业务侧 GlobalScreenCapture.GetCurrentHandle/GetColor 透明读 _tripleBuffer (DXGI 裁剪数据)
+4. IScreenVision.PixelAt: GlobalScreenCapture.GetColor 读 _tripleBuffer (DXGI 帧数据)
+5. IScreenVision.Find/FindAll: compute shader region 化匹配 GPU texture
+
+### Phase 24A C4 fence 异步回读 — deferred (跳过决策)
+
+- C4 原计划: ID3D11Fence + DeviceContext4.Signal/Wait + DispatchBatch latency-1 异步
+- 实际评估: IScreenVision.Find 是同步签名 (FindResult, 非 Task<FindResult>), fence 异步 fit 不进端口
+- 选项 A: 改端口签名加 Task<FindResult> → 触及 ~50 处业务调用, 端口侵入大
+- 选项 B: GpuFusedVisionAdapter 内部 Find 调用时同步 wait fence → 性能收益归零
+- 决策: deferred — 让用户跑 GpuVision dogfood 看真实 Map staging stall 时长 (< 5ms 则 C4 收益微薄永久 deferred, > 10ms 再评估)
+
+### Phase 24A 关键不变量
+
+1. **csproj 装配开关纯净**: GpuVision define 关闭时 GpuFusedVisionAdapter / GpuDevice / GpuVisionContext / DxgiCaptureSession 4 类型全 #if 包裹不存在 → 0 编译负担, 默认 csproj 仍走 Rust adapter
+2. **共享 D3D11 Device**: GpuFusedVisionAdapter own 1 GpuDevice 注入 DxgiCaptureSession + GpuVisionContext, 零拷贝端到端 (避跨 Device staging 中转)
+3. **DXGI 单源** (C6): GpuVision build 内 GDI 截屏 0 调用, 一次 DXGI Acquire 双 sink (compute SRV + _tripleBuffer)
+4. **业务侧 0 改动**: 12 处直调 GlobalScreenCapture.GetCurrentHandle / GetColor 全透明 (DXGI 数据 byte 级等价 GDI)
+5. **错误兜底分级**:
+   - DXGI Timeout (桌面静止): 返 false 非异常, _tripleBuffer/SRV 保留上次帧
+   - DXGI AccessLost (锁屏/UAC/全屏独占): 抛 InvalidOperationException, GpuFusedVisionAdapter.Capture catch 后本帧 skip (生产升级路径: catch+Dispose+ReInit session)
+   - 模板加载失败 (LazyImageLoader IsValid=false): Find 返 Miss / FindAll 返空
+   - GpuVisionContext.FindInRegion UploadMainTexture 未调用: catch 返 Miss
+6. **每 chunk 单 commit + 4 档 build 0 错** (DOTA2+Silt 默认 / +GpuVision / LOL / HF2)
+
+### Phase 24A architecture-sentinel verdict (主 lead 自审, 未跑显式扫描)
+
+- 落点 1NF: ✅ 端口纯净 (IScreenVision 接口签名 0 改动)
+- 装配链 SSOT: ✅ AdapterFactory.CreateVision #if GpuVision 单分支切换, AppContainer/Form2 LOL/HF2 装配不变
+- 类型上移: ✅ GpuDevice 共享 wrapper 上移 D3D11 Device 创建逻辑, 子类型只接 GpuDevice 注入
+- 副作用显式化: ✅ DxgiCaptureSession.TryAcquireFrame 返 bool (timeout 非异常) + InvalidOperationException (AccessLost) 双路签名
+- 接口契约破坏自检: ✅ IScreenVision 端口 + RustVisionAdapter + ProbeScreenVision 装饰链 0 改动
+
+### Phase 24A handoff_notes (Phase 25+ 候选)
+
+1. **C4 fence 异步回读 (deferred 转条件)**: 仅在 GpuVision dogfood 实测 Map staging stall > 10ms 时再做; < 5ms 则永久 deferred
+2. **多显示器扩展**: DxgiCaptureSession 锁 output index 0, Phase 25+ 扩 ctor 接 outputIndex 参数 (Output 数 = adapter.GetOutputCount)
+3. **DXGI AccessLost 升级 ReInit**: 当前 Capture 内 catch InvalidOperationException 本帧 skip 是简单兜底; 生产场景应 catch + Dispose + 重建 DxgiCaptureSession + GpuVisionContext (锁屏/UAC/全屏独占切回时业务不卡顿)
+4. **业务侧 12 处 GetCurrentHandle 切 PixelAt 端口** (继承 Phase 23 B#4 派生候选): 完成后 _tripleBuffer + 裁剪路径可逐步退役 (GpuFusedVisionAdapter.Capture 仅保留 DXGI → compute SRV 一路, 真端到端 GPU 零 CPU 回读)
+5. **多模板批量 Dispatch** (HLSL 路径优化): 当前 GpuVisionContext 单 needle 单 Dispatch; PoC GpuTemplateMatchProbe.GpuProbeContext.DispatchBatch 支持 multi-slice batch (Texture2DArray + Dispatch z=N), Phase 25+ 评估单帧多 needle 批量收益
+6. **SharedHandle 跨进程零拷贝**: 极致优化, DXGI 帧通过 SharedHandle 暴露给外部进程 (调试工具 / 录制), 当前不需
+
+### Phase 24A 反预测与实测偏差
+
+- **预测**: C4 fence 异步是 epic 必做 → **实测**: 端口同步签名 + Map staging stall 收益未实测前不确定, deferred 转条件做
+- **预测**: 双 subagent 并行节省时间显著 → **实测**: subagent 工作期主 lead 在 idle (~6 min), 真实节省的是 context isolation (大量 GPU 实现细节不污染主 context), 不是 wall-clock
+- **预测**: 双截屏 (C5) 是可接受 conservative 形态 → **实测**: 用户立刻反问 "CPU 不能也切换 DXGI", C6 单源是更合理终态 (主 lead 起手 over-conservative)
+- **预测**: C2 subagent 用 worktree 时 GpuDevice.cs 已 commit 在 main → **实测**: spawn 前主 lead 创建文件但未 commit, subagent 用 worktree 内临时 cp 一份 build verify, 主 lead 合并时一起 commit (subagent 自纠协议正确)
+
+### 待用户冒烟 (Phase 24A 收尾)
+
+切 csproj `DefineConstants` 加 `GpuVision` → 管理员运行 → 启动应用:
+
+1. **AppContainer 装配序无 NRE**: AdapterFactory.CreateVision() → GpuFusedVisionAdapter() ctor → GpuDevice (Hardware/Warp fallback) → DxgiCaptureSession (主显示器 DXGI dup) → GpuVisionContext (compute shader cs_5_0 内联编译)
+2. **启动若 InvalidOperationException** ("D3D11 device 创建失败" / "DXGI duplication access lost"): 重启或切默认 csproj 即恢复 Rust 路径
+3. **业务侧像素一致性**: GpuVision build 下 GlobalScreenCapture.GetCurrentHandle/GetColor 拿到的应是 DXGI 帧数据, 与默认 Rust+GDI 路径像素级等价 (BGRA 1920×1080)
+4. **图片识别准确性抽样**: 大牛/影魔 (物品识别) + 卡尔 (技能识别) + 暗影萨满 (buff 识别) GPU 路径准确性
+5. **GPU vs Rust 性能对比**: 帧延迟 (主循环模式1 HighQuality / 模式2 FullScreen) + CPU 占用 + GPU 占用 → 决策 C4 fence 异步必要性
+
+### Phase 24A 回滚锚点
+
+- 单 chunk revert: C1 `499e1e8` / C2+C3 `f70843d` / C5 `1650b48` / C6 `b62c004` 任一
+- 完整撤回 Phase 24A: `git revert b62c004 1650b48 f70843d 499e1e8` (逆序 4 commit)
+- 软撤回 (保留 GPU 代码但禁用): csproj `DefineConstants` 移除 `GpuVision` → AdapterFactory 走 Rust 分支, 0 行为变化
+
+### Phase 25+ 候选 (Phase 24A 之后剩余)
+
+继承前序 Phase 候选:
+- HeroIdentity epic (需 HUD 区域 + 业务需求, 21B deferred)
+- LolEngine/Hf2Engine 业务 (需用户业务输入, 21C deferred)
+- 猴子/海民 override OnKeyAsync 抽 DSL (Phase 22 后剩余, ROI 低保留)
+
+Phase 24A 派生:
+- C4 fence 异步 (条件: GpuVision dogfood 实测 stall > 10ms)
+- 多显示器 outputIndex 扩展 (handoff_notes #2)
+- DXGI AccessLost ReInit 升级 (handoff_notes #3)
+- 业务侧 12 处 GetCurrentHandle 切 PixelAt 端口 + _tripleBuffer 退役 (handoff_notes #4, 与 Phase 23 B#4 派生候选 合并)
+- 多模板批量 Dispatch (handoff_notes #5)
+
+### Phase 24A 累计统计
+
+- **commit 链**: 4 commit on main (C1 / C2+C3 / C5 / C6)
+- **净行数**: ~1140 行 (C1 +57 / C2+C3 +760 / C5 +176-48 / C6 +148-44)
+- **新文件**: 4 个 GPU adapter 实现文件 (Infrastructure/Vision/GpuVision/ 子目录)
+  - GpuDevice.cs 73 行
+  - GpuVisionContext.cs 568 行 (C2 520 + C5 +48 Texture2D overload)
+  - DxgiCaptureSession.cs 167 行
+  - GpuFusedVisionAdapter.cs ~225 行 (C5 176 + C6 +50 staging 路径)
+- **改动文件**: AdapterFactory.cs (装配开关) / GlobalScreenCapture.cs (+WriteBgraFrameAndCommit)
+- **删除**: 旧平铺 GpuFusedVisionAdapter.cs 占位 (C5 子目录迁移)
+- **架构纯净化**: GpuVision build 内 GDI 路径 0 调用 (Rust adapter 默认 csproj 仍用); 单一截屏源 (DXGI); 端口契约 (IScreenVision) 0 改动
+- **DSL 容量**: 无变化 (本 epic 纯 IScreenVision 端口实现, 不动业务 DSL)
+- **3 档 build verify final**:
+  - DOTA2+Silt 默认 (Rust+GDI): 0 错 246 warn (baseline 不变)
+  - DOTA2+Silt+GpuVision: 0 错 269 warn (+23 GPU 路径新 unused 警告, dogfood 真用后消)
+  - LOL: 0 错 137 warn
+  - HF2: 0 错 142 warn
