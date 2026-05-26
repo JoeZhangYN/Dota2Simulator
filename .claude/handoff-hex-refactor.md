@@ -2798,3 +2798,99 @@ epic 主题: **DSL 修旧 bug + 扩 typestate + Vision 端口扩 WithFrame types
   - DOTA2+Silt+GpuVision: 0 错 (272 warn baseline 一致)
   - LOL: 0 错 137 warn (baseline 一致)
   - HF2: 0 错 142 warn (baseline 一致)
+
+## Phase 26 异步控制语义底层 epic (启动中, 2026-05-26)
+
+**plan SSOT**: `C:\Users\JoeZhang\.claude\plans\serene-coalescing-moth.md` (经 6 轮 grill 重写)
+
+### 起源: 6 轮 grill 后 scope 锁定
+
+原 "继续 25B-D" → Phase 1 探索 + Phase 2 plan agent + 用户 6 轮 grill 暴露**异步控制 4 子问题**:
+
+| # | 子问题 | 用户原文场景 | 语义解 |
+|---|---|---|---|
+| 1 | 命令在途中间态干扰 | 切假腿 Int→Agi 经 Str 中间态被 probe 误判循环 | **Refractory 不应期** (子聚合) |
+| 2 | 命令未生效但视觉容差判定能按 | 被控制时灰图标 → 容差判定"能按" → 累积按键导致游戏异常 | **CommandAcked 双 signature** |
+| 3 | 窗口期错失 | 吹风/无敌期间命令丢失, buff 结束瞬间无法秒接跳刀 | **DeferredQueue + state-change-driven flush** |
+| 4 | 命令分类: Insertable vs Blocked | Dota2 部分命令引擎自 queue (插队), 部分必须 hero 能行动 | **ItemMetadata + 双发送路径** |
+
+### 用户决策汇总 (6 轮 grill 累计)
+
+| Q | 决策 |
+|---|---|
+| Intent/Observed 模型 | **改 Refractory** — Phase 1 调研发现 LegSwap 无 Observed 反向同步路径, 双轨不成立 |
+| A 段子聚合形态 | **独立 RefractoryState 子聚合** (而非 LegSwap 内加字段) — 通用 string key, 未来 SkillCD/BuffWindow 共享 |
+| 25C 三子项 | 仅 §1 ReplaceIcon (2 hero); §2/§3 砍 |
+| 25B Serial vs Burst | 双方法都抽 + KeepLeg helper |
+| 25D StepMachine | **推迟 Phase 27+** (scope a 排除) |
+| Combo Scheduler 抽象 | **推迟 Phase 27+** (用户 6-13 场景累计 J 段需 mega-design) |
+| C Backoff 防御 | **推迟 Phase 27+** (用户感知低, scope a 排除) |
+| AI / RL / GA 接入 | **推迟** (用户校准: "跨 AI 调用是利好不是直接目的") |
+| **本 epic scope** | **(a) 14 chunk** — A+B+D+E+F+G |
+| CommandAcked ROI | 技能 50x50 / 物品 62x45 动态 |
+| ItemCatalog 初版 | 守报默认 IsInsertable=false, 用户冒烟通过后逐批 enable |
+
+### Phase 26 14 chunk 拓扑
+
+```
+A 不应期 (3 chunk):
+  A1 RefractoryState 子聚合 (✅ commit a3f4b20, 2026-05-26)
+  A2 ItemEngine 切假腿走 Refractory ★ 用户冒烟核心
+  A3 DSL .WithRefractory(name, ms) modifier emit
+
+B CommandAcked (3 chunk):
+  B1 ICommandAckProbe + PixelDiffAckProbe 实现 (ROI 技能 50x50 / 物品 62x45)
+  B2 SkillEngine/ItemEngine 切 Acked 判定 ★ 用户冒烟核心 (灰图标累积)
+  B3 DSL .RequireAck() modifier emit
+
+D DeferredQueue (3 chunk):
+  D1 DeferredQueue 子聚合 (HeroLoopHost 持有 ImmutableQueue<DeferredCommand>)
+  D2 BuffObservable/StunObservable + state-change-driven flush ★ 用户冒烟核心 (吹风秒接)
+  D3 DSL .QueueWhen(condition) modifier emit
+
+E ItemMetadata (2 chunk):
+  E1 ItemDescriptor + ItemCatalog SSOT (守报 IsInsertable=false)
+  E2 ItemEngine 双发送路径 ★ 用户冒烟核心 (物品分类)
+
+F-G DSL 表达层附线 (3 chunk):
+  F1 物品 DSL 4 维 emit (.UseItemsSerial/.UseItemsBurst/.AfterCastReplaceIcon) + HeroStrategyBase KeepLeg helper
+  G1 6 hero Burst inline 替 (莱恩/沉默/屠夫/骨法/军团/天怒)
+  G2 KeepLeg 8 hero + ReplaceIcon 2 hero
+```
+
+### Phase 26 A1 完成 (✅ 2026-05-26, commit `a3f4b20`)
+
+- 新文件 `Dota2Simulator/GameAutomation/Domain/RefractoryState.cs` (32 行): Dictionary<string, long> SSOT, API: SetRefractory(name, durationMs) / IsRefractory(name) / Clear(name) / Reset()
+- `Dota2Simulator/GameAutomation/Application/HeroAggregate.cs` +3 行: `public RefractoryState Refractory { get; } = new();`
+- 类型新增 0 caller 业务零改
+- Build verify: DOTA2+Silt 0 错 248 warn (baseline 一致) / LOL 0 错 137 warn / HF2 0 错 142 warn / GpuVision PowerShell CLI `;` 解析问题留 IDE 验证 (A1 是 #if DOTA2 内类型新增, 对 GpuVision 行为无影响)
+
+### Phase 26 推迟到 Phase 27+ (用户 grill 6-19 场景 + scope 收紧)
+
+| Phase 候选 | 内容 | 用户原文场景 |
+|---|---|---|
+| **27** | **Combo Scheduler J 段** (SkillMetadata + ComboPlan DSL + Combo State) | 火女 吹风接光击阵 / 吹风接陨星锤 (2s+0.5s) / 萨尔 D 动态延迟 / 船长 EQ 最大化晕眩 / 跳刀破林肯接决斗 / 纷争+虚灵刀+技能 序列 / 刷新黑洞 / 凋零黑洞接刷新 / 马尔斯举盾反向矛+大 |
+| 27 | StepMachine DSL (原 25D) + 5 hero 迁 | 船长 E 双 Probe / 军团 F / 巫妖 E / 骨法 R / 天怒 D3 |
+| 27 | Backoff 熔断 (原 C 段) | 防御性 — 持续失败 5 次 alert + TTS + 跳主循环 |
+| 28+ | Channel cancel-into | 光法/小黑持续施法可提前结束达最大伤害; 光法大+Q 换魂可移动放技能 |
+| 28+ | 多 Hero Context | 德鲁伊小熊 Tab 切换 |
+| 28+ | State Machine Optimal-Path Planner | 卡尔球组合最小化搓 (冰雷火→火雷雷 只切火); 卡尔 D/F 槽位 cooldown-aware 交换 |
+| 29+ | Observation Space (战场感知) | 敌人位置 / 距离 / 速度 / Buff 识别 / Channel 状态 / Cooldown 表 (吹风天火 / 吹风推波陨石 等连招的前置依赖) |
+| 30+ | Trajectory Recorder + Reward Hooks | RL/GA 训练数据采集 (用户校准: "跨 AI 利好不是直接目的" — 推迟) |
+
+### Phase 26 待续 (下次 session 起手)
+
+- 当前已完成: A1 (commit `a3f4b20`)
+- 下一 chunk: **A2 ItemEngine 切假腿走 Refractory** (★ 用户冒烟核心, 改 ItemEngine 切假腿 hot path)
+- 关键设计:
+  - `切假腿类型(type)` 临界段开始时 `_aggregate.Refractory.SetRefractory("LegSwap", ~200)` (atomic 33ms×2 + ~130ms grace)
+  - `要求保持假腿 / 技能释放前切假腿 / 根据配置技能释放前切假腿` 入口 check `IsRefractory("LegSwap")` 短路
+- 用户冒烟剧本: 切智力↔敏捷↔力量 三态环反复 10 次, 验证 0 中间态循环 + 最终态正确
+
+### Phase 26 14 场景 backlog (Phase 27+ 准备消化)
+
+详上表"Phase 27+"段。归类:
+- J 段 Combo Scheduler: 场景 6-15 (10 项)
+- 多 hero / Planner: 场景 16-18
+- 战场预测: 场景 19
+- 现 19 场景仅 1-5 在 Phase 26 (本 epic) scope
