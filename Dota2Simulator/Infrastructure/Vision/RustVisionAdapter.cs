@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using Dota2Simulator.GameAutomation.Domain.Perception;
 using Dota2Simulator.GameAutomation.Ports;
+using Dota2Simulator.Infrastructure.Vision;
 
 namespace Dota2Simulator.Vision.Adapters;
 
@@ -63,4 +64,6 @@ public sealed class RustVisionAdapter : IScreenVision
         return result;
     }
 
+    /// <summary>Phase 25A C3: typestate frame scope — 走 GlobalScreenFrame singleton, 与 PixelAt 同一底层 (_tripleBuffer 单例同帧).</summary>
+    public T WithFrame<T>(Func<IScreenFrame, T> read) => read(GlobalScreenFrame.Instance);
 }

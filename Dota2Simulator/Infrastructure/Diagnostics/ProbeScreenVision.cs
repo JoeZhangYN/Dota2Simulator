@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using Dota2Simulator.GameAutomation.Domain.Perception;
@@ -46,5 +47,32 @@ public sealed class ProbeScreenVision : IScreenVision
         if (RecordReplayProbe.Enabled)
             RecordReplayProbe.Record(Port, nameof(FindAll), $"{needle}, {region}, {rate} => {result.Count} 命中");
         return result;
+    }
+
+    /// <summary>Phase 25A C3: WithFrame 装饰 — enabled 时递归装饰 frame 供内部 PixelAt 也录 (保 record/replay 完整性), 否则直透传 0 overhead.</summary>
+    public T WithFrame<T>(Func<IScreenFrame, T> read)
+    {
+        return _inner.WithFrame(frame =>
+        {
+            IScreenFrame probed = RecordReplayProbe.Enabled ? new ProbeFrame(frame) : frame;
+            T result = read(probed);
+            if (RecordReplayProbe.Enabled)
+                RecordReplayProbe.Record(Port, nameof(WithFrame), $"=> {result}");
+            return result;
+        });
+    }
+
+    private sealed class ProbeFrame : IScreenFrame
+    {
+        private const string FramePort = "Vision.Frame";
+        private readonly IScreenFrame _inner;
+        public ProbeFrame(IScreenFrame inner) => _inner = inner;
+        public Color PixelAt(ScreenPoint point)
+        {
+            Color c = _inner.PixelAt(point);
+            if (RecordReplayProbe.Enabled)
+                RecordReplayProbe.Record(FramePort, nameof(PixelAt), $"{point} => {c}");
+            return c;
+        }
     }
 }

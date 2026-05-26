@@ -10,6 +10,7 @@ using SharpDX.Direct3D11;
 using SharpDX.DXGI;
 using Dota2Simulator.GameAutomation.Domain.Perception;
 using Dota2Simulator.GameAutomation.Ports;
+using Dota2Simulator.Infrastructure.Vision;
 using Dota2Simulator.Vision;
 using MapFlags = SharpDX.Direct3D11.MapFlags;
 
@@ -121,6 +122,9 @@ public sealed class GpuFusedVisionAdapter : IScreenVision, IDisposable
         // _tripleBuffer 内是 DXGI 帧裁剪后的数据 (C6 单源), GetColor 内部坐标偏移转换合法.
         return GlobalScreenCapture.GetColor(point.X, point.Y);
     }
+
+    /// <summary>Phase 25A C3: typestate frame scope — 走 GlobalScreenFrame singleton, 与 PixelAt 同一底层 (_tripleBuffer 单例 = DXGI 帧裁剪数据).</summary>
+    public T WithFrame<T>(Func<IScreenFrame, T> read) => read(GlobalScreenFrame.Instance);
 
     public FindResult Find(Template needle, ScreenRegion region, MatchRate rate, Tolerance tolerance)
     {
