@@ -21,7 +21,7 @@ public sealed partial class 血魔Strategy : IHeroStrategy
         {
             _input.MouseClick(MouseButton.Right);
             走A();
-            _item.要求保持假腿();
+            KeepLeg();
             Common.Delay(2400);
             Point p = Control.MousePosition;
             _input.MouseMoveTo(new ScreenPoint(601, 988));

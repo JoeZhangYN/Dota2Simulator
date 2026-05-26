@@ -22,15 +22,14 @@ public sealed partial class 沉默Strategy : IHeroStrategy
 
     private async Task<bool> 大招前纷争()
     {
-        Common.Delay(33 * (
-            _item.根据图片使用物品(Dota2_Pictrue.物品.虚灵之刃_Tpl)
-            + _item.根据图片使用物品(Dota2_Pictrue.物品.纷争_Tpl)
-            + _item.根据图片使用物品(Dota2_Pictrue.物品.红杖_Tpl)
-            + _item.根据图片使用物品(Dota2_Pictrue.物品.红杖2_Tpl)
-            + _item.根据图片使用物品(Dota2_Pictrue.物品.红杖3_Tpl)
-            + _item.根据图片使用物品(Dota2_Pictrue.物品.红杖4_Tpl)
-            + _item.根据图片使用物品(Dota2_Pictrue.物品.红杖5_Tpl)
-        ));
+        _item.批量使用物品并行(
+            Dota2_Pictrue.物品.虚灵之刃_Tpl,
+            Dota2_Pictrue.物品.纷争_Tpl,
+            Dota2_Pictrue.物品.红杖_Tpl,
+            Dota2_Pictrue.物品.红杖2_Tpl,
+            Dota2_Pictrue.物品.红杖3_Tpl,
+            Dota2_Pictrue.物品.红杖4_Tpl,
+            Dota2_Pictrue.物品.红杖5_Tpl);
         return await Task.FromResult(false).ConfigureAwait(true);
     }
 

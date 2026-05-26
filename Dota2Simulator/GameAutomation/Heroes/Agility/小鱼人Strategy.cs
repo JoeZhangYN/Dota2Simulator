@@ -25,7 +25,7 @@ public sealed partial class 小鱼人Strategy : IHeroStrategy
                 _skill.通用技能后续动作(是否保持假腿: false);
                 _main._聚合.LegSwap.需要切假腿 = false;
                 Common.Delay(200);
-                _item.要求保持假腿();
+                KeepLeg();
             });
             return await Task.FromResult(false).ConfigureAwait(true);
         })

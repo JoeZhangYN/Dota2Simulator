@@ -27,7 +27,7 @@ public sealed partial class 火猫Strategy : IHeroStrategy
         .OnKey(Keys.W).PostAsync(async () => await Task.Run(() =>
         {
             Common.Delay(330);
-            _item.要求保持假腿();
+            KeepLeg();
         }).ConfigureAwait(false)).CustomProbe(async () =>
         {
             bool b = _vision.Find(Dota2_Pictrue.Buff.火猫_无影拳_Tpl, buff状态技能栏, new MatchRate(0.9), Tolerance.Exact).Found;
@@ -37,7 +37,7 @@ public sealed partial class 火猫Strategy : IHeroStrategy
                 {
                     Press(Keys.Q);
                 }
-                _item.要求保持假腿();
+                KeepLeg();
                 走A();
             }
             return await Task.FromResult(!b).ConfigureAwait(true);

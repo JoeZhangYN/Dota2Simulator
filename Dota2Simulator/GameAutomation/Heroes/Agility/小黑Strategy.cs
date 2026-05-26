@@ -44,7 +44,7 @@ public sealed partial class 小黑Strategy : IHeroStrategy
             }
             else
             {
-                _item.要求保持假腿();
+                KeepLeg();
                 Dota2Simulator.TTS.TTS.Speak("关闭冰箭");
             }
         })

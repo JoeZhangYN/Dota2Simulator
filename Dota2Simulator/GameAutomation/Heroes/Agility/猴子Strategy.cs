@@ -32,7 +32,7 @@ public sealed partial class 猴子Strategy : IHeroStrategy
             Common.Delay(33);
             _input.MouseClick(MouseButton.Right);
             Press(Keys.F1);
-            _item.要求保持假腿();
+            KeepLeg();
         }).ConfigureAwait(true);
     }
 }

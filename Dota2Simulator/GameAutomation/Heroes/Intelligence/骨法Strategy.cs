@@ -38,13 +38,12 @@ public sealed partial class 骨法Strategy : IHeroStrategy
     {
         return await _skill.主动技能进入CD后续(Keys.W, () =>
         {
-            Common.Delay(33 * (
-                _item.根据图片使用物品(Dota2_Pictrue.物品.红杖_Tpl)
-                + _item.根据图片使用物品(Dota2_Pictrue.物品.红杖2_Tpl)
-                + _item.根据图片使用物品(Dota2_Pictrue.物品.红杖3_Tpl)
-                + _item.根据图片使用物品(Dota2_Pictrue.物品.红杖4_Tpl)
-                + _item.根据图片使用物品(Dota2_Pictrue.物品.红杖5_Tpl)
-            ));
+            _item.批量使用物品并行(
+                Dota2_Pictrue.物品.红杖_Tpl,
+                Dota2_Pictrue.物品.红杖2_Tpl,
+                Dota2_Pictrue.物品.红杖3_Tpl,
+                Dota2_Pictrue.物品.红杖4_Tpl,
+                Dota2_Pictrue.物品.红杖5_Tpl);
         }).ConfigureAwait(true);
     }
 

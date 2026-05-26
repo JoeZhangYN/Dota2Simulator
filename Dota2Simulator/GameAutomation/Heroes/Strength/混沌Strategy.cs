@@ -45,7 +45,7 @@ public sealed partial class 混沌Strategy : IHeroStrategy
                 Common.Delay(15);
                 Press(k);
                 _main._聚合.LegSwap.条件假腿敏捷 = false;
-                _item.要求保持假腿();
+                KeepLeg();
             }
         })
         .LegSwap(Keys.E, alwaysSwap: false)

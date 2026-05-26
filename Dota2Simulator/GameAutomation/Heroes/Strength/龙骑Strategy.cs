@@ -22,7 +22,7 @@ public sealed partial class 龙骑Strategy : IHeroStrategy
         {
             走A();
             _ = _main._聚合.Skills.Mode(SlotKey.W) == 1 && _main._聚合.HasShard ? _skill.DOTA2释放CD就绪技能(Keys.D) : _skill.DOTA2释放CD就绪技能(Keys.Q);
-            _item.要求保持假腿();
+            KeepLeg();
         })
         .OnKey(Keys.R).CastSkill(Keys.R).AfterEnterCD()
         .OnKey(Keys.D).WhenHasShard().CustomProbe(async () => await _skill.技能通用判断(

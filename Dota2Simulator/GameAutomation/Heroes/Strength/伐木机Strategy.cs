@@ -25,7 +25,7 @@ public sealed partial class 伐木机Strategy : IHeroStrategy
         .OnKey(Keys.W).CastSkill(Keys.W).AfterCast()  // C2: 伐木聚链
         .OnKey(Keys.D).WhenStoneChoiceEq(2).CastSkill(Keys.D).AfterCast()  // C3: 锯齿轮旋 (Phase 21A: WhenStoneChoiceEq Guard 替原 override 短路)
         .OnKey(Keys.F).CastSkill(Keys.F).AfterEnterCD()  // C4: 喷火装置
-        .OnKey(Keys.R).CustomProbe(锯齿飞轮去后摇)  // C5: 锯齿飞轮 (释放技能后替换图标技能后续 lambda)
+        .OnKey(Keys.R).CastSkill(Keys.R).AfterCastReplaceIcon(Domain.Loop.SlotKey.R)  // C5: 锯齿飞轮 (Phase 26 G2: AfterCastReplaceIcon DSL 替原 CustomProbe lambda)
         .RegisterStoneProbe(伐木机获取命石)  // Phase 19G-4 RegisterStoneProbe DSL
         .Done();
 
@@ -43,11 +43,6 @@ public sealed partial class 伐木机Strategy : IHeroStrategy
         }
         _main._聚合.Stone.Probe = null;
         return await Task.FromResult(false).ConfigureAwait(true);
-    }
-
-    private async Task<bool> 锯齿飞轮去后摇()
-    {
-        return await _skill.释放技能后替换图标技能后续(Keys.R, () => _main._聚合.Skills.Step(Domain.Loop.SlotKey.R), v => _main._聚合.Skills.SetStep(Domain.Loop.SlotKey.R, v)).ConfigureAwait(true);
     }
 }
 #endif

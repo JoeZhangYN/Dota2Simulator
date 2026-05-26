@@ -40,7 +40,7 @@ public sealed partial class 幽鬼Strategy : IHeroStrategy
                     Dota2_Pictrue.物品.紫苑_Tpl,
                     Dota2_Pictrue.物品.血棘_Tpl);
             }
-            _item.要求保持假腿();
+            KeepLeg();
             走A();
         })
         .OnKey(Keys.E).CastSkill(Keys.E).AfterEnterCD()

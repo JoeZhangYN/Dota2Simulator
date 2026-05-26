@@ -54,12 +54,12 @@ public sealed partial class 军团Strategy : IHeroStrategy
                     _main._聚合.Skills.SetStep(SlotKey.Global, 1);
                     return await Task.FromResult(true).ConfigureAwait(true);
                 case < 2 when 步骤 == 1:
-                    // 4 跳刀变体 *并行* 求和单次 Delay (业务原 Common.Delay(33 * (a+b+c+d)) 累加单延迟, 与批量逐项不同) — 保留原表达式.
-                    Common.Delay(33 * (
-                        _item.根据图片使用物品(Dota2_Pictrue.物品.跳刀_Tpl)
-                        + _item.根据图片使用物品(Dota2_Pictrue.物品.跳刀_力量跳刀_Tpl)
-                        + _item.根据图片使用物品(Dota2_Pictrue.物品.跳刀_智力跳刀_Tpl)
-                        + _item.根据图片使用物品(Dota2_Pictrue.物品.跳刀_敏捷跳刀_Tpl)));
+                    // Phase 26 G1: 4 跳刀变体 Burst — _item.批量使用物品并行 替原累加单延迟 inline 形态.
+                    _item.批量使用物品并行(
+                        Dota2_Pictrue.物品.跳刀_Tpl,
+                        Dota2_Pictrue.物品.跳刀_力量跳刀_Tpl,
+                        Dota2_Pictrue.物品.跳刀_智力跳刀_Tpl,
+                        Dota2_Pictrue.物品.跳刀_敏捷跳刀_Tpl);
                     _main._聚合.Skills.SetStep(SlotKey.Global, 2);
                     return await Task.FromResult(true).ConfigureAwait(true);
                 case < 3:

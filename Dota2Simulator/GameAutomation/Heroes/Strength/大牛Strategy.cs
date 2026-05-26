@@ -1,4 +1,4 @@
-// Phase 15 C1: 大牛 Strategy 迁 HeroPlan + Pre DSL — Q AfterCast(postDelayMs:1300), W Pre(_input.Press(A)) + CustomProbe (释放技能后替换图标技能后续), R AfterCast.
+// Phase 15 C1: 大牛 Strategy 迁 HeroPlan + Pre DSL — Q AfterCast(postDelayMs:1300), W Pre(_input.Press(A)) + AfterCastReplaceIcon (Phase 26 G2: DSL chain 替原 CustomProbe lambda), R AfterCast.
 #if DOTA2
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -15,11 +15,7 @@ public sealed partial class 大牛Strategy : IHeroStrategy
 {
     protected override HeroPlan BuildPlan() => HeroPlanBuilder.New()
         .OnKey(Keys.Q).CastSkill(Keys.Q).AfterCast(postDelayMs: 1300)
-        .OnKey(Keys.W).Pre(() => 走A()).CustomProbe(async () =>
-            await _skill.释放技能后替换图标技能后续(
-                Keys.W,
-                () => _main._聚合.Skills.Step(SlotKey.W),
-                v => _main._聚合.Skills.SetStep(SlotKey.W, v)).ConfigureAwait(true))
+        .OnKey(Keys.W).Pre(() => 走A()).CastSkill(Keys.W).AfterCastReplaceIcon(SlotKey.W)  // Phase 26 G2: AfterCastReplaceIcon DSL 替原 CustomProbe lambda
         .OnKey(Keys.R).CastSkill(Keys.R).AfterCast()
         .LegSwap(Keys.E, alwaysSwap: false)
         .Done();
