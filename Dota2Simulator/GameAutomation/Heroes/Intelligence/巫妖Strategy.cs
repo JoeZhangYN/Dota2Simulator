@@ -1,5 +1,9 @@
-// Phase 16 C2: 巫妖 Strategy 迁 HeroPlan — 5 全 CustomProbe (Step(E)>0 ? 11/10 : 1/0 动态 mode, Q/W/R Step 状态机 11/1 切换), E CustomProbe (阴邪凝视 Step 0/1/2 状态机), W+Alt Execute 共享 C2.
+// Phase 27A retry2 S3 (2026-05-26): 巫妖 E 状态机迁 .StepMachine — 删 fire-and-forget Task.Run + Common.Delay(200), 改 new Delay(200) StepCommand 显式.
+// Phase 16 C2 base: 5 全 CustomProbe (Step(E)>0 ? 11/10 : 1/0 动态 mode, Q/W/R Step 状态机 11/1 切换), W+Alt Execute 共享 C2.
+// 横向耦合保留: Q/W/R/D 仍读 _main._聚合.Skills.Step(SlotKey.E); 因此 StepMachine 内 Conditional/SetStepIf wet Cond 同步写回 Skills.SetStep 桥接 (Phase 27B/C/D 评估读侧迁移).
+// S3 设计折衷: 走A() + 羊刀 是任意 side-effect, 19 原语无 InvokeAction 类直接表达, 走 escape hatch (predicate 内嵌副作用 + 返 bool) 与 S5 一致 pattern.
 #if DOTA2
+using System;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Dota2Simulator.GameAutomation.Application;
@@ -7,6 +11,7 @@ using Dota2Simulator.GameAutomation.Application.HeroPlans;
 using Dota2Simulator.GameAutomation.Domain.Actuation;
 using Dota2Simulator.GameAutomation.Domain.Heroes;
 using Dota2Simulator.GameAutomation.Domain.Loop;
+using Dota2Simulator.GameAutomation.Domain.StepMachine;
 using Dota2Simulator.Games;
 using Dota2Simulator.Games.Dota2;
 
@@ -19,40 +24,42 @@ public sealed partial class 巫妖Strategy : IHeroStrategy
         .OnKey(Keys.Q).CustomProbe(async () => await _skill.技能通用判断(Keys.Q, _main._聚合.Skills.Step(SlotKey.E) > 0 ? 11 : 1).ConfigureAwait(true))
         .OnKey(Keys.W).CustomProbe(async () => await _skill.技能通用判断(Keys.W, _main._聚合.Skills.Step(SlotKey.E) > 0 ? 11 : 1, false).ConfigureAwait(true))
         .OnKey(Keys.W, KeyModifiers.Alt).SetActive(ConditionSlotKey.C2)
-        .OnKey(Keys.E).CustomProbe(async () =>
-        {
-            if (_skill.DOTA2判断技能是否CD(Keys.E))
-            {
-                _main._聚合.Skills.SetStep(SlotKey.E, 0);
-                return true;
-            }
-            int step = _main._聚合.Skills.Step(SlotKey.E);
-            if (step == 0)
-            {
-                _main._聚合.Skills.SetStep(SlotKey.E, 1);
-                return true;
-            }
-            else if (step == 1)
-            {
-                _ = Task.Run(() =>
-                {
-                    Common.Delay(200);
-                    _main._聚合.Skills.SetStep(SlotKey.E, 2);
-                });
-                return true;
-            }
-            else
-            {
-                if (!_skill.DOTA2判断是否持续施法())
-                {
-                    _main._聚合.Skills.SetStep(SlotKey.E, 0);
-                    走A();
-                    _ = _item.根据图片使用物品(Dota2_Pictrue.物品.羊刀_Tpl);
-                    return false;
-                }
-                return true;
-            }
-        })
+        .OnKey(Keys.E).NoProbe()  // Step 状态机迁 .StepMachine("E_Mode", ...) 下方 chain; NoProbe 保 clause 终结合法 + lastIdx 锚点.
+        .StepMachine("E_Mode", sub => sub
+            .Initial(0)
+            .Step(0).Do(
+                new Conditional(
+                    _ =>
+                    {
+                        if (_skill.DOTA2判断技能是否CD(Keys.E))
+                        {
+                            _main._聚合.Skills.SetStep(SlotKey.E, 0);  // 横向耦合读侧 bridge: Q/W/R/D 仍读 Skills.Step(SlotKey.E).
+                            return true;
+                        }
+                        _main._聚合.Skills.SetStep(SlotKey.E, 1);
+                        return false;
+                    },
+                    ifSteps: new StepCommand[] { new SetStep(0) },
+                    elseSteps: new StepCommand[] { new SetStep(1) })
+            ).End()
+            .Step(1).Do(
+                new Delay(200),                                                                                        // 替代原 _=Task.Run(()=>Common.Delay(200)) fire-and-forget.
+                new SetStepIf(_ => { _main._聚合.Skills.SetStep(SlotKey.E, 2); return true; }, 2)                       // 同步写回 Skills.Step(SlotKey.E) 桥接 + StepMachineState SetStep(2).
+            ).End()
+            .Step(2).Do(
+                new Conditional(
+                    _ =>
+                    {
+                        if (_skill.DOTA2判断是否持续施法()) return true;
+                        _main._聚合.Skills.SetStep(SlotKey.E, 0);  // 横向耦合读侧 bridge.
+                        走A();
+                        _ = _item.根据图片使用物品(Dota2_Pictrue.物品.羊刀_Tpl);
+                        return false;
+                    },
+                    ifSteps: Array.Empty<StepCommand>(),
+                    elseSteps: new StepCommand[] { new SetStep(0) })
+            ).End()
+        )
         .OnKey(Keys.R).CustomProbe(async () => await _skill.技能通用判断(Keys.R, _main._聚合.Skills.Step(SlotKey.E) > 0 ? 11 : 1).ConfigureAwait(true))
         .OnKey(Keys.D).CustomProbe(async () => await _skill.技能通用判断(Keys.D, _main._聚合.Skills.Step(SlotKey.E) > 0 ? 10 : 0).ConfigureAwait(true))
         .Done();
