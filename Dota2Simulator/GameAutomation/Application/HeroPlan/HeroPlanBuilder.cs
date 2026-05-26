@@ -388,6 +388,61 @@ public sealed class HeroPlanBuilder
         => FinishClause(CastMode.AfterCastLegOnly, continueAttack, continueKey, postDelayMs);
 
     /// <summary>
+    /// Phase 22A: 终结子句为 "主动技能进入 CD 后跑自定义动作" — 替原 CustomProbe(async () => await _skill.主动技能进入CD后续(skillKey, lambda).ConfigureAwait(true)) 3 层壳模板.
+    /// 业务侧 lambda 只写"自定义动作 body"; DSL 内部 Plan.Apply 时 wrap 为 ConditionDelegateBitmap 调 SkillEngine.主动技能进入CD后续.
+    /// </summary>
+    public HeroPlanBuilder AfterEnterCDDo(Action customAction)
+        => FinishClauseAfter(SkillAfterMode.EnterCD, customAction);
+
+    /// <summary>
+    /// Phase 22A: 终结子句为 "主动技能释放后跑自定义动作" — 替原 CustomProbe(async () => await _skill.主动技能释放后续(skillKey, lambda).ConfigureAwait(true)) 3 层壳模板.
+    /// </summary>
+    public HeroPlanBuilder AfterCastDo(Action customAction)
+        => FinishClauseAfter(SkillAfterMode.Cast, customAction);
+
+    /// <summary>
+    /// Phase 22A: 终结子句为 "主动技能 CD 就绪后跑自定义动作" — 替原 CustomProbe(async () => await _skill.主动技能已就绪后续(skillKey, lambda).ConfigureAwait(true)) 3 层壳模板.
+    /// </summary>
+    public HeroPlanBuilder WhenReadyDo(Action customAction)
+        => FinishClauseAfter(SkillAfterMode.WhenReady, customAction);
+
+    private HeroPlanBuilder FinishClauseAfter(SkillAfterMode mode, Action customAction)
+    {
+        if (_pendingTrigger is null)
+        {
+            throw new InvalidOperationException($"FinishClauseAfter({mode}): 需先调 OnKey.");
+        }
+        if (_pendingSkill is null)
+        {
+            throw new InvalidOperationException($"FinishClauseAfter({mode}): 需先调 CastSkill (OnKey={_pendingTrigger}).");
+        }
+        if (customAction is null) throw new ArgumentNullException(nameof(customAction));
+
+        _clauses.Add(new HeroPlanClause(
+            TriggerKey: Domain.Actuation.VirtualKey.From(_pendingTrigger.Value),
+            SkillKey: _pendingSkill.Value,
+            Mode: CastMode.AfterEnterCD,  // 占位, 走 AfterMode 路径不消费 Mode.
+            ContinueAttack: false,
+            ContinueKey: Keys.None,
+            PostDelayMs: 0,
+            Guard: _pendingGuard,
+            PreActionSync: _pendingPreActionSync,
+            PreActionAsync: _pendingPreActionAsync,
+            Modifiers: _pendingModifiers,
+            PostActionSync: _pendingPostActionSync,
+            PostActionAsync: _pendingPostActionAsync,
+            GuardPredicate: _pendingGuardPredicate,
+            AfterMode: mode,
+            AfterCustomAction: customAction));
+
+        _lastClauseTrigger = _pendingTrigger;
+        _lastClauseGuard = _pendingGuard;
+        _lastClauseModifiers = _pendingModifiers;
+        ResetPending();
+        return this;
+    }
+
+    /// <summary>
     /// 终结子句为 Toggle 形态: 触发键 = D3/D4 数字键 toggle ConditionSlot.Active = !Active + TTS 播报;
     /// Probe 自循环 (释放 <paramref name="skillKey"/> 技能 mode=2 后返 Active, 直到再次按下 toggle 退出).
     /// 用于小仙女 D3 (续暗影/不续暗影) / 小强 D3 (循环爆裂/终止循环) / 瘟疫法师 D3 (循环脉冲/终止循环) 等形态.

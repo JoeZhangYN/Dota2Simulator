@@ -20,14 +20,14 @@ public sealed partial class 幽鬼Strategy : IHeroStrategy
         .LegSwap(Keys.E, alwaysSwap: false)
         .OnKey(Keys.F1).WhenHasShard().AdjustLegSwap(Keys.E, paramBool: true)
         .OnKey(Keys.Q).CastSkill(Keys.Q).AfterCast(continueAttack: false)
-        .OnKey(Keys.R).CustomProbe(async () => await _skill.主动技能释放后续(Keys.R, () =>
+        .OnKey(Keys.R).CastSkill(Keys.R).AfterCastDo(() =>
         {
             if (_main._聚合.Skills.Mode(SlotKey.F) == 1)
             {
                 _input.Press(VirtualKey.From(Keys.D));
             }
-        }).ConfigureAwait(true))
-        .OnKey(Keys.D).CustomProbe(async () => await _skill.主动技能进入CD后续(Keys.D, () =>
+        })
+        .OnKey(Keys.D).CastSkill(Keys.D).AfterEnterCDDo(() =>
         {
             if (_main._聚合.Skills.Mode(SlotKey.F) == 1)
             {
@@ -41,7 +41,7 @@ public sealed partial class 幽鬼Strategy : IHeroStrategy
             }
             _item.要求保持假腿();
             _input.Press(VirtualKey.From(Keys.A));
-        }).ConfigureAwait(true))
+        })
         .OnKey(Keys.E).CastSkill(Keys.E).AfterEnterCD()
         .OnKey(Keys.D2).Execute(() =>
         {

@@ -19,7 +19,7 @@ public sealed partial class 小骷髅Strategy : IHeroStrategy
         .AttackTiming(preDelay: 0.4, interval: 1.7)
         .OnKey(Keys.F1).WhenHasShard().Execute(() => _main._聚合.LegSwap.配置.修改配置(Keys.D, true, "敏捷"))
         .OnKey(Keys.F1).WhenHasAghanim().AdjustLegSwap(Keys.F, paramBool: true)
-        .OnKey(Keys.Q).CustomProbe(async () => await _skill.主动技能进入CD后续(Keys.Q, () =>
+        .OnKey(Keys.Q).CastSkill(Keys.Q).AfterEnterCDDo(() =>
         {
             if (_main._聚合.Skills.Mode(SlotKey.Q) == 1)
             {
@@ -33,22 +33,22 @@ public sealed partial class 小骷髅Strategy : IHeroStrategy
                 Common.Delay(33 * _item.根据图片使用物品(Dota2_Pictrue.物品.缚灵锁_Tpl));
             }
             _skill.通用技能后续动作();
-        }).ConfigureAwait(true))
-        .OnKey(Keys.W).CustomProbe(async () => await _skill.主动技能进入CD后续(Keys.W, () =>
+        })
+        .OnKey(Keys.W).CastSkill(Keys.W).AfterEnterCDDo(() =>
         {
             _ = _skill.DOTA2释放CD就绪技能(Keys.Q);
             _skill.通用技能后续动作();
-        }).ConfigureAwait(true))
-        .OnKey(Keys.E).CustomProbe(async () => await _skill.主动技能释放后续(Keys.E, () => _input.MouseClick(MouseButton.Right)).ConfigureAwait(true))
-        .OnKey(Keys.R).CustomProbe(async () => await _skill.主动技能进入CD后续(Keys.R, () => _input.MouseClick(MouseButton.Right)).ConfigureAwait(true))
-        .OnKey(Keys.D).WhenHasShard().CustomProbe(async () => await _skill.主动技能释放后续(Keys.F, () =>
+        })
+        .OnKey(Keys.E).CastSkill(Keys.E).AfterCastDo(() => _input.MouseClick(MouseButton.Right))
+        .OnKey(Keys.R).CastSkill(Keys.R).AfterEnterCDDo(() => _input.MouseClick(MouseButton.Right))
+        .OnKey(Keys.D).WhenHasShard().CastSkill(Keys.F).AfterCastDo(() =>
         {
             if (_main._聚合.Skills.Mode(SlotKey.F) == 1)
             {
                 Common.Delay(0);
                 _input.Press(VirtualKey.From(Keys.R));
             }
-        }).ConfigureAwait(true))
+        })
         .OnKey(Keys.F).WhenHasAghanim().CastSkill(Keys.F).AfterEnterCD()
         .OnKey(Keys.D2).Execute(() =>
         {

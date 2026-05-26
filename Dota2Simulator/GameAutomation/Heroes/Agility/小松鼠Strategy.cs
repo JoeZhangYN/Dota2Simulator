@@ -15,7 +15,7 @@ public sealed partial class 小松鼠Strategy : IHeroStrategy
 {
     protected override HeroPlan BuildPlan() => HeroPlanBuilder.New()
         .OnKey(Keys.F1).WhenHasShard().AdjustLegSwap(Keys.F, paramBool: true)
-        .OnKey(Keys.Q).CustomProbe(async () => await _skill.主动技能释放后续(Keys.Q, () =>
+        .OnKey(Keys.Q).CastSkill(Keys.Q).AfterCastDo(() =>
         {
             if (_main._聚合.Skills.Mode(SlotKey.W) == 1)
             {
@@ -25,8 +25,8 @@ public sealed partial class 小松鼠Strategy : IHeroStrategy
             {
                 _skill.通用技能后续动作();
             }
-        }).ConfigureAwait(true))
-        .OnKey(Keys.W).CustomProbe(async () => await _skill.主动技能释放后续(Keys.W, () =>
+        })
+        .OnKey(Keys.W).CastSkill(Keys.W).AfterCastDo(() =>
         {
             if (_main._聚合.Skills.Mode(SlotKey.E) == 1)
             {
@@ -36,7 +36,7 @@ public sealed partial class 小松鼠Strategy : IHeroStrategy
             {
                 _skill.通用技能后续动作();
             }
-        }).ConfigureAwait(true))
+        })
         .OnKey(Keys.R).NoProbe()
         .OnKey(Keys.F).WhenHasShard().CastSkill(Keys.F).AfterCast()
         .OnKey(Keys.D2).Execute(() =>

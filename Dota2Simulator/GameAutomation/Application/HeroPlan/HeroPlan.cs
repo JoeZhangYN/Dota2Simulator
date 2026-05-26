@@ -12,6 +12,22 @@ using Dota2Simulator.GameAutomation.Domain.Actuation;
 
 namespace Dota2Simulator.GameAutomation.Application.HeroPlans;
 
+/// <summary>
+/// Phase 22A: 标准化"主动技能 X 后续"调用形态 — 替代手写 CustomProbe + lambda 包装 SkillEngine 调用.
+/// 业务侧 lambda 只写"释放后/CD 后/就绪后"自定义动作, DSL 自动包装为 ConditionDelegateBitmap.
+/// </summary>
+public enum SkillAfterMode
+{
+    /// <summary>无 — 走 enum Guard / CustomProbeFn / IsToggle 等其它路径.</summary>
+    None = 0,
+    /// <summary>主动技能进入 CD 后跑 customAction — 等价 <c>await _skill.主动技能进入CD后续(skillKey, customAction)</c>.</summary>
+    EnterCD,
+    /// <summary>主动技能释放后跑 customAction — 等价 <c>await _skill.主动技能释放后续(skillKey, customAction)</c>.</summary>
+    Cast,
+    /// <summary>主动技能 CD 就绪后跑 customAction — 等价 <c>await _skill.主动技能已就绪后续(skillKey, customAction)</c>.</summary>
+    WhenReady,
+}
+
 /// <summary>聚合状态守卫 (按键触发时检查): 决定该 clause/setup 是否触发.</summary>
 public enum AggGuard
 {
@@ -55,7 +71,10 @@ public readonly record struct HeroPlanClause(
     Action? PostActionSync = null,
     Func<Task>? PostActionAsync = null,
     // Phase 21A: 通用谓词 Guard — 与 enum Guard 互斥 (非 null 时优先). 用于 SkillStep / StoneChoice 等多值状态的 specialized Guard.
-    Func<HeroContext, bool>? GuardPredicate = null);
+    Func<HeroContext, bool>? GuardPredicate = null,
+    // Phase 22A: 主动技能 X 后续 DSL — AfterMode != None 时优先级最高 (Apply 内自动包装 SkillEngine 调用为 Probe).
+    SkillAfterMode AfterMode = SkillAfterMode.None,
+    Action? AfterCustomAction = null);
 
 /// <summary>
 /// 假腿配置条目 (按键 → alwaysSwap 标志, OnActivate 时一次性应用).
@@ -158,6 +177,22 @@ public sealed class HeroPlan
             // NoProbe sentinel: 仅占槽, 不挂 Probe — 用于按键 Active 但无技能释放委托的边缘形态.
             if (clause.SkillKey == Keys.None)
             {
+                continue;
+            }
+
+            // Phase 22A: AfterXDo DSL (.AfterEnterCDDo / .AfterCastDo / .WhenReadyDo) — 业务侧 lambda 只写自定义动作, DSL 包装 SkillEngine 调用为 Probe.
+            if (clause.AfterMode != SkillAfterMode.None && clause.AfterCustomAction is not null)
+            {
+                Action body = clause.AfterCustomAction;
+                Keys sk = clause.SkillKey;
+                ConditionDelegateBitmap probe = clause.AfterMode switch
+                {
+                    SkillAfterMode.EnterCD => async () => await skill.主动技能进入CD后续(sk, body).ConfigureAwait(true),
+                    SkillAfterMode.Cast => async () => await skill.主动技能释放后续(sk, body).ConfigureAwait(true),
+                    SkillAfterMode.WhenReady => async () => await skill.主动技能已就绪后续(sk, body).ConfigureAwait(true),
+                    _ => throw new InvalidOperationException($"未处理的 SkillAfterMode: {clause.AfterMode}"),
+                };
+                ctx.Aggregate.Conditions[slotKey].Probe ??= probe;
                 continue;
             }
 

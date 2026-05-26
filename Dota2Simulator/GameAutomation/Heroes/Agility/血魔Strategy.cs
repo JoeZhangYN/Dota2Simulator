@@ -17,7 +17,7 @@ public sealed partial class 血魔Strategy : IHeroStrategy
 {
     protected override HeroPlan BuildPlan() => HeroPlanBuilder.New()
         .LegSwap(Keys.E, alwaysSwap: false)
-        .OnKey(Keys.W).CustomProbe(async () => await _skill.主动技能释放后续(Keys.W, () =>
+        .OnKey(Keys.W).CastSkill(Keys.W).AfterCastDo(() =>
         {
             _input.MouseClick(MouseButton.Right);
             _input.Press(VirtualKey.From(Keys.A));
@@ -29,7 +29,7 @@ public sealed partial class 血魔Strategy : IHeroStrategy
             {
                 _input.MouseMoveTo(new ScreenPoint(p.X, p.Y));
             }
-        }).ConfigureAwait(true))
+        })
         .OnKey(Keys.R).CastSkill(Keys.R).AfterCast()
         .OnKey(Keys.Q).CastSkill(Keys.Q).AfterEnterCD()
         .OnKey(Keys.Q, KeyModifiers.Alt).Execute(() => _main._聚合.Conditions[ConditionSlotKey.C3].Active = true)

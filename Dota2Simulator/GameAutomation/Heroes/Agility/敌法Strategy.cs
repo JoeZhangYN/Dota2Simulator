@@ -18,7 +18,7 @@ public sealed partial class 敌法Strategy : IHeroStrategy
     protected override HeroPlan BuildPlan() => HeroPlanBuilder.New()
         .LegSwap(Keys.Q, alwaysSwap: false)
         .OnKey(Keys.F1).WhenHasShard().AdjustLegSwap(Keys.D, paramBool: true)
-        .OnKey(Keys.W).CustomProbe(async () => await _skill.主动技能释放后续(Keys.W, () =>
+        .OnKey(Keys.W).CastSkill(Keys.W).AfterCastDo(() =>
         {
             if (_main._聚合.Skills.Mode(SlotKey.W) == 1)
             {
@@ -28,7 +28,7 @@ public sealed partial class 敌法Strategy : IHeroStrategy
                 _main._聚合.Skills.SetMode(SlotKey.W, 0);
             }
             _skill.通用技能后续动作();
-        }).ConfigureAwait(true))
+        })
         .OnKey(Keys.E).CastSkill(Keys.E).AfterEnterCDLegOnly()
         .OnKey(Keys.R).CastSkill(Keys.R).AfterCast()
         .OnKey(Keys.D).WhenHasShard().CastSkill(Keys.D).AfterEnterCDLegOnly()

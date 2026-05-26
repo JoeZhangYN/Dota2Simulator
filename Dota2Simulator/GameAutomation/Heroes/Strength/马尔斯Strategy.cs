@@ -14,7 +14,7 @@ namespace Dota2Simulator.GameAutomation.Heroes.Strength;
 public sealed partial class 马尔斯Strategy : IHeroStrategy
 {
     protected override HeroPlan BuildPlan() => HeroPlanBuilder.New()
-        .OnKey(Keys.Q).CustomProbe(async () => await _skill.主动技能释放后续(Keys.Q, () =>
+        .OnKey(Keys.Q).CastSkill(Keys.Q).AfterCastDo(() =>
         {
             if (_main._聚合.Skills.Mode(SlotKey.Q) == 1)
             {
@@ -24,16 +24,16 @@ public sealed partial class 马尔斯Strategy : IHeroStrategy
             {
                 _skill.通用技能后续动作();
             }
-        }).ConfigureAwait(true))
+        })
         .OnKey(Keys.W).CastSkill(Keys.W).AfterCast()
-        .OnKey(Keys.R).CustomProbe(async () => await _skill.主动技能释放后续(Keys.R, () =>
+        .OnKey(Keys.R).CastSkill(Keys.R).AfterCastDo(() =>
         {
             if (_skill.判断技能状态(Keys.E, SkillEngine.技能类型.状态))
             {
                 _input.Press(VirtualKey.From(Keys.E));
             }
             _skill.通用技能后续动作();
-        }).ConfigureAwait(true))
+        })
         .OnKey(Keys.D2).Execute(() =>
         {
             _main._聚合.Skills.ToggleMode(SlotKey.Q);

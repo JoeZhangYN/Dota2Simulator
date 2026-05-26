@@ -14,7 +14,7 @@ public sealed partial class 孽主Strategy : IHeroStrategy
 {
     protected override HeroPlan BuildPlan() => HeroPlanBuilder.New()
         .OnKey(Keys.Q).CastSkill(Keys.Q).AfterCast()
-        .OnKey(Keys.W).CustomProbe(async () => await _skill.主动技能释放后续(Keys.W, () =>
+        .OnKey(Keys.W).CastSkill(Keys.W).AfterCastDo(() =>
         {
             _input.MouseClick(MouseButton.Right);
             if (_skill.DOTA2释放CD就绪技能(Keys.Q))
@@ -22,7 +22,7 @@ public sealed partial class 孽主Strategy : IHeroStrategy
                 return;
             }
             _input.Press(VirtualKey.From(Keys.A));
-        }).ConfigureAwait(true))
+        })
         .Done();
 }
 #endif

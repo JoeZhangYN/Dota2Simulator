@@ -16,7 +16,7 @@ namespace Dota2Simulator.GameAutomation.Heroes.Intelligence;
 public sealed partial class 帕克Strategy : IHeroStrategy
 {
     protected override HeroPlan BuildPlan() => HeroPlanBuilder.New()
-        .OnKey(Keys.Q).CustomProbe(async () => await _skill.主动技能进入CD后续(Keys.Q, () =>
+        .OnKey(Keys.Q).CastSkill(Keys.Q).AfterEnterCDDo(() =>
         {
             _main._聚合.Skills.SetStep(SlotKey.Q, 1);
             Common.Delay(3400);
@@ -25,15 +25,15 @@ public sealed partial class 帕克Strategy : IHeroStrategy
                 _input.Press(VirtualKey.From(Keys.D));
             }
             _main._聚合.Skills.SetStep(SlotKey.Q, 0);
-        }).ConfigureAwait(true))
+        })
         .OnKey(Keys.W).CastSkill(Keys.W).AfterEnterCD()
         .OnKey(Keys.W, KeyModifiers.Control).Execute(() => _main._聚合.Conditions[ConditionSlotKey.C2].Active = true)
         .OnKey(Keys.R).CastSkill(Keys.R).AfterEnterCD()
-        .OnKey(Keys.D).CustomProbe(async () => await _skill.主动技能进入CD后续(Keys.D, () =>
+        .OnKey(Keys.D).CastSkill(Keys.D).AfterEnterCDDo(() =>
         {
             _input.Press(VirtualKey.From(Keys.F1));
             _input.Press(VirtualKey.From(Keys.F1));
-        }).ConfigureAwait(true))
+        })
         .OnKey(Keys.D2).Execute(() =>
         {
             _main._聚合.Skills.ToggleMode(SlotKey.D);

@@ -14,7 +14,7 @@ public sealed partial class 哈斯卡Strategy : IHeroStrategy
 {
     protected override HeroPlan BuildPlan() => HeroPlanBuilder.New()
         .OnKey(Keys.Q).CastSkill(Keys.W).AfterCast()
-        .OnKey(Keys.R).CustomProbe(async () => await _skill.主动技能释放后续(Keys.R, () =>
+        .OnKey(Keys.R).CastSkill(Keys.R).AfterCastDo(() =>
         {
             _input.MouseClick(MouseButton.Right);
             if (_skill.DOTA2释放CD就绪技能(Keys.Q))
@@ -22,7 +22,7 @@ public sealed partial class 哈斯卡Strategy : IHeroStrategy
                 return;
             }
             _input.Press(VirtualKey.From(Keys.A));
-        }).ConfigureAwait(true))
+        })
         .LegSwap(Keys.E, alwaysSwap: false)
         .Done();
 }

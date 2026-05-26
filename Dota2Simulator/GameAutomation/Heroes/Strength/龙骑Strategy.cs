@@ -18,12 +18,12 @@ public sealed partial class 龙骑Strategy : IHeroStrategy
         .LegSwap(Keys.E, alwaysSwap: false)
         .OnKey(Keys.F1).WhenHasShard().AdjustLegSwap(Keys.D, paramBool: true)
         .OnKey(Keys.Q).CastSkill(Keys.Q).AfterCast()
-        .OnKey(Keys.W).CustomProbe(async () => await _skill.主动技能进入CD后续(Keys.W, () =>
+        .OnKey(Keys.W).CastSkill(Keys.W).AfterEnterCDDo(() =>
         {
             _input.Press(VirtualKey.From(Keys.A));
             _ = _main._聚合.Skills.Mode(SlotKey.W) == 1 && _main._聚合.HasShard ? _skill.DOTA2释放CD就绪技能(Keys.D) : _skill.DOTA2释放CD就绪技能(Keys.Q);
             _item.要求保持假腿();
-        }).ConfigureAwait(true))
+        })
         .OnKey(Keys.R).CastSkill(Keys.R).AfterEnterCD()
         .OnKey(Keys.D).WhenHasShard().CustomProbe(async () => await _skill.技能通用判断(
             Keys.D,
