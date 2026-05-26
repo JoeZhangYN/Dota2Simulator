@@ -45,6 +45,12 @@ public abstract class HeroStrategyBase : IHeroStrategy
     /// <summary>该策略对应的英雄标识 — SG emit override (从 [HeroStrategy] attribute SSOT 派生).</summary>
     public abstract HeroId Hero { get; }
 
+    /// <summary>Plan lazy cache — 首次 OnActivate/OnKeyAsync 调用时触发 BuildPlan() 并缓存; HeroPlan 是不可变值对象, 单实例 strategy 全生命周期复用. WinForms message pump 单线程调用, 无需 Lazy&lt;T&gt; 锁开销.</summary>
+    private HeroPlan? _cachedPlan;
+
+    /// <summary>缓存的 plan 访问器 — 业务侧若需访问可在 override OnActivate/OnKeyAsync 内直接调用 <c>Plan</c>.</summary>
+    protected HeroPlan Plan => _cachedPlan ??= BuildPlan();
+
     /// <summary>
     /// 声明式 HeroPlan 构造 — 业务侧 override 返回 HeroPlanBuilder.New()...Done().
     /// 默认空 plan 用于未迁 hero (业务侧 override OnActivate/OnKeyAsync 自定义 body).
@@ -52,10 +58,10 @@ public abstract class HeroStrategyBase : IHeroStrategy
     protected virtual HeroPlan BuildPlan() => HeroPlanBuilder.New().Done();
 
     /// <summary>HeroPlan 主路径默认实现 — 业务覆盖 BuildPlan 即可消费; 未迁 hero 可 override.</summary>
-    public virtual void OnActivate(HeroContext ctx) => BuildPlan().Apply(ctx, _skill);
+    public virtual void OnActivate(HeroContext ctx) => Plan.Apply(ctx, _skill);
 
     /// <summary>HeroPlan 主路径默认实现 — 业务覆盖 BuildPlan 即可消费; 未迁 hero 可 override.</summary>
-    public virtual Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx) => BuildPlan().DispatchAsync(trigger, ctx, _item);
+    public virtual Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx) => Plan.DispatchAsync(trigger, ctx, _item);
 }
 
 #endif
