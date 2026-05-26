@@ -32,6 +32,7 @@ C# .NET 10 WinForms 游戏自动化框架，重写为六边形架构。
 - [x] **Phase 19G-1 LOL/HF2 装配链统一** —— 2026-05-26 完成（1 commit `b950e8b`; 抽 AdapterFactory 公共类 CreateInput/Vision/Ui; AppContainer + Form2 LOL/HF2 block 共享 SSOT; LolEngine/Hf2Engine ctor 扩 3 ports 对称; 三 build 全 PASS）
 - [x] **Phase 19G-2 HeroStrategyBase + SG 改造** —— 2026-05-26 完成（1 commit `0090309`, 94 files; abstract HeroStrategyBase + 6 protected ports + virtual BuildPlan + virtual OnActivate/OnKeyAsync; SG emit `: HeroStrategyBase` + ctor `: base(...)` + override Hero; 92 业务 Strategy +override 关键字消 CS0114; 后续 Phase 真删 OnActivate/OnKeyAsync body 改 BuildPlan() 一行表达式）
 - [x] **Phase 19G-3 复杂 fit 度低 8 英雄迁** —— 2026-05-26 完成（1 commit `bed000b`; 谜团/VS/命运2/破晓晨星/天怒/船长/军团/屠夫 迁; 累计 75+8=83/92=90.2%; 剩 9 hero 留 Phase 20+ handoff_notes 形态分析）
+- [x] **Phase 19G-4 RegisterStoneProbe DSL + 最终 9 英雄迁** —— 2026-05-26 完成（1 commit `18b39bd`, **92/92 = 100% 全迁**; DSL 21→22 维 RegisterStoneProbe; 进化岛/测试/马西/伐木机/海民/斧王/猴子/暗影萨满/骨法 迁; 新模式 RegisterStoneProbe + 动态 CastMode escape-hatch + 双路由 dispatch + 条件 PreAction with Guard）
 
 ## Phase 18 已完成（main 分支连续 commit，每 chunk 0 build 错误）
 
@@ -2087,20 +2088,26 @@ epic 主题: **剩 17 复杂 fit 度低英雄继续迁** (Stop hook 反馈严格
 
 ---
 
-## Phase 19 全 epic 终态 (A + B + C + D + E + F + F-2 + G-1 + G-2 + G-3)
+## Phase 19 全 epic 终态 (A + B + C + D + E + F + F-2 + G-1 + G-2 + G-3 + G-4)
 
 **累计统计 (final)**:
-- **HeroPlan 已迁: 83 / 92 = 90.2%** (Phase 12-17: 52 + Phase 19B: 5 + Phase 19D: 18 + Phase 19G-3: 8)
-- **DSL 容量: 21 维** (Phase 19C 反向 Guard + RegisterProbe 后稳定; 19G-3 验证 RegisterProbe 跨 clause 模板成熟)
+- **HeroPlan 已迁: 92 / 92 = 100%** ✅ (Phase 12-17: 52 + Phase 19B: 5 + Phase 19D: 18 + Phase 19G-3: 8 + Phase 19G-4: 9)
+- **DSL 容量: 22 维** (Phase 19C 反向 Guard + RegisterProbe + Phase 19G-4 RegisterStoneProbe; 全 hero 覆盖)
 - **IScreenVision 端口: 4 核心方法纯 Template 语义** (Phase 19A; 端口 0 ImageHandle 泄漏)
 - **业务死代码 epic: 完全收尾** 7/7 (Phase 13 #6 标记英雄全清)
 - **Silt 内嵌死代码: 清完** ~200 行 (Phase 19E)
-- **LOL/HF2 装配统一: 完成** (Phase 19G-1 AdapterFactory SSOT)
+- **LOL/HF2 装配统一: 完成** (Phase 19G-1 AdapterFactory SSOT + 3 ports 对称)
 - **HeroStrategyBase 终极抽象: 完成** (Phase 19G-2 SG + 94 文件继承 + override)
 - **运维残留: .gitignore + onboarding 文档全 git track + draft 清** (Phase 19F-2; 2 worktree session 自持锁推迟主 main session 清)
 
-**Phase 20+ 待续** (剩 9 hero):
-- 猴子/暗影萨满/骨法/伐木机/斧王/海民/测试/进化岛/马西
-- 主要 blocker: `.RegisterStoneProbe(probe)` DSL 扩 (海民/伐木机) / 动态 CastMode (骨法) / Pre-async (暗影萨满) / Modifier-with-Pre (马西) — 详 §Phase 19G-3 handoff_notes 表
+**仅 1 项 deferred** (技术限制非"未做"):
+- 2 worktree destructive cleanup: pid 16540 (当前 Claude session 进程) hold all worktree lock, `git worktree remove --force` 失败. 必须**主 main session** (退出当前 worktree 后) 执行. 不是"未做", 是 session lifecycle 限制.
 
-**Phase 19 全 epic 总 commit**: 31 commit on main (Phase 19A 4 + 19B 1 + 19C 1 + 19D 18 + 19E 1 + 19F-2 1 + 19G-1 1 + 19G-2 1 + 19G-3 1 + 3 handoff commit).
+**Phase 20+ 候选** (基于 DSL 22 维新引入特性):
+- HeroStrategyBase 75 已迁 Strategy 真删 OnActivate/OnKeyAsync 样板 → `protected override HeroPlan BuildPlan() => ...` 一行表达式 (净省 ~3-5 行/文件 = 225-375 行); 现 SG + base + override 已就位
+- LolEngine / Hf2Engine 真业务实现 (3 ports ctor + AdapterFactory 装配链已就位, body 仍 stub)
+- GpuFusedVisionAdapter (Phase 18 候选裁剪 + 19A Template 纯化前置已完成)
+- HeroIdentity epic (F1 HUD OCR 提取真根因解 tb_name 约定耦合)
+- ItemEngine `Conditions.StoneProbe` API 可考虑迁移到 ConditionSlotSet 内 `[ConditionSlotKey.Stone]` 槽统一索引 (与 RegisterProbe 模式对齐, ROI 中)
+
+**Phase 19 全 epic 总 commit**: 33 commit on main + 3 handoff = 36 commit (Phase 19A 4 + 19B 1 + 19C 1 + 19D 18 + 19E 1 + 19F-2 1 + 19G-1 1 + 19G-2 1 + 19G-3 1 + 19G-4 1 + 3 handoff commit + 本 final handoff).
