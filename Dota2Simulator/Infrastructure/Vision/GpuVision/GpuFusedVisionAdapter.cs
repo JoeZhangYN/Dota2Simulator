@@ -1,58 +1,71 @@
 // Infrastructure/Vision/GpuVision/GpuFusedVisionAdapter.cs
-// epic Phase 24A C5: GpuFusedVisionAdapter 真实现 — wire DxgiCaptureSession → GpuVisionContext → IScreenVision API.
-// C1 骨架阶段类放在 Infrastructure/Vision/ 平铺, C5 迁子目录 Infrastructure/Vision/GpuVision/ + 改 namespace 统一.
+// epic Phase 24A C5+C6: GpuFusedVisionAdapter 真实现 — wire DxgiCaptureSession + GpuVisionContext + DXGI 单源 (C6 消双截屏).
 #if GpuVision
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Runtime.InteropServices;
+using SharpDX;
 using SharpDX.Direct3D11;
+using SharpDX.DXGI;
 using Dota2Simulator.GameAutomation.Domain.Perception;
 using Dota2Simulator.GameAutomation.Ports;
 using Dota2Simulator.Vision;
+using MapFlags = SharpDX.Direct3D11.MapFlags;
 
 namespace Dota2Simulator.Infrastructure.Vision.GpuVision;
 
 /// <summary>
-/// IScreenVision 的 GPU 端实现 (epic Phase 24A 全段终态).
+/// IScreenVision 的 GPU 端实现 (epic Phase 24A 全段终态 C1+C2+C3+C5+C6).
 ///
 /// 装配开关: csproj DefineConstants `GpuVision` → AdapterFactory.CreateVision 走本 adapter; 否则 RustVisionAdapter.
 ///
+/// Phase 24A C6 — DXGI 单源 (替代 C5 conservative 双截屏方案):
+///   一次 DXGI 截全屏帧 → 同 GPU texture 喂两 sink:
+///     sink1: CopyResource → GpuVisionContext._mainTex (SRV-bind) — compute shader 用, 零回传
+///     sink2: CopyResource → 本类 _stagingTex (CPU-readable) → Map + 裁剪 mode.Region → byte[] →
+///            GlobalScreenCapture.WriteBgraFrameAndCommit → _tripleBuffer (业务侧 GetCurrentHandle/GetColor 透明用)
+///   不再调 GDI ModifyGraphics.CaptureScreenToHandle — 业务侧 12 处直调 GlobalScreenCapture 仍 work (透明拿 DXGI 数据).
+///
 /// 端到端路径:
-///   - Capture: DxgiCaptureSession.TryAcquireFrame (DXGI Desktop Duplication 直产 GPU Texture2D)
-///              → GpuVisionContext.UploadMainTexture(Texture2D) (CopyResource 到 SRV-bind texture, GPU 零回传)
-///              → ReleaseFrame (DXGI 契约配对)
-///              + 同时调 GlobalScreenCapture.CaptureScreen 维护 GDI 帧 (业务侧 12 处直调 GlobalScreenCapture
-///                GetCurrentHandle 仍 work; Phase 23 B#4 派生候选 12 处切 _vision.PixelAt 端口后可消)
-///   - Find/FindAll: LazyImageLoader 拿 template byte[] → GpuVisionContext.FindInRegion/FindAllInRegion
-///                   → compute shader region 化匹配 → FindResult
-///   - PixelAt: GDI fallback (GlobalScreenCapture.GetColor) — GPU Map staging buffer 单点开销不优, 当前业务侧
-///              PixelAt 真调用 4 处 (HeroLoopHost / SkillEngine / Silt / ProbeScreenVision), GDI 路径满足
+///   - Capture: DXGI Acquire (主显示器全屏) → 双 sink CopyResource → ReleaseFrame
+///   - Find/FindAll: LazyImageLoader 拿 template byte[] → GpuVisionContext.FindInRegion (compute shader region 化)
+///   - PixelAt: GlobalScreenCapture.GetColor (内部读 _tripleBuffer = DXGI 帧裁剪后的数据)
 ///
 /// 错误恢复:
-///   - DXGI AccessLost: Capture 内 catch InvalidOperationException, 本帧 skip; 生产场景应 catch + recreate
-///     session, 当前简单 skip 兜底 (下次 Capture 再试可能仍 lost, 业务侧呈现卡顿但不崩)
-///   - 模板加载失败 (LazyImageLoader.GetImage IsValid=false): Find 返 Miss / FindAll 返空数组
-///   - GpuVisionContext.FindInRegion 抛 InvalidOperationException (UploadMainTexture 未调用): catch 返 Miss
+///   - DXGI AccessLost: Capture 内 catch InvalidOperationException, 本帧 skip (业务侧 _tripleBuffer 保留上次帧)
+///   - 模板加载失败: Find 返 Miss / FindAll 返空
+///   - GpuVisionContext.FindInRegion 抛 (UploadMainTexture 未调用): catch 返 Miss
 ///
 /// 已知 limitation:
-///   - 单显示器 (DxgiCaptureSession 锁 output index 0); 多 monitor 场景 Phase 25+
-///   - 双截屏 (DXGI + GDI 并行) 性能代价: 业务侧 12 处直调 GlobalScreenCapture.GetCurrentHandle 兼容期成本
-///   - 同步 Map staging buffer 回读: GPU/CPU pipeline stall; C4 fence 异步 epic deferred 评估
+///   - 单显示器 (DxgiCaptureSession 锁 output 0); 多 monitor 留 Phase 25+
+///   - DXGI AccessLost 简单 skip 兜底 (生产升级: catch+ReInit session)
+///   - 同步 Map staging buffer 回读: GPU/CPU pipeline stall; C4 fence 异步 epic deferred
 /// </summary>
 public sealed class GpuFusedVisionAdapter : IScreenVision, IDisposable
 {
     private readonly GpuDevice _device;
+    private readonly DeviceContext _ctx;
     private readonly DxgiCaptureSession _capture;
     private readonly GpuVisionContext _context;
+
+    // C6 staging texture (DXGI 全屏帧 CPU 回读用)
+    private Texture2D? _stagingTex;
+    private int _stagingW;
+    private int _stagingH;
+
+    // 裁剪 mode.Region 后的 byte[] 缓存 (避免每帧 new 24MB GC pressure)
+    private byte[]? _regionBgraCache;
+
     private bool _disposed;
-    private bool _hasUploadedFrame;  // UploadMainTexture 是否成功调用过 (DXGI 0 帧时 Find 应早退 Miss)
+    private bool _hasUploadedFrame;
 
     public GpuFusedVisionAdapter()
     {
         _device = new GpuDevice();
         try
         {
+            _ctx = _device.ImmediateContext;
             _capture = new DxgiCaptureSession(_device);
             _context = new GpuVisionContext(_device);
         }
@@ -60,6 +73,7 @@ public sealed class GpuFusedVisionAdapter : IScreenVision, IDisposable
         {
             _context?.Dispose();
             _capture?.Dispose();
+            _stagingTex?.Dispose();
             _device.Dispose();
             throw;
         }
@@ -67,46 +81,50 @@ public sealed class GpuFusedVisionAdapter : IScreenVision, IDisposable
 
     public void Capture(CaptureMode mode)
     {
-        // GDI 路径维持: 业务侧 12 处直调 GlobalScreenCapture.GetCurrentHandle (Phase 23 B#4 §52 白名单同层取像素).
-        // Phase 23 B#4 派生候选: 12 处切 _vision.PixelAt 端口后, 本 GDI 截屏可删, 真端到端 GPU.
-        GlobalScreenCapture.CaptureScreen(mode.Region);
-
-        // GPU 路径: DXGI Acquire → CopyResource 到 _mainTex SRV-bind texture → ReleaseFrame.
         try
         {
-            if (_capture.TryAcquireFrame(out Texture2D? frame))
+            if (!_capture.TryAcquireFrame(out Texture2D? frame))
             {
-                try
-                {
-                    _context.UploadMainTexture(frame!);
-                    _hasUploadedFrame = true;
-                }
-                finally
-                {
-                    frame?.Dispose();
-                    _capture.ReleaseFrame();
-                }
+                // 超时 = 桌面静止. _tripleBuffer 与 _context._mainTex 都保留上次帧, 业务侧 GetCurrentHandle 仍合法.
+                return;
             }
-            // TryAcquireFrame 返 false = 桌面静止超时, 复用上次 _mainTex (_hasUploadedFrame 保持原状)
+
+            try
+            {
+                // sink1: CopyResource → compute shader SRV (零回传, Find/FindAll 用)
+                _context.UploadMainTexture(frame!);
+                _hasUploadedFrame = true;
+
+                // sink2: CopyResource → staging → Map → 裁剪 mode.Region → byte[] → _tripleBuffer
+                var desc = frame!.Description;
+                EnsureStagingTexture(desc.Width, desc.Height);
+                _ctx.CopyResource(frame, _stagingTex);
+                byte[] regionBytes = CropDxgiFrameToRegion(mode.Region);
+                GlobalScreenCapture.WriteBgraFrameAndCommit(
+                    regionBytes, mode.Region.Width, mode.Region.Height,
+                    mode.Region.X, mode.Region.Y);
+            }
+            finally
+            {
+                frame?.Dispose();
+                _capture.ReleaseFrame();
+            }
         }
         catch (InvalidOperationException)
         {
-            // DXGI AccessLost: 本帧 skip, 下次 Capture 再试 (业务呈卡顿但不崩).
-            // 生产场景升级: catch + Dispose+ReInit DxgiCaptureSession (C5 简单兜底).
+            // DXGI AccessLost: 本帧 skip, 下次 Capture 再试. 生产升级: Dispose + ReInit DxgiCaptureSession.
         }
     }
 
     public Color PixelAt(ScreenPoint point)
     {
-        // GDI fallback: 复用 GlobalScreenCapture.GetColor (与 RustVisionAdapter 同形态).
-        // 端到端 GPU PixelAt 需 Map staging buffer 单点开销 (~1ms), 与现有 GDI 路径 (~µs) 反向, 不实装.
+        // _tripleBuffer 内是 DXGI 帧裁剪后的数据 (C6 单源), GetColor 内部坐标偏移转换合法.
         return GlobalScreenCapture.GetColor(point.X, point.Y);
     }
 
     public FindResult Find(Template needle, ScreenRegion region, MatchRate rate, Tolerance tolerance)
     {
         if (!_hasUploadedFrame) return FindResult.Miss;
-
         if (!TryLoadTemplate(needle, out byte[]? bgra, out int tplW, out int tplH))
             return FindResult.Miss;
 
@@ -126,7 +144,6 @@ public sealed class GpuFusedVisionAdapter : IScreenVision, IDisposable
     public IReadOnlyList<ScreenPoint> FindAll(Template needle, ScreenRegion region, MatchRate rate, Tolerance tolerance)
     {
         if (!_hasUploadedFrame) return Array.Empty<ScreenPoint>();
-
         if (!TryLoadTemplate(needle, out byte[]? bgra, out int tplW, out int tplH))
             return Array.Empty<ScreenPoint>();
 
@@ -140,11 +157,60 @@ public sealed class GpuFusedVisionAdapter : IScreenVision, IDisposable
         {
             return Array.Empty<ScreenPoint>();
         }
-
         var result = new ScreenPoint[hits.Count];
         for (int i = 0; i < hits.Count; i++)
             result[i] = new ScreenPoint(hits[i].X, hits[i].Y);
         return result;
+    }
+
+    private void EnsureStagingTexture(int width, int height)
+    {
+        if (_stagingTex != null && _stagingW == width && _stagingH == height) return;
+        _stagingTex?.Dispose();
+        _stagingTex = new Texture2D(_device.Native, new Texture2DDescription
+        {
+            Width = width,
+            Height = height,
+            MipLevels = 1,
+            ArraySize = 1,
+            Format = Format.B8G8R8A8_UNorm,
+            SampleDescription = new SampleDescription(1, 0),
+            Usage = ResourceUsage.Staging,
+            BindFlags = BindFlags.None,
+            CpuAccessFlags = CpuAccessFlags.Read,
+            OptionFlags = ResourceOptionFlags.None
+        });
+        _stagingW = width;
+        _stagingH = height;
+    }
+
+    private unsafe byte[] CropDxgiFrameToRegion(Rectangle region)
+    {
+        int neededLength = region.Width * region.Height * 4;
+        if (_regionBgraCache == null || _regionBgraCache.Length != neededLength)
+            _regionBgraCache = new byte[neededLength];
+
+        var box = _ctx.MapSubresource(_stagingTex, 0, MapMode.Read, MapFlags.None);
+        try
+        {
+            byte* src = (byte*)box.DataPointer;
+            int srcPitch = box.RowPitch;
+            int dstPitch = region.Width * 4;
+            fixed (byte* dst = _regionBgraCache)
+            {
+                for (int y = 0; y < region.Height; y++)
+                {
+                    byte* srcRow = src + (region.Y + y) * srcPitch + region.X * 4;
+                    byte* dstRow = dst + y * dstPitch;
+                    System.Buffer.MemoryCopy(srcRow, dstRow, dstPitch, dstPitch);
+                }
+            }
+        }
+        finally
+        {
+            _ctx.UnmapSubresource(_stagingTex, 0);
+        }
+        return _regionBgraCache;
     }
 
     private static bool TryLoadTemplate(Template needle, out byte[]? bgra, out int tplW, out int tplH)
@@ -168,6 +234,7 @@ public sealed class GpuFusedVisionAdapter : IScreenVision, IDisposable
     {
         if (_disposed) return;
         _disposed = true;
+        _stagingTex?.Dispose();
         _context?.Dispose();
         _capture?.Dispose();
         _device?.Dispose();

@@ -117,6 +117,43 @@ namespace Dota2Simulator.Vision
         }
 
         /// <summary>
+        /// Phase 24A C6: 外部预备好的 BGRA byte[] 直接写入 _tripleBuffer + CommitCapture.
+        /// 由 GpuFusedVisionAdapter 用 — 替代 GDI ModifyGraphics.CaptureScreenToHandle 路径, 让 GpuVision build
+        /// 走 DXGI 单源 (DXGI 截全屏 → staging → 裁剪 mode.Region → 本 API → _tripleBuffer; 业务侧 GetCurrentHandle/GetColor
+        /// 透明使用 DXGI 数据).
+        ///
+        /// 不变量: width/height/offsetX/offsetY 一致性: 同 CaptureScreen 内 ModifyGraphics 路径协议.
+        /// 尺寸/偏移变化时自动 Cleanup + Initialize.
+        /// </summary>
+        public static void WriteBgraFrameAndCommit(byte[] bgra, int width, int height, int offsetX, int offsetY)
+        {
+            if (_tripleBuffer == null)
+            {
+                Initialize(width, height, offsetX, offsetY);
+            }
+            else if (_captureSize.Width != width || _captureSize.Height != height
+                     || _coordinateOffsetX != offsetX || _coordinateOffsetY != offsetY)
+            {
+                _logger.Warn($"WriteBgraFrameAndCommit 尺寸/偏移变化 {_captureSize}@({_coordinateOffsetX},{_coordinateOffsetY}) → {width}x{height}@({offsetX},{offsetY}), 重新初始化缓冲区");
+                Cleanup();
+                Initialize(width, height, offsetX, offsetY);
+            }
+
+            _tripleBuffer!.BeginCapture();
+            var writeHandle = _tripleBuffer.GetWriteBuffer();
+            var (ptr, length, _) = ImageManager.GetImageData(in writeHandle);
+            if (length >= bgra.Length)
+            {
+                Marshal.Copy(bgra, 0, ptr, bgra.Length);
+                _tripleBuffer.CommitCapture();
+            }
+            else
+            {
+                _logger.Error($"WriteBgraFrameAndCommit: buffer length {length} < bgra length {bgra.Length}, 跳过本帧");
+            }
+        }
+
+        /// <summary>
         /// 获取当前可读的图像句柄（包含是否新帧信息）
         /// </summary>
         public static (ImageHandle handle, bool isNewFrame) GetCurrentFrame()
