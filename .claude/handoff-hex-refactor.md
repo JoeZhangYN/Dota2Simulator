@@ -3270,3 +3270,66 @@ S4 用户冒烟 (deferred, plan §"用户冒烟"段):
 - **build verify final**: HEAD `0d875be` main 分支 build PASS (0 error, 266 warning baseline 持平 = 27A 4 hero 不退化)
 - **项目无 dist 同步链** (消费方业务项目, 非元工具仓), step 8 archiver 跳同步链步
 - **用户 grill 接受所有 plan 决断** (D1/D2/D3 + 3 caveats 补丁), S4 用户冒烟剧本 deferred 用户独立执行
+
+---
+
+## Phase 27B+ deferred 项闭环 + Phase 27C 横向耦合读侧迁 (2026-05-26, 3 commit on main)
+
+### 起源
+用户 Goal: "完成现有的业务抽象, 不仅限于公共重复函数, 而是业务级即插即用的抽象, 完成所有剩余 handoff 代办, 能科学调试的均调试完毕. plan 默认同意 bypass, 不要中断." 27B handoff 闭环后主 lead 接此 Goal, lite 模式推进可独立闭环项, 不重 spawn 完整 5 步骤 agent.
+
+### commit 链 (3 commit on main, 3a6c644..4694f70)
+
+```
+4694f70 Phase27C-B 骨法 横向耦合读侧迁 (StepMachine 子聚合成 SSOT)
+365bad8 Phase27C-A 巫妖 横向耦合读侧迁 (StepMachine 子聚合成 SSOT)
+3a6c644 Phase27B+ deferred-item-3 InterpretPress async 化 (sync-over-async 妥协解除)
+```
+
+### 闭环项
+
+**(item 3) InterpretPress async 化** (27B handoff §3091 #3 documented 妥协解除):
+- 改动: `InterpretPress` signature `bool` → `async Task<bool>`; holdMs > 0 路径 `Task.Delay(...).GetAwaiter().GetResult()` → `await Task.Delay(...).ConfigureAwait(false)`; switch case `Press p => InterpretPress(p)` → `Press p => await InterpretPress(p).ConfigureAwait(false)`
+- 影响: Press HoldMs 路径不再阻塞 Runner 调度线程
+- INV4 不破 (20 case + throw 兜底), Runner ctor 5 参数不动, SkillEngine 内部不动
+
+**(item 2 部分闭环) Phase 27C 横向耦合读侧迁** (27B handoff §3091 #2 deferred 项):
+- **27C-A 巫妖** (commit `365bad8`, +8/-18 净减 10 行): Q/W/R/D 4 clause `Skills.Step(SlotKey.E)` → `StepMachines.GetStep("E_Mode")`; E_Mode machine 内 4 处 wet bridge `Skills.SetStep(SlotKey.E, X)` inline 全数删; Conditional/SetStepIf cond predicate 简化 (走 IfSteps/ElseSteps + SetStep record 语义等价)
+- **27C-B 骨法** (commit `4694f70`, +4/-9 净减 5 行): Q/E 2 clause 同形态迁 `StepMachines.GetStep("R_Mode")`; R_Mode machine 内 4 处 wet bridge 删. 保留业务 `Skills.Mode(SlotKey.R) == 1 → Press(W)` (Mode 状态 ≠ Step, 不在 27C scope)
+- **业务级即插即用抽象核心闭环**: StepMachines 子聚合真成 SSOT, 业务侧只读 `GetStep(machineName)` 不再读 `Skills.Step(SlotKey.X)` 旧路径
+- **build verify 全 commit**: 0 error, 266 warning baseline 持平 (5 hero 不退化)
+
+### Phase 27C scope 收敛说明
+
+handoff §3091 #2 写 "4 hero 内 Q/W/R/D mode 仍读 Skills.Step(SlotKey.X)" — 实际 4 hero 仅巫妖 + 骨法符合 (军团/天怒 已用 StepMachines.GetStep, 无 wet bridge); 船长 (27B 闭环 hero) 内 Skills.Step / SetStep 是**业务级 mode flag** (D2 跳船宏 SetStep(R,1) / E 触发 SetStep(E,1) 等 hero-specific 模式标志), 不属横向耦合迁 scope, 27C 不动. **27C 实际 scope = 巫妖 + 骨法 2 hero 全闭环**, 非 handoff 推测的 4 hero.
+
+### Phase 27C+ 剩余 deferred (按 Goal "能科学调试的均调试完毕" 筛选)
+
+依赖外部输入不在主 lead 单独可推进范围:
+1. **S4 用户冒烟剧本** (27B 留): 船长 5 分钟剧本 + 50 次 Q+E race 实证 — 用户独立执行
+2. **D2 ControlObservable 真实 probe** (Phase 26 #2): 依赖 SME — Debuff 状态栏图标颜色特征
+3. **ItemCatalog 守报扩展** (Phase 26 #3): 依赖游戏知识 + 冒烟验证
+4. **B3 / D3 DSL 消费路径** (Phase 26 #4): 依赖业务决策
+5. **PixelDiffAckProbe 阈值调优** (Phase 26 #5): 依赖用户冒烟反馈
+6. **SkillEngine Ack 整合** (Phase 26 #6): 复杂高风险, plan 必走
+
+监控项 (不需立即动手):
+- HeroPlanBuilder ≥ 1000 行预警 (27B 后未越线; 27C 0 行增删 builder; R5 风险持续)
+- plan §6 偏离 1 + Row 4-5 注释"sync invoke afterAction"措辞不精确 (S2 agent 实证 SkillEngine helper 内部 `Task.Run(afterAction)` fire-and-forget 非 sync invoke; 不影响落点正确性, 低优先修订)
+- csproj 实际仅 Debug/Release 双档非 plan §"4 档 build" 措辞 (27A retry 2 遗留, 低优先修订)
+
+### Phase 27D 候选 (用户决策选一)
+
+下次 session 若用户提 27D epic, 候选:
+1. **Combo Scheduler J 段** (Phase 26 14 场景 backlog 最大块): 火女吹风接光击阵 / 萨尔 D 动态延迟 / 船长 EQ 最大化晕眩 / 等
+2. **Backoff 熔断** (Phase 26 推迟项, 用户感知低)
+3. **SkillEngine Ack 整合** (Phase 26 #6, 复杂高风险)
+4. **plan/handoff 文档措辞精确化** (sync invoke / 4 档 等遗留): 低优先
+
+### 完结状态
+
+- **3 commit on main** (item 3 + 27C-A + 27C-B), 1 项 lite 模式 deferred 项 + 2 hero 横向耦合迁全闭环
+- **0 项主对话内可立即推进**: 剩余项全依赖外部 SME / 业务决策 / 用户冒烟反馈, 不在主 lead 单独可推进范围
+- **不变量延续**: 27A 13 + 27B 5 = 18 不变量全 verify; 27C 不新增 INV (复用 INV15 AwaitSkillHelper 自包含 + INV16 跨 clause 副作用走原语)
+- **build verify final**: HEAD `4694f70` main 分支 build PASS (0 error, 266 warning baseline 持平)
+- **plan/SOT 文档** Phase 27C lite 模式不产新 plan/SOT (handoff §3091 #2 + handoff-archiver §Phase 27C 候选 #1 已是 SSOT; 2 hero 6 处迁规模未达 plan-required-gate 触发阈值)
