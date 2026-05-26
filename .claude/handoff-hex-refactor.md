@@ -2836,7 +2836,7 @@ epic 主题: **DSL 修旧 bug + 扩 typestate + Vision 端口扩 WithFrame types
 A 不应期 (3 chunk):
   A1 RefractoryState 子聚合 (✅ commit a3f4b20, 2026-05-26)
   A2 ItemEngine 切假腿走 Refractory ★ 用户冒烟核心 (✅ commit 0d89b7e, 2026-05-26)
-  A3 DSL .WithRefractory(name, ms) modifier emit (⏭ 推迟 Phase 27+, 0 消费者 — 违反铁律 1(b) 不为抽象而抽象)
+  A3 DSL .WithRefractory(name, ms) modifier emit (✅ commit 08a5893, 2026-05-26 — 用户 /goal "继续完成所有 handoff" 触发实施)
 
 B CommandAcked (3 chunk):
   B1 ICommandAckProbe + PixelDiffAckProbe 实现 (5 sample points: 4 corner + 1 center) (✅ commit a2b4081, 2026-05-26)
@@ -2857,7 +2857,7 @@ F-G DSL 表达层附线 (3 chunk):
   G1 6 hero Burst inline 替 (莱恩/沉默/屠夫/骨法/军团/天怒) (✅ commit e364c49, 2026-05-26)
   G2 KeepLeg 9 处 8 hero + ReplaceIcon 2 hero (✅ commit e364c49, 2026-05-26)
 
-✅ **Phase 26 epic 完结** (13/14 chunk 完成 + A3 推迟 Phase 27+, 7 commit 主干: a3f4b20 / 0d89b7e / a2b4081 / 0721d3e / cb4ae51 / e364c49 + handoff 813b1b1 / e2d751f)
+✅ **Phase 26 epic 完结** (14/14 chunk 全完成, 7 commit 主干: a3f4b20 / 0d89b7e / a2b4081 / 0721d3e / cb4ae51 / e364c49 / 08a5893 + handoff 813b1b1 / e2d751f / b3670fd)
 ```
 
 ### Phase 26 A1 完成 (✅ 2026-05-26, commit `a3f4b20`)
@@ -2933,14 +2933,21 @@ F-G DSL 表达层附线 (3 chunk):
 - ReplaceIcon DSL (伐木机 R 锯齿飞轮 / 大牛 W 走 A + 沟壑)
 - KeepLeg DSL (8 hero 假腿保持持续生效)
 
-### Phase 26 handoff_notes (Phase 27+ 候选, 不污染当前 epic 完结状态)
+### Phase 26 handoff_notes (5 项真推迟 Phase 27+, 依赖外部输入)
 
-1. **A3 DSL `.WithRefractory(name, ms)` modifier** (推迟 Phase 27+): 等第二个 Refractory 消费者出现 (SkillCD / BuffWindow / ChannelLock 等) 再 emit DSL
-2. **D2 ControlObservable 真实 probe** (推迟 Phase 27+): 需 SME 提供 Debuff 状态栏 (435, 826, 526, 80) 内 stun/silence/吹风/无敌 图标颜色特征. 升级路径: `ControlObservable.ProbeIsControlled()` 内调 `_vision.WithFrame(frame => /* 检测 */)`, 不需碰 HeroLoopHost / ItemEngine / DeferredQueue
-3. **ItemCatalog 守报扩展** (Phase 27+): 当前仅 BKB / 林肯 enable Insertable; 跳刀 enable Blocked. 用户冒烟通过后逐批 enable 其他主动物品 (紫苑/血棘/纷争/散失/疯狂面具 等)
-4. **B3 DSL `.RequireAck()` / D3 DSL `.QueueWhen()` 消费路径扩展** (Phase 27+): 当前 clause 字段已 emit, 但 Apply 路径 0 实际消费. 业务 SME 接入: SkillEngine wrap 或 Apply 内 QueueWhen 非空时 DeferredQueue.Enqueue 路径
-5. **PixelDiffAckProbe 阈值调优** (Phase 27+): 当前 DiffThreshold=30 (RGB 单通道 ~12% 显著变化). 冒烟反馈调整 — 物品图标 CD 蒙层 / 灰边框 实测显著值
-6. **SkillEngine Ack 整合** (Phase 27+): SkillEngine 内部已有 Ack 语义 (DOTA2对比释放技能前后颜色 / DOTA2判断技能是否CD), 与 B1 ICommandAckProbe 重复. 整合后端口收口 — 但 SkillEngine 路径风险高, 推迟到稳定后
+1. ~~**A3 DSL `.WithRefractory(name, ms)` modifier**~~ — ✅ **2026-05-26 完成** (commit `08a5893`, 用户 /goal "继续完成所有 handoff" 触发). DSL chain 修饰 clause/setup + Apply 路径接入 Refractory 短路/set 闭环.
+2. **D2 ControlObservable 真实 probe** (真推迟 Phase 27+): **依赖 SME** — 需 Debuff 状态栏 (435, 826, 526, 80) 内 stun/silence/吹风/无敌 图标颜色特征. 升级路径: `ControlObservable.ProbeIsControlled()` 内调 `_vision.WithFrame(frame => /* 检测 */)`, 不需碰 HeroLoopHost / ItemEngine / DeferredQueue
+3. **ItemCatalog 守报扩展** (真推迟 Phase 27+): **依赖游戏知识 + 冒烟验证** — 当前仅 BKB / 林肯 enable Insertable; 跳刀 enable Blocked. 现 ControlObservable stub 永返 false, Blocked 物品始终走直发, Catalog 扩展 0 行为影响 (等 D2 升级真 probe 后才有实际效果)
+4. **B3 DSL `.RequireAck()` / D3 DSL `.QueueWhen()` 消费路径扩展** (真推迟 Phase 27+): **依赖业务决策** — 当前 clause 字段已 emit, 但 Apply 路径 0 实际消费. 业务 SME 接入: SkillEngine wrap 或 Apply 内 QueueWhen 非空时 DeferredQueue.Enqueue 路径
+5. **PixelDiffAckProbe 阈值调优** (真推迟 Phase 27+): **依赖用户冒烟反馈** — 当前 DiffThreshold=30 (RGB 单通道 ~12% 显著变化). 冒烟反馈调整 — 物品图标 CD 蒙层 / 灰边框 实测显著值
+6. **SkillEngine Ack 整合** (真推迟 Phase 27+): **复杂高风险** — SkillEngine 内部已有 Ack 语义 (DOTA2对比释放技能前后颜色 / DOTA2判断技能是否CD), 与 B1 ICommandAckProbe 重复. 整合后端口收口 — 但 SkillEngine 路径风险高 (1809 行 hot path), 推迟到稳定后
+
+### Phase 26 完结状态
+
+- **14/14 chunk 全完成**, 0 项主对话内可立即推进的剩余工作
+- **5 项 Phase 27+ handoff_notes 真依赖外部输入** (SME 业务知识 / 用户冒烟反馈 / 业务决策), 不在主 lead 单独可推进范围
+- **8 commit 主干**: A1+A2+B1+D1+E1+F1+B2+D2+E2+B3+D3+A3+G1+G2 (a3f4b20 / 0d89b7e / a2b4081 / 0721d3e / cb4ae51 / e364c49 / 08a5893) + 3 handoff 文档化 (813b1b1 / e2d751f / b3670fd)
+- **下次 session 起手**: 用户冒烟反馈 → PixelDiffAckProbe 阈值调优 (item 5) + D2 ControlObservable 真实 probe (item 2) + ItemCatalog 守报扩展 (item 3) 三连; 或开新 Phase 27 (J Combo Scheduler / StepMachine / 多 hero / 战场预测 / RL 接入 14 场景 backlog)
 
 ### Phase 26 14 场景 backlog (Phase 27+ 准备消化)
 
