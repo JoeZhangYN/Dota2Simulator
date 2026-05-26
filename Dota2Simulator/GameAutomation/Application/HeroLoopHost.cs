@@ -253,14 +253,14 @@ namespace Dota2Simulator.GameAutomation.Application
 
             await Task.Run(async () =>
             {
-                ImageHandle 句柄 = 假腿类型 switch
+                Template template = 假腿类型 switch
                 {
-                    "敏捷" => Dota2_Pictrue.物品.假腿_敏捷腿,
-                    "力量" => Dota2_Pictrue.物品.假腿_力量腿,
+                    "敏捷" => Dota2_Pictrue.物品.假腿_敏捷腿_Tpl,
+                    "力量" => Dota2_Pictrue.物品.假腿_力量腿_Tpl,
                     _ => throw new NotImplementedException()
                 };
 
-                if (ImageFinder.FindImageInRegionBool(句柄, GlobalScreenCapture.GetCurrentHandle(), ItemEngine.获取物品范围(_aggregate.SkillCount)))
+                if (_vision.Find(template, ItemEngine.获取物品范围(_aggregate.SkillCount), new MatchRate(0.9), Tolerance.Exact).Found)
                 {
                     return;
                 }
