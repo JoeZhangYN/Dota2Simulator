@@ -1,6 +1,6 @@
 // Phase 27A retry2 S3 (2026-05-26): 骨法 R 状态机迁 .StepMachine — 删 fire-and-forget Task.Run + Common.Delay(200), 改 new Delay(200) StepCommand 显式.
 // Pre 物品 burst (希瓦+纷争) 保留 .OnKey(R).Pre(...) (是 setup 不是 step machine); .CustomProbe(生命吸取去后摇) 替为 .NoProbe() 保 Pre clause 终结合法 + lastIdx 锚点 (.StepMachine 紧贴 R clause 后).
-// 横向耦合保留: Q/E 仍读 _main._聚合.Skills.Step(SlotKey.R); 因此 StepMachine 内 Conditional/SetStepIf wet Cond 同步写回 Skills.SetStep 桥接 (Phase 27B/C/D 评估读侧迁移).
+// Phase 27C-B (2026-05-26): 横向耦合读侧迁完 — Q/E 改读 StepMachines.GetStep("R_Mode"); 4 处 wet bridge Skills.SetStep(SlotKey.R, X) 全数删. StepMachine 子聚合成 SSOT (handoff §3091 #2 闭环). Skills.Mode(SlotKey.R) ToggleMode 状态属业务 Mode 非 Step, 不在 27C scope.
 // D2 Execute (ToggleMode R + TTS) 走 _setups 路径不影响 _clauses[lastIdx] = R clause, .StepMachine 仍正确绑 R clause.
 // Phase 19G-4 base: 4 CustomProbe (Q/E 动态 mode + W 物品组合 + R Step 状态机) + D2 Execute (ToggleMode R + TTS).
 #if DOTA2
@@ -37,13 +37,9 @@ public sealed partial class 骨法Strategy : IHeroStrategy
                     _ =>
                     {
                         if (_skill.DOTA2判断技能是否CD(Keys.R))
-                        {
-                            _main._聚合.Skills.SetStep(SlotKey.R, 0);  // 横向耦合读侧 bridge: Q/E 仍读 Skills.Step(SlotKey.R).
                             return true;
-                        }
                         if (_main._聚合.Skills.Mode(SlotKey.R) == 1)
                             Press(Keys.W);
-                        _main._聚合.Skills.SetStep(SlotKey.R, 1);
                         return false;
                     },
                     IfSteps: new StepCommand[] { new SetStep(0) },
@@ -51,14 +47,13 @@ public sealed partial class 骨法Strategy : IHeroStrategy
             ).End()
             .Step(1).Do(
                 new Delay(200),                                                                                        // 替代原 _=Task.Run(()=>Common.Delay(200)) fire-and-forget.
-                new SetStepIf(_ => { _main._聚合.Skills.SetStep(SlotKey.R, 2); return true; }, 2)                       // 同步写回 Skills.Step(SlotKey.R) 桥接 + StepMachineState SetStep(2).
+                new SetStep(2)                                                                                         // Phase 27C-B: StepMachineState SetStep(2), wet bridge 已删.
             ).End()
             .Step(2).Do(
                 new Conditional(
                     _ =>
                     {
                         if (_skill.DOTA2判断是否持续施法()) return true;
-                        _main._聚合.Skills.SetStep(SlotKey.R, 0);  // 横向耦合读侧 bridge.
                         走A();
                         return false;
                     },
@@ -74,7 +69,7 @@ public sealed partial class 骨法Strategy : IHeroStrategy
         .Done();
 
     private async Task<bool> 幽冥轰爆去后摇()
-        => await _skill.技能通用判断(Keys.Q, _main._聚合.Skills.Step(SlotKey.R) > 0 ? 10 : 0).ConfigureAwait(true);
+        => await _skill.技能通用判断(Keys.Q, _main._聚合.StepMachines.GetStep("R_Mode") > 0 ? 10 : 0).ConfigureAwait(true);
 
     private async Task<bool> 衰老去后摇()
     {
@@ -90,6 +85,6 @@ public sealed partial class 骨法Strategy : IHeroStrategy
     }
 
     private async Task<bool> 幽冥守卫去后摇()
-        => await _skill.技能通用判断(Keys.E, _main._聚合.Skills.Step(SlotKey.R) > 0 ? 10 : 0).ConfigureAwait(true);
+        => await _skill.技能通用判断(Keys.E, _main._聚合.StepMachines.GetStep("R_Mode") > 0 ? 10 : 0).ConfigureAwait(true);
 }
 #endif
