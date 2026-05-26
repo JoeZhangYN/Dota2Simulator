@@ -1,0 +1,7 @@
+<Project>
+  <!-- Phase 25A C5: Dota2Simulator.Analyzers 3 条拆桥规则升级 WarningsAsErrors 让 build 失败而非可忽略 warn. -->
+  <!-- DS0001: Heroes/ 禁直调 通用前置 / DS0002: HeroStrategyBase 禁 override OnKeyAsync / DS0003: 业务侧禁 GlobalScreenCapture.GetCurrentHandle -->
+  <PropertyGroup>
+    <WarningsAsErrors>$(WarningsAsErrors);DS0001;DS0002;DS0003</WarningsAsErrors>
+  </PropertyGroup>
+</Project>

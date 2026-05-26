@@ -385,6 +385,9 @@
     <ProjectReference Include="..\Dota2Simulator.SourceGenerators\Dota2Simulator.SourceGenerators.csproj"
                       OutputItemType="Analyzer"
                       ReferenceOutputAssembly="false" />
+    <ProjectReference Include="..\Dota2Simulator.Analyzers\Dota2Simulator.Analyzers.csproj"
+                      OutputItemType="Analyzer"
+                      ReferenceOutputAssembly="false" />
   </ItemGroup>
 
   <ItemGroup>
