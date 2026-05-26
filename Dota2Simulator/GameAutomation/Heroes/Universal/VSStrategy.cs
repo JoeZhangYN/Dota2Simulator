@@ -1,61 +1,33 @@
+// Phase 19G-3: VS Strategy 迁 HeroPlan — Q AfterCast + R AfterCast (移形换位 C2) + W Execute (hard-code C2 共享 R, 业务侧 W/R 同 C3 实际语义即 W→移形换位). C3 恐怖波动 dead Probe (业务 OnKeyAsync 不触发) 不迁.
 #if DOTA2
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Dota2Simulator.GameAutomation.Application;
+using Dota2Simulator.GameAutomation.Application.HeroPlans;
 using Dota2Simulator.GameAutomation.Domain.Actuation;
 using Dota2Simulator.GameAutomation.Domain.Heroes;
-using Dota2Simulator.Games.Dota2;
-using Dota2Simulator.Vision;
-
-using Dota2Simulator.GameAutomation.Ports;
 
 namespace Dota2Simulator.GameAutomation.Heroes.Universal;
 
-/// <summary>VS（全才）策略——迁移自 _main.根据当前英雄增强 的 case "VS"。</summary>
 [HeroStrategy("VS", HeroAttribute.Universal)]
 public sealed partial class VSStrategy : IHeroStrategy
 {
+    private static readonly HeroPlan _plan = HeroPlanBuilder.New()
+        .OnKey(Keys.Q).CastSkill(Keys.Q).AfterCast()
+        .OnKey(Keys.R).CastSkill(Keys.R).AfterCast()
+        .Done();
 
+    protected override HeroPlan BuildPlan() => _plan;
 
-    public override void OnActivate(HeroContext ctx)
+    public override Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)
     {
-        _main._聚合.Conditions[ConditionSlotKey.C1].Probe ??= 魔法箭去后摇;
-        _main._聚合.Conditions[ConditionSlotKey.C2].Probe ??= 恐怖波动去后摇;
-        _main._聚合.Conditions[ConditionSlotKey.C3].Probe ??= 移形换位去后摇;
-    }
-
-    public override async Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)
-    {
-        VirtualKey key = trigger.Key;
-        await _item.根据按键判断技能释放前通用逻辑(new KeyEventArgs((Keys)key.ToNative())).ConfigureAwait(true);
-
-        if (key == VirtualKey.Q)
+        // W 共享 C2 移形换位 (业务原 W/R 都触发 C3 移形换位 Probe, 现 R 走 BuildPlan 占 C2; W 走 Execute hard-code C2.Active=true 等价行为).
+        if (trigger.Key == VirtualKey.W)
         {
-            _main._聚合.Conditions[ConditionSlotKey.C1].Active = true;
+            _main._聚合.Conditions[ConditionSlotKey.C2].Active = true;
+            return Task.CompletedTask;
         }
-        else if (key == VirtualKey.W)
-        {
-            _main._聚合.Conditions[ConditionSlotKey.C3].Active = true;
-        }
-        else if (key == VirtualKey.R)
-        {
-            _main._聚合.Conditions[ConditionSlotKey.C3].Active = true;
-        }
-    }
-
-    private async Task<bool> 魔法箭去后摇()
-    {
-        return await _skill.技能通用判断(Keys.Q, 1).ConfigureAwait(true);
-    }
-
-    private async Task<bool> 恐怖波动去后摇()
-    {
-        return await _skill.技能通用判断(Keys.W, 1).ConfigureAwait(true);
-    }
-
-    private async Task<bool> 移形换位去后摇()
-    {
-        return await _skill.技能通用判断(Keys.R, 1).ConfigureAwait(true);
+        return base.OnKeyAsync(trigger, ctx);
     }
 }
 #endif

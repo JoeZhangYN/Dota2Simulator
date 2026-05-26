@@ -1,40 +1,20 @@
+// Phase 19G-3: 破晓晨星 Strategy 迁 HeroPlan — W AfterCast (上界重锤 mode 1). C1 业务侧无触发, 用 NoProbe 占位映射 W→C2.
 #if DOTA2
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using Dota2Simulator.GameAutomation.Application;
-using Dota2Simulator.GameAutomation.Domain.Actuation;
+using Dota2Simulator.GameAutomation.Application.HeroPlans;
 using Dota2Simulator.GameAutomation.Domain.Heroes;
-using Dota2Simulator.Games.Dota2;
-using Dota2Simulator.Vision;
-
-using Dota2Simulator.GameAutomation.Ports;
 
 namespace Dota2Simulator.GameAutomation.Heroes.Strength;
 
 [HeroStrategy("破晓晨星", HeroAttribute.Strength)]
 public sealed partial class 破晓晨星Strategy : IHeroStrategy
 {
+    private static readonly HeroPlan _plan = HeroPlanBuilder.New()
+        .OnKey(Keys.None).NoProbe()  // 占 C1 (原 OnActivate 未注册 C1, OnKeyAsync 也不触发, 业务侧 W→C2 跳过 C1)
+        .OnKey(Keys.W).CastSkill(Keys.W).AfterCast()
+        .Done();
 
-
-    public override void OnActivate(HeroContext ctx)
-    {
-        _main._聚合.Conditions[ConditionSlotKey.C2].Probe ??= 上界重锤去后摇;
-    }
-
-    public override async Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)
-    {
-        VirtualKey key = trigger.Key;
-        await _item.根据按键判断技能释放前通用逻辑(new KeyEventArgs((Keys)key.ToNative())).ConfigureAwait(true);
-
-        if (key == VirtualKey.W)
-        {
-            _main._聚合.Conditions[ConditionSlotKey.C2].Active = true;
-        }
-    }
-
-    private async Task<bool> 上界重锤去后摇()
-    {
-        return await _skill.技能通用判断(Keys.W, 1).ConfigureAwait(true);
-    }
+    protected override HeroPlan BuildPlan() => _plan;
 }
 #endif
