@@ -173,10 +173,15 @@ namespace Dota2Simulator.Vision
 
         public void Dispose()
         {
-            // 代码错误,并未实现dispose方法
-            //_readBuffer.Handle?.Dispose();
-            //_writeBuffer.Handle?.Dispose();
-            //_readyBuffer.Handle?.Dispose();
+            // ImageHandle 是 readonly struct 不实现 IDisposable, 通过 ImageManager 注册表释放 backing buffer.
+            // 调用方约定: Dispose 时无并发 reader/writer (与通用 IDisposable 模式一致).
+            // BufferInfo.Handle 是 property (rvalue) 不能直传 in 参数, 用局部变量中转.
+            ImageHandle r = _readBuffer.Handle;
+            ImageHandle w = _writeBuffer.Handle;
+            ImageHandle y = _readyBuffer.Handle;
+            ImageManager.ReleaseImage(in r);
+            ImageManager.ReleaseImage(in w);
+            ImageManager.ReleaseImage(in y);
         }
     }
 }
