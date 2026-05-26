@@ -31,6 +31,9 @@ public sealed class HeroAggregate
     /// <summary>Phase 26 A1: 不应期子聚合 — 命名不应期 SSOT, 防"按键 atomic 段 + grace period" 期间其他 probe 误触 (切假腿中间态循环根治).</summary>
     public RefractoryState Refractory { get; } = new();
 
+    /// <summary>Phase 26 D1: 延迟命令队列子聚合 — 命令入队条件满足才出队执行, 防"窗口期错失" (吹风/无敌期间命令丢失, buff 结束瞬间秒接).</summary>
+    public DeferredQueue Deferred { get; } = new();
+
     /// <summary>Phase 8 C3: 当前英雄技能数量（4/5/6）——取代 Skill._技能数量 static。</summary>
     public int SkillCount { get; set; }
 

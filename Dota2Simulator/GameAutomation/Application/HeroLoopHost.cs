@@ -311,6 +311,9 @@ namespace Dota2Simulator.GameAutomation.Application
             // Phase 26 A2: 跨 hero 切换清除不应期残留, 防上一 hero LegSwap 不应期影响新 hero 决策.
             _aggregate.Refractory.Reset();
 
+            // Phase 26 D1: 跨 hero 切换清空延迟队列, 防上一 hero 入队的命令在新 hero 触发 (e.g. 上一 hero 入队的跳刀命令, 切英雄后 buff 结束误执行).
+            _aggregate.Deferred.Clear();
+
             _aggregate.HasAghanim = false;
             _aggregate.HasShard = false;
 
