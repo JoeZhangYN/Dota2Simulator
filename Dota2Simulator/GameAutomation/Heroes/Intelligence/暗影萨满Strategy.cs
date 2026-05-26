@@ -24,7 +24,7 @@ public sealed partial class 暗影萨满Strategy : IHeroStrategy
 
 
 
-    public void OnActivate(HeroContext ctx)
+    public override void OnActivate(HeroContext ctx)
     {
         _main._聚合.Conditions[ConditionSlotKey.C1].Probe ??= 苍穹振击取消后摇;
         _main._聚合.Conditions[ConditionSlotKey.C2].Probe ??= 变羊取消后摇;
@@ -33,7 +33,7 @@ public sealed partial class 暗影萨满Strategy : IHeroStrategy
         _main._聚合.Conditions[ConditionSlotKey.C5].Probe ??= 枷锁持续施法隐身;
     }
 
-    public Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)
+    public override Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)
     {
         VirtualKey key = trigger.Key;
         if (key == VirtualKey.Q)

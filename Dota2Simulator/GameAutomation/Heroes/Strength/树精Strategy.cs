@@ -20,8 +20,8 @@ public sealed partial class 树精Strategy : IHeroStrategy
         .OnKey(Keys.R).CastSkill(Keys.R).AfterCast()
         .Done();
 
-    public void OnActivate(HeroContext ctx) => _plan.Apply(ctx, _skill);
+    public override void OnActivate(HeroContext ctx) => _plan.Apply(ctx, _skill);
 
-    public Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx) => _plan.DispatchAsync(trigger, ctx, _item);
+    public override Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx) => _plan.DispatchAsync(trigger, ctx, _item);
 }
 #endif

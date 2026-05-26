@@ -17,9 +17,9 @@ public sealed partial class 术士Strategy : IHeroStrategy
 {
     private HeroPlan? _plan;
 
-    public void OnActivate(HeroContext ctx) => GetPlan().Apply(ctx, _skill);
+    public override void OnActivate(HeroContext ctx) => GetPlan().Apply(ctx, _skill);
 
-    public Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx) => GetPlan().DispatchAsync(trigger, ctx, _item);
+    public override Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx) => GetPlan().DispatchAsync(trigger, ctx, _item);
 
     private HeroPlan GetPlan() => _plan ??= HeroPlanBuilder.New()
         .OnKey(Keys.Q).Pre(() => _item.根据图片使用物品(Dota2_Pictrue.物品.纷争_Tpl)).CustomProbe(致命链接去后摇)

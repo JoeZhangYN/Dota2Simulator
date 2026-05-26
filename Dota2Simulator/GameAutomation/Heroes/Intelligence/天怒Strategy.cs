@@ -18,7 +18,7 @@ public sealed partial class 天怒Strategy : IHeroStrategy
 {
 
 
-    public void OnActivate(HeroContext ctx)
+    public override void OnActivate(HeroContext ctx)
     {
         _main._聚合.Conditions[ConditionSlotKey.C1].Probe ??= 循环奥数鹰隼;
         _main._聚合.Conditions[ConditionSlotKey.C2].Probe ??= 天怒秒人连招;
@@ -29,7 +29,7 @@ public sealed partial class 天怒Strategy : IHeroStrategy
         _skill.重复按键执行间隔阈值 = 100;
     }
 
-    public async Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)
+    public override async Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)
     {
         VirtualKey key = trigger.Key;
         await _item.根据按键判断技能释放前通用逻辑(new KeyEventArgs((Keys)key.ToNative())).ConfigureAwait(true);

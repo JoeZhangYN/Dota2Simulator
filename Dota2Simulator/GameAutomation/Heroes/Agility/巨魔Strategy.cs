@@ -20,8 +20,8 @@ public sealed partial class 巨魔Strategy : IHeroStrategy
         .LegSwap(Keys.Q, alwaysSwap: false)
         .Done();
 
-    public void OnActivate(HeroContext ctx) => _plan.Apply(ctx, _skill);
+    public override void OnActivate(HeroContext ctx) => _plan.Apply(ctx, _skill);
 
-    public Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx) => _plan.DispatchAsync(trigger, ctx, _item);
+    public override Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx) => _plan.DispatchAsync(trigger, ctx, _item);
 }
 #endif

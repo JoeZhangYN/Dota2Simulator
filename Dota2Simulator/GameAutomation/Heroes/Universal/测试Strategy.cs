@@ -19,11 +19,11 @@ public sealed partial class 测试Strategy : IHeroStrategy
 {
 
 
-    public void OnActivate(HeroContext ctx)
+    public override void OnActivate(HeroContext ctx)
     {
     }
 
-    public async Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)
+    public override async Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)
     {
         VirtualKey key = trigger.Key;
         if (key == VirtualKey.From(Keys.D1))

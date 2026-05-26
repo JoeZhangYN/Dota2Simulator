@@ -17,8 +17,8 @@ public sealed partial class 小仙女Strategy : IHeroStrategy
         .OnKey(Keys.D3).ToggleSlot(skillKey: Keys.W, speakOn: "续暗影", speakOff: "不续暗影")
         .Done();
 
-    public void OnActivate(HeroContext ctx) => _plan.Apply(ctx, _skill);
+    public override void OnActivate(HeroContext ctx) => _plan.Apply(ctx, _skill);
 
-    public Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx) => _plan.DispatchAsync(trigger, ctx, _item);
+    public override Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx) => _plan.DispatchAsync(trigger, ctx, _item);
 }
 #endif

@@ -26,12 +26,12 @@ public sealed partial class 马西Strategy : IHeroStrategy
 
 
 
-    public void OnActivate(HeroContext ctx)
+    public override void OnActivate(HeroContext ctx)
     {
         _main._聚合.Conditions[ConditionSlotKey.C2].Probe ??= 幽魂检测;
     }
 
-    public async Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)
+    public override async Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)
     {
         VirtualKey key = trigger.Key;
         await _item.根据按键判断技能释放前通用逻辑(new KeyEventArgs((Keys)key.ToNative())).ConfigureAwait(true);

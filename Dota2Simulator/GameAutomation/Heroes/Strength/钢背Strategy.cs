@@ -22,8 +22,8 @@ public sealed partial class 钢背Strategy : IHeroStrategy
         .OnKey(Keys.W).NoProbe()
         .Done();
 
-    public void OnActivate(HeroContext ctx) => _plan.Apply(ctx, _skill);
+    public override void OnActivate(HeroContext ctx) => _plan.Apply(ctx, _skill);
 
-    public Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx) => _plan.DispatchAsync(trigger, ctx, _item);
+    public override Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx) => _plan.DispatchAsync(trigger, ctx, _item);
 }
 #endif

@@ -18,7 +18,7 @@ public sealed partial class 军团Strategy : IHeroStrategy
 {
 
 
-    public void OnActivate(HeroContext ctx)
+    public override void OnActivate(HeroContext ctx)
     {
         _main._聚合.Conditions[ConditionSlotKey.C1].Probe ??= 压倒性优势去后摇;
         _main._聚合.Conditions[ConditionSlotKey.C2].Probe ??= 强攻去后摇;
@@ -28,7 +28,7 @@ public sealed partial class 军团Strategy : IHeroStrategy
         _main._聚合.LegSwap.配置.修改配置(Keys.E, false);
     }
 
-    public async Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)
+    public override async Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)
     {
         VirtualKey key = trigger.Key;
         await _item.根据按键判断技能释放前通用逻辑(new KeyEventArgs((Keys)key.ToNative())).ConfigureAwait(true);

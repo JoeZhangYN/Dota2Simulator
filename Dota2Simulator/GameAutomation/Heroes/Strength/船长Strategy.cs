@@ -23,7 +23,7 @@ public sealed partial class 船长Strategy : IHeroStrategy
 
 
 
-    public void OnActivate(HeroContext ctx)
+    public override void OnActivate(HeroContext ctx)
     {
         _main._聚合.Conditions[ConditionSlotKey.C1].Probe ??= 洪流接x回;
         _main._聚合.Conditions[ConditionSlotKey.C2].Probe ??= x释放后相关逻辑;
@@ -31,7 +31,7 @@ public sealed partial class 船长Strategy : IHeroStrategy
         _main._聚合.Conditions[ConditionSlotKey.C4].Probe ??= 立即释放洪流;
     }
 
-    public async Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)
+    public override async Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)
     {
         VirtualKey key = trigger.Key;
         await _item.根据按键判断技能释放前通用逻辑(new KeyEventArgs((Keys)key.ToNative())).ConfigureAwait(true);

@@ -22,7 +22,7 @@ public sealed partial class 海民Strategy : IHeroStrategy
 
 
 
-    public void OnActivate(HeroContext ctx)
+    public override void OnActivate(HeroContext ctx)
     {
         _main._聚合.Conditions.StoneProbe ??= 海民获取命石;
         _main._聚合.Conditions[ConditionSlotKey.C1].Probe ??= 冰片去后摇;
@@ -31,7 +31,7 @@ public sealed partial class 海民Strategy : IHeroStrategy
         _main._聚合.Conditions[ConditionSlotKey.C4].Probe ??= 酒友去后摇;
     }
 
-    public async Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)
+    public override async Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)
     {
         VirtualKey key = trigger.Key;
         await _item.根据按键判断技能释放前通用逻辑(new KeyEventArgs((Keys)key.ToNative())).ConfigureAwait(true);

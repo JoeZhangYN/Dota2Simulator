@@ -19,8 +19,8 @@ public sealed partial class 赏金Strategy : IHeroStrategy
         .OnKey(Keys.D2).ToggleSlot(Keys.R, "循环标记", "不循环标记")
         .Done();
 
-    public void OnActivate(HeroContext ctx) => _plan.Apply(ctx, _skill);
+    public override void OnActivate(HeroContext ctx) => _plan.Apply(ctx, _skill);
 
-    public Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx) => _plan.DispatchAsync(trigger, ctx, _item);
+    public override Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx) => _plan.DispatchAsync(trigger, ctx, _item);
 }
 #endif

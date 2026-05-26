@@ -21,7 +21,7 @@ public sealed partial class 伐木机Strategy : IHeroStrategy
 
 
 
-    public void OnActivate(HeroContext ctx)
+    public override void OnActivate(HeroContext ctx)
     {
         _main._聚合.Conditions.StoneProbe ??= 伐木机获取命石;
         _main._聚合.Conditions[ConditionSlotKey.C1].Probe ??= 死亡旋风去后摇;
@@ -31,7 +31,7 @@ public sealed partial class 伐木机Strategy : IHeroStrategy
         _main._聚合.Conditions[ConditionSlotKey.C5].Probe ??= 锯齿飞轮去后摇;
     }
 
-    public async Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)
+    public override async Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)
     {
         VirtualKey key = trigger.Key;
         await _item.根据按键判断技能释放前通用逻辑(new KeyEventArgs((Keys)key.ToNative())).ConfigureAwait(true);

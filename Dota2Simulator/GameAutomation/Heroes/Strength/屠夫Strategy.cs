@@ -18,14 +18,14 @@ public sealed partial class 屠夫Strategy : IHeroStrategy
 {
 
 
-    public void OnActivate(HeroContext ctx)
+    public override void OnActivate(HeroContext ctx)
     {
         _main._聚合.Conditions[ConditionSlotKey.C1].Probe ??= 钩子去僵直;
         _main._聚合.Conditions[ConditionSlotKey.C2].Probe ??= 肢解检测状态;
         _main._聚合.Conditions[ConditionSlotKey.C3].Probe ??= 快速接肢解;
     }
 
-    public async Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)
+    public override async Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx)
     {
         VirtualKey key = trigger.Key;
         await _item.根据按键判断技能释放前通用逻辑(new KeyEventArgs((Keys)key.ToNative())).ConfigureAwait(true);

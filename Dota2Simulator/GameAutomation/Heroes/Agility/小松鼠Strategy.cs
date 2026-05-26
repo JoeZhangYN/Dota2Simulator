@@ -15,9 +15,9 @@ public sealed partial class 小松鼠Strategy : IHeroStrategy
 {
     private HeroPlan? _plan;
 
-    public void OnActivate(HeroContext ctx) => GetPlan().Apply(ctx, _skill);
+    public override void OnActivate(HeroContext ctx) => GetPlan().Apply(ctx, _skill);
 
-    public Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx) => GetPlan().DispatchAsync(trigger, ctx, _item);
+    public override Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx) => GetPlan().DispatchAsync(trigger, ctx, _item);
 
     private HeroPlan GetPlan() => _plan ??= HeroPlanBuilder.New()
         .OnKey(Keys.F1).WhenHasShard().AdjustLegSwap(Keys.F, paramBool: true)

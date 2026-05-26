@@ -18,9 +18,9 @@ public sealed partial class 大鱼人Strategy : IHeroStrategy
 
     private HeroPlan? _plan;
 
-    public void OnActivate(HeroContext ctx) => GetPlan().Apply(ctx, _skill);
+    public override void OnActivate(HeroContext ctx) => GetPlan().Apply(ctx, _skill);
 
-    public Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx) => GetPlan().DispatchAsync(trigger, ctx, _item);
+    public override Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx) => GetPlan().DispatchAsync(trigger, ctx, _item);
 
     private HeroPlan GetPlan() => _plan ??= HeroPlanBuilder.New()
         .OnKey(Keys.Q).CustomProbe(async () => await _skill.技能通用判断(Keys.W, 1, 要接的按键: _main._聚合.HasShard ? Keys.A : Keys.R).ConfigureAwait(true))

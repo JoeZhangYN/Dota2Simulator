@@ -21,9 +21,9 @@ public sealed partial class 小精灵Strategy : IHeroStrategy
 
     private HeroPlan? _plan;
 
-    public void OnActivate(HeroContext ctx) => GetPlan().Apply(ctx, _skill);
+    public override void OnActivate(HeroContext ctx) => GetPlan().Apply(ctx, _skill);
 
-    public Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx) => GetPlan().DispatchAsync(trigger, ctx, _item);
+    public override Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx) => GetPlan().DispatchAsync(trigger, ctx, _item);
 
     private HeroPlan GetPlan() => _plan ??= HeroPlanBuilder.New()
         .OnKey(Keys.W).WhenNotHasAghanim().Execute(() => _main._聚合.Conditions[ConditionSlotKey.C2].Active = true)

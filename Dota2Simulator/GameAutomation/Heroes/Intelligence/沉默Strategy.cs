@@ -17,9 +17,9 @@ public sealed partial class 沉默Strategy : IHeroStrategy
 {
     private HeroPlan? _plan;
 
-    public void OnActivate(HeroContext ctx) => GetPlan().Apply(ctx, _skill);
+    public override void OnActivate(HeroContext ctx) => GetPlan().Apply(ctx, _skill);
 
-    public Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx) => GetPlan().DispatchAsync(trigger, ctx, _item);
+    public override Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx) => GetPlan().DispatchAsync(trigger, ctx, _item);
 
     private HeroPlan GetPlan() => _plan ??= HeroPlanBuilder.New()
         .OnKey(Keys.Q).CustomProbe(奥数诅咒去后摇)

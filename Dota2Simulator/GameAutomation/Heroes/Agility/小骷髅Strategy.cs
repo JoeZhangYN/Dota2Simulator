@@ -17,14 +17,14 @@ public sealed partial class 小骷髅Strategy : IHeroStrategy
 {
     private HeroPlan? _plan;
 
-    public void OnActivate(HeroContext ctx)
+    public override void OnActivate(HeroContext ctx)
     {
         GetPlan().Apply(ctx, _skill);
         _main._聚合.Attack.基础攻击前摇 = 0.4;
         _main._聚合.Attack.基础攻击间隔 = 1.7;
     }
 
-    public Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx) => GetPlan().DispatchAsync(trigger, ctx, _item);
+    public override Task OnKeyAsync(KeyTrigger trigger, HeroContext ctx) => GetPlan().DispatchAsync(trigger, ctx, _item);
 
     private HeroPlan GetPlan() => _plan ??= HeroPlanBuilder.New()
         .OnKey(Keys.F1).WhenHasShard().Execute(() => _main._聚合.LegSwap.配置.修改配置(Keys.D, true, "敏捷"))
