@@ -32,7 +32,7 @@ public sealed partial class 血魔Strategy : IHeroStrategy
         })
         .OnKey(Keys.R).CastSkill(Keys.R).AfterCast()
         .OnKey(Keys.Q).CastSkill(Keys.Q).AfterEnterCD()
-        .OnKey(Keys.Q, KeyModifiers.Alt).Execute(() => _main._聚合.Conditions[ConditionSlotKey.C3].Active = true)
+        .OnKey(Keys.Q, KeyModifiers.Alt).SetActive(ConditionSlotKey.C3)
         .Done();
 }
 #endif

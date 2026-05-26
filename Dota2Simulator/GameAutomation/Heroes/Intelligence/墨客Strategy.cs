@@ -16,7 +16,7 @@ public sealed partial class 墨客Strategy : IHeroStrategy
         .OnKey(Keys.Q).CastSkill(Keys.Q).AfterCast()
         .OnKey(Keys.W).CastSkill(Keys.W).AfterEnterCD()
         .OnKey(Keys.E).CastSkill(Keys.E).AfterCast()
-        .OnKey(Keys.E, KeyModifiers.Alt).Execute(() => _main._聚合.Conditions[ConditionSlotKey.C3].Active = true)
+        .OnKey(Keys.E, KeyModifiers.Alt).SetActive(ConditionSlotKey.C3)
         .OnKey(Keys.R).CastSkill(Keys.R).AfterCast()
         .OnKey(Keys.D).CastSkill(Keys.D).AfterEnterCD()
         .Done();

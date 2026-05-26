@@ -280,6 +280,27 @@ public sealed class HeroPlanBuilder
     }
 
     /// <summary>
+    /// Phase 22C: 终结 OnKey 链为 SetActive 形态 — 直接 set 指定 ConditionSlot.Active = true.
+    /// 替代 8 处业务 <c>.OnKey(K, modifiers).Execute(() => _main._聚合.Conditions[X].Active = true)</c> 同构 Execute lambda.
+    /// 业务侧形态: <c>.OnKey(Keys.W, KeyModifiers.Alt).SetActive(ConditionSlotKey.C2)</c>
+    /// </summary>
+    public HeroPlanBuilder SetActive(ConditionSlotKey slot)
+    {
+        if (_pendingTrigger is null) throw new InvalidOperationException("SetActive: 需先调 OnKey.");
+
+        _setups.Add(new SetupAction(
+            TriggerKey: Domain.Actuation.VirtualKey.From(_pendingTrigger.Value),
+            Guard: _pendingGuard,
+            Kind: SetupActionKind.SetActive,
+            ParamKey: Keys.None,
+            ParamBool: false,
+            Modifiers: _pendingModifiers,
+            ParamConditionSlot: slot));
+        ResetPending();
+        return this;
+    }
+
+    /// <summary>
     /// 终结 OnKey/OnEveryKey 链为 SetupAction (不挂 Probe, 仅副作用) — 当前 Kind = AdjustLegSwap.
     /// 例: <c>.OnKey(F1).WhenHasAghanim().AdjustLegSwap(F, true)</c> 表示按 F1 + 持神杖时改 LegSwap.修改配置(F, true).
     /// </summary>

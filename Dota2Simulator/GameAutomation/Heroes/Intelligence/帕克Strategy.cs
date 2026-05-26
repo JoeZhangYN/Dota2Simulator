@@ -27,7 +27,7 @@ public sealed partial class 帕克Strategy : IHeroStrategy
             _main._聚合.Skills.SetStep(SlotKey.Q, 0);
         })
         .OnKey(Keys.W).CastSkill(Keys.W).AfterEnterCD()
-        .OnKey(Keys.W, KeyModifiers.Control).Execute(() => _main._聚合.Conditions[ConditionSlotKey.C2].Active = true)
+        .OnKey(Keys.W, KeyModifiers.Control).SetActive(ConditionSlotKey.C2)
         .OnKey(Keys.R).CastSkill(Keys.R).AfterEnterCD()
         .OnKey(Keys.D).CastSkill(Keys.D).AfterEnterCDDo(() =>
         {

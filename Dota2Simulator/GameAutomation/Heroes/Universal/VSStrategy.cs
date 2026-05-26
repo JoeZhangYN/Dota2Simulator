@@ -14,7 +14,7 @@ public sealed partial class VSStrategy : IHeroStrategy
     protected override HeroPlan BuildPlan() => HeroPlanBuilder.New()
         .OnKey(Keys.Q).CastSkill(Keys.Q).AfterCast()
         .OnKey(Keys.R).CastSkill(Keys.R).AfterCast()
-        .OnKey(Keys.W).Execute(() => _main._聚合.Conditions[ConditionSlotKey.C2].Active = true)  // 业务原 W/R 都触发 C3 移形换位; 现 R 走 C2 (clause 顺序), W 走 setup hard-code C2 等价
+        .OnKey(Keys.W).SetActive(ConditionSlotKey.C2)  // 业务原 W/R 都触发 C3 移形换位; 现 R 走 C2 (clause 顺序), W 走 setup hard-code C2 等价
         .Done();
 }
 #endif

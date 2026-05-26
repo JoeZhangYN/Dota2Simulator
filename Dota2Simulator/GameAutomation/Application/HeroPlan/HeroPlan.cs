@@ -113,6 +113,8 @@ public enum SetupActionKind
     ExecuteAction,
     /// <summary>Phase 17: trigger key (通常 D2/D3/D4/D5 数字键) toggle 指定 ConditionSlot.Active + TTS 播报. 与 clause IsToggle 不同 — 这是 setup 形态, 不占 clause 槽, toggle 别的 ConditionSlot (e.g. D3 → C4 Active toggle).</summary>
     ToggleConditionSlot,
+    /// <summary>Phase 22C: trigger key 直接 set 指定 ConditionSlot.Active = true (单方向, 非 toggle). 替代 8 处业务 .Execute(() => Conditions[X].Active = true) 同构 Execute lambda. ParamConditionSlot 指定目标槽.</summary>
+    SetActive,
 }
 
 /// <summary>
@@ -311,6 +313,10 @@ public sealed class HeroPlan
                         {
                             Dota2Simulator.TTS.TTS.Speak(newActive ? setup.ParamStringOn : setup.ParamStringOff);
                         }
+                        break;
+                    case SetupActionKind.SetActive:
+                        // Phase 22C: 直接 set Active = true (单方向, 不 toggle), 替原 Execute(() => Conditions[X].Active = true) 同构.
+                        ctx.Aggregate.Conditions[setup.ParamConditionSlot].Active = true;
                         break;
                 }
             }

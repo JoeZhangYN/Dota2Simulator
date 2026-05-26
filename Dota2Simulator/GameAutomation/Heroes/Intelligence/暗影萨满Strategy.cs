@@ -26,8 +26,8 @@ public sealed partial class 暗影萨满Strategy : IHeroStrategy
         .OnKey(Keys.Q).CustomProbe(苍穹振击取消后摇)  // C1
         .OnKey(Keys.W).Pre(W键中立物品setup).CustomProbe(变羊取消后摇)  // C2
         .OnKey(Keys.R).CustomProbe(释放群蛇守卫取消后摇)  // C3
-        .OnKey(Keys.D2).Execute(() => _main._聚合.Conditions[ConditionSlotKey.C4].Active = true)
-        .OnKey(Keys.E).Execute(() => _main._聚合.Conditions[ConditionSlotKey.C5].Active = true)
+        .OnKey(Keys.D2).SetActive(ConditionSlotKey.C4)
+        .OnKey(Keys.E).SetActive(ConditionSlotKey.C5)
         .RegisterProbe(ConditionSlotKey.C4, 推推破林肯秒羊)
         .RegisterProbe(ConditionSlotKey.C5, 枷锁持续施法隐身)
         .OnKey(Keys.D1).Execute(D1_W_Mode循环)

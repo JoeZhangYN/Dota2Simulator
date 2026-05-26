@@ -18,7 +18,7 @@ public sealed partial class 巫妖Strategy : IHeroStrategy
     protected override HeroPlan BuildPlan() => HeroPlanBuilder.New()
         .OnKey(Keys.Q).CustomProbe(async () => await _skill.技能通用判断(Keys.Q, _main._聚合.Skills.Step(SlotKey.E) > 0 ? 11 : 1).ConfigureAwait(true))
         .OnKey(Keys.W).CustomProbe(async () => await _skill.技能通用判断(Keys.W, _main._聚合.Skills.Step(SlotKey.E) > 0 ? 11 : 1, false).ConfigureAwait(true))
-        .OnKey(Keys.W, KeyModifiers.Alt).Execute(() => _main._聚合.Conditions[ConditionSlotKey.C2].Active = true)
+        .OnKey(Keys.W, KeyModifiers.Alt).SetActive(ConditionSlotKey.C2)
         .OnKey(Keys.E).CustomProbe(async () =>
         {
             if (_skill.DOTA2判断技能是否CD(Keys.E))
