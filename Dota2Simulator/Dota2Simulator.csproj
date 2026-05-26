@@ -30,15 +30,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="inference_c\**" />
-    <EmbeddedResource Remove="inference_c\**" />
-    <None Remove="inference_c\**" />
-    <Compile Remove="_Legacy\**" />
-    <EmbeddedResource Remove="_Legacy\**" />
-    <None Remove="_Legacy\**" />
-  </ItemGroup>
-
-  <ItemGroup>
     <None Remove="Picture_Dota2\Buff_光法_大招.bmp" />
     <None Remove="Picture_Dota2\Buff_大牛_回魂.bmp" />
     <None Remove="Picture_Dota2\Buff_小强_大招.bmp" />
