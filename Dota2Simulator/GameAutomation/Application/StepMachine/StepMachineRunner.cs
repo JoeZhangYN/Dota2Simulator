@@ -107,6 +107,7 @@ public sealed class StepMachineRunner
             RegisterProbe r => InterpretRegisterProbe(r, machineName),
             UseItem u => InterpretUseItem(u),
             Delay d => await InterpretDelay(d).ConfigureAwait(false),
+            AwaitSkillHelper a => await InterpretAwaitSkillHelper(a).ConfigureAwait(false),
             _ => throw new InvalidOperationException($"Unknown StepCommand: {cmd.GetType().Name}")
         };
 
@@ -289,6 +290,17 @@ public sealed class StepMachineRunner
             await Task.Delay(d.Ms).ConfigureAwait(false);
         }
         return true;
+    }
+
+    private static async Task<bool> InterpretAwaitSkillHelper(AwaitSkillHelper a)
+    {
+        if (a.TimeoutMs is int t && t > 0)
+        {
+            Task<bool> probeTask = a.Probe();
+            Task winner = await Task.WhenAny(probeTask, Task.Delay(t)).ConfigureAwait(false);
+            return winner == probeTask && await probeTask.ConfigureAwait(false);
+        }
+        return await a.Probe().ConfigureAwait(false);
     }
 }
 #endif

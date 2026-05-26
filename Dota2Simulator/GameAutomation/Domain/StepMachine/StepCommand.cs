@@ -1,6 +1,7 @@
 #if DOTA2
 #nullable enable
 using System;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using Dota2Simulator.GameAutomation.Domain.Perception;
 using Dota2Simulator.Vision;
@@ -52,4 +53,7 @@ public sealed record UseItem(Template Template) : StepCommand;  // Wave 3 attemp
 
 // 19. 显式延迟 (R8 tick 节奏)
 public sealed record Delay(int Ms) : StepCommand;
+
+// 20. SkillEngine helper async polling adapter (Phase 27B 船长加入, 复杂度下沉到 SkillEngine 既有 helper, Runner 仅调度)
+public sealed record AwaitSkillHelper(Func<Task<bool>> Probe, int? TimeoutMs = null) : StepCommand;
 #endif
