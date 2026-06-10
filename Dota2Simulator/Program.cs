@@ -11,6 +11,9 @@ namespace Dota2Simulator
         [STAThread]
         private static void Main()
         {
+            // 输入后端 ABI 对账：部署了旧版/漂移 DLL 时启动即报错，而非运行时静默失败。
+            Input.NativeAbiCheck.EnsureContractSurface();
+
             _ = Application.SetHighDpiMode(HighDpiMode.SystemAware);
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);

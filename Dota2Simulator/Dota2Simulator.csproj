@@ -356,6 +356,9 @@
     <None Update="Infrastructure\Native\Libs\interception.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="Infrastructure\Native\Libs\interception_input.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Infrastructure\Native\Libs\KeyboardMouseSimulateDriver.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

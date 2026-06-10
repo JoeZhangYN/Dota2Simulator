@@ -2,50 +2,71 @@ using Dota2Simulator.GameAutomation.Domain.Actuation;
 using Dota2Simulator.GameAutomation.Domain.Perception;
 using Dota2Simulator.GameAutomation.Ports;
 using Dota2Simulator.KeyboardMouse;
-using WinFormsKeys = System.Windows.Forms.Keys;
+using NLog;
 
 namespace Dota2Simulator.Input.Adapters;
 
 /// <summary>
 /// IInputExecutor 的混合后端实现：复刻原 SimKeyBoard 的固定分发——
 /// 点击 / 单键 / 瞬移走 Interception 驱动；组合键 / 相对移动走 Enigo。
-/// 这不是「可替换 backend」——当前只有这一种固定分发配置。
+/// 两后端 FFI 面已对齐 input_abi 契约 42 符号（任何分发规则改动只需换绑定类名，
+/// 不再受单端能力缺口约束）；当前分发策略保持历史配置不变。
+/// 后端非 0 返回码记 NLog warn（IInputExecutor 保持 void，不向业务层抛异常）。
 /// </summary>
 public sealed class HybridInputAdapter : IInputExecutor
 {
-    public void Press(VirtualKey key) => InterceptionInput.KeyPress(key.ToNative());
+    private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
-    public void PressViaEnigo(VirtualKey key) => SimEnigo.KeyPress((WinFormsKeys)key.ToNative());
+    /// <summary>interception_input 失败路径：rc &gt; 0（InputError）。</summary>
+    private static void CheckDriver(int rc, string op)
+    {
+        if (rc != 0)
+        {
+            Logger.Warn("interception_input {Op} 失败 rc={Rc}: {Msg}", op, rc, InterceptionInput.LastError());
+        }
+    }
 
-    public void KeyDown(VirtualKey key) => InterceptionInput.KeyDown(key.ToNative());
+    /// <summary>simengio 失败路径：rc &lt; 0（SimError）。</summary>
+    private static void CheckEnigo(int rc, string op)
+    {
+        if (rc != 0)
+        {
+            Logger.Warn("simengio {Op} 失败 rc={Rc}: {Msg}", op, rc, SimEnigo.LastError());
+        }
+    }
 
-    public void KeyUp(VirtualKey key) => InterceptionInput.KeyUp(key.ToNative());
+    public void Press(VirtualKey key) => CheckDriver(InterceptionInput.KeyPress(key.ToNative()), nameof(Press));
+
+    public void PressViaEnigo(VirtualKey key) => CheckEnigo(SimEnigo.KeyPress(key.ToNative()), nameof(PressViaEnigo));
+
+    public void KeyDown(VirtualKey key) => CheckDriver(InterceptionInput.KeyDown(key.ToNative()), nameof(KeyDown));
+
+    public void KeyUp(VirtualKey key) => CheckDriver(InterceptionInput.KeyUp(key.ToNative()), nameof(KeyUp));
 
     public IKeyHold Hold(VirtualKey key)
     {
-        InterceptionInput.KeyDown(key.ToNative());
+        CheckDriver(InterceptionInput.KeyDown(key.ToNative()), nameof(Hold));
         return new KeyHoldHandle(this, key);
     }
 
     public void ComboWhile(VirtualKey key, VirtualKey modifier)
-        => SimEnigo.KeyPressWhile((WinFormsKeys)key.ToNative(), (WinFormsKeys)modifier.ToNative());
+        => CheckEnigo(SimEnigo.KeyPressWhile(key.ToNative(), modifier.ToNative()), nameof(ComboWhile));
 
     public void ComboWhile(VirtualKey key, VirtualKey modifier1, VirtualKey modifier2)
-        => SimEnigo.KeyPressWhileTwo(
-            (WinFormsKeys)key.ToNative(),
-            (WinFormsKeys)modifier1.ToNative(),
-            (WinFormsKeys)modifier2.ToNative());
+        => CheckEnigo(
+            SimEnigo.KeyPressWhileTwo(key.ToNative(), modifier1.ToNative(), modifier2.ToNative()),
+            nameof(ComboWhile));
 
     public void ComboAlt(VirtualKey key)
-        => SimEnigo.KeyPressAlt((WinFormsKeys)key.ToNative());
+        => CheckEnigo(SimEnigo.KeyPressAlt(key.ToNative()), nameof(ComboAlt));
 
     public void MouseClick(MouseButton button)
     {
         switch (button)
         {
-            case MouseButton.Left: InterceptionInput.MouseLeftClick(); break;
-            case MouseButton.Right: InterceptionInput.MouseRightClick(); break;
-            case MouseButton.Middle: InterceptionInput.MouseMiddleClick(); break;
+            case MouseButton.Left: CheckDriver(InterceptionInput.MouseLeftClick(), nameof(MouseClick)); break;
+            case MouseButton.Right: CheckDriver(InterceptionInput.MouseRightClick(), nameof(MouseClick)); break;
+            case MouseButton.Middle: CheckDriver(InterceptionInput.MouseMiddleClick(), nameof(MouseClick)); break;
         }
     }
 
@@ -53,10 +74,9 @@ public sealed class HybridInputAdapter : IInputExecutor
     {
         switch (button)
         {
-            case MouseButton.Left: SimEnigo.MouseLeftClick(); break;
-            case MouseButton.Right: SimEnigo.MouseRightClick(); break;
-            case MouseButton.Middle:
-                throw new System.NotSupportedException("SimEnigo 后端未导出 MouseMiddleClick");
+            case MouseButton.Left: CheckEnigo(SimEnigo.MouseLeftClick(), nameof(MouseClickViaEnigo)); break;
+            case MouseButton.Right: CheckEnigo(SimEnigo.MouseRightClick(), nameof(MouseClickViaEnigo)); break;
+            case MouseButton.Middle: CheckEnigo(SimEnigo.MouseMiddleClick(), nameof(MouseClickViaEnigo)); break;
             default:
                 throw new System.NotSupportedException($"未知 MouseButton: {button}");
         }
@@ -66,9 +86,9 @@ public sealed class HybridInputAdapter : IInputExecutor
     {
         switch (button)
         {
-            case MouseButton.Left: InterceptionInput.MouseLeftDown(); break;
-            case MouseButton.Right: InterceptionInput.MouseRightDown(); break;
-            case MouseButton.Middle: InterceptionInput.MouseMiddleDown(); break;
+            case MouseButton.Left: CheckDriver(InterceptionInput.MouseLeftDown(), nameof(MouseDown)); break;
+            case MouseButton.Right: CheckDriver(InterceptionInput.MouseRightDown(), nameof(MouseDown)); break;
+            case MouseButton.Middle: CheckDriver(InterceptionInput.MouseMiddleDown(), nameof(MouseDown)); break;
         }
     }
 
@@ -76,15 +96,25 @@ public sealed class HybridInputAdapter : IInputExecutor
     {
         switch (button)
         {
-            case MouseButton.Left: InterceptionInput.MouseLeftUp(); break;
-            case MouseButton.Right: InterceptionInput.MouseRightUp(); break;
-            case MouseButton.Middle: InterceptionInput.MouseMiddleUp(); break;
+            case MouseButton.Left: CheckDriver(InterceptionInput.MouseLeftUp(), nameof(MouseUp)); break;
+            case MouseButton.Right: CheckDriver(InterceptionInput.MouseRightUp(), nameof(MouseUp)); break;
+            case MouseButton.Middle: CheckDriver(InterceptionInput.MouseMiddleUp(), nameof(MouseUp)); break;
         }
     }
 
     public void MouseMoveTo(ScreenPoint point)
-        => InterceptionInput.MouseMoveTo(point.X, point.Y, 3840, 2160);
+        => CheckDriver(InterceptionInput.MouseMoveTo(point.X, point.Y, 3840, 2160), nameof(MouseMoveTo));
 
     public void MouseMove(int x, int y, bool relative)
-        => SimEnigo.MouseMove(x, y, relative ? 1 : 0);
+    {
+        if (relative)
+        {
+            CheckEnigo(SimEnigo.MouseMoveRelative(x, y), nameof(MouseMove));
+        }
+        else
+        {
+            // 旧 simengio MouseMove(x,y,0) 即 enigo 像素 Abs；契约面对应 MouseMoveTo（dims 仅校验）。
+            CheckEnigo(SimEnigo.MouseMoveTo(x, y, 3840, 2160), nameof(MouseMove));
+        }
+    }
 }

@@ -22,14 +22,6 @@ namespace Dota2Simulator.KeyboardMouse
 
         #region 模拟按键
 
-        /// <summary>
-        ///     用于预热,基本没用.
-        /// </summary>
-        public static void InitEnigoThreadlocal()
-        {
-            SimEnigo.init_enigo_threadlocal();
-        }
-
         public static void MouseLeftClick() => _executor.MouseClick(MouseButton.Left);
 
         public static void MouseRightClick() => _executor.MouseClick(MouseButton.Right);
