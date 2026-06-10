@@ -46,7 +46,9 @@ public readonly record struct Stratagem(ImmutableArray<Keys> Sequence, bool Ends
 /// </summary>
 public sealed class StratagemBuilder
 {
-    private readonly List<Keys> _seq = new() { Keys.Control };
+    // Keys.ControlKey(0x11) 是真实 VK；Keys.Control(0x20000) 是修饰符标志位，
+    // 过 VirtualKey.From guard 必抛（原 HF2_X helper 语义即点按 Ctrl，非按住）。
+    private readonly List<Keys> _seq = new() { Keys.ControlKey };
 
     public StratagemBuilder Up() { _seq.Add(Keys.Up); return this; }
     public StratagemBuilder Down() { _seq.Add(Keys.Down); return this; }
