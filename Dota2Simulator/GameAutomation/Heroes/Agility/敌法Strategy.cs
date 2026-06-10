@@ -38,14 +38,5 @@ public sealed partial class 敌法Strategy : IHeroStrategy
             Dota2Simulator.TTS.TTS.Speak("闪烁分身晕锤一次");
         })
         .Done();
-
-    /// <summary>因为有0.1秒的分裂时间，所以必须等待——复制自 _main.分身一齐攻击。</summary>
-    private void 分身一齐攻击()
-    {
-        Common.Delay(140);
-        _input.KeyDown(VirtualKey.From(Keys.Control));
-        走A();
-        _input.KeyUp(VirtualKey.From(Keys.Control));
-    }
 }
 #endif

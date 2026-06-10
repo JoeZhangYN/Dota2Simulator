@@ -16,19 +16,13 @@ namespace Dota2Simulator.GameAutomation.Heroes.Strength;
 [HeroStrategy("斧王", HeroAttribute.Strength)]
 public sealed partial class 斧王Strategy : IHeroStrategy
 {
-    private const int 等待延迟 = 33;
-
     protected override HeroPlan BuildPlan() => HeroPlanBuilder.New()
         .LegSwap(Keys.E, alwaysSwap: false)
         .OnKey(Keys.Q).Pre(() => _item.根据图片使用物品(Dota2_Pictrue.物品.魂戒_Tpl)).CustomProbe(吼去后摇)  // C1
         .OnKey(Keys.W).Pre(() => _item.根据图片使用物品(Dota2_Pictrue.物品.魂戒_Tpl)).CastSkill(Keys.W).AfterCast()  // C2: 战斗饥渴 (mode 1)
         .OnKey(Keys.R).Pre(() => _item.根据图片使用物品(Dota2_Pictrue.物品.魂戒_Tpl)).CastSkill(Keys.R).AfterCast()  // C3: 淘汰之刃 (mode 1)
         .OnKey(Keys.E).CustomProbe(跳吼)  // C4
-        .OnKey(Keys.D4).Execute(() =>
-        {
-            _main._聚合.Skills.ToggleMode(SlotKey.Q);
-            TTS.TTS.Speak(_main._聚合.Skills.Mode(SlotKey.Q) == 1 ? "吼接刃甲" : "吼不接刃甲");
-        })
+        .OnKey(Keys.D4).ToggleModeTts(SlotKey.Q, "吼接刃甲", "吼不接刃甲")
         .OnKey(Keys.D3).Execute(快速触发激怒)
         .Done();
 
@@ -45,11 +39,7 @@ public sealed partial class 斧王Strategy : IHeroStrategy
 
     private async Task<bool> 跳吼()
     {
-        if (_item.根据图片使用物品(Dota2_Pictrue.物品.跳刀_Tpl)
-            + _item.根据图片使用物品(Dota2_Pictrue.物品.跳刀_力量跳刀_Tpl)
-            + _item.根据图片使用物品(Dota2_Pictrue.物品.跳刀_智力跳刀_Tpl)
-            + _item.根据图片使用物品(Dota2_Pictrue.物品.跳刀_敏捷跳刀_Tpl) == 1)
-            Common.Delay(等待延迟);
+        _item.批量使用物品(物品连招.跳刀全变体);
         _ = _skill.DOTA2释放CD就绪技能(Keys.Q);
         return await Task.FromResult(false).ConfigureAwait(true);
     }

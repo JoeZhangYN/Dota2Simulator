@@ -9,6 +9,7 @@
 using Dota2Simulator.Vision;
 using Dota2Simulator.GameAutomation.Domain;
 using Dota2Simulator.GameAutomation.Domain.Actuation;
+using Dota2Simulator.GameAutomation.Domain.Items;
 using Dota2Simulator.GameAutomation.Domain.Perception;
 using Dota2Simulator.GameAutomation.Ports;
 using Dota2Simulator.Games;
@@ -40,6 +41,12 @@ namespace Dota2Simulator.GameAutomation.Application
 
         // Phase 26 B2: 命令确认探针 — optional (null 时退化为旧 fire-and-forget 路径). 注入路径: AppContainer wire PixelDiffAckProbe(vision).
         private readonly ICommandAckProbe? _ackProbe;
+
+        // 消费一次状态机: 跨帧跟踪消费品 (红杖等) 可使用→消失, 消费后跳过不再匹配.
+        // ItemEngine 单例 → 状态落"每局"; F1 重置 (重置耗蓝物品委托和条件) 时 Reset.
+        private readonly ConsumeOnceTracker _consumeTracker = new();
+        // 消费品末次可见槽位索引 (0-5): 未命中时据此查末槽 CD, 把"进 CD 灰图标"与"真消费"区分开.
+        private readonly Dictionary<string, int> _consumeLastSlot = new();
 
         public ItemEngine(IInputExecutor input, IScreenVision vision, IUiInvoker ui, HeroAggregate aggregate, SkillEngine skill, SessionState session, ICommandAckProbe? ackProbe = null)
         {
@@ -346,20 +353,19 @@ namespace Dota2Simulator.GameAutomation.Application
         private bool DOTA2判断任意物品是否锁闭()
         {
             物品信息 物品 = 根据技能数量获取物品信息(_aggregate.SkillCount);
-            Point 初始位置 = new(物品.物品锁闭x, 物品.物品锁闭y);
-            Color[] 目标颜色 = 物品.物品锁闭颜色;
-            byte 颜色容差 = 物品.物品锁闭颜色容差;
-
             for (int i = 0; i < 6; i++)
             {
-                if (!判断物品状态(物品, i, 初始位置, 目标颜色, 颜色容差))
+                if (判断序号物品是否锁闭(物品, i))
                 {
                     return true;
                 }
             }
-
             return false;
         }
+
+        /// <summary>指定槽位是否锁闭 (物品锁闭色不匹配即锁闭)。供 任意锁闭 与物品状态解析共用。</summary>
+        private bool 判断序号物品是否锁闭(物品信息 物品, int 序号)
+            => !判断物品状态(物品, 序号, new Point(物品.物品锁闭x, 物品.物品锁闭y), 物品.物品锁闭颜色, 物品.物品锁闭颜色容差);
 
         public static 物品信息 根据技能数量获取物品信息(int mode = 4)
         {
@@ -408,6 +414,10 @@ namespace Dota2Simulator.GameAutomation.Application
             _aggregate.Conditions[ConditionSlotKey.V].Probe = null;
             _aggregate.Conditions[ConditionSlotKey.B].Probe = null;
             _aggregate.Conditions[ConditionSlotKey.Space].Probe = null;
+
+            // 新一局: 重置消费一次状态 (上局消费的红杖等, 本局重新可消费)。
+            _consumeTracker.Reset();
+            _consumeLastSlot.Clear();
             return true;
         }
 
@@ -450,9 +460,13 @@ namespace Dota2Simulator.GameAutomation.Application
                 { Keys.Space, () => _aggregate.Conditions[ConditionSlotKey.Space].Probe ??= 物品space进入CD }
             };
 
-            foreach (Template 匹配句柄 in 需切假腿物品句柄)
+            // FindMany: 一帧喂全 22 模板 (修跨帧不一致 + 摊销 per-call 开销); 结果与数组同序对齐.
+            var 批量结果 = _vision.FindMany(需切假腿物品句柄, 获取物品范围(_aggregate.SkillCount), new MatchRate(0.9), Tolerance.Exact);
+            for (int i = 0; i < 需切假腿物品句柄.Length; i++)
             {
-                Keys key = 根据图片获取物品按键(匹配句柄);
+                Template 匹配句柄 = 需切假腿物品句柄[i];
+                Point? 位置 = 批量结果[i].Found ? new Point(批量结果[i].Point.X, 批量结果[i].Point.Y) : null;
+                Keys key = 根据位置获取按键(位置);
                 if (key != Keys.Escape && 物品进入CD委托.TryGetValue(key, out Action value))
                 {
                     if (匹配句柄 == Dota2_Pictrue.物品.魂戒_Tpl)
@@ -490,13 +504,16 @@ namespace Dota2Simulator.GameAutomation.Application
                 { Keys.Space, (() => _aggregate.Conditions[ConditionSlotKey.Space].Probe = null, () => _aggregate.Conditions[ConditionSlotKey.Space].Active = false) }
             };
 
-            foreach (Template 假腿句柄 in 假腿句柄集合)
+            // FindMany: 一帧批量查 3 假腿变体, 取首个命中 (语义等价原 break).
+            var 批量结果 = _vision.FindMany(假腿句柄集合, 获取物品范围(_aggregate.SkillCount), new MatchRate(0.9), Tolerance.Exact);
+            for (int i = 0; i < 假腿句柄集合.Length; i++)
             {
-                Keys key = 根据图片获取物品按键(假腿句柄);
+                Point? 位置 = 批量结果[i].Found ? new Point(批量结果[i].Point.X, 批量结果[i].Point.Y) : null;
+                Keys key = 根据位置获取按键(位置);
                 if (key != Keys.Escape)
                 {
                     _aggregate.LegSwap.假腿按键 = key;
-                    if (清空物品进入CD委托和条件映射.TryGetValue(_aggregate.LegSwap.假腿按键, out (Action 清空委托, Action 重置条件) actions))
+                    if (清空物品进入CD委托和条件映射.TryGetValue(key, out (Action 清空委托, Action 重置条件) actions))
                     {
                         actions.清空委托.Invoke();
                         actions.重置条件.Invoke();
@@ -546,29 +563,73 @@ namespace Dota2Simulator.GameAutomation.Application
         /// 内部按 templates 顺序 loop 调 <see cref="根据图片使用物品"/> + <c>Common.Delay(33 * count)</c>; 0 命中物品 0 延迟; 等价业务原语义.
         /// 业务侧形态: <c>_item.批量使用物品(Dota2_Pictrue.物品.散失_Tpl, 物品.散魂_Tpl, 物品.否决_Tpl, ...);</c> 一行表达式.
         /// </summary>
-        public void 批量使用物品(params Template[] templates)
-        {
-            if (templates is null) return;
-            foreach (Template tpl in templates)
-            {
-                Common.Delay(33 * 根据图片使用物品(tpl));
-            }
-        }
+        public void 批量使用物品(params Template[] templates) => 批量使用物品核心(templates, burst: false);
 
         /// <summary>
         /// Phase 26 F1 (2026-05-26): Burst 模式 — 所有物品 use 先调用累加 hit 数, 然后单次 delay = 33ms × sum.
         /// 与 <see cref="批量使用物品"/> 区别: Serial 每命中 delay 33ms (按键间隔); Burst 全按完单次 delay (按键近同帧, 用户体验"瞬发").
         /// 用于 G1 业务 6 hero (莱恩/沉默/屠夫/骨法/军团/天怒) 替原 <c>Common.Delay(33 * (use(A) + use(B) + use(C)))</c> inline 累加同构.
         /// </summary>
-        public void 批量使用物品并行(params Template[] templates)
+        public void 批量使用物品并行(params Template[] templates) => 批量使用物品核心(templates, burst: true);
+
+        /// <summary>
+        /// 批量使用物品统一编排: 逐 template find+press; 消费品 (<see cref="ItemCatalog.IsConsumedOnUse"/>)
+        /// 经 <see cref="ConsumeOnceTracker"/> 跨帧跟踪, 可使用→消失后标记 Consumed 并跳过, 不再匹配。
+        /// burst=false (Serial): 每命中 Delay 33ms; burst=true: 累加后单次 Delay (瞬发)。
+        /// 非消费品行为与原 Phase 22B/26F1 等价 (从不 Consumed, 零额外开销)。
+        /// </summary>
+        private void 批量使用物品核心(Template[] templates, bool burst)
         {
             if (templates is null) return;
             int sum = 0;
             foreach (Template tpl in templates)
             {
-                sum += 根据图片使用物品(tpl);
+                // 消费品消费后跳过, 不再搜索/使用。
+                if (_consumeTracker.IsConsumed(tpl.Name)) continue;
+
+                int hits = 根据图片使用物品(tpl);
+
+                // 仅对消费品额外观察状态以驱动消费一次转移 (CD/普通物品不进此分支, 零额外开销)。
+                if (ItemCatalog.IsConsumedOnUse(tpl.Name)) 观察消费状态(tpl);
+
+                if (burst) sum += hits;
+                else Common.Delay(33 * hits);
             }
-            Common.Delay(33 * sum);
+            if (burst) Common.Delay(33 * sum);
+        }
+
+        /// <summary>
+        /// 解析消费品当前物品槽状态并喂给 <see cref="ConsumeOnceTracker"/>。
+        /// 命中→记忆末槽 + 查该槽 CD; 未命中→查末槽 CD, 把"进 CD 灰图标"与"真消费"区分开。
+        /// 硬控走 ControlObservable; 锁闭按槽检测留扩展 (any-locked 会误判, 暂不产出);
+        /// LowMana/Highlighted 检测信号待补。
+        /// </summary>
+        private void 观察消费状态(Template tpl)
+        {
+            物品信息 物品 = 根据技能数量获取物品信息(_aggregate.SkillCount);
+            FindResult find = _vision.Find(tpl, 物品.物品范围, new MatchRate(0.9), Tolerance.Exact);
+
+            bool found = find.Found;
+            bool onCd;
+            bool locked = false;
+            if (found)
+            {
+                int slot = 位置到槽索引(new Point(find.Point.X, find.Point.Y), 物品);
+                if (slot >= 0)
+                {
+                    _consumeLastSlot[tpl.Name] = slot;
+                    locked = 判断序号物品是否锁闭(物品, slot);
+                }
+                onCd = slot >= 0 && DOTA2判断序号物品是否CD(slot);
+            }
+            else
+            {
+                onCd = _consumeLastSlot.TryGetValue(tpl.Name, out int s) && DOTA2判断序号物品是否CD(s);
+            }
+
+            bool heroDisabled = _host?.ControlObservable.CurrentState ?? false;
+            ItemSlotState state = ItemSlotState.Resolve(found, onCd, locked, heroDisabled);
+            _consumeTracker.Observe(tpl.Name, state);
         }
 
         public int 根据图片自我使用物品(Template 句柄)
@@ -609,6 +670,18 @@ namespace Dota2Simulator.GameAutomation.Application
             Keys k = 根据位置获取按键(位置);
             if (k == Keys.Escape) return 0;
 
+            // 长牙: 状态机门控 — item-use 查 ItemSlotState, 进CD / 锁闭则不按 (subsume 散落 CD/锁闭 检查).
+            // 不计硬控 (Insertable 物品受控时仍应发, 由既有 deferred 路径处理, 故 heroDisabled: false).
+            物品信息 物品状态信息 = 根据技能数量获取物品信息(_aggregate.SkillCount);
+            int 槽位 = 位置到槽索引(位置, 物品状态信息);
+            if (槽位 >= 0)
+            {
+                bool 进CD = DOTA2判断序号物品是否CD(槽位);
+                bool 锁闭 = 判断序号物品是否锁闭(物品状态信息, 槽位);
+                ItemSlotState 槽状态 = ItemSlotState.Resolve(found: true, onCooldown: 进CD, locked: 锁闭, heroDisabled: false);
+                if (!槽状态.CanUseNow) return 0;
+            }
+
             // Phase 26 B2: 物品按键不应期短路 — 上次 Ack Failed 触发 500ms Refractory 防"灰图标累积按键".
             string refractoryKey = $"Item:{k}";
             if (_aggregate.Refractory.IsRefractory(refractoryKey)) return 0;
@@ -644,12 +717,19 @@ namespace Dota2Simulator.GameAutomation.Application
 
         private Keys 根据位置获取按键(Point? 位置)
         {
+            物品信息 物品 = 根据技能数量获取物品信息(_aggregate.SkillCount);
+            int index = 位置到槽索引(位置, 物品);
+            return index < 0 ? Keys.Escape : 物品.物品位置[index];
+        }
+
+        /// <summary>位置 → 物品槽索引 (0-5); 无效位置或越界返 -1. 供按键映射与物品状态解析共用.</summary>
+        private static int 位置到槽索引(Point? 位置, 物品信息 物品)
+        {
             if (!位置.HasValue || ImageManager.是否无效位置(位置))
             {
-                return Keys.Escape;
+                return -1;
             }
 
-            物品信息 物品 = 根据技能数量获取物品信息(_aggregate.SkillCount);
             int x = 位置.Value.X + GameLayout.OffsetX;
             int y = 位置.Value.Y + GameLayout.OffsetY;
 
@@ -662,13 +742,7 @@ namespace Dota2Simulator.GameAutomation.Application
                 index += 3;
             }
 
-            // 验证索引范围并返回对应按键
-            if (index >= 0 && index < 物品.物品位置.Length)
-            {
-                return 物品.物品位置[index];
-            }
-
-            return Keys.Escape;
+            return (index >= 0 && index < 物品.物品位置.Length) ? index : -1;
         }
 
         #endregion

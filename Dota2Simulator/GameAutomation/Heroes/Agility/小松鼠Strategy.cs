@@ -39,16 +39,8 @@ public sealed partial class 小松鼠Strategy : IHeroStrategy
         })
         .OnKey(Keys.R).NoProbe()
         .OnKey(Keys.F).WhenHasShard().CastSkill(Keys.F).AfterCast()
-        .OnKey(Keys.D2).Execute(() =>
-        {
-            _main._聚合.Skills.ToggleMode(SlotKey.W);
-            Dota2Simulator.TTS.TTS.Speak(_main._聚合.Skills.Mode(SlotKey.W) == 0 ? "种树接平A" : "种树接捆");
-        })
-        .OnKey(Keys.D3).Execute(() =>
-        {
-            _main._聚合.Skills.ToggleMode(SlotKey.E);
-            Dota2Simulator.TTS.TTS.Speak(_main._聚合.Skills.Mode(SlotKey.E) == 0 ? "捆接平A" : "捆接种树");
-        })
+        .OnKey(Keys.D2).ToggleModeTts(SlotKey.W, "种树接捆", "种树接平A")
+        .OnKey(Keys.D3).ToggleModeTts(SlotKey.E, "捆接种树", "捆接平A")
         .Done();
 }
 #endif

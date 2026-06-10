@@ -45,11 +45,7 @@ public sealed partial class 火猫Strategy : IHeroStrategy
         .OnKey(Keys.Q).CastSkill(Keys.Q).AfterEnterCD()
         .OnKey(Keys.E).CastSkill(Keys.E).AfterEnterCD()
         .OnKey(Keys.D).CastSkill(Keys.D).AfterCast()
-        .OnKey(Keys.D2).Execute(() =>
-        {
-            _main._聚合.Skills.ToggleMode(SlotKey.W);
-            Dota2Simulator.TTS.TTS.Speak(_main._聚合.Skills.Mode(SlotKey.W) == 0 ? "不接捆" : "接捆");
-        })
+        .OnKey(Keys.D2).ToggleModeTts(SlotKey.W, "接捆", "不接捆")
         .Done();
 }
 #endif

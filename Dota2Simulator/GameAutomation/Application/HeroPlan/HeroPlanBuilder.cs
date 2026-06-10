@@ -260,70 +260,10 @@ public sealed class HeroPlanBuilder
     }
 
     /// <summary>
-    /// Phase 26 B3 (2026-05-26): clause 强制 CommandAcked — chain 直接修饰刚终结的 clause (与 AlsoAdjustLegSwap 同形态).
-    /// 业务消费者 (Engine wrap) 决定 Ack 语义; B2 已实现 ItemEngine 物品按键 fire-and-forget Ack, B3 chain 在 DSL 层声明意图供未来 Engine 路径扩展消费.
-    /// 例: <c>.OnKey(R).CastSkill(R).AfterCast().RequireAck()</c>
-    /// </summary>
-    public HeroPlanBuilder RequireAck()
-    {
-        if (_clauses.Count == 0)
-        {
-            throw new InvalidOperationException("RequireAck: 需先终结一个 clause (.AfterCast/.AfterEnterCD/.WhenReady/.AfterEnterCDDo/.AfterCastDo/.WhenReadyDo/.AfterCastReplaceIcon).");
-        }
-        int lastIdx = _clauses.Count - 1;
-        _clauses[lastIdx] = _clauses[lastIdx] with { RequireAck = true };
-        return this;
-    }
-
-    /// <summary>
-    /// Phase 26 D3 (2026-05-26): clause 延迟入队 — chain 直接修饰刚终结的 clause. 业务消费者 (Engine 路径 / Apply 路径扩展) 决定入队语义.
-    /// 用于"吹风秒接跳刀"形态: <c>.OnKey(W).CastSkill(跳刀).AfterEnterCD().QueueWhen(ctx => !ctx.Aggregate.SomeBuff.IsControlled)</c>
-    /// (当前 Apply 路径默认行为 = 直发; QueueWhen 字段写入 clause 后由后续 Engine 路径扩展消费).
-    /// </summary>
-    public HeroPlanBuilder QueueWhen(Func<HeroContext, bool> condition)
-    {
-        if (_clauses.Count == 0)
-        {
-            throw new InvalidOperationException("QueueWhen: 需先终结一个 clause.");
-        }
-        if (condition is null) throw new ArgumentNullException(nameof(condition));
-        int lastIdx = _clauses.Count - 1;
-        _clauses[lastIdx] = _clauses[lastIdx] with { QueueWhen = condition };
-        return this;
-    }
-
-    /// <summary>
-    /// Phase 26 A3 (2026-05-26): clause / setup 不应期声明 — chain 修饰刚终结的 clause 或 setup.
-    /// DispatchAsync 路径: 命中前 check <c>IsRefractory(name)</c> → 真则短路; 命中后 <c>SetRefractory(name, ms)</c>.
-    /// 用于 Strategy 显式声明不应期 (如未来 SkillCD / BuffWindow / ChannelLock 共享 Refractory 模型), 不需手改 Engine.
-    /// 例: <c>.OnKey(R).CastSkill(R).AfterCast().WithRefractory("天怒大招", 400)</c> — 天怒大招按下后 400ms 内同键再按短路.
-    /// 优先修饰最后入队的 clause; 若 0 clause 但有 setup, 修饰最后 setup.
-    /// </summary>
-    public HeroPlanBuilder WithRefractory(string name, int ms)
-    {
-        if (string.IsNullOrEmpty(name)) throw new ArgumentException("WithRefractory: name 不能为空.", nameof(name));
-        if (ms <= 0) throw new ArgumentOutOfRangeException(nameof(ms), "WithRefractory: ms 必须 > 0.");
-
-        if (_clauses.Count > 0)
-        {
-            int lastIdx = _clauses.Count - 1;
-            _clauses[lastIdx] = _clauses[lastIdx] with { RefractoryName = name, RefractoryMs = ms };
-            return this;
-        }
-        if (_setups.Count > 0)
-        {
-            int lastIdx = _setups.Count - 1;
-            _setups[lastIdx] = _setups[lastIdx] with { RefractoryName = name, RefractoryMs = ms };
-            return this;
-        }
-        throw new InvalidOperationException("WithRefractory: 需先终结一个 clause 或 setup.");
-    }
-
-    /// <summary>
     /// Phase 27A retry 2 S2 (2026-05-26): 注册 StepMachine 子定义 + 把当前最后一个 clause 的 StepMachineRefId 设为 name.
     /// **显式破坏 Phase 26 之前的"单 fluent type 不变量"** — 业务侧调链入 <see cref="StepMachineSubBuilder"/> sub 域, 通过闭包结束返主 builder.
     /// 关联 plan SSOT: Phase 27A retry 2 §7 SSOT 漂移点 + §7.2 DSL 维度增删表 (拆桥矩阵).
-    /// lastIdx-with 模式同 Phase 26 .WithRefractory L300-L317 沿用.
+    /// lastIdx-with 模式: 修饰 _clauses 最后入队项 (与 .AlsoAdjustLegSwap 同形态).
     /// </summary>
     public HeroPlanBuilder StepMachine(string name, Action<StepMachineSubBuilder> configure)
     {
@@ -335,7 +275,7 @@ public sealed class HeroPlanBuilder
         Domain.StepMachine.StepMachineDefinition def = sub.Build();
         _stepMachineDefinitions[name] = def;
 
-        // lastIdx-with 模式 — 同 Phase 26 .WithRefractory L308 沿用. clause 命中后由 DispatchAsync wiring hook 触发 Runner.
+        // lastIdx-with 模式: 修饰最后入队 clause. clause 命中后由 DispatchAsync wiring hook 触发 Runner.
         if (_clauses.Count > 0)
         {
             int lastIdx = _clauses.Count - 1;
@@ -415,6 +355,35 @@ public sealed class HeroPlanBuilder
             PreActionSync: _pendingPreActionSync,
             PreActionAsync: _pendingPreActionAsync,
             GuardPredicate: _pendingGuardPredicate));
+        ResetPending();
+        return this;
+    }
+
+    /// <summary>
+    /// Phase 28 C5: trigger key toggle 指定 Skills.Mode(SlotKey) + TTS 播报 (Mode==1 ? on : off).
+    /// 收口 17 处 D2/D3 .Execute(() => { Skills.ToggleMode(slot); TTS.Speak(Mode(slot)==N ? "A":"B"); }) 同构.
+    /// 注: 统一按 Mode==1?on:off; 原 Mode==0?A:B 形态对调文案 (on=B, off=A) 即等价 (toggle 仅 0↔1).
+    /// 例: <c>.OnKey(Keys.D2).ToggleModeTts(SlotKey.Q, "勾接咬", "勾接平A")</c>
+    /// </summary>
+    public HeroPlanBuilder ToggleModeTts(Domain.Loop.SlotKey slot, string on, string off)
+    {
+        if (_pendingTrigger is null)
+        {
+            throw new InvalidOperationException("ToggleModeTts: 需先调 OnKey (不支持 OnEveryKey 形态).");
+        }
+        _setups.Add(new SetupAction(
+            TriggerKey: Domain.Actuation.VirtualKey.From(_pendingTrigger.Value),
+            Guard: _pendingGuard,
+            Kind: SetupActionKind.ToggleSkillModeTts,
+            ParamKey: Keys.None,
+            ParamBool: false,
+            ParamStringOn: on,
+            ParamStringOff: off,
+            Modifiers: _pendingModifiers,
+            PreActionSync: _pendingPreActionSync,
+            PreActionAsync: _pendingPreActionAsync,
+            GuardPredicate: _pendingGuardPredicate,
+            ParamSkillSlot: slot));
         ResetPending();
         return this;
     }

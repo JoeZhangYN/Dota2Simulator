@@ -16,7 +16,6 @@ namespace Dota2Simulator.GameAutomation.Heroes.Universal;
 [HeroStrategy("猛犸", HeroAttribute.Universal)]
 public sealed partial class 猛犸Strategy : IHeroStrategy
 {
-    private const int 等待延迟 = 33;
 
     protected override HeroPlan BuildPlan() => HeroPlanBuilder.New()
         .OnKey(Keys.Q).CustomProbe(通用后续Probe)

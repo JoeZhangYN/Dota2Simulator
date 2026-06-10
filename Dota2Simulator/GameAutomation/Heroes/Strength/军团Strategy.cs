@@ -51,13 +51,7 @@ public sealed partial class 军团Strategy : IHeroStrategy
             ).End()
             // Step 1: 4 跳刀变体 ParallelBatch Burst (等价原 _item.批量使用物品并行 行为) + SetStep(2).
             .Step(1).Do(
-                new ParallelBatch(new StepCommand[]
-                {
-                    new UseItem(Dota2_Pictrue.物品.跳刀_Tpl),
-                    new UseItem(Dota2_Pictrue.物品.跳刀_力量跳刀_Tpl),
-                    new UseItem(Dota2_Pictrue.物品.跳刀_智力跳刀_Tpl),
-                    new UseItem(Dota2_Pictrue.物品.跳刀_敏捷跳刀_Tpl),
-                }),
+                物品连招.跳刀全变体.AsParallelBatch(),  // 4 跳刀变体 burst — SSOT 物品连招.跳刀全变体
                 new SetStep(2)
             ).End()
             // Step 2: 二阶 burst (紫苑/血棘/否决/散失/散魂/深渊之刃) + SetStep(3).
@@ -80,11 +74,7 @@ public sealed partial class 军团Strategy : IHeroStrategy
             ).End()
         )
         .OnKey(Keys.R).CastSkill(Keys.R).AfterCast()  // C4: 决斗去后摇 (mode 1)
-        .OnKey(Keys.D2).Execute(() =>
-        {
-            _main._聚合.Skills.ToggleMode(SlotKey.Global);
-            TTS.TTS.Speak(_main._聚合.Skills.Mode(SlotKey.Global) == 1 ? "跳刀决斗" : "直接决斗");
-        })
+        .OnKey(Keys.D2).ToggleModeTts(SlotKey.Global, "跳刀决斗", "直接决斗")
         .Done();
 }
 #endif

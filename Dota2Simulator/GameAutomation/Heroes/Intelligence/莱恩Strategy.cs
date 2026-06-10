@@ -16,8 +16,6 @@ namespace Dota2Simulator.GameAutomation.Heroes.Intelligence;
 [HeroStrategy("莱恩", HeroAttribute.Intelligence)]
 public sealed partial class 莱恩Strategy : IHeroStrategy
 {
-    private const int 等待延迟 = 33;
-
     protected override HeroPlan BuildPlan() => HeroPlanBuilder.New()
         .OnKey(Keys.W).CustomProbe(async () => await 莱恩羊接技能().ConfigureAwait(true))
         .OnKey(Keys.R).PreAsync(async () => await 大招前纷争().ConfigureAwait(true))
@@ -64,14 +62,7 @@ public sealed partial class 莱恩Strategy : IHeroStrategy
 
     private async Task<bool> 大招前纷争()
     {
-        _item.批量使用物品并行(
-            Dota2_Pictrue.物品.虚灵之刃_Tpl,
-            Dota2_Pictrue.物品.纷争_Tpl,
-            Dota2_Pictrue.物品.红杖_Tpl,
-            Dota2_Pictrue.物品.红杖2_Tpl,
-            Dota2_Pictrue.物品.红杖3_Tpl,
-            Dota2_Pictrue.物品.红杖4_Tpl,
-            Dota2_Pictrue.物品.红杖5_Tpl);
+        _item.批量使用物品并行(物品连招.大招前纷争);
         return await Task.FromResult(false).ConfigureAwait(true);
     }
 

@@ -51,16 +51,8 @@ public sealed partial class 小骷髅Strategy : IHeroStrategy
             }
         })
         .OnKey(Keys.F).WhenHasAghanim().CastSkill(Keys.F).AfterEnterCD()
-        .OnKey(Keys.D2).Execute(() =>
-        {
-            _main._聚合.Skills.ToggleMode(SlotKey.Q);
-            Dota2Simulator.TTS.TTS.Speak(_main._聚合.Skills.Mode(SlotKey.Q) == 1 ? "无脑接道具" : "手动道具");
-        })
-        .OnKey(Keys.D3).WhenHasShard().Execute(() =>
-        {
-            _main._聚合.Skills.ToggleMode(SlotKey.F);
-            Dota2Simulator.TTS.TTS.Speak(_main._聚合.Skills.Mode(SlotKey.F) == 1 ? "炽烈火雨隐身" : "炽烈火雨不隐身");
-        })
+        .OnKey(Keys.D2).ToggleModeTts(SlotKey.Q, "无脑接道具", "手动道具")
+        .OnKey(Keys.D3).WhenHasShard().ToggleModeTts(SlotKey.F, "炽烈火雨隐身", "炽烈火雨不隐身")
         .Done();
 }
 #endif

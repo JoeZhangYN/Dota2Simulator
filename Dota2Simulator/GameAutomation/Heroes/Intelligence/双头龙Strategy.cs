@@ -16,7 +16,6 @@ namespace Dota2Simulator.GameAutomation.Heroes.Intelligence;
 [HeroStrategy("双头龙", HeroAttribute.Intelligence)]
 public sealed partial class 双头龙Strategy : IHeroStrategy
 {
-    private const int 等待延迟 = 33;
 
     protected override HeroPlan BuildPlan() => HeroPlanBuilder.New()
         .OnKey(Keys.Q).CustomProbe(冰火交加去后摇)

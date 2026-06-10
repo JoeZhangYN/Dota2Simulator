@@ -19,11 +19,7 @@ public sealed partial class 炸弹人Strategy : IHeroStrategy
         .OnKey(Keys.Q).CustomProbe(粘性炸弹去后摇)
         .OnKey(Keys.W).CustomProbe(活性电击去后摇)
         .OnKey(Keys.E).Pre(() => _item.根据图片使用物品(Dota2_Pictrue.物品.纷争_Tpl)).CustomProbe(爆破起飞去后摇)
-        .OnKey(Keys.D2).Execute(() =>
-        {
-            _main._聚合.Skills.ToggleMode(SlotKey.E);
-            TTS.TTS.Speak(_main._聚合.Skills.Mode(SlotKey.E) == 0 ? "起飞后不接3连炸弹" : "起飞后接3连炸弹");
-        })
+        .OnKey(Keys.D2).ToggleModeTts(SlotKey.E, "起飞后接3连炸弹", "起飞后不接3连炸弹")
         .RegisterProbe(ConditionSlotKey.C4, 爆破后接3雷粘性炸弹)
         .Done();
 

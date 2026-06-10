@@ -26,11 +26,7 @@ public sealed partial class 混沌Strategy : IHeroStrategy
             要接的按键: _main._聚合.Skills.Mode(SlotKey.Q) == 1 ? Keys.W : Keys.A).ConfigureAwait(true))
         .OnKey(Keys.W).CastSkill(Keys.W).AfterCastLegOnly()
         .OnKey(Keys.R).CastSkill(Keys.R).AfterCast()
-        .OnKey(Keys.D2).Execute(() =>
-        {
-            _main._聚合.Skills.ToggleMode(SlotKey.Q);
-            Dota2Simulator.TTS.TTS.Speak(_main._聚合.Skills.Mode(SlotKey.Q) == 1 ? "混乱之箭接拉" : "混乱之箭接A");
-        })
+        .OnKey(Keys.D2).ToggleModeTts(SlotKey.Q, "混乱之箭接拉", "混乱之箭接A")
         .OnKey(Keys.D3).Execute(() =>
         {
             Keys k = _item.根据图片获取物品按键(Dota2_Pictrue.物品.臂章_开启_Tpl);

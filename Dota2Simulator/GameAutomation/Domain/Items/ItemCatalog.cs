@@ -26,7 +26,19 @@ public static class ItemCatalog
         ["林肯法球"] = new("林肯法球", IsInsertable: true),
         // Blocked (必须 hero 能行动, 受 stun/silence 阻断):
         ["跳刀"] = new("跳刀", IsInsertable: false),
+        // 消费品 (按一次永久消失) — 键用完整 Template 名 ("物品.X") 以匹配 TryGet(template.Name);
+        // IsInsertable: true 保证不触发 DeferredQueue (与未注册的直发默认一致, 零行为改变),
+        // IsConsumedOnUse: true 供 ConsumeOnceTracker 消费后跳过. 红杖 = Aghanim 5 视觉变体.
+        ["物品.红杖"] = new("物品.红杖", IsInsertable: true, IsConsumedOnUse: true),
+        ["物品.红杖2"] = new("物品.红杖2", IsInsertable: true, IsConsumedOnUse: true),
+        ["物品.红杖3"] = new("物品.红杖3", IsInsertable: true, IsConsumedOnUse: true),
+        ["物品.红杖4"] = new("物品.红杖4", IsInsertable: true, IsConsumedOnUse: true),
+        ["物品.红杖5"] = new("物品.红杖5", IsInsertable: true, IsConsumedOnUse: true),
     };
+
+    /// <summary>该物品名是否为消费品（消费一次后不再匹配）。miss → false（保守）。</summary>
+    public static bool IsConsumedOnUse(string name)
+        => _byName.TryGetValue(name, out ItemDescriptor? desc) && desc.IsConsumedOnUse;
 
     /// <summary>按物品名 lookup; miss 返 null (调用方走默认: E2 保守走 DeferredQueue).</summary>
     public static ItemDescriptor? TryGet(string name)

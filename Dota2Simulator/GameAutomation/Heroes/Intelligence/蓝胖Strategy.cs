@@ -19,11 +19,7 @@ public sealed partial class 蓝胖Strategy : IHeroStrategy
         .OnKey(Keys.E).NoProbe()  // 占 C3 (原 OnActivate 注册嗜血术 dead Probe, OnKeyAsync 不触发 E)
         .OnKey(Keys.F).CustomProbe(烈火护盾去后摇)
         .OnKey(Keys.D).CustomProbe(未精通火焰轰爆去后摇)
-        .OnKey(Keys.D2).Execute(() =>
-        {
-            _main._聚合.Skills.ToggleMode(SlotKey.W);
-            TTS.TTS.Speak(_main._聚合.Skills.Mode(SlotKey.W) == 0 ? "引燃接轰爆" : "引燃不接轰爆");
-        })
+        .OnKey(Keys.D2).ToggleModeTts(SlotKey.W, "引燃不接轰爆", "引燃接轰爆")
         .Done();
 
     private async Task<bool> 火焰轰爆去后摇()

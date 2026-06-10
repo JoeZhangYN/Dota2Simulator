@@ -34,11 +34,7 @@ public sealed partial class 马尔斯Strategy : IHeroStrategy
             }
             _skill.通用技能后续动作();
         })
-        .OnKey(Keys.D2).Execute(() =>
-        {
-            _main._聚合.Skills.ToggleMode(SlotKey.Q);
-            Dota2Simulator.TTS.TTS.Speak(_main._聚合.Skills.Mode(SlotKey.Q) == 1 ? "矛接大招" : "矛不接大招");
-        })
+        .OnKey(Keys.D2).ToggleModeTts(SlotKey.Q, "矛接大招", "矛不接大招")
         .Done();
 }
 #endif

@@ -13,7 +13,6 @@ namespace Dota2Simulator.GameAutomation.Heroes.Intelligence;
 [HeroStrategy("蓝猫", HeroAttribute.Intelligence)]
 public sealed partial class 蓝猫Strategy : IHeroStrategy
 {
-    private const int 等待延迟 = 33;
 
     protected override HeroPlan BuildPlan() => HeroPlanBuilder.New()
         .OnKey(Keys.Q).Execute(() => Task.Run(残影接平A))

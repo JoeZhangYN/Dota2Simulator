@@ -44,20 +44,7 @@ public sealed partial class 幽鬼Strategy : IHeroStrategy
             走A();
         })
         .OnKey(Keys.E).CastSkill(Keys.E).AfterEnterCD()
-        .OnKey(Keys.D2).Execute(() =>
-        {
-            _main._聚合.Skills.ToggleMode(SlotKey.F);
-            Dota2Simulator.TTS.TTS.Speak(_main._聚合.Skills.Mode(SlotKey.F) == 1 ? "如影随形分身" : "关闭随形分身");
-        })
+        .OnKey(Keys.D2).ToggleModeTts(SlotKey.F, "如影随形分身", "关闭随形分身")
         .Done();
-
-    /// <summary>因为有0.1秒的分裂时间，所以必须等待——复制自 _main.分身一齐攻击。</summary>
-    private void 分身一齐攻击()
-    {
-        Common.Delay(140);
-        _input.KeyDown(VirtualKey.From(Keys.Control));
-        走A();
-        _input.KeyUp(VirtualKey.From(Keys.Control));
-    }
 }
 #endif

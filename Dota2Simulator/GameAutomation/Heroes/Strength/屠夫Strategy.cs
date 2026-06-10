@@ -18,11 +18,7 @@ public sealed partial class 屠夫Strategy : IHeroStrategy
     protected override HeroPlan BuildPlan() => HeroPlanBuilder.New()
         .OnKey(Keys.Q).CustomProbe(钩子去僵直)  // C1: 钩子 (Mode==1 时跨 clause 设 C3.Active=true)
         .OnKey(Keys.R).CustomProbe(肢解检测状态)  // C2: 肢解
-        .OnKey(Keys.D2).Execute(() =>
-        {
-            _main._聚合.Skills.ToggleMode(SlotKey.Q);
-            TTS.TTS.Speak(_main._聚合.Skills.Mode(SlotKey.Q) == 1 ? "勾接咬" : "勾接平A");
-        })
+        .OnKey(Keys.D2).ToggleModeTts(SlotKey.Q, "勾接咬", "勾接平A")
         .RegisterProbe(ConditionSlotKey.C3, 快速接肢解)  // C3: 快速接肢解 (由 C1 Probe 跨 clause 驱动)
         .Done();
 
@@ -58,12 +54,7 @@ public sealed partial class 屠夫Strategy : IHeroStrategy
                 Dota2_Pictrue.物品.希瓦_Tpl,
                 Dota2_Pictrue.物品.虚灵之刃_Tpl,
                 Dota2_Pictrue.物品.否决_Tpl);
-            _item.批量使用物品并行(
-                Dota2_Pictrue.物品.红杖_Tpl,
-                Dota2_Pictrue.物品.红杖2_Tpl,
-                Dota2_Pictrue.物品.红杖3_Tpl,
-                Dota2_Pictrue.物品.红杖4_Tpl,
-                Dota2_Pictrue.物品.红杖5_Tpl);
+            _item.批量使用物品并行(物品连招.红杖五连);
             Press(Keys.R);
         }).ConfigureAwait(true);
     }

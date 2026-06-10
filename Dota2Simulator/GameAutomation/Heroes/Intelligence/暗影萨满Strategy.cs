@@ -20,7 +20,6 @@ namespace Dota2Simulator.GameAutomation.Heroes.Intelligence;
 [HeroStrategy("暗影萨满", HeroAttribute.Intelligence)]
 public sealed partial class 暗影萨满Strategy : IHeroStrategy
 {
-    private const int 等待延迟 = 33;
 
     protected override HeroPlan BuildPlan() => HeroPlanBuilder.New()
         .OnKey(Keys.Q).CustomProbe(苍穹振击取消后摇)  // C1
@@ -31,11 +30,7 @@ public sealed partial class 暗影萨满Strategy : IHeroStrategy
         .RegisterProbe(ConditionSlotKey.C4, 推推破林肯秒羊)
         .RegisterProbe(ConditionSlotKey.C5, 枷锁持续施法隐身)
         .OnKey(Keys.D1).Execute(D1_W_Mode循环)
-        .OnKey(Keys.D3).Execute(() =>
-        {
-            _main._聚合.Skills.ToggleMode(SlotKey.Q);
-            TTS.TTS.Speak(_main._聚合.Skills.Mode(SlotKey.Q) == 0 ? "羊" : "电羊");
-        })
+        .OnKey(Keys.D3).ToggleModeTts(SlotKey.Q, "电羊", "羊")
         .Done();
 
     private void W键中立物品setup()

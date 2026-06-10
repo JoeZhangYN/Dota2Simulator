@@ -13,7 +13,6 @@ namespace Dota2Simulator.GameAutomation.Heroes.Intelligence;
 [HeroStrategy("谜团", HeroAttribute.Intelligence)]
 public sealed partial class 谜团Strategy : IHeroStrategy
 {
-    private const int 等待延迟 = 33;
 
     protected override HeroPlan BuildPlan() => HeroPlanBuilder.New()
         .OnKey(Keys.F).Execute(() => Task.Run(刷新接凋零黑洞))

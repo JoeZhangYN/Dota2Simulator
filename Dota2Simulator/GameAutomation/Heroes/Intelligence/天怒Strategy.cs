@@ -48,14 +48,7 @@ public sealed partial class 天怒Strategy : IHeroStrategy
                 new UseItem(Dota2_Pictrue.物品.阿托斯之棍_Tpl),  // 原 Common.Delay(0 * ...) 0 延迟 → UseItem 无 Delay 等价
                 new UseItem(Dota2_Pictrue.物品.缚灵锁_Tpl),
                 new UseItem(Dota2_Pictrue.物品.虚灵之刃_Tpl),
-                new ParallelBatch(new StepCommand[]  // 5 红杖 — 等价原 _item.批量使用物品并行 Burst
-                {
-                    new UseItem(Dota2_Pictrue.物品.红杖_Tpl),
-                    new UseItem(Dota2_Pictrue.物品.红杖2_Tpl),
-                    new UseItem(Dota2_Pictrue.物品.红杖3_Tpl),
-                    new UseItem(Dota2_Pictrue.物品.红杖4_Tpl),
-                    new UseItem(Dota2_Pictrue.物品.红杖5_Tpl),
-                }),
+                物品连招.红杖五连.AsParallelBatch(),  // 5 红杖 burst — SSOT 物品连招.红杖五连
                 new UseItem(Dota2_Pictrue.物品.羊刀_Tpl),
                 new Delay(33),  // 原 Common.Delay(33 * _item.根据图片使用物品(羊刀)) — 羊刀 后摇延迟; 简化为固定 33ms.
                 new SetStep(2)

@@ -61,11 +61,7 @@ public sealed partial class 骨法Strategy : IHeroStrategy
                     ElseSteps: new StepCommand[] { new SetStep(0) })
             ).End()
         )
-        .OnKey(Keys.D2).Execute(() =>
-        {
-            _main._聚合.Skills.ToggleMode(SlotKey.R);
-            TTS.TTS.Speak(_main._聚合.Skills.Mode(SlotKey.R) == 1 ? "吸取接衰老" : "吸取不接衰老");
-        })
+        .OnKey(Keys.D2).ToggleModeTts(SlotKey.R, "吸取接衰老", "吸取不接衰老")
         .Done();
 
     private async Task<bool> 幽冥轰爆去后摇()
@@ -75,12 +71,7 @@ public sealed partial class 骨法Strategy : IHeroStrategy
     {
         return await _skill.主动技能进入CD后续(Keys.W, () =>
         {
-            _item.批量使用物品并行(
-                Dota2_Pictrue.物品.红杖_Tpl,
-                Dota2_Pictrue.物品.红杖2_Tpl,
-                Dota2_Pictrue.物品.红杖3_Tpl,
-                Dota2_Pictrue.物品.红杖4_Tpl,
-                Dota2_Pictrue.物品.红杖5_Tpl);
+            _item.批量使用物品并行(物品连招.红杖五连);
         }).ConfigureAwait(true);
     }
 

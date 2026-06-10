@@ -14,8 +14,6 @@ namespace Dota2Simulator.GameAutomation.Heroes.Strength;
 [HeroStrategy("大鱼人", HeroAttribute.Strength)]
 public sealed partial class 大鱼人Strategy : IHeroStrategy
 {
-    private const int 等待延迟 = 33;
-
     protected override HeroPlan BuildPlan() => HeroPlanBuilder.New()
         .OnKey(Keys.Q).CustomProbe(async () => await _skill.技能通用判断(Keys.W, 1, 要接的按键: _main._聚合.HasShard ? Keys.A : Keys.R).ConfigureAwait(true))
         .OnKey(Keys.W).CustomProbe(async () => await _skill.技能通用判断(Keys.W, 1, 要接的按键: _main._聚合.HasShard ? Keys.A : Keys.R).ConfigureAwait(true))
@@ -26,13 +24,7 @@ public sealed partial class 大鱼人Strategy : IHeroStrategy
             {
                 Common.Delay(等待延迟);
             }
-            if (_item.根据图片使用物品(Dota2_Pictrue.物品.跳刀_Tpl)
-                + _item.根据图片使用物品(Dota2_Pictrue.物品.跳刀_敏捷跳刀_Tpl)
-                + _item.根据图片使用物品(Dota2_Pictrue.物品.跳刀_智力跳刀_Tpl)
-                + _item.根据图片使用物品(Dota2_Pictrue.物品.跳刀_力量跳刀_Tpl) == 1)
-            {
-                Common.Delay(等待延迟);
-            }
+            _item.批量使用物品(物品连招.跳刀全变体);
             _ = _skill.DOTA2释放CD就绪技能(Keys.W);
             return await Task.FromResult(false).ConfigureAwait(true);
         })

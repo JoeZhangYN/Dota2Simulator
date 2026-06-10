@@ -34,11 +34,7 @@ public sealed partial class 帕克Strategy : IHeroStrategy
             Press(Keys.F1);
             Press(Keys.F1);
         })
-        .OnKey(Keys.D2).Execute(() =>
-        {
-            _main._聚合.Skills.ToggleMode(SlotKey.D);
-            Dota2Simulator.TTS.TTS.Speak(_main._聚合.Skills.Mode(SlotKey.D) == 1 ? "传" : "不传");
-        })
+        .OnKey(Keys.D2).ToggleModeTts(SlotKey.D, "传", "不传")
         .Done();
 }
 #endif

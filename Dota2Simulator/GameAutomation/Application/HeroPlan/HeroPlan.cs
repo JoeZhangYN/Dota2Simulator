@@ -82,10 +82,6 @@ public readonly record struct HeroPlanClause(
     Action? AfterCustomAction = null,
     // Phase 26 F1: ReplaceIcon DSL — AfterMode = CastReplaceIcon 时存 step SlotKey, Apply 内 wrap 为 SkillEngine.释放技能后替换图标技能后续 调用 (大牛 W / 伐木机 R 形态).
     Domain.Loop.SlotKey? AfterReplaceIconStepSlot = null,
-    // Phase 26 B3: 强制 CommandAcked — clause 命中后需 Ack 才推进; 当前为标记字段, 业务消费者 (Engine wrap) 决定语义. 默认 false 向后兼容.
-    bool RequireAck = false,
-    // Phase 26 D3: 延迟入队 condition — 非 null 时 clause 命中后不直发, 而是 DeferredQueue.Enqueue, ControlObservable 状态变化 + condition 满足时由 FlushAsync 出队执行.
-    Func<HeroContext, bool>? QueueWhen = null,
     // Phase 26 A3: 不应期 DSL — RefractoryName 非空时 DispatchAsync 路径: clause 触发前 check IsRefractory(name) → 真则短路; 命中后 SetRefractory(name, ms).
     string? RefractoryName = null,
     int RefractoryMs = 0,
@@ -126,7 +122,9 @@ public readonly record struct SetupAction(
     Func<HeroContext, bool>? GuardPredicate = null,
     // Phase 26 A3: 不应期 DSL (与 HeroPlanClause 对称) — RefractoryName 非空时 DispatchAsync 路径: setup 触发前 check IsRefractory(name) 短路; 命中后 SetRefractory(name, ms).
     string? RefractoryName = null,
-    int RefractoryMs = 0);
+    int RefractoryMs = 0,
+    // Phase 28 C5: ToggleSkillModeTts 目标技能槽 (Skills.Mode toggle 目标; 文案复用 ParamStringOn/Off).
+    Domain.Loop.SlotKey? ParamSkillSlot = null);
 
 /// <summary>SetupAction 副作用种类.</summary>
 public enum SetupActionKind
@@ -139,6 +137,8 @@ public enum SetupActionKind
     ToggleConditionSlot,
     /// <summary>Phase 22C: trigger key 直接 set 指定 ConditionSlot.Active = true (单方向, 非 toggle). 替代 8 处业务 .Execute(() => Conditions[X].Active = true) 同构 Execute lambda. ParamConditionSlot 指定目标槽.</summary>
     SetActive,
+    /// <summary>Phase 28 C5: trigger key toggle 指定 Skills.Mode(SlotKey) + TTS 播报 (Mode==1?On:Off). 收口 17 处 D2/D3 .Execute(ToggleMode+TTS) 同构. ParamSkillSlot 目标技能槽, ParamStringOn/Off 文案.</summary>
+    ToggleSkillModeTts,
 }
 
 /// <summary>
@@ -387,6 +387,20 @@ public sealed class HeroPlan
                     case SetupActionKind.SetActive:
                         // Phase 22C: 直接 set Active = true (单方向, 不 toggle), 替原 Execute(() => Conditions[X].Active = true) 同构.
                         ctx.Aggregate.Conditions[setup.ParamConditionSlot].Active = true;
+                        break;
+                    case SetupActionKind.ToggleSkillModeTts:
+                        // Phase 28 C5: toggle Skills.Mode + TTS 播报 (Mode==1 ? On : Off). 收口 17 处 D2/D3 ToggleMode+TTS 同构.
+                        if (setup.ParamSkillSlot.HasValue)
+                        {
+                            ctx.Aggregate.Skills.ToggleMode(setup.ParamSkillSlot.Value);
+                            if (setup.ParamStringOn is not null && setup.ParamStringOff is not null)
+                            {
+                                Dota2Simulator.TTS.TTS.Speak(
+                                    ctx.Aggregate.Skills.Mode(setup.ParamSkillSlot.Value) == 1
+                                        ? setup.ParamStringOn
+                                        : setup.ParamStringOff);
+                            }
+                        }
                         break;
                 }
 

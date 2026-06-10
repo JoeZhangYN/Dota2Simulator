@@ -41,11 +41,7 @@ public sealed partial class 祸乱之源Strategy : IHeroStrategy
                 _main._聚合.Skills.SetTime(SlotKey.Global, 4000);
             _main._聚合.Conditions[ConditionSlotKey.C3].Active = true;
         })
-        .OnKey(Keys.D2).Execute(() =>
-        {
-            _main._聚合.Skills.ToggleMode(SlotKey.E);
-            TTS.TTS.Speak(_main._聚合.Skills.Mode(SlotKey.E) == 0 ? "睡不接陨星锤" : "睡接陨星锤");
-        })
+        .OnKey(Keys.D2).ToggleModeTts(SlotKey.E, "睡接陨星锤", "睡不接陨星锤")
         .RegisterProbe(ConditionSlotKey.C3, 噩梦接平A锤)
         .Done();
 

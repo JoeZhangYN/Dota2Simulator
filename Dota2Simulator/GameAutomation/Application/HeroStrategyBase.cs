@@ -19,6 +19,9 @@ namespace Dota2Simulator.GameAutomation.Application;
 /// </summary>
 public abstract class HeroStrategyBase : IHeroStrategy
 {
+    /// <summary>基准帧延迟 (≈30fps, 33ms) — 收口 7 英雄各自 private const 等待延迟 = 33 (Phase 28 C4 常量去重).</summary>
+    protected const int 等待延迟 = 33;
+
     protected readonly IInputExecutor _input;
     protected readonly IScreenVision _vision;
     protected readonly SkillEngine _skill;
@@ -90,6 +93,18 @@ public abstract class HeroStrategyBase : IHeroStrategy
             if (!_skill.DOTA2判断状态技能是否启动(stateSkill))
                 Press(keyToPress);
         };
+
+    /// <summary>
+    /// 分身/幻象一齐攻击 — 前置 140ms 等待分裂完成,再用 Ctrl 包裹一次走 A 让本体+所有分身一齐攻击.
+    /// Phase 28 C1: 收口敌法/幽鬼两份逐字副本到基类单一 SSOT(原各自注释「复制自 _main.分身一齐攻击」).
+    /// </summary>
+    protected void 分身一齐攻击()
+    {
+        Dota2Simulator.Games.Common.Delay(140);
+        _input.KeyDown(Domain.Actuation.VirtualKey.From(System.Windows.Forms.Keys.Control));
+        走A();
+        _input.KeyUp(Domain.Actuation.VirtualKey.From(System.Windows.Forms.Keys.Control));
+    }
 }
 
 #endif
