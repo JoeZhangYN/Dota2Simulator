@@ -49,6 +49,19 @@ public sealed class ProbeScreenVision : IScreenVision
         return result;
     }
 
+    public IReadOnlyList<FindResult> FindMany(IReadOnlyList<Template> needles, ScreenRegion region, MatchRate rate, Tolerance tolerance)
+    {
+        IReadOnlyList<FindResult> result = _inner.FindMany(needles, region, rate, tolerance);
+        if (RecordReplayProbe.Enabled)
+        {
+            int found = 0;
+            for (int i = 0; i < result.Count; i++)
+                if (result[i].Found) found++;
+            RecordReplayProbe.Record(Port, nameof(FindMany), $"{needles.Count} 模板, {region}, {rate} => {found} 命中");
+        }
+        return result;
+    }
+
     /// <summary>Phase 25A C3: WithFrame 装饰 — enabled 时递归装饰 frame 供内部 PixelAt 也录 (保 record/replay 完整性), 否则直透传 0 overhead.</summary>
     public T WithFrame<T>(Func<IScreenFrame, T> read)
     {

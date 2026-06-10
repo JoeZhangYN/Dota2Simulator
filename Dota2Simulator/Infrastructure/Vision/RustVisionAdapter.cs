@@ -48,6 +48,37 @@ public sealed class RustVisionAdapter : IScreenVision
         return FindResult.Hit(new ScreenPoint(hit.Value.X, hit.Value.Y));
     }
 
+    /// <summary>
+    /// 一帧内批量查找一组模板（同 region）。一次 <see cref="GlobalScreenCapture.GetCurrentHandle"/>
+    /// 喂全组 → 修单模板循环跨帧不一致。结果与 needles 同序对齐。
+    /// </summary>
+    public IReadOnlyList<FindResult> FindMany(IReadOnlyList<Template> needles, ScreenRegion region, MatchRate rate, Tolerance tolerance)
+    {
+        if (needles is null || needles.Count == 0)
+            return Array.Empty<FindResult>();
+
+        var results = new FindResult[needles.Count];
+        ImageHandle frame = GlobalScreenCapture.GetCurrentHandle();
+        if (!frame.IsValid)
+        {
+            Array.Fill(results, FindResult.Miss);
+            return results;
+        }
+
+        // 解析全部模板句柄 → 一次融合 FFI 调用（单趟 rayon 摊销 per-call 开销）。
+        var handles = new ImageHandle[needles.Count];
+        for (int i = 0; i < needles.Count; i++)
+            handles[i] = LazyImageLoader.GetImage(needles[i].Name);
+
+        Rectangle rect = new(region.X, region.Y, region.Width, region.Height);
+        Point?[] hits = ImageFinder.FindManyInRegion(in frame, handles, rect, rate.Value);
+        for (int i = 0; i < hits.Length; i++)
+            results[i] = hits[i] is null
+                ? FindResult.Miss
+                : FindResult.Hit(new ScreenPoint(hits[i]!.Value.X, hits[i]!.Value.Y));
+        return results;
+    }
+
     /// <summary>V1 主力路径：在指定 region 查找模板的所有命中位置（屏幕坐标）。</summary>
     public IReadOnlyList<ScreenPoint> FindAll(Template needle, ScreenRegion region, MatchRate rate, Tolerance tolerance)
     {

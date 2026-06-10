@@ -145,6 +145,40 @@ public sealed class GpuFusedVisionAdapter : IScreenVision, IDisposable
         return hit is null ? FindResult.Miss : FindResult.Hit(new ScreenPoint(hit.Value.X, hit.Value.Y));
     }
 
+    public IReadOnlyList<FindResult> FindMany(IReadOnlyList<Template> needles, ScreenRegion region, MatchRate rate, Tolerance tolerance)
+    {
+        if (needles is null || needles.Count == 0) return Array.Empty<FindResult>();
+        var results = new FindResult[needles.Count];
+        if (!_hasUploadedFrame)
+        {
+            Array.Fill(results, FindResult.Miss);
+            return results;
+        }
+
+        Rectangle rect = new(region.X, region.Y, region.Width, region.Height);
+        for (int i = 0; i < needles.Count; i++)
+        {
+            if (!TryLoadTemplate(needles[i], out byte[]? bgra, out int tplW, out int tplH))
+            {
+                results[i] = FindResult.Miss;
+                continue;
+            }
+            Point? hit;
+            try
+            {
+                hit = _context.FindInRegion(needles[i], bgra!, tplW, tplH, rect, rate.Value, tolerance.Value);
+            }
+            catch (InvalidOperationException)
+            {
+                hit = null;
+            }
+            results[i] = hit is null
+                ? FindResult.Miss
+                : FindResult.Hit(new ScreenPoint(hit.Value.X, hit.Value.Y));
+        }
+        return results;
+    }
+
     public IReadOnlyList<ScreenPoint> FindAll(Template needle, ScreenRegion region, MatchRate rate, Tolerance tolerance)
     {
         if (!_hasUploadedFrame) return Array.Empty<ScreenPoint>();

@@ -22,6 +22,13 @@ public interface IScreenVision
     /// <summary>在指定屏幕区域内查找模板的所有命中位置。</summary>
     IReadOnlyList<ScreenPoint> FindAll(Template needle, ScreenRegion region, MatchRate rate, Tolerance tolerance);
 
+    /// <summary>
+    /// 在同一屏幕区域内、**同一帧**批量查找一组模板，返回与 <paramref name="needles"/> 同序对齐的逐模板结果。
+    /// 替代业务侧 <c>foreach(tpl) Find(tpl)</c> 样板：一次取帧喂全组（修多模板循环跨帧不一致），
+    /// 底层可由 adapter 用单趟融合摊销 per-call 开销（business 不感知）。
+    /// </summary>
+    IReadOnlyList<FindResult> FindMany(IReadOnlyList<Template> needles, ScreenRegion region, MatchRate rate, Tolerance tolerance);
+
     /// <summary>读取当前缓冲中指定屏幕坐标的颜色。</summary>
     Color PixelAt(ScreenPoint point);
 

@@ -76,6 +76,17 @@ namespace Dota2Simulator.Vision
         [DllImport("findpoints.dll", CallingConvention = CallingConvention.Cdecl)]
         private static extern void FreeMultipleResults(MultipleResults results);
 
+        // 批量融合：一次调用查 N 个模板（单趟 rayon 派发，摊销 per-call 开销）。
+        // subs 长度 = subCount；outResults 由调用方分配 subCount 个 Tuple，逐槽写命中或 NotFound。
+        [DllImport("findpoints.dll", CallingConvention = CallingConvention.Cdecl)]
+        private static extern void FindManyBytesInRegion(
+            IntPtr n1, UIntPtr len1, Tuple t1,
+            [In] SubImageRef[] subs, UIntPtr subCount,
+            Region region,
+            double matchRate,
+            byte ignore_r, byte ignore_g, byte ignore_b,
+            [Out] Tuple[] outResults);
+
         // 查找失败时的返回值
         private static readonly Tuple NotFound = new() { x = 245760, y = 143640 };
 
@@ -110,6 +121,16 @@ namespace Dota2Simulator.Vision
             public IntPtr points;
             public int count;
             public int capacity;
+        }
+
+        // 批量融合的单个子图引用（与 Rust SubImageRef #[repr(C)] 二进制一致）。
+        [StructLayout(LayoutKind.Sequential)]
+        public struct SubImageRef
+        {
+            public IntPtr ptr;
+            public UIntPtr len;
+            public uint width;
+            public uint height;
         }
 
         /// <summary>
@@ -293,6 +314,82 @@ namespace Dota2Simulator.Vision
             Color? ignoreColor = null)
         {
             return FindImageInRegion(in subImage, in mainImage, region, matchRate, ignoreColor) != null;
+        }
+
+        /// <summary>
+        /// 批量区域查找：一次融合调用在 <paramref name="region"/> 内查 <paramref name="subImages"/>
+        /// 全部模板（单趟 rayon 派发，摊销 per-call 开销）。返回与入参同序对齐的逐模板首命中
+        /// （未命中槽为 null）。无效子图句柄 → 该槽 null。
+        /// </summary>
+        public static unsafe Point?[] FindManyInRegion(
+            in ImageHandle mainImage,
+            IReadOnlyList<ImageHandle> subImages,
+            Rectangle region,
+            double matchRate = 0.9,
+            Color? ignoreColor = null)
+        {
+            int n = subImages.Count;
+            var results = new Point?[n];
+            if (n == 0) return results;
+
+            try
+            {
+                var mainData = ImageManager.GetImageData(in mainImage);
+                var regionStruct = new Region
+                {
+                    x = (uint)region.X,
+                    y = (uint)region.Y,
+                    width = (uint)region.Width,
+                    height = (uint)region.Height
+                };
+
+                byte ignoreR = 255, ignoreG = 20, ignoreB = 147;
+                if (ignoreColor.HasValue)
+                {
+                    ignoreR = ignoreColor.Value.R;
+                    ignoreG = ignoreColor.Value.G;
+                    ignoreB = ignoreColor.Value.B;
+                }
+
+                var subRefs = new SubImageRef[n];
+                for (int i = 0; i < n; i++)
+                {
+                    ImageHandle h = subImages[i];
+                    if (!h.IsValid) { subRefs[i] = default; continue; }
+                    var sd = ImageManager.GetImageData(in h);
+                    subRefs[i] = new SubImageRef
+                    {
+                        ptr = sd.ptr,
+                        len = (UIntPtr)sd.length,
+                        width = sd.size.x,
+                        height = sd.size.y
+                    };
+                }
+
+                GC.KeepAlive(mainImage);
+
+                var outTuples = new Tuple[n];
+                FindManyBytesInRegion(
+                    mainData.ptr, (UIntPtr)mainData.length, mainData.size,
+                    subRefs, (UIntPtr)n,
+                    regionStruct, matchRate, ignoreR, ignoreG, ignoreB,
+                    outTuples);
+
+                for (int i = 0; i < n; i++)
+                {
+                    results[i] = (outTuples[i].x == NotFound.x && outTuples[i].y == NotFound.y)
+                        ? (Point?)null
+                        : new Point((int)outTuples[i].x, (int)outTuples[i].y);
+                }
+
+                for (int i = 0; i < n; i++) GC.KeepAlive(subImages[i]);
+            }
+            catch (Exception ex)
+            {
+                _logger?.Error($"批量区域查找失败: {ex.Message}");
+            }
+
+            return results;
         }
 
         /// <summary>
