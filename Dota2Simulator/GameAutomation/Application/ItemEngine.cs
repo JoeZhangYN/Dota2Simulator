@@ -578,7 +578,8 @@ namespace Dota2Simulator.GameAutomation.Application
 
         public bool 根据图片队列使用物品(Template 句柄)
         {
-            return 执行物品操作(句柄, (k) => _input.ComboWhile(VirtualKey.From(k), VirtualKey.From(Keys.Shift))) > 0;
+            // Keys.Shift(0x10000) 是修饰符标志位非 VK，经 ushort 强转溢出；修饰键 VK 应为 ShiftKey(0x10)。
+            return 执行物品操作(句柄, (k) => _input.ComboWhile(VirtualKey.From(k), VirtualKey.From(Keys.ShiftKey))) > 0;
         }
 
         public int 根据图片多次使用物品(Template 句柄, int times, int 延迟)
