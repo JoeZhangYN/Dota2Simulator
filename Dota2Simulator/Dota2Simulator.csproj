@@ -396,6 +396,8 @@
   <ItemGroup>
     <AdditionalFiles Include="Picture_Dota2\**\*.bmp" />
     <AdditionalFiles Include="GameAutomation\Heroes\**\*Strategy.cs" />
+    <!-- input_abi 契约签名 manifest（SSOT 投影），喂 InputAbiExternGenerator 生成 [DllImport] extern。 -->
+    <AdditionalFiles Include="Infrastructure\Input\input_abi.contract.txt" />
   </ItemGroup>
 
 </Project>
