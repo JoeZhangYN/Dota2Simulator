@@ -2,6 +2,7 @@ using System;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows.Forms;
+using Dota2Simulator.Infrastructure.Input;
 
 namespace Dota2Simulator.KeyboardMouse
 {
@@ -11,22 +12,20 @@ namespace Dota2Simulator.KeyboardMouse
     /// 与 <see cref="InterceptionInput"/> 同面——任何调用点换类名即换后端。
     /// 返回值约定：0 = 成功，负值 = simengio 错误码（诊断文本走 <see cref="LastError"/>）。
     /// </summary>
-    internal static class SimEnigo
+    /// <remarks>
+    /// 契约 41 个标量签名 extern 由 <c>InputAbiExternGenerator</c> 从 SSOT manifest
+    /// （Infrastructure/Input/input_abi.contract.txt）生成（见 <see cref="InputAbiBindingsAttribute"/>）。
+    /// 本文件只手写：LastError（缓冲协议）、Keys 重载、simengio_text（契约外）。
+    /// </remarks>
+    [InputAbiBindings("simengio.dll")]
+    internal static partial class SimEnigo
     {
         private const string DllName = "simengio.dll";
 
-        #region 生命周期
-
-        /// <summary>可选的显式预热（幂等）。首次调用任意操作函数会自动初始化。</summary>
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
-        public static extern int Init();
-
-        /// <summary>释放 enigo 实例。可重复调用；再次调用任意操作函数会自动重新初始化。</summary>
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
-        public static extern void Cleanup();
+        #region 生命周期诊断（LastError 缓冲协议，手写）
 
         [DllImport(DllName, EntryPoint = "LastError", CallingConvention = CallingConvention.Cdecl)]
-        private static extern UIntPtr NativeLastError(byte[] buf, UIntPtr bufLen);
+        private static extern UIntPtr NativeLastError(byte[]? buf, UIntPtr bufLen);
 
         /// <summary>最近一次错误的诊断文本（调用线程局部）。</summary>
         public static string LastError()
@@ -40,30 +39,7 @@ namespace Dota2Simulator.KeyboardMouse
 
         #endregion
 
-        #region 键盘（code = Windows 虚拟键码）
-
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
-        public static extern int KeyPress(ushort code);
-
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
-        public static extern int KeyDown(ushort code);
-
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
-        public static extern int KeyUp(ushort code);
-
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
-        public static extern int KeyPressHold(ushort code, ulong holdMs);
-
-        /// <summary>按住修饰键点击主键：Down(mod) → Click(key) → Up(mod)。</summary>
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
-        public static extern int KeyPressWhile(ushort key, ushort modifier);
-
-        /// <summary>双修饰键组合（契约顺序：Down(mod2)+Down(mod1)+Click(key)+Up(mod2)+Up(mod1)）。</summary>
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
-        public static extern int KeyPressWhileTwo(ushort key, ushort mod1, ushort mod2);
-
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
-        public static extern int KeyPressAlt(ushort key);
+        #region 键盘 Keys 重载（手写，转发到生成的 ushort extern）
 
         public static int KeyPress(Keys key) => KeyPress((ushort)key);
         public static int KeyDown(Keys key) => KeyDown((ushort)key);
@@ -74,113 +50,7 @@ namespace Dota2Simulator.KeyboardMouse
 
         #endregion
 
-        #region 鼠标按钮
-
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
-        public static extern int MouseLeftClick();
-
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
-        public static extern int MouseLeftDoubleClick();
-
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
-        public static extern int MouseLeftDown();
-
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
-        public static extern int MouseLeftUp();
-
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
-        public static extern int MouseLeftClickHold(ulong holdMs);
-
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
-        public static extern int MouseRightClick();
-
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
-        public static extern int MouseRightDoubleClick();
-
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
-        public static extern int MouseRightDown();
-
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
-        public static extern int MouseRightUp();
-
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
-        public static extern int MouseRightClickHold(ulong holdMs);
-
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
-        public static extern int MouseMiddleClick();
-
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
-        public static extern int MouseMiddleDoubleClick();
-
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
-        public static extern int MouseMiddleDown();
-
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
-        public static extern int MouseMiddleUp();
-
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
-        public static extern int MouseMiddleClickHold(ulong holdMs);
-
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
-        public static extern int MouseXButton1Click();
-
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
-        public static extern int MouseXButton1DoubleClick();
-
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
-        public static extern int MouseXButton1Down();
-
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
-        public static extern int MouseXButton1Up();
-
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
-        public static extern int MouseXButton1ClickHold(ulong holdMs);
-
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
-        public static extern int MouseXButton2Click();
-
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
-        public static extern int MouseXButton2DoubleClick();
-
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
-        public static extern int MouseXButton2Down();
-
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
-        public static extern int MouseXButton2Up();
-
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
-        public static extern int MouseXButton2ClickHold(ulong holdMs);
-
-        #endregion
-
-        #region 滚轮 / 移动
-
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
-        public static extern int MouseScrollUp(short clicks);
-
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
-        public static extern int MouseScrollDown(short clicks);
-
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
-        public static extern int MouseScrollLeft(short clicks);
-
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
-        public static extern int MouseScrollRight(short clicks);
-
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
-        public static extern int MouseMoveRelative(int dx, int dy);
-
-        /// <summary>0-65535 虚拟坐标（simengio 按主显示器比例换算；interception 为虚拟桌面坐标基，单屏一致）。</summary>
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
-        public static extern int MouseMoveAbsolute(int x, int y);
-
-        /// <summary>屏幕像素坐标移动。</summary>
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
-        public static extern int MouseMoveTo(int x, int y, int screenWidth, int screenHeight);
-
-        #endregion
-
-        #region 契约外专属（interception 后端无 Unicode 通道，simengio 独有）
+        #region 契约外专属（interception 后端无 Unicode 通道，simengio 独有；手写）
 
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
         private static extern int simengio_text(byte[] utf8, UIntPtr len);
